@@ -1,0 +1,155 @@
+/**
+ * app/api/transcribe/route.ts
+ * BFF Proxy — Gemini Team Radio Transcription
+ *
+ * Model priority (Flash): gemini-3.5-flash-lite → gemini-3.5-flash → gemini-2.5-flash → gemini-2.5-flash-lite → gemini-flash-latest
+ * Auto-retries with next model name on 404 / model not found / deprecated model.
+ *
+ * Keeps the Gemini API key server-side (GEMINI_API_KEY env var).
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+export const runtime = 'nodejs';
+
+interface TranscribeRequest {
+  audioUrl: string;
+  driverNumber?: number;
+  sessionKey?: number;
+}
+
+interface TranscribeResponse {
+  transcript: string;
+  translation: string;
+  category: 'PIT' | 'TYRE' | 'PACE' | 'SAFETY' | 'STRATEGY';
+}
+
+const FLASH_MODELS = [
+  'gemini-3.5-flash-lite',
+  'gemini-3.5-flash',
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite',
+  'gemini-flash-latest',
+];
+
+const CATEGORY_KEYWORDS: Record<TranscribeResponse['category'], string[]> = {
+  PIT:      ['box', 'pit', 'stop', 'undercut', 'overcut', 'ピット'],
+  TYRE:     ['tyre', 'tire', 'compound', 'soft', 'medium', 'hard', 'graining', 'blister', 'タイヤ'],
+  SAFETY:   ['safety car', 'vsc', 'virtual', 'yellow', 'red flag', 'セーフティカー', 'フラッグ'],
+  STRATEGY: ['plan', 'strategy', 'gap', 'push', 'manage', 'fuel', 'engine mode', 'mode', 'プラン'],
+  PACE:     ['pace', 'lap', 'sector', 'push', 'good', 'well done', 'ペース'],
+};
+
+function classifyCategory(text: string): TranscribeResponse['category'] {
+  const lower = text.toLowerCase();
+  for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+    if (keywords.some(kw => lower.includes(kw))) {
+      return cat as TranscribeResponse['category'];
+    }
+  }
+  return 'PACE';
+}
+
+async function fetchAudioAsBase64(url: string): Promise<{ data: string; mimeType: string }> {
+  const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+  if (!res.ok) throw new Error(`Audio fetch failed: ${res.status}`);
+
+  const contentType = res.headers.get('content-type') ?? 'audio/mpeg';
+  const mimeType = contentType.split(';')[0].trim();
+
+  const buffer = await res.arrayBuffer();
+  const data = Buffer.from(buffer).toString('base64');
+  return { data, mimeType };
+}
+
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  try {
+    const body = (await req.json()) as TranscribeRequest;
+    const { audioUrl } = body;
+
+    if (!audioUrl) {
+      return NextResponse.json({ error: 'audioUrl is required' }, { status: 400 });
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: 'GEMINI_API_KEY not configured' }, { status: 503 });
+    }
+
+    // Fetch audio and convert to base64
+    const { data, mimeType } = await fetchAudioAsBase64(audioUrl);
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+
+    const prompt = `You are analyzing Formula 1 team radio communications.
+
+Listen to this audio clip and provide:
+1. An accurate English transcript of what is said.
+2. A Japanese translation of the transcript.
+3. A category classification.
+
+Respond ONLY in this exact JSON format (no markdown, no explanation):
+{
+  "transcript": "<english transcript>",
+  "translation": "<japanese translation>",
+  "category": "<one of: PIT, TYRE, PACE, SAFETY, STRATEGY>"
+}`;
+
+    let lastError: Error = new Error('No models available');
+    let text = '';
+
+    for (const modelName of FLASH_MODELS) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent([
+          prompt,
+          { inlineData: { data, mimeType } },
+        ]);
+        text = result.response.text().trim();
+        break; // Success!
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        const isUnavailable =
+          msg.includes('404') ||
+          msg.toLowerCase().includes('not found') ||
+          msg.toLowerCase().includes('no longer available') ||
+          msg.toLowerCase().includes('deprecated');
+
+        console.warn(`[transcribe] Model "${modelName}" failed (${isUnavailable ? 'unavailable' : 'error'}): ${msg}`);
+        if (isUnavailable) {
+          lastError = err instanceof Error ? err : new Error(msg);
+          continue;
+        }
+        throw err;
+      }
+    }
+
+    if (!text) {
+      throw lastError;
+    }
+
+    // Parse JSON response
+    let parsed: TranscribeResponse;
+    try {
+      // Strip markdown code fences if present
+      const jsonText = text.replace(/^```json\s*/i, '').replace(/\s*```$/i, '');
+      parsed = JSON.parse(jsonText) as TranscribeResponse;
+    } catch {
+      // Fallback: extract from raw text
+      parsed = {
+        transcript: text,
+        translation: '(翻訳の解析に失敗しました)',
+        category: classifyCategory(text),
+      };
+    }
+
+    return NextResponse.json(parsed);
+  } catch (err) {
+    console.error('[/api/transcribe] Error:', err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : 'Unknown error' },
+      { status: 500 }
+    );
+  }
+}
