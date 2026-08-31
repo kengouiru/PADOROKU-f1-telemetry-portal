@@ -38,6 +38,7 @@ import AIStrategist from '@/components/AIStrategist';
 import RaceNotebook, { type RaceNotebookHandle } from '@/components/RaceNotebook';
 
 import TelemetryChart from '@/components/TelemetryChart';
+import SectorAnalysis from '@/components/SectorAnalysis';
 
 // ── App State ─────────────────────────────────────────────────────────────────
 
@@ -334,6 +335,14 @@ export default function DashboardPage() {
         safetyCarPeriods={state.safetyCarPeriods}
         onLapClick={handleLapClick}
       />
+
+      {state.selectedDrivers.length > 0 && (
+        <SectorAnalysis
+          selectedDrivers={state.selectedDrivers}
+          drivers={state.drivers}
+          lapsCache={state.lapsCache}
+        />
+      )}
 
       {state.selectedDrivers.length > 0 && (
         <section>

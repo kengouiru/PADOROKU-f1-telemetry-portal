@@ -59,12 +59,37 @@ export interface Lap {
   duration_sector_1: number | null;
   duration_sector_2: number | null;
   duration_sector_3: number | null;
+  speed_i1?: number | null; // Intermediate 1 speed (km/h)
+  speed_i2?: number | null; // Intermediate 2 speed (km/h)
+  speed_fl?: number | null; // Finish Line speed (km/h)
+  speed_st?: number | null; // Speed Trap speed (km/h)
+  is_pit_out_lap?: boolean;
   driver_number: number;
   session_key: number;
   // Merged fields added by enrichLapsWithStints:
   compound?: TyreCompound;
   tyreAge?: number;
   stintNumber?: number | string;
+}
+
+/** Sector best status for color highlighting */
+export type SectorHighlight = 'purple' | 'green' | 'yellow' | 'none';
+
+/** Driver sector summary metrics */
+export interface DriverSectorSummary {
+  driverNumber: string;
+  driverName: string;
+  driverAcronym: string;
+  teamColour: string;
+  bestS1: number | null;
+  bestS2: number | null;
+  bestS3: number | null;
+  theoreticalBestLap: number | null; // Best S1 + Best S2 + Best S3
+  actualBestLap: number | null;
+  topSpeedST: number | null;
+  topSpeedI1: number | null;
+  topSpeedI2: number | null;
+  topSpeedFL: number | null;
 }
 
 /** A tyre stint record */

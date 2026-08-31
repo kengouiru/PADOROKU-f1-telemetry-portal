@@ -15,6 +15,9 @@ import type {
   SafetyCarPeriod,
   TyreCompound,
   ChartDataPoint,
+  Driver,
+  DriverSectorSummary,
+  SectorHighlight,
 } from './types';
 
 // ─────────────────────────────────────────────────────────────
@@ -260,3 +263,121 @@ export function lapsToChartData(laps: Lap[]): ChartDataPoint[] {
     }))
     .filter((d) => d.y > 0);
 }
+
+// ─────────────────────────────────────────────────────────────
+// Sector & Speed Trap Calculations
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Computes overall bests and per-driver best sector / speed trap metrics.
+ */
+export function calculateDriverSectorSummaries(
+  selectedDrivers: string[],
+  drivers: Driver[],
+  lapsCache: Record<string, Lap[]>
+): {
+  summaries: DriverSectorSummary[];
+  overallBestS1: number | null;
+  overallBestS2: number | null;
+  overallBestS3: number | null;
+  overallTopSpeedST: number | null;
+} {
+  let overallBestS1: number | null = null;
+  let overallBestS2: number | null = null;
+  let overallBestS3: number | null = null;
+  let overallTopSpeedST: number | null = null;
+
+  const summaries: DriverSectorSummary[] = selectedDrivers.map((driverNum) => {
+    const rawLaps = lapsCache[driverNum] ?? [];
+    const validLaps = rawLaps.filter((l) => (l.lap_duration ?? l.lap_time ?? 0) > 0 && (l.lap_duration ?? l.lap_time ?? 0) < 130);
+
+    const info = drivers.find((d) => d.driver_number.toString() === driverNum);
+    const driverName = info?.full_name ?? `Driver #${driverNum}`;
+    const driverAcronym = info?.name_acronym ?? `#${driverNum}`;
+    const teamColour = info ? formatColor(info.team_colour) : '#38bdf8';
+
+    // Best sectors for this driver
+    const s1List = validLaps.map((l) => l.duration_sector_1).filter((v): v is number => v !== null && v !== undefined && v > 0);
+    const s2List = validLaps.map((l) => l.duration_sector_2).filter((v): v is number => v !== null && v !== undefined && v > 0);
+    const s3List = validLaps.map((l) => l.duration_sector_3).filter((v): v is number => v !== null && v !== undefined && v > 0);
+    const lapTimes = validLaps.map((l) => l.lap_duration ?? l.lap_time ?? 0).filter((v) => v > 0);
+
+    const bestS1 = s1List.length > 0 ? Math.min(...s1List) : null;
+    const bestS2 = s2List.length > 0 ? Math.min(...s2List) : null;
+    const bestS3 = s3List.length > 0 ? Math.min(...s3List) : null;
+    const actualBestLap = lapTimes.length > 0 ? Math.min(...lapTimes) : null;
+
+    const theoreticalBestLap =
+      bestS1 !== null && bestS2 !== null && bestS3 !== null
+        ? Number((bestS1 + bestS2 + bestS3).toFixed(3))
+        : null;
+
+    // Top speeds
+    const stList = validLaps.map((l) => l.speed_st).filter((v): v is number => v !== null && v !== undefined && v > 0);
+    const i1List = validLaps.map((l) => l.speed_i1).filter((v): v is number => v !== null && v !== undefined && v > 0);
+    const i2List = validLaps.map((l) => l.speed_i2).filter((v): v is number => v !== null && v !== undefined && v > 0);
+    const flList = validLaps.map((l) => l.speed_fl).filter((v): v is number => v !== null && v !== undefined && v > 0);
+
+    const topSpeedST = stList.length > 0 ? Math.max(...stList) : null;
+    const topSpeedI1 = i1List.length > 0 ? Math.max(...i1List) : null;
+    const topSpeedI2 = i2List.length > 0 ? Math.max(...i2List) : null;
+    const topSpeedFL = flList.length > 0 ? Math.max(...flList) : null;
+
+    // Update overall bests
+    if (bestS1 !== null && (overallBestS1 === null || bestS1 < overallBestS1)) overallBestS1 = bestS1;
+    if (bestS2 !== null && (overallBestS2 === null || bestS2 < overallBestS2)) overallBestS2 = bestS2;
+    if (bestS3 !== null && (overallBestS3 === null || bestS3 < overallBestS3)) overallBestS3 = bestS3;
+    if (topSpeedST !== null && (overallTopSpeedST === null || topSpeedST > overallTopSpeedST)) overallTopSpeedST = topSpeedST;
+
+    return {
+      driverNumber: driverNum,
+      driverName,
+      driverAcronym,
+      teamColour,
+      bestS1,
+      bestS2,
+      bestS3,
+      theoreticalBestLap,
+      actualBestLap,
+      topSpeedST,
+      topSpeedI1,
+      topSpeedI2,
+      topSpeedFL,
+    };
+  });
+
+  return {
+    summaries,
+    overallBestS1,
+    overallBestS2,
+    overallBestS3,
+    overallTopSpeedST,
+  };
+}
+
+/**
+ * Returns highlight status ('purple' | 'green' | 'yellow' | 'none') for a sector time.
+ */
+export function getSectorHighlight(
+  val: number | null | undefined,
+  personalBest: number | null | undefined,
+  overallBest: number | null | undefined
+): SectorHighlight {
+  if (val === null || val === undefined || isNaN(val) || val <= 0) return 'none';
+  if (overallBest !== null && overallBest !== undefined && Math.abs(val - overallBest) < 0.001) {
+    return 'purple';
+  }
+  if (personalBest !== null && personalBest !== undefined && Math.abs(val - personalBest) < 0.001) {
+    return 'green';
+  }
+  return 'yellow';
+}
+
+/**
+ * Format speed in km/h.
+ */
+export function formatSpeed(speed: number | null | undefined): string {
+  if (speed === null || speed === undefined || isNaN(speed) || speed <= 0) return '-';
+  return `${speed.toFixed(1)} km/h`;
+}
+

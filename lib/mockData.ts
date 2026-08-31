@@ -240,13 +240,24 @@ export function generateMockLaps(
       baseTime -= profile.postPit2Boost;
     }
 
+    // Calculate speed traps based on driver profile and fuel load (lap number)
+    const baseSpeedST = driverNumber === 1 ? 326.5 : driverNumber === 16 ? 324.0 : 322.0;
+    const baseSpeedI1 = driverNumber === 1 ? 298.0 : driverNumber === 16 ? 296.0 : 294.5;
+    const baseSpeedI2 = driverNumber === 1 ? 258.0 : driverNumber === 16 ? 256.0 : 254.0;
+    const baseSpeedFL = driverNumber === 1 ? 295.0 : driverNumber === 16 ? 293.0 : 291.5;
+    const fuelSpeedBonus = i * 0.12; // lighter car reaches slightly higher top speed
+
     laps.push({
       lap_number: i,
-      lap_duration: lapTime,
+      lap_duration: Number(lapTime.toFixed(3)),
       date_start: new Date(timeAccumulator).toISOString(),
-      duration_sector_1: 30.2 - i * 0.02 + seed(i + 100) * 0.3,
-      duration_sector_2: 41.5 - i * 0.04 + seed(i + 200) * 0.5,
-      duration_sector_3: 24.8 - i * 0.02 + seed(i + 300) * 0.2,
+      duration_sector_1: Number((30.2 - i * 0.02 + seed(i + 100) * 0.3).toFixed(3)),
+      duration_sector_2: Number((41.5 - i * 0.04 + seed(i + 200) * 0.5).toFixed(3)),
+      duration_sector_3: Number((24.8 - i * 0.02 + seed(i + 300) * 0.2).toFixed(3)),
+      speed_i1: Number((baseSpeedI1 + fuelSpeedBonus + seed(i + 400) * 3.0).toFixed(1)),
+      speed_i2: Number((baseSpeedI2 + fuelSpeedBonus * 0.6 + seed(i + 500) * 3.5).toFixed(1)),
+      speed_fl: Number((baseSpeedFL + fuelSpeedBonus + seed(i + 600) * 2.5).toFixed(1)),
+      speed_st: Number((baseSpeedST + fuelSpeedBonus + seed(i + 700) * 3.0).toFixed(1)),
       driver_number: driverNumber,
       session_key: sessionKey,
     });
