@@ -133,6 +133,7 @@ export default function DashboardPage() {
   const [mobileTab, setMobileTab] = useState<MobileTab>('analysis');
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>('ai');
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile sidebar drawer
+  const [aiDrawerOpen, setAiDrawerOpen] = useState(false); // AI & Notebook slide drawer
 
   const timelineRef = useRef<TeamRadioTimelineHandle>(null);
   const notebookRef = useRef<RaceNotebookHandle>(null);
@@ -428,61 +429,54 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        {/* Selected driver pills (desktop) */}
-        <div className="hidden sm:flex items-center gap-1.5">
-          {state.selectedDrivers.map(num => {
-            const drv = state.drivers.find(d => d.driver_number.toString() === num);
-            const color = drv ? `#${drv.team_colour}` : '#38bdf8';
-            return (
-              <span key={num} className="px-2 py-0.5 rounded-full text-xs font-racing font-bold border"
-                style={{ borderColor: `${color}60`, color, backgroundColor: `${color}15` }}>
-                {drv?.name_acronym ?? `#${num}`}
+        {/* Header Right Actions: Selected driver pills + AI Drawer Toggle Button */}
+        <div className="flex items-center gap-2">
+          {/* Selected driver pills (desktop) */}
+          <div className="hidden sm:flex items-center gap-1.5 mr-1">
+            {state.selectedDrivers.map(num => {
+              const drv = state.drivers.find(d => d.driver_number.toString() === num);
+              const color = drv ? `#${drv.team_colour}` : '#38bdf8';
+              return (
+                <span key={num} className="px-2 py-0.5 rounded-full text-xs font-racing font-bold border"
+                  style={{ borderColor: `${color}60`, color, backgroundColor: `${color}15` }}>
+                  {drv?.name_acronym ?? `#${num}`}
+                </span>
+              );
+            })}
+            {state.isLoading && (
+              <span className="text-xs text-slate-500 flex items-center gap-1">
+                <span className="w-3 h-3 border border-slate-500 border-t-transparent rounded-full animate-spin" />
               </span>
-            );
-          })}
-          {state.isLoading && (
-            <span className="text-xs text-slate-500 flex items-center gap-1">
-              <span className="w-3 h-3 border border-slate-500 border-t-transparent rounded-full animate-spin" />
-            </span>
-          )}
+            )}
+          </div>
+
+          {/* AI Strategist Toggle Button (Header) */}
+          <button
+            onClick={() => setAiDrawerOpen(v => !v)}
+            className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold flex items-center gap-1.5 transition-all shadow-md ${
+              aiDrawerOpen
+                ? 'bg-blue-600 text-white border border-blue-400 shadow-[0_0_12px_rgba(37,99,235,0.4)]'
+                : 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-white/10 hover:border-white/25'
+            }`}
+          >
+            <span>🤖</span>
+            <span>AI STRATEGIST</span>
+            {aiDrawerOpen && <span className="text-[10px] ml-0.5">✕</span>}
+          </button>
         </div>
       </header>
 
-      {/* ── DESKTOP Layout (lg+) ── */}
-      <div className="hidden lg:flex flex-1 min-h-0 overflow-hidden">
+      {/* ── DESKTOP Layout (lg+) ── Full-width main analysis area */}
+      <div className="hidden lg:flex flex-1 min-h-0 overflow-hidden relative">
         {/* Sidebar */}
         <aside className="w-56 flex-shrink-0 border-r border-white/10 p-4 overflow-y-auto bg-slate-950/50">
           {sidebarContent}
         </aside>
 
-        {/* Main */}
+        {/* Main Analysis Area (Expands to full available width) */}
         <main className="flex-1 min-w-0 p-5 overflow-y-auto">
           {analysisContent}
         </main>
-
-        {/* Right Panel — AI + Notebook */}
-        <div className="w-80 flex-shrink-0 border-l border-white/10 flex flex-col bg-slate-950/30">
-          {/* Tab bar */}
-          <div className="flex border-b border-white/10 flex-shrink-0">
-            {([['ai', '🤖 AI分析'], ['notebook', '📓 ノート']] as [RightPanelTab, string][]).map(([tab, label]) => (
-              <button
-                key={tab}
-                onClick={() => setRightPanelTab(tab)}
-                className={`flex-1 py-2.5 text-xs font-medium transition-colors ${
-                  rightPanelTab === tab
-                    ? 'text-white border-b-2 border-f1-red'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          {/* Panel content — flex-col so child h-full works */}
-          <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-            {rightPanelTab === 'ai' ? aiContent : notebookContent}
-          </div>
-        </div>
       </div>
 
       {/* ── MOBILE / TABLET Layout (<lg) ── */}
@@ -534,6 +528,66 @@ export default function DashboardPage() {
           ))}
         </nav>
       </div>
+
+      {/* ── Slide-over AI Strategist & Notebook Drawer (Desktop & Tablet) ── */}
+      {aiDrawerOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end animate-fade-in">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
+            onClick={() => setAiDrawerOpen(false)}
+          />
+
+          {/* Drawer Panel */}
+          <div className="relative z-10 w-full sm:w-[420px] md:w-[460px] h-full bg-slate-900/95 border-l border-white/15 shadow-2xl flex flex-col overflow-hidden animate-slide-left">
+            {/* Drawer Header & Tabs */}
+            <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-white/10 bg-slate-950/60">
+              {/* Tab switcher */}
+              <div className="flex bg-slate-800/80 rounded-xl p-1 border border-white/10">
+                {([['ai', '🤖 AI分析'], ['notebook', '📓 レースノート']] as [RightPanelTab, string][]).map(([tab, label]) => (
+                  <button
+                    key={tab}
+                    onClick={() => setRightPanelTab(tab)}
+                    className={`px-3 py-1 text-xs font-medium rounded-lg transition-all ${
+                      rightPanelTab === tab
+                        ? 'bg-blue-600 text-white font-bold shadow-md'
+                        : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Close Button */}
+              <button
+                onClick={() => setAiDrawerOpen(false)}
+                className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs transition-colors"
+                title="閉じる"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Drawer Content */}
+            <div className="flex-1 min-h-0 flex flex-col overflow-hidden p-3 bg-slate-900/50">
+              {rightPanelTab === 'ai' ? aiContent : notebookContent}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Floating Action Button (FAB) (Visible when drawer is closed) ── */}
+      {!aiDrawerOpen && (
+        <button
+          onClick={() => setAiDrawerOpen(true)}
+          className="fixed bottom-6 right-6 z-40 hidden lg:flex items-center gap-2 px-4 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-racing font-bold text-xs shadow-2xl border border-white/20 transition-all hover:scale-105 active:scale-95 group"
+          title="AIストラテジストを開く"
+        >
+          <span className="text-base group-hover:animate-bounce">🤖</span>
+          <span>AI STRATEGIST</span>
+        </button>
+      )}
     </div>
   );
 }
