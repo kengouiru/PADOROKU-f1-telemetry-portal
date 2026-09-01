@@ -230,3 +230,27 @@ export interface TranscriptResult {
   translation: string;
   category: RadioCategory;
 }
+
+/** Pit Strategy & Undercut Simulation Models */
+export interface PitSimulationResult {
+  driverNum: string;
+  driverName: string;
+  driverAcronym: string;
+  teamColour: string;
+  currentLap: number;
+  currentPosition: number;
+  predictedExitPosition: number;
+  trafficStatus: 'CLEAN_AIR' | 'IN_TRAFFIC' | 'CLOSE_GAP';
+  gapAheadSeconds: number | null;
+  aheadDriverAcronym: string | null;
+  gapBehindSeconds: number | null;
+  behindDriverAcronym: string | null;
+  undercutSuccessProb: number; // 0 - 100%
+  overcutViability: 'HIGH' | 'MEDIUM' | 'LOW';
+  freshTyreDeltaPerLap: number; // e.g. +1.4s
+  pitLossSeconds: number; // e.g. 22.5s
+  currentTyreCompound: TyreCompound;
+  currentTyreAge: number;
+  targetCompound: TyreCompound;
+}
+

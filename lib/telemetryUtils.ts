@@ -18,6 +18,7 @@ import type {
   Driver,
   DriverSectorSummary,
   SectorHighlight,
+  PitSimulationResult,
 } from './types';
 
 // ─────────────────────────────────────────────────────────────
@@ -603,6 +604,184 @@ export function getProxiedAudioUrl(url: string | null | undefined): string {
   if (url.startsWith('/api/')) return url;
   return `/api/audio-proxy?url=${encodeURIComponent(url)}`;
 }
+
+// ─────────────────────────────────────────────────────────────
+// Pit Strategy & Undercut Simulation
+// ─────────────────────────────────────────────────────────────
+
+interface SimulatePitOptions {
+  pitLossSeconds?: number;
+  freshTyreDeltaPerLap?: number;
+  targetCompound?: TyreCompound;
+}
+
+/**
+ * Computes pit exit track position, clean air status, and undercut probability for selected drivers.
+ */
+export function simulatePitStrategy(
+  selectedDrivers: string[],
+  drivers: Driver[],
+  lapsCache: Record<string, Lap[]>,
+  stints: Stint[],
+  options: SimulatePitOptions = {}
+): PitSimulationResult[] {
+  const pitLoss = options.pitLossSeconds ?? 22.5;
+  const freshGain = options.freshTyreDeltaPerLap ?? 1.4;
+  const targetCompound = options.targetCompound ?? 'HARD';
+
+  if (selectedDrivers.length === 0) return [];
+
+  // Determine current lap number across active drivers
+  let currentLap = 0;
+  selectedDrivers.forEach((num) => {
+    const laps = lapsCache[num] ?? [];
+    if (laps.length > 0) {
+      const maxL = Math.max(...laps.map((l) => l.lap_number));
+      if (maxL > currentLap) currentLap = maxL;
+    }
+  });
+
+  // Calculate cumulative race time for all drivers in session up to currentLap
+  const allDriversCumulative: {
+    driverNum: string;
+    driver: Driver | undefined;
+    cumulativeTime: number;
+    lapCount: number;
+    currentLapDuration: number;
+    compound: TyreCompound;
+    tyreAge: number;
+  }[] = [];
+
+  drivers.forEach((driver) => {
+    const num = driver.driver_number.toString();
+    const rawLaps = lapsCache[num] ?? [];
+    if (rawLaps.length === 0) return;
+
+    const enriched = enrichLapsWithStints(rawLaps, stints, num);
+    let totalTime = 0;
+    let lapCount = 0;
+    let lastDuration = 95;
+    let compound: TyreCompound = 'UNKNOWN';
+    let tyreAge = 0;
+
+    enriched.forEach((l) => {
+      if (l.lap_number <= currentLap) {
+        const dur = l.lap_duration ?? l.lap_time ?? 0;
+        if (dur > 0) {
+          totalTime += dur;
+          lapCount++;
+          lastDuration = dur;
+          compound = (l.compound ?? 'UNKNOWN') as TyreCompound;
+          tyreAge = l.tyreAge ?? 0;
+        }
+      }
+    });
+
+    if (lapCount > 0) {
+      allDriversCumulative.push({
+        driverNum: num,
+        driver,
+        cumulativeTime: totalTime,
+        lapCount,
+        currentLapDuration: lastDuration,
+        compound,
+        tyreAge,
+      });
+    }
+  });
+
+  // Sort by cumulative race time to establish current track order
+  allDriversCumulative.sort((a, b) => a.cumulativeTime - b.cumulativeTime);
+
+  return selectedDrivers.map((driverNum) => {
+    const driverInfo = drivers.find((d) => d.driver_number.toString() === driverNum);
+    const driverAcronym = driverInfo?.name_acronym ?? `#${driverNum}`;
+    const driverName = driverInfo?.full_name ?? `Driver #${driverNum}`;
+    const teamColour = driverInfo ? formatColor(driverInfo.team_colour) : '#38bdf8';
+
+    const currentEntryIdx = allDriversCumulative.findIndex((x) => x.driverNum === driverNum);
+    const currentEntry = allDriversCumulative[currentEntryIdx];
+    const currentPos = currentEntryIdx !== -1 ? currentEntryIdx + 1 : 1;
+
+    const myCurrentTime = currentEntry?.cumulativeTime ?? 0;
+    const simulatedPitTime = myCurrentTime + pitLoss;
+
+    // Simulate new standing after pit stop
+    const simulatedStandings = allDriversCumulative
+      .filter((x) => x.driverNum !== driverNum)
+      .map((x) => ({
+        driverNum: x.driverNum,
+        driverAcronym: x.driver?.name_acronym ?? `#${x.driverNum}`,
+        time: x.cumulativeTime,
+      }));
+
+    // Insert simulated position
+    simulatedStandings.push({
+      driverNum,
+      driverAcronym,
+      time: simulatedPitTime,
+    });
+    simulatedStandings.sort((a, b) => a.time - b.time);
+
+    const predictedExitPos = simulatedStandings.findIndex((x) => x.driverNum === driverNum) + 1;
+
+    // Find car ahead and car behind upon exit
+    const myExitIdx = predictedExitPos - 1;
+    const aheadCar = myExitIdx > 0 ? simulatedStandings[myExitIdx - 1] : null;
+    const behindCar = myExitIdx < simulatedStandings.length - 1 ? simulatedStandings[myExitIdx + 1] : null;
+
+    const gapAhead = aheadCar ? Number((simulatedPitTime - aheadCar.time).toFixed(1)) : null;
+    const gapBehind = behindCar ? Number((behindCar.time - simulatedPitTime).toFixed(1)) : null;
+
+    // Determine traffic status
+    let trafficStatus: 'CLEAN_AIR' | 'IN_TRAFFIC' | 'CLOSE_GAP' = 'CLEAN_AIR';
+    if ((gapAhead !== null && gapAhead < 1.4) || (gapBehind !== null && gapBehind < 1.0)) {
+      trafficStatus = 'IN_TRAFFIC';
+    } else if (gapAhead !== null && gapAhead < 2.5) {
+      trafficStatus = 'CLOSE_GAP';
+    }
+
+    // Undercut success probability against target ahead (if in P2+)
+    let undercutSuccessProb = 50;
+    let overcutViability: 'HIGH' | 'MEDIUM' | 'LOW' = 'MEDIUM';
+
+    if (currentPos > 1 && currentEntryIdx > 0) {
+      const targetCarAhead = allDriversCumulative[currentEntryIdx - 1];
+      const gapToTarget = Number((myCurrentTime - targetCarAhead.cumulativeTime).toFixed(2));
+      // Net gain on out-lap + next lap vs tyre degradation
+      const netGain = freshGain * 1.5 - gapToTarget;
+      undercutSuccessProb = Math.min(95, Math.max(10, Math.round(50 + netGain * 25)));
+      overcutViability = undercutSuccessProb > 70 ? 'LOW' : undercutSuccessProb < 35 ? 'HIGH' : 'MEDIUM';
+    } else {
+      // Leading driver: undercut danger from behind
+      undercutSuccessProb = 85; // Strong defense capability
+      overcutViability = 'MEDIUM';
+    }
+
+    return {
+      driverNum,
+      driverName,
+      driverAcronym,
+      teamColour,
+      currentLap,
+      currentPosition: currentPos,
+      predictedExitPosition: predictedExitPos,
+      trafficStatus,
+      gapAheadSeconds: gapAhead,
+      aheadDriverAcronym: aheadCar?.driverAcronym ?? null,
+      gapBehindSeconds: gapBehind,
+      behindDriverAcronym: behindCar?.driverAcronym ?? null,
+      undercutSuccessProb,
+      overcutViability,
+      freshTyreDeltaPerLap: freshGain,
+      pitLossSeconds: pitLoss,
+      currentTyreCompound: currentEntry?.compound ?? 'UNKNOWN',
+      currentTyreAge: currentEntry?.tyreAge ?? 0,
+      targetCompound,
+    };
+  });
+}
+
 
 
 

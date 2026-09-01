@@ -39,6 +39,7 @@ import RaceNotebook, { type RaceNotebookHandle } from '@/components/RaceNotebook
 
 import TelemetryChart from '@/components/TelemetryChart';
 import SectorAnalysis from '@/components/SectorAnalysis';
+import PitStrategySimulator from '@/components/PitStrategySimulator';
 
 // ── App State ─────────────────────────────────────────────────────────────────
 
@@ -346,6 +347,16 @@ export default function DashboardPage() {
           selectedDrivers={state.selectedDrivers}
           drivers={state.drivers}
           lapsCache={state.lapsCache}
+        />
+      )}
+
+      {state.selectedDrivers.length > 0 && (
+        <PitStrategySimulator
+          selectedDrivers={state.selectedDrivers}
+          drivers={state.drivers}
+          lapsCache={state.lapsCache}
+          stints={state.stints}
+          geminiApiKey={state.geminiApiKey}
         />
       )}
 
