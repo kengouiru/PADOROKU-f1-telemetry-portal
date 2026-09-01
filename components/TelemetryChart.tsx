@@ -790,6 +790,7 @@ function InlineRadioItem({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isLoadingAi, setIsLoadingAi] = useState(false);
+  const [audioError, setAudioError] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const transcript = transcriptCache?.transcript ?? radio.transcript ?? '';
@@ -799,11 +800,16 @@ function InlineRadioItem({
 
   React.useEffect(() => {
     if (!radio.recording_url) return;
+    setAudioError(false);
     const audio = new Audio(radio.recording_url);
     audioRef.current = audio;
 
     audio.onloadedmetadata = () => setDuration(audio.duration || 0);
     audio.ontimeupdate = () => setCurrentTime(audio.currentTime || 0);
+    audio.onerror = () => {
+      setAudioError(true);
+      setIsPlaying(false);
+    };
     audio.onended = () => {
       setIsPlaying(false);
       setCurrentTime(0);
@@ -823,8 +829,14 @@ function InlineRadioItem({
     } else {
       audioRef.current
         .play()
-        .then(() => setIsPlaying(true))
-        .catch(() => setIsPlaying(false));
+        .then(() => {
+          setIsPlaying(true);
+          setAudioError(false);
+        })
+        .catch(() => {
+          setAudioError(true);
+          setIsPlaying(false);
+        });
     }
   };
 
@@ -878,8 +890,8 @@ function InlineRadioItem({
 
   return (
     <div className="bg-slate-950/70 border border-white/10 rounded-xl p-3 flex flex-col md:flex-row gap-3 md:items-center">
-      {/* Audio Player */}
-      {radio.recording_url && (
+      {/* Audio Player or Error / Missing Fallback */}
+      {radio.recording_url && !audioError ? (
         <div className="flex items-center gap-2.5 bg-slate-900/90 px-3 py-2 rounded-xl border border-white/5 md:w-64 flex-shrink-0">
           <button
             onClick={togglePlay}
@@ -902,6 +914,13 @@ function InlineRadioItem({
               <span>{duration ? `${duration.toFixed(1)}s` : '--'}</span>
             </div>
           </div>
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 bg-slate-900/60 px-3 py-2 rounded-xl border border-yellow-500/20 md:w-64 flex-shrink-0 text-slate-400 text-xs">
+          <span className="text-yellow-400">⚠️</span>
+          <span className="text-[11px]">
+            {audioError ? '音声ファイル読込不可' : '音声データなし'}
+          </span>
         </div>
       )}
 

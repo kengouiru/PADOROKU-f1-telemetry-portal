@@ -354,6 +354,7 @@ function TimelineCard({ event, driverColor, transcript, isLoadingTranscript, onF
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [audioError, setAudioError] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const finalTranscript = transcript?.transcript ?? event.transcript ?? '';
@@ -366,11 +367,16 @@ function TimelineCard({ event, driverColor, transcript, isLoadingTranscript, onF
   // Audio setup
   useEffect(() => {
     if (!event.recording_url) return;
+    setAudioError(false);
     const audio = new Audio(event.recording_url);
     audioRef.current = audio;
 
     audio.onloadedmetadata = () => setDuration(audio.duration || 0);
     audio.ontimeupdate = () => setCurrentTime(audio.currentTime || 0);
+    audio.onerror = () => {
+      setAudioError(true);
+      setIsPlaying(false);
+    };
     audio.onended = () => {
       setIsPlaying(false);
       setCurrentTime(0);
@@ -388,7 +394,16 @@ function TimelineCard({ event, driverColor, transcript, isLoadingTranscript, onF
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+      audioRef.current
+        .play()
+        .then(() => {
+          setIsPlaying(true);
+          setAudioError(false);
+        })
+        .catch(() => {
+          setAudioError(true);
+          setIsPlaying(false);
+        });
     }
   };
 
@@ -447,8 +462,8 @@ function TimelineCard({ event, driverColor, transcript, isLoadingTranscript, onF
           <span className="text-slate-500 text-[11px] font-mono">{formatTime(event.date)}</span>
         </div>
 
-        {/* Audio Player */}
-        {event.recording_url && (
+        {/* Audio Player or Fallback */}
+        {event.recording_url && !audioError ? (
           <div className="bg-slate-950/70 rounded-lg p-2 border border-white/5 flex items-center gap-2.5">
             <button
               onClick={toggleAudio}
@@ -471,6 +486,11 @@ function TimelineCard({ event, driverColor, transcript, isLoadingTranscript, onF
                 <span>{duration ? `${duration.toFixed(1)}s` : '--'}</span>
               </div>
             </div>
+          </div>
+        ) : (
+          <div className="bg-slate-950/40 rounded-lg px-2.5 py-1.5 border border-yellow-500/20 flex items-center gap-1.5 text-slate-400 text-[11px]">
+            <span className="text-yellow-400">⚠️</span>
+            <span>{audioError ? '音声ファイル読込不可（テキスト要約のみ）' : '音声データなし（テキスト要約のみ）'}</span>
           </div>
         )}
 
