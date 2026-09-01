@@ -41,7 +41,13 @@ import TelemetryChart from '@/components/TelemetryChart';
 import SectorAnalysis from '@/components/SectorAnalysis';
 import PitStrategySimulator from '@/components/PitStrategySimulator';
 
+import NewsPaddockHub from '@/components/hubs/NewsPaddockHub';
+import KnowledgeHistoryHub from '@/components/hubs/KnowledgeHistoryHub';
+import RaceNotesReportHub from '@/components/hubs/RaceNotesReportHub';
+
 // ── App State ─────────────────────────────────────────────────────────────────
+
+export type ActiveHub = 'telemetry' | 'news' | 'knowledge' | 'notes';
 
 interface AppState {
   selectedYear: string;
@@ -64,7 +70,7 @@ interface AppState {
 }
 
 // Mobile tab type
-type MobileTab = 'analysis' | 'ai' | 'notebook';
+type MobileTab = 'telemetry' | 'news' | 'knowledge' | 'notes' | 'ai';
 // Desktop right-panel tab
 type RightPanelTab = 'ai' | 'notebook';
 
@@ -131,7 +137,8 @@ function buildInitialState(): AppState {
 
 export default function DashboardPage() {
   const [state, setState] = useState<AppState>(buildInitialState);
-  const [mobileTab, setMobileTab] = useState<MobileTab>('analysis');
+  const [activeHub, setActiveHub] = useState<ActiveHub>('telemetry');
+  const [mobileTab, setMobileTab] = useState<MobileTab>('telemetry');
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>('ai');
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile sidebar drawer
   const [aiDrawerOpen, setAiDrawerOpen] = useState(false); // AI & Notebook slide drawer
@@ -283,8 +290,8 @@ export default function DashboardPage() {
 
   const handleLapClick = useCallback((driverNum: string, lapNumber: number) => {
     timelineRef.current?.scrollToLap(driverNum, lapNumber);
-    // On mobile, switch to analysis tab when lap is clicked
-    if (mobileTab !== 'analysis') setMobileTab('analysis');
+    // On mobile, switch to telemetry tab when lap is clicked
+    if (mobileTab !== 'telemetry') setMobileTab('telemetry');
   }, [mobileTab]);
 
   const handleTranscriptFetched = useCallback(
@@ -297,7 +304,7 @@ export default function DashboardPage() {
     notebookRef.current?.addNote(content, source);
     // Switch to notebook tab so user sees the added note
     setRightPanelTab('notebook');
-    if (mobileTab === 'ai') setMobileTab('notebook');
+    if (mobileTab === 'ai') setMobileTab('notes');
   }, [mobileTab]);
 
   // Session tag for notebook entries
@@ -417,53 +424,85 @@ export default function DashboardPage() {
     <div className="min-h-screen flex flex-col bg-f1-gradient">
 
       {/* ── Header (sticky) ── */}
-      <header className="flex-shrink-0 sticky top-0 z-30 border-b border-white/10 px-4 py-2.5 flex items-center gap-3 bg-slate-950/85 backdrop-blur-md">
-        {/* Mobile menu toggle */}
-        <button
-          className="lg:hidden text-slate-400 hover:text-white text-lg"
-          onClick={() => setSidebarOpen(v => !v)}
-          aria-label="Toggle sidebar"
-        >
-          ☰
-        </button>
+      <header className="flex-shrink-0 sticky top-0 z-30 border-b border-white/10 px-4 py-2.5 flex items-center justify-between gap-3 bg-slate-950/90 backdrop-blur-md">
+        {/* Left: Logo + Session badge */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+          {/* Mobile menu toggle */}
+          <button
+            className="lg:hidden text-slate-400 hover:text-white text-lg"
+            onClick={() => setSidebarOpen((v) => !v)}
+            aria-label="Toggle sidebar"
+          >
+            ☰
+          </button>
 
-        {/* Logo */}
-        <div className="w-7 h-7 bg-f1-red rounded flex items-center justify-center flex-shrink-0">
-          <span className="font-racing text-white text-xs font-black">F1</span>
-        </div>
-        <div className="flex-1 min-w-0">
-          <h1 className="font-racing text-sm font-bold text-white tracking-widest leading-tight truncate">
-            F1 TELEMETRY ANALYZER
-          </h1>
-          <p className="text-slate-500 text-xs hidden sm:block">
-            {state.isDemoMode ? 'DEMO — 2024 Bahrain GP' : 'LIVE — OpenF1 API'}
-          </p>
+          {/* Logo */}
+          <div className="w-7 h-7 bg-f1-red rounded flex items-center justify-center flex-shrink-0 shadow-md">
+            <span className="font-racing text-white text-xs font-black">F1</span>
+          </div>
+          <div>
+            <h1 className="font-racing text-sm font-bold text-white tracking-widest leading-tight hidden sm:block">
+              F1 TELEMETRY ANALYZER
+            </h1>
+            <p className="text-slate-500 text-[11px] hidden md:block">
+              {state.isDemoMode ? 'DEMO — 2024 Bahrain GP' : 'LIVE — OpenF1 API'}
+            </p>
+          </div>
         </div>
 
-        {/* Header Right Actions: Selected driver pills + AI Drawer Toggle Button */}
+        {/* Center: Global Multi-Hub Navigation Pills (Desktop & Tablet) */}
+        <nav className="hidden md:flex items-center bg-slate-900/90 rounded-2xl p-1 border border-white/10 shadow-inner">
+          {(
+            [
+              ['telemetry', '🏎️ Telemetry & Live'],
+              ['news', '📰 News & Paddock'],
+              ['knowledge', '📚 Knowledge & History'],
+              ['notes', '📝 Race Notes & Report'],
+            ] as [ActiveHub, string][]
+          ).map(([hub, label]) => (
+            <button
+              key={hub}
+              onClick={() => setActiveHub(hub)}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-racing font-bold transition-all ${
+                activeHub === hub
+                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+
+        {/* Right: Driver Pills + AI Strategist Toggle */}
         <div className="flex items-center gap-2">
           {/* Selected driver pills (desktop) */}
-          <div className="hidden sm:flex items-center gap-1.5 mr-1">
-            {state.selectedDrivers.map(num => {
-              const drv = state.drivers.find(d => d.driver_number.toString() === num);
-              const color = drv ? `#${drv.team_colour}` : '#38bdf8';
-              return (
-                <span key={num} className="px-2 py-0.5 rounded-full text-xs font-racing font-bold border"
-                  style={{ borderColor: `${color}60`, color, backgroundColor: `${color}15` }}>
-                  {drv?.name_acronym ?? `#${num}`}
+          {activeHub === 'telemetry' && (
+            <div className="hidden xl:flex items-center gap-1.5 mr-1">
+              {state.selectedDrivers.map((num) => {
+                const drv = state.drivers.find((d) => d.driver_number.toString() === num);
+                const color = drv ? `#${drv.team_colour}` : '#38bdf8';
+                return (
+                  <span
+                    key={num}
+                    className="px-2 py-0.5 rounded-full text-xs font-racing font-bold border"
+                    style={{ borderColor: `${color}60`, color, backgroundColor: `${color}15` }}
+                  >
+                    {drv?.name_acronym ?? `#${num}`}
+                  </span>
+                );
+              })}
+              {state.isLoading && (
+                <span className="text-xs text-slate-500 flex items-center gap-1">
+                  <span className="w-3 h-3 border border-slate-500 border-t-transparent rounded-full animate-spin" />
                 </span>
-              );
-            })}
-            {state.isLoading && (
-              <span className="text-xs text-slate-500 flex items-center gap-1">
-                <span className="w-3 h-3 border border-slate-500 border-t-transparent rounded-full animate-spin" />
-              </span>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* AI Strategist Toggle Button (Header) */}
           <button
-            onClick={() => setAiDrawerOpen(v => !v)}
+            onClick={() => setAiDrawerOpen((v) => !v)}
             className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold flex items-center gap-1.5 transition-all shadow-md ${
               aiDrawerOpen
                 ? 'bg-blue-600 text-white border border-blue-400 shadow-[0_0_12px_rgba(37,99,235,0.4)]'
@@ -471,22 +510,38 @@ export default function DashboardPage() {
             }`}
           >
             <span>🤖</span>
-            <span>AI STRATEGIST</span>
+            <span className="hidden sm:inline">AI STRATEGIST</span>
             {aiDrawerOpen && <span className="text-[10px] ml-0.5">✕</span>}
           </button>
         </div>
       </header>
 
-      {/* ── DESKTOP Layout (lg+) ── Full-width main analysis area */}
+      {/* ── DESKTOP Layout (lg+) ── */}
       <div className="hidden lg:flex flex-1 min-h-0 overflow-hidden relative">
-        {/* Sidebar */}
-        <aside className="w-56 flex-shrink-0 border-r border-white/10 p-4 overflow-y-auto bg-slate-950/50">
-          {sidebarContent}
-        </aside>
+        {/* Left Sidebar (Only visible in Telemetry Hub) */}
+        {activeHub === 'telemetry' && (
+          <aside className="w-56 flex-shrink-0 border-r border-white/10 p-4 overflow-y-auto bg-slate-950/50">
+            {sidebarContent}
+          </aside>
+        )}
 
-        {/* Main Analysis Area (Expands to full available width) */}
+        {/* Main Hub Area */}
         <main className="flex-1 min-w-0 p-5 overflow-y-auto">
-          {analysisContent}
+          {activeHub === 'telemetry' && analysisContent}
+          {activeHub === 'news' && <NewsPaddockHub />}
+          {activeHub === 'knowledge' && <KnowledgeHistoryHub />}
+          {activeHub === 'notes' && (
+            <RaceNotesReportHub
+              selectedDrivers={state.selectedDrivers}
+              drivers={state.drivers}
+              lapsCache={state.lapsCache}
+              stints={state.stints}
+              pitStopsCache={state.pitStopsCache}
+              safetyCarPeriods={state.safetyCarPeriods}
+              sessionName={state.currentSession?.session_name ?? '2024 Bahrain GP Race'}
+              geminiApiKey={state.geminiApiKey}
+            />
+          )}
         </main>
       </div>
 
@@ -511,27 +566,47 @@ export default function DashboardPage() {
 
         {/* Tab content */}
         <div className="flex-1 min-h-0 overflow-y-auto p-4">
-          {mobileTab === 'analysis' && analysisContent}
+          {mobileTab === 'telemetry' && analysisContent}
+          {mobileTab === 'news' && <NewsPaddockHub />}
+          {mobileTab === 'knowledge' && <KnowledgeHistoryHub />}
+          {mobileTab === 'notes' && (
+            <RaceNotesReportHub
+              selectedDrivers={state.selectedDrivers}
+              drivers={state.drivers}
+              lapsCache={state.lapsCache}
+              stints={state.stints}
+              pitStopsCache={state.pitStopsCache}
+              safetyCarPeriods={state.safetyCarPeriods}
+              sessionName={state.currentSession?.session_name ?? '2024 Bahrain GP Race'}
+              geminiApiKey={state.geminiApiKey}
+            />
+          )}
           {mobileTab === 'ai' && aiContent}
-          {mobileTab === 'notebook' && notebookContent}
         </div>
 
         {/* Bottom tab bar */}
         <nav className="flex-shrink-0 flex border-t border-white/10 bg-slate-950/90 backdrop-blur-sm safe-bottom">
-          {([
-            ['analysis', '📈', '分析'],
-            ['ai',       '🤖', 'AI'],
-            ['notebook', '📓', 'ノート'],
-          ] as [MobileTab, string, string][]).map(([tab, icon, label]) => (
+          {(
+            [
+              ['telemetry', '🏎️', '分析'],
+              ['news',      '📰', 'ニュース'],
+              ['knowledge', '📚', 'ナレッジ'],
+              ['notes',     '📝', 'ノート'],
+              ['ai',        '🤖', 'AI'],
+            ] as [MobileTab, string, string][]
+          ).map(([tab, icon, label]) => (
             <button
               key={tab}
-              onClick={() => setMobileTab(tab)}
+              onClick={() => {
+                setMobileTab(tab);
+                if (tab !== 'ai') setActiveHub(tab as ActiveHub);
+              }}
               className={`flex-1 flex flex-col items-center py-2.5 gap-0.5 text-xs transition-colors ${
-                mobileTab === tab ? 'text-white' : 'text-slate-500 hover:text-slate-300'
+                mobileTab === tab ? 'text-white font-bold' : 'text-slate-500 hover:text-slate-300'
               }`}
             >
               <span className="text-base">{icon}</span>
-              <span className="text-xs">{label}</span>
+              <span className="text-[10px]">{label}</span>
               {mobileTab === tab && (
                 <span className="w-6 h-0.5 bg-f1-red rounded-full mt-0.5" />
               )}
