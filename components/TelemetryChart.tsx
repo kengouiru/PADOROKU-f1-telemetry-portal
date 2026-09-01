@@ -2,14 +2,19 @@
 
 /**
  * components/TelemetryChart.tsx
- * Lap-time comparison chart with:
- *  - Clean timeline markers at chart bottom (does not obstruct telemetry lines)
- *  - Non-intrusive Inline Audio Player & AI Tactical Summary directly below chart
+ * Multi-mode F1 Telemetry Chart:
+ *  1. Lap Times (Laps vs Lap Duration)
+ *  2. Gap / Delta (Laps vs Gap relative to reference driver)
+ *  3. Stint Pace (Tyre Age vs Lap Duration & Degradation)
+ *
+ * Integrated with:
+ *  - Safety Car / VSC shaded bands
+ *  - Pit stop "P" markers & bottom Radio timeline pins
+ *  - Inline Audio Player & AI Tactical Summary
  *  - Quick radio lap jump pills
- *  - Tooltip preview of radio contents
  */
 
-import React, { useMemo, useRef, useState, useEffect } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import {
   Chart as ChartJS,
   LinearScale,
@@ -24,7 +29,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
-import type { Driver, Lap, Stint, PitStop, SafetyCarPeriod, TeamRadio } from '@/lib/types';
+import type { Driver, Lap, Stint, PitStop, SafetyCarPeriod, TeamRadio, TyreCompound } from '@/lib/types';
 import {
   enrichLapsWithStints,
   formatColor,
@@ -32,6 +37,8 @@ import {
   formatLapTime,
   lapsToChartData,
   mapRadioRecordingsToLaps,
+  calculateCumulativeGaps,
+  calculateStintDegradation,
 } from '@/lib/telemetryUtils';
 
 // ── Register Chart.js modules globally (idempotent) ───────────────────────────
@@ -39,15 +46,19 @@ ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend, Filler
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+export type ChartMode = 'laps' | 'gap' | 'stint';
+
 interface ChartPoint {
   x: number;
   y: number;
-  compound: string;
-  tyreAge: number;
-  s1: number | null;
-  s2: number | null;
-  s3: number | null;
+  compound?: string;
+  tyreAge?: number;
+  s1?: number | null;
+  s2?: number | null;
+  s3?: number | null;
+  lapNumber?: number;
   driverNum: string;
+  extraLabel?: string;
 }
 
 type F1Dataset = ChartDataset<'line', ChartPoint[]> & {
@@ -95,6 +106,7 @@ export default function TelemetryChart({
   onTranscriptFetched,
 }: TelemetryChartProps) {
   const chartRef = useRef<ChartJS<'line', ChartPoint[]>>(null);
+  const [chartMode, setChartMode] = useState<ChartMode>('laps');
   const [activeRadioContext, setActiveRadioContext] = useState<ActiveRadioContext | null>(null);
 
   // ── Mapped Radios per Driver ───────────────────────────────────────────────
@@ -123,9 +135,8 @@ export default function TelemetryChart({
     return list.sort((a, b) => (a.radio.lap_number ?? 0) - (b.radio.lap_number ?? 0));
   }, [selectedDrivers, mappedRadios, drivers]);
 
-  // ── Build datasets ─────────────────────────────────────────────────────────
-
-  const datasets: F1Dataset[] = useMemo(() => {
+  // ── 1. Datasets for "Lap Times" mode ───────────────────────────────────────
+  const lapTimesDatasets: F1Dataset[] = useMemo(() => {
     const teamColorCount: Record<string, number> = {};
 
     return selectedDrivers.map((driverNum) => {
@@ -139,6 +150,7 @@ export default function TelemetryChart({
         s1: p.s1,
         s2: p.s2,
         s3: p.s3,
+        lapNumber: p.x,
         driverNum,
       }));
 
@@ -172,13 +184,106 @@ export default function TelemetryChart({
     });
   }, [selectedDrivers, lapsCache, stints, drivers]);
 
-  // ── Safety-car band plugin ────────────────────────────────────────────────
+  // ── 2. Datasets for "Gap / Delta" mode ──────────────────────────────────────
+  const { gapDatasets, refDriverCode } = useMemo(() => {
+    const { series, referenceDriverNum } = calculateCumulativeGaps(
+      selectedDrivers,
+      drivers,
+      lapsCache,
+      stints
+    );
+
+    const refInfo = drivers.find((d) => d.driver_number.toString() === referenceDriverNum);
+    const refCode = refInfo?.name_acronym ?? `#${referenceDriverNum}`;
+
+    const dsList: F1Dataset[] = series.map((s) => {
+      const points: ChartPoint[] = s.points.map((p) => ({
+        x: p.x,
+        y: p.y,
+        compound: p.compound,
+        tyreAge: p.tyreAge,
+        lapNumber: p.x,
+        driverNum: s.driverNum,
+        extraLabel: p.gapDelta !== 0 ? `(${p.gapDelta > 0 ? '+' : ''}${p.gapDelta.toFixed(3)}s/L)` : '',
+      }));
+
+      const isRef = s.isReference;
+      return {
+        label: isRef ? `${s.driverAcronym} (基準: 0.0s)` : `${s.driverAcronym} vs ${refCode}`,
+        data: points,
+        borderColor: s.teamColour,
+        backgroundColor: s.teamColour + '22',
+        borderDash: isRef ? [3, 3] : [],
+        borderWidth: isRef ? 2 : 2.5,
+        fill: false,
+        tension: 0.2,
+        pointBackgroundColor: points.map((p) => getTyreColor(p.compound)),
+        pointBorderColor: s.teamColour,
+        pointRadius: isRef ? 2 : 4,
+        pointHoverRadius: 7,
+        originalColor: s.teamColour,
+        driverNum: s.driverNum,
+        parsing: false as never,
+      } as F1Dataset;
+    });
+
+    return { gapDatasets: dsList, refDriverCode: refCode };
+  }, [selectedDrivers, drivers, lapsCache, stints]);
+
+  // ── 3. Datasets for "Stint Pace" mode ───────────────────────────────────────
+  const stintDatasets: F1Dataset[] = useMemo(() => {
+    const stintSeries = calculateStintDegradation(
+      selectedDrivers,
+      drivers,
+      lapsCache,
+      stints
+    );
+
+    return stintSeries.map((st, idx) => {
+      const tyreColor = getTyreColor(st.compound);
+      const points: ChartPoint[] = st.points.map((p) => ({
+        x: p.x, // Tyre age
+        y: p.y, // Lap time
+        compound: st.compound,
+        tyreAge: p.x,
+        lapNumber: p.lapNumber,
+        driverNum: st.driverNum,
+        extraLabel: `+${p.deltaFromStintStart.toFixed(2)}s deg`,
+      }));
+
+      const isOddStint = st.stintNumber % 2 === 1;
+
+      return {
+        label: `${st.driverAcronym} S${st.stintNumber} (${st.compound} avg ${formatLapTime(st.avgPace)})`,
+        data: points,
+        borderColor: st.teamColour,
+        backgroundColor: tyreColor + '33',
+        borderDash: isOddStint ? [] : [6, 4],
+        borderWidth: 2.5,
+        fill: false,
+        tension: 0.25,
+        pointBackgroundColor: tyreColor,
+        pointBorderColor: st.teamColour,
+        pointRadius: 4,
+        pointHoverRadius: 7,
+        originalColor: st.teamColour,
+        driverNum: st.driverNum,
+        parsing: false as never,
+      } as F1Dataset;
+    });
+  }, [selectedDrivers, drivers, lapsCache, stints]);
+
+  // Active datasets based on mode
+  const currentDatasets =
+    chartMode === 'gap' ? gapDatasets : chartMode === 'stint' ? stintDatasets : lapTimesDatasets;
+
+  // ── Safety-car band plugin (active on Laps & Gap modes) ─────────────────────
 
   const scPlugin: Plugin<'line'> = useMemo(
     () => ({
       id: 'f1_sc_bands',
       beforeDraw(chart) {
-        if (!safetyCarPeriods.length) return;
+        if (chartMode === 'stint' || !safetyCarPeriods.length) return;
         const { ctx, chartArea, scales } = chart;
         if (!chartArea || !scales.x) return;
         ctx.save();
@@ -196,10 +301,10 @@ export default function TelemetryChart({
         ctx.restore();
       },
     }),
-    [safetyCarPeriods]
+    [safetyCarPeriods, chartMode]
   );
 
-  // ── Pit markers (on plot) & Radio Bottom Timeline Pins ─────────────────────
+  // ── Pit & Radio Timeline Markers Plugin ────────────────────────────────────
 
   const markersPlugin: Plugin<'line'> = useMemo(
     () => ({
@@ -208,108 +313,107 @@ export default function TelemetryChart({
         const { ctx, chartArea, scales } = chart;
         if (!chartArea || !scales.x) return;
 
-        // 1. Draw Pit Stop "P" Markers directly above lap points
-        chart.data.datasets.forEach((ds, dsIdx) => {
-          const f1ds = ds as F1Dataset;
-          if (!f1ds.driverNum) return;
-          const driverNum = f1ds.driverNum;
-          const pits = pitStopsCache[driverNum] ?? [];
-          const meta = chart.getDatasetMeta(dsIdx);
+        // Pit markers (Laps mode)
+        if (chartMode === 'laps') {
+          chart.data.datasets.forEach((ds, dsIdx) => {
+            const f1ds = ds as F1Dataset;
+            if (!f1ds.driverNum) return;
+            const driverNum = f1ds.driverNum;
+            const pits = pitStopsCache[driverNum] ?? [];
+            const meta = chart.getDatasetMeta(dsIdx);
 
-          pits.forEach((pit) => {
-            const dataIdx = f1ds.data.findIndex(
-              (d) => (d as ChartPoint).x === pit.lap_number
-            );
-            if (dataIdx === -1) return;
-            const el = meta.data[dataIdx] as { x: number; y: number } | undefined;
-            if (!el) return;
+            pits.forEach((pit) => {
+              const dataIdx = f1ds.data.findIndex(
+                (d) => (d as ChartPoint).x === pit.lap_number
+              );
+              if (dataIdx === -1) return;
+              const el = meta.data[dataIdx] as { x: number; y: number } | undefined;
+              if (!el) return;
+              ctx.save();
+              ctx.fillStyle = '#ef4444';
+              ctx.beginPath();
+              ctx.arc(el.x, el.y - 13, 6.5, 0, 2 * Math.PI);
+              ctx.fill();
+              ctx.fillStyle = '#fff';
+              ctx.font = 'bold 8.5px Inter,sans-serif';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.fillText('P', el.x, el.y - 13);
+              ctx.restore();
+            });
+          });
+        }
+
+        // Radio Bottom Timeline Pins (Laps & Gap mode)
+        if (chartMode === 'laps' || chartMode === 'gap') {
+          const radioLapsMap: Record<number, { driverNum: string; count: number }[]> = {};
+
+          selectedDrivers.forEach((dNum) => {
+            const radios = mappedRadios[dNum] ?? [];
+            radios.forEach((r) => {
+              if (r.lap_number) {
+                if (!radioLapsMap[r.lap_number]) radioLapsMap[r.lap_number] = [];
+                const existing = radioLapsMap[r.lap_number].find((x) => x.driverNum === dNum);
+                if (existing) {
+                  existing.count++;
+                } else {
+                  radioLapsMap[r.lap_number].push({ driverNum: dNum, count: 1 });
+                }
+              }
+            });
+          });
+
+          const bottomY = chartArea.bottom - 12;
+
+          Object.entries(radioLapsMap).forEach(([lapStr, driverEntries]) => {
+            const lapNum = Number(lapStr);
+            const xPos = scales.x.getPixelForValue(lapNum);
+            if (xPos < chartArea.left || xPos > chartArea.right) return;
+
             ctx.save();
-            ctx.fillStyle = '#ef4444';
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.18)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([2, 3]);
             ctx.beginPath();
-            ctx.arc(el.x, el.y - 13, 6.5, 0, 2 * Math.PI);
-            ctx.fill();
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 8.5px Inter,sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('P', el.x, el.y - 13);
+            ctx.moveTo(xPos, chartArea.top);
+            ctx.lineTo(xPos, bottomY - 8);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            driverEntries.forEach((entry, i) => {
+              const driverInfo = drivers.find((d) => d.driver_number.toString() === entry.driverNum);
+              const color = driverInfo ? formatColor(driverInfo.team_colour) : '#38bdf8';
+              const offset = (i - (driverEntries.length - 1) / 2) * 14;
+
+              ctx.fillStyle = '#0f172a';
+              ctx.beginPath();
+              ctx.arc(xPos + offset, bottomY, 7, 0, 2 * Math.PI);
+              ctx.fill();
+
+              ctx.lineWidth = 1.5;
+              ctx.strokeStyle = color;
+              ctx.beginPath();
+              ctx.arc(xPos + offset, bottomY, 7, 0, 2 * Math.PI);
+              ctx.stroke();
+
+              ctx.fillStyle = color;
+              ctx.font = 'bold 8px sans-serif';
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+              ctx.fillText('🎙', xPos + offset, bottomY + 0.5);
+            });
+
             ctx.restore();
           });
-        });
-
-        // 2. Draw Radio Pins neatly at the bottom timeline area (above X-axis)
-        // Group radios by lap to avoid collision
-        const radioLapsMap: Record<number, { driverNum: string; count: number }[]> = {};
-
-        selectedDrivers.forEach((dNum) => {
-          const radios = mappedRadios[dNum] ?? [];
-          radios.forEach((r) => {
-            if (r.lap_number) {
-              if (!radioLapsMap[r.lap_number]) radioLapsMap[r.lap_number] = [];
-              const existing = radioLapsMap[r.lap_number].find((x) => x.driverNum === dNum);
-              if (existing) {
-                existing.count++;
-              } else {
-                radioLapsMap[r.lap_number].push({ driverNum: dNum, count: 1 });
-              }
-            }
-          });
-        });
-
-        const bottomY = chartArea.bottom - 12;
-
-        Object.entries(radioLapsMap).forEach(([lapStr, driverEntries]) => {
-          const lapNum = Number(lapStr);
-          const xPos = scales.x.getPixelForValue(lapNum);
-          if (xPos < chartArea.left || xPos > chartArea.right) return;
-
-          ctx.save();
-
-          // Subtle vertical guide line connecting bottom pin upward
-          ctx.strokeStyle = 'rgba(56, 189, 248, 0.18)';
-          ctx.lineWidth = 1;
-          ctx.setLineDash([2, 3]);
-          ctx.beginPath();
-          ctx.moveTo(xPos, chartArea.top);
-          ctx.lineTo(xPos, bottomY - 8);
-          ctx.stroke();
-          ctx.setLineDash([]);
-
-          // Draw small radio pill at bottom
-          driverEntries.forEach((entry, i) => {
-            const driverInfo = drivers.find((d) => d.driver_number.toString() === entry.driverNum);
-            const color = driverInfo ? formatColor(driverInfo.team_colour) : '#38bdf8';
-            const offset = (i - (driverEntries.length - 1) / 2) * 14;
-
-            ctx.fillStyle = '#0f172a';
-            ctx.beginPath();
-            ctx.arc(xPos + offset, bottomY, 7, 0, 2 * Math.PI);
-            ctx.fill();
-
-            ctx.lineWidth = 1.5;
-            ctx.strokeStyle = color;
-            ctx.beginPath();
-            ctx.arc(xPos + offset, bottomY, 7, 0, 2 * Math.PI);
-            ctx.stroke();
-
-            ctx.fillStyle = color;
-            ctx.font = 'bold 8px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('🎙', xPos + offset, bottomY + 0.5);
-          });
-
-          ctx.restore();
-        });
+        }
       },
     }),
-    [pitStopsCache, mappedRadios, selectedDrivers, drivers]
+    [pitStopsCache, mappedRadios, selectedDrivers, drivers, chartMode]
   );
 
   // ── Open Radio Context in Inline Panel ────────────────────────────────────
 
   const selectRadioContext = (driverNum: string, lapNumber: number) => {
-    // Notify timeline scroll
     onLapClick?.(driverNum, lapNumber);
 
     const radiosOnLap = (mappedRadios[driverNum] ?? []).filter(
@@ -337,22 +441,26 @@ export default function TelemetryChart({
     }
   };
 
-  // ── Chart options ─────────────────────────────────────────────────────────
+  // ── Dynamic Chart Options based on Mode ───────────────────────────────────
 
-  const options: ChartOptions<'line'> = useMemo(
-    () => ({
+  const options: ChartOptions<'line'> = useMemo(() => {
+    const isGap = chartMode === 'gap';
+    const isStint = chartMode === 'stint';
+
+    return {
       responsive: true,
       maintainAspectRatio: false,
-      animation: { duration: 300 },
+      animation: { duration: 250 },
       parsing: false,
       interaction: { mode: 'index', intersect: false },
       onClick(_, active) {
         if (!active.length) return;
         const { datasetIndex, index } = active[0];
-        const ds = datasets[datasetIndex];
+        const ds = currentDatasets[datasetIndex];
         const pt = ds?.data[index] as ChartPoint | undefined;
         if (ds && pt) {
-          selectRadioContext(ds.driverNum, pt.x);
+          const targetLap = pt.lapNumber ?? pt.x;
+          selectRadioContext(ds.driverNum, targetLap);
         }
       },
       scales: {
@@ -360,29 +468,37 @@ export default function TelemetryChart({
           type: 'linear',
           title: {
             display: true,
-            text: 'LAP',
-            color: 'rgba(255,255,255,0.45)',
-            font: { size: 11 },
+            text: isStint ? 'TYRE AGE (周回数 / STINT LAPS)' : 'LAP (周回)',
+            color: 'rgba(255,255,255,0.5)',
+            font: { size: 10, weight: 'bold' },
           },
           ticks: { color: 'rgba(255,255,255,0.45)', maxTicksLimit: 16 },
           grid: { color: 'rgba(255,255,255,0.06)' },
         },
         y: {
           type: 'linear',
-          suggestedMin: 88,
-          suggestedMax: 130,
+          suggestedMin: isGap ? -5 : 88,
+          suggestedMax: isGap ? 25 : 130,
           title: {
             display: true,
-            text: 'LAP TIME',
-            color: 'rgba(255,255,255,0.45)',
-            font: { size: 11 },
+            text: isGap ? 'GAP TO REFERENCE (秒)' : 'LAP TIME (タイム)',
+            color: 'rgba(255,255,255,0.5)',
+            font: { size: 10, weight: 'bold' },
           },
           ticks: {
             color: 'rgba(255,255,255,0.45)',
-            callback: (v) =>
-              typeof v === 'number' ? formatLapTime(v) : String(v),
+            callback: (v) => {
+              if (typeof v !== 'number') return String(v);
+              if (isGap) return `${v > 0 ? '+' : ''}${v.toFixed(1)}s`;
+              return formatLapTime(v);
+            },
           },
-          grid: { color: 'rgba(255,255,255,0.06)' },
+          grid: {
+            color: (ctx) =>
+              isGap && ctx.tick.value === 0
+                ? 'rgba(255,255,255,0.3)'
+                : 'rgba(255,255,255,0.06)',
+          },
         },
       },
       plugins: {
@@ -390,41 +506,62 @@ export default function TelemetryChart({
           display: true,
           position: 'top',
           labels: {
-            color: 'rgba(255,255,255,0.8)',
+            color: 'rgba(255,255,255,0.85)',
             font: { size: 11 },
-            boxWidth: 20,
-            padding: 14,
+            boxWidth: 16,
+            padding: 12,
             usePointStyle: true,
           },
         },
         tooltip: {
           backgroundColor: 'rgba(8,12,30,0.96)',
-          borderColor: 'rgba(255,255,255,0.12)',
+          borderColor: 'rgba(255,255,255,0.15)',
           borderWidth: 1,
           titleColor: '#fff',
           bodyColor: 'rgba(255,255,255,0.7)',
           padding: 10,
           callbacks: {
-            title: (items) => `Lap ${items[0]?.parsed?.x ?? '?'}`,
+            title: (items) => {
+              const pt = items[0]?.raw as ChartPoint | undefined;
+              if (isStint) return `Tyre Age: ${pt?.x ?? '?'}周目 (Lap ${pt?.lapNumber ?? '?'})`;
+              return `Lap ${items[0]?.parsed?.x ?? '?'}`;
+            },
             label(ctx) {
               const raw = ctx.raw as ChartPoint;
+              const targetLap = raw.lapNumber ?? raw.x;
               const dRadios = (mappedRadios[raw.driverNum] ?? []).filter(
-                (r) => r.lap_number === raw.x
+                (r) => r.lap_number === targetLap
               );
+
+              if (isGap) {
+                return [
+                  `  ${ctx.dataset.label}: ${raw.y > 0 ? '+' : ''}${raw.y.toFixed(3)}s ${raw.extraLabel ?? ''}`,
+                  `  Tyre: ${raw.compound ?? ''} (${raw.tyreAge}L old)`,
+                  ...(dRadios.length > 0 ? ['  🎙️ チーム無線あり (クリックで再生)'] : []),
+                ];
+              }
+
+              if (isStint) {
+                return [
+                  `  ${ctx.dataset.label}: ${formatLapTime(raw.y)}`,
+                  `  デグラデーション: ${raw.extraLabel ?? ''}`,
+                  ...(dRadios.length > 0 ? ['  🎙️ チーム無線あり (クリックで再生)'] : []),
+                ];
+              }
+
+              // Default: Lap Times
               const lines = [
                 `  ${ctx.dataset.label}: ${formatLapTime(raw.y)}`,
                 `  Tyre: ${raw.compound} (${raw.tyreAge}L old)`,
               ];
               if (raw.s1 != null) {
                 lines.push(
-                  `  S1 ${raw.s1.toFixed(3)}  S2 ${(raw.s2 ?? 0).toFixed(
-                    3
-                  )}  S3 ${(raw.s3 ?? 0).toFixed(3)}`
+                  `  S1 ${raw.s1.toFixed(3)}  S2 ${(raw.s2 ?? 0).toFixed(3)}  S3 ${(raw.s3 ?? 0).toFixed(3)}`
                 );
               }
               if (dRadios.length > 0) {
                 const preview = dRadios[0].transcript
-                  ? dRadios[0].transcript.slice(0, 38) + '...'
+                  ? dRadios[0].transcript.slice(0, 35) + '...'
                   : '無線あり';
                 lines.push(`  🎙️ 無線: "${preview}" (クリックで下部に再生展開)`);
               }
@@ -433,9 +570,8 @@ export default function TelemetryChart({
           },
         },
       },
-    }),
-    [datasets, mappedRadios, drivers, lapsCache, stints]
-  );
+    };
+  }, [chartMode, currentDatasets, mappedRadios]);
 
   // ── Empty state ───────────────────────────────────────────────────────────
 
@@ -453,37 +589,52 @@ export default function TelemetryChart({
 
   return (
     <div className="glass-card p-4 flex flex-col gap-3 relative">
-      {/* Title & Status */}
-      <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+      {/* Title & Mode Switcher Tabs */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-white/10 pb-3">
         <div>
           <h3 className="text-xs font-racing font-bold text-white tracking-widest border-l-2 border-f1-red pl-2 uppercase">
-            LAP TIME COMPARISON & TEAM RADIO
+            {chartMode === 'laps'
+              ? 'LAP TIME COMPARISON'
+              : chartMode === 'gap'
+              ? 'GAP / DELTA TO REFERENCE'
+              : 'STINT & TYRE DEGRADATION'}
           </h3>
           <p className="text-xs text-slate-500 mt-0.5">
-            グラフ下部の 🎙️ ピンまたは周回ピルをクリックすると、直下に音声とAI戦術要約が展開されます
+            {chartMode === 'laps' && '周回ごとのラップタイム推移とセーフティカー・無線連動'}
+            {chartMode === 'gap' && `基準ドライバー (${refDriverCode}) に対するタイム差（秒）の推移・アンダーカット分析`}
+            {chartMode === 'stint' && 'タイヤ周回数（Tyre Age）に応じたデグラデーション（劣化傾向）の比較'}
           </p>
         </div>
-        <div className="hidden sm:flex items-center gap-3 text-xs text-slate-400">
-          <span className="flex items-center gap-1.5">
-            <span className="inline-flex w-3.5 h-3.5 rounded-full bg-red-500 text-white text-[9px] items-center justify-center font-bold leading-none">
-              P
-            </span>
-            <span>ピット</span>
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="inline-flex w-3.5 h-3.5 rounded-full bg-slate-900 border border-sky-400 text-sky-400 text-[9px] items-center justify-center font-bold leading-none">
-              🎙
-            </span>
-            <span>無線タイムライン</span>
-          </span>
+
+        {/* Mode Switcher Pills */}
+        <div className="flex bg-slate-900/90 rounded-xl p-1 border border-white/10 self-start sm:self-auto">
+          {(
+            [
+              ['laps', '📈 Lap Times'],
+              ['gap', '⏱️ Gap / Delta'],
+              ['stint', '🛞 Stint Pace'],
+            ] as [ChartMode, string][]
+          ).map(([mode, label]) => (
+            <button
+              key={mode}
+              onClick={() => setChartMode(mode)}
+              className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+                chartMode === mode
+                  ? 'bg-blue-600 text-white font-bold shadow-md'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Chart Canvas Area */}
-      <div style={{ position: 'relative', width: '100%', height: 280 }}>
+      <div style={{ position: 'relative', width: '100%', height: 285 }}>
         <Line
           ref={chartRef}
-          data={{ datasets: datasets as ChartDataset<'line', ChartPoint[]>[] }}
+          data={{ datasets: currentDatasets as ChartDataset<'line', ChartPoint[]>[] }}
           options={options}
           plugins={[scPlugin, markersPlugin]}
         />
@@ -646,7 +797,7 @@ function InlineRadioItem({
   const aiSummary = transcriptCache?.aiSummary ?? radio.aiSummary ?? '';
   const category = (transcriptCache?.category ?? radio.category ?? 'PACE').toUpperCase();
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!radio.recording_url) return;
     const audio = new Audio(radio.recording_url);
     audioRef.current = audio;
@@ -685,7 +836,6 @@ function InlineRadioItem({
     }
   };
 
-  // Trigger Gemini AI Tactical Summary
   const handleFetchAi = async () => {
     if (!radio.recording_url || isLoadingAi) return;
     setIsLoadingAi(true);
@@ -773,7 +923,6 @@ function InlineRadioItem({
           </div>
         )}
 
-        {/* AI Tactical Intent Summary */}
         {aiSummary ? (
           <div className="bg-purple-950/30 border border-purple-500/30 rounded-lg p-2 text-xs text-purple-200 mt-0.5">
             <span className="text-[10px] font-bold text-purple-400 block mb-0.5 uppercase tracking-wider">

@@ -381,3 +381,216 @@ export function formatSpeed(speed: number | null | undefined): string {
   return `${speed.toFixed(1)} km/h`;
 }
 
+// ─────────────────────────────────────────────────────────────
+// Gap / Delta Analysis
+// ─────────────────────────────────────────────────────────────
+
+export interface GapDataPoint {
+  x: number; // Lap number
+  y: number; // Gap in seconds relative to reference driver
+  lapTime: number;
+  gapDelta: number; // Lap-by-lap delta (+faster / -slower)
+  compound: TyreCompound;
+  tyreAge: number;
+  driverNum: string;
+}
+
+export interface DriverGapSeries {
+  driverNum: string;
+  driverName: string;
+  driverAcronym: string;
+  teamColour: string;
+  isReference: boolean;
+  points: GapDataPoint[];
+}
+
+/**
+ * Calculates cumulative gap (in seconds) between drivers across each lap.
+ * Reference driver (first selected) has a gap of 0.0s.
+ */
+export function calculateCumulativeGaps(
+  selectedDrivers: string[],
+  drivers: Driver[],
+  lapsCache: Record<string, Lap[]>,
+  stints: Stint[]
+): {
+  series: DriverGapSeries[];
+  referenceDriverNum: string | null;
+} {
+  if (selectedDrivers.length === 0) {
+    return { series: [], referenceDriverNum: null };
+  }
+
+  const refNum = selectedDrivers[0];
+  const enrichedLaps: Record<string, Lap[]> = {};
+  selectedDrivers.forEach((num) => {
+    enrichedLaps[num] = enrichLapsWithStints(lapsCache[num] ?? [], stints, num);
+  });
+
+  // Calculate cumulative race time per lap for each driver
+  const cumulativeTimes: Record<string, Record<number, number>> = {};
+  const maxLap = Math.max(
+    ...selectedDrivers.map((num) => {
+      const laps = enrichedLaps[num] ?? [];
+      let total = 0;
+      cumulativeTimes[num] = {};
+      laps.forEach((l) => {
+        const dur = l.lap_duration ?? l.lap_time ?? 0;
+        if (dur > 0) {
+          total += dur;
+          cumulativeTimes[num][l.lap_number] = total;
+        }
+      });
+      return laps.length > 0 ? Math.max(...laps.map((l) => l.lap_number)) : 0;
+    }),
+    0
+  );
+
+  const series: DriverGapSeries[] = selectedDrivers.map((driverNum) => {
+    const info = drivers.find((d) => d.driver_number.toString() === driverNum);
+    const driverName = info?.full_name ?? `Driver #${driverNum}`;
+    const driverAcronym = info?.name_acronym ?? `#${driverNum}`;
+    const teamColour = info ? formatColor(info.team_colour) : '#38bdf8';
+    const isReference = driverNum === refNum;
+
+    const laps = enrichedLaps[driverNum] ?? [];
+    const points: GapDataPoint[] = [];
+
+    let prevGap = 0;
+    for (let lap = 1; lap <= maxLap; lap++) {
+      const lapObj = laps.find((l) => l.lap_number === lap);
+      const myCum = cumulativeTimes[driverNum]?.[lap];
+      const refCum = cumulativeTimes[refNum]?.[lap];
+
+      if (myCum !== undefined && refCum !== undefined) {
+        // Gap relative to ref (if ref is leading, gap is positive e.g. +3.5s behind ref)
+        const gap = Number((myCum - refCum).toFixed(3));
+        const lapDur = lapObj?.lap_duration ?? lapObj?.lap_time ?? 0;
+        const gapDelta = lap === 1 ? 0 : Number((gap - prevGap).toFixed(3));
+        prevGap = gap;
+
+        points.push({
+          x: lap,
+          y: gap,
+          lapTime: lapDur,
+          gapDelta,
+          compound: (lapObj?.compound ?? 'UNKNOWN') as TyreCompound,
+          tyreAge: lapObj?.tyreAge ?? 0,
+          driverNum,
+        });
+      }
+    }
+
+    return {
+      driverNum,
+      driverName,
+      driverAcronym,
+      teamColour,
+      isReference,
+      points,
+    };
+  });
+
+  return { series, referenceDriverNum: refNum };
+}
+
+// ─────────────────────────────────────────────────────────────
+// Stint Pace & Tyre Degradation
+// ─────────────────────────────────────────────────────────────
+
+export interface StintPaceSeries {
+  id: string;
+  driverNum: string;
+  driverAcronym: string;
+  teamColour: string;
+  stintNumber: number;
+  compound: TyreCompound;
+  lapStart: number;
+  lapEnd: number;
+  points: {
+    x: number; // Tyre Age (1, 2, 3...)
+    y: number; // Lap time (seconds)
+    lapNumber: number;
+    deltaFromStintStart: number; // Degradation delta
+  }[];
+  avgPace: number;
+  degRatePerLap: number; // Slope of degradation (seconds / lap)
+}
+
+/**
+ * Groups laps by stint to analyze tyre pace and degradation trends over tyre age.
+ */
+export function calculateStintDegradation(
+  selectedDrivers: string[],
+  drivers: Driver[],
+  lapsCache: Record<string, Lap[]>,
+  stints: Stint[]
+): StintPaceSeries[] {
+  const result: StintPaceSeries[] = [];
+
+  selectedDrivers.forEach((driverNum) => {
+    const info = drivers.find((d) => d.driver_number.toString() === driverNum);
+    const driverAcronym = info?.name_acronym ?? `#${driverNum}`;
+    const teamColour = info ? formatColor(info.team_colour) : '#38bdf8';
+
+    const rawLaps = lapsCache[driverNum] ?? [];
+    const enriched = enrichLapsWithStints(rawLaps, stints, driverNum);
+    const driverStints = stints
+      .filter((s) => s.driver_number === parseInt(driverNum, 10))
+      .sort((a, b) => a.stint_number - b.stint_number);
+
+    driverStints.forEach((stint) => {
+      const stintLaps = enriched
+        .filter(
+          (l) =>
+            l.lap_number >= stint.lap_start &&
+            (stint.lap_end === null || l.lap_number <= stint.lap_end) &&
+            (l.lap_duration ?? l.lap_time ?? 0) > 0 &&
+            (l.lap_duration ?? l.lap_time ?? 0) < 115 // exclude in/out pit laps
+        )
+        .sort((a, b) => a.lap_number - b.lap_number);
+
+      if (stintLaps.length === 0) return;
+
+      const firstLapTime = stintLaps[0].lap_duration ?? stintLaps[0].lap_time ?? 0;
+      const validTimes = stintLaps.map((l) => l.lap_duration ?? l.lap_time ?? 0);
+      const avgPace =
+        validTimes.reduce((acc, v) => acc + v, 0) / validTimes.length;
+
+      const points = stintLaps.map((l, idx) => {
+        const dur = l.lap_duration ?? l.lap_time ?? 0;
+        return {
+          x: idx + 1, // Tyre Age in this stint (1, 2, 3...)
+          y: dur,
+          lapNumber: l.lap_number,
+          deltaFromStintStart: Number((dur - firstLapTime).toFixed(3)),
+        };
+      });
+
+      // Compute simple linear degradation rate (s/lap)
+      let degRate = 0;
+      if (points.length > 2) {
+        const lastP = points[points.length - 1];
+        degRate = Number(((lastP.y - points[0].y) / (points.length - 1)).toFixed(3));
+      }
+
+      result.push({
+        id: `${driverNum}_stint_${stint.stint_number}`,
+        driverNum,
+        driverAcronym,
+        teamColour,
+        stintNumber: stint.stint_number,
+        compound: (stint.compound?.toUpperCase() ?? 'UNKNOWN') as TyreCompound,
+        lapStart: stint.lap_start,
+        lapEnd: stint.lap_end ?? stintLaps[stintLaps.length - 1].lap_number,
+        points,
+        avgPace: Number(avgPace.toFixed(3)),
+        degRatePerLap: degRate,
+      });
+    });
+  });
+
+  return result;
+}
+
+
