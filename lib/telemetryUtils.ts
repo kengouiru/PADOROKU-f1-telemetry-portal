@@ -593,4 +593,16 @@ export function calculateStintDegradation(
   return result;
 }
 
+/**
+ * Converts a raw audio URL (OpenF1 / F1 CDN) into a local streaming proxy URL
+ * to bypass browser CORS restrictions and header policies.
+ */
+export function getProxiedAudioUrl(url: string | null | undefined): string {
+  if (!url) return '';
+  // If already relative / proxied, return directly
+  if (url.startsWith('/api/')) return url;
+  return `/api/audio-proxy?url=${encodeURIComponent(url)}`;
+}
+
+
 

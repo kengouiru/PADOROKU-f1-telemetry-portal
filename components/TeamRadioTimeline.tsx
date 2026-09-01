@@ -8,7 +8,7 @@
 
 import React, { useState, useRef, useCallback, useEffect, useMemo, useImperativeHandle, forwardRef } from 'react';
 import type { Driver, Lap, TeamRadio, PitStop, RaceControlMessage } from '@/lib/types';
-import { formatColor, mapRadioRecordingsToLaps, formatLapTime } from '@/lib/telemetryUtils';
+import { formatColor, mapRadioRecordingsToLaps, formatLapTime, getProxiedAudioUrl } from '@/lib/telemetryUtils';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -368,7 +368,7 @@ function TimelineCard({ event, driverColor, transcript, isLoadingTranscript, onF
   useEffect(() => {
     if (!event.recording_url) return;
     setAudioError(false);
-    const audio = new Audio(event.recording_url);
+    const audio = new Audio(getProxiedAudioUrl(event.recording_url));
     audioRef.current = audio;
 
     audio.onloadedmetadata = () => setDuration(audio.duration || 0);

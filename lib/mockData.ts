@@ -120,7 +120,7 @@ export const MOCK_TEAM_RADIO: Record<string, TeamRadio[]> = {
   '9161_1': [
     {
       date: '2024-03-02T15:03:45.000Z',
-      recording_url: 'https://livetiming.formula1.com/static/2024/2024-03-02_Bahrain_Grand_Prix/2024-03-02_Race/TeamRadio/MAXVER01_1_20240302_150345.mp3',
+      recording_url: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/MAXVER01_1_20230916_141749.mp3',
       driver_number: 1,
       session_key: 9161,
       category: 'PACE',
@@ -130,7 +130,7 @@ export const MOCK_TEAM_RADIO: Record<string, TeamRadio[]> = {
     },
     {
       date: '2024-03-02T15:09:50.000Z',
-      recording_url: 'https://livetiming.formula1.com/static/2024/2024-03-02_Bahrain_Grand_Prix/2024-03-02_Race/TeamRadio/MAXVER01_4_20240302_150950.mp3',
+      recording_url: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/MAXVER01_1_20230916_142555.mp3',
       driver_number: 1,
       session_key: 9161,
       category: 'TYRE',
@@ -140,7 +140,7 @@ export const MOCK_TEAM_RADIO: Record<string, TeamRadio[]> = {
     },
     {
       date: '2024-03-02T15:17:30.000Z',
-      recording_url: 'https://livetiming.formula1.com/static/2024/2024-03-02_Bahrain_Grand_Prix/2024-03-02_Race/TeamRadio/MAXVER01_10_20240302_151730.mp3',
+      recording_url: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/MAXVER01_1_20230916_142903.mp3',
       driver_number: 1,
       session_key: 9161,
       category: 'STRATEGY',
@@ -150,7 +150,7 @@ export const MOCK_TEAM_RADIO: Record<string, TeamRadio[]> = {
     },
     {
       date: '2024-03-02T15:28:30.000Z',
-      recording_url: 'https://livetiming.formula1.com/static/2024/2024-03-02_Bahrain_Grand_Prix/2024-03-02_Race/TeamRadio/MAXVER01_17_20240302_152830.mp3',
+      recording_url: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/MAXVER01_1_20230916_144953.mp3',
       driver_number: 1,
       session_key: 9161,
       category: 'PIT',
@@ -160,7 +160,7 @@ export const MOCK_TEAM_RADIO: Record<string, TeamRadio[]> = {
     },
     {
       date: '2024-03-02T15:30:10.000Z',
-      recording_url: 'https://livetiming.formula1.com/static/2024/2024-03-02_Bahrain_Grand_Prix/2024-03-02_Race/TeamRadio/MAXVER01_18_20240302_153010.mp3',
+      recording_url: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/MAXVER01_1_20230916_145526.mp3',
       driver_number: 1,
       session_key: 9161,
       category: 'PACE',
@@ -170,7 +170,7 @@ export const MOCK_TEAM_RADIO: Record<string, TeamRadio[]> = {
     },
     {
       date: '2024-03-02T15:59:55.000Z',
-      recording_url: 'https://livetiming.formula1.com/static/2024/2024-03-02_Bahrain_Grand_Prix/2024-03-02_Race/TeamRadio/MAXVER01_36_20240302_155955.mp3',
+      recording_url: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/MAXVER01_1_20230916_141749.mp3',
       driver_number: 1,
       session_key: 9161,
       category: 'PIT',
@@ -180,7 +180,7 @@ export const MOCK_TEAM_RADIO: Record<string, TeamRadio[]> = {
     },
     {
       date: '2024-03-02T16:29:00.000Z',
-      recording_url: 'https://livetiming.formula1.com/static/2024/2024-03-02_Bahrain_Grand_Prix/2024-03-02_Race/TeamRadio/MAXVER01_57_20240302_162900.mp3',
+      recording_url: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/MAXVER01_1_20230916_142555.mp3',
       driver_number: 1,
       session_key: 9161,
       category: 'PACE',
@@ -192,7 +192,7 @@ export const MOCK_TEAM_RADIO: Record<string, TeamRadio[]> = {
   '9161_44': [
     {
       date: '2024-03-02T15:03:45.000Z',
-      recording_url: 'https://livetiming.formula1.com/static/2024/2024-03-02_Bahrain_Grand_Prix/2024-03-02_Race/TeamRadio/LEWHAM01_1_20240302_150345.mp3',
+      recording_url: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/LEWHAM01_44_20230916_142617.mp3',
       driver_number: 44,
       session_key: 9161,
       category: 'TYRE',
@@ -202,7 +202,7 @@ export const MOCK_TEAM_RADIO: Record<string, TeamRadio[]> = {
     },
     {
       date: '2024-03-02T15:08:20.000Z',
-      recording_url: 'https://livetiming.formula1.com/static/2024/2024-03-02_Bahrain_Grand_Prix/2024-03-02_Race/TeamRadio/LEWHAM01_3_20240302_150820.mp3',
+      recording_url: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/LEWHAM01_44_20230916_153501.mp3',
       driver_number: 44,
       session_key: 9161,
       category: 'PACE',
@@ -212,7 +212,7 @@ export const MOCK_TEAM_RADIO: Record<string, TeamRadio[]> = {
     },
     {
       date: '2024-03-02T15:18:10.000Z',
-      recording_url: 'https://livetiming.formula1.com/static/2024/2024-03-02_Bahrain_Grand_Prix/2024-03-02_Race/TeamRadio/LEWHAM01_10_20240302_151810.mp3',
+      recording_url: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/LEWHAM01_44_20230916_142617.mp3',
       driver_number: 44,
       session_key: 9161,
       category: 'TYRE',
@@ -222,7 +222,7 @@ export const MOCK_TEAM_RADIO: Record<string, TeamRadio[]> = {
     },
     {
       date: '2024-03-02T15:25:20.000Z',
-      recording_url: 'https://livetiming.formula1.com/static/2024/2024-03-02_Bahrain_Grand_Prix/2024-03-02_Race/TeamRadio/LEWHAM01_15_20240302_152520.mp3',
+      recording_url: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/LEWHAM01_44_20230916_153501.mp3',
       driver_number: 44,
       session_key: 9161,
       category: 'PIT',
@@ -232,7 +232,7 @@ export const MOCK_TEAM_RADIO: Record<string, TeamRadio[]> = {
     },
     {
       date: '2024-03-02T15:38:00.000Z',
-      recording_url: 'https://livetiming.formula1.com/static/2024/2024-03-02_Bahrain_Grand_Prix/2024-03-02_Race/TeamRadio/LEWHAM01_23_20240302_153800.mp3',
+      recording_url: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/LEWHAM01_44_20230916_142617.mp3',
       driver_number: 44,
       session_key: 9161,
       category: 'STRATEGY',
@@ -242,7 +242,7 @@ export const MOCK_TEAM_RADIO: Record<string, TeamRadio[]> = {
     },
     {
       date: '2024-03-02T16:27:00.000Z',
-      recording_url: 'https://livetiming.formula1.com/static/2024/2024-03-02_Bahrain_Grand_Prix/2024-03-02_Race/TeamRadio/LEWHAM01_56_20240302_162700.mp3',
+      recording_url: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/LEWHAM01_44_20230916_153501.mp3',
       driver_number: 44,
       session_key: 9161,
       category: 'PACE',
@@ -254,7 +254,7 @@ export const MOCK_TEAM_RADIO: Record<string, TeamRadio[]> = {
   '9161_16': [
     {
       date: '2024-03-02T15:04:10.000Z',
-      recording_url: 'https://livetiming.formula1.com/static/2024/2024-03-02_Bahrain_Grand_Prix/2024-03-02_Race/TeamRadio/CHALEC01_1_20240302_150410.mp3',
+      recording_url: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/CHALEC01_16_20230916_140111.mp3',
       driver_number: 16,
       session_key: 9161,
       category: 'SAFETY',
@@ -264,7 +264,7 @@ export const MOCK_TEAM_RADIO: Record<string, TeamRadio[]> = {
     },
     {
       date: '2024-03-02T15:15:30.000Z',
-      recording_url: 'https://livetiming.formula1.com/static/2024/2024-03-02_Bahrain_Grand_Prix/2024-03-02_Race/TeamRadio/CHALEC01_11_20240302_151530.mp3',
+      recording_url: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/CHALEC01_16_20230916_151616.mp3',
       driver_number: 16,
       session_key: 9161,
       category: 'TYRE',

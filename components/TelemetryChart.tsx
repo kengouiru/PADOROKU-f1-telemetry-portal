@@ -39,6 +39,7 @@ import {
   mapRadioRecordingsToLaps,
   calculateCumulativeGaps,
   calculateStintDegradation,
+  getProxiedAudioUrl,
 } from '@/lib/telemetryUtils';
 
 // ── Register Chart.js modules globally (idempotent) ───────────────────────────
@@ -801,7 +802,7 @@ function InlineRadioItem({
   React.useEffect(() => {
     if (!radio.recording_url) return;
     setAudioError(false);
-    const audio = new Audio(radio.recording_url);
+    const audio = new Audio(getProxiedAudioUrl(radio.recording_url));
     audioRef.current = audio;
 
     audio.onloadedmetadata = () => setDuration(audio.duration || 0);
