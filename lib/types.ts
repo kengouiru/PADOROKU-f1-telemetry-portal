@@ -112,9 +112,18 @@ export interface TeamRadio {
   // Pre-populated in mock data, resolved via Gemini in live mode:
   transcript?: string;           // English transcription
   translation?: string;          // Japanese translation
+  aiSummary?: string;            // Strategic tactical context summary
   category?: RadioCategory;
   // Merged field added by mapRadioRecordingsToLaps:
   lap_number?: number | null;
+}
+
+/** Transcript cache record structure */
+export interface RadioTranscriptData {
+  transcript: string;
+  translation: string;
+  aiSummary?: string;
+  category: string;
 }
 
 /** A pit stop record */

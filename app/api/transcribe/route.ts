@@ -1,11 +1,11 @@
 /**
  * app/api/transcribe/route.ts
- * BFF Proxy — Gemini Team Radio Transcription
+ * BFF Proxy — Gemini Team Radio Transcription & Tactical AI Summary
+ *
+ * Accepts audio URL + lap telemetry context, returns transcript, Japanese translation,
+ * category classification, and strategic race context summary.
  *
  * Model priority (Flash): gemini-3.5-flash-lite → gemini-3.5-flash → gemini-2.5-flash → gemini-2.5-flash-lite → gemini-flash-latest
- * Auto-retries with next model name on 404 / model not found / deprecated model.
- *
- * Keeps the Gemini API key server-side (GEMINI_API_KEY env var).
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -13,15 +13,18 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export const runtime = 'nodejs';
 
-interface TranscribeRequest {
+export interface TranscribeRequest {
   audioUrl: string;
   driverNumber?: number;
-  sessionKey?: number;
+  driverName?: string;
+  lapNumber?: number;
+  lapContext?: string; // Telemetry context (e.g. tyre compound, tyre age, lap time delta)
 }
 
-interface TranscribeResponse {
+export interface TranscribeResponse {
   transcript: string;
   translation: string;
+  aiSummary: string;
   category: 'PIT' | 'TYRE' | 'PACE' | 'SAFETY' | 'STRATEGY';
 }
 
@@ -34,11 +37,11 @@ const FLASH_MODELS = [
 ];
 
 const CATEGORY_KEYWORDS: Record<TranscribeResponse['category'], string[]> = {
-  PIT:      ['box', 'pit', 'stop', 'undercut', 'overcut', 'ピット'],
-  TYRE:     ['tyre', 'tire', 'compound', 'soft', 'medium', 'hard', 'graining', 'blister', 'タイヤ'],
-  SAFETY:   ['safety car', 'vsc', 'virtual', 'yellow', 'red flag', 'セーフティカー', 'フラッグ'],
-  STRATEGY: ['plan', 'strategy', 'gap', 'push', 'manage', 'fuel', 'engine mode', 'mode', 'プラン'],
-  PACE:     ['pace', 'lap', 'sector', 'push', 'good', 'well done', 'ペース'],
+  PIT:      ['box', 'pit', 'stop', 'undercut', 'overcut', 'ピット', '入る'],
+  TYRE:     ['tyre', 'tire', 'compound', 'soft', 'medium', 'hard', 'graining', 'blister', 'タイヤ', 'グリップ'],
+  SAFETY:   ['safety car', 'vsc', 'virtual', 'yellow', 'red flag', 'セーフティカー', 'フラッグ', 'sc'],
+  STRATEGY: ['plan', 'strategy', 'gap', 'push', 'manage', 'fuel', 'engine mode', 'mode', 'プラン', 'ストラテジー'],
+  PACE:     ['pace', 'lap', 'sector', 'push', 'good', 'well done', 'ペース', 'タイム'],
 };
 
 function classifyCategory(text: string): TranscribeResponse['category'] {
@@ -66,13 +69,17 @@ async function fetchAudioAsBase64(url: string): Promise<{ data: string; mimeType
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const body = (await req.json()) as TranscribeRequest;
-    const { audioUrl } = body;
+    const { audioUrl, driverName, lapNumber, lapContext } = body;
 
     if (!audioUrl) {
       return NextResponse.json({ error: 'audioUrl is required' }, { status: 400 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey =
+      process.env.GEMINI_API_KEY ??
+      req.headers.get('x-gemini-key') ??
+      '';
+
     if (!apiKey) {
       return NextResponse.json({ error: 'GEMINI_API_KEY not configured' }, { status: 503 });
     }
@@ -82,17 +89,30 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     const genAI = new GoogleGenerativeAI(apiKey);
 
-    const prompt = `You are analyzing Formula 1 team radio communications.
+    const contextSection = lapContext
+      ? `\n\n--- RACE TELEMETRY CONTEXT AT THIS MOMENT ---
+Driver: ${driverName ?? 'Driver'}
+Lap: ${lapNumber ?? 'Unknown'}
+Context: ${lapContext}
+--- END CONTEXT ---`
+      : '';
 
-Listen to this audio clip and provide:
-1. An accurate English transcript of what is said.
-2. A Japanese translation of the transcript.
-3. A category classification.
+    const prompt = `You are an elite Formula 1 race engineer and strategist.
+Listen to this team radio clip and analyze it with the provided telemetry context.
 
-Respond ONLY in this exact JSON format (no markdown, no explanation):
+${contextSection}
+
+Provide:
+1. transcript: Accurate verbatim English transcript of the radio message.
+2. translation: Natural Japanese translation of what was said.
+3. aiSummary: 1-2 sentence concise Japanese tactical explanation of the driver/engineer's strategic intent, considering the race context (e.g. why they are boxing, managing tyres, reacting to a delta, etc.).
+4. category: Exactly one of "PIT", "TYRE", "PACE", "SAFETY", "STRATEGY".
+
+Respond ONLY in this exact JSON format (no markdown code fences, no extra text):
 {
-  "transcript": "<english transcript>",
-  "translation": "<japanese translation>",
+  "transcript": "<verbatim english transcript>",
+  "translation": "<natural japanese translation>",
+  "aiSummary": "<tactical context & intent in Japanese>",
   "category": "<one of: PIT, TYRE, PACE, SAFETY, STRATEGY>"
 }`;
 
@@ -132,14 +152,17 @@ Respond ONLY in this exact JSON format (no markdown, no explanation):
     // Parse JSON response
     let parsed: TranscribeResponse;
     try {
-      // Strip markdown code fences if present
-      const jsonText = text.replace(/^```json\s*/i, '').replace(/\s*```$/i, '');
+      const jsonText = text.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
       parsed = JSON.parse(jsonText) as TranscribeResponse;
+      if (!parsed.aiSummary) {
+        parsed.aiSummary = parsed.translation;
+      }
     } catch {
       // Fallback: extract from raw text
       parsed = {
         transcript: text,
         translation: '(翻訳の解析に失敗しました)',
+        aiSummary: text,
         category: classifyCategory(text),
       };
     }

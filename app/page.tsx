@@ -332,8 +332,12 @@ export default function DashboardPage() {
         drivers={state.drivers}
         stints={state.stints}
         pitStopsCache={state.pitStopsCache}
+        teamRadioCache={state.teamRadioCache}
         safetyCarPeriods={state.safetyCarPeriods}
         onLapClick={handleLapClick}
+        geminiApiKey={state.geminiApiKey}
+        transcriptsCache={state.transcriptsCache}
+        onTranscriptFetched={handleTranscriptFetched}
       />
 
       {state.selectedDrivers.length > 0 && (
