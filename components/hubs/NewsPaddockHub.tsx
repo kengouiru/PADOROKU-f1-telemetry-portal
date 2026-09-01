@@ -2,80 +2,136 @@
 
 /**
  * components/hubs/NewsPaddockHub.tsx
- * Hub 2: Latest F1 News, Paddock Rumors, and FIA Bulletins.
+ * Hub 2: Latest F1 News, Paddock Rumors, and Gemini AI 3-Line Smart Summarizer.
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
-interface NewsItem {
+export interface F1NewsArticle {
   id: string;
   title: string;
   summary: string;
-  category: 'RACE' | 'TECHNICAL' | 'PADDOCK' | 'FIA';
-  date: string;
-  readTime: string;
+  link: string;
+  source: string;
+  pubDate: string;
+  category: 'TECHNICAL' | 'PADDOCK' | 'RACE' | 'FIA';
   badgeColor: string;
 }
 
-const MOCK_NEWS: NewsItem[] = [
-  {
-    id: 'news-1',
-    title: 'レッドブル、次戦に向けたフロアアップデートの投入を決定 — ダウンフォース向上へ',
-    summary: '高速コーナーでの安定性向上を目指し、アンダーフロア前端のベンチュリトンネル形状とエッジウィングの気流制御を改良した新型パッケージを投入予定。',
-    category: 'TECHNICAL',
-    date: '2時間前',
-    readTime: '3分で読める',
-    badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-  },
-  {
-    id: 'news-2',
-    title: 'フェラーリ、タイヤデグラデーション改善に向けサスペンションジオメトリを再評価',
-    summary: 'ロングランにおけるリアタイヤのオーバーヒートを抑制するため、リアサスペンションのキネマティクス設定を見直す作業が進められている。',
-    category: 'TECHNICAL',
-    date: '4時間前',
-    readTime: '4分で読める',
-    badgeColor: 'bg-red-500/20 text-red-300 border-red-500/30',
-  },
-  {
-    id: 'news-3',
-    title: 'パドック速報：2025年ドライバー移籍市場の最新動向とシート争い',
-    summary: '複数チームで契約更新と移籍をめぐる水面下の交渉が本格化。若手ドライバーの昇格シナリオとベテランの去就が注目を集める。',
-    category: 'PADDOCK',
-    date: '6時間前',
-    readTime: '5分で読める',
-    badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-  },
-  {
-    id: 'news-4',
-    title: 'FIA、トラックリミット監視システムの高精度AIカメラを今週末より試験導入',
-    summary: 'ターン出口での白線踏み越え判定を自動化する高解像度コンピュータビジョンシステムを導入し、審理時間を大幅に短縮する方針を発表。',
-    category: 'FIA',
-    date: '1日前',
-    readTime: '2分で読める',
-    badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-  },
-  {
-    id: 'news-5',
-    title: '週末のグランプリ決勝展望：2ストップ対1ストップの戦略分岐点',
-    summary: '路面温度の低下が予想されるナイトセッションにおいて、ハードタイヤのウォームアップとアンダーカット効果が勝敗の鍵を握る。',
-    category: 'RACE',
-    date: '1日前',
-    readTime: '4分で読める',
-    badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-  },
-];
+interface NewsPaddockHubProps {
+  geminiApiKey?: string;
+}
 
-export default function NewsPaddockHub() {
+export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProps) {
+  const [articles, setArticles] = useState<F1NewsArticle[]>([]);
+  const [isLoadingNews, setIsLoadingNews] = useState<boolean>(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  const filteredNews = MOCK_NEWS.filter((item) => {
+  // AI Summaries per article ID
+  const [aiSummaries, setAiSummaries] = useState<Record<string, string>>({});
+  const [loadingAiSummary, setLoadingAiSummary] = useState<Record<string, boolean>>({});
+
+  // Fetch News from BFF API
+  const fetchNews = useCallback(async () => {
+    setIsLoadingNews(true);
+    try {
+      const res = await fetch('/api/f1-news');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setArticles(data.articles ?? []);
+    } catch (e) {
+      console.warn('[News Fetch Error]:', e);
+    } finally {
+      setIsLoadingNews(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchNews();
+  }, [fetchNews]);
+
+  // Generate 3-Line Smart Summary via Gemini AI
+  const handleGenerateSummary = async (article: F1NewsArticle) => {
+    if (loadingAiSummary[article.id] || aiSummaries[article.id]) return;
+
+    setLoadingAiSummary((prev) => ({ ...prev, [article.id]: true }));
+
+    try {
+      const prompt = `あなたはF1のチーフレースアナリストです。
+以下のF1ニュース記事（タイトル・概要）に基づき、日本のF1ファンやチームストラテジスト向けに、必ず以下の3項目フォーマットで【簡潔で鋭い3行スマート要約】を作成してください。
+
+【記事情報】
+タイトル: ${article.title}
+概要: ${article.summary}
+カテゴリ: ${article.category}
+ソース: ${article.source}
+
+【出力フォーマット】
+・【概要】（何が発表/発生したのかを1文で）
+・【戦術/技術的影響】（マシンパフォーマンス、タイヤ、戦略への影響を1文で）
+・【今後の注目点】（週末のセッションや今後の展望を1文で）`;
+
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (geminiApiKey) headers['x-gemini-key'] = geminiApiKey;
+
+      const res = await fetch('/api/strategist', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: prompt }],
+        }),
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const reader = res.body?.getReader();
+      const decoder = new TextDecoder();
+      let text = '';
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          text += decoder.decode(value, { stream: true });
+          setAiSummaries((prev) => ({ ...prev, [article.id]: text }));
+        }
+      } else {
+        const json = await res.json();
+        text = json.response ?? json.text ?? '';
+        setAiSummaries((prev) => ({ ...prev, [article.id]: text }));
+      }
+    } catch (e) {
+      console.warn('[News AI Summary Error]:', e);
+      setAiSummaries((prev) => ({
+        ...prev,
+        [article.id]: '・【概要】要約の生成に失敗しました。\n・【戦術/技術的影響】時間をおいて再試行してください。\n・【今後の注目点】APIキー設定を確認してください。',
+      }));
+    } finally {
+      setLoadingAiSummary((prev) => ({ ...prev, [article.id]: false }));
+    }
+  };
+
+  const filteredNews = articles.filter((item) => {
     const matchCat = selectedCategory === 'ALL' || item.category === selectedCategory;
     const matchSearch =
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.summary.toLowerCase().includes(searchQuery.toLowerCase());
+      item.summary.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.source.toLowerCase().includes(searchQuery.toLowerCase());
     return matchCat && matchSearch;
   });
+
+  const formatRelativeTime = (iso: string) => {
+    try {
+      const diffMs = Date.now() - new Date(iso).getTime();
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      if (diffHours < 1) return '数十分前';
+      if (diffHours < 24) return `${diffHours}時間前`;
+      return `${Math.floor(diffHours / 24)}日前`;
+    } catch {
+      return '本日';
+    }
+  };
 
   return (
     <div className="flex flex-col gap-5 max-w-6xl mx-auto animate-fade-in">
@@ -85,26 +141,34 @@ export default function NewsPaddockHub() {
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
             <span className="text-xs font-racing font-bold text-emerald-400 uppercase tracking-widest">
-              LIVE PADDOCK FEED
+              LIVE PADDOCK & NEWS FEED
             </span>
           </div>
           <h2 className="text-xl font-racing font-black text-white tracking-wider">
             NEWS & PADDOCK INTELLIGENCE
           </h2>
           <p className="text-xs text-slate-400 max-w-xl">
-            FIA公式リリース、各チームの技術アップデート、ドライバーコメント、パドックの最新動向をリアルタイム配信。
+            FIA公式発表、技術アップデート、ドライバー市場のパドック動向を配信。Gemini AIによる3行スマート要約に対応。
           </p>
         </div>
 
-        {/* Search Input */}
-        <div className="z-10 w-full md:w-72">
+        {/* Search & Refresh Actions */}
+        <div className="z-10 flex items-center gap-2 w-full md:w-auto">
           <input
             type="text"
-            placeholder="キーワードでニュースを検索..."
+            placeholder="キーワードやチーム名で検索..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-900/80 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
+            className="w-full md:w-64 bg-slate-900/80 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
           />
+          <button
+            onClick={fetchNews}
+            disabled={isLoadingNews}
+            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 transition-colors flex items-center justify-center flex-shrink-0 disabled:opacity-50"
+            title="ニュースを再取得"
+          >
+            <span className={isLoadingNews ? 'animate-spin' : ''}>🔄</span>
+          </button>
         </div>
       </div>
 
@@ -131,38 +195,121 @@ export default function NewsPaddockHub() {
         ))}
       </div>
 
-      {/* News Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filteredNews.map((item) => (
-          <div
-            key={item.id}
-            className="glass-card p-5 flex flex-col justify-between gap-3 hover:border-white/20 transition-all group"
-          >
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${item.badgeColor}`}>
-                  {item.category}
-                </span>
-                <span className="text-[11px] text-slate-500 font-mono">{item.date}</span>
+      {/* Loading Skeleton */}
+      {isLoadingNews && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="glass-card p-5 h-44 flex flex-col justify-between animate-pulse">
+              <div className="space-y-2">
+                <div className="w-20 h-4 bg-slate-800 rounded" />
+                <div className="w-full h-5 bg-slate-800 rounded" />
+                <div className="w-4/5 h-3 bg-slate-800/60 rounded" />
               </div>
-              <h3 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors leading-snug">
-                {item.title}
-              </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                {item.summary}
-              </p>
+              <div className="w-1/3 h-4 bg-slate-800/40 rounded" />
             </div>
+          ))}
+        </div>
+      )}
 
-            <div className="flex items-center justify-between pt-3 border-t border-white/5 text-[11px] text-slate-500">
-              <span>⏱️ {item.readTime}</span>
-              <span className="text-sky-400 group-hover:translate-x-0.5 transition-transform flex items-center gap-1 font-medium">
-                <span>続きを読む</span>
-                <span>➔</span>
-              </span>
+      {/* News Grid */}
+      {!isLoadingNews && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filteredNews.length === 0 ? (
+            <div className="col-span-full glass-card p-12 text-center text-slate-500 text-xs flex flex-col items-center gap-2">
+              <span className="text-3xl">📰</span>
+              <span>該当するニュースが見つかりませんでした</span>
             </div>
-          </div>
-        ))}
-      </div>
+          ) : (
+            filteredNews.map((item) => (
+              <div
+                key={item.id}
+                className="glass-card p-5 flex flex-col justify-between gap-3 hover:border-white/20 transition-all group relative overflow-hidden"
+              >
+                <div className="flex flex-col gap-2.5">
+                  {/* Category, Source, and Date Header */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${item.badgeColor}`}>
+                        {item.category}
+                      </span>
+                      <span className="text-[11px] text-slate-400 font-mono">
+                        {item.source}
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-slate-500 font-mono">
+                      {formatRelativeTime(item.pubDate)}
+                    </span>
+                  </div>
+
+                  {/* Title & Summary */}
+                  <h3 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors leading-snug">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    {item.summary}
+                  </p>
+
+                  {/* AI 3-Line Smart Summary Block (if generated) */}
+                  {aiSummaries[item.id] && (
+                    <div className="bg-purple-950/40 border border-purple-500/30 rounded-xl p-3 text-xs text-purple-200 mt-1 animate-fade-in flex flex-col gap-1.5 shadow-inner">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1">
+                          <span>✨</span>
+                          <span>AI 3行スマート要約</span>
+                        </span>
+                        <span className="text-[9px] text-purple-400/80 font-mono">Gemini 3.5</span>
+                      </div>
+                      <div className="space-y-1 text-[11px] text-slate-200 leading-relaxed whitespace-pre-wrap font-sans">
+                        {aiSummaries[item.id]}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Card Action Buttons */}
+                <div className="flex items-center justify-between pt-3 border-t border-white/5 text-xs">
+                  {/* AI Summarize Button */}
+                  {!aiSummaries[item.id] ? (
+                    <button
+                      onClick={() => handleGenerateSummary(item)}
+                      disabled={loadingAiSummary[item.id]}
+                      className="py-1 px-2.5 rounded-lg bg-purple-900/40 hover:bg-purple-900/60 border border-purple-500/30 text-purple-200 text-[11px] font-medium flex items-center gap-1.5 transition-all disabled:opacity-50"
+                    >
+                      {loadingAiSummary[item.id] ? (
+                        <>
+                          <span className="w-2.5 h-2.5 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                          <span>AI要約中...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>✨</span>
+                          <span>AIで3行要約</span>
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <span className="text-[10px] text-emerald-400 flex items-center gap-1">
+                      <span>✓</span>
+                      <span>要約展開中</span>
+                    </span>
+                  )}
+
+                  {/* External Read Original Article Link */}
+                  <a
+                    href={item.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sky-400 hover:text-sky-300 text-xs font-medium flex items-center gap-1 group-hover:translate-x-0.5 transition-transform ml-auto"
+                  >
+                    <span>元記事を読む</span>
+                    <span>↗</span>
+                  </a>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 }

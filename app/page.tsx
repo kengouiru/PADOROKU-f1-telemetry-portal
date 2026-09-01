@@ -528,7 +528,7 @@ export default function DashboardPage() {
         {/* Main Hub Area */}
         <main className="flex-1 min-w-0 p-5 overflow-y-auto">
           {activeHub === 'telemetry' && analysisContent}
-          {activeHub === 'news' && <NewsPaddockHub />}
+          {activeHub === 'news' && <NewsPaddockHub geminiApiKey={state.geminiApiKey} />}
           {activeHub === 'knowledge' && <KnowledgeHistoryHub />}
           {activeHub === 'notes' && (
             <RaceNotesReportHub
@@ -567,7 +567,7 @@ export default function DashboardPage() {
         {/* Tab content */}
         <div className="flex-1 min-h-0 overflow-y-auto p-4">
           {mobileTab === 'telemetry' && analysisContent}
-          {mobileTab === 'news' && <NewsPaddockHub />}
+          {mobileTab === 'news' && <NewsPaddockHub geminiApiKey={state.geminiApiKey} />}
           {mobileTab === 'knowledge' && <KnowledgeHistoryHub />}
           {mobileTab === 'notes' && (
             <RaceNotesReportHub
