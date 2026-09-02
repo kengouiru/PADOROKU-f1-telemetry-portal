@@ -456,21 +456,28 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
                       <span className="text-xs text-slate-400 font-mono">{driver.country}</span>
                     </div>
 
-                    {driver.championships > 0 && (
+                    {driver.status === 'Legend' ? (
+                      <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono flex items-center gap-1 shadow-sm">
+                        <span>👑</span>
+                        <span>殿堂入り ({driver.championships}冠)</span>
+                      </span>
+                    ) : driver.championships > 0 ? (
                       <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono flex items-center gap-1">
                         <span>🏆</span>
                         <span>{driver.championships}冠</span>
                       </span>
-                    )}
+                    ) : null}
                   </div>
 
                   {/* Driver Name & Team */}
                   <div>
-                    <h3 className="text-base font-bold text-white leading-tight group-hover:text-sky-300 transition-colors">
-                      {driver.fullName}
+                    <h3 className="text-base font-bold text-white leading-tight group-hover:text-sky-300 transition-colors flex items-center gap-1.5">
+                      <span>{driver.fullName}</span>
+                      {driver.status === 'Legend' && <span className="text-amber-400 text-xs">👑</span>}
                     </h3>
                     <p className="text-xs text-slate-400 mt-0.5">{driver.team}</p>
                   </div>
+
 
                   {/* Driver Type Tag */}
                   <div className="bg-slate-950/60 px-2.5 py-1 rounded-lg border border-white/5 text-[11px] text-sky-200/90 truncate">

@@ -3,7 +3,8 @@
 /**
  * components/hubs/DriverDetailModal.tsx
  * Comprehensive Detailed Modal/Drawer for F1 Drivers (Current & Legends).
- * Supports In-Text Citations ([1]), Keyboard Navigation, and Multi-tab Deep Dive.
+ * Enhanced with deep analytical tabs, telemetry engineering signatures,
+ * iconic races breakdown, multiple quotes, and unified champagne gold (#D4AF37) for Legends.
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -27,6 +28,9 @@ export default function DriverDetailModal({
   const [activeTab, setActiveTab] = useState<DetailTab>('overview');
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
   const modalContentRef = useRef<HTMLDivElement>(null);
+
+  const isLegend = driver.status === 'Legend';
+  const themeColor = isLegend ? '#D4AF37' : driver.teamColor;
 
   // Find currentIndex for Prev / Next navigation
   const currentIndex = allDrivers.findIndex((d) => d.id === driver.id);
@@ -85,31 +89,31 @@ export default function DriverDetailModal({
       {/* Modal Card */}
       <div
         ref={modalContentRef}
-        className="glass-card bg-slate-950/95 border border-white/15 w-full max-w-4xl max-h-[90vh] flex flex-col rounded-3xl shadow-2xl overflow-hidden relative"
-        style={{ borderTopColor: driver.teamColor, borderTopWidth: 4 }}
+        className="glass-card bg-slate-950/95 border border-white/15 w-full max-w-4xl max-h-[92vh] flex flex-col rounded-3xl shadow-2xl overflow-hidden relative"
+        style={{ borderTopColor: themeColor, borderTopWidth: 4 }}
       >
         {/* Top Navigation Bar: Prev / Next & Close */}
-        <div className="p-4 sm:px-6 bg-slate-900/90 border-b border-white/10 flex items-center justify-between gap-3">
+        <div className="p-3.5 sm:px-6 bg-slate-900/90 border-b border-white/10 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <button
               onClick={() => prevDriver && onSelectDriver(prevDriver)}
-              className="p-1.5 sm:px-3 sm:py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all"
+              className="px-2.5 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1.5 transition-all"
               title="前の選手 (←キー)"
             >
               <span>◀</span>
-              <span className="hidden sm:inline">{prevDriver?.code}</span>
+              <span className="font-mono font-bold">{prevDriver?.code}</span>
             </button>
             <button
               onClick={() => nextDriver && onSelectDriver(nextDriver)}
-              className="p-1.5 sm:px-3 sm:py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all"
+              className="px-2.5 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1.5 transition-all"
               title="次の選手 (→キー)"
             >
-              <span className="hidden sm:inline">{nextDriver?.code}</span>
+              <span className="font-mono font-bold">{nextDriver?.code}</span>
               <span>▶</span>
             </button>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <span className="text-[10px] text-slate-500 font-mono hidden md:inline">
               キーボード [←] [→] で選手切り替え / [ESC] で閉じる
             </span>
@@ -123,14 +127,20 @@ export default function DriverDetailModal({
         </div>
 
         {/* Driver Hero Header */}
-        <div className="p-5 sm:p-6 bg-gradient-to-b from-slate-900/60 to-transparent border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-start sm:items-center gap-3.5">
+        <div
+          className={`p-5 sm:p-6 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+            isLegend
+              ? 'bg-gradient-to-r from-amber-950/40 via-yellow-950/20 to-slate-900/40'
+              : 'bg-gradient-to-b from-slate-900/60 to-transparent'
+          }`}
+        >
+          <div className="flex items-start sm:items-center gap-4">
             <div
-              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex flex-col items-center justify-center font-racing font-black border shadow-lg flex-shrink-0"
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex flex-col items-center justify-center font-racing font-black border shadow-xl flex-shrink-0"
               style={{
-                color: driver.teamColor,
-                borderColor: `${driver.teamColor}60`,
-                backgroundColor: `${driver.teamColor}15`,
+                color: themeColor,
+                borderColor: `${themeColor}80`,
+                backgroundColor: `${themeColor}15`,
               }}
             >
               <span className="text-xl sm:text-2xl leading-none">#{driver.number}</span>
@@ -141,42 +151,52 @@ export default function DriverDetailModal({
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs text-slate-400 font-mono">{driver.country}</span>
                 <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold font-mono border ${
-                    driver.status === 'Legend'
-                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono border ${
+                    isLegend
+                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
                       : 'bg-sky-500/20 text-sky-300 border-sky-500/40'
                   }`}
                 >
-                  {driver.status === 'Legend' ? '👑 殿堂入りレジェンド' : '🏁 現役ドライバー'}
+                  {isLegend ? '👑 殿堂入り F1 LEGEND' : '🏁 現役ドライバー'}
                 </span>
-                <span className="bg-slate-800/80 text-slate-300 px-2 py-0.5 rounded-full text-[10px] font-medium border border-white/10">
+                <span className="bg-slate-800/90 text-slate-300 px-2 py-0.5 rounded-full text-[10px] font-medium border border-white/10">
                   {driver.driverType}
                 </span>
               </div>
 
-              <h2 className="text-xl sm:text-2xl font-black text-white leading-tight">
-                {driver.fullName}
+              <h2 className="text-xl sm:text-2xl font-black text-white leading-tight flex items-center gap-2">
+                <span>{driver.fullName}</span>
+                {isLegend && <span className="text-amber-400 text-lg">👑</span>}
               </h2>
               <p className="text-xs text-slate-400">
-                <strong className="text-slate-300">{driver.team}</strong>
-                {driver.nickname && <span className="ml-2 text-slate-500">({driver.nickname})</span>}
+                <strong className="text-slate-200">{driver.team}</strong>
+                {driver.nickname && <span className="ml-2 text-slate-400">({driver.nickname})</span>}
               </p>
             </div>
           </div>
 
           {/* Championship Trophy Banner */}
           {driver.championships > 0 && (
-            <div className="bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-500/40 rounded-2xl p-3 px-4 flex items-center gap-3 self-start sm:self-auto flex-shrink-0">
-              <span className="text-2xl sm:text-3xl">🏆</span>
+            <div
+              className="rounded-2xl p-3 px-4 flex items-center gap-3 self-start sm:self-auto flex-shrink-0 border shadow-lg"
+              style={{
+                backgroundColor: isLegend ? 'rgba(212, 175, 55, 0.15)' : 'rgba(245, 158, 11, 0.12)',
+                borderColor: `${themeColor}60`,
+              }}
+            >
+              <span className="text-3xl">🏆</span>
               <div>
-                <span className="text-xs font-racing font-bold text-amber-300 uppercase tracking-widest block">
-                  WORLD CHAMPION
+                <span
+                  className="text-xs font-racing font-bold uppercase tracking-widest block"
+                  style={{ color: themeColor }}
+                >
+                  {isLegend ? 'LEGENDARY WORLD CHAMPION' : 'WORLD CHAMPION'}
                 </span>
                 <span className="text-base sm:text-lg font-black text-white font-mono">
                   {driver.championships}回 王座
                 </span>
                 {driver.championshipYears && (
-                  <span className="block text-[10px] text-amber-200/80 font-mono">
+                  <span className="block text-[10px] text-amber-200/90 font-mono">
                     ({driver.championshipYears.join(', ')})
                   </span>
                 )}
@@ -214,6 +234,17 @@ export default function DriverDetailModal({
           {/* TAB 1: OVERVIEW & CAREER STATS */}
           {activeTab === 'overview' && (
             <div className="space-y-5 animate-fade-in">
+              {/* Detailed Career Biography Narrative */}
+              <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-2">
+                <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>📜</span>
+                  <span>キャリア総括 ＆ レース人生の軌跡</span>
+                </h4>
+                <p className="text-xs text-slate-200 leading-relaxed">
+                  {renderTextWithCitations(driver.careerSummary)}
+                </p>
+              </div>
+
               {/* Stats 4-Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="bg-slate-900/80 border border-white/10 p-3.5 rounded-2xl text-center">
@@ -229,7 +260,10 @@ export default function DriverDetailModal({
                   <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
                     🥇 優勝数
                   </span>
-                  <span className="text-xl font-bold font-mono text-amber-400 mt-1 block">
+                  <span
+                    className="text-xl font-bold font-mono mt-1 block"
+                    style={{ color: themeColor }}
+                  >
                     {driver.wins}
                   </span>
                   <span className="text-[9px] text-slate-500">
@@ -303,7 +337,7 @@ export default function DriverDetailModal({
             </div>
           )}
 
-          {/* TAB 2: DRIVING STYLE */}
+          {/* TAB 2: DRIVING STYLE & ENGINEERING */}
           {activeTab === 'style' && (
             <div className="space-y-4 animate-fade-in">
               <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-2">
@@ -333,8 +367,38 @@ export default function DriverDetailModal({
                 </div>
               </div>
 
+              {/* Telemetry Engineering Signature (Deep Dive) */}
+              <div className="bg-gradient-to-r from-blue-950/40 via-purple-950/30 to-slate-900/60 border border-sky-500/30 p-4 rounded-2xl space-y-2 shadow-inner">
+                <h4 className="text-xs font-racing font-bold text-sky-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>📈</span>
+                  <span>テレメトリー工学解析・ステアリング＆ペダル波形特性</span>
+                </h4>
+                <p className="text-xs text-slate-200 leading-relaxed font-mono text-[11px]">
+                  {driver.drivingStyle.telemetrySignature}
+                </p>
+              </div>
+
+              {/* Preferred Circuit Types */}
+              <div className="bg-slate-950/60 border border-white/10 p-4 rounded-2xl space-y-2">
+                <h4 className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🎯</span>
+                  <span>得意とするサーキット特性・レイアウト</span>
+                </h4>
+                <ul className="space-y-1.5">
+                  {driver.drivingStyle.preferredCircuitTypes.map((cType, idx) => (
+                    <li
+                      key={idx}
+                      className="bg-slate-900/60 px-3 py-1.5 rounded-lg border border-white/5 text-xs text-slate-300 flex items-center gap-2"
+                    >
+                      <span className="text-sky-400 font-bold">•</span>
+                      <span>{cType}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
               {/* Braking & Tyre Deep Dive */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
                 <div className="bg-slate-950/60 border border-white/5 p-4 rounded-2xl space-y-1.5">
                   <span className="text-xs font-racing font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                     <span>🛑</span>
@@ -358,17 +422,25 @@ export default function DriverDetailModal({
             </div>
           )}
 
-          {/* TAB 3: BIOGRAPHY & EPISODES */}
+          {/* TAB 3: BIOGRAPHY, ICONIC RACES & RIVALRIES */}
           {activeTab === 'bio' && (
-            <div className="space-y-4 animate-fade-in">
-              {/* Iconic Quote */}
-              <div className="bg-gradient-to-r from-blue-950/60 to-purple-950/60 border border-blue-500/30 p-4 rounded-2xl space-y-1.5 shadow-lg">
-                <span className="text-[10px] font-racing font-bold text-sky-400 uppercase tracking-wider">
-                  💬 象徴的名言 / ICONIC QUOTE
-                </span>
-                <p className="text-sm font-serif italic text-white leading-relaxed">
-                  {driver.biography.iconicQuote}
-                </p>
+            <div className="space-y-5 animate-fade-in">
+              {/* Multiple Iconic Quotes */}
+              <div className="space-y-2">
+                <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>💬</span>
+                  <span>象徴的名言集 / ICONIC QUOTES</span>
+                </h4>
+                <div className="space-y-2">
+                  {driver.biography.quotes.map((quote, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-gradient-to-r from-blue-950/40 to-slate-900/60 border border-blue-500/20 p-3.5 rounded-xl text-xs font-serif italic text-sky-100 shadow-sm"
+                    >
+                      {quote}
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Personality & Character */}
@@ -381,6 +453,51 @@ export default function DriverDetailModal({
                   {driver.biography.personality}
                 </p>
               </div>
+
+              {/* Rivalries & History */}
+              <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-1.5">
+                <h4 className="text-xs font-racing font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>⚔️</span>
+                  <span>ライバル関係史・パドックの人間模様</span>
+                </h4>
+                <p className="text-xs text-slate-200 leading-relaxed">
+                  {driver.biography.rivalries}
+                </p>
+              </div>
+
+              {/* Top 3 Iconic Races Breakdown */}
+              {driver.biography.iconicRaces && driver.biography.iconicRaces.length > 0 && (
+                <div className="space-y-2.5">
+                  <h4 className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>🏆</span>
+                    <span>キャリアを象徴する伝説のレース</span>
+                  </h4>
+                  <div className="space-y-3">
+                    {driver.biography.iconicRaces.map((race, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-slate-950/70 border border-white/10 rounded-2xl p-4 space-y-2"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-bold text-white font-racing">
+                            {race.gp} ({race.year})
+                          </span>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-900/40 text-blue-300 border border-blue-500/30">
+                            MASTERCLASS #{idx + 1}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-300 leading-relaxed">
+                          {race.description}
+                        </p>
+                        <div className="bg-purple-950/30 border border-purple-500/20 p-2.5 rounded-xl text-[11px] text-purple-200 flex items-start gap-1.5">
+                          <span className="text-purple-400 font-bold">⚡ 戦術的決定打:</span>
+                          <span className="text-slate-300">{race.tacticalMasterclass}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Off-Track Passions */}
               <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-1.5">
