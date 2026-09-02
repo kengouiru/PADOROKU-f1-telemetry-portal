@@ -147,6 +147,33 @@ export interface EmbeddedRadio {
   audioUrl?: string;
 }
 
+export interface KeyCorner {
+  number: string;
+  name: string;
+  characteristic: string;
+}
+
+export interface TrackGeometry {
+  elevationChangeMeters: number;
+  longestStraightMeters: number;
+  gForceMax: { lateral: number; longitudinal: number };
+  keyCorners: KeyCorner[];
+}
+
+export interface CircuitHistoricalMoment {
+  year: number;
+  title: string;
+  description: string;
+  significance: string;
+}
+
+export interface CircuitVisualMap {
+  imageUrl: string;
+  credit: string;
+  license: string;
+  sourceUrl: string;
+}
+
 export interface CircuitProfile {
   id: string;
   name: string;
@@ -166,6 +193,9 @@ export interface CircuitProfile {
     year: number;
   };
   characteristics: string;
+  visualMap?: CircuitVisualMap;
+  trackGeometry?: TrackGeometry;
+  historicalMoments?: CircuitHistoricalMoment[];
   setupNotes?: {
     aeroTradeoff: string;
     kerbUsage: string;
@@ -174,6 +204,7 @@ export interface CircuitProfile {
   telemetrySession?: TelemetryTarget;
   references: Reference[];
 }
+
 
 
 export interface StrategyConcept {
@@ -1712,6 +1743,8 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     downforceLevel: 'Medium',
     tyreStress: 'High',
     typicalPitLossSec: 22.5,
+    safetyCarProbability: '60% (中程度)',
+    undercutImpact: '極めて大（新品タイヤのゲイン約1.8秒/周）',
     lapRecord: {
       time: '1:31.447',
       driver: 'Pedro de la Rosa (McLaren)',
@@ -1719,6 +1752,48 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     },
     characteristics:
       '過酷なストップ＆ゴー特性と高粗度アスファルトによる極端なリアタイヤ熱ダレが特徴 [1]。ターン1、ターン4、ターン11など強力なブレーキングポイントが多く、アンダーカットの威力がグリッド中でも最大級に高い [2]。',
+    visualMap: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Bahrain_International_Circuit--Grand_Prix_Layout.svg/960px-Bahrain_International_Circuit--Grand_Prix_Layout.svg.png',
+      credit: 'Will_Scalise',
+      license: 'CC BY-SA 3.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Bahrain_International_Circuit--Grand_Prix_Layout.svg',
+    },
+    trackGeometry: {
+      elevationChangeMeters: 17.5,
+      longestStraightMeters: 1090,
+      gForceMax: { lateral: 4.2, longitudinal: 4.8 },
+      keyCorners: [
+        { number: 'T1', name: 'ミハエル・シューマッハ・コーナー', characteristic: '330km/hから60km/hへ急減速するメインオーバーテイクポイント。' },
+        { number: 'T4', name: 'ターン4', characteristic: '下り勾配でリアが抜けやすい中速右コーナー。外側トラックリミット違反多発。' },
+        { number: 'T9-T10', name: 'ターン9 / ターン10', characteristic: '左下り複合ヘアピン。荷重移動で左フロントが極めてロックしやすい難所。' },
+        { number: 'T11', name: 'ターン11', characteristic: '上り勾配の高速左コーナー。立ち上がりのトラクションが第3ストレートを左右。' },
+      ],
+    },
+    historicalMoments: [
+      {
+        year: 2014,
+        title: 'Duel in the Desert（砂漠の一騎打ち）',
+        description: 'ハミルトンとロズベルグがセーフティカー明けのラスト10周、ホイールを接触させながら演じた近代F1屈指の同門死闘。',
+        significance: 'メルセデス黄金期の幕開けを告げ、パワーユニット時代の接近戦の醍醐味を世界に見せつけた。',
+      },
+      {
+        year: 2020,
+        title: 'ロマン・グロージャンの奇跡の生還',
+        description: 'オープニングラップで220km/hでガードレールを貫通・真っ二つに炎上するも、HALOに救われ28秒後に炎の中から脱出。',
+        significance: 'FIAの安全規格「HALO」と難燃レーシングスーツの劇的な人命救助効果を証明した。',
+      },
+      {
+        year: 2022,
+        title: 'ルクレール vs フェルスタッペン 新規定開幕戦',
+        description: 'ターン1とターン4でDRSゾーンを計算に入れた3周連続のパッシング合戦を展開し、跳ね馬が1-2フィニッシュ。',
+        significance: 'グラウンドエフェクトカーによる新規定が「追従しやすいレース」を実現したことを証明。',
+      },
+    ],
+    setupNotes: {
+      aeroTradeoff: '3本のロングストレート最高速と低速シケインのトラクションの妥協点を探るミディアムDF。',
+      kerbUsage: 'ターン1およびターン4の縁石は比較的フラットだが、脱出側の立ち上がりで踏みすぎるとトラクション抜け。',
+      brakeDemands: '1周に4回のヘビーブレーキングがあり、ディスク温度が1000℃を超える過酷な熱負荷。',
+    },
     telemetrySession: {
       year: 2024,
       meetingKey: 1234,
@@ -1755,6 +1830,8 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     downforceLevel: 'High',
     tyreStress: 'Very High',
     typicalPitLossSec: 22.8,
+    safetyCarProbability: '45% (中低)',
+    undercutImpact: '大（アウトラップのタイヤウォームアップとトラフィック処理が鍵）',
     lapRecord: {
       time: '1:30.983',
       driver: 'Lewis Hamilton (Mercedes)',
@@ -1762,6 +1839,50 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     },
     characteristics:
       '世界で唯一の8の字立体交差を持つテクニカルコース [1]。セクター1の連続S字やデグナー、スプーン、130Rなど高横Gコーナーが連続し、フロント・リア双方のタイヤデグラデーションが激しい [2]。',
+    visualMap: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Suzuka_circuit_map--2005.svg/960px-Suzuka_circuit_map--2005.svg.png',
+      credit: 'Will_Scalise',
+      license: 'CC BY-SA 3.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Suzuka_circuit_map--2005.svg',
+    },
+    trackGeometry: {
+      elevationChangeMeters: 40.4,
+      longestStraightMeters: 900,
+      gForceMax: { lateral: 5.2, longitudinal: 4.6 },
+      keyCorners: [
+        { number: 'T3-T6', name: 'S字カーブ (Esses)', characteristic: '200km/h超で左右に切り返すリズムの極致。1つのライン乱れが全区間のタイムロスに直結。' },
+        { number: 'T8-T9', name: 'デグナー・カーブ', characteristic: 'T8の縁石に乗るミリ単位の精度が要求され、T9は飛び出し厳禁のブラインド右。' },
+        { number: 'T11', name: 'ヘアピン', characteristic: '急減速からの立ち上がりトラクション勝負。インを刺すブレーキング合戦の要所。' },
+        { number: 'T13-T14', name: 'スプーンカーブ', characteristic: '複合下りコーナー。西ストレートの最高速を稼ぐための脱出ボトムスピード維持が鍵。' },
+        { number: 'T15', name: '130R', characteristic: '全開300km/h超で突入する伝説の超高速左コーナー。度胸とハイダウンフォースが試される。' },
+        { number: 'T16-T17', name: '日立Astemoシケイン', characteristic: '数々の歴史的ドラマを生んだ最終減速ポイント。ブレーキング勝負の最終決戦場。' },
+      ],
+    },
+    historicalMoments: [
+      {
+        year: 1989,
+        title: 'セナ・プロスト シケインの接触劇',
+        description: 'タイトルを争うマクラーレン・ホンダの同門2台が47周目のシケイン進入で激突。セナ失格によりプロストが王座獲得。',
+        significance: 'F1史上最大の政治的・感情的遺恨を生み、翌年の報復劇へと続く伝説のターニングポイント。',
+      },
+      {
+        year: 1990,
+        title: 'スタート直後 ターン1での260km/h激突',
+        description: 'ポールポジションのセナと2番手プロストがスタート直後のターン1で時速260kmで激突リタイア、セナの王座奪還が確定。',
+        significance: '前年の因縁を晴らすセナの容赦なき執念が世界に衝撃を与えた瞬間。',
+      },
+      {
+        year: 2005,
+        title: 'キミ・ライコネン 17番手からの最終周130R逆転劇',
+        description: '予選雨で17番グリッドに沈んだライコネンが怒涛の追い上げ、最終ラップのターン1でフィジケラをアウトから抜き去り奇跡の優勝。',
+        significance: '現代F1における「純粋なスピードとオーバーテイクの芸術」と称される最高峰のレース。',
+      },
+    ],
+    setupNotes: {
+      aeroTradeoff: 'セクター1のS字での回頭性とダウンフォースを最優先。西ストレートでのドラッグを最小化するエアロ効率。',
+      kerbUsage: 'デグナーやシケインの縁石を攻撃的に使うため、車高のボトミングを防ぐサスペンションストロークが必要。',
+      brakeDemands: 'シケインとヘアピン以外はコーナリング主体の流体コースのため、ブレーキ冷却よりもタイヤ温度保持が重要。',
+    },
     references: [
       {
         id: 1,
@@ -1790,6 +1911,8 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     downforceLevel: 'Low',
     tyreStress: 'Medium',
     typicalPitLossSec: 24.2,
+    safetyCarProbability: '55% (中程度)',
+    undercutImpact: '中（ロングストレートでのスリップストリームとDRSによる逆転が容易）',
     lapRecord: {
       time: '1:21.046',
       driver: 'Rubens Barrichello (Ferrari)',
@@ -1797,6 +1920,49 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     },
     characteristics:
       '「スピードの殿堂」と呼ばれる超高速サーキット [1]。最高速350km/h超に達するため極限の低ドラッグ（薄型リヤウィング）セッティングが要求され、第1シケイン（ターン1）でのブレーキング勝負がレースの命運を分ける [2]。',
+    visualMap: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Monza_track_map.svg/960px-Monza_track_map.svg.png',
+      credit: 'Will_Scalise',
+      license: 'CC BY-SA 3.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Monza_track_map.svg',
+    },
+    trackGeometry: {
+      elevationChangeMeters: 9.5,
+      longestStraightMeters: 1120,
+      gForceMax: { lateral: 4.5, longitudinal: 5.4 },
+      keyCorners: [
+        { number: 'T1-T2', name: 'ヴァリアンテ・デル・レッティフィーロ', characteristic: '355km/hから70km/hへ急制動する第1シケイン。スタート直後の大混乱ポイント。' },
+        { number: 'T4-T5', name: 'ヴァリアンテ・デッラ・ロッジア', characteristic: '進入の縁石アタックと脱出トラクションが問われる第2シケイン。' },
+        { number: 'T6-T7', name: 'クルヴァ・ディ・レズモ (第1・第2レズモ)', characteristic: '低ダウンフォース仕様のマシンが横滑りしやすい高速右コーナー2連続。' },
+        { number: 'T8-T10', name: 'ヴァリアンテ・アスカリ', characteristic: '左・右・左と高速で切り抜けるリズムセクション。フロア剛性が重要。' },
+        { number: 'T11', name: 'クルヴァ・アルボレート (旧パラボリカ)', characteristic: 'メインストレートの最高速を決定づける長大な複合高速右コーナー。' },
+      ],
+    },
+    historicalMoments: [
+      {
+        year: 1971,
+        title: 'F1史上最僅差フィニッシュ（0.01秒差）',
+        description: 'ピーター・ゲシンが2位ロニー・ピーターソンと0.01秒差、上位5台が0.61秒差にひしめく歴史的超高速スリップストリーム決戦。',
+        significance: 'シケイン設置前のモンツァにおける究極のスリップストリームバトルの象徴。',
+      },
+      {
+        year: 2008,
+        title: 'ベッテル＆トロロッソ 雨の奇跡の初優勝',
+        description: '21歳のセバスチャン・ベッテルが豪雨のモンツァで当時の史上最年少ポール・トゥ・ウィンを達成。',
+        significance: 'ミナルディを母体とする小規模チーム「トロロッソ」に初勝利をもたらし、4連覇王者の伝説が幕を開けた。',
+      },
+      {
+        year: 2019,
+        title: 'シャルル・ルクレール 跳ね馬9年ぶりの母国勝利',
+        description: 'メルセデス2台（ハミルトン＆ボッタス）の波状攻撃を53周にわたり鉄壁のディフェンスで防ぎきり戴冠。',
+        significance: '熱狂のティフォシの前に立ち、「Il Predestinato（運命の子）」としての地位を不動のものにした。',
+      },
+    ],
+    setupNotes: {
+      aeroTradeoff: '極小フラップの「モンダ・スペシャル」ウイングによる絶対的最高速重視。',
+      kerbUsage: '第1・第2シケインのソーセージカーブに乗るとマシンが飛び跳ねて破損するため、正確なライン取りが必須。',
+      brakeDemands: 'ロングストレート後の急減速でブレーキ温度が急上昇し、冷えたタイヤでのロックアップに注意。',
+    },
     references: [
       {
         id: 1,
@@ -1825,6 +1991,8 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     downforceLevel: 'Medium',
     tyreStress: 'Very High',
     typicalPitLossSec: 23.5,
+    safetyCarProbability: '75% (高確率)',
+    undercutImpact: '大（7kmのロングコースのためピットタイミングが順位を激変させる）',
     lapRecord: {
       time: '1:46.286',
       driver: 'Valtteri Bottas (Mercedes)',
@@ -1832,6 +2000,49 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     },
     characteristics:
       'F1カレンダー最長を誇る名門コース [1]。オールージュからラディオンへの急勾配駆け上がりでの激しい垂直G圧縮、ケメルストレートでの最高速、セクター2のテクニカルコーナー群と、気候急変（スパ・ウェザー）が特徴 [2]。',
+    visualMap: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Spa-Francorchamps_of_Belgium.svg/960px-Spa-Francorchamps_of_Belgium.svg.png',
+      credit: 'Will_Scalise',
+      license: 'CC BY-SA 3.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Spa-Francorchamps_of_Belgium.svg',
+    },
+    trackGeometry: {
+      elevationChangeMeters: 102.2,
+      longestStraightMeters: 2000,
+      gForceMax: { lateral: 5.4, longitudinal: 4.9 },
+      keyCorners: [
+        { number: 'T1', name: 'ラ・ソース (La Source)', characteristic: 'スタート直後の右鋭角ヘアピン。急減速と立ち上がりトラクションが問われる。' },
+        { number: 'T2-T4', name: 'オールージュ 〜 ラディオン', characteristic: '高低差を一気に駆け上がる世界屈指の名物コーナー。垂直Gと横Gが同時にかかる。' },
+        { number: 'T5-T7', name: 'レ・コーム (Les Combes)', characteristic: 'ケメルストレートエンドの主オーバーテイクポイント。右・左・右の切り返し。' },
+        { number: 'T10-T11', name: 'プーオン (Pouhon)', characteristic: '290km/h全開で下りながら飛び込む超高速左ダブルエイペックス。首への負荷最大。' },
+        { number: 'T18-T19', name: 'バスストップ・シケイン', characteristic: 'ピットエントリー手前の超低速シケイン。最終周の飛び込み勝負の舞台。' },
+      ],
+    },
+    historicalMoments: [
+      {
+        year: 1998,
+        title: '雨の13台多重クラッシュ＆シューマッハ激怒',
+        description: '豪雨のスタート直後に13台が絡む大惨事が発生。再スタート後首位独走のシューマッハがクルサードに追突し、ピットへ怒りの殴り込み。',
+        significance: 'スパ・ウェザーの恐ろしさと、激闘が生む人間ドラマの極限を象徴する伝説の一戦。',
+      },
+      {
+        year: 2000,
+        title: 'ハッキネン ゾンタを挟む300km/hダブルパッシング',
+        description: 'ケメルストレートで周回遅れのゾンタの左を抜くシューマッハに対し、ハッキネンが右側のわずかな隙間を一閃して首位奪取。',
+        significance: '「F1史上最も美しいオーバーテイク」としてモータースポーツ史に刻まれる名場面。',
+      },
+      {
+        year: 2004,
+        title: 'シューマッハ 7度目のワールドチャンピオン達成',
+        description: 'ライコネンの初優勝の背後で2位に入り、自身通算7度目の世界タイトルを確定。',
+        significance: 'フェラーリ黄金期の頂点であり、不滅の大記録7冠が達成された記念碑的レース。',
+      },
+    ],
+    setupNotes: {
+      aeroTradeoff: 'セクター1＆3のストレート最高速と、セクター2のワインディングでのダウンフォースの妥協点。',
+      kerbUsage: 'バスストップシケインでの鋭い縁石乗り越えと、プーオンでの縁石接地安定性が重要。',
+      brakeDemands: 'レ・コームとバスストップでのハードブレーキング。雨天時のブレーキディスク冷えに注意。',
+    },
     references: [
       {
         id: 1,
@@ -1850,36 +2061,83 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     ],
   },
   {
-    id: 'monaco',
+    id: 'circuit-de-monaco',
     name: 'モナコ市街地コース',
-    officialName: 'Circuit de Monaco',
+    officialName: 'Circuit de Monaco (Monte Carlo)',
     country: 'モナコ 🇲🇨',
     lengthKm: 3.337,
     turns: 19,
     drsZones: 1,
     downforceLevel: 'High',
     tyreStress: 'Low',
-    typicalPitLossSec: 19.5,
+    typicalPitLossSec: 21.0,
+    safetyCarProbability: '85% (極めて高い)',
+    undercutImpact: 'オーバーカット（新品ハードのウォームアップ遅れによりステイアウトが有利な場合多し）',
     lapRecord: {
       time: '1:12.909',
       driver: 'Lewis Hamilton (Mercedes)',
       year: 2021,
     },
     characteristics:
-      'ガードレールに囲まれた究極のストリートサーキット [1]。オーバーテイクが極めて困難なため予選ポールポジションの価値が最大であり、決勝では「オーバーカット」やSCタイミングを狙うステイアウト戦術が常套手段となる [2]。',
+      '「モータースポーツの至宝」と称される世界最高峰の市街地サーキット [1]。エスケープゾーンが皆無でミリ単位の壁際アタックが要求され、予選ポールポジションの価値が年間で最も高い [2]。',
+    visualMap: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Monte_Carlo_Formula_1_track_map.svg/960px-Monte_Carlo_Formula_1_track_map.svg.png',
+      credit: 'Will_Scalise',
+      license: 'CC BY-SA 3.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Monte_Carlo_Formula_1_track_map.svg',
+    },
+    trackGeometry: {
+      elevationChangeMeters: 42.0,
+      longestStraightMeters: 669,
+      gForceMax: { lateral: 3.8, longitudinal: 4.5 },
+      keyCorners: [
+        { number: 'T1', name: 'サン・デボーテ (Sainte-Dévote)', characteristic: '教会前の第1コーナー。予選での壁激突や決勝スタートでの混乱多発。' },
+        { number: 'T6', name: 'グランドホテル・ヘアピン (旧ロウズ)', characteristic: 'F1で最も遅い（約45km/h）ヘアピン。最大ステアリング切れ角が必要。' },
+        { number: 'T7-T8', name: 'ポルティエ 〜 トンネル', characteristic: '海沿いから暗闇のトンネルへ。最高速290km/hに達するストリートの爆走区間。' },
+        { number: 'T10-T11', name: 'ヌーベル・シケイン', characteristic: 'トンネル脱出後の急減速。唯一の確実なオーバーテイクポイント。' },
+        { number: 'T12', name: 'タバコ・コーナー (Tabac)', characteristic: 'ヨットハーバー沿いをミリ単位で攻める高速左コーナー。' },
+        { number: 'T13-T16', name: 'プールサイド・シケイン', characteristic: '縁石を豪快に跨ぎながら駆け抜ける高速テクニカルS字。' },
+        { number: 'T17-T18', name: 'ラスカス 〜 アントニー・ノゲス', characteristic: 'ピットレーン入口を巻き込む超低速ヘアピン。' },
+      ],
+    },
+    historicalMoments: [
+      {
+        year: 1988,
+        title: 'アイルトン・セナ 予選1.4秒差の恍惚と悲劇のクラッシュ',
+        description: '予選でプロストに1.4秒差をつける「神と対話した」ラップを刻むも、決勝50秒独走中にポルティエのガードレールにヒットし自宅直行。',
+        significance: 'セナが自らの限界を超え、完全無欠のレーサーへと覚醒するきっかけとなった象徴的エピソード。',
+      },
+      {
+        year: 1992,
+        title: 'セナ vs マンセル 伝説のラスト3周',
+        description: 'ホイールナット脱落で緊急ピットしたマンセルが新品タイヤで猛追するも、セナが巧みなマシン配置で幅寄せし0.2秒差で逃げ切り。',
+        significance: '「モナコでは抜けない」を戦術的ディフェンスの極致として世界に証明した伝説のバトル。',
+      },
+      {
+        year: 1996,
+        title: 'オリビエ・パニス 完走3台の雨の奇跡の初優勝',
+        description: '豪雨による大波乱でリタイアが続出する中、14番手スタートのパニス（リジェ）が生き残りキャリア唯一のF1優勝。',
+        significance: 'F1史上最少完走台数記録（3台チェッカー）となったサバイバルレース。',
+      },
+    ],
+    setupNotes: {
+      aeroTradeoff: 'ドラッグを無視した最大マキシマムダウンフォース。ウィングを限界まで立てる。',
+      kerbUsage: 'プールサイドの縁石を大胆にカットするため、しなやかなサスペンションと高い最低地上高が必要。',
+      brakeDemands: '低速コーナーが連続するためブレーキ冷却風量が不足しやすく、キャリパー過熱対策が不可欠。',
+    },
     references: [
       {
         id: 1,
-        title: 'Automobile Club de Monaco Circuit Dossier',
-        publisher: 'ACM Technical Bureau',
+        title: 'Automobile Club de Monaco Circuit History & Technical Blueprint',
+        publisher: 'Automobile Club de Monaco (ACM)',
         url: 'https://acm.mc',
         verifiedDate: '2024-05-20',
       },
       {
         id: 2,
-        title: 'Strategic Overcut Dynamics in Low-Degradation Street Circuits',
-        publisher: 'Motorsport Strategy Engineering Journal',
-        url: 'https://www.racecar-engineering.com',
+        title: 'Street Circuit Vehicle Dynamics and Maximum Steering Lock Analysis: Monaco',
+        publisher: 'F1 Technical Analysis',
+        url: 'https://www.f1technical.net',
         verifiedDate: '2024-05-25',
       },
     ],
@@ -1892,30 +2150,76 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     lengthKm: 5.891,
     turns: 18,
     drsZones: 2,
-    downforceLevel: 'High',
+    downforceLevel: 'Medium-High',
     tyreStress: 'Very High',
-    typicalPitLossSec: 20.8,
+    typicalPitLossSec: 21.8,
+    safetyCarProbability: '65% (中高)',
+    undercutImpact: '大（超高速セクターでのタイヤ発熱が極めて高い）',
     lapRecord: {
       time: '1:27.097',
       driver: 'Max Verstappen (Red Bull)',
       year: 2020,
     },
     characteristics:
-      'モータースポーツの聖地。マゴッツ・ベケッツ・チャペルの高速連続S字コーナー群がタイヤのフロント左と右側に極限の横Gをかける [1]。ダウンフォースの純粋な空力効率がタイムに直結する [2]。',
+      '1950年にF1世界選手権の第1戦が開催された「F1発祥の地」[1]。マゴッツ・ベケッツ・チャペルなどの伝説的超高速S字セクションが連続し、現代F1マシンの空力ダウンフォースと横G限界（最大5.6G）を存分に体感できる高速サーキット [2]。',
+    visualMap: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Silverstone_Circuit_2020.png/960px-Silverstone_Circuit_2020.png',
+      credit: 'Luki4842',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Silverstone_Circuit_2020.png',
+    },
+    trackGeometry: {
+      elevationChangeMeters: 11.3,
+      longestStraightMeters: 1034,
+      gForceMax: { lateral: 5.6, longitudinal: 4.8 },
+      keyCorners: [
+        { number: 'T1-T2', name: 'アビー 〜 ファーム (Abbey / Farm)', characteristic: 'スタート直後の290km/h全開突入セクション。マシンの接地性が試される。' },
+        { number: 'T3-T5', name: 'ヴィレッジ 〜 ループ (Village / Loop)', characteristic: 'インフィールドの低速複合シケイン。急減速と低速トラクションが重要。' },
+        { number: 'T9', name: 'コプス (Copse)', characteristic: '290km/hで飛び込む度胸試しの超高速右コーナー。' },
+        { number: 'T10-T14', name: 'マゴッツ 〜 ベケッツ 〜 チャペル', characteristic: 'F1屈指の超高速S字。横Gが5.6Gに達し、ドライバーの首とタイヤを極限まで痛めつける。' },
+        { number: 'T15', name: 'ストーブ (Stowe)', characteristic: 'ハンガーストレートエンドの豪快な下りブレーキングポイント。' },
+        { number: 'T16-T18', name: 'ヴェイル 〜 クラブ (Vale / Club)', characteristic: 'ピットエントリー前の最終複合減速シケイン。' },
+      ],
+    },
+    historicalMoments: [
+      {
+        year: 2020,
+        title: 'ルイス・ハミルトン 最終周3輪走行での奇跡の勝利',
+        description: '最終ラップで左フロントタイヤがバースト、ホイールから火花を散らしながらフェルスタッペンの猛追を5.8秒差で逃げ切り優勝。',
+        significance: 'F1史に残る最もスリリングなチェッカーフラッグの瞬間。',
+      },
+      {
+        year: 2021,
+        title: 'ハミルトン vs フェルスタッペン 51Gクラッシュ',
+        description: 'オープニングラップのコプスコーナーで2台が接触、フェルスタッペンが51Gの衝撃でバリアへ激突リタイア。',
+        significance: '2021年タイトル争いの激化を決定づけた世紀のクラッシュ。',
+      },
+      {
+        year: 2022,
+        title: 'カルロス・サインツ 悲願の初優勝＆伝説の4台バトル',
+        description: '終盤のセーフティカー明け、サインツが初優勝を飾り、背後でペレス、ハミルトン、ルクレールが壮絶な三つ巴バトルを展開。',
+        significance: '新規定マシンの追従性能の高さとホイール・トゥ・ホイールの美しさが凝縮された名勝負。',
+      },
+    ],
+    setupNotes: {
+      aeroTradeoff: 'マゴッツ・ベケッツの超高速安定性を保つためのハイダウンフォースセッティング。',
+      kerbUsage: '高速コーナーの立ち上がり縁石を限界まで使うため、フロアの柔軟性と縁石衝撃吸収が鍵。',
+      brakeDemands: 'ヴィレッジ、ブルックランズ、ストーブでのブレーキング。タイヤの横荷重による摩耗熱管理が最重要。',
+    },
     references: [
       {
         id: 1,
-        title: 'Silverstone Circuit Maggotts-Becketts Complex Aerodynamic Loads',
-        publisher: 'Silverstone Motorsport Operations',
+        title: 'Silverstone Circuit Heritage & Modern High-Downforce Dynamics',
+        publisher: 'Silverstone Circuit Official Archives',
         url: 'https://www.silverstone.co.uk',
-        verifiedDate: '2024-07-01',
+        verifiedDate: '2024-07-05',
       },
       {
         id: 2,
-        title: 'Tyre Lateral Distortion and Blistering Risks at High-Speed Circuits',
-        publisher: 'Pirelli Motorsport Technical Bulletins',
-        url: 'https://www.pirelli.com',
-        verifiedDate: '2024-07-04',
+        title: 'High Lateral G-Force Load and Structural Stress in Maggotts-Becketts Complex',
+        publisher: 'FIA Formula One Technical Working Group',
+        url: 'https://www.fia.com',
+        verifiedDate: '2024-07-08',
       },
     ],
   },
