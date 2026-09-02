@@ -2,8 +2,8 @@
 
 /**
  * components/hubs/KnowledgeHistoryHub.tsx
- * Hub 3: F1 Knowledge & History with 5 Sub-Tabs, Academic In-Text Citations ([1]),
- * Key Team Radio Player Embeds, and Deep Telemetry Session Navigation.
+ * Hub 3: F1 Knowledge & History with 5 Sub-Tabs, Compact Grid & Modal View for Drivers,
+ * Academic In-Text Citations ([1]), Key Team Radio Embeds, and Deep Telemetry Session Navigation.
  */
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -23,8 +23,10 @@ import {
   type TelemetryTarget,
 } from '@/data/f1KnowledgeData';
 import { getProxiedAudioUrl } from '@/lib/telemetryUtils';
+import DriverDetailModal from './DriverDetailModal';
 
 type SubTab = 'teams' | 'drivers' | 'circuits' | 'strategy' | 'history';
+type DriverStatusFilter = 'ALL' | 'Current' | 'Legend';
 
 interface KnowledgeHistoryHubProps {
   onNavigateToTelemetry?: (target?: TelemetryTarget) => void;
@@ -150,6 +152,9 @@ function EmbeddedRadioCard({ radio }: { radio: EmbeddedRadio }) {
 export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: KnowledgeHistoryHubProps) {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('teams');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [driverStatusFilter, setDriverStatusFilter] = useState<DriverStatusFilter>('ALL');
+  const [driverTeamFilter, setDriverTeamFilter] = useState<string>('ALL');
+  const [selectedDriverDetail, setSelectedDriverDetail] = useState<DriverProfile | null>(null);
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
 
   // Jump to Reference list & highlight target reference
@@ -244,6 +249,20 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
     );
   };
 
+  // Filtered drivers logic
+  const filteredDrivers = KNOWLEDGE_DRIVERS.filter((d) => {
+    const matchesSearch =
+      d.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      d.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      d.team.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      d.driverType.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesStatus = driverStatusFilter === 'ALL' || d.status === driverStatusFilter;
+    const matchesTeam = driverTeamFilter === 'ALL' || d.team.toLowerCase().includes(driverTeamFilter.toLowerCase());
+
+    return matchesSearch && matchesStatus && matchesTeam;
+  });
+
   return (
     <div className="flex flex-col gap-5 max-w-6xl mx-auto animate-fade-in">
       {/* Header Banner */}
@@ -258,7 +277,7 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
             F1 KNOWLEDGE & HISTORICAL ARCHIVES
           </h2>
           <p className="text-xs text-slate-400 max-w-xl">
-            FIA公式規則、チーム工学哲学、ドライバー特性、サーキットデータ、伝説の名勝負を生無線ログ（🎙️）と実テレメトリー連携付きで体系化。
+            FIA公式規則、全10チーム工学哲学、ドライバー詳細名鑑、サーキットデータ、伝説の名勝負を生無線ログ（🎙️）と実テレメトリー連携付きで体系化。
           </p>
         </div>
 
@@ -278,8 +297,8 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
       <div className="flex items-center gap-2 overflow-x-auto pb-1 bg-slate-950/60 p-1.5 rounded-2xl border border-white/10 shadow-inner">
         {(
           [
-            ['teams', '🏎️ チーム紹介'],
-            ['drivers', '👤 ドライバー名鑑'],
+            ['teams', '🏎️ チーム紹介 (全10チーム)'],
+            ['drivers', '👤 ドライバー名鑑 (詳細ビュー)'],
             ['circuits', '🏁 サーキット解説'],
             ['strategy', '🛞 戦略 & 規則'],
             ['history', '🏛️ 歴史アーカイブ'],
@@ -364,100 +383,133 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
         </div>
       )}
 
-      {/* ── Sub-Tab 2: DRIVERS ── */}
+      {/* ── Sub-Tab 2: DRIVERS (Compact Grid + Detail Modal) ── */}
       {activeSubTab === 'drivers' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
-          {KNOWLEDGE_DRIVERS.filter(
-            (d) =>
-              d.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              d.code.toLowerCase().includes(searchQuery.toLowerCase())
-          ).map((driver) => (
-            <div
-              key={driver.id}
-              className="glass-card p-5 flex flex-col justify-between gap-4 border-l-4"
-              style={{ borderLeftColor: driver.teamColor }}
-            >
-              <div className="flex flex-col gap-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <span
-                      className="text-sm font-racing font-bold px-2.5 py-1 rounded-xl border"
-                      style={{
-                        color: driver.teamColor,
-                        borderColor: `${driver.teamColor}60`,
-                        backgroundColor: `${driver.teamColor}15`,
-                      }}
-                    >
-                      {driver.code} #{driver.number}
-                    </span>
-                    <div>
-                      <h3 className="text-base font-bold text-white leading-tight">
-                        {driver.fullName}
-                      </h3>
-                      <span className="text-xs text-slate-400 font-mono">
-                        {driver.country} • {driver.team}
-                      </span>
-                    </div>
-                  </div>
+        <div className="flex flex-col gap-4 animate-fade-in">
+          {/* Driver Filters Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-950/60 p-3 rounded-2xl border border-white/10">
+            {/* Status Filter Tabs */}
+            <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-white/5">
+              {(
+                [
+                  ['ALL', '全選手'],
+                  ['Current', '🏁 現役グリッド'],
+                  ['Legend', '👑 歴代レジェンド'],
+                ] as [DriverStatusFilter, string][]
+              ).map(([status, label]) => (
+                <button
+                  key={status}
+                  onClick={() => setDriverStatusFilter(status)}
+                  className={`px-3 py-1 rounded-lg text-xs font-racing font-bold transition-all ${
+                    driverStatusFilter === status
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
 
-                  {driver.championships > 0 && (
-                    <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono">
-                      🏆 王座 {driver.championships}回
-                    </span>
-                  )}
-                </div>
+            {/* Team Filter Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-0.5 text-xs">
+              <span className="text-[10px] text-slate-500 font-mono mr-1">TEAM:</span>
+              {['ALL', 'Red Bull', 'Ferrari', 'McLaren', 'Mercedes', 'Aston Martin', 'RB'].map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setDriverTeamFilter(t)}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all flex-shrink-0 ${
+                    driverTeamFilter === t
+                      ? 'bg-slate-700 text-sky-400 font-bold border border-sky-400/40'
+                      : 'bg-slate-900/60 text-slate-400 hover:bg-slate-800'
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
 
-                {/* Driving Style Analysis */}
-                <div className="bg-slate-950/60 p-3.5 rounded-xl border border-white/5 space-y-2 text-xs">
-                  <h4 className="text-[10px] font-racing font-bold text-sky-400 uppercase tracking-wider">
-                    🏎️ ドライビングスタイル＆操縦特性
-                  </h4>
-                  <p className="text-slate-300 leading-relaxed text-[11px]">
-                    {driver.drivingStyle.summary}
-                  </p>
-                  <div className="pt-2 border-t border-white/5 space-y-1.5 text-[11px] text-slate-400">
-                    <div>
-                      <strong className="text-slate-300 font-mono">制動技術:</strong>{' '}
-                      {renderTextWithCitations(driver.drivingStyle.brakingTechnique, driver.id)}
-                    </div>
-                    <div>
-                      <strong className="text-slate-300 font-mono">タイヤ管理:</strong>{' '}
-                      {renderTextWithCitations(driver.drivingStyle.tyreManagement, driver.id)}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Career Milestones */}
-                <div className="space-y-1 text-xs">
-                  <h4 className="text-[10px] font-racing font-bold text-slate-400 uppercase tracking-wider">
-                    🚩 キャリアの重要節目
-                  </h4>
-                  <ul className="space-y-1">
-                    {driver.milestones.map((m, idx) => (
-                      <li
-                        key={idx}
-                        className="bg-slate-900/60 p-2 rounded-lg text-[11px] text-slate-300 flex items-center justify-between border border-white/5"
+          {/* Compact Driver Grid Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            {filteredDrivers.map((driver) => (
+              <div
+                key={driver.id}
+                onClick={() => setSelectedDriverDetail(driver)}
+                className="glass-card p-4 flex flex-col justify-between gap-3 border-l-4 cursor-pointer hover:border-sky-400 hover:bg-slate-900/90 transition-all hover:scale-[1.02] shadow-md group relative overflow-hidden"
+                style={{ borderLeftColor: driver.teamColor }}
+              >
+                <div className="space-y-2">
+                  {/* Card Top: Number, Code, Country, Title Badge */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="text-xs font-racing font-black px-2 py-0.5 rounded-lg border"
+                        style={{
+                          color: driver.teamColor,
+                          borderColor: `${driver.teamColor}60`,
+                          backgroundColor: `${driver.teamColor}15`,
+                        }}
                       >
-                        <span>
-                          <span className="text-slate-500 font-mono mr-2">{m.date}</span>
-                          {m.event}
-                        </span>
-                        <button
-                          onClick={() => handleCitationClick(driver.id, m.refId)}
-                          className="text-[9px] font-mono text-sky-400 hover:underline flex-shrink-0 ml-2"
-                        >
-                          [{m.refId}]
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
+                        #{driver.number} {driver.code}
+                      </span>
+                      <span className="text-xs text-slate-400 font-mono">{driver.country}</span>
+                    </div>
+
+                    {driver.championships > 0 && (
+                      <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono flex items-center gap-1">
+                        <span>🏆</span>
+                        <span>{driver.championships}冠</span>
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Driver Name & Team */}
+                  <div>
+                    <h3 className="text-base font-bold text-white leading-tight group-hover:text-sky-300 transition-colors">
+                      {driver.fullName}
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">{driver.team}</p>
+                  </div>
+
+                  {/* Driver Type Tag */}
+                  <div className="bg-slate-950/60 px-2.5 py-1 rounded-lg border border-white/5 text-[11px] text-sky-200/90 truncate">
+                    🏷️ {driver.driverType}
+                  </div>
+                </div>
+
+                {/* Card Bottom: Quick Stats Bar & Action Indicator */}
+                <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                  <div className="flex items-center gap-3">
+                    <span>
+                      勝: <strong className="text-amber-400">{driver.wins}</strong>
+                    </span>
+                    <span>
+                      登壇: <strong className="text-sky-400">{driver.podiums}</strong>
+                    </span>
+                    <span>
+                      PP: <strong className="text-purple-400">{driver.polePositions}</strong>
+                    </span>
+                  </div>
+
+                  <span className="text-sky-400 group-hover:translate-x-1 transition-transform font-bold text-xs flex items-center gap-0.5">
+                    <span>詳細</span>
+                    <span>➔</span>
+                  </span>
                 </div>
               </div>
+            ))}
+          </div>
 
-              {/* References Box */}
-              {renderReferencesBox(driver.references, driver.id)}
-            </div>
-          ))}
+          {/* Driver Detail Modal */}
+          {selectedDriverDetail && (
+            <DriverDetailModal
+              driver={selectedDriverDetail}
+              allDrivers={filteredDrivers}
+              onSelectDriver={(d) => setSelectedDriverDetail(d)}
+              onClose={() => setSelectedDriverDetail(null)}
+            />
+          )}
         </div>
       )}
 
