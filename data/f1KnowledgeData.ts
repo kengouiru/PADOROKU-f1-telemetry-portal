@@ -12,6 +12,13 @@ export interface Reference {
   verifiedDate: string;
 }
 
+export interface TeamIconicCar {
+  model: string;
+  year: number;
+  achievement: string;
+  keyTech: string;
+}
+
 export interface TeamProfile {
   id: string;
   name: string;
@@ -20,8 +27,15 @@ export interface TeamProfile {
   powerUnit: string;
   base: string;
   constructorTitles: number;
+  championshipYears?: number[];
   drivers: string[]; // 3-letter codes
   color: string;
+  structure?: {
+    technicalDirector: string;
+    aeroHead: string;
+    facility: string;
+  };
+  iconicCars?: TeamIconicCar[];
   philosophy: {
     aeroFocus: string;
     mechanicalFocus: string;
@@ -29,6 +43,7 @@ export interface TeamProfile {
   };
   references: Reference[];
 }
+
 
 export interface DriverMilestone {
   date: string;
@@ -143,15 +158,23 @@ export interface CircuitProfile {
   downforceLevel: 'High' | 'Medium-High' | 'Medium' | 'Low';
   tyreStress: 'Very High' | 'High' | 'Medium' | 'Low';
   typicalPitLossSec: number;
+  safetyCarProbability?: string;
+  undercutImpact?: string;
   lapRecord: {
     time: string;
     driver: string;
     year: number;
   };
   characteristics: string;
+  setupNotes?: {
+    aeroTradeoff: string;
+    kerbUsage: string;
+    brakeDemands: string;
+  };
   telemetrySession?: TelemetryTarget;
   references: Reference[];
 }
+
 
 export interface StrategyConcept {
   id: string;

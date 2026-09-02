@@ -24,6 +24,8 @@ import {
 } from '@/data/f1KnowledgeData';
 import { getProxiedAudioUrl } from '@/lib/telemetryUtils';
 import DriverDetailModal from './DriverDetailModal';
+import TeamDetailModal from './TeamDetailModal';
+import CircuitDetailModal from './CircuitDetailModal';
 
 type SubTab = 'teams' | 'drivers' | 'circuits' | 'strategy' | 'history';
 type DriverStatusFilter = 'ALL' | 'Current' | 'Legend';
@@ -155,6 +157,8 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
   const [driverStatusFilter, setDriverStatusFilter] = useState<DriverStatusFilter>('ALL');
   const [driverTeamFilter, setDriverTeamFilter] = useState<string>('ALL');
   const [selectedDriverDetail, setSelectedDriverDetail] = useState<DriverProfile | null>(null);
+  const [selectedTeamDetail, setSelectedTeamDetail] = useState<TeamProfile | null>(null);
+  const [selectedCircuitDetail, setSelectedCircuitDetail] = useState<CircuitProfile | null>(null);
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
 
   // Jump to Reference list & highlight target reference
@@ -321,65 +325,111 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
         ))}
       </div>
 
-      {/* ── Sub-Tab 1: TEAMS ── */}
+      {/* ── Sub-Tab 1: TEAMS (Compact Grid + Detail Modal) ── */}
       {activeSubTab === 'teams' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
-          {KNOWLEDGE_TEAMS.filter(
-            (t) =>
-              t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              t.philosophy.description.toLowerCase().includes(searchQuery.toLowerCase())
-          ).map((team) => (
-            <div
-              key={team.id}
-              className="glass-card p-5 flex flex-col justify-between gap-4 border-l-4"
-              style={{ borderLeftColor: team.color }}
-            >
-              <div className="flex flex-col gap-3">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
-                      {team.base}
+        <div className="flex flex-col gap-4 animate-fade-in">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            {KNOWLEDGE_TEAMS.filter(
+              (t) =>
+                t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                t.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                t.philosophy.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                t.base.toLowerCase().includes(searchQuery.toLowerCase())
+            ).map((team) => (
+              <div
+                key={team.id}
+                onClick={() => setSelectedTeamDetail(team)}
+                className="glass-card p-4 flex flex-col justify-between gap-3 border-l-4 cursor-pointer hover:border-sky-400 hover:bg-slate-900/90 transition-all hover:scale-[1.02] shadow-md group relative overflow-hidden"
+                style={{ borderLeftColor: team.color }}
+              >
+                <div className="space-y-2.5">
+                  {/* Card Header: Initial Badge, Name, Titles */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center font-racing font-black text-xs border shadow-sm flex-shrink-0"
+                        style={{
+                          color: team.color,
+                          borderColor: `${team.color}60`,
+                          backgroundColor: `${team.color}15`,
+                        }}
+                      >
+                        {team.name.slice(0, 3).toUpperCase()}
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 font-mono block">
+                          {team.base.split(',')[0]}
+                        </span>
+                        <h3 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors leading-tight">
+                          {team.name}
+                        </h3>
+                      </div>
+                    </div>
+
+                    {team.constructorTitles > 0 && (
+                      <span className="text-[10px] font-mono font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-md flex-shrink-0">
+                        🏆 {team.constructorTitles}回
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Team Meta Badges */}
+                  <div className="flex items-center gap-1.5 flex-wrap text-[10px] font-mono">
+                    <span className="bg-slate-800/90 text-slate-300 px-2 py-0.5 rounded-md border border-white/5">
+                      ⚡ {team.powerUnit}
                     </span>
-                    <h3 className="text-base font-bold text-white leading-tight">
-                      {team.fullName}
-                    </h3>
-                    <span className="text-xs text-slate-400 font-mono">
-                      代表: {team.teamPrincipal} • PU: {team.powerUnit}
+                    <span className="bg-slate-800/90 text-slate-400 px-2 py-0.5 rounded-md border border-white/5">
+                      代表: {team.teamPrincipal.split(' ')[1] || team.teamPrincipal}
                     </span>
                   </div>
-                  <div className="bg-slate-900/90 px-2.5 py-1 rounded-xl border border-white/10 text-right">
-                    <span className="text-xs font-bold text-amber-400 font-mono">
-                      🏆 {team.constructorTitles}回
-                    </span>
-                    <span className="block text-[9px] text-slate-500">タイトル</span>
+
+                  {/* Drivers Tags */}
+                  <div className="flex items-center gap-1 text-[11px] font-mono">
+                    <span className="text-[10px] text-slate-500 mr-1">DRV:</span>
+                    {team.drivers.map((d) => (
+                      <span
+                        key={d}
+                        className="px-1.5 py-0.5 rounded text-[10px] font-bold border"
+                        style={{
+                          color: team.color,
+                          borderColor: `${team.color}40`,
+                          backgroundColor: `${team.color}10`,
+                        }}
+                      >
+                        {d}
+                      </span>
+                    ))}
                   </div>
+
+                  {/* Philosophy summary snippet */}
+                  <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed bg-slate-950/40 p-2 rounded-lg border border-white/5">
+                    {team.philosophy.description.replace(/\[\d+\]/g, '')}
+                  </p>
                 </div>
 
-                {/* Engineering Philosophy */}
-                <div className="bg-slate-950/60 p-3.5 rounded-xl border border-white/5 space-y-2 text-xs">
-                  <h4 className="text-[10px] font-racing font-bold text-sky-400 uppercase tracking-wider">
-                    🛠️ 開発思想・エンジニアリング特性
-                  </h4>
-                  <p className="text-slate-200 leading-relaxed text-[11px]">
-                    {renderTextWithCitations(team.philosophy.description, team.id)}
-                  </p>
-                  <div className="pt-2 border-t border-white/5 space-y-1 text-[11px] text-slate-400">
-                    <div>
-                      <strong className="text-slate-300 font-mono">空力焦点:</strong>{' '}
-                      {team.philosophy.aeroFocus}
-                    </div>
-                    <div>
-                      <strong className="text-slate-300 font-mono">サスペンション:</strong>{' '}
-                      {team.philosophy.mechanicalFocus}
-                    </div>
-                  </div>
+                {/* Card Footer: Detail Link */}
+                <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[11px] font-mono text-slate-400">
+                  <span className="text-[10px] text-slate-500">
+                    一次出典: {team.references.length}件
+                  </span>
+                  <span className="text-sky-400 group-hover:underline flex items-center gap-0.5 font-bold">
+                    <span>詳細解説を見る</span>
+                    <span>➔</span>
+                  </span>
                 </div>
               </div>
+            ))}
+          </div>
 
-              {/* References Box */}
-              {renderReferencesBox(team.references, team.id)}
-            </div>
-          ))}
+          {/* Team Detail Modal */}
+          {selectedTeamDetail && (
+            <TeamDetailModal
+              team={selectedTeamDetail}
+              allTeams={KNOWLEDGE_TEAMS}
+              onSelectTeam={(t) => setSelectedTeamDetail(t)}
+              onClose={() => setSelectedTeamDetail(null)}
+            />
+          )}
         </div>
       )}
 
@@ -520,85 +570,92 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
         </div>
       )}
 
-      {/* ── Sub-Tab 3: CIRCUITS ── */}
+      {/* ── Sub-Tab 3: CIRCUITS (Compact Grid + Detail Modal) ── */}
       {activeSubTab === 'circuits' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-fade-in">
-          {KNOWLEDGE_CIRCUITS.filter(
-            (c) =>
-              c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              c.country.toLowerCase().includes(searchQuery.toLowerCase())
-          ).map((circuit) => (
-            <div
-              key={circuit.id}
-              className="glass-card p-5 flex flex-col justify-between gap-4"
-            >
-              <div className="flex flex-col gap-3">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">
-                      {circuit.country}
-                    </span>
-                    <h3 className="text-base font-bold text-white leading-tight">
-                      {circuit.name}
-                    </h3>
-                    <span className="text-xs text-slate-400 font-mono">
-                      {circuit.officialName}
-                    </span>
-                  </div>
-                  <div className="bg-slate-900/80 px-2.5 py-1 rounded-xl border border-white/10 text-right">
-                    <span className="text-xs font-bold text-sky-400 font-mono">
+        <div className="flex flex-col gap-4 animate-fade-in">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            {KNOWLEDGE_CIRCUITS.filter(
+              (c) =>
+                c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                c.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                c.officialName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                c.characteristics.toLowerCase().includes(searchQuery.toLowerCase())
+            ).map((circuit) => (
+              <div
+                key={circuit.id}
+                onClick={() => setSelectedCircuitDetail(circuit)}
+                className="glass-card p-4 flex flex-col justify-between gap-3 border-l-4 border-l-sky-500 cursor-pointer hover:border-sky-400 hover:bg-slate-900/90 transition-all hover:scale-[1.02] shadow-md group relative overflow-hidden"
+              >
+                <div className="space-y-2.5">
+                  {/* Card Header: Country, Name, Length */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <span className="text-[10px] text-slate-400 font-mono block">
+                        {circuit.country}
+                      </span>
+                      <h3 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors leading-tight">
+                        {circuit.name}
+                      </h3>
+                    </div>
+                    <span className="text-[11px] font-mono font-bold text-sky-400 bg-sky-950/60 border border-sky-500/30 px-2 py-0.5 rounded-md flex-shrink-0">
                       {circuit.lengthKm} km
                     </span>
-                    <span className="block text-[9px] text-slate-500">
-                      {circuit.turns}コーナー / DRS {circuit.drsZones}本
+                  </div>
+
+                  {/* Circuit Specs Badges */}
+                  <div className="grid grid-cols-3 gap-1.5 bg-slate-950/50 p-2 rounded-xl border border-white/5 text-center text-[10px] font-mono">
+                    <div>
+                      <span className="text-slate-500 block text-[9px]">DF要求</span>
+                      <strong className="text-sky-300">{circuit.downforceLevel}</strong>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block text-[9px]">タイヤ負荷</span>
+                      <strong className="text-amber-400">{circuit.tyreStress}</strong>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block text-[9px]">ピットロス</span>
+                      <strong className="text-slate-200">約{circuit.typicalPitLossSec}s</strong>
+                    </div>
+                  </div>
+
+                  {/* Characteristics snippet */}
+                  <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed bg-slate-900/40 p-2 rounded-lg border border-white/5">
+                    {circuit.characteristics.replace(/\[\d+\]/g, '')}
+                  </p>
+
+                  {/* Lap Record Snippet */}
+                  <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between">
+                    <span>⏱️ レコード:</span>
+                    <span className="text-slate-200 font-bold">
+                      {circuit.lapRecord.time} ({circuit.lapRecord.driver})
                     </span>
                   </div>
                 </div>
 
-                {/* Circuit Metrics Grid */}
-                <div className="grid grid-cols-3 gap-2 bg-slate-950/60 p-2.5 rounded-xl border border-white/5 text-center text-xs">
-                  <div>
-                    <span className="text-[10px] text-slate-500 block">DF要求</span>
-                    <strong className="text-slate-200 font-mono">{circuit.downforceLevel}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-500 block">タイヤ負荷</span>
-                    <strong className="text-amber-400 font-mono">{circuit.tyreStress}</strong>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-500 block">想定ピットロス</span>
-                    <strong className="text-sky-400 font-mono">{circuit.typicalPitLossSec}s</strong>
-                  </div>
-                </div>
-
-                {/* Characteristics */}
-                <p className="text-xs text-slate-300 leading-relaxed bg-slate-900/40 p-3 rounded-xl border border-white/5">
-                  {renderTextWithCitations(circuit.characteristics, circuit.id)}
-                </p>
-
-                {/* Lap Record & Deep Telemetry Link Button */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs pt-2 border-t border-white/5">
-                  <span className="text-[11px] text-slate-400">
-                    ⏱️ コースレコード: <strong className="text-white font-mono">{circuit.lapRecord.time}</strong> ({circuit.lapRecord.driver})
+                {/* Card Footer */}
+                <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[11px] font-mono text-slate-400">
+                  <span className="text-[10px] text-slate-500">
+                    {circuit.turns} ターン / DRS {circuit.drsZones}
                   </span>
-
-                  {circuit.telemetrySession && onNavigateToTelemetry && (
-                    <button
-                      onClick={() => onNavigateToTelemetry(circuit.telemetrySession)}
-                      className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-500 hover:to-sky-500 text-white rounded-xl text-xs font-racing font-bold flex items-center gap-1.5 shadow-md transition-all self-start sm:self-auto active:scale-95"
-                    >
-                      <span>📊</span>
-                      <span>テレメトリーで実データを確認</span>
-                      <span>➔</span>
-                    </button>
-                  )}
+                  <span className="text-sky-400 group-hover:underline flex items-center gap-0.5 font-bold">
+                    <span>詳細解説を見る</span>
+                    <span>➔</span>
+                  </span>
                 </div>
               </div>
+            ))}
+          </div>
 
-              {/* References Box */}
-              {renderReferencesBox(circuit.references, circuit.id)}
-            </div>
-          ))}
+          {/* Circuit Detail Modal */}
+          {selectedCircuitDetail && (
+            <CircuitDetailModal
+              circuit={selectedCircuitDetail}
+              allCircuits={KNOWLEDGE_CIRCUITS}
+              onSelectCircuit={(c) => setSelectedCircuitDetail(c)}
+              onNavigateToTelemetry={onNavigateToTelemetry}
+              onClose={() => setSelectedCircuitDetail(null)}
+            />
+          )}
         </div>
       )}
 
