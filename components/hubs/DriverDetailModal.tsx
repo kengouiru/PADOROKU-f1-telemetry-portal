@@ -3,9 +3,9 @@
 /**
  * components/hubs/DriverDetailModal.tsx
  * Comprehensive Detailed Modal/Drawer for F1 Drivers (Current & Legends).
- * Enhanced with clean CC-licensed portrait image with attribution,
- * telemetry engineering signatures, mechanical preferences, race engineers,
- * number origins, and unified champagne gold (#D4AF37) for Legends.
+ * Enhanced with clean CC-licensed portrait image with attribution via streaming image-proxy,
+ * robust fallback badge, telemetry engineering signatures, mechanical preferences,
+ * race engineers, number origins, and unified champagne gold (#D4AF37) for Legends.
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -28,11 +28,13 @@ export default function DriverDetailModal({
 }: DriverDetailModalProps) {
   const [activeTab, setActiveTab] = useState<DetailTab>('overview');
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
+  const [imgLoaded, setImgLoaded] = useState<boolean>(false);
   const [imgError, setImgError] = useState<boolean>(false);
   const modalContentRef = useRef<HTMLDivElement>(null);
 
-  // Reset image error state when driver changes
+  // Reset image state on driver change
   useEffect(() => {
+    setImgLoaded(false);
     setImgError(false);
   }, [driver.id]);
 
@@ -91,6 +93,10 @@ export default function DriverDetailModal({
     });
   };
 
+  const proxiedImageUrl = driver.visualAsset?.imageUrl
+    ? `/api/image-proxy?url=${encodeURIComponent(driver.visualAsset.imageUrl)}`
+    : null;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-md animate-fade-in">
       {/* Modal Card */}
@@ -141,56 +147,64 @@ export default function DriverDetailModal({
               : 'bg-gradient-to-b from-slate-900/60 to-transparent'
           }`}
         >
-          <div className="flex items-start sm:items-center gap-4">
-            {/* Driver Portrait Image with Fallback */}
-            {driver.visualAsset && !imgError ? (
-              <div className="flex flex-col items-center flex-shrink-0 group">
+          <div className="flex items-center gap-4 sm:gap-5">
+            {/* Driver Portrait Image Area */}
+            <div className="flex flex-col items-center flex-shrink-0">
+              <div
+                className="w-20 h-24 sm:w-24 sm:h-28 rounded-2xl overflow-hidden border shadow-xl bg-slate-900 relative flex items-center justify-center"
+                style={{ borderColor: `${themeColor}80` }}
+              >
+                {/* Fallback Badge (rendered under image or if error) */}
                 <div
-                  className="w-20 h-24 sm:w-24 sm:h-28 rounded-2xl overflow-hidden border shadow-xl bg-slate-900 relative"
-                  style={{ borderColor: `${themeColor}80` }}
+                  className="absolute inset-0 flex flex-col items-center justify-center font-racing font-black"
+                  style={{
+                    color: themeColor,
+                    backgroundColor: `${themeColor}18`,
+                  }}
                 >
+                  <span className="text-2xl sm:text-3xl leading-none">#{driver.number}</span>
+                  <span className="text-xs tracking-wider mt-1">{driver.code}</span>
+                </div>
+
+                {/* Actual Portrait Image via safe Proxy */}
+                {proxiedImageUrl && !imgError && (
                   <img
-                    src={driver.visualAsset.imageUrl}
+                    src={proxiedImageUrl}
                     alt={driver.fullName}
+                    referrerPolicy="no-referrer"
+                    onLoad={() => setImgLoaded(true)}
                     onError={() => setImgError(true)}
-                    className="w-full h-full object-cover object-top filter brightness-95 group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
+                    className={`absolute inset-0 w-full h-full object-cover object-top filter brightness-95 transition-opacity duration-300 ${
+                      imgLoaded ? 'opacity-100' : 'opacity-0'
+                    }`}
                   />
-                  {/* Floating Number Badge on Photo */}
+                )}
+
+                {/* Floating Number Badge */}
+                {imgLoaded && !imgError && (
                   <div
-                    className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-md text-[10px] font-racing font-black bg-black/80 backdrop-blur-sm border"
+                    className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-md text-[10px] font-racing font-black bg-black/85 backdrop-blur-sm border shadow-sm"
                     style={{ color: themeColor, borderColor: `${themeColor}60` }}
                   >
                     #{driver.number}
                   </div>
-                </div>
+                )}
+              </div>
 
-                {/* CC Attribution Link */}
+              {/* CC Attribution Link */}
+              {driver.visualAsset && (
                 <a
                   href={driver.visualAsset.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-1 text-[9px] text-slate-400 hover:text-sky-300 font-mono flex items-center gap-0.5 transition-colors"
+                  className="mt-1 text-[9px] text-slate-400 hover:text-sky-300 font-mono flex items-center gap-0.5 transition-colors max-w-[100px] truncate"
                   title={`撮影: ${driver.visualAsset.credit} (${driver.visualAsset.license})`}
                 >
                   <span>Photo: {driver.visualAsset.credit}</span>
                   <span className="text-[8px]">↗</span>
                 </a>
-              </div>
-            ) : (
-              /* Fallback Geometric Badge */
-              <div
-                className="w-20 h-24 sm:w-24 sm:h-28 rounded-2xl flex flex-col items-center justify-center font-racing font-black border shadow-xl flex-shrink-0"
-                style={{
-                  color: themeColor,
-                  borderColor: `${themeColor}80`,
-                  backgroundColor: `${themeColor}15`,
-                }}
-              >
-                <span className="text-2xl sm:text-3xl leading-none">#{driver.number}</span>
-                <span className="text-xs sm:text-sm tracking-wider mt-1">{driver.code}</span>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* Driver Title & Identity */}
             <div className="space-y-1.5">
@@ -422,7 +436,7 @@ export default function DriverDetailModal({
                 </div>
               </div>
 
-              {/* Mechanical Preferences Block (NEW) */}
+              {/* Mechanical Preferences Block */}
               {driver.engineeringPreference && (
                 <div className="bg-slate-950/80 border border-amber-500/30 p-4 rounded-2xl space-y-3">
                   <h4 className="text-xs font-racing font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -510,7 +524,7 @@ export default function DriverDetailModal({
           {/* TAB 3: BIOGRAPHY, ICONIC RACES & RIVALRIES */}
           {activeTab === 'bio' && (
             <div className="space-y-5 animate-fade-in">
-              {/* Race Engineer Block (NEW) */}
+              {/* Race Engineer Block */}
               {driver.raceEngineer && (
                 <div className="bg-gradient-to-r from-blue-950/40 via-slate-900/80 to-slate-950/60 border border-sky-500/30 p-4 rounded-2xl space-y-2">
                   <div className="flex items-center justify-between">

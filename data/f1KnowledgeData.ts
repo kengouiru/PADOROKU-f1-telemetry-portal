@@ -536,11 +536,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '超攻撃的オーバーステア派',
     numberOrigin: '幼少期から好んでいたパーソナルナンバー「33」から、世界王者獲得に伴いチャンピオンナンバー「1」を行使。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Max_Verstappen_2017_Malaysia_2.jpg/480px-Max_Verstappen_2017_Malaysia_2.jpg',
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3973_by_Stepro_%28medium_crop%29.jpg/500px-2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3973_by_Stepro_%28medium_crop%29.jpg',
       caption: 'Max Verstappen (Red Bull Racing)',
-      credit: 'Morio',
+      credit: 'Stepro',
       license: 'CC BY-SA 4.0',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Max_Verstappen_2017_Malaysia_2.jpg',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:2024-08-25_Motorsport,_Formel_1,_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3973_by_Stepro_(medium_crop).jpg',
     },
     engineeringPreference: {
       setupBalance: '極端なオーバーステア傾向（鋭敏なフロントノーズと敏感なリア）を要求。他車がスピンするレベルの回頭性を好む。',
@@ -638,11 +638,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: 'V字コーナリング＆タイヤ長寿命派',
     numberOrigin: '父アンソニーの愛車のナンバープレート「F44」およびカート時代の初優勝番号に由来し、王座獲得後も「1」を使わず「44」を一貫して使用。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Lewis_Hamilton_2016_Malaysia_2.jpg/480px-Lewis_Hamilton_2016_Malaysia_2.jpg',
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Prime_Minister_Keir_Starmer_meets_Sir_Lewis_Hamilton_%2854566928382%29_%28cropped%29.jpg/500px-Prime_Minister_Keir_Starmer_meets_Sir_Lewis_Hamilton_%2854566928382%29_%28cropped%29.jpg',
       caption: 'Lewis Hamilton (Mercedes-AMG F1)',
-      credit: 'Morio',
-      license: 'CC BY-SA 4.0',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Lewis_Hamilton_2016_Malaysia_2.jpg',
+      credit: 'Simon Dawson / No 10 Downing Street',
+      license: 'CC BY 2.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Prime_Minister_Keir_Starmer_meets_Sir_Lewis_Hamilton_(54566928382)_(cropped).jpg',
     },
     engineeringPreference: {
       setupBalance: 'フロントの強烈なグリップと安定したリアトラクションのバランスを重視。ブレーキング時のピッチ剛性を求める。',
@@ -740,11 +740,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '高ボトムスピード＆スムーズ派',
     numberOrigin: 'バレンティーノ・ロッシ（46番）の大ファンだが46を避け、ロゴ（LN4）のデザインに最適だった「4」を選択。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Lando_Norris_2022.jpg/480px-Lando_Norris_2022.jpg',
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg/500px-2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg',
       caption: 'Lando Norris (McLaren F1 Team)',
-      credit: 'Stefan Brending',
+      credit: 'Stepro',
       license: 'CC BY-SA 4.0',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Lando_Norris_2022.jpg',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:2024-08-25_Motorsport,_Formel_1,_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_(cropped2).jpg',
     },
     engineeringPreference: {
       setupBalance: 'フロントの初期レスポンスが高く、高速コーナーでリアが安定して張り付くエアロプラットフォームを重視。',
@@ -834,11 +834,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '予選一撃＆壁際限界アタッカー',
     numberOrigin: '自身の誕生日（10月16日）に由来し、「1 + 6 = 7」の意味も込めて「16」を選択。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Charles_Leclerc_2019_Malaysia.jpg/480px-Charles_Leclerc_2019_Malaysia.jpg',
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Charles_Leclerc_at_the_2026_Cannes_Film_Festival_%28cropped%29.jpg/500px-Charles_Leclerc_at_the_2026_Cannes_Film_Festival_%28cropped%29.jpg',
       caption: 'Charles Leclerc (Scuderia Ferrari)',
-      credit: 'Morio',
+      credit: 'Georges Biard',
       license: 'CC BY-SA 4.0',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Charles_Leclerc_2019_Malaysia.jpg',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Charles_Leclerc_at_the_2026_Cannes_Film_Festival_(cropped).jpg',
     },
     engineeringPreference: {
       setupBalance: 'フロントの鋭いノーズの入り（オーバーステア）を好み、リアがルーズな状態でもスロットルでコントロール。',
@@ -934,11 +934,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '冷静沈着＆高精度ライン派',
     numberOrigin: 'カート時代に偶然割り当てられた「81」番で好成績を収めたことから、パーソナルナンバーとして定着。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Oscar_Piastri_2023.jpg/480px-Oscar_Piastri_2023.jpg',
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/2026_Chinese_GP_-_Oscar_Piastri_%28cropped%29_%28cropped%29.jpg/500px-2026_Chinese_GP_-_Oscar_Piastri_%28cropped%29_%28cropped%29.jpg',
       caption: 'Oscar Piastri (McLaren F1 Team)',
-      credit: 'Stefan Brending',
+      credit: 'Stepro',
       license: 'CC BY-SA 4.0',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Oscar_Piastri_2023.jpg',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:2026_Chinese_GP_-_Oscar_Piastri_(cropped)_(cropped).jpg',
     },
     engineeringPreference: {
       setupBalance: 'ニュートラルで予測可能なマシンバランスを重視。極端な挙動変化を嫌い、一貫したラインを追求。',
@@ -1022,11 +1022,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '頭脳派戦略＆タイヤウィスパラー',
     numberOrigin: '「Carlo5 5ainz」のスペルに見立てたダブル5（55）番。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Carlos_Sainz_Jr_2022.jpg/480px-Carlos_Sainz_Jr_2022.jpg',
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Formula1Gabelhofen2022_%2804%29_%28cropped2%29.jpg/500px-Formula1Gabelhofen2022_%2804%29_%28cropped2%29.jpg',
       caption: 'Carlos Sainz Jr. (Scuderia Ferrari)',
-      credit: 'Stefan Brending',
+      credit: 'Granada',
       license: 'CC BY-SA 4.0',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Carlos_Sainz_Jr_2022.jpg',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Formula1Gabelhofen2022_(04)_(cropped2).jpg',
     },
     engineeringPreference: {
       setupBalance: 'リアの安定性を基盤としつつ、ブレーキング時の荷重移動が穏やかなメカニカルセットアップを好む。',
@@ -1110,11 +1110,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '予選一撃アタッカー＆アグレッシブ派',
     numberOrigin: '兄がカートで使用していた「63」番を受け継ぎ、GR63のロゴとしても愛用。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/George_Russell_2022.jpg/480px-George_Russell_2022.jpg',
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/KingsLeonSilverstne040724_%2828_of_112%29_%2853838006028%29_%28cropped%29.jpg/500px-KingsLeonSilverstne040724_%2828_of_112%29_%2853838006028%29_%28cropped%29.jpg',
       caption: 'George Russell (Mercedes-AMG F1)',
-      credit: 'Stefan Brending',
-      license: 'CC BY-SA 4.0',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:George_Russell_2022.jpg',
+      credit: 'Leon7',
+      license: 'CC BY-SA 2.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:KingsLeonSilverstne040724_(28_of_112)_(53838006028)_(cropped).jpg',
     },
     engineeringPreference: {
       setupBalance: 'フロントの反応が鋭く、ダイレクトにノーズが入るセッティングを好む。',
@@ -1198,11 +1198,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '市街地スペシャリスト＆タイヤケア派',
     numberOrigin: '幼少期に憧れたクラブ・アメリカのサッカー選手イバン・サモラーノの背番号「11」に由来。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Sergio_Perez_2022.jpg/480px-Sergio_Perez_2022.jpg',
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/7a/Sergio_P%C3%A9rez_2019_%28cropped%29.jpg',
       caption: 'Sergio Perez (Red Bull Racing)',
-      credit: 'Stefan Brending',
+      credit: 'Morio',
       license: 'CC BY-SA 4.0',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Sergio_Perez_2022.jpg',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Sergio_P%C3%A9rez_2019_(cropped).jpg',
     },
     engineeringPreference: {
       setupBalance: 'リアのスタビリティ（アンダーステア傾向）を重視。リアが逃げないマシンでトラクションを稼ぐ。',
@@ -1292,11 +1292,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '超絶順応＆総合力オールラウンダー',
     numberOrigin: '1996年7月14日、14歳の時にカート世界選手権で優勝した幸運の番号「14」に由来。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Fernando_Alonso_2022.jpg/480px-Fernando_Alonso_2022.jpg',
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Alonso-68_%2824710447098%29.jpg/500px-Alonso-68_%2824710447098%29.jpg',
       caption: 'Fernando Alonso (Aston Martin F1)',
-      credit: 'Stefan Brending',
-      license: 'CC BY-SA 4.0',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Fernando_Alonso_2022.jpg',
+      credit: 'cchana',
+      license: 'CC BY-SA 2.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Alonso-68_(24710447098).jpg',
     },
     engineeringPreference: {
       setupBalance: 'フロントタイヤの強い食いつきを最優先。リアが不安定であっても自身のステアリング修正でカバー可能。',
@@ -1388,11 +1388,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '奥深いレイトブレーキング派',
     numberOrigin: 'カート時代に使用していた「11」番が空いていなかったため、倍の「22」番を選択（ジェンソン・バトンの王者番号でもある）。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Yuki_Tsunoda_2022.jpg/480px-Yuki_Tsunoda_2022.jpg',
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Yuki_Tsunoda_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_%28028A8096%29.jpg/500px-Yuki_Tsunoda_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_%28028A8096%29.jpg',
       caption: 'Yuki Tsunoda (Visa Cash App RB)',
-      credit: 'Stefan Brending',
+      credit: 'Sienna2018',
       license: 'CC BY-SA 4.0',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Yuki_Tsunoda_2022.jpg',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Yuki_Tsunoda_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_(028A8096).jpg',
     },
     engineeringPreference: {
       setupBalance: '奥深いレイトブレーキングを可能にするフロントの絶対的制動スタビリティを重視。',
@@ -1483,11 +1483,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '異次元の予選アタック＆セナ足スロットル',
     numberOrigin: 'ロータスおよびマクラーレン・ホンダ黄金期に世界を席巻した象徴のゼッケン「12」番。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Ayrton_Senna_Imola_1989.jpg/480px-Ayrton_Senna_Imola_1989.jpg',
-      caption: 'Ayrton Senna (McLaren-Honda, Imola 1989)',
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Ayrton_Senna_Pesawat_RC_Cropped.jpg',
+      caption: 'Ayrton Senna da Silva',
       credit: 'Instituto Ayrton Senna',
-      license: 'CC BY 2.0',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Ayrton_Senna_Imola_1989.jpg',
+      license: 'CC BY-SA 3.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Ayrton_Senna_Pesawat_RC_Cropped.jpg',
     },
     engineeringPreference: {
       setupBalance: 'フロントの超絶レスポンス。ターボラグを克服するための繊細なペダルセットアップを要求。',
@@ -1584,11 +1584,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '予選ペース連続周回＆完全無欠マシン',
     numberOrigin: 'フェラーリ黄金期に5連覇を達成した不滅のチャンピオンナンバー「1」。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Michael_Schumacher_2005.jpg/480px-Michael_Schumacher_2005.jpg',
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Michael_Schumacher%2C_September_2005.jpg/500px-Michael_Schumacher%2C_September_2005.jpg',
       caption: 'Michael Schumacher (Scuderia Ferrari, 2005)',
       credit: 'Hans-Peter van Velthoven',
       license: 'CC BY-SA 3.0',
-      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Michael_Schumacher_2005.jpg',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Michael_Schumacher,_September_2005.jpg',
     },
     engineeringPreference: {
       setupBalance: 'フロントの圧倒的な入り。左足ブレーキで車体を安定させながらリアをわずかに滑らせるセッティング。',
