@@ -67,6 +67,15 @@ export interface DriverVisualAsset {
   sourceUrl: string;
 }
 
+export interface VisualGalleryItem {
+  imageUrl: string;
+  caption: string;
+  tag?: string; // e.g. "Portrait", "Action", "Podium", "Historic", "Track Map", "Panoramic"
+  credit: string;
+  license: string;
+  sourceUrl: string;
+}
+
 
 export interface EngineeringPreference {
   setupBalance: string;
@@ -96,6 +105,7 @@ export interface DriverProfile {
   driverType: string;
   numberOrigin: string;
   visualAsset?: DriverVisualAsset;
+  visualGallery?: VisualGalleryItem[];
   engineeringPreference?: EngineeringPreference;
   raceEngineer?: RaceEngineer;
   careerSummary: string;
@@ -217,6 +227,7 @@ export interface CircuitProfile {
     trackMap: CircuitVisualAsset;
     atmosphereImage?: CircuitVisualAsset;
   };
+  visualGallery?: VisualGalleryItem[];
   trackGeometry?: TrackGeometry;
   allCorners?: CircuitCornerDetail[];
   historicalMoments?: CircuitHistoricalMoment[];
@@ -621,6 +632,32 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       license: 'CC BY-SA 4.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:2024-08-25_Motorsport,_Formel_1,_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3973_by_Stepro_(medium_crop).jpg',
     },
+    visualGallery: [
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/2021_British_Grand_Prix_%2851349530573%29_%28cropped%29.jpg/960px-2021_British_Grand_Prix_%2851349530573%29_%28cropped%29.jpg',
+        caption: 'レッドブル・レーシングの絶対的エース・若き3冠王者 マックス・フェルスタッペン',
+        tag: 'Portrait',
+        credit: 'Luki4842',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:2021_British_Grand_Prix_(51349530573)_(cropped).jpg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/2018_Chinese_Grand_Prix_Qualifying_Max_Verstappen_%2827842985498%29.jpg/960px-2018_Chinese_Grand_Prix_Qualifying_Max_Verstappen_%2827842985498%29.jpg',
+        caption: '超攻撃的なオーバーステアセッティングでエイペックスを切り裂くフェルスタッペン',
+        tag: 'Action',
+        credit: 'Luki4842',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:2018_Chinese_Grand_Prix_Qualifying_Max_Verstappen_(27842985498).jpg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/2018_Austrian_Grand_Prix_podium_%2829388813658%29.jpg/960px-2018_Austrian_Grand_Prix_podium_%2829388813658%29.jpg',
+        caption: 'レッドブル・リンク母国グランプリでの歓喜の優勝トロフィーセレモニー',
+        tag: 'Podium',
+        credit: 'Luki4842',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:2018_Austrian_Grand_Prix_podium_(29388813658).jpg',
+      },
+    ],
     engineeringPreference: {
       setupBalance: '極端なオーバーステア傾向（鋭敏なフロントノーズと敏感なリア）を要求。他車がスピンするレベルの回頭性を好む。',
       pedalFeel: 'ショートストロークかつ超高剛性のブレーキペダル。ミリ単位の踏力コントロールでトレイルブレーキングを制御。',
@@ -723,6 +760,32 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       license: 'CC BY 2.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Prime_Minister_Keir_Starmer_meets_Sir_Lewis_Hamilton_(54566928382)_(cropped).jpg',
     },
+    visualGallery: [
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/2021_United_States_Grand_Prix_23_%28cropped%29.jpg/960px-2021_United_States_Grand_Prix_23_%28cropped%29.jpg',
+        caption: '歴代最多105勝を誇る7冠絶対王者 サー・ルイス・ハミルトン',
+        tag: 'Portrait',
+        credit: 'Luki4842',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:2021_United_States_Grand_Prix_23_(cropped).jpg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/2024_British_Grand_Prix%2C_Hamilton_%281%29.jpg/960px-2024_British_Grand_Prix%2C_Hamilton_%281%29.jpg',
+        caption: '2024年イギリスGP・母国シルバーストンでの奇跡の復活勝利',
+        tag: 'Action',
+        credit: 'Simon Dawson',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:2024_British_Grand_Prix,_Hamilton_(1).jpg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/2018_Italian_Grand_Prix_Hamilton_%2844313902384%29.jpg/960px-2018_Italian_Grand_Prix_Hamilton_%2844313902384%29.jpg',
+        caption: '熱狂のモンツァでの勝利とティフォシを前にした表彰台トロフィー',
+        tag: 'Podium',
+        credit: 'Luki4842',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:2018_Italian_Grand_Prix_Hamilton_(44313902384).jpg',
+      },
+    ],
     engineeringPreference: {
       setupBalance: 'フロントの強烈なグリップと安定したリアトラクションのバランスを重視。ブレーキング時のピッチ剛性を求める。',
       pedalFeel: 'プログレッシブでストローク量のあるブレーキタッチ。ロックアップ寸前を足裏の微妙なリリースで回避。',
@@ -825,6 +888,24 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       license: 'CC BY-SA 4.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:2024-08-25_Motorsport,_Formel_1,_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_(cropped2).jpg',
     },
+    visualGallery: [
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg/960px-2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg',
+        caption: 'マクラーレンのエースとして覚醒したランド・ノリス',
+        tag: 'Portrait',
+        credit: 'Stepro',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:2024-08-25_Motorsport,_Formel_1,_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_(cropped2).jpg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/2024_British_Grand_Prix%2C_Norris_%282%29.jpg/960px-2024_British_Grand_Prix%2C_Norris_%282%29.jpg',
+        caption: '母国シルバーストンでの激しいトップ争いと攻めの走り',
+        tag: 'Action',
+        credit: 'Simon Dawson',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:2024_British_Grand_Prix,_Norris_(2).jpg',
+      },
+    ],
     engineeringPreference: {
       setupBalance: 'フロントの初期レスポンスが高く、高速コーナーでリアが安定して張り付くエアロプラットフォームを重視。',
       pedalFeel: '立ち上がりがリニアでコントロール幅の広いブレーキペダル。',
@@ -919,6 +1000,24 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       license: 'CC BY-SA 4.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Charles_Leclerc_at_the_2026_Cannes_Film_Festival_(cropped).jpg',
     },
+    visualGallery: [
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/2019_Chinese_Grand_Prix_Leclerc_%2847583134682%29_%28cropped%29.jpg/960px-2019_Chinese_Grand_Prix_Leclerc_%2847583134682%29_%28cropped%29.jpg',
+        caption: '跳ね馬を率いるモナコの至宝 シャルル・ルクレール',
+        tag: 'Portrait',
+        credit: 'Luki4842',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:2019_Chinese_Grand_Prix_Leclerc_(47583134682)_(cropped).jpg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/2021_British_Grand_Prix_%2851349271106%29.jpg/960px-2021_British_Grand_Prix_%2851349271106%29.jpg',
+        caption: 'フェラーリSF21を限界領域でコントロールするアタックラップ',
+        tag: 'Action',
+        credit: 'Luki4842',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:2021_British_Grand_Prix_(51349271106).jpg',
+      },
+    ],
     engineeringPreference: {
       setupBalance: 'フロントの鋭いノーズの入り（オーバーステア）を好み、リアがルーズな状態でもスロットルでコントロール。',
       pedalFeel: '初期タッチが非常に硬く、ダイレクトに制動力が出るブレーキフィール。',
@@ -1377,6 +1476,24 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       license: 'CC BY-SA 2.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Alonso-68_(24710447098).jpg',
     },
+    visualGallery: [
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Alonso-68_%2824710447098%29.jpg/960px-Alonso-68_%2824710447098%29.jpg',
+        caption: '現役最多400戦超の鉄人 2冠王者フェルナンド・アロンソ',
+        tag: 'Portrait',
+        credit: 'cchana',
+        license: 'CC BY-SA 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Alonso-68_(24710447098).jpg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Alonso_Monaco_2016.jpg/960px-Alonso_Monaco_2016.jpg',
+        caption: 'モナコ市街地を巧みなマシンコントロールで攻めるアロンソ',
+        tag: 'Action',
+        credit: 'Luki4842',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Alonso_Monaco_2016.jpg',
+      },
+    ],
     engineeringPreference: {
       setupBalance: 'フロントタイヤの強い食いつきを最優先。リアが不安定であっても自身のステアリング修正でカバー可能。',
       pedalFeel: '踏力リニアリティが高く、コーナー奥深くで繊細に抜けるブレーキペダル。',
@@ -1473,6 +1590,32 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       license: 'CC BY-SA 4.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Yuki_Tsunoda_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_(028A8096).jpg',
     },
+    visualGallery: [
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/FIA_F1_Austria_2023_Nr._22_%281%29.jpg/960px-FIA_F1_Austria_2023_Nr._22_%281%29.jpg',
+        caption: '世界最高峰F1で存在感を放つ日本の若きエース 角田裕毅',
+        tag: 'Portrait',
+        credit: 'Luki4842',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:FIA_F1_Austria_2023_Nr._22_(1).jpg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/2022_British_Grand_Prix_%2852382343026%29.jpg/960px-2022_British_Grand_Prix_%2852382343026%29.jpg',
+        caption: 'シルバーストンの超高速コーナーを駆け抜ける角田裕毅',
+        tag: 'Action',
+        credit: 'Luki4842',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:2022_British_Grand_Prix_(52382343026).jpg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/2021_US_GP%2C_Tsunoda.jpg',
+        caption: '緊迫のコクピット・集中を高めるグリッド上での角田',
+        tag: 'Cockpit',
+        credit: 'Luki4842',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:2021_US_GP,_Tsunoda.jpg',
+      },
+    ],
     engineeringPreference: {
       setupBalance: '奥深いレイトブレーキングを可能にするフロントの絶対的制動スタビリティを重視。',
       pedalFeel: '踏み始めの初期バイトが強力で、踏力コントロールがダイレクトなブレーキ。',
@@ -1568,6 +1711,32 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       license: 'CC BY-SA 3.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Ayrton_Senna_Pesawat_RC_Cropped.jpg',
     },
+    visualGallery: [
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Ayrton_Senna_Pesawat_RC_Cropped.jpg',
+        caption: '音速の貴公子・不滅のカリスマ アイルトン・セナ',
+        tag: 'Portrait',
+        credit: 'Instituto Ayrton Senna',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Ayrton_Senna_Pesawat_RC_Cropped.jpg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/1985_European_GP_Senna.jpg/960px-1985_European_GP_Senna.jpg',
+        caption: '1985年ロータス・ルノーでヨーロッパを疾走するセナ',
+        tag: 'Action',
+        credit: 'Luki4842',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:1985_European_GP_Senna.jpg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/AyrtonSennaAtHockheimGP1993-2.jpg/960px-AyrtonSennaAtHockheimGP1993-2.jpg',
+        caption: '1993年マクラーレンMP4/8での渾身のアタック',
+        tag: 'Historic',
+        credit: 'Luki4842',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:AyrtonSennaAtHockheimGP1993-2.jpg',
+      },
+    ],
     engineeringPreference: {
       setupBalance: 'フロントの超絶レスポンス。ターボラグを克服するための繊細なペダルセットアップを要求。',
       pedalFeel: 'スロットルを毎秒数回煽る「セナ足」に対応する超高感度スロットルペダル。',
@@ -1798,6 +1967,24 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Bahrain_International_Circuit_back_straight.jpg',
       },
     },
+    visualGallery: [
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Bahrain_International_Circuit--Grand_Prix_Layout.svg/960px-Bahrain_International_Circuit--Grand_Prix_Layout.svg.png',
+        caption: 'サヒール・インターナショナル・サーキット公式トラックレイアウト図',
+        tag: 'Track Map',
+        credit: 'Will_Scalise',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Bahrain_International_Circuit--Grand_Prix_Layout.svg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Bahrain_International_Circuit_back_straight.jpg/960px-Bahrain_International_Circuit_back_straight.jpg',
+        caption: '砂漠の闇を照らす強力なナイトレース照明とバックストレート',
+        tag: 'Panoramic',
+        credit: 'LutzWeidner',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Bahrain_International_Circuit_back_straight.jpg',
+      },
+    ],
     trackGeometry: {
       elevationChangeMeters: 17.5,
       longestStraightMeters: 1090,
@@ -1924,6 +2111,40 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:F1_2014_JAP_Lewis_Hamilton_4968.jpg',
       },
     },
+    visualGallery: [
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Suzuka_circuit_map--2005.svg/960px-Suzuka_circuit_map--2005.svg.png',
+        caption: '世界唯一の8の字立体交差サーキット 鈴鹿公式レイアウト図',
+        tag: 'Track Map',
+        credit: 'Will_Scalise',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Suzuka_circuit_map--2005.svg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/F1_2014_JAP_Lewis_Hamilton_4968.jpg/960px-F1_2014_JAP_Lewis_Hamilton_4968.jpg',
+        caption: '鈴鹿名物・セクター1の高速S字を駆け抜けるF1マシン',
+        tag: 'Action',
+        credit: 'Morio',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:F1_2014_JAP_Lewis_Hamilton_4968.jpg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Suzuka_Circuit_2006.jpg/960px-Suzuka_Circuit_2006.jpg',
+        caption: '鈴鹿のランドマーク・大観覧車とグランドスタンド全景',
+        tag: 'Panoramic',
+        credit: 'Luki4842',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Suzuka_Circuit_2006.jpg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Schumacher_car_Suzuka_2006.jpg/960px-Schumacher_car_Suzuka_2006.jpg',
+        caption: '2006年ミハエル・シューマッハとフェラーリ248 F1の鈴鹿決戦',
+        tag: 'Historic',
+        credit: 'Luki4842',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Schumacher_car_Suzuka_2006.jpg',
+      },
+    ],
     trackGeometry: {
       elevationChangeMeters: 40.4,
       longestStraightMeters: 900,
@@ -2057,6 +2278,24 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Ferrari_Challenge_-_Autodromo_Nazionale_di_Monza_-_03-04-2016_(25876182923).jpg',
       },
     },
+    visualGallery: [
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Monza_track_map.svg/960px-Monza_track_map.svg.png',
+        caption: '超高速「スピードの殿堂」モンツァ公式トラックレイアウト図',
+        tag: 'Track Map',
+        credit: 'Will_Scalise',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Monza_track_map.svg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Ferrari_Challenge_-_Autodromo_Nazionale_di_Monza_-_03-04-2016_%2825876182923%29.jpg/960px-Ferrari_Challenge_-_Autodromo_Nazionale_di_Monza_-_03-04-2016_%2825876182923%29.jpg',
+        caption: '熱狂のティフォシで埋め尽くされるモンツァのメインストレート',
+        tag: 'Panoramic',
+        credit: 'Nic Redhead',
+        license: 'CC BY-SA 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Ferrari_Challenge_-_Autodromo_Nazionale_di_Monza_-_03-04-2016_(25876182923).jpg',
+      },
+    ],
     trackGeometry: {
       elevationChangeMeters: 9.5,
       longestStraightMeters: 1120,
@@ -2173,6 +2412,40 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Eau_Rouge01.jpg',
       },
     },
+    visualGallery: [
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Spa-Francorchamps_of_Belgium.svg/960px-Spa-Francorchamps_of_Belgium.svg.png',
+        caption: 'F1最長7.004km スパ・フランコルシャン公式レイアウト図',
+        tag: 'Track Map',
+        credit: 'Will_Scalise',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Spa-Francorchamps_of_Belgium.svg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Eau_Rouge01.jpg/960px-Eau_Rouge01.jpg',
+        caption: '見上げるような名物オールージュ〜ラディオンの急勾配セクション',
+        tag: 'Action',
+        credit: 'Gerd Breitenbach',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Eau_Rouge01.jpg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Circuit_de_Spa-Francorchamps%2C_April_22%2C_2018_SkySat_%28cropped%29.jpg/960px-Circuit_de_Spa-Francorchamps%2C_April_22%2C_2018_SkySat_%28cropped%29.jpg',
+        caption: 'アルデンヌの深い森に抱かれたスパ・フランコルシャンの衛星全景写真',
+        tag: 'Panoramic',
+        credit: 'Planet Labs Inc.',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Circuit_de_Spa-Francorchamps,_April_22,_2018_SkySat_(cropped).jpg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Francorchamps01.jpg/960px-Francorchamps01.jpg',
+        caption: '歴史あるピットレーンとメインストレートのパドック景観',
+        tag: 'Historic',
+        credit: 'Gerd Breitenbach',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Francorchamps01.jpg',
+      },
+    ],
     trackGeometry: {
       elevationChangeMeters: 102.2,
       longestStraightMeters: 2000,
@@ -2293,6 +2566,32 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:2009_White_Porsche_997_GT3_at_Loews_Hairpin,_Monte_Carlo,_Monaco.jpg',
       },
     },
+    visualGallery: [
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Monte_Carlo_Formula_1_track_map.svg/960px-Monte_Carlo_Formula_1_track_map.svg.png',
+        caption: 'モナコ公国市街地サーキット公式トラックレイアウト図',
+        tag: 'Track Map',
+        credit: 'Will_Scalise',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Monte_Carlo_Formula_1_track_map.svg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/2009_White_Porsche_997_GT3_at_Loews_Hairpin%2C_Monte_Carlo%2C_Monaco.jpg/960px-2009_White_Porsche_997_GT3_at_Loews_Hairpin%2C_Monte_Carlo%2C_Monaco.jpg',
+        caption: '世界で最も低速かつタイトなグランドホテル・ヘアピン（旧ロウズ）',
+        tag: 'Action',
+        credit: 'Ben',
+        license: 'CC BY-SA 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:2009_White_Porsche_997_GT3_at_Loews_Hairpin,_Monte_Carlo,_Monaco.jpg',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Circuit_de_Monaco%2C_April_1%2C_2018_SkySat_%28cropped%29.jpg/960px-Circuit_de_Monaco%2C_April_1%2C_2018_SkySat_%28cropped%29.jpg',
+        caption: '地中海とヨットハーバーを囲むモナコ市街地コースの衛星空撮写真',
+        tag: 'Panoramic',
+        credit: 'Planet Labs Inc.',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Circuit_de_Monaco,_April_1,_2018_SkySat_(cropped).jpg',
+      },
+    ],
     trackGeometry: {
       elevationChangeMeters: 42.0,
       longestStraightMeters: 669,
@@ -2419,6 +2718,24 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:2024_British_Grand_Prix,_Hamilton_(5).jpg',
       },
     },
+    visualGallery: [
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Silverstone_Circuit_2020.png/960px-Silverstone_Circuit_2020.png',
+        caption: 'F1発祥の地・シルバーストン公式トラックレイアウト図',
+        tag: 'Track Map',
+        credit: 'Luki4842',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Silverstone_Circuit_2020.png',
+      },
+      {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/2024_British_Grand_Prix%2C_Hamilton_%285%29.jpg/960px-2024_British_Grand_Prix%2C_Hamilton_%285%29.jpg',
+        caption: '超高速マゴッツ・ベケッツを臨むシルバーストンの観客席',
+        tag: 'Action',
+        credit: 'Simon Dawson',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:2024_British_Grand_Prix,_Hamilton_(5).jpg',
+      },
+    ],
     trackGeometry: {
       elevationChangeMeters: 11.3,
       longestStraightMeters: 1034,

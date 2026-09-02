@@ -12,6 +12,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import type { CircuitProfile, Reference, TelemetryTarget } from '@/data/f1KnowledgeData';
+import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
 
 interface CircuitDetailModalProps {
   circuit: CircuitProfile;
@@ -228,6 +229,15 @@ export default function CircuitDetailModal({
           ════════════════════════════════════════════════════════════ */}
           {activeTab === 'map' && (
             <div className="space-y-5 animate-fade-in">
+              {/* Photo Gallery Carousel (Layout, Atmosphere, Action, Historic) */}
+              {circuit.visualGallery && circuit.visualGallery.length > 0 && (
+                <PhotoGalleryCarousel
+                  items={circuit.visualGallery}
+                  title="📸 CIRCUIT PHOTO & MAP GALLERY / コースギャラリー"
+                  themeColor="#38bdf8"
+                />
+              )}
+
               {/* Dual Visual Gallery: Layout Map + Atmosphere Photo */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* 1. Track Layout Blueprint Map */}

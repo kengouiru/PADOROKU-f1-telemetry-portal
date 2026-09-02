@@ -10,6 +10,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import type { DriverProfile, Reference } from '@/data/f1KnowledgeData';
+import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
 
 interface DriverDetailModalProps {
   driver: DriverProfile;
@@ -294,6 +295,30 @@ export default function DriverDetailModal({
           {/* TAB 1: OVERVIEW & CAREER STATS */}
           {activeTab === 'overview' && (
             <div className="space-y-5 animate-fade-in">
+              {/* Photo Gallery Carousel (3-5 Photos with Sneak Peek) */}
+              {(driver.visualGallery && driver.visualGallery.length > 0) ? (
+                <PhotoGalleryCarousel
+                  items={driver.visualGallery}
+                  title="📸 DRIVER PHOTO & ACTION GALLERY / ギャラリー"
+                  themeColor={themeColor}
+                />
+              ) : driver.visualAsset ? (
+                <PhotoGalleryCarousel
+                  items={[
+                    {
+                      imageUrl: driver.visualAsset.imageUrl,
+                      caption: driver.visualAsset.caption,
+                      tag: 'Portrait',
+                      credit: driver.visualAsset.credit,
+                      license: driver.visualAsset.license,
+                      sourceUrl: driver.visualAsset.sourceUrl,
+                    },
+                  ]}
+                  title="📸 DRIVER PHOTO / ポートレート"
+                  themeColor={themeColor}
+                />
+              ) : null}
+
               {/* Detailed Career Biography Narrative */}
               <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-2">
                 <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
