@@ -3,8 +3,9 @@
 /**
  * components/hubs/DriverDetailModal.tsx
  * Comprehensive Detailed Modal/Drawer for F1 Drivers (Current & Legends).
- * Enhanced with deep analytical tabs, telemetry engineering signatures,
- * iconic races breakdown, multiple quotes, and unified champagne gold (#D4AF37) for Legends.
+ * Enhanced with clean CC-licensed portrait image with attribution,
+ * telemetry engineering signatures, mechanical preferences, race engineers,
+ * number origins, and unified champagne gold (#D4AF37) for Legends.
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -27,7 +28,13 @@ export default function DriverDetailModal({
 }: DriverDetailModalProps) {
   const [activeTab, setActiveTab] = useState<DetailTab>('overview');
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
+  const [imgError, setImgError] = useState<boolean>(false);
   const modalContentRef = useRef<HTMLDivElement>(null);
+
+  // Reset image error state when driver changes
+  useEffect(() => {
+    setImgError(false);
+  }, [driver.id]);
 
   const isLegend = driver.status === 'Legend';
   const themeColor = isLegend ? '#D4AF37' : driver.teamColor;
@@ -93,7 +100,7 @@ export default function DriverDetailModal({
         style={{ borderTopColor: themeColor, borderTopWidth: 4 }}
       >
         {/* Top Navigation Bar: Prev / Next & Close */}
-        <div className="p-3.5 sm:px-6 bg-slate-900/90 border-b border-white/10 flex items-center justify-between gap-3">
+        <div className="p-3 sm:px-6 bg-slate-900/90 border-b border-white/10 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <button
               onClick={() => prevDriver && onSelectDriver(prevDriver)}
@@ -135,19 +142,58 @@ export default function DriverDetailModal({
           }`}
         >
           <div className="flex items-start sm:items-center gap-4">
-            <div
-              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex flex-col items-center justify-center font-racing font-black border shadow-xl flex-shrink-0"
-              style={{
-                color: themeColor,
-                borderColor: `${themeColor}80`,
-                backgroundColor: `${themeColor}15`,
-              }}
-            >
-              <span className="text-xl sm:text-2xl leading-none">#{driver.number}</span>
-              <span className="text-xs sm:text-sm tracking-wider mt-0.5">{driver.code}</span>
-            </div>
+            {/* Driver Portrait Image with Fallback */}
+            {driver.visualAsset && !imgError ? (
+              <div className="flex flex-col items-center flex-shrink-0 group">
+                <div
+                  className="w-20 h-24 sm:w-24 sm:h-28 rounded-2xl overflow-hidden border shadow-xl bg-slate-900 relative"
+                  style={{ borderColor: `${themeColor}80` }}
+                >
+                  <img
+                    src={driver.visualAsset.imageUrl}
+                    alt={driver.fullName}
+                    onError={() => setImgError(true)}
+                    className="w-full h-full object-cover object-top filter brightness-95 group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                  {/* Floating Number Badge on Photo */}
+                  <div
+                    className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-md text-[10px] font-racing font-black bg-black/80 backdrop-blur-sm border"
+                    style={{ color: themeColor, borderColor: `${themeColor}60` }}
+                  >
+                    #{driver.number}
+                  </div>
+                </div>
 
-            <div className="space-y-1">
+                {/* CC Attribution Link */}
+                <a
+                  href={driver.visualAsset.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 text-[9px] text-slate-400 hover:text-sky-300 font-mono flex items-center gap-0.5 transition-colors"
+                  title={`撮影: ${driver.visualAsset.credit} (${driver.visualAsset.license})`}
+                >
+                  <span>Photo: {driver.visualAsset.credit}</span>
+                  <span className="text-[8px]">↗</span>
+                </a>
+              </div>
+            ) : (
+              /* Fallback Geometric Badge */
+              <div
+                className="w-20 h-24 sm:w-24 sm:h-28 rounded-2xl flex flex-col items-center justify-center font-racing font-black border shadow-xl flex-shrink-0"
+                style={{
+                  color: themeColor,
+                  borderColor: `${themeColor}80`,
+                  backgroundColor: `${themeColor}15`,
+                }}
+              >
+                <span className="text-2xl sm:text-3xl leading-none">#{driver.number}</span>
+                <span className="text-xs sm:text-sm tracking-wider mt-1">{driver.code}</span>
+              </div>
+            )}
+
+            {/* Driver Title & Identity */}
+            <div className="space-y-1.5">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs text-slate-400 font-mono">{driver.country}</span>
                 <span
@@ -290,20 +336,29 @@ export default function DriverDetailModal({
                 </div>
               </div>
 
-              {/* Bio Meta Grid */}
-              <div className="bg-slate-950/60 border border-white/10 p-4 rounded-2xl grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono">
-                <div>
-                  <span className="text-slate-500 block text-[10px]">生年月日</span>
-                  <span className="text-slate-200">{driver.birthDate}</span>
+              {/* Bio Meta Grid with Number Origin */}
+              <div className="bg-slate-950/60 border border-white/10 p-4 rounded-2xl space-y-3 font-mono">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                  <div>
+                    <span className="text-slate-500 block text-[10px]">生年月日</span>
+                    <span className="text-slate-200">{driver.birthDate}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block text-[10px]">出身地</span>
+                    <span className="text-slate-200">{driver.birthPlace}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-500 block text-[10px]">F1デビュー</span>
+                    <span className="text-slate-200">{driver.f1Debut}</span>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-slate-500 block text-[10px]">出身地</span>
-                  <span className="text-slate-200">{driver.birthPlace}</span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block text-[10px]">F1デビュー</span>
-                  <span className="text-slate-200">{driver.f1Debut}</span>
-                </div>
+
+                {driver.numberOrigin && (
+                  <div className="pt-2 border-t border-white/5 flex items-start gap-2 text-xs">
+                    <span className="text-amber-400 font-bold flex-shrink-0">#️⃣ カーナンバー #{driver.number} の由来:</span>
+                    <span className="text-slate-300">{driver.numberOrigin}</span>
+                  </div>
+                )}
               </div>
 
               {/* Career Milestones Timeline */}
@@ -367,6 +422,36 @@ export default function DriverDetailModal({
                 </div>
               </div>
 
+              {/* Mechanical Preferences Block (NEW) */}
+              {driver.engineeringPreference && (
+                <div className="bg-slate-950/80 border border-amber-500/30 p-4 rounded-2xl space-y-3">
+                  <h4 className="text-xs font-racing font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>🔧</span>
+                    <span>マシンセットアップ & メカニカル嗜好</span>
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                    <div className="bg-slate-900/70 p-3 rounded-xl border border-white/5 space-y-1">
+                      <span className="text-amber-400 font-bold block text-[11px]">⚖️ 車体バランス</span>
+                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                        {driver.engineeringPreference.setupBalance}
+                      </p>
+                    </div>
+                    <div className="bg-slate-900/70 p-3 rounded-xl border border-white/5 space-y-1">
+                      <span className="text-amber-400 font-bold block text-[11px]">🦶 ペダルタッチ・制動感</span>
+                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                        {driver.engineeringPreference.pedalFeel}
+                      </p>
+                    </div>
+                    <div className="bg-slate-900/70 p-3 rounded-xl border border-white/5 space-y-1">
+                      <span className="text-amber-400 font-bold block text-[11px]">🎯 ステアリングフィール</span>
+                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                        {driver.engineeringPreference.steeringWeight}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Telemetry Engineering Signature (Deep Dive) */}
               <div className="bg-gradient-to-r from-blue-950/40 via-purple-950/30 to-slate-900/60 border border-sky-500/30 p-4 rounded-2xl space-y-2 shadow-inner">
                 <h4 className="text-xs font-racing font-bold text-sky-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -425,6 +510,29 @@ export default function DriverDetailModal({
           {/* TAB 3: BIOGRAPHY, ICONIC RACES & RIVALRIES */}
           {activeTab === 'bio' && (
             <div className="space-y-5 animate-fade-in">
+              {/* Race Engineer Block (NEW) */}
+              {driver.raceEngineer && (
+                <div className="bg-gradient-to-r from-blue-950/40 via-slate-900/80 to-slate-950/60 border border-sky-500/30 p-4 rounded-2xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-racing font-bold text-sky-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <span>📻</span>
+                      <span>相棒レースエンジニア & 無線交信連携</span>
+                    </h4>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-900/60 text-sky-200 border border-sky-500/40 font-bold">
+                      CALLSIGN: &quot;{driver.raceEngineer.callsign}&quot;
+                    </span>
+                  </div>
+                  <div className="text-xs space-y-1">
+                    <p className="text-slate-100 font-semibold flex items-center gap-2">
+                      <span>担当: {driver.raceEngineer.name}</span>
+                    </p>
+                    <p className="text-slate-300 text-[11px] leading-relaxed">
+                      {driver.raceEngineer.dynamic}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Multiple Iconic Quotes */}
               <div className="space-y-2">
                 <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">

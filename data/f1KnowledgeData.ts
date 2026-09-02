@@ -43,6 +43,28 @@ export interface IconicRace {
   tacticalMasterclass: string;
 }
 
+
+export interface DriverVisualAsset {
+  imageUrl: string;
+  caption: string;
+  credit: string;
+  license: string;
+  sourceUrl: string;
+}
+
+
+export interface EngineeringPreference {
+  setupBalance: string;
+  pedalFeel: string;
+  steeringWeight: string;
+}
+
+export interface RaceEngineer {
+  name: string;
+  callsign: string;
+  dynamic: string;
+}
+
 export interface DriverProfile {
   id: string;
   code: string; // 3-letter e.g. "VER"
@@ -57,6 +79,10 @@ export interface DriverProfile {
   birthPlace: string;
   f1Debut: string;
   driverType: string;
+  numberOrigin: string;
+  visualAsset?: DriverVisualAsset;
+  engineeringPreference?: EngineeringPreference;
+  raceEngineer?: RaceEngineer;
   careerSummary: string;
   entries: number;
   wins: number;
@@ -82,6 +108,7 @@ export interface DriverProfile {
   milestones: DriverMilestone[];
   references: Reference[];
 }
+
 
 
 
@@ -507,6 +534,24 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     birthPlace: 'Hasselt, Belgium',
     f1Debut: '2015年 オーストラリアGP (Toro Rosso)',
     driverType: '超攻撃的オーバーステア派',
+    numberOrigin: '幼少期から好んでいたパーソナルナンバー「33」から、世界王者獲得に伴いチャンピオンナンバー「1」を行使。',
+    visualAsset: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Max_Verstappen_2017_Malaysia_2.jpg/480px-Max_Verstappen_2017_Malaysia_2.jpg',
+      caption: 'Max Verstappen (Red Bull Racing)',
+      credit: 'Morio',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Max_Verstappen_2017_Malaysia_2.jpg',
+    },
+    engineeringPreference: {
+      setupBalance: '極端なオーバーステア傾向（鋭敏なフロントノーズと敏感なリア）を要求。他車がスピンするレベルの回頭性を好む。',
+      pedalFeel: 'ショートストロークかつ超高剛性のブレーキペダル。ミリ単位の踏力コントロールでトレイルブレーキングを制御。',
+      steeringWeight: 'ダイレクトでクイックなステアリングラック比。タイヤ接地面の微小スライドを瞬時に感知するフィードバックを重視。',
+    },
+    raceEngineer: {
+      name: 'Gianpiero Lambiase',
+      callsign: 'GP',
+      dynamic: '2016年加入以来の固い絆。互いに一切妥協せず、無線で夫婦喧嘩のようにストレートに意見をぶつけ合いながら最高の結果を導く。',
+    },
     careerSummary:
       '元F1ドライバーの父ヨス・フェルスタッペンによる徹底した英才教育を受け、カート界で数々のタイトルを総なめにした後、ヨーロッパF3選手権で1年戦っただけで異例の17歳F1昇格を果たす [1]。2016年スペインGPでレッドブル昇格初戦にして史上最年少優勝を達成。2021年の劇的な初戴冠以降、2022年・2023年と圧倒的な強さでシーズン最多勝記録（19勝）を更新し、現代F1の絶対王者として君臨している [2]。',
     entries: 206,
@@ -591,6 +636,24 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     birthPlace: 'Stevenage, United Kingdom',
     f1Debut: '2007年 オーストラリアGP (McLaren)',
     driverType: 'V字コーナリング＆タイヤ長寿命派',
+    numberOrigin: '父アンソニーの愛車のナンバープレート「F44」およびカート時代の初優勝番号に由来し、王座獲得後も「1」を使わず「44」を一貫して使用。',
+    visualAsset: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Lewis_Hamilton_2016_Malaysia_2.jpg/480px-Lewis_Hamilton_2016_Malaysia_2.jpg',
+      caption: 'Lewis Hamilton (Mercedes-AMG F1)',
+      credit: 'Morio',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Lewis_Hamilton_2016_Malaysia_2.jpg',
+    },
+    engineeringPreference: {
+      setupBalance: 'フロントの強烈なグリップと安定したリアトラクションのバランスを重視。ブレーキング時のピッチ剛性を求める。',
+      pedalFeel: 'プログレッシブでストローク量のあるブレーキタッチ。ロックアップ寸前を足裏の微妙なリリースで回避。',
+      steeringWeight: '適度な重みと路面インフォメーションが明確に伝わるフィードバック設定を好む。',
+    },
+    raceEngineer: {
+      name: 'Peter Bonnington',
+      callsign: 'Bono',
+      dynamic: '「Hammer Time（勝負をかける時だ）」や「Get in there Lewis!」でお馴染みのF1界最強コンビ。絶大な信頼感でレースを掌握。',
+    },
     careerSummary:
       'マクラーレンのロン・デニスに見出され、GP2王座を経て2007年マクラーレンから衝撃のデビュー（開幕9戦連続表彰台）[1]。2008年に当時史上最年少で王座を獲得。2013年にメルセデスへ移籍すると、ハイブリッドV6ターボ導入とともに黄金期を築き、ミハエル・シューマッハに並ぶ歴代最多タイ7度の世界王座、100勝以上の前人未到の記録を樹立した [2]。',
     entries: 350,
@@ -675,6 +738,24 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     birthPlace: 'Bristol, United Kingdom',
     f1Debut: '2019年 オーストラリアGP (McLaren)',
     driverType: '高ボトムスピード＆スムーズ派',
+    numberOrigin: 'バレンティーノ・ロッシ（46番）の大ファンだが46を避け、ロゴ（LN4）のデザインに最適だった「4」を選択。',
+    visualAsset: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Lando_Norris_2022.jpg/480px-Lando_Norris_2022.jpg',
+      caption: 'Lando Norris (McLaren F1 Team)',
+      credit: 'Stefan Brending',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Lando_Norris_2022.jpg',
+    },
+    engineeringPreference: {
+      setupBalance: 'フロントの初期レスポンスが高く、高速コーナーでリアが安定して張り付くエアロプラットフォームを重視。',
+      pedalFeel: '立ち上がりがリニアでコントロール幅の広いブレーキペダル。',
+      steeringWeight: '軽快でスムースなステアリングフィールを好み、タイヤの熱ダレを微細にセンシング。',
+    },
+    raceEngineer: {
+      name: 'Will Joseph',
+      callsign: 'Will',
+      dynamic: 'デビュー以来のパートナー。ノリスの直感的なフィードバックを即座にテレメトリデータと照合して的確な指示を出す。',
+    },
     careerSummary:
       'カート時代に世界王者となり、フォーミュラ・ルノー、ヨーロッパF3を制覇してマクラーレン育成から2019年にF1デビュー [1]。低迷期にあったマクラーレンをリーダーとして支え続け、2024年マイアミGPで待望の初優勝を遂げると、チームをコンストラクターズ選手権争いのトップへと押し上げた [2]。',
     entries: 125,
@@ -751,6 +832,24 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     birthPlace: 'Monte Carlo, Monaco',
     f1Debut: '2018年 オーストラリアGP (Sauber)',
     driverType: '予選一撃＆壁際限界アタッカー',
+    numberOrigin: '自身の誕生日（10月16日）に由来し、「1 + 6 = 7」の意味も込めて「16」を選択。',
+    visualAsset: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Charles_Leclerc_2019_Malaysia.jpg/480px-Charles_Leclerc_2019_Malaysia.jpg',
+      caption: 'Charles Leclerc (Scuderia Ferrari)',
+      credit: 'Morio',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Charles_Leclerc_2019_Malaysia.jpg',
+    },
+    engineeringPreference: {
+      setupBalance: 'フロントの鋭いノーズの入り（オーバーステア）を好み、リアがルーズな状態でもスロットルでコントロール。',
+      pedalFeel: '初期タッチが非常に硬く、ダイレクトに制動力が出るブレーキフィール。',
+      steeringWeight: '軽めでダイレクト感のある操舵力を好み、壁際ミリ単位の繊細な修正を行う。',
+    },
+    raceEngineer: {
+      name: 'Bryan Bozzi',
+      callsign: 'Bryan',
+      dynamic: '2024年途中からタッグを組む新パートナー。的確でクリアな情報伝達でルクレールの集中力を支える。',
+    },
     careerSummary:
       'フェラーリ・ドライバー・アカデミー（FDA）で育ち、GP3・F2をルーキー王者として制覇 [1]。2018年ザウバーでの鮮烈なデビューを経て2019年にフェラーリへ電撃抜擢。スパとモンツァで連勝を飾り、跳ね馬のエースドライバーとしての地位を確立 [2]。',
     entries: 144,
@@ -833,6 +932,24 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     birthPlace: 'Melbourne, Australia',
     f1Debut: '2023年 バーレーンGP (McLaren)',
     driverType: '冷静沈着＆高精度ライン派',
+    numberOrigin: 'カート時代に偶然割り当てられた「81」番で好成績を収めたことから、パーソナルナンバーとして定着。',
+    visualAsset: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Oscar_Piastri_2023.jpg/480px-Oscar_Piastri_2023.jpg',
+      caption: 'Oscar Piastri (McLaren F1 Team)',
+      credit: 'Stefan Brending',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Oscar_Piastri_2023.jpg',
+    },
+    engineeringPreference: {
+      setupBalance: 'ニュートラルで予測可能なマシンバランスを重視。極端な挙動変化を嫌い、一貫したラインを追求。',
+      pedalFeel: 'プログレッシブで滑らかな踏み応えのブレーキ。',
+      steeringWeight: '精密なフィードバック重視のステアリングフィール。',
+    },
+    raceEngineer: {
+      name: 'Tom Stallard',
+      callsign: 'Tom',
+      dynamic: '元五輪ボート銀メダリストのエンジニア。論理的で落ち着いた無線指示がピアストリの冷静さと完璧にマッチ。',
+    },
     careerSummary:
       'フォーミュラ・ルノー、F3、F2をすべてルーキーイヤーで制覇するというルイス・ハミルトンやシャルル・ルクレールに匹敵する偉業を達成 [1]。2023年マクラーレンからデビューし、カタールGPスプリント勝利、2024年にはハンガリーとアゼルバイジャンで決勝勝利を収めるなど、驚異的な成長曲線を描いている [2]。',
     entries: 43,
@@ -903,6 +1020,24 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     birthPlace: 'Madrid, Spain',
     f1Debut: '2015年 オーストラリアGP (Toro Rosso)',
     driverType: '頭脳派戦略＆タイヤウィスパラー',
+    numberOrigin: '「Carlo5 5ainz」のスペルに見立てたダブル5（55）番。',
+    visualAsset: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Carlos_Sainz_Jr_2022.jpg/480px-Carlos_Sainz_Jr_2022.jpg',
+      caption: 'Carlos Sainz Jr. (Scuderia Ferrari)',
+      credit: 'Stefan Brending',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Carlos_Sainz_Jr_2022.jpg',
+    },
+    engineeringPreference: {
+      setupBalance: 'リアの安定性を基盤としつつ、ブレーキング時の荷重移動が穏やかなメカニカルセットアップを好む。',
+      pedalFeel: 'ロングストロークで細かい踏力調整が可能なブレーキタッチ。',
+      steeringWeight: 'しっかりとした手応えのあるステアリングフィール。',
+    },
+    raceEngineer: {
+      name: 'Riccardo Adami',
+      callsign: 'Riccardo',
+      dynamic: 'ベッテル時代からフェラーリを支えるベテラン。サインツの戦略的ディスカッションを尊重し緻密にサポート。',
+    },
     careerSummary:
       'WRC王者カルロス・サインツ・シニアの息子としてトロロッソからデビュー。ルノー、マクラーレンを経てフェラーリへ加入 [1]。高い戦術眼とマシンのセットアップ能力を武器に、2022年シルバーストンでの初優勝、2023年シンガポールでのレッドブル全勝阻止など、知性派ドライバーとしての名声を確立 [2]。',
     entries: 203,
@@ -973,6 +1108,24 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     birthPlace: 'King\'s Lynn, United Kingdom',
     f1Debut: '2019年 オーストラリアGP (Williams)',
     driverType: '予選一撃アタッカー＆アグレッシブ派',
+    numberOrigin: '兄がカートで使用していた「63」番を受け継ぎ、GR63のロゴとしても愛用。',
+    visualAsset: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/George_Russell_2022.jpg/480px-George_Russell_2022.jpg',
+      caption: 'George Russell (Mercedes-AMG F1)',
+      credit: 'Stefan Brending',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:George_Russell_2022.jpg',
+    },
+    engineeringPreference: {
+      setupBalance: 'フロントの反応が鋭く、ダイレクトにノーズが入るセッティングを好む。',
+      pedalFeel: '剛性感が高く瞬時に最大減速Gを発生させるショートストロークブレーキ。',
+      steeringWeight: 'レスポンスが速く正確なフィードバックを要求。',
+    },
+    raceEngineer: {
+      name: 'Marcus Dudley',
+      callsign: 'Marcus',
+      dynamic: 'エンジニアリングデータの詳細な数値共有を好むラッセルと緊密に連携。',
+    },
     careerSummary:
       'GP3、F2を連覇しメルセデス育成から2019年ウィリアムズでデビュー。マシンの戦闘力を超える予選パフォーマンスから「ミスター・サタデー」の異名をとる [1]。2022年メルセデスへ昇格し、サンパウロGPでチーム唯一の優勝を達成。次世代リーダーとして定着 [2]。',
     entries: 125,
@@ -1043,6 +1196,24 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     birthPlace: 'Guadalajara, Mexico',
     f1Debut: '2011年 オーストラリアGP (Sauber)',
     driverType: '市街地スペシャリスト＆タイヤケア派',
+    numberOrigin: '幼少期に憧れたクラブ・アメリカのサッカー選手イバン・サモラーノの背番号「11」に由来。',
+    visualAsset: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Sergio_Perez_2022.jpg/480px-Sergio_Perez_2022.jpg',
+      caption: 'Sergio Perez (Red Bull Racing)',
+      credit: 'Stefan Brending',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Sergio_Perez_2022.jpg',
+    },
+    engineeringPreference: {
+      setupBalance: 'リアのスタビリティ（アンダーステア傾向）を重視。リアが逃げないマシンでトラクションを稼ぐ。',
+      pedalFeel: 'リニアでコントロールしやすいブレーキタッチ。',
+      steeringWeight: 'しっかりとしたフィードバックのあるステアリング。',
+    },
+    raceEngineer: {
+      name: 'Hugh Bird',
+      callsign: 'Woody',
+      dynamic: 'レッドブルのベテランエンジニア。チェコのタイヤ温存戦略とピットストップタイミングを綿密にコントロール。',
+    },
     careerSummary:
       'ザウバー、マクラーレン、フォースインディア／レーシングポイントを経て2021年レッドブルに加入 [1]。2020年サヒールGPでの最後尾からの初優勝、2021年アブダビGPでの伝説のディフェンス、モナコやバクーでのストリート勝利など数々の歴史的瞬間を刻む [2]。',
     entries: 278,
@@ -1119,6 +1290,24 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     birthPlace: 'Oviedo, Spain',
     f1Debut: '2001年 オーストラリアGP (Minardi)',
     driverType: '超絶順応＆総合力オールラウンダー',
+    numberOrigin: '1996年7月14日、14歳の時にカート世界選手権で優勝した幸運の番号「14」に由来。',
+    visualAsset: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Fernando_Alonso_2022.jpg/480px-Fernando_Alonso_2022.jpg',
+      caption: 'Fernando Alonso (Aston Martin F1)',
+      credit: 'Stefan Brending',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Fernando_Alonso_2022.jpg',
+    },
+    engineeringPreference: {
+      setupBalance: 'フロントタイヤの強い食いつきを最優先。リアが不安定であっても自身のステアリング修正でカバー可能。',
+      pedalFeel: '踏力リニアリティが高く、コーナー奥深くで繊細に抜けるブレーキペダル。',
+      steeringWeight: '路面とタイヤの摩擦変化が直感的に伝わるクリアなステアリング。',
+    },
+    raceEngineer: {
+      name: 'Chris Cronin',
+      callsign: 'Chris',
+      dynamic: 'アロンソの膨大なレース内情報処理と連携し、他車の戦略ギャップをリアルタイムで分析。',
+    },
     careerSummary:
       '2001年ミナルディからデビューし、ルノーで2005年・2006年にミハエル・シューマッハを破って世界王者連覇 [1]。マクラーレン、フェラーリ、アルピーヌ、アストンマーティンと渡り歩き、ル・マン24時間連覇やWEC王者も獲得。通算400戦に迫る今なおグリッド最速の一角として輝き続ける生ける伝説 [2]。',
     entries: 398,
@@ -1197,6 +1386,24 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     birthPlace: 'Kanagawa, Japan',
     f1Debut: '2021年 バーレーンGP (AlphaTauri)',
     driverType: '奥深いレイトブレーキング派',
+    numberOrigin: 'カート時代に使用していた「11」番が空いていなかったため、倍の「22」番を選択（ジェンソン・バトンの王者番号でもある）。',
+    visualAsset: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Yuki_Tsunoda_2022.jpg/480px-Yuki_Tsunoda_2022.jpg',
+      caption: 'Yuki Tsunoda (Visa Cash App RB)',
+      credit: 'Stefan Brending',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Yuki_Tsunoda_2022.jpg',
+    },
+    engineeringPreference: {
+      setupBalance: '奥深いレイトブレーキングを可能にするフロントの絶対的制動スタビリティを重視。',
+      pedalFeel: '踏み始めの初期バイトが強力で、踏力コントロールがダイレクトなブレーキ。',
+      steeringWeight: '高速コーナーでのインフォメーションが豊かなステアリング。',
+    },
+    raceEngineer: {
+      name: 'Ernesto Desiderio',
+      callsign: 'Ernesto',
+      dynamic: '2024年からの相棒。角田の感情とパッションを冷静に受け止め、クリアで論理的な交信で支える。',
+    },
     careerSummary:
       'ホンダ・フォーミュラ・ドリーム・プロジェクト（HFDP）とレッドブル・ジュニアチームに所属し、F3・F2でルーキー優勝を重ねて2021年アルファタウリからF1昇格 [1]。日本人ドライバーとして史上初のデビュー戦入賞を飾り、4年目を迎えた2024年にはチームリーダーとして予選Q3進出の常連となり、トップチーム昇格を狙う [2]。',
     entries: 88,
@@ -1274,6 +1481,24 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     birthPlace: 'São Paulo, Brazil',
     f1Debut: '1984年 ブラジルGP (Toleman)',
     driverType: '異次元の予選アタック＆セナ足スロットル',
+    numberOrigin: 'ロータスおよびマクラーレン・ホンダ黄金期に世界を席巻した象徴のゼッケン「12」番。',
+    visualAsset: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Ayrton_Senna_Imola_1989.jpg/480px-Ayrton_Senna_Imola_1989.jpg',
+      caption: 'Ayrton Senna (McLaren-Honda, Imola 1989)',
+      credit: 'Instituto Ayrton Senna',
+      license: 'CC BY 2.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Ayrton_Senna_Imola_1989.jpg',
+    },
+    engineeringPreference: {
+      setupBalance: 'フロントの超絶レスポンス。ターボラグを克服するための繊細なペダルセットアップを要求。',
+      pedalFeel: 'スロットルを毎秒数回煽る「セナ足」に対応する超高感度スロットルペダル。',
+      steeringWeight: 'パワーステアリングのない時代、タイヤとマシンの挙動を100%伝えるステアリング。',
+    },
+    raceEngineer: {
+      name: 'Giorgio Ascanelli / Steve Nichols',
+      callsign: 'Giorgio',
+      dynamic: 'セナの神秘的とも言える車両感覚をテレメトリ黎明期に解析しマシンに反映させた名エンジニアたち。',
+    },
     careerSummary:
       'カート時代から圧倒的な才能を示し、イギリスF3を制覇して1984年トールマンからF1デビュー [1]。ロータス時代に卓越した予選スピードを開花させ、1988年マクラーレン・ホンダへ加入するとアラン・プロストとの伝説の黄金期を築き、3度の世界王座を獲得 [2]。極限の集中力と天性の感覚で世界中のモータースポーツファンを熱狂させた絶対的カリスマ。',
     entries: 161,
@@ -1357,6 +1582,24 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     birthPlace: 'Hürth, Germany',
     f1Debut: '1991年 ベルギーGP (Jordan)',
     driverType: '予選ペース連続周回＆完全無欠マシン',
+    numberOrigin: 'フェラーリ黄金期に5連覇を達成した不滅のチャンピオンナンバー「1」。',
+    visualAsset: {
+      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Michael_Schumacher_2005.jpg/480px-Michael_Schumacher_2005.jpg',
+      caption: 'Michael Schumacher (Scuderia Ferrari, 2005)',
+      credit: 'Hans-Peter van Velthoven',
+      license: 'CC BY-SA 3.0',
+      sourceUrl: 'https://commons.wikimedia.org/wiki/File:Michael_Schumacher_2005.jpg',
+    },
+    engineeringPreference: {
+      setupBalance: 'フロントの圧倒的な入り。左足ブレーキで車体を安定させながらリアをわずかに滑らせるセッティング。',
+      pedalFeel: '左足ブレーキングに特化した超高精度ブレーキペダルとスロットルオーバーラップ制御。',
+      steeringWeight: '極限のフィジカルを活かした重厚で正確無比なステアリングレスポンス。',
+    },
+    raceEngineer: {
+      name: 'Ross Brawn / Luca Baldisserri',
+      callsign: 'Ross',
+      dynamic: 'F1史上最高の戦略コンビ。「マイケル、毎周予選アタックで25秒差を作れ」という無茶振りに応えた伝説のパートナーシップ。',
+    },
     careerSummary:
       '1991年スパでジョーダンから衝撃のデビューを飾り、直後にベネトンへ移籍して1994年・1995年に世界王座連覇 [1]。1996年に名門フェラーリへ移籍すると、ジャン・トッド、ロス・ブラウンらとともにチームを再建し、2000年から2004年にかけて前人未到のドライバーズタイトル5連覇を達成 [2]。F1のフィジカルトレーニング基準を塗り替えた近代F1の皇帝。',
     entries: 308,
