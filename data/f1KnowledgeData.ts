@@ -153,6 +153,14 @@ export interface KeyCorner {
   characteristic: string;
 }
 
+export interface CircuitCornerDetail {
+  number: string;
+  name: string;
+  gearEstimated: string;
+  speedEstimated: string;
+  engineeringTip: string;
+}
+
 export interface TrackGeometry {
   elevationChangeMeters: number;
   longestStraightMeters: number;
@@ -160,11 +168,22 @@ export interface TrackGeometry {
   keyCorners: KeyCorner[];
 }
 
+export interface CircuitVisualAsset {
+  imageUrl: string;
+  credit: string;
+  license: string;
+  sourceUrl: string;
+  caption?: string;
+}
+
 export interface CircuitHistoricalMoment {
   year: number;
   title: string;
   description: string;
+  detailedStory?: string;
   significance: string;
+  historicalImpact?: string;
+  momentImage?: CircuitVisualAsset;
 }
 
 export interface CircuitVisualMap {
@@ -194,7 +213,12 @@ export interface CircuitProfile {
   };
   characteristics: string;
   visualMap?: CircuitVisualMap;
+  visualAssets?: {
+    trackMap: CircuitVisualAsset;
+    atmosphereImage?: CircuitVisualAsset;
+  };
   trackGeometry?: TrackGeometry;
+  allCorners?: CircuitCornerDetail[];
   historicalMoments?: CircuitHistoricalMoment[];
   setupNotes?: {
     aeroTradeoff: string;
@@ -204,6 +228,7 @@ export interface CircuitProfile {
   telemetrySession?: TelemetryTarget;
   references: Reference[];
 }
+
 
 
 
@@ -1758,6 +1783,21 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       license: 'CC BY-SA 3.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Bahrain_International_Circuit--Grand_Prix_Layout.svg',
     },
+    visualAssets: {
+      trackMap: {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Bahrain_International_Circuit--Grand_Prix_Layout.svg/960px-Bahrain_International_Circuit--Grand_Prix_Layout.svg.png',
+        credit: 'Will_Scalise',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Bahrain_International_Circuit--Grand_Prix_Layout.svg',
+      },
+      atmosphereImage: {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Bahrain_International_Circuit_back_straight.jpg/960px-Bahrain_International_Circuit_back_straight.jpg',
+        caption: '砂漠を鮮やかに照らすサヒールの強力なナイトレース照明とバックストレート',
+        credit: 'LutzWeidner',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Bahrain_International_Circuit_back_straight.jpg',
+      },
+    },
     trackGeometry: {
       elevationChangeMeters: 17.5,
       longestStraightMeters: 1090,
@@ -1769,24 +1809,48 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         { number: 'T11', name: 'ターン11', characteristic: '上り勾配の高速左コーナー。立ち上がりのトラクションが第3ストレートを左右。' },
       ],
     },
+    allCorners: [
+      { number: 'T1', name: 'ミハエル・シューマッハ・コーナー', gearEstimated: '2nd', speedEstimated: '65 km/h', engineeringTip: '330km/hから一気に減速。イン側の縁石に乗りすぎず、T2への切り返しラインを優先して立ち上がる。' },
+      { number: 'T2-T3', name: 'ターン2 〜 ターン3', gearEstimated: '3rd ➔ 5th', speedEstimated: '130 ➔ 220 km/h', engineeringTip: '全開加速しながら左から右へ切り返す。リアタイヤのトラクション抜けによるスライドを制御。' },
+      { number: 'T4', name: 'ターン4', gearEstimated: '4th', speedEstimated: '145 km/h', engineeringTip: '下り勾配の右中速コーナー。フロントの舵角を保ちつつ、外側縁石トラックリミットのミリ単位を見極める。' },
+      { number: 'T5-T7', name: 'エッセ (Esses)', gearEstimated: '5th ➔ 6th', speedEstimated: '220 ➔ 255 km/h', engineeringTip: '左・右・左と下りながら駆け抜ける高速セクション。マシンのメカニカルグリップと空力安定性が試される。' },
+      { number: 'T8', name: 'ターン8 (ヘアピン)', gearEstimated: '2nd', speedEstimated: '75 km/h', engineeringTip: '低速右ヘアピン。イン側エイペックスを確実に捉え、後続のDRSゾーンへ向けたトラクションを稼ぐ。' },
+      { number: 'T9-T10', name: 'ターン9 〜 ターン10', gearEstimated: '2nd', speedEstimated: '60 km/h', engineeringTip: '下りながらステアリングを切り込んでブレーキングする最難関。荷重が抜けた左フロントのロックアップが多発。' },
+      { number: 'T11', name: 'ターン11', gearEstimated: '5th', speedEstimated: '200 km/h', engineeringTip: '上り勾配の高速左コーナー。フロントのノーズが入りやすく、アクセル全開への移行タイミングが重要。' },
+      { number: 'T12', name: 'ターン12', gearEstimated: '6th', speedEstimated: '255 km/h', engineeringTip: '全開のまま駆け抜ける右高速ベンド。タイヤの横荷重がピークに達する。' },
+      { number: 'T13', name: 'ターン13', gearEstimated: '4th', speedEstimated: '130 km/h', engineeringTip: 'バックストレートへ繋がる重要右コーナー。早めのスロットルオンでバックストレート最高速を最大化。' },
+      { number: 'T14-T15', name: '最終シケイン (ターン14/15)', gearEstimated: '3rd ➔ 4th', speedEstimated: '115 ➔ 160 km/h', engineeringTip: 'メインストレート前の最終減速。縁石を使いつつ、スナップオーバーステアを抑えて全開脱出。' },
+    ],
     historicalMoments: [
       {
         year: 2014,
         title: 'Duel in the Desert（砂漠の一騎打ち）',
         description: 'ハミルトンとロズベルグがセーフティカー明けのラスト10周、ホイールを接触させながら演じた近代F1屈指の同門死闘。',
+        detailedStory:
+          '2014年ハイブリッドPU導入初年度、メルセデスW05は他チームを毎周1秒以上引き離す圧倒的戦闘力を誇っていた。セーフティカー導入により、オプション（ソフト）を履くロズベルグとプライム（ミディアム）のハミルトンの差が消滅。チームからの「2台とも確実に完走させろ」という無線指示をよそに、ロズベルグはターン1とターン4で何度も並びかけ、ハミルトンは絶妙なクロスラインとブレーキングディフェンスでことごとくブロック。最後は0.685秒差でハミルトンが逃げ切った。',
         significance: 'メルセデス黄金期の幕開けを告げ、パワーユニット時代の接近戦の醍醐味を世界に見せつけた。',
+        historicalImpact:
+          '同門対決におけるチームオーダーの限界と、ドライバー同士の心理戦が激化。後の2016年タイトル争いへと繋がる因縁の原点となった。',
       },
       {
         year: 2020,
         title: 'ロマン・グロージャンの奇跡の生還',
         description: 'オープニングラップで220km/hでガードレールを貫通・真っ二つに炎上するも、HALOに救われ28秒後に炎の中から脱出。',
+        detailedStory:
+          '2020年バーレーンGPのオープニングラップ、ターン3脱出後にクビアトと接触したグロージャンのハースVF-20は、時速221km・衝撃力67Gでコース脇のスチール製ガードレールを突き破った。マシンは前後に真っ二つに裂け、モノコックはガードレールの間に挟まり、燃料タンクから漏れたガソリンにより巨大な火球となって炎上。HALOがドライバー頭部の直撃を防ぎ、グロージャンは意識を失うことなく自力でシートベルトを解除、28秒後に炎の中から脱出した。',
         significance: 'FIAの安全規格「HALO」と難燃レーシングスーツの劇的な人命救助効果を証明した。',
+        historicalImpact:
+          '導入時に美観などの理由で賛否両論あったHALOの必要性が全世界で完全肯定され、FIAはガードレールの構造やメディカルカーの初期消火プロトコルをさらに強化した。',
       },
       {
         year: 2022,
         title: 'ルクレール vs フェルスタッペン 新規定開幕戦',
         description: 'ターン1とターン4でDRSゾーンを計算に入れた3周連続のパッシング合戦を展開し、跳ね馬が1-2フィニッシュ。',
+        detailedStory:
+          '2022年、グラウンドエフェクトカーが復活した新規定の初戦。首位ルクレール（フェラーリ）に対し、フェルスタッペン（レッドブル）がターン1のDRSで毎周インを奪うも、ルクレールはあえてターン1で無理に抵抗せず、ターン4へ向かう第2DRSゾーンでターンイン直後に抜き返すという極めて高度な「DRS検出ポイント逆算戦術」を展開。3周連続のパッシング合戦を制したルクレールが完勝した。',
         significance: 'グラウンドエフェクトカーによる新規定が「追従しやすいレース」を実現したことを証明。',
+        historicalImpact:
+          'DRS検出ラインを利用した「あえて前に出させない」チェスのような頭脳戦が現代F1の新たな戦術標準として定着した。',
       },
     ],
     setupNotes: {
@@ -1845,6 +1909,21 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       license: 'CC BY-SA 3.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Suzuka_circuit_map--2005.svg',
     },
+    visualAssets: {
+      trackMap: {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Suzuka_circuit_map--2005.svg/960px-Suzuka_circuit_map--2005.svg.png',
+        credit: 'Will_Scalise',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Suzuka_circuit_map--2005.svg',
+      },
+      atmosphereImage: {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/F1_2014_JAP_Lewis_Hamilton_4968.jpg/960px-F1_2014_JAP_Lewis_Hamilton_4968.jpg',
+        caption: '世界屈指の難関・名物S字コーナーを駆け抜けるF1マシン',
+        credit: 'Morio',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:F1_2014_JAP_Lewis_Hamilton_4968.jpg',
+      },
+    },
     trackGeometry: {
       elevationChangeMeters: 40.4,
       longestStraightMeters: 900,
@@ -1852,30 +1931,67 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       keyCorners: [
         { number: 'T3-T6', name: 'S字カーブ (Esses)', characteristic: '200km/h超で左右に切り返すリズムの極致。1つのライン乱れが全区間のタイムロスに直結。' },
         { number: 'T8-T9', name: 'デグナー・カーブ', characteristic: 'T8の縁石に乗るミリ単位の精度が要求され、T9は飛び出し厳禁のブラインド右。' },
-        { number: 'T11', name: 'ヘアピン', characteristic: '急減速からの立ち上がりトラクション勝負。インを刺すブレーキング合戦の要所。' },
+        { number: 'T11', name: 'ヘアピン', characteristic: '急減速からの立ち上がりトラクション勝捕。インを刺すブレーキング合戦の要所。' },
         { number: 'T13-T14', name: 'スプーンカーブ', characteristic: '複合下りコーナー。西ストレートの最高速を稼ぐための脱出ボトムスピード維持が鍵。' },
         { number: 'T15', name: '130R', characteristic: '全開300km/h超で突入する伝説の超高速左コーナー。度胸とハイダウンフォースが試される。' },
         { number: 'T16-T17', name: '日立Astemoシケイン', characteristic: '数々の歴史的ドラマを生んだ最終減速ポイント。ブレーキング勝負の最終決戦場。' },
       ],
     },
+    allCorners: [
+      { number: 'T1-T2', name: '第1・第2コーナー', gearEstimated: '6th ➔ 4th', speedEstimated: '235 ➔ 150 km/h', engineeringTip: 'メインストレートから高速のまま飛び込み、第2コーナーに向けてトレイルブレーキングでマシンの向きを変える。' },
+      { number: 'T3', name: 'S字 1つ目 (左)', gearEstimated: '5th', speedEstimated: '215 km/h', engineeringTip: 'セクター1のリズムの起点。イン側の縁石に触れすぎず、マシンの挙動を安定させる。' },
+      { number: 'T4', name: 'S字 2つ目 (右)', gearEstimated: '5th', speedEstimated: '205 km/h', engineeringTip: '素早い荷重移動が要求される。フロントタイヤの応答性がタイムに直結。' },
+      { number: 'T5', name: 'S字 3つ目 (左)', gearEstimated: '4th', speedEstimated: '190 km/h', engineeringTip: '上り勾配によりフロントの接地感が増す。アクセルの微細なコントロールでアンダーを防ぐ。' },
+      { number: 'T6', name: '逆バンクコーナー', gearEstimated: '4th', speedEstimated: '180 km/h', engineeringTip: '路面カントが外側へ逃げているため遠心力でマシンが外へ流されやすい難所。' },
+      { number: 'T7', name: 'ダンロップ・コーナー', gearEstimated: '6th', speedEstimated: '245 km/h', engineeringTip: '全開で駆け上がるブラインドの高速左。強烈な横Gと加速Gが同時にかかる。' },
+      { number: 'T8', name: 'デグナー1', gearEstimated: '5th', speedEstimated: '235 km/h', engineeringTip: '縁石をミリ単位でアタックする度胸試しの超高速右コーナー。' },
+      { number: 'T9', name: 'デグナー2', gearEstimated: '3rd', speedEstimated: '135 km/h', engineeringTip: 'T8の直後に急制動。イン側縁石に乗ると跳ねて外側のグラベルに飛び出す罠。' },
+      { number: 'T10', name: '110R (立体交差下)', gearEstimated: '7th', speedEstimated: '280 km/h', engineeringTip: '立体交差の下をくぐり抜ける全開右ベンド。' },
+      { number: 'T11', name: 'ヘアピン', gearEstimated: '2nd', speedEstimated: '65 km/h', engineeringTip: '強烈なブレーキングからインの縁石をなめるようにクリア。脱出のトラクションが勝負。' },
+      { number: 'T12', name: '200R', gearEstimated: '6th', speedEstimated: '260 km/h', engineeringTip: 'スプーンへ向けた下り高速右。マシンの空力バランスが安定していることが前提。' },
+      { number: 'T13', name: 'スプーン入口', gearEstimated: '5th', speedEstimated: '200 km/h', engineeringTip: '下りながらのブレーキングでリアが不安定になりやすい。' },
+      { number: 'T14', name: 'スプーン出口', gearEstimated: '4th', speedEstimated: '160 km/h', engineeringTip: '西ストレートの最高速を決める最重要脱出エイペックス。スロットル全開タイミングが命。' },
+      { number: 'T15', name: '130R', gearEstimated: '8th', speedEstimated: '305 km/h', engineeringTip: '全開300km/h超で飛び込む伝説の高速左。マシンのダウンフォース限界とドライバーの精神力が試される。' },
+      { number: 'T16-T17', name: '日立Astemoシケイン', gearEstimated: '2nd', speedEstimated: '70 km/h', engineeringTip: '310km/hからフルブレーキング。数々の名勝負と接触事故の舞台となった最終減速帯。' },
+      { number: 'T18', name: '最終コーナー', gearEstimated: '4th ➔ 7th', speedEstimated: '165 km/h', engineeringTip: '下りながらメインストレートへ全開加速。DRSゾーンへの脱出トラクションを最大化。' },
+    ],
     historicalMoments: [
       {
         year: 1989,
         title: 'セナ・プロスト シケインの接触劇',
         description: 'タイトルを争うマクラーレン・ホンダの同門2台が47周目のシケイン進入で激突。セナ失格によりプロストが王座獲得。',
+        detailedStory:
+          '1989年第15戦日本GP。ポイントリーダーのプロストに対し、逆転王座には優勝が絶対条件のセナ。47周目、セナがシケイン手前でインへ飛び込むが、プロストが早めにステアリングを切り込んで2台のマクラーレン・ホンダMP4/5が激突・停止。プロストはその場でリタイアするも、セナはマーシャルの押しがけでコース復帰し、ノーズ交換を経てトップチェッカーを受けた。しかしレース後、FIA（ジャン＝マリー・バレストル会長）は「シケイン不通過（ショートカット）」を理由にセナを失格処分とし、プロストのタイトルが決定した。',
         significance: 'F1史上最大の政治的・感情的遺恨を生み、翌年の報復劇へと続く伝説のターニングポイント。',
+        historicalImpact:
+          'コース復帰規定やFIAの裁定プロセスの透明化に関する激しい議論を巻き起こし、ドライバーと競技統括団体の関係性を根本から揺るがした。',
+        momentImage: {
+          imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Ayrton_Senna_Pesawat_RC_Cropped.jpg',
+          caption: '不屈の闘志で鈴鹿を駆け抜けたアイルトン・セナ',
+          credit: 'Instituto Ayrton Senna',
+          license: 'CC BY-SA 3.0',
+          sourceUrl: 'https://commons.wikimedia.org/wiki/File:Ayrton_Senna_Pesawat_RC_Cropped.jpg',
+        },
       },
       {
         year: 1990,
         title: 'スタート直後 ターン1での260km/h激突',
         description: 'ポールポジションのセナと2番手プロストがスタート直後のターン1で時速260kmで激突リタイア、セナの王座奪還が確定。',
+        detailedStory:
+          '前年の因縁を引きずった1990年日本GP。ポールを獲得したセナは、汚れたイン側のPPグリッド位置をアウト側へ変更するようFIAに要請するも却下された。スタートでプロスト（フェラーリ）が好発進して先行するが、ターン1進入でイン側に並びかけたセナはアクセルを緩めず、時速260kmでプロストの右リアに激突。2台は砂煙を上げてグラベルへ消え、スタートわずか9秒でセナの年間チャンピオンが確定した。',
         significance: '前年の因縁を晴らすセナの容赦なき執念が世界に衝撃を与えた瞬間。',
+        historicalImpact:
+          '危険走行と報復行為に関するペナルティ基準の見直し、およびスターティンググリッドの配置規則の厳格化につながった。',
       },
       {
         year: 2005,
         title: 'キミ・ライコネン 17番手からの最終周130R逆転劇',
         description: '予選雨で17番グリッドに沈んだライコネンが怒涛の追い上げ、最終ラップのターン1でフィジケラをアウトから抜き去り奇跡の優勝。',
+        detailedStory:
+          '2005年日本GP。土曜予選の豪雨により、アロンソ、シューマッハ、ライコネンら有力勢が後方に沈む大波乱のグリッド。17番手スタートのマクラーレン・メルセデスのライコネンは、驚異的なハイペースと完璧なオーバーテイクを連発。首位フィジケラ（ルノー）との差を毎周1秒以上縮め、ファイナルラップのストレートエンドからターン1のアウト側にマシンを並べ、豪快に抜き去ってトップへ浮上した。',
         significance: '現代F1における「純粋なスピードとオーバーテイクの芸術」と称される最高峰のレース。',
+        historicalImpact:
+          'ドライ路面での17番グリッドからの優勝は鈴鹿史上最も低いグリッドからの勝利記録となり、オーバーテイクが困難とされた近代F1における金字塔となった。',
       },
     ],
     setupNotes: {
@@ -1926,6 +2042,21 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       license: 'CC BY-SA 3.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Monza_track_map.svg',
     },
+    visualAssets: {
+      trackMap: {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Monza_track_map.svg/960px-Monza_track_map.svg.png',
+        credit: 'Will_Scalise',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Monza_track_map.svg',
+      },
+      atmosphereImage: {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Ferrari_Challenge_-_Autodromo_Nazionale_di_Monza_-_03-04-2016_%2825876182923%29.jpg/960px-Ferrari_Challenge_-_Autodromo_Nazionale_di_Monza_-_03-04-2016_%2825876182923%29.jpg',
+        caption: 'スピードの殿堂・モンツァのメインストレートとティフォシで埋まるスタンド',
+        credit: 'Nic Redhead',
+        license: 'CC BY-SA 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Ferrari_Challenge_-_Autodromo_Nazionale_di_Monza_-_03-04-2016_(25876182923).jpg',
+      },
+    },
     trackGeometry: {
       elevationChangeMeters: 9.5,
       longestStraightMeters: 1120,
@@ -1938,24 +2069,45 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         { number: 'T11', name: 'クルヴァ・アルボレート (旧パラボリカ)', characteristic: 'メインストレートの最高速を決定づける長大な複合高速右コーナー。' },
       ],
     },
+    allCorners: [
+      { number: 'T1-T2', name: 'ヴァリアンテ・デル・レッティフィーロ (第1シケイン)', gearEstimated: '2nd', speedEstimated: '70 km/h', engineeringTip: '355km/hから70km/hへ減速。5.4Gの減速Gがかかり、タイヤスモークを上げやすい最大の勝負所。' },
+      { number: 'T3', name: 'クルヴァ・グランデ (クルヴァ・ビアルビ)', gearEstimated: '8th', speedEstimated: '320 km/h', engineeringTip: '全開で駆け抜ける長大な右ベンド。スリップストリームを利用して第2シケインへ仕掛ける助走区間。' },
+      { number: 'T4-T5', name: 'ヴァリアンテ・デッラ・ロッジア (第2シケイン)', gearEstimated: '3rd', speedEstimated: '125 km/h', engineeringTip: '左・右の縁石を大胆にカット。脱出時のトラクションでレズモへのアプローチが決まる。' },
+      { number: 'T6', name: '第1レズモ (クルヴァ・ディ・レズモ 1)', gearEstimated: '5th', speedEstimated: '210 km/h', engineeringTip: 'ブラインドの右中高速コーナー。低ダウンフォースのためフロントの切れ込みがシビア。' },
+      { number: 'T7', name: '第2レズモ (クルヴァ・ディ・レズモ 2)', gearEstimated: '4th', speedEstimated: '160 km/h', engineeringTip: 'セラーリオのストレートへ向けて早めにアクセルを開ける。外側グラベルへのコースオフ注意。' },
+      { number: 'T8-T10', name: 'ヴァリアンテ・アスカリ', gearEstimated: '4th ➔ 5th', speedEstimated: '170 ➔ 230 km/h', engineeringTip: '左・右・左とリズミカルに切り抜ける超高速シケイン。フロアの接地安定性と縁石の乗り越えが鍵。' },
+      { number: 'T11', name: 'クルヴァ・アルボレート (旧パラボリカ)', gearEstimated: '5th', speedEstimated: '205 km/h', engineeringTip: '徐々に曲率が緩くなる長大な右コーナー。外側のトラックリミットを使い切ってメインストレートへ加速。' },
+    ],
     historicalMoments: [
       {
         year: 1971,
         title: 'F1史上最僅差フィニッシュ（0.01秒差）',
         description: 'ピーター・ゲシンが2位ロニー・ピーターソンと0.01秒差、上位5台が0.61秒差にひしめく歴史的超高速スリップストリーム決戦。',
+        detailedStory:
+          '1971年イタリアGP。シケインが設置される前のモンツァは、全開率が極めて高い超高速コースであった。決勝ではBRMのピーター・ゲシン、マーチのロニー・ピーターソン、ティレルのフランソワ・セベールら5台がスリップストリームを利用して毎周のように順位を入れ替える大乱戦。最終周のパラボリカを5台横並びで立ち上がり、ゲシンがピーターソンをわずか0.01秒差で退けて初優勝。1位から5位までのタイム差はわずか0.61秒という不滅の記録となった。',
         significance: 'シケイン設置前のモンツァにおける究極のスリップストリームバトルの象徴。',
+        historicalImpact:
+          '平均時速242.6km/hの危険な高速バトルを受け、安全対策として翌1972年からコース上にシケイン（減速帯）が新設される契機となった。',
       },
       {
         year: 2008,
         title: 'ベッテル＆トロロッソ 雨の奇跡の初優勝',
         description: '21歳のセバスチャン・ベッテルが豪雨のモンツァで当時の史上最年少ポール・トゥ・ウィンを達成。',
+        detailedStory:
+          '2008年イタリアGP。週末を通じて激しい雨に見舞われたモンツァで、当時21歳73日のセバスチャン・ベッテル（トロロッソ・フェラーリ）がポールポジションを獲得。決勝でも水煙を上げるウェット路面を完璧なライン取りでリードし、ファステストラップを刻みながらヘイキ・コバライネン（マクラーレン）に12.5秒差をつけて独走優勝を飾った。',
         significance: 'ミナルディを母体とする小規模チーム「トロロッソ」に初勝利をもたらし、4連覇王者の伝説が幕を開けた。',
+        historicalImpact:
+          'イタリアの小規模プライベーター出身チームがワークス勢を破るシンデレラストーリーとなり、ベッテルの才能を決定づけた。',
       },
       {
         year: 2019,
         title: 'シャルル・ルクレール 跳ね馬9年ぶりの母国勝利',
         description: 'メルセデス2台（ハミルトン＆ボッタス）の波状攻撃を53周にわたり鉄壁のディフェンスで防ぎきり戴冠。',
+        detailedStory:
+          '2019年イタリアGP。フェラーリ加入1年目のルクレールはPPからスタート。背後からDRS圏内で猛追するルイス・ハミルトンとバルテリ・ボッタスのメルセデス2台に対し、第2シケインやレズモでミリ単位のポジショニングを行い、ストレートの最高速アドバンテージを活かしてブロック。53周の激闘を完封し、フェラーリに2010年アロンソ以来9年ぶりとなる母国モンツァ制覇をもたらした。',
         significance: '熱狂のティフォシの前に立ち、「Il Predestinato（運命の子）」としての地位を不動のものにした。',
+        historicalImpact:
+          'ブレーキング時の進路変更に関するブラック＆ホワイトフラッグ（警告旗）の運用基準が再定義される契機となった。',
       },
     ],
     setupNotes: {
@@ -2006,6 +2158,21 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       license: 'CC BY-SA 3.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Spa-Francorchamps_of_Belgium.svg',
     },
+    visualAssets: {
+      trackMap: {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Spa-Francorchamps_of_Belgium.svg/960px-Spa-Francorchamps_of_Belgium.svg.png',
+        credit: 'Will_Scalise',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Spa-Francorchamps_of_Belgium.svg',
+      },
+      atmosphereImage: {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Eau_Rouge01.jpg/960px-Eau_Rouge01.jpg',
+        caption: '世界屈指の急勾配・名物オールージュ〜ラディオンの駆け上がり',
+        credit: 'Gerd Breitenbach',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Eau_Rouge01.jpg',
+      },
+    },
     trackGeometry: {
       elevationChangeMeters: 102.2,
       longestStraightMeters: 2000,
@@ -2018,24 +2185,49 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         { number: 'T18-T19', name: 'バスストップ・シケイン', characteristic: 'ピットエントリー手前の超低速シケイン。最終周の飛び込み勝負の舞台。' },
       ],
     },
+    allCorners: [
+      { number: 'T1', name: 'ラ・ソース (La Source)', gearEstimated: '1st ➔ 2nd', speedEstimated: '70 km/h', engineeringTip: 'スタート直後の大渋滞ポイント。イン側をコンパクトに回り、ケメルへの全開加速へ繋げる。' },
+      { number: 'T2', name: 'オー・ルージュ (Eau Rouge)', gearEstimated: '7th', speedEstimated: '300 km/h', engineeringTip: '谷底へ下りながら左へ切り込む。強烈なサスペンション底付き（ボトミング）に耐える剛性が必要。' },
+      { number: 'T3-T4', name: 'ラディオン (Raidillon)', gearEstimated: '8th', speedEstimated: '305 km/h', engineeringTip: '見上げるような急勾配を全開で右・左と駆け上がる。視界が空しか見えないブラインド名所。' },
+      { number: 'T5-T7', name: 'レ・コーム (Les Combes)', gearEstimated: '4th ➔ 5th', speedEstimated: '150 ➔ 170 km/h', engineeringTip: 'ケメルストレートエンドの主オーバーテイクポイント。右・左・右と縁石を使って軽快に切り返す。' },
+      { number: 'T8', name: 'マルメディ (Malmedy)', gearEstimated: '5th', speedEstimated: '175 km/h', engineeringTip: '下り勾配の右コーナー。フロントの舵角を保ちながらリバージュへアプローチ。' },
+      { number: 'T9', name: 'リバージュ (Rivage / Bruxelles)', gearEstimated: '3rd', speedEstimated: '115 km/h', engineeringTip: 'すり鉢状の下り右ヘアピン。フロントタイヤの右側が摩耗しやすい。' },
+      { number: 'T10-T11', name: 'プーオン (Pouhon / Double Gauche)', gearEstimated: '7th', speedEstimated: '290 km/h', engineeringTip: '下りながら飛び込む超高速左ダブルエイペックス。最大5.4Gの横Gがドライバーを襲う。' },
+      { number: 'T12-T13', name: 'フェーニュ (Fagnes)', gearEstimated: '5th', speedEstimated: '185 km/h', engineeringTip: '右・左のテクニカルシケイン。脱出時の縁石の使い方でスタブローの速度が変わる。' },
+      { number: 'T14-T15', name: 'スタブロー (Stavelot)', gearEstimated: '6th ➔ 7th', speedEstimated: '240 ➔ 280 km/h', engineeringTip: '全開で駆け抜ける右高速コーナー。ここからブランシモンまで長い全開区間が続く。' },
+      { number: 'T16-T17', name: 'ブランシモン (Blanchimont)', gearEstimated: '8th', speedEstimated: '315 km/h', engineeringTip: '315km/h全開でクリアする左高速ベンド。度胸とマシンの空力スタビリティの極致。' },
+      { number: 'T18-T19', name: 'バスストップ・シケイン', gearEstimated: '2nd', speedEstimated: '75 km/h', engineeringTip: '320km/hから急減速する右・左シケイン。ピットイン車両とのライン交錯にも注意。' },
+    ],
     historicalMoments: [
       {
         year: 1998,
         title: '雨の13台多重クラッシュ＆シューマッハ激怒',
         description: '豪雨のスタート直後に13台が絡む大惨事が発生。再スタート後首位独走のシューマッハがクルサードに追突し、ピットへ怒りの殴り込み。',
+        detailedStory:
+          '1998年ベルギーGP。激しい豪雨の中スタートが切られた直後、ラ・ソース立ち上がりでクルサード（マクラーレン）がスピンし、後続の13台が次々と激突するF1史上最大規模の多重クラッシュが発生。赤旗再スタート後、首位を独走していたミハエル・シューマッハ（フェラーリ）は、周回遅れのクルサードを追い抜く際、水煙の中で急減速したクルサードの右リアに激突し右前輪を喪失。ピットへ帰還したシューマッハは激怒し、マクラーレンのガレージへ殴り込み「お前は俺を殺す気か！」と詰め寄る前代未聞の騒乱となった。',
         significance: 'スパ・ウェザーの恐ろしさと、激闘が生む人間ドラマの極限を象徴する伝説の一戦。',
+        historicalImpact:
+          '豪雨時のセーフティカースタート規則の制定や、周回遅れ車両に対する青旗掲示プロトコルの厳格化へとつながった。',
       },
       {
         year: 2000,
         title: 'ハッキネン ゾンタを挟む300km/hダブルパッシング',
         description: 'ケメルストレートで周回遅れのゾンタの左を抜くシューマッハに対し、ハッキネンが右側のわずかな隙間を一閃して首位奪取。',
+        detailedStory:
+          '2000年ベルギーGP。濡れた路面が乾きゆく中、首位シューマッハ（フェラーリ）と追うハッキネン（マクラーレン）の一騎打ち。41周目のケメルストレート、時速300kmを超える超高速域で、前方に周回遅れのリカルド・ゾンタ（BARホンダ）が出現。シューマッハがゾンタの左側のアウトから抜きにかかった瞬間、ハッキネンはゾンタの右イン側の極めて狭い隙間に迷わずノーズを差し込み、2台同時にオーバーテイク。次のレ・コームで鮮やかにトップを奪取した。',
         significance: '「F1史上最も美しいオーバーテイク」としてモータースポーツ史に刻まれる名場面。',
+        historicalImpact:
+          '高速域における瞬時の空間認識とフェアプレーの最高峰として、後世のドライバーたちのお手本となった。',
       },
       {
         year: 2004,
         title: 'シューマッハ 7度目のワールドチャンピオン達成',
         description: 'ライコネンの初優勝の背後で2位に入り、自身通算7度目の世界タイトルを確定。',
+        detailedStory:
+          '2004年ベルギーGP。この年13勝を挙げた圧倒的なフェラーリF2004を駆るシューマッハは、自身のF1デビューの地であるスパで2位チェッカーを受け、4戦を残して自身通算7度目のドライバーズチャンピオンを確定させた。',
         significance: 'フェラーリ黄金期の頂点であり、不滅の大記録7冠が達成された記念碑的レース。',
+        historicalImpact:
+          'ミハエル・シューマッハという巨人がF1の歴史に残した最多王座記録の頂点として、今なお語り継がれている。',
       },
     ],
     setupNotes: {
@@ -2086,6 +2278,21 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       license: 'CC BY-SA 3.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Monte_Carlo_Formula_1_track_map.svg',
     },
+    visualAssets: {
+      trackMap: {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Monte_Carlo_Formula_1_track_map.svg/960px-Monte_Carlo_Formula_1_track_map.svg.png',
+        credit: 'Will_Scalise',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Monte_Carlo_Formula_1_track_map.svg',
+      },
+      atmosphereImage: {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/2009_White_Porsche_997_GT3_at_Loews_Hairpin%2C_Monte_Carlo%2C_Monaco.jpg/960px-2009_White_Porsche_997_GT3_at_Loews_Hairpin%2C_Monte_Carlo%2C_Monaco.jpg',
+        caption: '世界で最も低速かつタイトなグランドホテル・ヘアピン（旧ロウズ）',
+        credit: 'Ben',
+        license: 'CC BY-SA 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:2009_White_Porsche_997_GT3_at_Loews_Hairpin,_Monte_Carlo,_Monaco.jpg',
+      },
+    },
     trackGeometry: {
       elevationChangeMeters: 42.0,
       longestStraightMeters: 669,
@@ -2100,24 +2307,53 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         { number: 'T17-T18', name: 'ラスカス 〜 アントニー・ノゲス', characteristic: 'ピットレーン入口を巻き込む超低速ヘアピン。' },
       ],
     },
+    allCorners: [
+      { number: 'T1', name: 'サン・デボーテ (Sainte-Dévote)', gearEstimated: '2nd', speedEstimated: '85 km/h', engineeringTip: '教会前の右直角コーナー。外側のエスケープゾーンへ逃げ込むマシンが絶えない難所。' },
+      { number: 'T2', name: 'ボー・リバージュ (Beau Rivage)', gearEstimated: '5th ➔ 6th', speedEstimated: '210 ➔ 270 km/h', engineeringTip: 'カジノへ向けて急勾配を駆け上がる全開区間。路面のうねりでマシンが跳ねやすい。' },
+      { number: 'T3', name: 'マスネ (Massenet)', gearEstimated: '3rd', speedEstimated: '130 km/h', engineeringTip: 'オテル・ド・パリの横をかすめる左ロングコーナー。壁際数ミリのライン取り。' },
+      { number: 'T4', name: 'カジノ・スクエア (Casino Square)', gearEstimated: '3rd', speedEstimated: '120 km/h', engineeringTip: 'カジノ広場を抜ける右コーナー。路面の起伏でアンダーステアが出やすい。' },
+      { number: 'T5', name: 'ミラボ・オート (Mirabeau Haute)', gearEstimated: '2nd', speedEstimated: '80 km/h', engineeringTip: '下りながら急制動する右コーナー。イン側の段差に注意。' },
+      { number: 'T6', name: 'グランドホテル・ヘアピン (旧ロウズ)', gearEstimated: '1st', speedEstimated: '45 km/h', engineeringTip: 'F1最遅ヘアピン。モナコ専用のステアリングラック（切れ角増大）が必須。' },
+      { number: 'T7', name: 'ミラボ・バス (Mirabeau Bas)', gearEstimated: '2nd', speedEstimated: '75 km/h', engineeringTip: '海沿いへ向かう下りの右タイトコーナー。' },
+      { number: 'T8', name: 'ポルティエ (Portier)', gearEstimated: '2nd', speedEstimated: '70 km/h', engineeringTip: 'トンネルへ入る直前の右コーナー。1988年セナがクラッシュした有名な現場。' },
+      { number: 'T9', name: 'トンネル (Tunnel)', gearEstimated: '6th', speedEstimated: '285 km/h', engineeringTip: '暗闇から光へ飛び出す唯一の高速全開ベンド。風圧とエンジン音の反響が凄まじい。' },
+      { number: 'T10-T11', name: 'ヌーベル・シケイン (Nouvelle Chicane)', gearEstimated: '2nd', speedEstimated: '60 km/h', engineeringTip: '290km/hからフルブレーキングする左・右シケイン。唯一の飛び込みオーバーテイク地点。' },
+      { number: 'T12', name: 'タバコ・コーナー (Tabac)', gearEstimated: '4th', speedEstimated: '160 km/h', engineeringTip: 'ヨットハーバーの防波堤スレスレをかすめる高速左コーナー。' },
+      { number: 'T13-T14', name: 'ルイス・シロン (Louis Chiron)', gearEstimated: '5th', speedEstimated: '200 km/h', engineeringTip: 'スイミングプール手前の高速S字進入。' },
+      { number: 'T15-T16', name: 'スイミングプール (Swimming Pool)', gearEstimated: '4th', speedEstimated: '140 km/h', engineeringTip: '縁石を豪快に飛び越えながら切り返す名物シケイン。フロアの耐久性が試される。' },
+      { number: 'T17', name: 'ラスカス (La Rascasse)', gearEstimated: '1st', speedEstimated: '50 km/h', engineeringTip: 'レストラン「ラスカス」を巻き込む超低速右ヘアピン。' },
+      { number: 'T18-T19', name: 'ヴィラージュ・アントニー・ノゲス', gearEstimated: '2nd', speedEstimated: '80 km/h', engineeringTip: 'メインストレート前の最終右コーナー。ピットエントリーとの分岐点。' },
+    ],
     historicalMoments: [
       {
         year: 1988,
         title: 'アイルトン・セナ 予選1.4秒差の恍惚と悲劇のクラッシュ',
         description: '予選でプロストに1.4秒差をつける「神と対話した」ラップを刻むも、決勝50秒独走中にポルティエのガードレールにヒットし自宅直行。',
+        detailedStory:
+          '1988年モナコGP。予選でアイルトン・セナ（マクラーレン・ホンダ）は、同じマシンに乗るアラン・プロストに対し1.427秒という異次元の大差をつけてポールポジションを獲得。「自分はトンネルの中を走っているようだった。意識の向こう側で神の領域にいた」と語った。決勝でも2位プロストを50秒以上引き離して独走していたが、67周目のポルティエ（ターン8）でイン側のガードレールにヒットしサスペンションを破損。リタイアしたセナはピットに戻らず、そのままモナコのアパートメントへ歩いて帰宅し、部屋に閉じこもって涙を流した。',
         significance: 'セナが自らの限界を超え、完全無欠のレーサーへと覚醒するきっかけとなった象徴的エピソード。',
+        historicalImpact:
+          'リード時における精神的集中力とピットからのペース指示管理の重要性が再認識され、セナのその後の圧倒的強さの礎となった。',
       },
       {
         year: 1992,
         title: 'セナ vs マンセル 伝説のラスト3周',
         description: 'ホイールナット脱落で緊急ピットしたマンセルが新品タイヤで猛追するも、セナが巧みなマシン配置で幅寄せし0.2秒差で逃げ切り。',
+        detailedStory:
+          '1992年モナコGP。開幕5連勝中のナイジェル・マンセル（ウィリアムズ・ルノーFW14B）が独走していたが、残り7周でホイールナットの緩みにより緊急ピットイン。新品ソフトタイヤを履いたマンセルは毎周2秒近くタイムを縮め、残り3周で首位セナのマクラーレンMP4/7Aの背後にピタリと張り付いた。マンセルは左右にマシンを振って威嚇するが、セナはコーナーごとに完璧なイン側のブロックラインを取り続け、最後はわずか0.215秒差で逃げ切ってモナコ通算5勝目を飾った。',
         significance: '「モナコでは抜けない」を戦術的ディフェンスの極致として世界に証明した伝説のバトル。',
+        historicalImpact:
+          '圧倒的なマシンスペック差をドライバーの技量とポジショニングで覆すことができるモナコの特殊性を世界に知らしめた。',
       },
       {
         year: 1996,
         title: 'オリビエ・パニス 完走3台の雨の奇跡の初優勝',
         description: '豪雨による大波乱でリタイアが続出する中、14番手スタートのパニス（リジェ）が生き残りキャリア唯一のF1優勝。',
+        detailedStory:
+          '1996年モナコGP。決勝直前の豪雨により路面は完全なウェット。シューマッハがオープニングラップのロウズでクラッシュしたのを皮切りに、ヒル、アレジ、アーバインら有力勢が次々とリタイア。14番手スタートのオリビエ・パニス（リジェ・無限ホンダ）は、スリックタイヤへ絶妙なタイミングで交換し、エディ・アーバインをロウズで強引にパスしてトップへ浮上。規定の2時間制限により75周でチェッカーとなり、完走わずか3台という歴史的サバイバルを制した。',
         significance: 'F1史上最少完走台数記録（3台チェッカー）となったサバイバルレース。',
+        historicalImpact:
+          'リジェチームにとって15年ぶり、そして無限ホンダエンジンにとっても歴史的なF1初勝利となった。',
       },
     ],
     setupNotes: {
@@ -2168,6 +2404,21 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       license: 'CC BY-SA 4.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Silverstone_Circuit_2020.png',
     },
+    visualAssets: {
+      trackMap: {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Silverstone_Circuit_2020.png/960px-Silverstone_Circuit_2020.png',
+        credit: 'Luki4842',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:Silverstone_Circuit_2020.png',
+      },
+      atmosphereImage: {
+        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/2024_British_Grand_Prix%2C_Hamilton_%285%29.jpg/960px-2024_British_Grand_Prix%2C_Hamilton_%285%29.jpg',
+        caption: 'F1発祥の地・シルバーストンを満たす熱狂のグランドスタンド',
+        credit: 'Simon Dawson',
+        license: 'CC BY 2.0',
+        sourceUrl: 'https://commons.wikimedia.org/wiki/File:2024_British_Grand_Prix,_Hamilton_(5).jpg',
+      },
+    },
     trackGeometry: {
       elevationChangeMeters: 11.3,
       longestStraightMeters: 1034,
@@ -2181,24 +2432,49 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         { number: 'T16-T18', name: 'ヴェイル 〜 クラブ (Vale / Club)', characteristic: 'ピットエントリー前の最終複合減速シケイン。' },
       ],
     },
+    allCorners: [
+      { number: 'T1-T2', name: 'アビー 〜 ファーム (Abbey / Farm)', gearEstimated: '7th ➔ 8th', speedEstimated: '290 km/h', engineeringTip: 'スタート直後の全開右〜左コーナー。マシンのエアロプラットフォームの安定性が試される。' },
+      { number: 'T3-T4', name: 'ヴィレッジ 〜 ザ・ループ (Village / The Loop)', gearEstimated: '2nd ➔ 3rd', speedEstimated: '85 ➔ 110 km/h', engineeringTip: 'インフィールドの低速複合。急制動からヘアピン状のループを回り込むトラクション勝負。' },
+      { number: 'T5', name: 'アエロ (Aintree)', gearEstimated: '4th ➔ 6th', speedEstimated: '160 ➔ 240 km/h', engineeringTip: 'ウェリントン・ストレートへ向けて全開加速する重要な脱出レフト。' },
+      { number: 'T6-T7', name: 'ブルックランズ 〜 ラフィールド (Brooklands / Luffield)', gearEstimated: '3rd ➔ 4th', speedEstimated: '135 ➔ 155 km/h', engineeringTip: '長大な複合右旋回。フロント左タイヤに継続的な横荷重がかかり、アンダーステアが出やすい。' },
+      { number: 'T8', name: 'ウッドコート (Woodcote)', gearEstimated: '7th', speedEstimated: '275 km/h', engineeringTip: '旧ピットストレートを全開で通過する緩やかな右ベンド。' },
+      { number: 'T9', name: 'コプス (Copse)', gearEstimated: '7th', speedEstimated: '290 km/h', engineeringTip: '290km/hの超高速でブラインドに飛び込む右コーナー。ドライバーの度胸とダウンフォースの極地。' },
+      { number: 'T10', name: 'マゴッツ (Maggotts)', gearEstimated: '8th', speedEstimated: '300 km/h', engineeringTip: '高速S字の入り口。左へ全開で飛び込み、ベケッツへの荷重移動を開始。' },
+      { number: 'T11-T13', name: 'ベケッツ (Becketts)', gearEstimated: '6th ➔ 5th', speedEstimated: '250 ➔ 195 km/h', engineeringTip: '右・左・右と切り返す超高横G区間（最大5.6G）。首とタイヤトレッドに極度の負荷。' },
+      { number: 'T14', name: 'チャペル (Chapel)', gearEstimated: '7th', speedEstimated: '265 km/h', engineeringTip: 'ハンガーストレートへ向けてアクセル全開で脱出。縁石を踏みすぎるとマシンが跳ねる。' },
+      { number: 'T15', name: 'ストーブ (Stowe)', gearEstimated: '5th', speedEstimated: '200 km/h', engineeringTip: '320km/hから豪快に下りながら飛び込む右中高速コーナー。' },
+      { number: 'T16-T18', name: 'ヴェイル 〜 クラブ (Vale / Club)', gearEstimated: '2nd ➔ 4th', speedEstimated: '90 ➔ 160 km/h', engineeringTip: '急減速のシケインからメインストレートへ駆け上がる最終複合コーナー。' },
+    ],
     historicalMoments: [
       {
         year: 2020,
         title: 'ルイス・ハミルトン 最終周3輪走行での奇跡の勝利',
         description: '最終ラップで左フロントタイヤがバースト、ホイールから火花を散らしながらフェルスタッペンの猛追を5.8秒差で逃げ切り優勝。',
+        detailedStory:
+          '2020年イギリスGP。メルセデスはハミルトンとボッタスが1-2を独走していたが、残り2周でボッタスとサインツのタイヤが相次いでバースト。2位フェルスタッペン（レッドブル）がFL狙いでピットに入った直後、ファイナルラップのストレートで首位ハミルトンの左フロントタイヤもパンク。タイヤが裂けてホイールが剥き出しになり、火花と白煙を上げながら時速200km以上で走るハミルトンに対し、背後から新品ソフトのフェルスタッペンが猛追。ハミルトンは3輪のままマゴッツ・ベケッツを駆け抜け、わずか5.8秒差でチェッカーを受けた。',
         significance: 'F1史に残る最もスリリングなチェッカーフラッグの瞬間。',
+        historicalImpact:
+          'ピレリは高速コーナーでの極度の横荷重によるタイヤ構造疲労の原因を調査し、最低空気圧とキャンバー角の厳格化を実施した。',
       },
       {
         year: 2021,
         title: 'ハミルトン vs フェルスタッペン 51Gクラッシュ',
         description: 'オープニングラップのコプスコーナーで2台が接触、フェルスタッペンが51Gの衝撃でバリアへ激突リタイア。',
+        detailedStory:
+          '2021年イギリスGP。スプリント予選を制したフェルスタッペンとハミルトンが決勝オープニングラップから激しいサイド・バイ・サイドを展開。時速290kmで突入する超高速コプスコーナー（ターン9）で、インに飛び込んだハミルトンの左前輪がフェルスタッペンの右後輪に接触。フェルスタッペンのマシンはスピンしてタイヤバリアへ激突、衝撃力は51Gを記録した。ハミルトンは10秒ペナルティを受けながらも終盤にルクレールを逆転して優勝した。',
         significance: '2021年タイトル争いの激化を決定づけた世紀のクラッシュ。',
+        historicalImpact:
+          'コーナリング時におけるイン側車両のエイペックス占有権とオーバーテイクガイドラインに関する世界的な議論を巻き起こした。',
       },
       {
         year: 2022,
         title: 'カルロス・サインツ 悲願の初優勝＆伝説の4台バトル',
         description: '終盤のセーフティカー明け、サインツが初優勝を飾り、背後でペレス、ハミルトン、ルクレールが壮絶な三つ巴バトルを展開。',
+        detailedStory:
+          '2022年イギリスGP。ポールポジションを獲得したカルロス・サインツ（フェラーリ）が終盤のSCリスタートでソフトタイヤの利点を活かして首位を奪還し、自身F1参戦150戦目にして待望の初優勝。その背後で、摩耗ハードのルクレール、ダメージを負ったペレス、母国のハミルトンがヴィレッジからループにかけて3台・4台横並びの神がかり的バトルを繰り広げた。',
         significance: '新規定マシンの追従性能の高さとホイール・トゥ・ホイールの美しさが凝縮された名勝負。',
+        historicalImpact:
+          '2022年グラウンドエフェクト新規定が意図した「乱流の少ない接近戦」の成功を完璧に証明したレースとなった。',
       },
     ],
     setupNotes: {
