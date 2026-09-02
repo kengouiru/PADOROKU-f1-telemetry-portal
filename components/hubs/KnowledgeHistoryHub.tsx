@@ -3,10 +3,10 @@
 /**
  * components/hubs/KnowledgeHistoryHub.tsx
  * Hub 3: F1 Knowledge & History with 5 Sub-Tabs, Academic In-Text Citations ([1]),
- * and Direct Telemetry Navigation Linking.
+ * Key Team Radio Player Embeds, and Deep Telemetry Session Navigation.
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   KNOWLEDGE_TEAMS,
   KNOWLEDGE_DRIVERS,
@@ -19,15 +19,135 @@ import {
   type CircuitProfile,
   type StrategyConcept,
   type HistoryArchive,
+  type EmbeddedRadio,
+  type TelemetryTarget,
 } from '@/data/f1KnowledgeData';
+import { getProxiedAudioUrl } from '@/lib/telemetryUtils';
 
 type SubTab = 'teams' | 'drivers' | 'circuits' | 'strategy' | 'history';
 
 interface KnowledgeHistoryHubProps {
-  onNavigateTelemetry?: (sessionKey?: number) => void;
+  onNavigateToTelemetry?: (target?: TelemetryTarget) => void;
 }
 
-export default function KnowledgeHistoryHub({ onNavigateTelemetry }: KnowledgeHistoryHubProps) {
+/** Individual Team Radio Audio Player with Play/Pause and Seek Bar */
+function EmbeddedRadioCard({ radio }: { radio: EmbeddedRadio }) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [audioError, setAudioError] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (!radio.audioUrl) return;
+    setAudioError(false);
+    const audio = new Audio(getProxiedAudioUrl(radio.audioUrl));
+    audioRef.current = audio;
+
+    audio.onloadedmetadata = () => setDuration(audio.duration || 0);
+    audio.ontimeupdate = () => setCurrentTime(audio.currentTime || 0);
+    audio.onerror = () => {
+      setAudioError(true);
+      setIsPlaying(false);
+    };
+    audio.onended = () => {
+      setIsPlaying(false);
+      setCurrentTime(0);
+    };
+
+    return () => {
+      audio.pause();
+      audioRef.current = null;
+    };
+  }, [radio.audioUrl]);
+
+  const togglePlay = () => {
+    if (!audioRef.current || audioError) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play().then(() => setIsPlaying(true)).catch(() => setAudioError(true));
+    }
+  };
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = Number(e.target.value);
+    setCurrentTime(val);
+    if (audioRef.current) audioRef.current.currentTime = val;
+  };
+
+  const isPitWall = radio.speaker === 'PIT WALL';
+
+  return (
+    <div className="bg-slate-950/70 border border-white/10 rounded-xl p-3.5 flex flex-col gap-2.5 shadow-inner">
+      {/* Radio Header: Lap badge + Speaker badge */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="bg-slate-800 text-sky-400 border border-sky-500/30 px-2 py-0.5 rounded text-[10px] font-mono font-bold">
+            {radio.lap}
+          </span>
+          <span
+            className={`px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase border ${
+              isPitWall
+                ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+            }`}
+          >
+            {isPitWall ? '📡 PIT WALL' : '🏎️ DRIVER'}
+          </span>
+          <span className="text-xs font-bold text-white leading-tight">
+            {radio.speakerName}
+          </span>
+        </div>
+
+        {radio.audioUrl && !audioError && (
+          <button
+            onClick={togglePlay}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold font-mono transition-all shadow-md active:scale-95"
+          >
+            <span>{isPlaying ? '⏸ 一時停止' : '▶ 音声再生'}</span>
+          </button>
+        )}
+      </div>
+
+      {/* Audio Seek Bar (if audio available) */}
+      {radio.audioUrl && !audioError && (
+        <div className="flex items-center gap-2 bg-slate-900/80 px-2.5 py-1 rounded-lg border border-white/5 text-[10px] font-mono">
+          <span className="text-slate-400 w-8">{currentTime.toFixed(1)}s</span>
+          <input
+            type="range"
+            min={0}
+            max={duration || 10}
+            step={0.1}
+            value={currentTime}
+            onChange={handleSeek}
+            className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sky-400"
+          />
+          <span className="text-slate-500 w-8">{duration ? `${duration.toFixed(1)}s` : '--'}</span>
+        </div>
+      )}
+
+      {/* Transcript (English & Japanese) */}
+      <div className="space-y-1 text-xs">
+        <p className="text-slate-200 font-mono text-[11px] italic bg-slate-900/50 p-2 rounded-lg border border-white/5">
+          &ldquo;{radio.transcript}&rdquo;
+        </p>
+        <p className="text-sky-200/90 text-xs pl-1">
+          💬 {radio.translation}
+        </p>
+      </div>
+
+      {/* Strategic Tactical Impact Context */}
+      <div className="bg-purple-950/30 border border-purple-500/20 p-2 rounded-lg text-[11px] text-purple-200 flex items-start gap-1.5">
+        <span className="text-purple-400 font-bold">⚡ 戦略的決定打:</span>
+        <span className="text-slate-300 leading-snug">{radio.strategicContext}</span>
+      </div>
+    </div>
+  );
+}
+
+export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: KnowledgeHistoryHubProps) {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('teams');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
@@ -131,14 +251,14 @@ export default function KnowledgeHistoryHub({ onNavigateTelemetry }: KnowledgeHi
         <div className="flex flex-col gap-1 z-10">
           <div className="flex items-center gap-2">
             <span className="text-xs font-racing font-bold text-sky-400 uppercase tracking-widest">
-              ACADEMIC CITATIONS & ENCYCLOPEDIA
+              ACADEMIC CITATIONS & DEEP TELEMETRY LINKING
             </span>
           </div>
           <h2 className="text-xl font-racing font-black text-white tracking-wider">
             F1 KNOWLEDGE & HISTORICAL ARCHIVES
           </h2>
           <p className="text-xs text-slate-400 max-w-xl">
-            FIA公式規則、チーム工学哲学、ドライバー特性、サーキットデータ、伝説の名勝負を一次出典（[1]）付きで体系化。
+            FIA公式規則、チーム工学哲学、ドライバー特性、サーキットデータ、伝説の名勝負を生無線ログ（🎙️）と実テレメトリー連携付きで体系化。
           </p>
         </div>
 
@@ -397,19 +517,20 @@ export default function KnowledgeHistoryHub({ onNavigateTelemetry }: KnowledgeHi
                   {renderTextWithCitations(circuit.characteristics, circuit.id)}
                 </p>
 
-                {/* Lap Record & Telemetry Link */}
-                <div className="flex items-center justify-between text-xs pt-2 border-t border-white/5">
+                {/* Lap Record & Deep Telemetry Link Button */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs pt-2 border-t border-white/5">
                   <span className="text-[11px] text-slate-400">
                     ⏱️ コースレコード: <strong className="text-white font-mono">{circuit.lapRecord.time}</strong> ({circuit.lapRecord.driver})
                   </span>
 
-                  {circuit.telemetrySession && onNavigateTelemetry && (
+                  {circuit.telemetrySession && onNavigateToTelemetry && (
                     <button
-                      onClick={() => onNavigateTelemetry(circuit.telemetrySession?.sessionKey)}
-                      className="px-2.5 py-1 bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-500 hover:to-sky-500 text-white rounded-lg text-[10px] font-racing font-bold flex items-center gap-1 shadow-md transition-all"
+                      onClick={() => onNavigateToTelemetry(circuit.telemetrySession)}
+                      className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-500 hover:to-sky-500 text-white rounded-xl text-xs font-racing font-bold flex items-center gap-1.5 shadow-md transition-all self-start sm:self-auto active:scale-95"
                     >
                       <span>📊</span>
                       <span>テレメトリーで実データを確認</span>
+                      <span>➔</span>
                     </button>
                   )}
                 </div>
@@ -446,13 +567,14 @@ export default function KnowledgeHistoryHub({ onNavigateTelemetry }: KnowledgeHi
                     <p className="text-xs text-slate-400 mt-0.5">{strat.subtitle}</p>
                   </div>
 
-                  {strat.telemetrySession && onNavigateTelemetry && (
+                  {strat.telemetrySession && onNavigateToTelemetry && (
                     <button
-                      onClick={() => onNavigateTelemetry(strat.telemetrySession?.sessionKey)}
-                      className="px-3 py-1.5 bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-500 hover:to-sky-500 text-white rounded-xl text-xs font-racing font-bold flex items-center gap-1.5 shadow-md transition-all"
+                      onClick={() => onNavigateToTelemetry(strat.telemetrySession)}
+                      className="px-3.5 py-1.5 bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-500 hover:to-sky-500 text-white rounded-xl text-xs font-racing font-bold flex items-center gap-1.5 shadow-md transition-all active:scale-95"
                     >
                       <span>📊</span>
                       <span>テレメトリーでアンダーカットを見る</span>
+                      <span>➔</span>
                     </button>
                   )}
                 </div>
@@ -478,6 +600,21 @@ export default function KnowledgeHistoryHub({ onNavigateTelemetry }: KnowledgeHi
                     ))}
                   </ul>
                 </div>
+
+                {/* Embedded Key Team Radio Logs */}
+                {strat.keyRadios && strat.keyRadios.length > 0 && (
+                  <div className="space-y-2 pt-2 border-t border-white/10">
+                    <h4 className="text-[10px] font-racing font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1">
+                      <span>🎙️</span>
+                      <span>KEY TEAM RADIO / 象徴的チーム無線ログ</span>
+                    </h4>
+                    <div className="space-y-2">
+                      {strat.keyRadios.map((radio) => (
+                        <EmbeddedRadioCard key={radio.id} radio={radio} />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* References Box */}
@@ -527,6 +664,21 @@ export default function KnowledgeHistoryHub({ onNavigateTelemetry }: KnowledgeHi
                     {item.outcome}
                   </span>
                 </div>
+
+                {/* Embedded Key Team Radio Logs */}
+                {item.keyRadios && item.keyRadios.length > 0 && (
+                  <div className="space-y-2 pt-2 border-t border-white/10">
+                    <h4 className="text-[10px] font-racing font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1">
+                      <span>🎙️</span>
+                      <span>KEY TEAM RADIO / 象徴的チーム無線ログ</span>
+                    </h4>
+                    <div className="space-y-2">
+                      {item.keyRadios.map((radio) => (
+                        <EmbeddedRadioCard key={radio.id} radio={radio} />
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* References Box */}

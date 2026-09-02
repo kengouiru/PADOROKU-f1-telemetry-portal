@@ -44,6 +44,7 @@ import PitStrategySimulator from '@/components/PitStrategySimulator';
 import NewsPaddockHub from '@/components/hubs/NewsPaddockHub';
 import KnowledgeHistoryHub from '@/components/hubs/KnowledgeHistoryHub';
 import RaceNotesReportHub from '@/components/hubs/RaceNotesReportHub';
+import type { TelemetryTarget } from '@/data/f1KnowledgeData';
 
 // ── App State ─────────────────────────────────────────────────────────────────
 
@@ -307,6 +308,31 @@ export default function DashboardPage() {
     if (mobileTab === 'ai') setMobileTab('notes');
   }, [mobileTab]);
 
+  // Deep Telemetry Navigation handler from Knowledge Hub
+  const handleNavigateToTelemetry = useCallback((target?: TelemetryTarget) => {
+    setActiveHub('telemetry');
+    setMobileTab('telemetry');
+
+    if (!target) return;
+
+    // Auto-select driver if specified and not selected
+    if (target.targetDriver && !state.selectedDrivers.includes(target.targetDriver)) {
+      setState(prev => ({
+        ...prev,
+        selectedDrivers: [...prev.selectedDrivers, target.targetDriver!],
+      }));
+    }
+
+    // Scroll & focus timeline / chart to target lap
+    if (target.targetLap) {
+      const drv = target.targetDriver ?? state.selectedDrivers[0] ?? '1';
+      setTimeout(() => {
+        timelineRef.current?.scrollToLap(drv, target.targetLap!);
+      }, 300);
+    }
+  }, [state.selectedDrivers]);
+
+
   // Session tag for notebook entries
   const sessionTag = state.currentSession
     ? `${state.currentSession.year} — ${state.currentSession.meeting_official_name?.replace('(デモ用サンプル)', '').trim() ?? ''} ${state.currentSession.session_name}`
@@ -530,12 +556,7 @@ export default function DashboardPage() {
           {activeHub === 'telemetry' && analysisContent}
           {activeHub === 'news' && <NewsPaddockHub geminiApiKey={state.geminiApiKey} />}
           {activeHub === 'knowledge' && (
-            <KnowledgeHistoryHub
-              onNavigateTelemetry={() => {
-                setActiveHub('telemetry');
-                setMobileTab('telemetry');
-              }}
-            />
+            <KnowledgeHistoryHub onNavigateToTelemetry={handleNavigateToTelemetry} />
           )}
           {activeHub === 'notes' && (
             <RaceNotesReportHub
@@ -576,12 +597,7 @@ export default function DashboardPage() {
           {mobileTab === 'telemetry' && analysisContent}
           {mobileTab === 'news' && <NewsPaddockHub geminiApiKey={state.geminiApiKey} />}
           {mobileTab === 'knowledge' && (
-            <KnowledgeHistoryHub
-              onNavigateTelemetry={() => {
-                setActiveHub('telemetry');
-                setMobileTab('telemetry');
-              }}
-            />
+            <KnowledgeHistoryHub onNavigateToTelemetry={handleNavigateToTelemetry} />
           )}
           {mobileTab === 'notes' && (
             <RaceNotesReportHub

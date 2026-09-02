@@ -55,6 +55,26 @@ export interface DriverProfile {
   references: Reference[];
 }
 
+export interface TelemetryTarget {
+  year: number;
+  meetingKey?: number;
+  sessionKey?: number;
+  meetingName?: string;
+  targetLap?: number;
+  targetDriver?: string;
+}
+
+export interface EmbeddedRadio {
+  id: string;
+  lap: string;
+  speaker: 'DRIVER' | 'PIT WALL';
+  speakerName: string;
+  transcript: string;
+  translation: string;
+  strategicContext: string;
+  audioUrl?: string;
+}
+
 export interface CircuitProfile {
   id: string;
   name: string;
@@ -72,12 +92,7 @@ export interface CircuitProfile {
     year: number;
   };
   characteristics: string;
-  telemetrySession?: {
-    year: number;
-    meetingKey: number;
-    sessionKey: number;
-    sessionName: string;
-  };
+  telemetrySession?: TelemetryTarget;
   references: Reference[];
 }
 
@@ -88,12 +103,8 @@ export interface StrategyConcept {
   subtitle: string;
   description: string;
   keyTakeaways: string[];
-  telemetrySession?: {
-    year: number;
-    meetingKey: number;
-    sessionKey: number;
-    sessionName: string;
-  };
+  keyRadios?: EmbeddedRadio[];
+  telemetrySession?: TelemetryTarget;
   references: Reference[];
 }
 
@@ -105,8 +116,11 @@ export interface HistoryArchive {
   subtitle: string;
   strategicNarrative: string;
   outcome: string;
+  keyRadios?: EmbeddedRadio[];
+  telemetrySession?: TelemetryTarget;
   references: Reference[];
 }
+
 
 // ─────────────────────────────────────────────────────────────
 // DATA SETS
@@ -424,7 +438,9 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       year: 2024,
       meetingKey: 1234,
       sessionKey: 9161,
-      sessionName: '2024 Bahrain GP Race',
+      meetingName: 'Bahrain Grand Prix',
+      targetLap: 1,
+      targetDriver: '1',
     },
     references: [
       {
@@ -563,11 +579,25 @@ export const KNOWLEDGE_STRATEGIES: StrategyConcept[] = [
       '復帰時にトラフィック（遅いマシン）に引っかかるとアウトラップのゲインが消滅し失敗する',
       'ピットロスタイムが約22秒の場合、相手が翌周ピットインした際のタイム差をミリ秒単位で予測することが肝要',
     ],
+    keyRadios: [
+      {
+        id: 'radio-undercut-1',
+        lap: 'Lap 15',
+        speaker: 'PIT WALL',
+        speakerName: 'Peter Bonnington (Bono)',
+        transcript: 'Box box, Lewis, box box. Let\'s get the undercut on Leclerc.',
+        translation: 'ピットインだルイス。ルクレールに対してアンダーカットを仕掛けるぞ。',
+        strategicContext: 'フェラーリの前でピットアウトし順位を逆転するための決定打となった無線指示。',
+        audioUrl: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/LEWHAM01_44_20230916_142617.mp3',
+      },
+    ],
     telemetrySession: {
       year: 2024,
       meetingKey: 1234,
       sessionKey: 9161,
-      sessionName: '2024 Bahrain GP Race',
+      meetingName: 'Bahrain Grand Prix',
+      targetLap: 15,
+      targetDriver: '44',
     },
     references: [
       {
@@ -656,6 +686,26 @@ export const KNOWLEDGE_HISTORY: HistoryArchive[] = [
     strategicNarrative:
       'コース上でマクラーレン（ハッキネン＆クルサード）を抜けないと判断したフェラーリの戦略家ロス・ブラウンは、突如「3ストップ作戦」への変更を決断 [1]。シューマッハに対し「ピットアウト後に25秒のギャップを作るため、毎周予選アタックのペースで走れ」と指示。シューマッハは異次元のファステストラップを連発し、見事マクラーレン勢の前でピットアウトして歴史的勝利を飾った [2]。',
     outcome: 'フェラーリ M.シューマッハ優勝（マクラーレンを戦略と超絶ドライビングで完全粉砕）',
+    keyRadios: [
+      {
+        id: 'radio-1998-1',
+        lap: 'Lap 43',
+        speaker: 'PIT WALL',
+        speakerName: 'Ross Brawn (Technical Director)',
+        transcript: 'Michael, you have 19 laps to pull out 25 seconds. We need 19 qualifying laps from you.',
+        translation: 'ミハエル、25秒のギャップを作るのに残り19周ある。お前の予選アタックラップを19周連続で見せてくれ。',
+        strategicContext: '3ストップ成功のための絶対条件をドライバーに課したF1史に残る伝説の無線。',
+      },
+      {
+        id: 'radio-1998-2',
+        lap: 'Lap 44',
+        speaker: 'DRIVER',
+        speakerName: 'Michael Schumacher',
+        transcript: 'Thank you very much. Copy that.',
+        translation: '了解、任せてくれ。',
+        strategicContext: '不可能とも思える過酷な要求に即座に応じ、毎周1秒ずつマクラーレンを引き離す鬼神の走りを開始した瞬間。',
+      },
+    ],
     references: [
       {
         id: 1,
@@ -682,6 +732,17 @@ export const KNOWLEDGE_HISTORY: HistoryArchive[] = [
     strategicNarrative:
       '豪雨による2時間の中断、チームメイトとの接触、ドライブスルーペナルティ、パンクなどにより一時最下位（P21）まで転落したバトン [1]。しかし路面が乾きゆく中で誰よりも早くインターミディエイト、ドライタイヤへのスイッチを決断。驚異的なペースで全車をゴボウ抜きし、最終ラップのターン6でトップのベッテルにプレッシャーをかけてミスを誘発し劇的な逆転優勝を果たした [2]。',
     outcome: 'マクラーレン J.バトン優勝（F1史上最長時間レース 4時間4分39秒を制覇）',
+    keyRadios: [
+      {
+        id: 'radio-2011-1',
+        lap: 'Lap 51',
+        speaker: 'DRIVER',
+        speakerName: 'Jenson Button',
+        transcript: 'The slick tyre is definitely the right tyre now. I have mega grip!',
+        translation: '今スリックタイヤに替えるのが絶対に正解だ。ものすごいグリップがある！',
+        strategicContext: 'ウェット路面が乾くクロスオーバーポイントを誰よりも先に見極め、怒涛の追い上げの引き金を引いた無線。',
+      },
+    ],
     references: [
       {
         id: 1,
@@ -708,6 +769,28 @@ export const KNOWLEDGE_HISTORY: HistoryArchive[] = [
     strategicNarrative:
       'シーズン全22戦を戦い抜き、フェルスタッペンとハミルトンが全くの同ポイントで迎えた最終決戦 [1]。レース終盤ラティフィのクラッシュによりセーフティカーが導入。レッドブルは新品ソフトタイヤへのギャンブルピットを敢行し、ステイアウトしたハミルトン（摩耗したハード）との最終周スプリント勝負に持ち込み、ターン5で劇的オーバーテイクを決めて悲願の初タイトルを獲得した [2]。',
     outcome: 'レッドブル M.フェルスタッペン優勝＆初の世界王者戴冠',
+    keyRadios: [
+      {
+        id: 'radio-2021-1',
+        lap: 'Lap 53',
+        speaker: 'PIT WALL',
+        speakerName: 'Gianpiero Lambiase (GP)',
+        transcript: 'Safety car deployed. Box, Max, box for Softs! Opportunity for a free stop.',
+        translation: 'セーフティカー導入だ。ピットインだマックス、ソフトタイヤを履く！フリーストップの好機だ。',
+        strategicContext: 'ステイアウトを選択したメルセデスに対し、逆転を賭けてソフトタイヤへ履き替える勝負手となったピットコール。',
+        audioUrl: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/MAXVER01_1_20230916_144953.mp3',
+      },
+      {
+        id: 'radio-2021-2',
+        lap: 'Finish',
+        speaker: 'PIT WALL',
+        speakerName: 'Christian Horner',
+        transcript: 'MAX VERSTAPPEN! YOU ARE THE WORLD CHAMPION! THE WORLD CHAMPION!',
+        translation: 'マックス・フェルスタッペン！君が世界チャンピオンだ！世界チャンピオンだ！',
+        strategicContext: 'ファイナルラップでの逆転劇直後、チーム代表ホーナーが絶叫した戴冠の瞬間。',
+        audioUrl: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/MAXVER01_1_20230916_142555.mp3',
+      },
+    ],
     references: [
       {
         id: 1,
@@ -726,3 +809,4 @@ export const KNOWLEDGE_HISTORY: HistoryArchive[] = [
     ],
   },
 ];
+
