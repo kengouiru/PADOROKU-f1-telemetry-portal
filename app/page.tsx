@@ -529,7 +529,14 @@ export default function DashboardPage() {
         <main className="flex-1 min-w-0 p-5 overflow-y-auto">
           {activeHub === 'telemetry' && analysisContent}
           {activeHub === 'news' && <NewsPaddockHub geminiApiKey={state.geminiApiKey} />}
-          {activeHub === 'knowledge' && <KnowledgeHistoryHub />}
+          {activeHub === 'knowledge' && (
+            <KnowledgeHistoryHub
+              onNavigateTelemetry={() => {
+                setActiveHub('telemetry');
+                setMobileTab('telemetry');
+              }}
+            />
+          )}
           {activeHub === 'notes' && (
             <RaceNotesReportHub
               selectedDrivers={state.selectedDrivers}
@@ -568,7 +575,14 @@ export default function DashboardPage() {
         <div className="flex-1 min-h-0 overflow-y-auto p-4">
           {mobileTab === 'telemetry' && analysisContent}
           {mobileTab === 'news' && <NewsPaddockHub geminiApiKey={state.geminiApiKey} />}
-          {mobileTab === 'knowledge' && <KnowledgeHistoryHub />}
+          {mobileTab === 'knowledge' && (
+            <KnowledgeHistoryHub
+              onNavigateTelemetry={() => {
+                setActiveHub('telemetry');
+                setMobileTab('telemetry');
+              }}
+            />
+          )}
           {mobileTab === 'notes' && (
             <RaceNotesReportHub
               selectedDrivers={state.selectedDrivers}
