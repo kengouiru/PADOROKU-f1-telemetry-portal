@@ -192,3 +192,31 @@ export async function loadDriverData(
 
   return { laps, teamRadio, pitStops };
 }
+
+export interface RawCarData {
+  brake: number;
+  date: string;
+  driver_number: number;
+  meeting_key: number;
+  n_gear: number;
+  rpm: number;
+  session_key: number;
+  speed: number;
+  throttle: number;
+  drs?: number;
+}
+
+/**
+ * Fetch raw car data (speed, throttle, brake, gear, rpm) from OpenF1 /car_data
+ */
+export async function fetchCarData(
+  sessionKey: number,
+  driverNumber: number,
+  dateStart?: string,
+  dateEnd?: string
+): Promise<RawCarData[]> {
+  let url = `${BASE_URL}/car_data?session_key=${sessionKey}&driver_number=${driverNumber}`;
+  if (dateStart) url += `&date>=${encodeURIComponent(dateStart)}`;
+  if (dateEnd) url += `&date<=${encodeURIComponent(dateEnd)}`;
+  return fetchWithTimeout<RawCarData[]>(url, 5000);
+}

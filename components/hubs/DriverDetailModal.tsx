@@ -9,13 +9,14 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import type { DriverProfile, Reference } from '@/data/f1KnowledgeData';
+import type { DriverProfile, Reference, TelemetryTarget } from '@/data/f1KnowledgeData';
 import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
 
 interface DriverDetailModalProps {
   driver: DriverProfile;
   allDrivers: DriverProfile[];
   onSelectDriver: (driver: DriverProfile) => void;
+  onNavigateToTelemetry?: (target?: TelemetryTarget) => void;
   onClose: () => void;
 }
 
@@ -25,6 +26,7 @@ export default function DriverDetailModal({
   driver,
   allDrivers,
   onSelectDriver,
+  onNavigateToTelemetry,
   onClose,
 }: DriverDetailModalProps) {
   const [activeTab, setActiveTab] = useState<DetailTab>('overview');
@@ -555,6 +557,19 @@ export default function DriverDetailModal({
                 <p className="text-xs text-slate-200 leading-relaxed font-mono text-[11px]">
                   {driver.drivingStyle.telemetrySignature}
                 </p>
+
+                {onNavigateToTelemetry && (
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onNavigateToTelemetry({ year: 2024, targetDriver: String(driver.number) });
+                    }}
+                    className="w-full mt-2 py-2 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-500 hover:to-sky-500 text-white font-racing font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
+                  >
+                    <span>📊</span>
+                    <span>このドライバーの車速・ペダル重ね合わせテレメトリーを見る ➔</span>
+                  </button>
+                )}
               </div>
 
               {/* Preferred Circuit Types */}

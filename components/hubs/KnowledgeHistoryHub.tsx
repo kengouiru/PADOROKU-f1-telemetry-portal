@@ -564,6 +564,7 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
               driver={selectedDriverDetail}
               allDrivers={filteredDrivers}
               onSelectDriver={(d) => setSelectedDriverDetail(d)}
+              onNavigateToTelemetry={onNavigateToTelemetry}
               onClose={() => setSelectedDriverDetail(null)}
             />
           )}

@@ -38,6 +38,7 @@ import AIStrategist from '@/components/AIStrategist';
 import RaceNotebook, { type RaceNotebookHandle } from '@/components/RaceNotebook';
 
 import TelemetryChart from '@/components/TelemetryChart';
+import DetailedTelemetryChart from '@/components/telemetry/DetailedTelemetryChart';
 import SectorAnalysis from '@/components/SectorAnalysis';
 import PitStrategySimulator from '@/components/PitStrategySimulator';
 
@@ -143,6 +144,15 @@ export default function DashboardPage() {
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>('ai');
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile sidebar drawer
   const [aiDrawerOpen, setAiDrawerOpen] = useState(false); // AI & Notebook slide drawer
+  const [detailedTelemetryParams, setDetailedTelemetryParams] = useState<{
+    circuitId: string;
+    driver1: string;
+    driver2: string;
+  }>({
+    circuitId: 'bahrain-international',
+    driver1: 'VER',
+    driver2: 'NOR',
+  });
 
   const timelineRef = useRef<TeamRadioTimelineHandle>(null);
   const notebookRef = useRef<RaceNotebookHandle>(null);
@@ -313,7 +323,41 @@ export default function DashboardPage() {
     setActiveHub('telemetry');
     setMobileTab('telemetry');
 
-    if (!target) return;
+    if (!target) {
+      setTimeout(() => {
+        document.getElementById('detailed-telemetry-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+      return;
+    }
+
+    const DRIVER_NUM_TO_CODE: Record<string, string> = {
+      '1': 'VER',
+      '44': 'HAM',
+      '4': 'NOR',
+      '16': 'LEC',
+      '81': 'PIA',
+      '55': 'SAI',
+      '63': 'RUS',
+      '11': 'PER',
+      '14': 'ALO',
+      '22': 'TSU',
+    };
+
+    const targetCode = target.targetDriver ? (DRIVER_NUM_TO_CODE[target.targetDriver] ?? 'VER') : 'VER';
+    const otherCode = targetCode === 'VER' ? 'NOR' : 'VER';
+
+    let circId = 'bahrain-international';
+    if (target.meetingName?.includes('Japan') || target.meetingName?.includes('Suzuka')) circId = 'suzuka';
+    else if (target.meetingName?.includes('Belgium') || target.meetingName?.includes('Spa')) circId = 'spa-francorchamps';
+    else if (target.meetingName?.includes('Italy') || target.meetingName?.includes('Monza')) circId = 'monza';
+    else if (target.meetingName?.includes('Britain') || target.meetingName?.includes('Silverstone')) circId = 'silverstone';
+    else if (target.meetingName?.includes('Monaco')) circId = 'monaco';
+
+    setDetailedTelemetryParams({
+      circuitId: circId,
+      driver1: targetCode,
+      driver2: otherCode,
+    });
 
     // Auto-select driver if specified and not selected
     if (target.targetDriver && !state.selectedDrivers.includes(target.targetDriver)) {
@@ -323,12 +367,17 @@ export default function DashboardPage() {
       }));
     }
 
+    // Scroll & focus to detailed telemetry section
+    setTimeout(() => {
+      document.getElementById('detailed-telemetry-section')?.scrollIntoView({ behavior: 'smooth' });
+    }, 200);
+
     // Scroll & focus timeline / chart to target lap
     if (target.targetLap) {
       const drv = target.targetDriver ?? state.selectedDrivers[0] ?? '1';
       setTimeout(() => {
         timelineRef.current?.scrollToLap(drv, target.targetLap!);
-      }, 300);
+      }, 350);
     }
   }, [state.selectedDrivers]);
 
@@ -374,6 +423,15 @@ export default function DashboardPage() {
         transcriptsCache={state.transcriptsCache}
         onTranscriptFetched={handleTranscriptFetched}
       />
+
+      {/* 3-Tier Synchronized Detailed Telemetry (Car Data Comparison) */}
+      <section id="detailed-telemetry-section">
+        <DetailedTelemetryChart
+          initialCircuitId={detailedTelemetryParams.circuitId}
+          initialDriver1Code={detailedTelemetryParams.driver1}
+          initialDriver2Code={detailedTelemetryParams.driver2}
+        />
+      </section>
 
       {state.selectedDrivers.length > 0 && (
         <SectorAnalysis
