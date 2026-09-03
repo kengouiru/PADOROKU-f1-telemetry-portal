@@ -89,6 +89,12 @@ export interface RaceEngineer {
   dynamic: string;
 }
 
+export interface DriverSocialLinks {
+  instagram?: string; // 公式Instagram URL (例: "https://www.instagram.com/maxverstappen1/")
+  xTwitter?: string;  // 公式X (旧Twitter) URL
+  website?: string;   // 公式個人Webサイト
+}
+
 export interface DriverProfile {
   id: string;
   code: string; // 3-letter e.g. "VER"
@@ -108,6 +114,7 @@ export interface DriverProfile {
   visualGallery?: VisualGalleryItem[];
   engineeringPreference?: EngineeringPreference;
   raceEngineer?: RaceEngineer;
+  socialLinks?: DriverSocialLinks;
   careerSummary: string;
   entries: number;
   wins: number;
@@ -676,6 +683,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       callsign: 'GP',
       dynamic: '2016年加入以来の固い絆。互いに一切妥協せず、無線で夫婦喧嘩のようにストレートに意見をぶつけ合いながら最高の結果を導く。',
     },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/maxverstappen1/',
+      xTwitter: 'https://x.com/Max33Verstappen',
+      website: 'https://www.verstappen.com',
+    },
     careerSummary:
       '元F1ドライバーの父ヨス・フェルスタッペンによる徹底した英才教育を受け、カート界で数々のタイトルを総なめにした後、ヨーロッパF3選手権で1年戦っただけで異例の17歳F1昇格を果たす [1]。2016年スペインGPでレッドブル昇格初戦にして史上最年少優勝を達成。2021年の劇的な初戴冠以降、2022年・2023年と圧倒的な強さでシーズン最多勝記録（19勝）を更新し、現代F1の絶対王者として君臨している [2]。',
     entries: 206,
@@ -812,6 +824,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       callsign: 'Bono',
       dynamic: '「Hammer Time（勝負をかける時だ）」や「Get in there Lewis!」でお馴染みのF1界最強コンビ。絶大な信頼感でレースを掌握。',
     },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/lewishamilton/',
+      xTwitter: 'https://x.com/LewisHamilton',
+      website: 'https://www.lewishamilton.com',
+    },
     careerSummary:
       'マクラーレンのロン・デニスに見出され、GP2王座を経て2007年マクラーレンから衝撃のデビュー（開幕9戦連続表彰台）[1]。2008年に当時史上最年少で王座を獲得。2013年にメルセデスへ移籍すると、ハイブリッドV6ターボ導入とともに黄金期を築き、ミハエル・シューマッハに並ぶ歴代最多タイ7度の世界王座、100勝以上の前人未到の記録を樹立した [2]。',
     entries: 350,
@@ -940,6 +957,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       callsign: 'Will',
       dynamic: 'デビュー以来のパートナー。ノリスの直感的なフィードバックを即座にテレメトリデータと照合して的確な指示を出す。',
     },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/landonorris/',
+      xTwitter: 'https://x.com/LandoNorris',
+      website: 'https://landonorris.com',
+    },
     careerSummary:
       'カート時代に世界王者となり、フォーミュラ・ルノー、ヨーロッパF3を制覇してマクラーレン育成から2019年にF1デビュー [1]。低迷期にあったマクラーレンをリーダーとして支え続け、2024年マイアミGPで待望の初優勝を遂げると、チームをコンストラクターズ選手権争いのトップへと押し上げた [2]。',
     entries: 125,
@@ -1059,6 +1081,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       name: 'Bryan Bozzi',
       callsign: 'Bryan',
       dynamic: '2024年途中からタッグを組む新パートナー。的確でクリアな情報伝達でルクレールの集中力を支える。',
+    },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/charles_leclerc/',
+      xTwitter: 'https://x.com/Charles_Leclerc',
+      website: 'https://www.charlesleclerc.com',
     },
     careerSummary:
       'フェラーリ・ドライバー・アカデミー（FDA）で育ち、GP3・F2をルーキー王者として制覇 [1]。2018年ザウバーでの鮮烈なデビューを経て2019年にフェラーリへ電撃抜擢。スパとモンツァで連勝を飾り、跳ね馬のエースドライバーとしての地位を確立 [2]。',
@@ -1186,6 +1213,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       callsign: 'Tom',
       dynamic: '元五輪ボート銀メダリストのエンジニア。論理的で落ち着いた無線指示がピアストリの冷静さと完璧にマッチ。',
     },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/oscarpiastri/',
+      xTwitter: 'https://x.com/OscarPiastri',
+      website: 'https://oscarpiastri.com',
+    },
     careerSummary:
       'フォーミュラ・ルノー、F3、F2をすべてルーキーイヤーで制覇するというルイス・ハミルトンやシャルル・ルクレールに匹敵する偉業を達成 [1]。2023年マクラーレンからデビューし、カタールGPスプリント勝利、2024年にはハンガリーとアゼルバイジャンで決勝勝利を収めるなど、驚異的な成長曲線を描いている [2]。',
     entries: 43,
@@ -1299,6 +1331,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       name: 'Riccardo Adami',
       callsign: 'Riccardo',
       dynamic: 'ベッテル時代からフェラーリを支えるベテラン。サインツの戦略的ディスカッションを尊重し緻密にサポート。',
+    },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/carlossainz55/',
+      xTwitter: 'https://x.com/Carlossainz55',
+      website: 'https://www.carlossainz.es',
     },
     careerSummary:
       'WRC王者カルロス・サインツ・シニアの息子としてトロロッソからデビュー。ルノー、マクラーレンを経てフェラーリへ加入 [1]。高い戦術眼とマシンのセットアップ能力を武器に、2022年シルバーストンでの初優勝、2023年シンガポールでのレッドブル全勝阻止など、知性派ドライバーとしての名声を確立 [2]。',
@@ -1414,6 +1451,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       callsign: 'Marcus',
       dynamic: 'エンジニアリングデータの詳細な数値共有を好むラッセルと緊密に連携。',
     },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/georgerussell63/',
+      xTwitter: 'https://x.com/GeorgeRussell63',
+      website: 'https://www.georgerussell63.com',
+    },
     careerSummary:
       'GP3、F2を連覇しメルセデス育成から2019年ウィリアムズでデビュー。マシンの戦闘力を超える予選パフォーマンスから「ミスター・サタデー」の異名をとる [1]。2022年メルセデスへ昇格し、サンパウロGPでチーム唯一の優勝を達成。次世代リーダーとして定着 [2]。',
     entries: 125,
@@ -1527,6 +1569,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       name: 'Hugh Bird',
       callsign: 'Woody',
       dynamic: 'レッドブルのベテランエンジニア。チェコのタイヤ温存戦略とピットストップタイミングを綿密にコントロール。',
+    },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/schecoperez/',
+      xTwitter: 'https://x.com/SChecoPerez',
+      website: 'https://checoperez.com',
     },
     careerSummary:
       'ザウバー、マクラーレン、フォースインディア／レーシングポイントを経て2021年レッドブルに加入 [1]。2020年サヒールGPでの最後尾からの初優勝、2021年アブダビGPでの伝説のディフェンス、モナコやバクーでのストリート勝利など数々の歴史的瞬間を刻む [2]。',
@@ -1647,6 +1694,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       name: 'Chris Cronin',
       callsign: 'Chris',
       dynamic: 'アロンソの膨大なレース内情報処理と連携し、他車の戦略ギャップをリアルタイムで分析。',
+    },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/fernandoalo_oficial/',
+      xTwitter: 'https://x.com/alo_oficial',
+      website: 'https://www.fernandoalonso.com',
     },
     careerSummary:
       '2001年ミナルディからデビューし、ルノーで2005年・2006年にミハエル・シューマッハを破って世界王者連覇 [1]。マクラーレン、フェラーリ、アルピーヌ、アストンマーティンと渡り歩き、ル・マン24時間連覇やWEC王者も獲得。通算400戦に迫る今なおグリッド最速の一角として輝き続ける生ける伝説 [2]。',
@@ -1770,6 +1822,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       callsign: 'Ernesto',
       dynamic: '2024年からの相棒。角田の感情とパッションを冷静に受け止め、クリアで論理的な交信で支える。',
     },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/yukitsunoda0511/',
+      xTwitter: 'https://x.com/yukitsunoda07',
+      website: 'https://www.yukitsunoda.com',
+    },
     careerSummary:
       'ホンダ・フォーミュラ・ドリーム・プロジェクト（HFDP）とレッドブル・ジュニアチームに所属し、F3・F2でルーキー優勝を重ねて2021年アルファタウリからF1昇格 [1]。日本人ドライバーとして史上初のデビュー戦入賞を飾り、4年目を迎えた2024年にはチームリーダーとして予選Q3進出の常連となり、トップチーム昇格を狙う [2]。',
     entries: 88,
@@ -1890,6 +1947,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       name: 'Giorgio Ascanelli / Steve Nichols',
       callsign: 'Giorgio',
       dynamic: 'セナの神秘的とも言える車両感覚をテレメトリ黎明期に解析しマシンに反映させた名エンジニアたち。',
+    },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/oficialayrtonsenna/',
+      xTwitter: 'https://x.com/ayrtonsenna',
+      website: 'https://f1.ayrtonsenna.com.br',
     },
     careerSummary:
       'カート時代から圧倒的な才能を示し、イギリスF3を制覇して1984年トールマンからF1デビュー [1]。ロータス時代に卓越した予選スピードを開花させ、1988年マクラーレン・ホンダへ加入するとアラン・プロストとの伝説の黄金期を築き、3度の世界王座を獲得 [2]。極限の集中力と天性の感覚で世界中のモータースポーツファンを熱狂させた絶対的カリスマ。',
@@ -2017,6 +2079,11 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       name: 'Ross Brawn / Luca Baldisserri',
       callsign: 'Ross',
       dynamic: 'F1史上最高の戦略コンビ。「マイケル、毎周予選アタックで25秒差を作れ」という無茶振りに応えた伝説のパートナーシップ。',
+    },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/michaelschumacher/',
+      xTwitter: 'https://x.com/schumacher',
+      website: 'https://www.michael-schumacher.de',
     },
     careerSummary:
       '1991年スパでジョーダンから衝撃のデビューを飾り、直後にベネトンへ移籍して1994年・1995年に世界王座連覇 [1]。1996年に名門フェラーリへ移籍すると、ジャン・トッド、ロス・ブラウンらとともにチームを再建し、2000年から2004年にかけて前人未到のドライバーズタイトル5連覇を達成 [2]。F1のフィジカルトレーニング基準を塗り替えた近代F1の皇帝。',
