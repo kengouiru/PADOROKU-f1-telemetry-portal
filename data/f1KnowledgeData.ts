@@ -626,7 +626,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '超攻撃的オーバーステア派',
     numberOrigin: '幼少期から好んでいたパーソナルナンバー「33」から、世界王者獲得に伴いチャンピオンナンバー「1」を行使。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3973_by_Stepro_%28medium_crop%29.jpg/500px-2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3973_by_Stepro_%28medium_crop%29.jpg',
+      imageUrl: '/images/drivers/driver_asset_1.jpg',
       caption: 'Max Verstappen (Red Bull Racing)',
       credit: 'Stepro',
       license: 'CC BY-SA 4.0',
@@ -634,7 +634,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
         visualGallery: [
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/52/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3973_by_Stepro_%28medium_crop%29.jpg/960px-2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3973_by_Stepro_%28medium_crop%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_2.jpg',
         caption: 'パドックでの引き締まった精悍な表情のマックス・フェルスタッペン',
         tag: 'Portrait',
         credit: 'Steffen Prößdorf',
@@ -642,7 +642,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:2024-08-25_Motorsport,_Formel_1,_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3973_by_Stepro_(medium_crop).jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0b/2018_Austrian_Grand_Prix_podium_%2829388813658%29.jpg/960px-2018_Austrian_Grand_Prix_podium_%2829388813658%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_3.jpg',
         caption: 'レッドブル・リンク母国グランプリでの歓喜の優勝トロフィーセレモニー',
         tag: 'Podium',
         credit: 'pedrik',
@@ -650,7 +650,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:2018_Austrian_Grand_Prix_podium_(29388813658).jpg',
       },
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/b2/FIA_F1_Austria_2023_Max_Verstappen_%28cropped%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_2.jpg',
         caption: '2023年オーストリアGP・レーシングスーツ姿でのリラックスした素顔',
         tag: 'Paddock',
         credit: 'Lukas Raich',
@@ -658,7 +658,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:FIA_F1_Austria_2023_Max_Verstappen_(cropped).jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/38/Max_Verstappen_Integralhelm_2024.jpg/960px-Max_Verstappen_Integralhelm_2024.jpg',
+        imageUrl: '/images/drivers/driver_asset_5.jpg',
         caption: 'チャンピオンナンバー1をあしらったオフィシャルヘルメット',
         tag: 'Cockpit',
         credit: 'Auge=mit',
@@ -762,7 +762,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: 'V字コーナリング＆タイヤ長寿命派',
     numberOrigin: '父アンソニーの愛車のナンバープレート「F44」およびカート時代の初優勝番号に由来し、王座獲得後も「1」を使わず「44」を一貫して使用。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Prime_Minister_Keir_Starmer_meets_Sir_Lewis_Hamilton_%2854566928382%29_%28cropped%29.jpg/500px-Prime_Minister_Keir_Starmer_meets_Sir_Lewis_Hamilton_%2854566928382%29_%28cropped%29.jpg',
+      imageUrl: '/images/drivers/driver_asset_3.jpg',
       caption: 'Lewis Hamilton (Mercedes-AMG F1)',
       credit: 'Simon Dawson / No 10 Downing Street',
       license: 'CC BY 2.0',
@@ -770,7 +770,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
         visualGallery: [
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Prime_Minister_Keir_Starmer_meets_Sir_Lewis_Hamilton_%2854566928382%29_%28cropped%29.jpg/960px-Prime_Minister_Keir_Starmer_meets_Sir_Lewis_Hamilton_%2854566928382%29_%28cropped%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_7.jpg',
         caption: 'サーの称号を持つ7冠絶対王者 サー・ルイス・ハミルトン',
         tag: 'Portrait',
         credit: 'Simon Dawson / No 10 Downing Street',
@@ -778,7 +778,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Prime_Minister_Keir_Starmer_meets_Sir_Lewis_Hamilton_(54566928382)_(cropped).jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/Podium_Italian_Grand_Prix_2015.jpg/960px-Podium_Italian_Grand_Prix_2015.jpg',
+        imageUrl: '/images/drivers/driver_asset_8.jpg',
         caption: '熱狂のモンツァ・ティフォシを前にしたポディウムセレモニー',
         tag: 'Podium',
         credit: 'Amy huby',
@@ -786,7 +786,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Podium_Italian_Grand_Prix_2015.jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a9/2021_United_States_Grand_Prix_23_%28cropped%29.jpg/960px-2021_United_States_Grand_Prix_23_%28cropped%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_9.jpg',
         caption: 'USグランプリパドックでのレーシングスーツ姿',
         tag: 'Paddock',
         credit: 'rsyphotography',
@@ -794,7 +794,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:2021_United_States_Grand_Prix_23_(cropped).jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/2024_British_Grand_Prix%2C_Hamilton_%281%29.jpg/960px-2024_British_Grand_Prix%2C_Hamilton_%281%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_10.jpg',
         caption: '2024年シルバーストン・2年半ぶりの復活優勝に歓喜するハミルトン',
         tag: 'Podium',
         credit: 'Jen Ross',
@@ -898,7 +898,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '高ボトムスピード＆スムーズ派',
     numberOrigin: 'バレンティーノ・ロッシ（46番）の大ファンだが46を避け、ロゴ（LN4）のデザインに最適だった「4」を選択。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg/500px-2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28cropped2%29.jpg',
+      imageUrl: '/images/drivers/driver_asset_4.jpg',
       caption: 'Lando Norris (McLaren F1 Team)',
       credit: 'Stepro',
       license: 'CC BY-SA 4.0',
@@ -906,7 +906,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
         visualGallery: [
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3975_by_Stepro_%28cropped%29.jpg/960px-2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3975_by_Stepro_%28cropped%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_12.jpg',
         caption: 'マクラーレンのエースとして覚醒したランド・ノリスのポートレート',
         tag: 'Portrait',
         credit: 'Steffen Prößdorf',
@@ -914,7 +914,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:2024-08-25_Motorsport,_Formel_1,_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3975_by_Stepro_(cropped).jpg',
       },
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a0/2024-08-25_Motorsport%2C_Formel_1%2C_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_%28Lando_Norris%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_5.jpg',
         caption: 'パドックで笑顔を見せるリラックスしたノリス',
         tag: 'Paddock',
         credit: 'Steffen Prößdorf',
@@ -922,7 +922,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:2024-08-25_Motorsport,_Formel_1,_Gro%C3%9Fer_Preis_der_Niederlande_2024_STP_3968_by_Stepro_(Lando_Norris).jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Lando_Norris_Helmet_2024.jpg/960px-Lando_Norris_Helmet_2024.jpg',
+        imageUrl: '/images/drivers/driver_asset_14.jpg',
         caption: '2024年蛍光イエローが映えるパーソナルヘルメット',
         tag: 'Cockpit',
         credit: 'Liauzh',
@@ -1018,7 +1018,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '予選一撃＆壁際限界アタッカー',
     numberOrigin: '自身の誕生日（10月16日）に由来し、「1 + 6 = 7」の意味も込めて「16」を選択。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Charles_Leclerc_at_the_2026_Cannes_Film_Festival_%28cropped%29.jpg/500px-Charles_Leclerc_at_the_2026_Cannes_Film_Festival_%28cropped%29.jpg',
+      imageUrl: '/images/drivers/driver_asset_6.jpg',
       caption: 'Charles Leclerc (Scuderia Ferrari)',
       credit: 'Georges Biard',
       license: 'CC BY-SA 4.0',
@@ -1026,7 +1026,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
         visualGallery: [
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2d/Charles_Leclerc_and_Alexandra_Leclerc_at_the_2026_Cannes_Film_Festival.jpg/960px-Charles_Leclerc_and_Alexandra_Leclerc_at_the_2026_Cannes_Film_Festival.jpg',
+        imageUrl: '/images/drivers/driver_asset_16.jpg',
         caption: '跳ね馬を率いるモナコの至宝 シャルル・ルクレール',
         tag: 'Portrait',
         credit: 'Gabriel Hutchinson',
@@ -1034,7 +1034,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Charles_Leclerc_and_Alexandra_Leclerc_at_the_2026_Cannes_Film_Festival.jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/FIA_F1_Austria_2022_Podium_Race_Winner_Leclerc.jpg/960px-FIA_F1_Austria_2022_Podium_Race_Winner_Leclerc.jpg',
+        imageUrl: '/images/drivers/driver_asset_17.jpg',
         caption: '2022年オーストリアGP優勝・ポディウムでトロフィーを誇るルクレール',
         tag: 'Podium',
         credit: 'Lukas Raich',
@@ -1042,7 +1042,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:FIA_F1_Austria_2022_Podium_Race_Winner_Leclerc.jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/27/Charles_Leclerc_Silverstone_2018.jpg/960px-Charles_Leclerc_Silverstone_2018.jpg',
+        imageUrl: '/images/drivers/driver_asset_18.jpg',
         caption: 'パドックでの真剣な表情のルクレール',
         tag: 'Paddock',
         credit: 'Jen Ross',
@@ -1144,7 +1144,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '冷静沈着＆高精度ライン派',
     numberOrigin: 'カート時代に偶然割り当てられた「81」番で好成績を収めたことから、パーソナルナンバーとして定着。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/2026_Chinese_GP_-_Oscar_Piastri_%28cropped%29_%28cropped%29.jpg/500px-2026_Chinese_GP_-_Oscar_Piastri_%28cropped%29_%28cropped%29.jpg',
+      imageUrl: '/images/drivers/driver_asset_7.jpg',
       caption: 'Oscar Piastri (McLaren F1 Team)',
       credit: 'Stepro',
       license: 'CC BY-SA 4.0',
@@ -1152,7 +1152,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
         visualGallery: [
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/2026_Chinese_GP_-_Oscar_Piastri_%28cropped%29_%28cropped%29.jpg/960px-2026_Chinese_GP_-_Oscar_Piastri_%28cropped%29_%28cropped%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_8.jpg',
         caption: '冷静沈着な若き天才 オスカー・ピアストリ',
         tag: 'Portrait',
         credit: 'Stepro',
@@ -1160,7 +1160,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:2026_Chinese_GP_-_Oscar_Piastri_(cropped)_(cropped).jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bb/Oscar_Piastri_-_2017_British_F4_Knockhill_%28Sunday%2C_R4_podium%29.jpg/960px-Oscar_Piastri_-_2017_British_F4_Knockhill_%28Sunday%2C_R4_podium%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_21.jpg',
         caption: '表彰台での爽やかな笑顔のピアストリ',
         tag: 'Podium',
         credit: 'Cs-wolves',
@@ -1168,7 +1168,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Oscar_Piastri_-_2017_British_F4_Knockhill_(Sunday,_R4_podium).jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Oscar_Piastri_Helmet_2024.jpg/960px-Oscar_Piastri_Helmet_2024.jpg',
+        imageUrl: '/images/drivers/driver_asset_22.jpg',
         caption: '2024年マクラーレン・オフィシャルヘルメット',
         tag: 'Cockpit',
         credit: 'Liauzh',
@@ -1258,7 +1258,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '頭脳派戦略＆タイヤウィスパラー',
     numberOrigin: '「Carlo5 5ainz」のスペルに見立てたダブル5（55）番。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Formula1Gabelhofen2022_%2804%29_%28cropped2%29.jpg/500px-Formula1Gabelhofen2022_%2804%29_%28cropped2%29.jpg',
+      imageUrl: '/images/drivers/driver_asset_9.jpg',
       caption: 'Carlos Sainz Jr. (Scuderia Ferrari)',
       credit: 'Granada',
       license: 'CC BY-SA 4.0',
@@ -1266,7 +1266,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
         visualGallery: [
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/Carlos_Sainz_Jr._2022.jpg/960px-Carlos_Sainz_Jr._2022.jpg',
+        imageUrl: '/images/drivers/driver_asset_24.jpg',
         caption: '冷静沈着なスムース・オペレーター カルロス・サインツ',
         tag: 'Portrait',
         credit: 'Wastrick',
@@ -1274,7 +1274,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Carlos_Sainz_Jr._2022.jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Carlos_Sainz_-_2023_Italian_Grand_Prix.jpg/960px-Carlos_Sainz_-_2023_Italian_Grand_Prix.jpg',
+        imageUrl: '/images/drivers/driver_asset_25.jpg',
         caption: '2023年モンツァ・ティフォシの前でポールポジションと表彰台を獲得したサインツ',
         tag: 'Podium',
         credit: 'Eustace Bagge',
@@ -1282,7 +1282,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Carlos_Sainz_-_2023_Italian_Grand_Prix.jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Carlos_Sainz_Jr_%2853838437566%29.jpg/960px-Carlos_Sainz_Jr_%2853838437566%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_26.jpg',
         caption: 'パドックでのリラックスしたサインツ',
         tag: 'Paddock',
         credit: 'Peter Menzel',
@@ -1372,7 +1372,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '予選一撃アタッカー＆アグレッシブ派',
     numberOrigin: '兄がカートで使用していた「63」番を受け継ぎ、GR63のロゴとしても愛用。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/KingsLeonSilverstne040724_%2828_of_112%29_%2853838006028%29_%28cropped%29.jpg/500px-KingsLeonSilverstne040724_%2828_of_112%29_%2853838006028%29_%28cropped%29.jpg',
+      imageUrl: '/images/drivers/driver_asset_10.jpg',
       caption: 'George Russell (Mercedes-AMG F1)',
       credit: 'Leon7',
       license: 'CC BY-SA 2.0',
@@ -1380,7 +1380,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
         visualGallery: [
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/da/George_Russell_racing_driver_cropd.png',
+        imageUrl: '/images/drivers/driver_asset_11.png',
         caption: 'メルセデスの次世代リーダー ジョージ・ラッセル',
         tag: 'Portrait',
         credit: 'Lukas Raich',
@@ -1388,7 +1388,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:George_Russell_racing_driver_cropd.png',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fd/George_Russell%2C_FIA_F2_Austria_2018_podium.JPG/960px-George_Russell%2C_FIA_F2_Austria_2018_podium.JPG',
+        imageUrl: '/images/drivers/driver_asset_29.jpg',
         caption: '表彰台での誇らしげなラッセル',
         tag: 'Podium',
         credit: 'Lukas Raich',
@@ -1396,7 +1396,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:George_Russell,_FIA_F2_Austria_2018_podium.JPG',
       },
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Podium_celebration_at_the_2026_Australian_Grand_Prix_%28028A8767%29_cropped.jpg',
+        imageUrl: '/images/drivers/driver_asset_12.jpg',
         caption: 'パドックでの歓喜のラッセル',
         tag: 'Paddock',
         credit: 'Yu Chu Chin',
@@ -1486,7 +1486,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '市街地スペシャリスト＆タイヤケア派',
     numberOrigin: '幼少期に憧れたクラブ・アメリカのサッカー選手イバン・サモラーノの背番号「11」に由来。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/7a/Sergio_P%C3%A9rez_2019_%28cropped%29.jpg',
+      imageUrl: '/images/drivers/driver_asset_13.jpg',
       caption: 'Sergio Perez (Red Bull Racing)',
       credit: 'Morio',
       license: 'CC BY-SA 4.0',
@@ -1494,7 +1494,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
         visualGallery: [
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/94/Sergio_P%C3%A9rez.jpg',
+        imageUrl: '/images/drivers/driver_asset_14.jpg',
         caption: 'メキシコの英雄・防衛大臣 セルジオ・ペレス',
         tag: 'Portrait',
         credit: 'Beisbol lmp',
@@ -1502,7 +1502,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Sergio_P%C3%A9rez.jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/2012_Italian_GP_-_Champagne.jpg/960px-2012_Italian_GP_-_Champagne.jpg',
+        imageUrl: '/images/drivers/driver_asset_33.jpg',
         caption: 'モンツァでの奇跡の表彰台シャンパンファイト',
         tag: 'Podium',
         credit: 'Francesco Crippa',
@@ -1510,7 +1510,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:2012_Italian_GP_-_Champagne.jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Sergio_Perez%2C_Red_Bull_Racing_F1_Team%2C_British_GP%2C_Silverstone_2021_%2851350041074%29.jpg/960px-Sergio_Perez%2C_Red_Bull_Racing_F1_Team%2C_British_GP%2C_Silverstone_2021_%2851350041074%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_34.jpg',
         caption: 'レッドブルのレーシングスーツに身を包んだペレス',
         tag: 'Paddock',
         credit: 'Jen Ross',
@@ -1606,7 +1606,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '超絶順応＆総合力オールラウンダー',
     numberOrigin: '1996年7月14日、14歳の時にカート世界選手権で優勝した幸運の番号「14」に由来。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Alonso-68_%2824710447098%29.jpg/500px-Alonso-68_%2824710447098%29.jpg',
+      imageUrl: '/images/drivers/driver_asset_15.jpg',
       caption: 'Fernando Alonso (Aston Martin F1)',
       credit: 'cchana',
       license: 'CC BY-SA 2.0',
@@ -1614,7 +1614,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
         visualGallery: [
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/87/Fernando_Alonso_Malaysia_2012.jpg',
+        imageUrl: '/images/drivers/driver_asset_16.jpg',
         caption: '現役最多400戦超の鉄人 2冠王者フェルナンド・アロンソ',
         tag: 'Portrait',
         credit: 'F1fans',
@@ -1622,7 +1622,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Fernando_Alonso_Malaysia_2012.jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Fernando_Alonso_2011_Itay_podium.jpg/960px-Fernando_Alonso_2011_Itay_podium.jpg',
+        imageUrl: '/images/drivers/driver_asset_37.jpg',
         caption: 'モンツァ表彰台でトロフィーを掲げるアロンソ',
         tag: 'Podium',
         credit: 'Nic Redhead',
@@ -1630,7 +1630,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Fernando_Alonso_2011_Itay_podium.jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Fernando_Alonso_%286148500438%29.jpg/960px-Fernando_Alonso_%286148500438%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_38.jpg',
         caption: 'パドックでの鋭い眼差しのアロンソ',
         tag: 'Paddock',
         credit: 'Nic Redhead',
@@ -1728,7 +1728,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '奥深いレイトブレーキング派',
     numberOrigin: 'カート時代に使用していた「11」番が空いていなかったため、倍の「22」番を選択（ジェンソン・バトンの王者番号でもある）。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Yuki_Tsunoda_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_%28028A8096%29.jpg/500px-Yuki_Tsunoda_at_the_Melbourne_Walk_during_the_2026_Australian_Grand_Prix_%28028A8096%29.jpg',
+      imageUrl: '/images/drivers/driver_asset_17.jpg',
       caption: 'Yuki Tsunoda (Visa Cash App RB)',
       credit: 'Sienna2018',
       license: 'CC BY-SA 4.0',
@@ -1736,7 +1736,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
         visualGallery: [
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/FIA_F1_Austria_2023_Yuki_Tsunoda.jpg/960px-FIA_F1_Austria_2023_Yuki_Tsunoda.jpg',
+        imageUrl: '/images/drivers/driver_asset_40.jpg',
         caption: '世界最高峰F1で存在感を放つ日本の若きエース 角田裕毅',
         tag: 'Portrait',
         credit: 'Lukas Raich',
@@ -1744,7 +1744,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:FIA_F1_Austria_2023_Yuki_Tsunoda.jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/FIA_F1_Austria_2023_Nr._22_%28Post-Race%29.jpg/960px-FIA_F1_Austria_2023_Nr._22_%28Post-Race%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_41.jpg',
         caption: 'レース直後のパドックでの真剣な表情',
         tag: 'Paddock',
         credit: 'Lukas Raich',
@@ -1752,7 +1752,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:FIA_F1_Austria_2023_Nr._22_(Post-Race).jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/2024_British_Grand_Prix%2C_Tsunoda_%281%29.jpg/960px-2024_British_Grand_Prix%2C_Tsunoda_%281%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_42.jpg',
         caption: 'シルバーストンでのファンサービスとレーシングスーツ姿',
         tag: 'Paddock',
         credit: 'Jen Ross',
@@ -1849,7 +1849,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '異次元の予選アタック＆セナ足スロットル',
     numberOrigin: 'ロータスおよびマクラーレン・ホンダ黄金期に世界を席巻した象徴のゼッケン「12」番。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Ayrton_Senna_Pesawat_RC_Cropped.jpg',
+      imageUrl: '/images/drivers/driver_asset_18.jpg',
       caption: 'Ayrton Senna da Silva',
       credit: 'Instituto Ayrton Senna',
       license: 'CC BY-SA 3.0',
@@ -1857,7 +1857,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
         visualGallery: [
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Ayrton_Senna_Pesawat_RC_Cropped.jpg',
+        imageUrl: '/images/drivers/driver_asset_18.jpg',
         caption: '音速の貴公子 3度の世界王者 アイルトン・セナ',
         tag: 'Portrait',
         credit: 'Instituto Ayrton Senna',
@@ -1865,7 +1865,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Ayrton_Senna_Pesawat_RC_Cropped.jpg',
       },
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/AyrtonSennaAtHockheimGP1993-2.jpg/960px-AyrtonSennaAtHockheimGP1993-2.jpg',
+        imageUrl: '/images/drivers/driver_asset_19.jpg',
         caption: '1993年マクラーレン・ホンダ時代の闘志あふれるセナ',
         tag: 'Paddock',
         credit: 'Luki4842',
@@ -1873,7 +1873,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:AyrtonSennaAtHockheimGP1993-2.jpg',
       },
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/1985_European_GP_Senna.jpg/960px-1985_European_GP_Senna.jpg',
+        imageUrl: '/images/drivers/driver_asset_20.jpg',
         caption: '若き日のロータス時代・コクピットで集中を高めるセナ',
         tag: 'Cockpit',
         credit: 'Luki4842',
@@ -1976,7 +1976,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '予選ペース連続周回＆完全無欠マシン',
     numberOrigin: 'フェラーリ黄金期に5連覇を達成した不滅のチャンピオンナンバー「1」。',
     visualAsset: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Michael_Schumacher%2C_September_2005.jpg/500px-Michael_Schumacher%2C_September_2005.jpg',
+      imageUrl: '/images/drivers/driver_asset_21.jpg',
       caption: 'Michael Schumacher (Scuderia Ferrari, 2005)',
       credit: 'Hans-Peter van Velthoven',
       license: 'CC BY-SA 3.0',
@@ -1984,7 +1984,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
         visualGallery: [
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c2/Michael_Schumacher%2C_September_2005.jpg',
+        imageUrl: '/images/drivers/driver_asset_22.jpg',
         caption: 'フェラーリで5連覇を達成した不滅の皇帝 ミハエル・シューマッハ',
         tag: 'Portrait',
         credit: 'Aécio Neves',
@@ -1992,7 +1992,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Michael_Schumacher,_September_2005.jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7a/GP_Imola2005_Podium.jpg/960px-GP_Imola2005_Podium.jpg',
+        imageUrl: '/images/drivers/driver_asset_49.jpg',
         caption: 'イモラ表彰台でガッツポーズを決めるシューマッハ',
         tag: 'Podium',
         credit: 'formula1photos',
@@ -2000,7 +2000,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:GP_Imola2005_Podium.jpg',
       },
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/8/8d/Michael_Schumacher_-_%28cropped%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_23.jpg',
         caption: 'フェラーリのパドックでの穏やかな笑顔',
         tag: 'Paddock',
         credit: 'Nicolas Bachmann',
@@ -2117,14 +2117,14 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     characteristics:
       '過酷なストップ＆ゴー特性と高粗度アスファルトによる極端なリアタイヤ熱ダレが特徴 [1]。ターン1、ターン4、ターン11など強力なブレーキングポイントが多く、アンダーカットの威力がグリッド中でも最大級に高い [2]。',
     visualMap: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Bahrain_International_Circuit--Grand_Prix_Layout.svg/960px-Bahrain_International_Circuit--Grand_Prix_Layout.svg.png',
+      imageUrl: '/images/circuits/circuit_asset_1.png',
       credit: 'Will_Scalise',
       license: 'CC BY-SA 3.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Bahrain_International_Circuit--Grand_Prix_Layout.svg',
     },
     visualAssets: {
       trackMap: {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Bahrain_International_Circuit--Grand_Prix_Layout.svg/960px-Bahrain_International_Circuit--Grand_Prix_Layout.svg.png',
+        imageUrl: '/images/circuits/circuit_asset_1.png',
         credit: 'Will_Scalise',
         license: 'CC BY-SA 3.0',
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Bahrain_International_Circuit--Grand_Prix_Layout.svg',
@@ -2132,7 +2132,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Bahrain_International_Circuit_back_straight.jpg/960px-Bahrain_International_Circuit_back_straight.jpg',
+        imageUrl: '/images/circuits/circuit_asset_2.jpg',
         caption: '砂漠の闇を照らす強力なナイトレース照明とバックストレートの全景',
         tag: 'Panoramic',
         credit: 'LutzWeidner',
@@ -2246,14 +2246,14 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     characteristics:
       '世界で唯一の8の字立体交差を持つテクニカルコース [1]。セクター1の連続S字やデグナー、スプーン、130Rなど高横Gコーナーが連続し、フロント・リア双方のタイヤデグラデーションが激しい [2]。',
     visualMap: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Suzuka_circuit_map--2005.svg/960px-Suzuka_circuit_map--2005.svg.png',
+      imageUrl: '/images/circuits/circuit_asset_3.png',
       credit: 'Will_Scalise',
       license: 'CC BY-SA 3.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Suzuka_circuit_map--2005.svg',
     },
     visualAssets: {
       trackMap: {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Suzuka_circuit_map--2005.svg/960px-Suzuka_circuit_map--2005.svg.png',
+        imageUrl: '/images/circuits/circuit_asset_3.png',
         credit: 'Will_Scalise',
         license: 'CC BY-SA 3.0',
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Suzuka_circuit_map--2005.svg',
@@ -2261,7 +2261,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Suzuka_Circuit_2006.jpg/960px-Suzuka_Circuit_2006.jpg',
+        imageUrl: '/images/circuits/circuit_asset_6.jpg',
         caption: '鈴鹿のランドマーク・大観覧車と超満員のグランドスタンド全景',
         tag: 'Panoramic',
         credit: 'shiraga from Osaka',
@@ -2269,7 +2269,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Suzuka_Circuit_2006.jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/33/Suzuka_Circuit_21-09-2024.jpg/960px-Suzuka_Circuit_21-09-2024.jpg',
+        imageUrl: '/images/circuits/circuit_asset_7.jpg',
         caption: '決勝日の熱気に包まれるメインストレートとピットビルディング',
         tag: 'Atmosphere',
         credit: 'BWard 1997',
@@ -2277,7 +2277,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Suzuka_Circuit_21-09-2024.jpg',
       },
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Podium_2016_Japanese_GP.jpg',
+        imageUrl: '/images/circuits/circuit_asset_4.jpg',
         caption: '世界中のF1ファンで埋め尽くされるホームストレートと表彰台セレモニー',
         tag: 'Podium',
         credit: 'Japan Tourism Agency',
@@ -2327,7 +2327,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         historicalImpact:
           'コース復帰規定やFIAの裁定プロセスの透明化に関する激しい議論を巻き起こし、ドライバーと競技統括団体の関係性を根本から揺るがした。',
         momentImage: {
-          imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Ayrton_Senna_Pesawat_RC_Cropped.jpg',
+          imageUrl: '/images/drivers/driver_asset_18.jpg',
           caption: '不屈の闘志で鈴鹿を駆け抜けたアイルトン・セナ',
           credit: 'Instituto Ayrton Senna',
           license: 'CC BY-SA 3.0',
@@ -2398,14 +2398,14 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     characteristics:
       '「スピードの殿堂」と呼ばれる超高速サーキット [1]。最高速350km/h超に達するため極限の低ドラッグ（薄型リヤウィング）セッティングが要求され、第1シケイン（ターン1）でのブレーキング勝負がレースの命運を分ける [2]。',
     visualMap: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Monza_track_map.svg/960px-Monza_track_map.svg.png',
+      imageUrl: '/images/circuits/circuit_asset_5.png',
       credit: 'Will_Scalise',
       license: 'CC BY-SA 3.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Monza_track_map.svg',
     },
     visualAssets: {
       trackMap: {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Monza_track_map.svg/960px-Monza_track_map.svg.png',
+        imageUrl: '/images/circuits/circuit_asset_5.png',
         credit: 'Will_Scalise',
         license: 'CC BY-SA 3.0',
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Monza_track_map.svg',
@@ -2413,7 +2413,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Tifosi_%286196236858%29.jpg/960px-Tifosi_%286196236858%29.jpg',
+        imageUrl: '/images/circuits/circuit_asset_12.jpg',
         caption: 'レース終了後コースを埋め尽くす情熱のティフォシと跳ね馬の大旗',
         tag: 'Atmosphere',
         credit: 'Nic Redhead',
@@ -2421,7 +2421,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Tifosi_(6196236858).jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3c/Ferrari_Challenge_-_Autodromo_Nazionale_di_Monza_-_03-04-2016_%2825876182923%29.jpg/960px-Ferrari_Challenge_-_Autodromo_Nazionale_di_Monza_-_03-04-2016_%2825876182923%29.jpg',
+        imageUrl: '/images/circuits/circuit_asset_13.jpg',
         caption: 'スピードの殿堂・モンツァのメインストレートとグランドスタンド',
         tag: 'Panoramic',
         credit: 'Nic Redhead',
@@ -2429,7 +2429,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Ferrari_Challenge_-_Autodromo_Nazionale_di_Monza_-_03-04-2016_(25876182923).jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/46/2022_6_Hours_of_Monza_-_Pit_lane.jpg/960px-2022_6_Hours_of_Monza_-_Pit_lane.jpg',
+        imageUrl: '/images/circuits/circuit_asset_14.jpg',
         caption: '歴史あるモンツァのピットレーンとガレージの緊迫感',
         tag: 'Paddock',
         credit: 'United Autosports',
@@ -2533,14 +2533,14 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     characteristics:
       'F1カレンダー最長を誇る名門コース [1]。オールージュからラディオンへの急勾配駆け上がりでの激しい垂直G圧縮、ケメルストレートでの最高速、セクター2のテクニカルコーナー群と、気候急変（スパ・ウェザー）が特徴 [2]。',
     visualMap: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Spa-Francorchamps_of_Belgium.svg/960px-Spa-Francorchamps_of_Belgium.svg.png',
+      imageUrl: '/images/circuits/circuit_asset_6.png',
       credit: 'Will_Scalise',
       license: 'CC BY-SA 3.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Spa-Francorchamps_of_Belgium.svg',
     },
     visualAssets: {
       trackMap: {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Spa-Francorchamps_of_Belgium.svg/960px-Spa-Francorchamps_of_Belgium.svg.png',
+        imageUrl: '/images/circuits/circuit_asset_6.png',
         credit: 'Will_Scalise',
         license: 'CC BY-SA 3.0',
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Spa-Francorchamps_of_Belgium.svg',
@@ -2548,7 +2548,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8a/2022_6_Hours_of_Spa-Francorchamps_-_Eau_Rouge_Corner_stands.jpg/960px-2022_6_Hours_of_Spa-Francorchamps_-_Eau_Rouge_Corner_stands.jpg',
+        imageUrl: '/images/circuits/circuit_asset_17.jpg',
         caption: '名物オールージュの断崖を埋め尽くすスタンドと観客席',
         tag: 'Atmosphere',
         credit: 'United Autosports',
@@ -2556,7 +2556,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:2022_6_Hours_of_Spa-Francorchamps_-_Eau_Rouge_Corner_stands.jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/77/Circuit_de_Spa-Francorchamps%2C_April_22%2C_2018_SkySat_%28cropped%29.jpg/960px-Circuit_de_Spa-Francorchamps%2C_April_22%2C_2018_SkySat_%28cropped%29.jpg',
+        imageUrl: '/images/circuits/circuit_asset_18.jpg',
         caption: 'アルデンヌの雄大な大自然に広がる全長7kmのスパ全景パノラマ',
         tag: 'Panoramic',
         credit: 'Planet Labs',
@@ -2564,7 +2564,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Circuit_de_Spa-Francorchamps,_April_22,_2018_SkySat_(cropped).jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/04/2022_Le_Mans_Cup_-_Pit_lane_at_Spa.jpg/960px-2022_Le_Mans_Cup_-_Pit_lane_at_Spa.jpg',
+        imageUrl: '/images/circuits/circuit_asset_19.jpg',
         caption: '緊迫感漂うスパのピットレーンとチームガレージ',
         tag: 'Paddock',
         credit: 'United Autosports',
@@ -2672,20 +2672,20 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     characteristics:
       '「モータースポーツの至宝」と称される世界最高峰の市街地サーキット [1]。エスケープゾーンが皆無でミリ単位の壁際アタックが要求され、予選ポールポジションの価値が年間で最も高い [2]。',
     visualMap: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Monte_Carlo_Formula_1_track_map.svg/960px-Monte_Carlo_Formula_1_track_map.svg.png',
+      imageUrl: '/images/circuits/circuit_asset_7.png',
       credit: 'Will_Scalise',
       license: 'CC BY-SA 3.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Monte_Carlo_Formula_1_track_map.svg',
     },
     visualAssets: {
       trackMap: {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Monte_Carlo_Formula_1_track_map.svg/960px-Monte_Carlo_Formula_1_track_map.svg.png',
+        imageUrl: '/images/circuits/circuit_asset_7.png',
         credit: 'Will_Scalise',
         license: 'CC BY-SA 3.0',
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Monte_Carlo_Formula_1_track_map.svg',
       },
       atmosphereImage: {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/2009_White_Porsche_997_GT3_at_Loews_Hairpin%2C_Monte_Carlo%2C_Monaco.jpg/960px-2009_White_Porsche_997_GT3_at_Loews_Hairpin%2C_Monte_Carlo%2C_Monaco.jpg',
+        imageUrl: '/images/circuits/circuit_asset_8.jpg',
         caption: '世界で最も低速かつタイトなグランドホテル・ヘアピン（旧ロウズ）',
         credit: 'Ben',
         license: 'CC BY-SA 2.0',
@@ -2694,7 +2694,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Monte_Carlo_Formula_1_track_map.svg/960px-Monte_Carlo_Formula_1_track_map.svg.png',
+        imageUrl: '/images/circuits/circuit_asset_7.png',
         caption: 'モナコ公国市街地サーキット公式トラックレイアウト図',
         tag: 'Track Map',
         credit: 'Will_Scalise',
@@ -2702,7 +2702,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Monte_Carlo_Formula_1_track_map.svg',
       },
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/2009_White_Porsche_997_GT3_at_Loews_Hairpin%2C_Monte_Carlo%2C_Monaco.jpg/960px-2009_White_Porsche_997_GT3_at_Loews_Hairpin%2C_Monte_Carlo%2C_Monaco.jpg',
+        imageUrl: '/images/circuits/circuit_asset_8.jpg',
         caption: '世界で最も低速かつタイトなグランドホテル・ヘアピン（旧ロウズ）',
         tag: 'Action',
         credit: 'Ben',
@@ -2710,7 +2710,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:2009_White_Porsche_997_GT3_at_Loews_Hairpin,_Monte_Carlo,_Monaco.jpg',
       },
       {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Circuit_de_Monaco%2C_April_1%2C_2018_SkySat_%28cropped%29.jpg/960px-Circuit_de_Monaco%2C_April_1%2C_2018_SkySat_%28cropped%29.jpg',
+        imageUrl: '/images/circuits/circuit_asset_9.jpg',
         caption: '地中海とヨットハーバーを囲むモナコ市街地コースの衛星空撮写真',
         tag: 'Panoramic',
         credit: 'Planet Labs Inc.',
@@ -2824,14 +2824,14 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     characteristics:
       '1950年にF1世界選手権の第1戦が開催された「F1発祥の地」[1]。マゴッツ・ベケッツ・チャペルなどの伝説的超高速S字セクションが連続し、現代F1マシンの空力ダウンフォースと横G限界（最大5.6G）を存分に体感できる高速サーキット [2]。',
     visualMap: {
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Silverstone_Circuit_2020.png/960px-Silverstone_Circuit_2020.png',
+      imageUrl: '/images/circuits/circuit_asset_10.png',
       credit: 'Luki4842',
       license: 'CC BY-SA 4.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Silverstone_Circuit_2020.png',
     },
     visualAssets: {
       trackMap: {
-        imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Silverstone_Circuit_2020.png/960px-Silverstone_Circuit_2020.png',
+        imageUrl: '/images/circuits/circuit_asset_10.png',
         credit: 'Luki4842',
         license: 'CC BY-SA 4.0',
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:Silverstone_Circuit_2020.png',
@@ -2839,7 +2839,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/70/2024_British_Grand_Prix%2C_Hamilton_%285%29.jpg/960px-2024_British_Grand_Prix%2C_Hamilton_%285%29.jpg',
+        imageUrl: '/images/circuits/circuit_asset_28.jpg',
         caption: 'F1発祥の地・シルバーストンを満たす熱狂的な大観衆',
         tag: 'Atmosphere',
         credit: 'Jen Ross',
@@ -2847,7 +2847,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         sourceUrl: 'https://commons.wikimedia.org/wiki/File:2024_British_Grand_Prix,_Hamilton_(5).jpg',
       },
       {
-        imageUrl: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/24/2024_British_Grand_Prix%2C_Hamilton_%281%29.jpg/960px-2024_British_Grand_Prix%2C_Hamilton_%281%29.jpg',
+        imageUrl: '/images/drivers/driver_asset_10.jpg',
         caption: '近代的なシルバーストン・ウイングとパドックの熱気',
         tag: 'Paddock',
         credit: 'Jen Ross',

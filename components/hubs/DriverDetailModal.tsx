@@ -95,7 +95,9 @@ export default function DriverDetailModal({
   };
 
   const proxiedImageUrl = driver.visualAsset?.imageUrl
-    ? `/api/image-proxy?url=${encodeURIComponent(driver.visualAsset.imageUrl)}`
+    ? driver.visualAsset.imageUrl.startsWith('/')
+      ? driver.visualAsset.imageUrl
+      : `/api/image-proxy?url=${encodeURIComponent(driver.visualAsset.imageUrl)}`
     : null;
 
   return (

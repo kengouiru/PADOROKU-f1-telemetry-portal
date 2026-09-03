@@ -132,7 +132,9 @@ export default function PhotoGalleryCarousel({
             const isLoaded = loadedImages[idx];
             const isError = errorImages[idx];
             const isCurrent = activeIndex === idx;
-            const proxiedUrl = `/api/image-proxy?url=${encodeURIComponent(item.imageUrl)}`;
+            const finalImageUrl = item.imageUrl.startsWith('/')
+              ? item.imageUrl
+              : `/api/image-proxy?url=${encodeURIComponent(item.imageUrl)}`;
 
             return (
               <div
@@ -161,7 +163,7 @@ export default function PhotoGalleryCarousel({
                 {/* Main Image */}
                 {!isError ? (
                   <img
-                    src={proxiedUrl}
+                    src={finalImageUrl}
                     alt={item.caption}
                     referrerPolicy="no-referrer"
                     onLoad={() => setLoadedImages((prev) => ({ ...prev, [idx]: true }))}

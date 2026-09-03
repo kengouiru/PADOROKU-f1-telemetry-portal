@@ -103,11 +103,15 @@ export default function CircuitDetailModal({
   const atmosphereAsset = circuit.visualAssets?.atmosphereImage;
 
   const proxiedMapUrl = mapAsset?.imageUrl
-    ? `/api/image-proxy?url=${encodeURIComponent(mapAsset.imageUrl)}`
+    ? mapAsset.imageUrl.startsWith('/')
+      ? mapAsset.imageUrl
+      : `/api/image-proxy?url=${encodeURIComponent(mapAsset.imageUrl)}`
     : null;
 
   const proxiedAtmosphereUrl = atmosphereAsset?.imageUrl
-    ? `/api/image-proxy?url=${encodeURIComponent(atmosphereAsset.imageUrl)}`
+    ? atmosphereAsset.imageUrl.startsWith('/')
+      ? atmosphereAsset.imageUrl
+      : `/api/image-proxy?url=${encodeURIComponent(atmosphereAsset.imageUrl)}`
     : null;
 
   return (
@@ -628,7 +632,11 @@ export default function CircuitDetailModal({
                           <div className="bg-slate-900/90 border border-white/10 rounded-xl p-3 flex flex-col sm:flex-row items-center gap-3">
                             <div className="w-full sm:w-36 h-28 rounded-lg overflow-hidden flex-shrink-0 bg-slate-950 flex items-center justify-center">
                               <img
-                                src={`/api/image-proxy?url=${encodeURIComponent(moment.momentImage.imageUrl)}`}
+                                src={
+                                  moment.momentImage.imageUrl.startsWith('/')
+                                    ? moment.momentImage.imageUrl
+                                    : `/api/image-proxy?url=${encodeURIComponent(moment.momentImage.imageUrl)}`
+                                }
                                 alt={moment.momentImage.caption || moment.title}
                                 referrerPolicy="no-referrer"
                                 className="w-full h-full object-cover"
