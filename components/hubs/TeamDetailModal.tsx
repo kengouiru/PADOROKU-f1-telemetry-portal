@@ -198,19 +198,8 @@ export default function TeamDetailModal({
           )}
         </div>
 
-        {/* Photo Gallery: Historic Cars & Factory */}
-        {team.visualGallery && team.visualGallery.length > 0 && (
-          <div className="px-5 sm:px-6 pt-3 pb-1 border-b border-white/10 bg-slate-950/40">
-            <PhotoGalleryCarousel
-              items={team.visualGallery}
-              title="HISTORIC CARS & FACTORY GALLERY"
-              themeColor={themeColor}
-            />
-          </div>
-        )}
-
         {/* Modal Sub-Tabs */}
-        <div className="flex items-center gap-2 px-5 sm:px-6 pt-3 border-b border-white/10 bg-slate-900/40 overflow-x-auto">
+        <div className="flex items-center gap-2 px-5 sm:px-6 pt-3 border-b border-white/10 bg-slate-900/40 overflow-x-auto flex-shrink-0">
           {(
             [
               ['factory', '🏭 ファクトリー & 組織体系'],
@@ -328,6 +317,15 @@ export default function TeamDetailModal({
           {/* TAB 3: HISTORY & ICONIC CARS */}
           {activeTab === 'history' && (
             <div className="space-y-4 animate-fade-in">
+              {/* Photo Gallery Carousel (Historic Cars & Factory) */}
+              {team.visualGallery && team.visualGallery.length > 0 && (
+                <PhotoGalleryCarousel
+                  items={team.visualGallery}
+                  title="📸 HISTORIC CARS & FACTORY GALLERY"
+                  themeColor={themeColor}
+                />
+              )}
+
               <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-2">
                 <h4 className="text-xs font-racing font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                   <span>🏆</span>

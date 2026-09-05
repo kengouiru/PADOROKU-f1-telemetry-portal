@@ -324,7 +324,7 @@ export default function DriverDetailModal({
         </div>
 
         {/* Modal Sub-Tabs */}
-        <div className="flex items-center gap-2 px-5 sm:px-6 pt-3 border-b border-white/10 bg-slate-900/40 overflow-x-auto">
+        <div className="flex items-center gap-2 px-5 sm:px-6 pt-3 border-b border-white/10 bg-slate-900/40 overflow-x-auto flex-shrink-0">
           {(
             [
               ['overview', '📊 プロフィール & 実績'],
