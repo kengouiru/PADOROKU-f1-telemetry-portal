@@ -609,17 +609,17 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* AI Strategist Toggle Button (Header) */}
+          {/* AI Strategist Toggle Button (Header: Desktop & Tablet only) */}
           <button
             onClick={() => setAiDrawerOpen((v) => !v)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold flex items-center gap-1.5 transition-all shadow-md ${
+            className={`hidden sm:flex px-3 py-1.5 rounded-xl text-xs font-racing font-bold items-center gap-1.5 transition-all shadow-md flex-shrink-0 ${
               aiDrawerOpen
                 ? 'bg-blue-600 text-white border border-blue-400 shadow-[0_0_12px_rgba(37,99,235,0.4)]'
                 : 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-white/10 hover:border-white/25'
             }`}
           >
             <span>🤖</span>
-            <span className="hidden sm:inline">AI STRATEGIST</span>
+            <span>AI STRATEGIST</span>
             {aiDrawerOpen && <span className="text-[10px] ml-0.5">✕</span>}
           </button>
 

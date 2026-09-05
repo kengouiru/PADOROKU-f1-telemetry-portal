@@ -523,31 +523,31 @@ export default function DetailedTelemetryChart({
           {/* ── Quick Corner Zoom Bar & Navigation Controls ── */}
           <div className="bg-slate-900/90 rounded-xl p-2.5 border border-white/10 space-y-2 mb-2 shadow-lg">
             <div className="flex items-center justify-between flex-wrap gap-2">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 flex-wrap">
                 <span className="text-xs font-racing font-bold text-amber-400 flex items-center gap-1">
                   <span>⚡</span>
-                  <span>クイックズーム:</span>
+                  <span>ズーム:</span>
                 </span>
                 {selectedCornerName ? (
-                  <span className="text-xs font-mono font-bold text-amber-300 px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 flex items-center gap-1 shadow-sm">
+                  <span className="text-[11px] sm:text-xs font-mono font-bold text-amber-300 px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 flex items-center gap-1 shadow-sm">
                     <span>🎯</span>
-                    <span>{selectedCornerName} (±200m / {zoomRange?.start}% 〜 {zoomRange?.end}%)</span>
+                    <span>{selectedCornerName} ({zoomRange?.start}% 〜 {zoomRange?.end}%)</span>
                   </span>
                 ) : (
-                  <span className="text-xs text-slate-400 font-mono">ラップ全体 (0% 〜 100%)</span>
+                  <span className="text-[11px] sm:text-xs text-slate-400 font-mono">ラップ全体 (0% 〜 100%)</span>
                 )}
               </div>
 
               {/* Hover Operation Guide Badge & Reset */}
               <div className="flex items-center gap-2">
-                <div className="px-2.5 py-1 rounded-lg bg-sky-500/15 border border-sky-500/30 text-sky-300 text-[11px] font-mono font-semibold flex items-center gap-1.5 shadow-sm">
+                <div className="hidden md:flex px-2.5 py-1 rounded-lg bg-sky-500/15 border border-sky-500/30 text-sky-300 text-[11px] font-mono font-semibold items-center gap-1.5 shadow-sm">
                   <span className="animate-pulse">↔</span>
-                  <span>グラフ上をマウス移動でコース追従（Deltaゴースト）</span>
+                  <span>グラフ上を移動でコース追従（Deltaゴースト）</span>
                 </div>
                 {zoomRange && (
                   <button
                     onClick={handleResetZoom}
-                    className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-red-600/80 hover:bg-red-500 text-white transition-all shadow-md flex items-center gap-1 cursor-pointer"
+                    className="text-[11px] sm:text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-red-600/80 hover:bg-red-500 text-white transition-all shadow-md flex items-center gap-1 cursor-pointer"
                     title="ラップ全体表示にリセット"
                   >
                     <span>↺</span>

@@ -109,41 +109,42 @@ export default function DriverDetailModal({
     : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-black/80 backdrop-blur-md animate-fade-in">
       {/* Modal Card */}
       <div
         ref={modalContentRef}
-        className="glass-card bg-slate-950/95 border border-white/15 w-full max-w-4xl max-h-[92vh] flex flex-col rounded-3xl shadow-2xl overflow-hidden relative"
+        className="glass-card bg-slate-950/95 border border-white/15 w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden relative"
         style={{ borderTopColor: themeColor, borderTopWidth: 4 }}
       >
         {/* Top Navigation Bar: Prev / Next & Close */}
-        <div className="p-3 sm:px-6 bg-slate-900/90 border-b border-white/10 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
+        <div className="p-2.5 sm:px-6 bg-slate-900/90 border-b border-white/10 flex items-center justify-between gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
             <button
               onClick={() => prevDriver && onSelectDriver(prevDriver)}
-              className="px-2.5 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1.5 transition-all"
+              className="px-2 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer"
               title="前の選手 (←キー)"
             >
               <span>◀</span>
-              <span className="font-mono font-bold">{prevDriver?.code}</span>
+              <span className="font-mono font-bold truncate">{prevDriver?.code}</span>
             </button>
             <button
               onClick={() => nextDriver && onSelectDriver(nextDriver)}
-              className="px-2.5 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1.5 transition-all"
+              className="px-2 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer"
               title="次の選手 (→キー)"
             >
-              <span className="font-mono font-bold">{nextDriver?.code}</span>
+              <span className="font-mono font-bold truncate">{nextDriver?.code}</span>
               <span>▶</span>
             </button>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <span className="text-[10px] text-slate-500 font-mono hidden md:inline">
               キーボード [←] [→] で選手切り替え / [ESC] で閉じる
             </span>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm font-bold transition-all hover:scale-105"
+              className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
+              title="閉じる (ESC)"
             >
               ✕
             </button>

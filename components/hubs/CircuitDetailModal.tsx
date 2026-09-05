@@ -131,41 +131,41 @@ export default function CircuitDetailModal({
   const atmosphereCaption: string = (atmosphereAsset && 'caption' in atmosphereAsset && typeof atmosphereAsset.caption === 'string') ? atmosphereAsset.caption : circuit.name;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-black/80 backdrop-blur-md animate-fade-in">
       {/* Modal Card */}
       <div
         ref={modalContentRef}
-        className="glass-card bg-slate-950/95 border border-white/15 w-full max-w-5xl max-h-[92vh] flex flex-col rounded-3xl shadow-2xl overflow-hidden relative"
+        className="glass-card bg-slate-950/95 border border-white/15 w-full max-w-5xl max-h-[92vh] flex flex-col rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden relative"
         style={{ borderTopColor: '#38bdf8', borderTopWidth: 4 }}
       >
         {/* Top Navigation Bar: Prev / Next & Close */}
-        <div className="p-3 sm:px-6 bg-slate-900/90 border-b border-white/10 flex items-center justify-between gap-3 flex-shrink-0">
-          <div className="flex items-center gap-2">
+        <div className="p-2.5 sm:px-6 bg-slate-900/90 border-b border-white/10 flex items-center justify-between gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
             <button
               onClick={() => prevCircuit && onSelectCircuit(prevCircuit)}
-              className="px-2.5 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1.5 transition-all"
+              className="px-2 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer max-w-[130px] sm:max-w-none"
               title="前のサーキット (←キー)"
             >
               <span>◀</span>
-              <span className="font-mono font-bold">{prevCircuit?.name}</span>
+              <span className="font-mono font-bold truncate">{prevCircuit?.name}</span>
             </button>
             <button
               onClick={() => nextCircuit && onSelectCircuit(nextCircuit)}
-              className="px-2.5 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1.5 transition-all"
+              className="px-2 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer max-w-[130px] sm:max-w-none"
               title="次のサーキット (→キー)"
             >
-              <span className="font-mono font-bold">{nextCircuit?.name}</span>
+              <span className="font-mono font-bold truncate">{nextCircuit?.name}</span>
               <span>▶</span>
             </button>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
             <span className="text-[10px] text-slate-500 font-mono hidden md:inline">
               キーボード [←] [→] でサーキット切り替え / [ESC] で閉じる
             </span>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all text-sm font-bold"
+              className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-all text-sm font-bold cursor-pointer"
               title="閉じる (ESC)"
             >
               ✕

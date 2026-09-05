@@ -39,12 +39,12 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setDropdownOpen((v) => !v)}
-          className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-amber-500/30 text-white transition-all shadow-md cursor-pointer group"
+          className="flex items-center gap-1.5 p-1 pl-1.5 pr-2 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-amber-500/30 text-white transition-all shadow-md cursor-pointer group flex-shrink-0"
           title="アカウント設定 & メンバー情報"
         >
           {/* User Avatar */}
           {user.image ? (
-            <div className="w-6 h-6 rounded-lg overflow-hidden border border-amber-400/50 flex-shrink-0">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg overflow-hidden border border-amber-400/50 flex-shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={user.image}
@@ -53,14 +53,14 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
               />
             </div>
           ) : (
-            <div className="w-6 h-6 rounded-lg bg-amber-500 text-slate-950 font-racing font-bold text-xs flex items-center justify-center flex-shrink-0">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-amber-500 text-slate-950 font-racing font-bold text-xs flex items-center justify-center flex-shrink-0">
               {initial}
             </div>
           )}
 
           {/* User Name & Pro Badge */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs font-racing font-bold max-w-[90px] sm:max-w-[120px] truncate">
+          <div className="flex items-center gap-1">
+            <span className="text-[11px] sm:text-xs font-racing font-bold max-w-[65px] sm:max-w-[120px] truncate hidden xs:inline">
               {user.name || 'Pro User'}
             </span>
             <span className="px-1.5 py-0.2 rounded text-[9px] font-racing font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm">
@@ -68,7 +68,7 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
             </span>
           </div>
 
-          <span className="text-[10px] text-slate-400 group-hover:text-white transition-colors">
+          <span className="text-[9px] text-slate-400 group-hover:text-white transition-colors">
             ▼
           </span>
         </button>
@@ -108,7 +108,7 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
   return (
     <button
       onClick={onOpenAuthModal}
-      className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500/20 to-blue-600/20 hover:from-sky-500/30 hover:to-blue-600/30 text-sky-300 hover:text-white border border-sky-500/40 text-xs font-racing font-bold transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+      className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500/20 to-blue-600/20 hover:from-sky-500/30 hover:to-blue-600/30 text-sky-300 hover:text-white border border-sky-500/40 text-[11px] sm:text-xs font-racing font-bold transition-all shadow-md flex items-center gap-1 sm:gap-1.5 cursor-pointer flex-shrink-0"
     >
       <span>🔑</span>
       <span className="hidden sm:inline">ログイン / サインアップ</span>
