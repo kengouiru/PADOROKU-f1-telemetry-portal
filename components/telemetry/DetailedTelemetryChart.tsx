@@ -132,6 +132,23 @@ export default function DetailedTelemetryChart({
     ? [zoomRange.start, zoomRange.end]
     : [0, 100];
 
+  // Sliced telemetry data points for active zoom window (stretches cleanly across full chart width)
+  const displayPoints = useMemo(() => {
+    if (!zoomRange) return points;
+    let safeStart = 0;
+    let safeEnd = points.length - 1;
+    for (let i = 0; i < points.length; i++) {
+      if (points[i].distPercent < zoomRange.start) {
+        safeStart = i;
+      }
+      if (points[i].distPercent <= zoomRange.end) {
+        safeEnd = Math.min(points.length - 1, i + 1);
+      }
+    }
+    const sliced = points.slice(safeStart, safeEnd + 1);
+    return sliced.length >= 2 ? sliced : points;
+  }, [points, zoomRange]);
+
   // Calculate Zoom Section Insight Metrics
   const zoomMetrics = useMemo(() => {
     if (!zoomRange) return null;
@@ -599,7 +616,7 @@ export default function DetailedTelemetryChart({
             <div className="h-44 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
-                  data={points}
+                  data={displayPoints}
                   syncId="f1-telemetry-car-data"
                   margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
                   onMouseMove={handleChartMouseMove}
@@ -611,6 +628,7 @@ export default function DetailedTelemetryChart({
                     hide
                     domain={currentDomain}
                     type="number"
+                    allowDataOverflow={true}
                   />
                   <YAxis
                     domain={[40, 360]}
@@ -624,21 +642,27 @@ export default function DetailedTelemetryChart({
                   />
 
                   {/* Corner Markers */}
-                  {cornerMarkers.map((marker, idx) => (
-                    <ReferenceLine
-                      key={idx}
-                      x={marker.distPercent}
-                      stroke="#475569"
-                      strokeDasharray="2 2"
-                      label={{
-                        value: marker.cornerName,
-                        position: 'insideTop',
-                        fill: '#94a3b8',
-                        fontSize: 9,
-                        fontWeight: 'bold',
-                      }}
-                    />
-                  ))}
+                  {cornerMarkers
+                    .filter(
+                      (marker) =>
+                        !zoomRange ||
+                        (marker.distPercent >= zoomRange.start && marker.distPercent <= zoomRange.end)
+                    )
+                    .map((marker, idx) => (
+                      <ReferenceLine
+                        key={idx}
+                        x={marker.distPercent}
+                        stroke="#475569"
+                        strokeDasharray="2 2"
+                        label={{
+                          value: marker.cornerName,
+                          position: 'insideTop',
+                          fill: '#94a3b8',
+                          fontSize: 9,
+                          fontWeight: 'bold',
+                        }}
+                      />
+                    ))}
 
                   {/* Active Section Apex Speed Reference Marker */}
                   {zoomMetrics && (
@@ -696,7 +720,7 @@ export default function DetailedTelemetryChart({
             <div className="h-32 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
-                  data={points}
+                  data={displayPoints}
                   syncId="f1-telemetry-car-data"
                   margin={{ top: 5, right: 10, left: -15, bottom: 0 }}
                   onMouseMove={handleChartMouseMove}
@@ -708,6 +732,7 @@ export default function DetailedTelemetryChart({
                     hide
                     domain={currentDomain}
                     type="number"
+                    allowDataOverflow={true}
                   />
                   <YAxis domain={[0, 105]} stroke="#94a3b8" fontSize={10} tickCount={3} />
                   <Tooltip
@@ -773,7 +798,7 @@ export default function DetailedTelemetryChart({
             <div className="h-32 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
-                  data={points}
+                  data={displayPoints}
                   syncId="f1-telemetry-car-data"
                   margin={{ top: 5, right: 10, left: -15, bottom: 20 }}
                   onMouseMove={handleChartMouseMove}
@@ -787,6 +812,8 @@ export default function DetailedTelemetryChart({
                     fontSize={10}
                     domain={currentDomain}
                     type="number"
+                    allowDataOverflow={true}
+                    tickFormatter={(val) => `${Math.round(val)}%`}
                   />
                   {/* Left Axis: Gear */}
                   <YAxis
