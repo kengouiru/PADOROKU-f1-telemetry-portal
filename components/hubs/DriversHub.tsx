@@ -159,13 +159,25 @@ export default function DriversHub({
             ) : null}
           </div>
 
-          {/* Driver Name & Team */}
-          <div>
-            <h3 className="text-base font-bold text-white leading-tight group-hover:text-sky-300 transition-colors flex items-center gap-1.5">
-              <span>{driver.fullName}</span>
-              {driver.status === 'Legend' && <span className="text-amber-400 text-xs">👑</span>}
-            </h3>
-            <p className="text-xs text-slate-400 mt-0.5">{driver.team}</p>
+          {/* Driver Name, Team & Portrait Photo */}
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0 flex-1">
+              <h3 className="text-base font-bold text-white leading-tight group-hover:text-sky-300 transition-colors flex items-center gap-1.5">
+                <span className="truncate">{driver.fullName}</span>
+                {driver.status === 'Legend' && <span className="text-amber-400 text-xs">👑</span>}
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5 truncate">{driver.team}</p>
+            </div>
+            {driver.visualAsset?.imageUrl && (
+              <div className="w-12 h-12 rounded-xl overflow-hidden border border-white/10 shrink-0 bg-slate-800 shadow-md group-hover:border-sky-400/50 transition-colors">
+                <img
+                  src={driver.visualAsset.imageUrl}
+                  alt={driver.fullName}
+                  className="w-full h-full object-cover object-top"
+                  loading="lazy"
+                />
+              </div>
+            )}
           </div>
 
           {/* Driver Type Tag */}
