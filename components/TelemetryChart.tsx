@@ -14,7 +14,7 @@
  *  - Quick radio lap jump pills
  */
 
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useRef, useState, useCallback } from 'react';
 import {
   Chart as ChartJS,
   LinearScale,
@@ -414,7 +414,7 @@ export default function TelemetryChart({
 
   // ── Open Radio Context in Inline Panel ────────────────────────────────────
 
-  const selectRadioContext = (driverNum: string, lapNumber: number) => {
+  const selectRadioContext = useCallback((driverNum: string, lapNumber: number) => {
     onLapClick?.(driverNum, lapNumber);
 
     const radiosOnLap = (mappedRadios[driverNum] ?? []).filter(
@@ -440,7 +440,7 @@ export default function TelemetryChart({
         radios: radiosOnLap,
       });
     }
-  };
+  }, [drivers, lapsCache, mappedRadios, onLapClick, stints]);
 
   // ── Dynamic Chart Options based on Mode ───────────────────────────────────
 
@@ -572,7 +572,7 @@ export default function TelemetryChart({
         },
       },
     };
-  }, [chartMode, currentDatasets, mappedRadios]);
+  }, [chartMode, currentDatasets, mappedRadios, selectRadioContext]);
 
   // ── Empty state ───────────────────────────────────────────────────────────
 
@@ -938,7 +938,7 @@ function InlineRadioItem({
 
         {transcript && (
           <div className="space-y-0.5">
-            <p className="text-white font-medium italic">"{transcript}"</p>
+            <p className="text-white font-medium italic">&ldquo;{transcript}&rdquo;</p>
             {translation && <p className="text-slate-300 text-[11px]">🗣 {translation}</p>}
           </div>
         )}

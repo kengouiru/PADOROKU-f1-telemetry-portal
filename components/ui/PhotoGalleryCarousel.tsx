@@ -36,12 +36,9 @@ export default function PhotoGalleryCarousel({
   const [errorImages, setErrorImages] = useState<{ [key: number]: boolean }>({});
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // If no items, do not render
-  if (!items || items.length === 0) return null;
-
   // Track active slide on scroll
   const handleScroll = useCallback(() => {
-    if (!scrollContainerRef.current) return;
+    if (!scrollContainerRef.current || !items) return;
     const container = scrollContainerRef.current;
     const scrollLeft = container.scrollLeft;
     const slideWidth = container.firstElementChild
@@ -51,7 +48,7 @@ export default function PhotoGalleryCarousel({
     if (newIndex >= 0 && newIndex < items.length && newIndex !== activeIndex) {
       setActiveIndex(newIndex);
     }
-  }, [items.length, activeIndex]);
+  }, [items, activeIndex]);
 
   // Scroll by direction
   const scrollToSlide = (index: number) => {
@@ -70,9 +67,12 @@ export default function PhotoGalleryCarousel({
   };
 
   const handleNext = () => {
-    const next = Math.min(items.length - 1, activeIndex + 1);
+    const next = Math.min((items?.length || 1) - 1, activeIndex + 1);
     scrollToSlide(next);
   };
+
+  // If no items, do not render
+  if (!items || items.length === 0) return null;
 
   return (
     <div className={`space-y-2.5 ${className}`}>
@@ -165,6 +165,8 @@ export default function PhotoGalleryCarousel({
                   <img
                     src={finalImageUrl}
                     alt={item.caption}
+                    loading="lazy"
+                    decoding="async"
                     referrerPolicy="no-referrer"
                     onLoad={() => setLoadedImages((prev) => ({ ...prev, [idx]: true }))}
                     onError={() => setErrorImages((prev) => ({ ...prev, [idx]: true }))}

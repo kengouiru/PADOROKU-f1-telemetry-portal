@@ -497,7 +497,7 @@ function TimelineCard({ event, driverColor, transcript, isLoadingTranscript, onF
         {/* Transcript & Translation */}
         {finalTranscript ? (
           <div className="space-y-1">
-            <p className="text-white font-medium italic text-xs leading-relaxed">"{finalTranscript}"</p>
+            <p className="text-white font-medium italic text-xs leading-relaxed">&ldquo;{finalTranscript}&rdquo;</p>
             {finalTranslation && (
               <p className="text-slate-300 text-xs leading-relaxed">🗣 {finalTranslation}</p>
             )}

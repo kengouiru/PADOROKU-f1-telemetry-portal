@@ -182,6 +182,8 @@ export default function DriverDetailModal({
                   <img
                     src={proxiedImageUrl}
                     alt={driver.fullName}
+                    loading="lazy"
+                    decoding="async"
                     referrerPolicy="no-referrer"
                     onLoad={() => setImgLoaded(true)}
                     onError={() => setImgError(true)}

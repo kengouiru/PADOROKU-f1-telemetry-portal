@@ -6,6 +6,8 @@ import { NextRequest, NextResponse } from 'next/server';
  * Resolves browser CORS restrictions and Referrer header blocks by fetching images server-side.
  */
 
+export const dynamic = 'force-dynamic';
+
 const ALLOWED_HOSTS = [
   'upload.wikimedia.org',
   'commons.wikimedia.org',

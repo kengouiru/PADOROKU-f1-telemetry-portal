@@ -6,6 +6,8 @@ import { NextRequest, NextResponse } from 'next/server';
  * Resolves browser CORS restrictions and Referrer header blocks by fetching audio server-side.
  */
 
+export const dynamic = 'force-dynamic';
+
 // Allowed audio hostnames to prevent open proxy vulnerability
 const ALLOWED_HOSTS = [
   'livetiming.formula1.com',

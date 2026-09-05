@@ -175,6 +175,7 @@ export default function DriversHub({
                   alt={driver.fullName}
                   className="w-full h-full object-cover object-top"
                   loading="lazy"
+                  decoding="async"
                 />
               </div>
             )}

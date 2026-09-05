@@ -393,6 +393,8 @@ export default function CircuitDetailModal({
                       <img
                         src={proxiedAtmosphereUrl}
                         alt={`${circuit.name} Atmosphere`}
+                        loading="lazy"
+                        decoding="async"
                         referrerPolicy="no-referrer"
                         onLoad={() => setAtmosphereLoaded(true)}
                         onError={() => setAtmosphereError(true)}
@@ -727,6 +729,8 @@ export default function CircuitDetailModal({
                                     : `/api/image-proxy?url=${encodeURIComponent(moment.momentImage.imageUrl)}`
                                 }
                                 alt={moment.momentImage.caption || moment.title}
+                                loading="lazy"
+                                decoding="async"
                                 referrerPolicy="no-referrer"
                                 className="w-full h-full object-cover"
                               />

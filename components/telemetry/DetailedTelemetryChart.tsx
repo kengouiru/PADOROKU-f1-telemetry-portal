@@ -225,10 +225,11 @@ export default function DetailedTelemetryChart({
   }, [hoverDistPercent, points]);
 
   // Chart hover mouse movement handler
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleChartMouseMove = (state: any) => {
-    if (state && state.activePayload && state.activePayload.length > 0) {
-      const payload = state.activePayload[0].payload as NormalizedTelemetryPoint;
+  const handleChartMouseMove = (state: Parameters<NonNullable<React.ComponentProps<typeof LineChart>['onMouseMove']>>[0]) => {
+    if (!state) return;
+    const s = state as { activePayload?: Array<{ payload?: NormalizedTelemetryPoint }> };
+    if (s.activePayload && s.activePayload.length > 0) {
+      const payload = s.activePayload[0]?.payload;
       if (payload && typeof payload.distPercent === 'number') {
         setHoverDistPercent(payload.distPercent);
       }
