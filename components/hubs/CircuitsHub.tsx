@@ -3,7 +3,7 @@
 /**
  * components/hubs/CircuitsHub.tsx
  * Circuits Hub with Region & Characteristics Quick Filter Pills,
- * Search Filter, Result Counter, Reset Action, and Detail Modal.
+ * Integrated Free-word Search, Live Result Counter, Condition Reset, and Detail Modal.
  */
 
 import React, { useState, useMemo } from 'react';
@@ -143,7 +143,11 @@ export default function CircuitsHub({
 }: CircuitsHubProps) {
   const [regionFilter, setRegionFilter] = useState<CircuitRegion>('ALL');
   const [characteristicFilter, setCharacteristicFilter] = useState<CircuitCharacteristic>('ALL');
+  const [localSearch, setLocalSearch] = useState<string>('');
   const [selectedCircuitDetail, setSelectedCircuitDetail] = useState<CircuitProfile | null>(null);
+
+  // Sync effective search between prop and local state
+  const effectiveSearch = searchQuery || localSearch;
 
   const filteredCircuits = useMemo(() => {
     return KNOWLEDGE_CIRCUITS.filter((c) => {
@@ -158,9 +162,9 @@ export default function CircuitsHub({
           return false;
         }
       }
-      // Search filter
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
+      // Free word search filter (AND logic: Name, Country, Official Name, Characteristics)
+      if (effectiveSearch.trim()) {
+        const q = effectiveSearch.toLowerCase().trim();
         const matches =
           c.name.toLowerCase().includes(q) ||
           c.country.toLowerCase().includes(q) ||
@@ -170,16 +174,32 @@ export default function CircuitsHub({
       }
       return true;
     });
-  }, [regionFilter, characteristicFilter, searchQuery]);
+  }, [regionFilter, characteristicFilter, effectiveSearch]);
 
   const isFiltered =
     regionFilter !== 'ALL' ||
     characteristicFilter !== 'ALL' ||
-    searchQuery.trim() !== '';
+    effectiveSearch.trim() !== '';
 
   const handleResetFilters = () => {
     setRegionFilter('ALL');
     setCharacteristicFilter('ALL');
+    setLocalSearch('');
+    if (onClearSearch) {
+      onClearSearch();
+    }
+  };
+
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setLocalSearch(val);
+    if (onSearchChange) {
+      onSearchChange(val);
+    }
+  };
+
+  const handleClearLocalSearch = () => {
+    setLocalSearch('');
     if (onClearSearch) {
       onClearSearch();
     }
@@ -187,9 +207,9 @@ export default function CircuitsHub({
 
   return (
     <div className="flex flex-col gap-4 animate-fade-in">
-      {/* ── Filter Bar Section ── */}
+      {/* ── Quick Filter Bar Section ── */}
       <div className="bg-slate-950/70 border border-white/10 rounded-2xl p-4 shadow-lg flex flex-col gap-3.5">
-        {/* Top Controls: Region Pills & Summary Badge */}
+        {/* Row 1: Region Pills, Counter Badge & Reset Button */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/5 pb-3">
           {/* Region Pills */}
           <div className="flex flex-wrap items-center gap-1.5">
@@ -203,7 +223,7 @@ export default function CircuitsHub({
                 <button
                   key={opt.key}
                   onClick={() => setRegionFilter(opt.key)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 border shadow-sm ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 border shadow-sm cursor-pointer ${
                     active
                       ? 'bg-blue-600 text-white border-blue-400 shadow-blue-500/20'
                       : 'bg-slate-900/80 text-slate-400 border-white/5 hover:border-white/20 hover:text-white hover:bg-slate-800'
@@ -216,10 +236,10 @@ export default function CircuitsHub({
             })}
           </div>
 
-          {/* Result Count & Reset Button */}
+          {/* Result Counter & Condition Reset */}
           <div className="flex items-center gap-2 self-end md:self-auto flex-shrink-0">
             <span className="text-xs font-mono font-bold bg-slate-900 px-3 py-1.5 rounded-xl border border-white/10 text-sky-400">
-              該当件数:{' '}
+              表示中:{' '}
               <strong className="text-white text-sm">
                 {filteredCircuits.length}
               </strong>{' '}
@@ -229,22 +249,23 @@ export default function CircuitsHub({
             {isFiltered && (
               <button
                 onClick={handleResetFilters}
-                className="text-xs font-mono font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 px-3 py-1.5 rounded-xl transition-all flex items-center gap-1 shadow-sm active:scale-95"
-                title="すべての絞り込みを解除"
+                className="text-xs font-mono font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 px-3 py-1.5 rounded-xl transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
+                title="すべての絞り込み条件をリセット"
               >
                 <span>✕</span>
-                <span>リセット</span>
+                <span>条件リセット</span>
               </button>
             )}
           </div>
         </div>
 
-        {/* Bottom Controls: Characteristic Pills & Active Filters */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        {/* Row 2: Characteristic Pills & Inline Free-Word Search Bar */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          {/* Characteristic Pills */}
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1">
               <span>🏎️</span>
-              <span>特性:</span>
+              <span>コース特性:</span>
             </span>
             {CHARACTERISTIC_OPTIONS.map((opt) => {
               const active = characteristicFilter === opt.key;
@@ -252,7 +273,7 @@ export default function CircuitsHub({
                 <button
                   key={opt.key}
                   onClick={() => setCharacteristicFilter(opt.key)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 border shadow-sm ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 border shadow-sm cursor-pointer ${
                     active
                       ? 'bg-purple-600 text-white border-purple-400 shadow-purple-500/20'
                       : 'bg-slate-900/80 text-slate-400 border-white/5 hover:border-white/20 hover:text-white hover:bg-slate-800'
@@ -265,17 +286,26 @@ export default function CircuitsHub({
             })}
           </div>
 
-          {/* Quick Active Filter Indicator */}
-          <div className="text-[11px] font-mono text-slate-500 hidden lg:block">
-            {regionFilter !== 'ALL' && (
-              <span className="mr-2 text-sky-300">
-                地域: {REGION_OPTIONS.find((r) => r.key === regionFilter)?.label}
-              </span>
-            )}
-            {characteristicFilter !== 'ALL' && (
-              <span className="text-purple-300">
-                特性: {CHARACTERISTIC_OPTIONS.find((c) => c.key === characteristicFilter)?.label}
-              </span>
+          {/* Inline Free-word Search Input */}
+          <div className="relative w-full lg:w-72">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 text-xs">
+              🔍
+            </span>
+            <input
+              type="text"
+              placeholder="コース名・国名で検索..."
+              value={effectiveSearch}
+              onChange={handleSearchInputChange}
+              className="w-full bg-slate-900/90 border border-white/10 rounded-xl pl-8 pr-7 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
+            />
+            {effectiveSearch && (
+              <button
+                onClick={handleClearLocalSearch}
+                className="absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-400 hover:text-white text-xs cursor-pointer"
+                title="検索条件をクリア"
+              >
+                ✕
+              </button>
             )}
           </div>
         </div>
@@ -293,7 +323,7 @@ export default function CircuitsHub({
           </p>
           <button
             onClick={handleResetFilters}
-            className="mt-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-racing font-bold transition-all shadow-md"
+            className="mt-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-racing font-bold transition-all shadow-md cursor-pointer"
           >
             フィルターをリセットする
           </button>
