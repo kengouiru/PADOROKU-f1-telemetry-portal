@@ -11,7 +11,8 @@
  * - Interactive hover scrubbing: hovering or clicking along the track scrubs telemetry charts!
  */
 
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
+import type { NormalizedTelemetryPoint } from '@/lib/carTelemetryService';
 
 export interface CornerPin {
   number: string;
@@ -3920,54 +3921,224 @@ function interpolateTrackCoords(waypoints: Array<{ pct: number; x: number; y: nu
 interface TelemetryTrackMapProps {
   circuitId: string;
   hoverDistPercent: number | null;
+  hoverTelemetryPoint?: NormalizedTelemetryPoint | null;
+  telemetryPoints?: NormalizedTelemetryPoint[];
+  circuitLengthM?: number;
   driver1: { code: string; color: string; name: string };
   driver2: { code: string; color: string; name: string };
   onSelectCorner?: (corner: { name: string; pct: number }) => void;
   activeCornerName?: string | null;
+  apexInsight?: {
+    cornerName: string;
+    apexPct: number;
+    apexSpeed1: number;
+    apexSpeed2: number;
+    apexSpeedDelta: number;
+    fasterDriverCode: string;
+  } | null;
   className?: string;
+}
+
+/**
+ * Color interpolation for brake pressure:
+ * 0% ~ 30%: Cyan/Teal (#06b6d4 -> #14b8a6) - initial bite / trail braking release
+ * 30% ~ 70%: Yellow/Amber (#eab308 -> #f97316) - medium pedal pressure
+ * 70% ~ 100%: Bright Red / Crimson (#ef4444 -> #dc2626) - threshold 100% full braking
+ */
+function getBrakeColor(val: number): string {
+  if (val <= 0) return '#06b6d4';
+  if (val < 30) {
+    const t = val / 30;
+    return t < 0.5 ? '#06b6d4' : '#14b8a6';
+  } else if (val < 70) {
+    const t = (val - 30) / 40;
+    return t < 0.5 ? '#eab308' : '#f97316';
+  } else {
+    const t = (val - 70) / 30;
+    return t < 0.5 ? '#ef4444' : '#dc2626';
+  }
 }
 
 export default function TelemetryTrackMap({
   circuitId,
   hoverDistPercent,
+  hoverTelemetryPoint,
+  telemetryPoints,
+  circuitLengthM = 5400,
   driver1,
   driver2,
   onSelectCorner,
   activeCornerName,
+  apexInsight,
   className = '',
 }: TelemetryTrackMapProps) {
+  // Brake heatmap display states
+  const [showBrakeHeatmap, setShowBrakeHeatmap] = useState<boolean>(true);
+  const [brakeDriverMode, setBrakeDriverMode] = useState<'MAX' | 'D1' | 'D2'>('MAX');
+
   // Resolve circuit data
   const trackData = useMemo(() => {
     return CIRCUIT_TRACK_MAPS[circuitId] || GENERIC_TRACK;
   }, [circuitId]);
 
-  // Interpolate car positions on track
+  // Interpolate car positions on track with delta-coupled physical ghost positioning
   const currentPct = hoverDistPercent !== null ? hoverDistPercent : 0;
-  const carPos = useMemo(() => {
-    return interpolateTrackCoords(trackData.waypoints, currentPct);
-  }, [trackData.waypoints, currentPct]);
 
-  // Slight offset for driver 2 so both markers are distinguishable when overlapping
-  const car1Pos = carPos;
-  const car2Pos = { x: carPos.x + 3.5, y: carPos.y - 3.5 };
+  const ghostData = useMemo(() => {
+    if (hoverDistPercent === null) return null;
+
+    if (!hoverTelemetryPoint) {
+      const basePos = interpolateTrackCoords(trackData.waypoints, currentPct);
+      return {
+        car1Pos: basePos,
+        car2Pos: { x: basePos.x + 3.5, y: basePos.y - 3.5 },
+        pct1: currentPct,
+        pct2: currentPct,
+        gapMeters: 0,
+        deltaSeconds: 0,
+        isD1Ahead: false,
+        isD2Ahead: false,
+      };
+    }
+
+    const { speed1, speed2, delta } = hoverTelemetryPoint;
+    // Delta > 0: Driver 1 is faster/ahead by delta seconds.
+    // Delta < 0: Driver 2 is faster/ahead by |delta| seconds.
+    const avgSpeed_ms = Math.max(15, ((speed1 + speed2) / 2) / 3.6);
+    const gapMeters = avgSpeed_ms * delta; // in meters (positive = D1 ahead)
+    const lengthM = circuitLengthM || 5400;
+    const gapPct = (gapMeters / lengthM) * 100;
+
+    // Distribute gap centered around current hovered progress
+    let pct1 = currentPct + gapPct / 2;
+    let pct2 = currentPct - gapPct / 2;
+    pct1 = Math.max(0, Math.min(100, pct1));
+    pct2 = Math.max(0, Math.min(100, pct2));
+
+    const pos1 = interpolateTrackCoords(trackData.waypoints, pct1);
+    const pos2 = interpolateTrackCoords(trackData.waypoints, pct2);
+
+    // If screen distance is very small (< 4px), add slight lateral offset so both dots are legible
+    const dx = pos2.x - pos1.x;
+    const dy = pos2.y - pos1.y;
+    const screenDist = Math.sqrt(dx * dx + dy * dy);
+    let finalPos2 = pos2;
+    if (screenDist < 4) {
+      finalPos2 = { x: pos2.x + 3.5, y: pos2.y - 3.5 };
+    }
+
+    return {
+      car1Pos: pos1,
+      car2Pos: finalPos2,
+      pct1,
+      pct2,
+      gapMeters,
+      deltaSeconds: delta,
+      isD1Ahead: delta > 0.005,
+      isD2Ahead: delta < -0.005,
+    };
+  }, [hoverDistPercent, hoverTelemetryPoint, currentPct, trackData.waypoints, circuitLengthM]);
+
+  // Compute Brake Heatmap segments along track
+  const brakeSegments = useMemo(() => {
+    if (!telemetryPoints || telemetryPoints.length === 0) return [];
+
+    const segments: Array<{
+      x1: number;
+      y1: number;
+      x2: number;
+      y2: number;
+      brakePct: number;
+      color: string;
+      strokeWidth: number;
+      cornerName?: string;
+    }> = [];
+
+    const numSteps = 150;
+    const step = 100 / numSteps;
+
+    for (let i = 0; i < numSteps; i++) {
+      const p1Pct = i * step;
+      const p2Pct = Math.min(100, (i + 1) * step);
+      const midPct = (p1Pct + p2Pct) / 2;
+
+      // Find closest telemetry point to midPct
+      let closestPt = telemetryPoints[0];
+      let minDiff = 999;
+      for (let j = 0; j < telemetryPoints.length; j++) {
+        const diff = Math.abs(telemetryPoints[j].distPercent - midPct);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestPt = telemetryPoints[j];
+        }
+      }
+
+      const brakeVal =
+        brakeDriverMode === 'D1'
+          ? closestPt.brake1
+          : brakeDriverMode === 'D2'
+          ? closestPt.brake2
+          : Math.max(closestPt.brake1, closestPt.brake2);
+
+      if (brakeVal > 2) {
+        const p1Coord = interpolateTrackCoords(trackData.waypoints, p1Pct);
+        const p2Coord = interpolateTrackCoords(trackData.waypoints, p2Pct);
+        const color = getBrakeColor(brakeVal);
+        const strokeWidth = 3.5 + (brakeVal / 100) * 5.5; // 3.5px ~ 9px
+
+        segments.push({
+          x1: p1Coord.x,
+          y1: p1Coord.y,
+          x2: p2Coord.x,
+          y2: p2Coord.y,
+          brakePct: brakeVal,
+          color,
+          strokeWidth,
+          cornerName: closestPt.cornerName,
+        });
+      }
+    }
+    return segments;
+  }, [telemetryPoints, brakeDriverMode, trackData.waypoints]);
+
+  // Interpolate Apex coordinates if insight is available
+  const apexCoords = useMemo(() => {
+    if (!apexInsight) return null;
+    return interpolateTrackCoords(trackData.waypoints, apexInsight.apexPct);
+  }, [apexInsight, trackData.waypoints]);
 
   return (
-    <div className={`relative bg-slate-950/90 rounded-2xl border border-white/10 p-3 sm:p-4 flex flex-col items-center justify-between ${className}`}>
+    <div className={`relative bg-slate-950/90 rounded-2xl border border-white/10 p-3 sm:p-4 flex flex-col items-center justify-between gap-2.5 ${className}`}>
       {/* Header bar */}
       <div className="w-full flex items-center justify-between gap-2 pb-2 border-b border-white/10 text-xs">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
-          <span className="font-racing font-bold text-white tracking-wide truncate max-w-[200px]">
+          <span className="font-racing font-bold text-white tracking-wide truncate max-w-[190px]">
             {trackData.name}
           </span>
         </div>
-        <div className="font-mono text-[11px] text-slate-400">
-          TRACK PROGRESS: <span className="text-sky-300 font-bold">{Math.round(currentPct)}%</span>
+        <div className="font-mono text-[11px] text-slate-400 flex items-center gap-2">
+          {ghostData && Math.abs(ghostData.deltaSeconds) > 0.005 ? (
+            <span
+              className={`px-1.5 py-0.5 rounded text-[10px] font-bold border ${
+                ghostData.isD1Ahead
+                  ? 'bg-blue-500/20 text-sky-300 border-blue-500/40'
+                  : 'bg-orange-500/20 text-orange-300 border-orange-500/40'
+              }`}
+            >
+              Δ {ghostData.isD1Ahead ? driver1.code : driver2.code} +
+              {Math.abs(ghostData.deltaSeconds).toFixed(3)}s ({Math.abs(ghostData.gapMeters).toFixed(1)}m)
+            </span>
+          ) : (
+            <span>
+              TRACK PROGRESS: <span className="text-sky-300 font-bold">{Math.round(currentPct)}%</span>
+            </span>
+          )}
         </div>
       </div>
 
       {/* SVG Canvas */}
-      <div className="relative w-full aspect-[4/3] max-w-[420px] my-2 flex items-center justify-center">
+      <div className="relative w-full aspect-[4/3] max-w-[420px] my-1 flex items-center justify-center">
         <svg
           viewBox="0 0 400 300"
           className="w-full h-full filter drop-shadow-[0_0_15px_rgba(14,165,233,0.15)]"
@@ -3979,6 +4150,9 @@ export default function TelemetryTrackMap({
             </filter>
             <filter id="glow-d2" x="-50%" y="-50%" width="200%" height="200%">
               <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor={driver2.color} />
+            </filter>
+            <filter id="glow-apex" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#f59e0b" />
             </filter>
             <linearGradient id="trackGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.8" />
@@ -4017,6 +4191,27 @@ export default function TelemetryTrackMap({
             strokeLinejoin="round"
             className="opacity-75"
           />
+
+          {/* ── Feature 2: Braking Zone Heatmap Ribbon ── */}
+          {showBrakeHeatmap && brakeSegments.length > 0 && (
+            <g className="filter drop-shadow-[0_0_6px_rgba(239,68,68,0.5)]">
+              {brakeSegments.map((seg, idx) => (
+                <line
+                  key={idx}
+                  x1={seg.x1}
+                  y1={seg.y1}
+                  x2={seg.x2}
+                  y2={seg.y2}
+                  stroke={seg.color}
+                  strokeWidth={seg.strokeWidth}
+                  strokeLinecap="round"
+                  opacity={0.92}
+                >
+                  <title>{`ブレーキング区間: 踏力 ${seg.brakePct}% ${seg.cornerName ? `(${seg.cornerName})` : ''}`}</title>
+                </line>
+              ))}
+            </g>
+          )}
 
           {/* Start/Finish Line */}
           <circle
@@ -4076,62 +4271,294 @@ export default function TelemetryTrackMap({
             );
           })}
 
-          {/* Synchronized Hover Pointers (Driver 1 & Driver 2) */}
-          {hoverDistPercent !== null && (
-            <>
-              {/* Driver 1 Pulse Marker */}
+          {/* ── Feature 3: Apex Speed Insight Reticle & Floating Badge ── */}
+          {apexCoords && apexInsight && (
+            <g className="pointer-events-none animate-fade-in" filter="url(#glow-apex)">
+              {/* Outer pulsing ring */}
               <circle
-                cx={car1Pos.x}
-                cy={car1Pos.y}
-                r="7"
-                fill={driver1.color}
-                filter="url(#glow-d1)"
-                className="animate-pulse"
+                cx={apexCoords.x}
+                cy={apexCoords.y}
+                r="13"
+                fill="none"
+                stroke="#f59e0b"
+                strokeWidth="1.5"
+                strokeDasharray="3 3"
+                opacity="0.85"
               />
-              <circle
-                cx={car1Pos.x}
-                cy={car1Pos.y}
-                r="3.5"
-                fill="#ffffff"
+              {/* Crosshair lines */}
+              <line
+                x1={apexCoords.x - 17}
+                y1={apexCoords.y}
+                x2={apexCoords.x + 17}
+                y2={apexCoords.y}
+                stroke="#f59e0b"
+                strokeWidth="1"
+                strokeDasharray="2 2"
+                opacity="0.75"
+              />
+              <line
+                x1={apexCoords.x}
+                y1={apexCoords.y - 17}
+                x2={apexCoords.x}
+                y2={apexCoords.y + 17}
+                stroke="#f59e0b"
+                strokeWidth="1"
+                strokeDasharray="2 2"
+                opacity="0.75"
+              />
+              {/* Center Apex Diamond */}
+              <polygon
+                points={`${apexCoords.x},${apexCoords.y - 4.5} ${apexCoords.x + 4.5},${apexCoords.y} ${apexCoords.x},${apexCoords.y + 4.5} ${apexCoords.x - 4.5},${apexCoords.y}`}
+                fill="#f59e0b"
               />
 
+              {/* Floating Apex Speed Badge */}
+              <g transform={`translate(${apexCoords.x}, ${apexCoords.y - 20})`}>
+                <rect
+                  x="-72"
+                  y="-9"
+                  width="144"
+                  height="18"
+                  rx="5"
+                  fill="#020617"
+                  stroke="#f59e0b"
+                  strokeWidth="1.2"
+                  opacity="0.95"
+                  className="filter drop-shadow-[0_2px_8px_rgba(245,158,11,0.5)]"
+                />
+                <text
+                  x="0"
+                  y="3.5"
+                  textAnchor="middle"
+                  fontSize="7.5"
+                  fontFamily="monospace"
+                  fontWeight="bold"
+                  fill="#ffffff"
+                >
+                  🎯 APEX: {driver1.code} {apexInsight.apexSpeed1} vs {driver2.code} {apexInsight.apexSpeed2} km/h
+                </text>
+              </g>
+            </g>
+          )}
+
+          {/* ── Feature 1: Delta-Coupled Ghost Car Synchronized Pointers ── */}
+          {ghostData && (
+            <g>
+              {/* Delta Tether Line between Driver 1 and Driver 2 if physically separated */}
+              {Math.abs(ghostData.gapMeters) >= 1.5 && (
+                <>
+                  <line
+                    x1={ghostData.car1Pos.x}
+                    y1={ghostData.car1Pos.y}
+                    x2={ghostData.car2Pos.x}
+                    y2={ghostData.car2Pos.y}
+                    stroke="#94a3b8"
+                    strokeWidth="1.5"
+                    strokeDasharray="2 2"
+                    opacity="0.85"
+                  />
+                  {/* Floating Delta Badge */}
+                  <g
+                    transform={`translate(${(ghostData.car1Pos.x + ghostData.car2Pos.x) / 2}, ${
+                      (ghostData.car1Pos.y + ghostData.car2Pos.y) / 2 - 12
+                    })`}
+                  >
+                    <rect
+                      x="-26"
+                      y="-7"
+                      width="52"
+                      height="14"
+                      rx="4"
+                      fill="#020617"
+                      stroke={ghostData.deltaSeconds >= 0 ? driver1.color : driver2.color}
+                      strokeWidth="1"
+                      className="filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                    />
+                    <text
+                      x="0"
+                      y="3.5"
+                      textAnchor="middle"
+                      fontSize="7.5"
+                      fontFamily="monospace"
+                      fontWeight="bold"
+                      fill={ghostData.deltaSeconds >= 0 ? driver1.color : driver2.color}
+                    >
+                      {ghostData.deltaSeconds >= 0
+                        ? `+${ghostData.deltaSeconds.toFixed(2)}s`
+                        : `${ghostData.deltaSeconds.toFixed(2)}s`}
+                    </text>
+                  </g>
+                </>
+              )}
+
+              {/* Driver 1 Pulse Marker */}
+              <g className="cursor-pointer">
+                <circle
+                  cx={ghostData.car1Pos.x}
+                  cy={ghostData.car1Pos.y}
+                  r={ghostData.isD1Ahead ? '8' : '6.5'}
+                  fill={driver1.color}
+                  filter="url(#glow-d1)"
+                  className="animate-pulse"
+                />
+                <circle
+                  cx={ghostData.car1Pos.x}
+                  cy={ghostData.car1Pos.y}
+                  r="3.5"
+                  fill="#ffffff"
+                />
+                {/* Ghost ring if Driver 1 is trailing */}
+                {ghostData.isD2Ahead && (
+                  <circle
+                    cx={ghostData.car1Pos.x}
+                    cy={ghostData.car1Pos.y}
+                    r="10"
+                    fill="none"
+                    stroke={driver1.color}
+                    strokeWidth="1.2"
+                    strokeDasharray="2 2"
+                    opacity="0.75"
+                  />
+                )}
+                <title>{`${driver1.name} (${driver1.code}): ${hoverTelemetryPoint?.speed1 ?? 0} km/h`}</title>
+              </g>
+
               {/* Driver 2 Pulse Marker */}
-              <circle
-                cx={car2Pos.x}
-                cy={car2Pos.y}
-                r="7"
-                fill={driver2.color}
-                filter="url(#glow-d2)"
-                className="animate-pulse"
-              />
-              <circle
-                cx={car2Pos.x}
-                cy={car2Pos.y}
-                r="3.5"
-                fill="#ffffff"
-              />
-            </>
+              <g className="cursor-pointer">
+                <circle
+                  cx={ghostData.car2Pos.x}
+                  cy={ghostData.car2Pos.y}
+                  r={ghostData.isD2Ahead ? '8' : '6.5'}
+                  fill={driver2.color}
+                  filter="url(#glow-d2)"
+                  className="animate-pulse"
+                />
+                <circle
+                  cx={ghostData.car2Pos.x}
+                  cy={ghostData.car2Pos.y}
+                  r="3.5"
+                  fill="#ffffff"
+                />
+                {/* Ghost ring if Driver 2 is trailing */}
+                {ghostData.isD1Ahead && (
+                  <circle
+                    cx={ghostData.car2Pos.x}
+                    cy={ghostData.car2Pos.y}
+                    r="10"
+                    fill="none"
+                    stroke={driver2.color}
+                    strokeWidth="1.2"
+                    strokeDasharray="2 2"
+                    opacity="0.75"
+                  />
+                )}
+                <title>{`${driver2.name} (${driver2.code}): ${hoverTelemetryPoint?.speed2 ?? 0} km/h`}</title>
+              </g>
+            </g>
           )}
         </svg>
 
         {/* Legend Overlay at corner */}
-        <div className="absolute bottom-1 left-2 bg-slate-900/80 backdrop-blur-md rounded-lg p-1.5 border border-white/10 flex items-center gap-2.5 text-[10px] font-mono">
+        <div className="absolute bottom-1 left-2 bg-slate-900/85 backdrop-blur-md rounded-lg p-1.5 border border-white/10 flex items-center gap-2.5 text-[10px] font-mono shadow-md">
           <div className="flex items-center gap-1">
             <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: driver1.color }} />
             <span className="text-white font-bold">{driver1.code}</span>
+            {hoverTelemetryPoint && (
+              <span className="text-slate-400 text-[9px]">{hoverTelemetryPoint.speed1}k</span>
+            )}
           </div>
           <div className="flex items-center gap-1">
             <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: driver2.color }} />
             <span className="text-white font-bold">{driver2.code}</span>
+            {hoverTelemetryPoint && (
+              <span className="text-slate-400 text-[9px]">{hoverTelemetryPoint.speed2}k</span>
+            )}
           </div>
+          {ghostData && (
+            <span className="text-[9px] px-1 py-0.2 rounded bg-slate-800 text-sky-300 border border-white/5">
+              👻 Ghost連動
+            </span>
+          )}
         </div>
       </div>
 
+      {/* ── Feature 2: Braking Heatmap Toggle & Driver Selector Bar ── */}
+      <div className="w-full flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/10 text-xs">
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => setShowBrakeHeatmap(!showBrakeHeatmap)}
+            className={`px-2 py-1 rounded-lg text-[10px] font-mono font-bold transition-all flex items-center gap-1 cursor-pointer ${
+              showBrakeHeatmap
+                ? 'bg-red-500/20 text-red-300 border border-red-500/40 shadow-sm'
+                : 'bg-slate-900 text-slate-400 hover:text-white border border-white/5'
+            }`}
+            title="ブレーキ踏力ヒートマップの表示/非表示を切り替え"
+          >
+            <span>🔥</span>
+            <span>ブレーキ熱帯: {showBrakeHeatmap ? 'ON' : 'OFF'}</span>
+          </button>
+
+          {showBrakeHeatmap && (
+            <div className="flex items-center gap-1 bg-slate-900/90 p-0.5 rounded-lg border border-white/5 text-[9px] font-mono">
+              <button
+                onClick={() => setBrakeDriverMode('MAX')}
+                className={`px-1.5 py-0.5 rounded transition-all cursor-pointer ${
+                  brakeDriverMode === 'MAX'
+                    ? 'bg-red-600 text-white font-bold'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+                title="両ドライバーの最大踏力を合成表示"
+              >
+                MAX
+              </button>
+              <button
+                onClick={() => setBrakeDriverMode('D1')}
+                className={`px-1.5 py-0.5 rounded transition-all cursor-pointer ${
+                  brakeDriverMode === 'D1'
+                    ? 'bg-sky-600 text-white font-bold'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+                style={{ color: brakeDriverMode === 'D1' ? '#fff' : driver1.color }}
+                title={`${driver1.code} の単独ブレーキ踏力を表示`}
+              >
+                {driver1.code}
+              </button>
+              <button
+                onClick={() => setBrakeDriverMode('D2')}
+                className={`px-1.5 py-0.5 rounded transition-all cursor-pointer ${
+                  brakeDriverMode === 'D2'
+                    ? 'bg-orange-600 text-white font-bold'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+                style={{ color: brakeDriverMode === 'D2' ? '#fff' : driver2.color }}
+                title={`${driver2.code} の単独ブレーキ踏力を表示`}
+              >
+                {driver2.code}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Heatmap Spectrum Legend */}
+        {showBrakeHeatmap && (
+          <div className="flex items-center gap-1.5 text-[9px] font-mono text-slate-400">
+            <span className="text-cyan-300">0% (リリース)</span>
+            <div
+              className="w-14 h-2 rounded-full border border-white/10"
+              style={{
+                background: 'linear-gradient(to right, #06b6d4, #eab308, #ef4444)',
+              }}
+            />
+            <span className="text-red-400 font-bold">100% (フル)</span>
+          </div>
+        )}
+      </div>
+
       {/* Footer Instructions / Corner Click hint */}
-      <div className="w-full pt-2 border-t border-white/10 text-center">
-        <p className="text-[11px] text-slate-400 font-mono flex items-center justify-center gap-1">
+      <div className="w-full text-center">
+        <p className="text-[10px] text-slate-400 font-mono flex items-center justify-center gap-1.5">
           <span>💡</span>
-          <span>コーナーピンをクリックでテレメトリーをズーム解析</span>
+          <span>ピンでズーム / ホバーでDelta物理ゴースト演出</span>
         </p>
       </div>
     </div>

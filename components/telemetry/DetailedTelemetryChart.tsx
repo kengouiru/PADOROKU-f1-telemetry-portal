@@ -39,7 +39,7 @@ import {
 import { KNOWLEDGE_CIRCUITS, KNOWLEDGE_DRIVERS } from '@/data/f1KnowledgeData';
 import TelemetryTrackMap, { CIRCUIT_TRACK_MAPS } from './TelemetryTrackMap';
 
-interface DetailedTelemetryChartProps {
+export interface DetailedTelemetryChartProps {
   initialCircuitId?: string;
   initialDriver1Code?: string;
   initialDriver2Code?: string;
@@ -145,14 +145,24 @@ export default function DetailedTelemetryChart({
     // Minimum apex speed
     let minSpeed1 = entryPoint.speed1;
     let minSpeed2 = entryPoint.speed2;
+    let apexPoint1 = entryPoint;
+    let apexPoint2 = entryPoint;
+
     sectionPoints.forEach((p) => {
-      if (p.speed1 < minSpeed1) minSpeed1 = p.speed1;
-      if (p.speed2 < minSpeed2) minSpeed2 = p.speed2;
+      if (p.speed1 < minSpeed1) {
+        minSpeed1 = p.speed1;
+        apexPoint1 = p;
+      }
+      if (p.speed2 < minSpeed2) {
+        minSpeed2 = p.speed2;
+        apexPoint2 = p;
+      }
     });
 
     const entrySpeedDelta = entryPoint.speed1 - entryPoint.speed2;
     const apexSpeedDelta = minSpeed1 - minSpeed2;
     const exitDeltaDiff = (exitPoint.delta || 0) - (entryPoint.delta || 0);
+    const apexPct = Math.round(((apexPoint1.distPercent + apexPoint2.distPercent) / 2) * 10) / 10;
 
     return {
       cornerName: selectedCornerName || 'Selected Section',
@@ -163,9 +173,38 @@ export default function DetailedTelemetryChart({
       apexSpeed1: minSpeed1,
       apexSpeed2: minSpeed2,
       apexSpeedDelta,
+      apexPct,
       exitDeltaDiff,
     };
   }, [zoomRange, points, selectedCornerName]);
+
+  // High-precision Apex Insight for minimap and annotations
+  const apexInsight = useMemo(() => {
+    if (!zoomMetrics) return null;
+    return {
+      cornerName: zoomMetrics.cornerName,
+      apexPct: zoomMetrics.apexPct,
+      apexSpeed1: zoomMetrics.apexSpeed1,
+      apexSpeed2: zoomMetrics.apexSpeed2,
+      apexSpeedDelta: zoomMetrics.apexSpeedDelta,
+      fasterDriverCode: zoomMetrics.apexSpeedDelta >= 0 ? d1.code : d2.code,
+    };
+  }, [zoomMetrics, d1.code, d2.code]);
+
+  // Current Hovered Telemetry Data Point for Delta Ghost & Real-time inspection
+  const hoverTelemetryPoint = useMemo(() => {
+    if (hoverDistPercent === null || points.length === 0) return null;
+    let closestPt = points[0];
+    let minDiff = 999;
+    for (let i = 0; i < points.length; i++) {
+      const diff = Math.abs(points[i].distPercent - hoverDistPercent);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestPt = points[i];
+      }
+    }
+    return closestPt;
+  }, [hoverDistPercent, points]);
 
   // Chart hover mouse movement handler
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -421,10 +460,14 @@ export default function DetailedTelemetryChart({
           <TelemetryTrackMap
             circuitId={selectedCircuit}
             hoverDistPercent={hoverDistPercent}
+            hoverTelemetryPoint={hoverTelemetryPoint}
+            telemetryPoints={points}
+            circuitLengthM={circuitLengthM}
             driver1={d1}
             driver2={d2}
             onSelectCorner={handleSelectCorner}
             activeCornerName={selectedCornerName}
+            apexInsight={apexInsight}
           />
 
           {/* Zoom Section Tactical Mini-Insight Card */}
@@ -457,18 +500,45 @@ export default function DetailedTelemetryChart({
                   </div>
                 </div>
 
-                {/* Apex Speed */}
-                <div className="bg-slate-950/80 p-2.5 rounded-xl border border-white/5 space-y-1">
-                  <span className="text-[10px] text-slate-400 block">ボトム速度 (Apex)</span>
+                {/* Apex Speed (ボトム速度) with Visual Comparison */}
+                <div className="bg-slate-950/90 p-2.5 rounded-xl border border-amber-500/30 space-y-1.5 shadow-md">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-amber-300 font-bold flex items-center gap-1">
+                      <span>🎯</span>
+                      <span>ボトム速度 (Apex)</span>
+                    </span>
+                    <span className="text-[9px] font-mono text-slate-500">@{zoomMetrics.apexPct}%</span>
+                  </div>
                   <div className="flex items-baseline justify-between">
                     <span style={{ color: d1.color }} className="font-bold">{zoomMetrics.apexSpeed1} km/h</span>
                     <span className="text-slate-600">vs</span>
                     <span style={{ color: d2.color }} className="font-bold">{zoomMetrics.apexSpeed2} km/h</span>
                   </div>
-                  <div className="text-[10px] text-right font-bold text-emerald-400">
-                    {zoomMetrics.apexSpeedDelta >= 0
-                      ? `+${zoomMetrics.apexSpeedDelta} km/h (${d1.code})`
-                      : `${zoomMetrics.apexSpeedDelta} km/h (${d2.code})`}
+                  {/* Speed Bar Comparison */}
+                  <div className="w-full bg-slate-800 h-1 rounded-full overflow-hidden flex">
+                    <div
+                      style={{
+                        width: `${(zoomMetrics.apexSpeed1 / (zoomMetrics.apexSpeed1 + zoomMetrics.apexSpeed2)) * 100}%`,
+                        backgroundColor: d1.color,
+                      }}
+                      className="h-full"
+                    />
+                    <div
+                      style={{
+                        width: `${(zoomMetrics.apexSpeed2 / (zoomMetrics.apexSpeed1 + zoomMetrics.apexSpeed2)) * 100}%`,
+                        backgroundColor: d2.color,
+                      }}
+                      className="h-full"
+                    />
+                  </div>
+                  <div className="text-[10px] text-right font-bold">
+                    {zoomMetrics.apexSpeedDelta === 0 ? (
+                      <span className="text-slate-400">差分なし (±0 km/h)</span>
+                    ) : zoomMetrics.apexSpeedDelta > 0 ? (
+                      <span style={{ color: d1.color }}>+{zoomMetrics.apexSpeedDelta} km/h ({d1.code} 高速維持)</span>
+                    ) : (
+                      <span style={{ color: d2.color }}>+{Math.abs(zoomMetrics.apexSpeedDelta)} km/h ({d2.code} 高速維持)</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -494,10 +564,18 @@ export default function DetailedTelemetryChart({
         <div className="xl:col-span-8 space-y-2 bg-slate-950/90 rounded-2xl p-3 sm:p-4 border border-white/10">
           {/* ── TIER 1: SPEED OVERLAY (km/h) ── */}
           <div>
-            <div className="flex items-center justify-between mb-1 px-1">
-              <div className="flex items-center gap-1.5">
+            <div className="flex items-center justify-between mb-1 px-1 flex-wrap gap-1">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-racing font-bold text-sky-400">① SPEED</span>
                 <span className="text-[10px] font-mono text-slate-400">車速重ね合わせ (0 ~ 350 km/h)</span>
+                {zoomMetrics && (
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1 shadow-sm">
+                    <span>🎯</span>
+                    <span>
+                      Apex車速: {d1.code} {zoomMetrics.apexSpeed1} vs {d2.code} {zoomMetrics.apexSpeed2} km/h (差分 {zoomMetrics.apexSpeedDelta >= 0 ? `+${zoomMetrics.apexSpeedDelta}` : zoomMetrics.apexSpeedDelta} km/h)
+                    </span>
+                  </span>
+                )}
               </div>
               <span className="text-[10px] font-mono text-slate-500">Unit: km/h</span>
             </div>
@@ -544,6 +622,23 @@ export default function DetailedTelemetryChart({
                       }}
                     />
                   ))}
+
+                  {/* Active Section Apex Speed Reference Marker */}
+                  {zoomMetrics && (
+                    <ReferenceLine
+                      x={zoomMetrics.apexPct}
+                      stroke="#f59e0b"
+                      strokeWidth={2}
+                      strokeDasharray="4 2"
+                      label={{
+                        value: `🎯 APEX (${zoomMetrics.apexSpeed1} vs ${zoomMetrics.apexSpeed2} km/h)`,
+                        position: 'insideBottomRight',
+                        fill: '#f59e0b',
+                        fontSize: 9.5,
+                        fontWeight: 'bold',
+                      }}
+                    />
+                  )}
 
                   {/* Driver 1 Speed */}
                   <Line
