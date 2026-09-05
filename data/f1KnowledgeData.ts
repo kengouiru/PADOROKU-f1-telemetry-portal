@@ -36,6 +36,7 @@ export interface TeamProfile {
     facility: string;
   };
   iconicCars?: TeamIconicCar[];
+  visualGallery?: VisualGalleryItem[];
   philosophy: {
     aeroFocus: string;
     mechanicalFocus: string;
@@ -290,6 +291,32 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     constructorTitles: 6,
     drivers: ['VER', 'PER'],
     color: '#38bdf8',
+    visualGallery:     [
+      {
+        imageUrl: "/images/teams/team_redbull_rb19.jpg",
+        caption: "RB19 (2023): シーズン22戦21勝のF1歴代最多勝記録を樹立した究極のマシン",
+        tag: "Historic Car",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/teams/team_redbull_rb9.jpg",
+        caption: "RB9 (2013): セバスチャン・ベッテルが9連勝で4年連続ダブルタイトルを達成したV8最終兵器",
+        tag: "Championship",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/teams/team_redbull_factory.jpg",
+        caption: "Milton Keynes Campus: 風洞・シミュレーター・Red Bull Powertrainsが集結する中枢ファクトリー",
+        tag: "Factory",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
     philosophy: {
       aeroFocus: '高効率アンダーフロア負圧生成とDRS展開時の超低ドラッグ設計',
       mechanicalFocus: 'プルロッドフロント＆プッシュロッドリアによる極端なアンチダイブ／アンチスクワット特性',
@@ -323,6 +350,32 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     constructorTitles: 16,
     drivers: ['LEC', 'SAI'],
     color: '#f87171',
+    visualGallery:     [
+      {
+        imageUrl: "/images/teams/team_ferrari_f2004.jpg",
+        caption: "F2004: ミハエル・シューマッハが18戦13勝を記録したフェラーリ史上最強のV10名車",
+        tag: "Historic Car",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/teams/team_ferrari_312t.jpg",
+        caption: "312T (1975): ニキ・ラウダが駆りフェラーリ黄金期を拓いた横置きトランスミッションの傑作",
+        tag: "Historic Car",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/teams/team_ferrari_factory.jpg",
+        caption: "Maranello Factory & Galleria: スクーデリアの情熱と最先端レーシングテクノロジーの聖地",
+        tag: "Factory",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
     philosophy: {
       aeroFocus: 'サイドポッド上のウォッシュアウト気流とビームウィングの高効率化',
       mechanicalFocus: '低速シケインにおけるメカニカルグリップと縁石走破性の最適化',
@@ -356,6 +409,32 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     constructorTitles: 8,
     drivers: ['NOR', 'PIA'],
     color: '#fb923c',
+    visualGallery:     [
+      {
+        imageUrl: "/images/teams/team_mclaren_mp4_4.jpg",
+        caption: "MP4/4 (1988): セナとプロストが16戦15勝を記録したF1史上最も象徴的なターボモンスター",
+        tag: "Historic Car",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/teams/team_mclaren_mp4_13.jpg",
+        caption: "MP4/13 (1998): ニューウェイ設計でミカ・ハッキネンを世界王者に導いたシルバーアロー",
+        tag: "Championship",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/teams/team_mclaren_mtc.jpg",
+        caption: "McLaren Technology Centre (MTC): ノーマン・フォスター卿設計のウォーキング先進ファクトリー",
+        tag: "Factory",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
     philosophy: {
       aeroFocus: '中高速コーナーでの圧倒的ダウンフォースとフロアエッジの気流封じ込め',
       mechanicalFocus: 'フロントタイヤの熱入れ性能と空力プラットフォームの安定性',
@@ -389,6 +468,24 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     constructorTitles: 8,
     drivers: ['HAM', 'RUS'],
     color: '#2dd4bf',
+    visualGallery:     [
+      {
+        imageUrl: "/images/teams/team_mercedes_w11.jpg",
+        caption: "W11 EQ Performance (2020): DASシステムを搭載しF1史上最速ラップレコードを多数更新した漆黒の矢",
+        tag: "Historic Car",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/teams/team_mercedes_w05.jpg",
+        caption: "F1 W05 Hybrid (2014): V6ターボハイブリッド時代の幕開けを告げ圧倒的な16勝を挙げた覇王",
+        tag: "Championship",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
     philosophy: {
       aeroFocus: 'フロントウィングのウェイク制御と直線ドラッグ低減のバランス',
       mechanicalFocus: 'プッシュロッド前後サスペンションによるライドハイト制御の復権',
@@ -422,6 +519,24 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     constructorTitles: 0,
     drivers: ['ALO', 'STR'],
     color: '#34d399',
+    visualGallery:     [
+      {
+        imageUrl: "/images/teams/team_astonmartin_amr23.jpg",
+        caption: "AMR23 (2023): フェルナンド・アロンソが年間8回の表彰台を獲得しチームを大躍進させた名車",
+        tag: "Historic Car",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/teams/team_astonmartin_db5.jpg",
+        caption: "AMR Technology Campus (Silverstone): 2023年に新設された最新鋭のスマートファクトリー",
+        tag: "Factory",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
     philosophy: {
       aeroFocus: 'アグレッシブなサイドポッド・ウォータースライド形状によるビームウィング気流供給',
       mechanicalFocus: 'ブレーキング初期のノーズ安定性と低速トラクションの向上',
@@ -455,6 +570,24 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     constructorTitles: 2,
     drivers: ['GAS', 'OCO'],
     color: '#0284c7',
+    visualGallery:     [
+      {
+        imageUrl: "/images/teams/team_alpine_a521.jpg",
+        caption: "A521 (2021): エステバン・オコンがハンガロリンクで劇的なチーム初優勝を飾った記念碑的マシン",
+        tag: "Historic Car",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/teams/team_alpine_r25.jpg",
+        caption: "Renault R25 (2005): フェルナンド・アロンソがシューマッハの連覇を阻み自身初戴冠を果たしたV10の雄",
+        tag: "Championship",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
     philosophy: {
       aeroFocus: 'フロントノーズ下の気流分離とリアディフューザー拡大',
       mechanicalFocus: '軽量化によるバラスト配置自由度と前後重量配分の最適化',
@@ -488,6 +621,24 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     constructorTitles: 9,
     drivers: ['ALB', 'COL'],
     color: '#38bdf8',
+    visualGallery:     [
+      {
+        imageUrl: "/images/teams/team_williams_fw14b.jpg",
+        caption: "FW14B (1992): ナイジェル・マンセルがアクティブサスペンションを駆使し圧倒的強さで王座に就いたハイテクF1の頂点",
+        tag: "Historic Car",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/teams/team_williams_fw18.jpg",
+        caption: "FW18 (1996): デーモン・ヒルがチャンピオンに輝き16戦12勝を記録した名車",
+        tag: "Championship",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
     philosophy: {
       aeroFocus: '直線最高速（ストレートラインスピード）とDRS効率の最大化',
       mechanicalFocus: 'ステアリング入力に対するダイレクトな応答性とデジタル製造インフラの刷新',
@@ -521,6 +672,24 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     constructorTitles: 0,
     drivers: ['TSU', 'RIC'],
     color: '#60a5fa',
+    visualGallery:     [
+      {
+        imageUrl: "/images/teams/team_rb_at01.jpg",
+        caption: "AlphaTauri AT01 (2020): ピエール・ガスリーがモンツァで劇的な大金星優勝を飾った白紺のマシン",
+        tag: "Historic Car",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/teams/team_rb_str3.jpg",
+        caption: "Toro Rosso STR3 (2008): 21歳のセバスチャン・ベッテルが雨のモンツァで史上最年少ポール・トゥ・ウィンを成し遂げた伝説",
+        tag: "Historic Car",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
     philosophy: {
       aeroFocus: 'レッドブル・テクノロジーとのシナジーを活かしたフロントサスペンション気流制御',
       mechanicalFocus: '低速コーナーのメカニカル回頭性と縁石追従性',
@@ -554,6 +723,24 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     constructorTitles: 0,
     drivers: ['BOT', 'ZHO'],
     color: '#4ade80',
+    visualGallery:     [
+      {
+        imageUrl: "/images/teams/team_sauber_c12.jpg",
+        caption: "C12 (1993): ザウバーがF1に初参戦しデビュー戦で5位入賞を果たした歴史的原点",
+        tag: "Historic Car",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/teams/team_sauber_c20.jpg",
+        caption: "C20 (2001): ニック・ハイドフェルドと新人キミ・ライコネンがランキング4位へ押し上げた軽快な名機",
+        tag: "Historic Car",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
     philosophy: {
       aeroFocus: 'プルロッドフロントサスペンションへの刷新によるアンダーフロア前端気流の浄化',
       mechanicalFocus: 'ピットストップ機材の刷新とタイヤ交換速度の短縮',
@@ -587,6 +774,24 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     constructorTitles: 0,
     drivers: ['HUL', 'MAG'],
     color: '#e2e8f0',
+    visualGallery:     [
+      {
+        imageUrl: "/images/teams/team_haas_vf18.jpg",
+        caption: "VF-18 (2018): チーム創設わずか3年目でコンストラクターズ5位へ躍進したハース歴代最高傑作",
+        tag: "Historic Car",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/teams/team_haas_vf22.jpg",
+        caption: "VF-22 (2022): ブラジルGPでマグヌッセンがチーム史上初の奇跡のポールポジションを獲得したグラウンドエフェクトカー",
+        tag: "Historic Car",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
     philosophy: {
       aeroFocus: 'リアタイヤ周辺の熱害排出とフロア後端のシーリング',
       mechanicalFocus: 'レース距離でのタイヤマネジメントと実走データの迅速なセットアップ反映',

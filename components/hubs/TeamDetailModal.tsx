@@ -10,6 +10,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import type { TeamProfile, Reference } from '@/data/f1KnowledgeData';
+import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
 
 interface TeamDetailModalProps {
   team: TeamProfile;
@@ -197,6 +198,17 @@ export default function TeamDetailModal({
           )}
         </div>
 
+        {/* Photo Gallery: Historic Cars & Factory */}
+        {team.visualGallery && team.visualGallery.length > 0 && (
+          <div className="px-5 sm:px-6 pt-3 pb-1 border-b border-white/10 bg-slate-950/40">
+            <PhotoGalleryCarousel
+              items={team.visualGallery}
+              title="HISTORIC CARS & FACTORY GALLERY"
+              themeColor={themeColor}
+            />
+          </div>
+        )}
+
         {/* Modal Sub-Tabs */}
         <div className="flex items-center gap-2 px-5 sm:px-6 pt-3 border-b border-white/10 bg-slate-900/40 overflow-x-auto">
           {(
@@ -339,6 +351,55 @@ export default function TeamDetailModal({
                   {team.name} は長年にわたりF1の技術革新をリードし、空力効率やサスペンション構造、パワーユニットの熱効率において数々のベンチマークを築いてきた。
                 </p>
               </div>
+
+              {/* Visual Gallery Cards: Historic Cars & Factory */}
+              {team.visualGallery && team.visualGallery.length > 0 && (
+                <div className="space-y-3">
+                  <h4 className="text-xs font-racing font-bold text-sky-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>📸</span>
+                    <span>歴代名車 & ファクトリーフォトコレクション</span>
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {team.visualGallery.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-slate-950/80 border border-white/10 rounded-2xl overflow-hidden shadow-lg hover:border-sky-500/40 transition-all flex flex-col justify-between"
+                      >
+                        <div className="relative aspect-video w-full bg-slate-900">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={item.imageUrl}
+                            alt={item.caption}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                          {item.tag && (
+                            <span
+                              className="absolute top-2 left-2 px-2 py-0.5 rounded-md text-[10px] font-mono font-bold border backdrop-blur-md"
+                              style={{
+                                color: themeColor,
+                                borderColor: `${themeColor}60`,
+                                backgroundColor: '#020617cc',
+                              }}
+                            >
+                              {item.tag}
+                            </span>
+                          )}
+                        </div>
+                        <div className="p-3 space-y-1.5 flex-1 flex flex-col justify-between">
+                          <p className="text-xs font-bold text-white leading-snug">
+                            {item.caption}
+                          </p>
+                          <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 border-t border-white/5 pt-1.5">
+                            <span className="truncate max-w-[140px]">Photo: {item.credit}</span>
+                            <span className="text-[9px] bg-slate-800 px-1.5 py-0.5 rounded flex-shrink-0">{item.license}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
