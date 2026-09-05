@@ -2154,6 +2154,1509 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       },
     ],
   },
+  {
+    id: "pierre-gasly",
+    code: "GAS",
+    number: 10,
+    fullName: "Pierre Gasly",
+    country: "フランス 🇫🇷",
+    team: "Alpine",
+    teamColor: "#0093cc",
+    status: "Current",
+    nickname: "ピエロ / モンツァの奇跡",
+    birthDate: "1996-02-07",
+    birthPlace: "Rouen, France",
+    f1Debut: "2017年 マレーシアGP (Toro Rosso)",
+    driverType: "粘り強いバトル＆勝機を逃さない一撃",
+    numberOrigin: "フォーミュラ・ルノー2.0でタイトルを獲得した際のラッキーナンバー「10」。元フランス代表ジダンへの憧れも込める。",
+    visualAsset: {
+      imageUrl: "/images/drivers/driver_gasly.jpg",
+      caption: "Pierre Gasly (BWT Alpine F1 Team, 2024)",
+      credit: "Jen Ross",
+      license: "CC BY 2.0",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Pierre_Gasly,_British_GP_2024_(5).jpg"
+    },
+    visualGallery: [
+      {
+        imageUrl: "/images/drivers/driver_gasly.jpg",
+        caption: "アルピーヌで中団グリッドの牽引役を担うピエール・ガスリー",
+        tag: "Portrait",
+        credit: "Jen Ross",
+        license: "CC BY 2.0",
+        sourceUrl: "https://commons.wikimedia.org/wiki/File:Pierre_Gasly,_British_GP_2024_(5).jpg"
+      },
+      {
+        imageUrl: "/images/drivers/driver_gasly_podium.jpg",
+        caption: "2020年イタリアGPで感動のF1初優勝を成し遂げたポディウム",
+        tag: "Podium",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 2.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
+    socialLinks: {
+      instagram: "https://www.instagram.com/pierregasly/",
+      xTwitter: "https://twitter.com/PierreGASLY",
+      website: "https://www.pierregasly.com/"
+    },
+    raceEngineer: {
+      name: "John Howard",
+      callsign: "John",
+      dynamic: "冷静沈着なペース伝達。トラフィック状況とタイヤデグラデーションの共有を毎ラップ密に行う。"
+    },
+    engineeringPreference: {
+      setupBalance: "フロントの応答性が鋭いシャープなセットアップを好み、リアが若干流れる挙動をスロットルで手なずける。",
+      pedalFeel: "ショートストロークの硬質なブレーキペダル。初期制動でガツンと踏力を立ち上げる。",
+      steeringWeight: "中程度。切り始めのインフォメーションを重視したセッティング。"
+    },
+    careerSummary: "2020年モンツァで劇的な初優勝を飾ったフランスの実力派。レッドブル育成から幾多の逆境を乗り越え、現在はアルピーヌのエースとしてチームを牽引。",
+    entries: 155,
+    wins: 1,
+    podiums: 5,
+    polePositions: 0,
+    championships: 0,
+    drivingStyle: {
+      traits: [
+        "優れたレースペースマネジメント",
+        "混戦での状況判断力",
+        "ウェット路面での粘り強さ"
+      ],
+      brakingTechnique: "初期踏力が極めて鋭く、エイペックスに向けて素早く脱力してターンイン時のフロント回頭性を最大化する。",
+      tyreManagement: "スティント後半にタイヤ表面温度を保ちながら安定したペースを維持する技術に定評がある。",
+      telemetrySignature: "ブレーキング初期の減速G立ち上がりが急峻。エイペックス通過時のステアリング舵角が一定で安定している。",
+      preferredCircuitTypes: [
+        "中高速サーキット (シルバーストン、スパ)",
+        "超高速・スリップストリーム (モンツァ)"
+      ],
+      summary: "激しいポジション争いでのディフェンス技術と、乱高下するレース展開で上位に生き残るレースクラフトに長ける。"
+    },
+    biography: {
+      personality: "情熱的で友情に厚く、逆境から何度でも立ち上がる不屈のファイター。",
+      rivalries: "エステバン・オコンとは幼少期カート時代からの宿敵。互いに譲らない激しいチーム内バトルを展開。",
+      iconicRaces: [
+        {
+          gp: "2020 イタリアGP (モンツァ)",
+          year: 2020,
+          description: "赤旗再スタートとセーフティカーを活かし首位へ浮上。終盤サインツの猛追をわずか0.4秒差で抑えきり劇的初優勝。",
+          tacticalMasterclass: "セクター2のレズモからアスカリにかけて一切のミスを排し、DRS圏内での防衛を完遂。"
+        }
+      ],
+      quotes: [
+        "「僕らは成し遂げたんだ！何て日だ！信じられない！」",
+        "「諦めなければ、いつか必ず報われる日が来る。」"
+      ],
+      offTrack: "ファッションへの関心が高く、パドックでのスタイリッシュな着こなしでも知られる。"
+    },
+    milestones: [
+      {
+        date: "2017-10-01",
+        event: "トロロッソからF1デビュー",
+        refId: 1
+      },
+      {
+        date: "2019-11-17",
+        event: "ブラジルGPでハミルトンとのドラッグレースを制し劇的初表彰台 (P2)",
+        refId: 1
+      },
+      {
+        date: "2020-09-06",
+        event: "モンツァでアルファタウリに歴史的初優勝をもたらす",
+        refId: 2
+      }
+    ],
+    references: [
+      {
+        id: 1,
+        title: "Pierre Gasly Official Biography & Racing Record",
+        publisher: "Alpine F1 Team",
+        url: "https://www.alpinef1team.com",
+        verifiedDate: "2024-03-01"
+      },
+      {
+        id: 2,
+        title: "Italian GP 2020: The Miracle of Monza",
+        publisher: "Formula1.com",
+        url: "https://www.formula1.com",
+        verifiedDate: "2024-03-01"
+      }
+    ]
+  },
+  {
+    id: "esteban-ocon",
+    code: "OCO",
+    number: 31,
+    fullName: "Esteban Ocon",
+    country: "フランス 🇫🇷",
+    team: "Alpine",
+    teamColor: "#0093cc",
+    status: "Current",
+    nickname: "エスティ・ベスティ / 鉄壁のディフェンダー",
+    birthDate: "1996-09-17",
+    birthPlace: "Évreux, France",
+    f1Debut: "2016年 ベルギーGP (Manor)",
+    driverType: "ミリ単位のブロック＆アグレッシブディフェンス",
+    numberOrigin: "2007年に初めてカート選手権で優勝した際のカーナンバー「31」。",
+    visualAsset: {
+      imageUrl: "/images/drivers/driver_ocon.jpg",
+      caption: "Esteban Ocon (BWT Alpine F1 Team, 2024)",
+      credit: "Wikimedia Commons",
+      license: "CC BY-SA 4.0",
+      sourceUrl: "https://commons.wikimedia.org"
+    },
+    visualGallery: [
+      {
+        imageUrl: "/images/drivers/driver_ocon.jpg",
+        caption: "卓越したディフェンス力と鋭い反射神経を持つエステバン・オコン",
+        tag: "Portrait",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/drivers/driver_ocon_2.jpg",
+        caption: "アルピーヌのコックピットでアタックに備えるオコン",
+        tag: "Cockpit",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
+    socialLinks: {
+      instagram: "https://www.instagram.com/estebanocon/",
+      xTwitter: "https://twitter.com/OconEsteban",
+      website: "https://www.esteban-ocon.com/"
+    },
+    raceEngineer: {
+      name: "Josh Peckett",
+      callsign: "Josh",
+      dynamic: "クリアで簡潔な指示。タイヤマネジメントとディフェンスラインの指示において抜群のコンビネーション。"
+    },
+    engineeringPreference: {
+      setupBalance: "ニュートラルから安定したリアエンド。ブレーキング時のスタビリティを最重要視する。",
+      pedalFeel: "長めのストロークでコントロール域が広いプログレッシブな踏力特性。",
+      steeringWeight: "やや重め。ダイレクトな反力を好む。"
+    },
+    careerSummary: "2021年ハンガリーGPウィナー。ミリ単位のホイール・トゥ・ホイールバトルと決して引かない強靭なメンタリティを誇るファイター。",
+    entries: 154,
+    wins: 1,
+    podiums: 4,
+    polePositions: 0,
+    championships: 0,
+    drivingStyle: {
+      traits: [
+        "堅牢なポジショニング",
+        "タイヤのグレイニング抑制技術",
+        "スタート直後のポジションアップ"
+      ],
+      brakingTechnique: "ストレートエンドでラインを厳格に保持しながら確実な減速を行う。",
+      tyreManagement: "フロントタイヤの熱管理が巧みで、ロングランでもグリップ低下を緩やかに抑える。",
+      telemetrySignature: "ブレーキング終了からスロットルオンへの移行が極めてスムーズ。ステアリング舵角を一定に保つ時間が長い。",
+      preferredCircuitTypes: [
+        "抜きどころが少なくテクニカルなコース (ハンガロリンク、モナコ)"
+      ],
+      summary: "一度ポジションを奪ったら絶対に譲らない鉄壁のディフェンスライン構築。タイヤを持たせながらの防衛戦で真価を発揮。"
+    },
+    biography: {
+      personality: "実家がキャンピングカー生活で遠征を支えた苦労人。レースへの真摯な献身と貪欲な闘志を持つ。",
+      rivalries: "ピエール・ガスリーやセルジオ・ペレスなど歴代チームメイトと常に火花を散らす激しいライバル関係。",
+      iconicRaces: [
+        {
+          gp: "2021 ハンガリーGP (ハンガロリンク)",
+          year: 2021,
+          description: "スタートの混乱を切り抜けトップへ浮上。ベッテルのプレッシャーを70周にわたり耐え抜き見事初優勝。",
+          tacticalMasterclass: "チームメイトのアロンソがハミルトンを足止めする間、ノーミスでラップを刻み続けた。"
+        }
+      ],
+      quotes: [
+        "「決して諦めないこと。家族がすべてを犠牲にしてくれたから今ここにいる。」"
+      ],
+      offTrack: "RCカー（ラジコン）の腕前はプロ級。熱心なシミュレーター練習家。"
+    },
+    milestones: [
+      {
+        date: "2016-08-28",
+        event: "マノーからF1デビュー",
+        refId: 1
+      },
+      {
+        date: "2020-12-06",
+        event: "サヒールGPでルノーに復帰後初表彰台 (P2)",
+        refId: 1
+      },
+      {
+        date: "2021-08-01",
+        event: "ハンガロリンクで劇的なキャリア初優勝",
+        refId: 2
+      }
+    ],
+    references: [
+      {
+        id: 1,
+        title: "Esteban Ocon Profile",
+        publisher: "Alpine F1 Team",
+        url: "https://www.alpinef1team.com",
+        verifiedDate: "2024-03-01"
+      },
+      {
+        id: 2,
+        title: "Hungarian Grand Prix 2021 Race Review",
+        publisher: "Formula1.com",
+        url: "https://www.formula1.com",
+        verifiedDate: "2024-03-01"
+      }
+    ]
+  },
+  {
+    id: "alexander-albon",
+    code: "ALB",
+    number: 23,
+    fullName: "Alexander Albon",
+    country: "タイ 🇹🇭",
+    team: "Williams",
+    teamColor: "#00a0de",
+    status: "Current",
+    nickname: "アルボンボーイ / タイヤの魔術師",
+    birthDate: "1996-03-23",
+    birthPlace: "London, UK",
+    f1Debut: "2019年 オーストラリアGP (Toro Rosso)",
+    driverType: "超ロングスティント＆タイヤマネジメント職人",
+    numberOrigin: "幼少期から憧れていたバスケットボール界の神マイケル・ジョーダンの「23」。",
+    visualAsset: {
+      imageUrl: "/images/drivers/driver_albon.jpg",
+      caption: "Alexander Albon (Williams Racing, 2024)",
+      credit: "Wikimedia Commons",
+      license: "CC BY-SA 4.0",
+      sourceUrl: "https://commons.wikimedia.org"
+    },
+    visualGallery: [
+      {
+        imageUrl: "/images/drivers/driver_albon.jpg",
+        caption: "ウィリアムズのエースとしてチームを牽引するアレクサンダー・アルボン",
+        tag: "Portrait",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/drivers/driver_albon_paddock.jpg",
+        caption: "パドックでエンジニアとセットアップを協議するアルボン",
+        tag: "Paddock",
+        credit: "Jen Ross",
+        license: "CC BY 2.0",
+        sourceUrl: "https://commons.wikimedia.org/wiki/File:Alexander_Albon_Williams_2024.jpg"
+      }
+    ],
+    socialLinks: {
+      instagram: "https://www.instagram.com/alex_albon/",
+      xTwitter: "https://twitter.com/alex_albon",
+      website: "https://www.alexalbon.com/"
+    },
+    raceEngineer: {
+      name: "James Urwin",
+      callsign: "James",
+      dynamic: "穏やかで的確な無線交信。ピットストップタイミングの柔軟な判断で数々の奇跡的な入賞を演出。"
+    },
+    engineeringPreference: {
+      setupBalance: "フロントの鋭い回頭性を求めつつ、ウィリアムズの特性であるストレートスピードを最大化するローダウンフォースを好む。",
+      pedalFeel: "中程度のペダルストローク。トレイルブレーキングでの車体姿勢制御を極めて繊細に行う。",
+      steeringWeight: "軽快でダイレクトな応答性。"
+    },
+    careerSummary: "驚異的なタイヤマネジメントでウィリアムズの復権を支えるタイ国籍のエースドライバー。卓越したレースペースとオーバーテイク技術を兼ね備える。",
+    entries: 104,
+    wins: 0,
+    podiums: 2,
+    polePositions: 0,
+    championships: 0,
+    drivingStyle: {
+      traits: [
+        "超長距離タイヤライフの引き出し",
+        "正確無比なトレイルブレーキング",
+        "トップスピードを活かした防衛"
+      ],
+      brakingTechnique: "進入での荷重移動が極めて滑らかで、タイヤのインベタ接地圧を一定に保つ。",
+      tyreManagement: "ハードタイヤでレース全体の9割を走りきるなど、グリッド最高峰のタイヤ保存能力を誇る。",
+      telemetrySignature: "コーナー進入時のステアリング入力が極めて滑らかでタイヤへの横荷重ショックが少ない。アクセルの立ち上がりも緩やかでリアの空転を最小限に抑える。",
+      preferredCircuitTypes: [
+        "直線スピードが活きる高速コース (モンツァ、スパ、カナダ)"
+      ],
+      summary: "ハードタイヤでレース全体の9割を走りきるなど、驚異的なタイヤライフを引き出す職人技。ストレートスピードを活かした防衛戦が代名詞。"
+    },
+    biography: {
+      personality: "温厚でユーモアに溢れ、パドック屈指の人格者。ペットの猫とゴルフをこよなく愛する。",
+      rivalries: "中団グループでアルピーヌやハースと毎戦繰り広げる1ポイントを懸けた死闘。",
+      iconicRaces: [
+        {
+          gp: "2022 オーストラリアGP (メルボルン)",
+          year: 2022,
+          description: "ハードタイヤでスタートから57周目までタイヤ交換を引っ張り、最終ラップ直前ピットインで奇跡の10位入賞を達成。",
+          tacticalMasterclass: "レース全周回をほぼ同一ペースで走り抜く信じがたいタイヤ管理術を披露。"
+        }
+      ],
+      quotes: [
+        "「僕らは持てるカードをすべて使い、最後まで戦い抜いた。」"
+      ],
+      offTrack: "プロゴルファーのリリー・ムニ・ヒーと交際。スニーカーコレクター。"
+    },
+    milestones: [
+      {
+        date: "2019-03-17",
+        event: "トロロッソからF1デビュー",
+        refId: 1
+      },
+      {
+        date: "2020-09-13",
+        event: "ムジェロ・トスカーナGPでレッドブルから自身初表彰台 (P3)",
+        refId: 1
+      },
+      {
+        date: "2022-04-10",
+        event: "ウィリアムズで57周ハードタイヤ走行の奇跡的入賞",
+        refId: 2
+      }
+    ],
+    references: [
+      {
+        id: 1,
+        title: "Alexander Albon Profile",
+        publisher: "Williams Racing",
+        url: "https://www.williamsf1.com",
+        verifiedDate: "2024-03-01"
+      },
+      {
+        id: 2,
+        title: "How Albon made 57 laps on one set of tyres work",
+        publisher: "Formula1.com",
+        url: "https://www.formula1.com",
+        verifiedDate: "2024-03-01"
+      }
+    ]
+  },
+  {
+    id: "franco-colapinto",
+    code: "COL",
+    number: 43,
+    fullName: "Franco Colapinto",
+    country: "アルゼンチン 🇦🇷",
+    team: "Williams",
+    teamColor: "#00a0de",
+    status: "Current",
+    nickname: "アルゼンチンの若獅子 / フランキート",
+    birthDate: "2003-05-27",
+    birthPlace: "Pilar, Buenos Aires, Argentina",
+    f1Debut: "2024年 イタリアGP (Williams)",
+    driverType: "大胆不敵な度胸＆即応型ハイアダプテーション",
+    numberOrigin: "カート時代にキャリア初期の勝利を積み重ねたパーソナルナンバー「43」。",
+    visualAsset: {
+      imageUrl: "/images/drivers/driver_colapinto.jpg",
+      caption: "Franco Colapinto (Williams Racing, 2024)",
+      credit: "Wikimedia Commons",
+      license: "CC BY-SA 4.0",
+      sourceUrl: "https://commons.wikimedia.org"
+    },
+    visualGallery: [
+      {
+        imageUrl: "/images/drivers/driver_colapinto.jpg",
+        caption: "2024年中盤に彗星の如く現れF1界に旋風を巻き起こしたフランコ・コラピント",
+        tag: "Portrait",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
+    socialLinks: {
+      instagram: "https://www.instagram.com/francolapinto/",
+      xTwitter: "https://twitter.com/FranColapinto",
+      website: "https://www.francolapinto.com/"
+    },
+    raceEngineer: {
+      name: "Gaetan Jego",
+      callsign: "Gaetan",
+      dynamic: "新人のコラピントに常にポジティブで明確なフィードバックを与え、急速な学習を後押しする。"
+    },
+    engineeringPreference: {
+      setupBalance: "フロントのグリップとダイレクト感を好む。リアのナーバスな挙動を怖れず、限界域を攻め込む。",
+      pedalFeel: "レスポンスの良いブレーキペダル。初期踏力で鋭く制動をかける。",
+      steeringWeight: "標準的。フィーリングの素直さを重視。"
+    },
+    careerSummary: "2024年シーズン途中に電撃デビューを果たし、参戦2戦目でポイントを獲得したアルゼンチンの超新星。アグレッシブな走りで世界の注目を集める。",
+    entries: 9,
+    wins: 0,
+    podiums: 0,
+    polePositions: 0,
+    championships: 0,
+    drivingStyle: {
+      traits: [
+        "市街地サーキットへの驚異的な適応速度",
+        "アグレッシブなオーバーテイク",
+        "高い心理的タフネス"
+      ],
+      brakingTechnique: "深いブレーキングでエイペックスまで突っ込み、マシンの回頭性を引き出す。",
+      tyreManagement: "アグレッシブな走調ながらタイヤの熱ダレを抑制する適応力を併せ持つ。",
+      telemetrySignature: "コーナー進入でのブレーキングポイントがベテラン勢と遜色なく奥深い。アクセルオンのタイミングが早く、リアを滑らせながら向きを変える。",
+      preferredCircuitTypes: [
+        "市街地コース (バクー、シンガポール)",
+        "中高速サーキット (モンツァ)"
+      ],
+      summary: "初走行の市街地コースでも恐れを知らず限界ギリギリのウォールタッチラインをトレースする度胸と天性のスピード。"
+    },
+    biography: {
+      personality: "陽気で人懐っこく、母国アルゼンチンで国民的英雄として熱狂的な支持を集める。",
+      rivalries: "中団グリッドのベテラン勢（アロンソやヒュルケンベルグ）に臆せず挑む。",
+      iconicRaces: [
+        {
+          gp: "2024 アゼルバイジャンGP (バクー)",
+          year: 2024,
+          description: "F1参戦わずか2戦目で予選Q3進出、決勝でもベテラン勢を相手にノーミスで8位入賞を果たしアルゼンチン人として42年ぶりの入賞。",
+          tacticalMasterclass: "難関バクーの城壁セクションでミリ単位の精密走行を継続。"
+        }
+      ],
+      quotes: [
+        "「マシンに乗った瞬間、恐れは消える。自分の持てるすべてを捧げるだけだ。」"
+      ],
+      offTrack: "マテ茶をパドックでも愛飲。アルゼンチンサッカーの大ファン。"
+    },
+    milestones: [
+      {
+        date: "2024-09-01",
+        event: "モンツァ・イタリアGPでウィリアムズからF1電撃デビュー (12位完走)",
+        refId: 1
+      },
+      {
+        date: "2024-09-15",
+        event: "バクー・アゼルバイジャンGPでF1初入賞 (8位)",
+        refId: 1
+      }
+    ],
+    references: [
+      {
+        id: 1,
+        title: "Franco Colapinto Driver Profile",
+        publisher: "Williams Racing",
+        url: "https://www.williamsf1.com",
+        verifiedDate: "2024-09-20"
+      }
+    ]
+  },
+  {
+    id: "lance-stroll",
+    code: "STR",
+    number: 18,
+    fullName: "Lance Stroll",
+    country: "カナダ 🇨🇦",
+    team: "Aston Martin",
+    teamColor: "#00665e",
+    status: "Current",
+    nickname: "雨の魔術師 / ストロール",
+    birthDate: "1998-10-29",
+    birthPlace: "Montreal, Canada",
+    f1Debut: "2017年 オーストラリアGP (Williams)",
+    driverType: "豪雨コンディション＆スタート職人",
+    numberOrigin: "イタリアF4とFIA F3でチャンピオンを獲得した際に背負っていた幸運の「18」。",
+    visualAsset: {
+      imageUrl: "/images/drivers/driver_stroll.jpg",
+      caption: "Lance Stroll (Aston Martin Aramco F1 Team, 2024)",
+      credit: "Jen Ross",
+      license: "CC BY 2.0",
+      sourceUrl: "https://commons.wikimedia.org/wiki/File:Lance_Stroll,_British_GP_2024_(1).jpg"
+    },
+    visualGallery: [
+      {
+        imageUrl: "/images/drivers/driver_stroll.jpg",
+        caption: "雨のレースで無類の強さを発揮するランス・ストロール",
+        tag: "Portrait",
+        credit: "Jen Ross",
+        license: "CC BY 2.0",
+        sourceUrl: "https://commons.wikimedia.org/wiki/File:Lance_Stroll,_British_GP_2024_(1).jpg"
+      },
+      {
+        imageUrl: "/images/drivers/driver_stroll_paddock.jpg",
+        caption: "アストンマーティンのホスピタリティで集中を高めるストロール",
+        tag: "Paddock",
+        credit: "Wikimedia Commons",
+        license: "CC BY 2.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
+    socialLinks: {
+      instagram: "https://www.instagram.com/lance_stroll/",
+      xTwitter: "https://twitter.com/lance_stroll",
+      website: "https://www.lancestroll.com/"
+    },
+    raceEngineer: {
+      name: "Ben Michell",
+      callsign: "Ben",
+      dynamic: "気象レーダーと路面コンディションの推移を詳細に共有し、ストロールの雨天感覚を最大限にサポート。"
+    },
+    engineeringPreference: {
+      setupBalance: "リアの安定性を重視。トラクションがしっかりかかるセットアップで脱出加速を活かす。",
+      pedalFeel: "比較的ソフトな踏み始めから奥で効くペダルタッチ。",
+      steeringWeight: "やや軽め。"
+    },
+    careerSummary: "ルーキーイヤーの表彰台や雨のトルコGPポールポジションなど、極限コンディションで輝くカナダの実力派ドライバー。",
+    entries: 166,
+    wins: 0,
+    podiums: 3,
+    polePositions: 1,
+    championships: 0,
+    drivingStyle: {
+      traits: [
+        "雨天・ウェットでの卓越したコントロール",
+        "スタートダッシュの鋭さ",
+        "ロングランでの粘り強い巡航"
+      ],
+      brakingTechnique: "ウェット路面でのグリップ限界の把握が鋭く、滑りやすい路面での踏力調整に長ける。",
+      tyreManagement: "雨用タイヤのオーバーヒートを防ぐライン取りが得意。",
+      telemetrySignature: "ウェットコンディションでのスロットル操作が小刻みで、ホイールスピンの兆候をミリ秒単位で相殺する。",
+      preferredCircuitTypes: [
+        "雨のサーキット全般",
+        "ストップ＆ゴー型コース (モントリオール、バクー)"
+      ],
+      summary: "濡れた路面でグリップを見つけ出す特殊なセンサーを持ち、オープニングラップでのポジションアップ数がグリッド屈指。"
+    },
+    biography: {
+      personality: "寡黙でストイック。自転車事故で両手首骨折の重傷を負いながら驚異的な回復力で開幕戦に出場した不屈の闘志。",
+      rivalries: "チームメイトのフェルナンド・アロンソからドライビング技術を貪欲に吸収。",
+      iconicRaces: [
+        {
+          gp: "2020 トルコGP (イスタンブール)",
+          year: 2020,
+          description: "氷のように滑る豪雨のイスタンブールパークで完璧なアタックを見せ、キャリア初ポールポジションを獲得。",
+          tacticalMasterclass: "ウェットタイヤとインターミディエイトのクロスオーバーポイントを完璧に見極めた。"
+        }
+      ],
+      quotes: [
+        "「雨が降れば、マシンの差は縮まり、ドライバーの感覚がすべてを決める。」"
+      ],
+      offTrack: "スノーボードとサーフィンが得意。"
+    },
+    milestones: [
+      {
+        date: "2017-06-25",
+        event: "バクー・アゼルバイジャンGPでルーキーイヤー初表彰台 (P3)",
+        refId: 1
+      },
+      {
+        date: "2020-11-14",
+        event: "トルコGPで大雨のイスタンブールを制し初ポールポジション獲得",
+        refId: 2
+      }
+    ],
+    references: [
+      {
+        id: 1,
+        title: "Lance Stroll Profile",
+        publisher: "Aston Martin F1 Team",
+        url: "https://www.astonmartinf1.com",
+        verifiedDate: "2024-03-01"
+      },
+      {
+        id: 2,
+        title: "Turkish GP 2020: Stroll takes sensational pole",
+        publisher: "Formula1.com",
+        url: "https://www.formula1.com",
+        verifiedDate: "2024-03-01"
+      }
+    ]
+  },
+  {
+    id: "nico-hulkenberg",
+    code: "HUL",
+    number: 27,
+    fullName: "Nico Hülkenberg",
+    country: "ドイツ 🇩🇪",
+    team: "Haas",
+    teamColor: "#b6babd",
+    status: "Current",
+    nickname: "ハルク / 予選の魔術師 / スーパーサブ",
+    birthDate: "1987-08-19",
+    birthPlace: "Emmerich am Rhein, Germany",
+    f1Debut: "2010年 バーレーンGP (Williams)",
+    driverType: "予選一発アタックの鬼＆正確無比なマシン開発者",
+    numberOrigin: "ジル・ヴィルヌーヴを象徴する伝説の栄光ナンバー「27」。自身の誕生日（8月19日：8+19=27）でもある。",
+    visualAsset: {
+      imageUrl: "/images/drivers/driver_hulkenberg.jpg",
+      caption: "Nico Hülkenberg (MoneyGram Haas F1 Team, 2024)",
+      credit: "Wikimedia Commons",
+      license: "CC BY-SA 4.0",
+      sourceUrl: "https://commons.wikimedia.org"
+    },
+    visualGallery: [
+      {
+        imageUrl: "/images/drivers/driver_hulkenberg.jpg",
+        caption: "予選でマシンのポテンシャルを120%引き出すニコ・ヒュルケンベルグ",
+        tag: "Portrait",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/drivers/driver_hulkenberg_paddock.jpg",
+        caption: "パドックでエンジニア陣と熱心にテレメトリーを確認するヒュルケンベルグ",
+        tag: "Paddock",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
+    socialLinks: {
+      instagram: "https://www.instagram.com/hulkhulkenberg/",
+      xTwitter: "https://twitter.com/HulkHulkenberg",
+      website: "https://www.nicohulkenberg.net/"
+    },
+    raceEngineer: {
+      name: "Gary Gannon",
+      callsign: "Gary",
+      dynamic: "極めてプロフェッショナルな情報伝達。タイヤ発熱とトラフィック間隔の指示で予選Q3進出を連発。"
+    },
+    engineeringPreference: {
+      setupBalance: "フロントの剛性感が高く、ステアリングを切った瞬間にノーズが吸い付くフロント重視セッティング。",
+      pedalFeel: "ショートストロークかつリニアな油圧タッチ。",
+      steeringWeight: "重め。正確な微修正を好む。"
+    },
+    careerSummary: "予選Q3進出の常連にして2015年ル・マン24時間ウィナー。マシンの限界を余すところなく引き出すグリッド屈指の技巧派ベテラン。",
+    entries: 227,
+    wins: 0,
+    podiums: 0,
+    polePositions: 1,
+    championships: 0,
+    drivingStyle: {
+      traits: [
+        "予選での驚異的な限界アタック",
+        "代役参戦での即応力",
+        "マシンセットアップの的確なフィードバック"
+      ],
+      brakingTechnique: "トレイルブレーキングのリリース速度が極めてリニアで、マシンのピッチ変化を最小化する。",
+      tyreManagement: "予選アタック時のアウトラップでのタイヤウォームアップが完璧。",
+      telemetrySignature: "ステアリングの舵角入力が非常にクリーンで無駄な微修正が皆無。ブレーキリリースとターンインの同期精度が極めて高い。",
+      preferredCircuitTypes: [
+        "中高速コーナーが連続するサーキット (シルバーストン、鈴鹿、スパ)"
+      ],
+      summary: "予選Q3での驚異的な一発タイム計測。代役参戦でも即座にトップ10入りを果たす天賦のドライビング適応力。"
+    },
+    biography: {
+      personality: "冷静で皮肉の効いたユーモアを持ち、パドックのエンジニアから絶大な信頼を集めるプロ中のプロ。",
+      rivalries: "ケビン・マグヌッセンとは激闘の歴史を経てハースで互いを認め合う最強のベテランコンビを結成。",
+      iconicRaces: [
+        {
+          gp: "2010 ブラジルGP (インテルラゴス)",
+          year: 2010,
+          description: "ルーキーイヤーにウェットからドライへ変化する難条件で、ウィリアムズを駆り2位ベッテルに1秒以上の大差をつけて圧巻の初ポールポジション獲得。",
+          tacticalMasterclass: "全車の中で最も早く乾くラインを把握しタイヤ温度を完璧に管理。"
+        }
+      ],
+      quotes: [
+        "「マシンの限界を見極めること。予選の1ラップにはドライバーの純粋な魂が宿る。」"
+      ],
+      offTrack: "2015年にポルシェから参戦したル・マン24時間レースで初挑戦総合優勝を飾る快挙を達成。"
+    },
+    milestones: [
+      {
+        date: "2010-11-06",
+        event: "インテルラゴスでウィリアムズから圧巻の初ポールポジション獲得",
+        refId: 1
+      },
+      {
+        date: "2015-06-14",
+        event: "F1現役ドライバーとして参戦したル・マン24時間レースで総合優勝",
+        refId: 2
+      }
+    ],
+    references: [
+      {
+        id: 1,
+        title: "Nico Hülkenberg Official Site",
+        publisher: "Hülkenberg Racing",
+        url: "https://www.nicohulkenberg.net",
+        verifiedDate: "2024-03-01"
+      },
+      {
+        id: 2,
+        title: "Le Mans 24 Hours 2015 Official Results",
+        publisher: "ACO / FIA WEC",
+        url: "https://www.24h-lemans.com",
+        verifiedDate: "2024-03-01"
+      }
+    ]
+  },
+  {
+    id: "kevin-magnussen",
+    code: "MAG",
+    number: 20,
+    fullName: "Kevin Magnussen",
+    country: "デンマーク 🇩🇰",
+    team: "Haas",
+    teamColor: "#b6babd",
+    status: "Current",
+    nickname: "K-Mag / 闘犬バイキング",
+    birthDate: "1992-10-05",
+    birthPlace: "Roskilde, Denmark",
+    f1Debut: "2014年 オーストラリアGP (McLaren)",
+    driverType: "肉弾戦上等の武闘派＆電撃スタート",
+    numberOrigin: "フォーミュラ・ルノー3.5でタイトルを獲得した際のナンバー「20」。",
+    visualAsset: {
+      imageUrl: "/images/drivers/driver_magnussen.jpg",
+      caption: "Kevin Magnussen (MoneyGram Haas F1 Team, 2024)",
+      credit: "Wikimedia Commons",
+      license: "CC BY-SA 4.0",
+      sourceUrl: "https://commons.wikimedia.org"
+    },
+    visualGallery: [
+      {
+        imageUrl: "/images/drivers/driver_magnussen.jpg",
+        caption: "バイキング魂溢れる激しいホイール・トゥ・ホイールの鬼 ケビン・マグヌッセン",
+        tag: "Portrait",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/drivers/driver_magnussen_paddock.jpg",
+        caption: "ハースのピットでアタックのタイミングを見計らうマグヌッセン",
+        tag: "Paddock",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
+    socialLinks: {
+      instagram: "https://www.instagram.com/kevinmagnussen/",
+      xTwitter: "https://twitter.com/KevinMagnussen",
+      website: "https://kevinmagnussen.com/"
+    },
+    raceEngineer: {
+      name: "Mark Slade",
+      callsign: "Mark",
+      dynamic: "ベテランエンジニアのスレイドと強い信頼関係を築き、冷静な戦略指示とマグヌッセンの攻撃的な走りを両立。"
+    },
+    engineeringPreference: {
+      setupBalance: "フロントの入りが良くオーバーステア傾向を好む。ブレーキングでマシンの姿勢を急旋回させる。",
+      pedalFeel: "ガツンと初期制動が効く硬いブレーキフィール。",
+      steeringWeight: "ダイレクトで重め。"
+    },
+    careerSummary: "ハースの歴史を支え続けるデンマークの闘将。デビュー戦表彰台や2022年ブラジルGPポールなど、記憶に残る名場面を創出し続ける。",
+    entries: 182,
+    wins: 0,
+    podiums: 1,
+    polePositions: 1,
+    championships: 0,
+    drivingStyle: {
+      traits: [
+        "妥協なき激しいディフェンス",
+        "スタート直後の抜群のダッシュ力",
+        "濡れた路面での大胆なアタック"
+      ],
+      brakingTechnique: "減速Gの立ち上がりが極めて急激で、相手のインサイドへ果敢に飛び込む。",
+      tyreManagement: "激しいバトルの中でもタイヤトラクションを逃さない工夫を凝らす。",
+      telemetrySignature: "減速Gの立ち上がりが極めて急激でレイトブレーキングが際立つ。スロットル全開の踏み込みが早くリアを振りながら立ち上がる。",
+      preferredCircuitTypes: [
+        "市街地サーキット (サウジアラビア、シンガポール)",
+        "高速テクニカルコース (インテルラゴス、スパ)"
+      ],
+      summary: "一切引かないホイール・トゥ・ホイールの肉弾戦。チームのためならペナルティを辞さずに他車を抑え込む究極のチームプレイヤー。"
+    },
+    biography: {
+      personality: "普段は家族思いで物静かだが、ヘルメットを被ると獰猛なバイキングファイターに変貌する。",
+      rivalries: "中団グリッドのあらゆるドライバーと激しいホイール・トゥ・ホイールの攻防を展開。",
+      iconicRaces: [
+        {
+          gp: "2022 ブラジルGP (インテルラゴス)",
+          year: 2022,
+          description: "雨が近づく金曜予選で完璧なタイミングでアタックを決め、ハースにチーム史上初の奇跡のポールポジションをもたらす。",
+          tacticalMasterclass: "セクター1からノーミスでタイムをまとめ、赤旗中断の好機を最大限に活かした。"
+        }
+      ],
+      quotes: [
+        "「レースに出るなら、持てるすべてを懸けて戦う。引く気は一切ない。」"
+      ],
+      offTrack: "父ヤン・マグヌッセンも元F1ドライバー。家族で耐久レースに参戦。"
+    },
+    milestones: [
+      {
+        date: "2014-03-16",
+        event: "マクラーレンからデビュー戦のオーストラリアGPで2位表彰台獲得の快挙",
+        refId: 1
+      },
+      {
+        date: "2022-11-11",
+        event: "ブラジルGPでハースに史上初のポールポジションをもたらす",
+        refId: 2
+      }
+    ],
+    references: [
+      {
+        id: 1,
+        title: "Kevin Magnussen Driver Profile",
+        publisher: "Haas F1 Team",
+        url: "https://www.haasf1team.com",
+        verifiedDate: "2024-03-01"
+      },
+      {
+        id: 2,
+        title: "Brazilian GP 2022: Magnussen takes shock Haas pole",
+        publisher: "Formula1.com",
+        url: "https://www.formula1.com",
+        verifiedDate: "2024-03-01"
+      }
+    ]
+  },
+  {
+    id: "valtteri-bottas",
+    code: "BOT",
+    number: 77,
+    fullName: "Valtteri Bottas",
+    country: "フィンランド 🇫🇷",
+    team: "Stake Sauber",
+    teamColor: "#52e252",
+    status: "Current",
+    nickname: "フライング・フィン / ボッタス2.0 / ウッドチョッパー",
+    birthDate: "1989-08-28",
+    birthPlace: "Nastola, Finland",
+    f1Debut: "2013年 オーストラリアGP (Williams)",
+    driverType: "精密機械のようなクリーンアタック＆無類のクオリファイア",
+    numberOrigin: "「Valt77i Bo77as」と名前に似ていることから選んだアイコニックな「77」。",
+    visualAsset: {
+      imageUrl: "/images/drivers/driver_bottas.jpg",
+      caption: "Valtteri Bottas (Stake F1 Team Kick Sauber, 2024)",
+      credit: "Wikimedia Commons",
+      license: "CC BY-SA 4.0",
+      sourceUrl: "https://commons.wikimedia.org"
+    },
+    visualGallery: [
+      {
+        imageUrl: "/images/drivers/driver_bottas.jpg",
+        caption: "通算10勝・67回表彰台を誇るフライング・フィン バルテリ・ボッタス",
+        tag: "Portrait",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/drivers/driver_bottas_podium.jpg",
+        caption: "2019年開幕戦オーストラリアGPで圧勝し雄叫びを上げるボッタス",
+        tag: "Podium",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
+    socialLinks: {
+      instagram: "https://www.instagram.com/valtteribottas/",
+      xTwitter: "https://twitter.com/ValtteriBottas",
+      website: "https://valtteribottas.com/"
+    },
+    raceEngineer: {
+      name: "Steven Petrik",
+      callsign: "Steven",
+      dynamic: "タイヤ温度とデグラデーション状況を的確に共有。北欧特有の落ち着いたテンポで交信。"
+    },
+    engineeringPreference: {
+      setupBalance: "極めて素直なニュートラルバランス。リアのトラクションが安定したマシンで真価を発揮。",
+      pedalFeel: "プログレッシブな踏力特性。トレイルブレーキングのコントロール性を最重視。",
+      steeringWeight: "適度な重さ。余分な振動のない澄んだ手応え。"
+    },
+    careerSummary: "メルセデス黄金期を支えコンストラクターズ5連覇に貢献したフィンランドの英雄。通算10勝、ポールポジション20回を記録。",
+    entries: 246,
+    wins: 10,
+    podiums: 67,
+    polePositions: 20,
+    championships: 0,
+    drivingStyle: {
+      traits: [
+        "予選での驚異的な正確性",
+        "クリーンなタイヤマネジメント",
+        "フロント荷重移動の滑らかさ"
+      ],
+      brakingTechnique: "トレイルブレーキング時にノーズを穏やかに沈ませ、タイヤを痛めずに旋回スピードを稼ぐ。",
+      tyreManagement: "クリーンなライン取りにより熱劣化を均等に保つ。",
+      telemetrySignature: "ステアリング舵角の波形が滑らかなサインカーブを描く。ブレーキングからターンインへの過渡期にタイヤのスキール音を出さない極上の荷重移動。",
+      preferredCircuitTypes: [
+        "スムーズなアスファルトの中高速コース (ソチ、メルボルン、鈴鹿)"
+      ],
+      summary: "予選での精密無比なライン取りとクリーンなドライビング。メルセデス時代はハミルトンと互角の予選スピードを披露。"
+    },
+    biography: {
+      personality: "リラックスした人柄とフィンランド特有の「Sisu（不屈の精神）」。オーストラリアのライフスタイルとサイクリングを愛する。",
+      rivalries: "ルイス・ハミルトンとはメルセデス黄金期にチームメイトとして最高峰の予選バトルを繰り広げた。",
+      iconicRaces: [
+        {
+          gp: "2019 オーストラリアGP (メルボルン)",
+          year: 2019,
+          description: "スタートでハミルトンを抜き去り、異次元のペースで20秒以上の大差をつけて独走優勝。「To whom it may concern, **** you」の名言を残した。",
+          tacticalMasterclass: "レース全周にわたってファステストラップを更新し続ける完璧なレースマネジメント。"
+        }
+      ],
+      quotes: [
+        "「To whom it may concern, **** you.」",
+        "「自分自身を信じ続けること。それが唯一の真実だ。」"
+      ],
+      offTrack: "グラベルロードバイク（自転車）の大会に多数参戦。独自のコーヒーブランド「Kahiwa Coffee」を共同所有。"
+    },
+    milestones: [
+      {
+        date: "2017-04-30",
+        event: "ロシアGP（ソチ）でF1初優勝を達成",
+        refId: 1
+      },
+      {
+        date: "2019-11-03",
+        event: "アメリカGPで優勝しドライバーズランキング2位を確定",
+        refId: 1
+      },
+      {
+        date: "2021-10-10",
+        event: "トルコGPで雨の中完璧なポール・トゥ・ウィン（通算10勝目）",
+        refId: 2
+      }
+    ],
+    references: [
+      {
+        id: 1,
+        title: "Valtteri Bottas Career Stats",
+        publisher: "Mercedes-AMG Petronas F1 Team Archives",
+        url: "https://www.mercedesamgf1.com",
+        verifiedDate: "2024-01-10"
+      },
+      {
+        id: 2,
+        title: "Turkish GP 2021: Bottas masterclass in the wet",
+        publisher: "Formula1.com",
+        url: "https://www.formula1.com",
+        verifiedDate: "2024-01-10"
+      }
+    ]
+  },
+  {
+    id: "zhou-guanyu",
+    code: "ZHO",
+    number: 24,
+    fullName: "Zhou Guanyu",
+    country: "中国 🇨🇳",
+    team: "Stake Sauber",
+    teamColor: "#52e252",
+    status: "Current",
+    nickname: "ジョー / 中国のパイオニア",
+    birthDate: "1999-05-30",
+    birthPlace: "Shanghai, China",
+    f1Debut: "2022年 バーレーンGP (Alfa Romeo)",
+    driverType: "クレバーなタイヤ管理＆ミスフリーな堅実性",
+    numberOrigin: "幼少期から崇拝していたバスケットボール界の伝説コービー・ブライアントの背番号「24」。",
+    visualAsset: {
+      imageUrl: "/images/drivers/driver_zhou.jpg",
+      caption: "Zhou Guanyu (Stake F1 Team Kick Sauber, 2024)",
+      credit: "Wikimedia Commons",
+      license: "CC BY-SA 4.0",
+      sourceUrl: "https://commons.wikimedia.org"
+    },
+    visualGallery: [
+      {
+        imageUrl: "/images/drivers/driver_zhou.jpg",
+        caption: "中国人初のF1フル参戦ドライバー 周冠宇（ジョー・グアンユー）",
+        tag: "Portrait",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/drivers/driver_zhou_paddock.jpg",
+        caption: "母国中国GPでパドックの熱狂に応える周冠宇",
+        tag: "Paddock",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
+    socialLinks: {
+      instagram: "https://www.instagram.com/zhouguanyu24/",
+      xTwitter: "https://twitter.com/ZhouGuanyu24",
+      website: "https://www.zhou-guanyu.com/"
+    },
+    raceEngineer: {
+      name: "Jorn Becker",
+      callsign: "Jorn",
+      dynamic: "タイヤ内圧とトラフィック情報の共有を緻密に行い、アンダーカット戦略を組み立てる。"
+    },
+    engineeringPreference: {
+      setupBalance: "弱アンダーステア傾向の安定した車体挙動。リアのブレを嫌う。",
+      pedalFeel: "長めのストロークで繊細にコントロールできるブレーキタッチ。",
+      steeringWeight: "標準的。滑らかな操舵感を好む。"
+    },
+    careerSummary: "中国人ドライバーとして史上初のF1フル参戦を果たした歴史的パイオニア。デビュー戦での入賞や母国中国GPでの熱狂など、アジアのモータースポーツを牽引。",
+    entries: 68,
+    wins: 0,
+    podiums: 0,
+    polePositions: 0,
+    championships: 0,
+    drivingStyle: {
+      traits: [
+        "ミスの極端な少なさ",
+        "タイヤデグラデーションの低減",
+        "市街地での高い集中力"
+      ],
+      brakingTechnique: "タイヤロックを徹底して回避するクリーンで安定したブレーキング。",
+      tyreManagement: "リアタイヤのスピンを抑え、スティント後半まで安定したトラクションを維持。",
+      telemetrySignature: "コーナリング中の舵角修正が少なく、タイヤの表面温度を均一に保つスムーズなGコントロール。",
+      preferredCircuitTypes: [
+        "上海インターナショナル・サーキット",
+        "バーレーン",
+        "モントリオール"
+      ],
+      summary: "極めてミスの少ないクレバーなドライビング。接触を避けて確実にマシンをチェッカーまで運ぶ安定感。"
+    },
+    biography: {
+      personality: "礼儀正しくファッショナブル。中国のモータースポーツ史を切り拓くパイオニアとしての誇りを持つ。",
+      rivalries: "チームメイトのバルテリ・ボッタスから学びつつ予選での僅差の戦いを演じる。",
+      iconicRaces: [
+        {
+          gp: "2024 中国GP (上海)",
+          year: 2024,
+          description: "母国の観客の前で初めて走った中国GP。チェッカー後にホームストレートで涙を流し母国の熱狂に応えた。",
+          tacticalMasterclass: "激しいスプリントと決勝をノーミスで完走し、ファンを感動の渦に巻き込んだ。"
+        }
+      ],
+      quotes: [
+        "「僕の走りが、未来の中国の若い子どもたちがF1を目指すきっかけになってほしい。」"
+      ],
+      offTrack: "ファッションモデルとしても活躍。特注ヘルメットのデザインに強いこだわりを持つ。"
+    },
+    milestones: [
+      {
+        date: "2022-03-20",
+        event: "バーレーンGPでF1デビュー戦10位入賞を果たす快挙",
+        refId: 1
+      },
+      {
+        date: "2024-04-21",
+        event: "中国人ドライバーとして史上初めて母国中国GPを走行・完走",
+        refId: 2
+      }
+    ],
+    references: [
+      {
+        id: 1,
+        title: "Zhou Guanyu Official Site",
+        publisher: "Zhou Racing",
+        url: "https://www.zhou-guanyu.com",
+        verifiedDate: "2024-03-01"
+      },
+      {
+        id: 2,
+        title: "Emotional Zhou reflects on historic home race",
+        publisher: "Formula1.com",
+        url: "https://www.formula1.com",
+        verifiedDate: "2024-04-25"
+      }
+    ]
+  },
+  {
+    id: "daniel-ricciardo",
+    code: "RIC",
+    number: 3,
+    fullName: "Daniel Ricciardo",
+    country: "オーストラリア 🇦🇺",
+    team: "RB / Visa Cash App RB",
+    teamColor: "#6692ff",
+    status: "Current",
+    nickname: "ハニージャガー / ハニーバジャー / シューイー男爵",
+    birthDate: "1989-07-01",
+    birthPlace: "Perth, Western Australia",
+    f1Debut: "2011年 イギリスGP (HRT)",
+    driverType: "異次元のレイトブレーキング＆飛び込みオーバーテイク",
+    numberOrigin: "デイル・アーンハートSr.への憧れと、自身のレースキャリア初期のナンバー「3」。",
+    visualAsset: {
+      imageUrl: "/images/drivers/driver_ricciardo.jpg",
+      caption: "Daniel Ricciardo (Visa Cash App RB F1 Team, 2024)",
+      credit: "Wikimedia Commons",
+      license: "CC BY-SA 4.0",
+      sourceUrl: "https://commons.wikimedia.org"
+    },
+    visualGallery: [
+      {
+        imageUrl: "/images/drivers/driver_ricciardo.jpg",
+        caption: "天下一品のレイトブレーキングで観客を魅了するダニエル・リカルド",
+        tag: "Portrait",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/drivers/driver_ricciardo_2.jpg",
+        caption: "パドックに笑顔とエネルギーをもたらすハニーバジャー",
+        tag: "Paddock",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 4.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
+    socialLinks: {
+      instagram: "https://www.instagram.com/danielricciardo/",
+      xTwitter: "https://twitter.com/danielricciardo",
+      website: "https://danielricciardo.com/"
+    },
+    raceEngineer: {
+      name: "Pierre Hamelin",
+      callsign: "Pierre",
+      dynamic: "ユーモアを交えつつ的確なタイヤ状況とオーバーテイク機会を提示。"
+    },
+    engineeringPreference: {
+      setupBalance: "進入でのフロントノーズの食いつきと、トレイルブレーキング時にリアが粘るシャシーバランスを好む。",
+      pedalFeel: "強固なブレーキペダル。奥でミリ単位の踏力コントロールができるショートストローク。",
+      steeringWeight: "ダイレクトで明確なインフォメーション。"
+    },
+    careerSummary: "グランプリ通算8勝、モナコGP制覇を誇るF1界屈指の人気ドライバー。卓越したレイトブレーキングと大胆な飛び込みオーバーテイクが代名詞。",
+    entries: 257,
+    wins: 8,
+    podiums: 32,
+    polePositions: 3,
+    championships: 0,
+    drivingStyle: {
+      traits: [
+        "世界最強のレイトブレーキング",
+        "インサイドへの鋭いダイブボム",
+        "市街地モナコでの異次元スピード"
+      ],
+      brakingTechnique: "限界ギリギリまでブレーキングを我慢し、トレイルブレーキングで車体を曲げながら飛び込む。",
+      tyreManagement: "フロントタイヤに負荷をかけすぎず、トラクション重視のラインでリアを守る。",
+      telemetrySignature: "他車がブレーキを踏み始めてからさらに10m以上奥で100%ブレーキを踏み込む。エイペックス直前までブレーキを残しながら強引にノーズをインに向ける。",
+      preferredCircuitTypes: [
+        "市街地サーキット (モナコ、バクー、シンガポール)",
+        "中高速コース (モンツァ、スパ)"
+      ],
+      summary: "「Lick the stamp and send it」に代表される、ブレーキングポイントを極限まで奥に取る電光石火のダイブボム・オーバーテイク。"
+    },
+    biography: {
+      personality: "満面のビッグスマイルと「Shoey（シューズからシャンパンを飲む）」で世界中のファンに愛されるパドックの太陽。",
+      rivalries: "マックス・フェルスタッペンやセバスチャン・ベッテルら歴代王者とレッドブルで激闘を展開。",
+      iconicRaces: [
+        {
+          gp: "2018 モナコGP (モンテカルロ)",
+          year: 2018,
+          description: "MGU-Kの故障で160馬力を失い、ギアも6速までしか使えない絶望的状況でベッテルを抑えきり悲願のモナコ初優勝。",
+          tacticalMasterclass: "コーナー脱出のトラクションと短い直線での位置取りだけで首位を死守した伝説の走量。"
+        }
+      ],
+      quotes: [
+        "「Lick the stamp and send it! (切手を舐めて貼って、投函するだけさ！)」",
+        "「僕は勝つためにここにいる。」"
+      ],
+      offTrack: "自身のワインブランド「DR3」やアパレル「Enchante」を展開。カントリーミュージック好き。"
+    },
+    milestones: [
+      {
+        date: "2014-06-08",
+        event: "カナダGPでメルセデス連勝を阻むキャリア初優勝",
+        refId: 1
+      },
+      {
+        date: "2018-05-27",
+        event: "パワー喪失を耐え抜いて感動のモナコGP優勝",
+        refId: 1
+      },
+      {
+        date: "2021-09-12",
+        event: "モンツァでマクラーレンに9年ぶりの勝利（1-2フィニッシュ）をもたらす",
+        refId: 2
+      }
+    ],
+    references: [
+      {
+        id: 1,
+        title: "Daniel Ricciardo Official Biography",
+        publisher: "Ricciardo Racing",
+        url: "https://danielricciardo.com",
+        verifiedDate: "2024-01-10"
+      },
+      {
+        id: 2,
+        title: "Italian GP 2021: Ricciardo leads McLaren 1-2",
+        publisher: "Formula1.com",
+        url: "https://www.formula1.com",
+        verifiedDate: "2024-01-10"
+      }
+    ]
+  },
+  {
+    id: "alain-prost",
+    code: "PRO",
+    number: 1,
+    fullName: "Alain Prost",
+    country: "フランス 🇫🇷",
+    team: "McLaren / Renault / Ferrari / Williams",
+    teamColor: "#D4AF37",
+    status: "Legend",
+    nickname: "プロフェッサー (教授) / Le Professeur",
+    birthDate: "1955-02-24",
+    birthPlace: "Lorette, Loire, France",
+    f1Debut: "1980年 アルゼンチンGP (McLaren)",
+    driverType: "完璧な知性＆レース全体の数学的マネジメント",
+    numberOrigin: "4度のワールドチャンピオン獲得時に背負った栄光のナンバー「1」。",
+    visualAsset: {
+      imageUrl: "/images/drivers/driver_prost.jpg",
+      caption: "Alain Prost (McLaren TAG Porsche, 1984)",
+      credit: "Wikimedia Commons",
+      license: "CC BY-SA 3.0",
+      sourceUrl: "https://commons.wikimedia.org"
+    },
+    visualGallery: [
+      {
+        imageUrl: "/images/drivers/driver_prost.jpg",
+        caption: "F1史上屈指の頭脳と技術で4度の世界王者に輝いたアラン・プロスト",
+        tag: "Portrait",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 3.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/drivers/driver_prost_2.jpg",
+        caption: "マクラーレン・ホンダで数々の歴史的勝利を打ち立てたプロスト",
+        tag: "Action",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 3.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/drivers/driver_prost_mclaren.jpg",
+        caption: "白煙を上げてコーナーを立ち上がる伝説のプロスト・マクラーレン",
+        tag: "Action",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 3.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
+    socialLinks: {
+      instagram: "https://www.instagram.com/alainprostofficial/",
+      xTwitter: "https://twitter.com/Prost_official",
+      website: "https://www.prost.com/"
+    },
+    raceEngineer: {
+      name: "Neil Oatley",
+      callsign: "Neil",
+      dynamic: "車体ジオメトリと燃費計算を緻密にすり合わせ、レース終盤に最も速くなるセットアップを追求。"
+    },
+    engineeringPreference: {
+      setupBalance: "わずかにアンダーステア寄りの極めて安定したマシン。タイヤと燃料を極限まで節約するセッティング。",
+      pedalFeel: "プログレッシブで滑らかなブレーキ。ブレーキロックを絶対にいかなるコーナーでも起こさない。",
+      steeringWeight: "極めて軽やか。スムーズな舵角維持。"
+    },
+    careerSummary: "通算51勝、4度の世界チャンピオン。卓越した計算能力とスムーズな走りで「プロフェッサー」と称されたF1史上最高の頭脳派レジェンド。",
+    entries: 199,
+    wins: 51,
+    podiums: 106,
+    polePositions: 33,
+    championships: 4,
+    championshipYears: [
+      1985,
+      1986,
+      1989,
+      1993
+    ],
+    drivingStyle: {
+      traits: [
+        "神業的なタイヤ＆燃料マネジメント",
+        "極限まで無駄を削ぎ落としたスムーズなステアリング",
+        "レース全体の戦況予測能力"
+      ],
+      brakingTechnique: "決してホイールロックを起こさず、減速と旋回を最も滑らかに連動させる芸術的ブレーキング。",
+      tyreManagement: "レース終了時でもタイヤトレッドが新品のように残るほどの極限のタイヤ節約技術。",
+      telemetrySignature: "テレメトリー波形に急激なスパイクが一切存在しない。ブレーキング、荷重移動、スロットル開度のすべてが極上のなだらかな曲線を描く。",
+      preferredCircuitTypes: [
+        "スムーズなテクニカルコース (ポール・リカール、モナコ、シルバーストン)"
+      ],
+      summary: "「レースで勝つために必要な最小限のスピードで走る」。車体、エンジン、ブレーキ、タイヤに一切の負荷をかけず、チェッカーフラッグ時に1位でゴールする究極の合理的ドライビング。"
+    },
+    biography: {
+      personality: "明晰な頭脳と冷静沈着な判断力。政治的駆け引きにも長け、F1の戦いをチェスのように支配した「教授」。",
+      rivalries: "アイルトン・セナとはF1史上最も熾烈でドラマチックな宿命のライバル関係。ニキ・ラウダとは0.5点差の王座争いを演じた。",
+      iconicRaces: [
+        {
+          gp: "1986 オーストラリアGP (アデレード)",
+          year: 1986,
+          description: "圧倒的有利と言われたマンセルとピケのウィリアムズ・ホンダに対し、巧みな燃費とタイヤ管理で劇的な逆転タイトル連覇を達成。",
+          tacticalMasterclass: "パンクで脱落したライバルを横目に、燃料計ギリギリのペースでマシンをチェッカーへ導いた。"
+        }
+      ],
+      quotes: [
+        "「レースとは、可能な限り遅く走り、それでもなお勝つことだ。」",
+        "「セナがいたからこそ、僕のキャリアは不滅のものになった。」"
+      ],
+      offTrack: "ツール・ド・フランスの市民レースに出場するほどの熱狂的サイクリスト。F1チーム「プロスト・グランプリ」のオーナーも務めた。"
+    },
+    milestones: [
+      {
+        date: "1981-07-05",
+        event: "フランスGP（ディジョン）でルノーからキャリア初優勝",
+        refId: 1
+      },
+      {
+        date: "1985-10-06",
+        event: "ヨーロッパGP（ブランズハッチ）でフランス人初のワールドチャンピオン戴冠",
+        refId: 1
+      },
+      {
+        date: "1993-09-26",
+        event: "ポルトガルGPで通算4度目のワールドチャンピオンを確定",
+        refId: 2
+      }
+    ],
+    references: [
+      {
+        id: 1,
+        title: "Alain Prost: Four-Time World Champion Legacy",
+        publisher: "FIA Hall of Fame",
+        url: "https://www.fia.com",
+        verifiedDate: "2023-05-15"
+      },
+      {
+        id: 2,
+        title: "McLaren Heritage: The Alain Prost Archives",
+        publisher: "McLaren Racing",
+        url: "https://www.mclaren.com",
+        verifiedDate: "2023-05-15"
+      }
+    ]
+  },
+  {
+    id: "niki-lauda",
+    code: "LAU",
+    number: 12,
+    fullName: "Niki Lauda",
+    country: "オーストリア 🇦🇹",
+    team: "Ferrari / Brabham / McLaren",
+    teamColor: "#D4AF37",
+    status: "Legend",
+    nickname: "不死鳥 / ラット / コンピューター",
+    birthDate: "1949-02-22",
+    birthPlace: "Vienna, Austria",
+    f1Debut: "1971年 オーストリアGP (March)",
+    driverType: "冷静沈着な論理的分析＆奇跡の不屈精神",
+    numberOrigin: "1975年フェラーリで自身初の世界タイトルを獲得した際に背負った伝説の「12」。",
+    visualAsset: {
+      imageUrl: "/images/drivers/driver_lauda.jpg",
+      caption: "Niki Lauda (Scuderia Ferrari, 1975)",
+      credit: "Wikimedia Commons",
+      license: "CC BY-SA 3.0",
+      sourceUrl: "https://commons.wikimedia.org"
+    },
+    visualGallery: [
+      {
+        imageUrl: "/images/drivers/driver_lauda.jpg",
+        caption: "不屈の魂で3度のワールドチャンピオンに輝いた伝説のニキ・ラウダ",
+        tag: "Portrait",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 3.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/drivers/driver_lauda_2.jpg",
+        caption: "マクラーレンで復帰し0.5ポイント差で3度目の王座を獲得したラウダ",
+        tag: "Action",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 3.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: "/images/drivers/driver_lauda_ferrari.jpg",
+        caption: "フェラーリ312Tを駆り1970年代のF1を席巻した黄金期",
+        tag: "Historic",
+        credit: "Wikimedia Commons",
+        license: "CC BY-SA 3.0",
+        sourceUrl: "https://commons.wikimedia.org"
+      }
+    ],
+    socialLinks: {
+      instagram: "https://www.instagram.com/nikilaudaofficial/",
+      website: "https://www.lauda.com/"
+    },
+    raceEngineer: {
+      name: "Mauro Forghieri",
+      callsign: "Mauro",
+      dynamic: "マシンの欠陥を辛辣かつ正確に指摘し、エンジニアと二人三脚で常勝マシンを作り上げる。"
+    },
+    engineeringPreference: {
+      setupBalance: "正確で剛性感のあるフロント回頭性。自身のテスト走行によるデータ主義的マシンセッティング。",
+      pedalFeel: "明確でダイレクトなブレーキングタッチ。",
+      steeringWeight: "適正なフィードバック。直感ではなく理詰めのセッティング。"
+    },
+    careerSummary: "3度の世界チャンピオン。1976年の瀕死の炎上事故からわずか42日後に奇跡の復帰を遂げた「不死鳥」。データと論理でレースを支配した不朽の英雄。",
+    entries: 171,
+    wins: 25,
+    podiums: 54,
+    polePositions: 24,
+    championships: 3,
+    championshipYears: [
+      1975,
+      1977,
+      1984
+    ],
+    drivingStyle: {
+      traits: [
+        "感情を排除した冷静なリスク計算",
+        "開発能力とマシンフィードバックの天才",
+        "不屈の精神力"
+      ],
+      brakingTechnique: "リスクを一切冒さず、確実に止めて確実に立ち上がる計算されたブレーキング。",
+      tyreManagement: "摩耗度合いをラップごとに把握し、タイヤの性能低下曲線を予測して走行。",
+      telemetrySignature: "コーナーごとの速度損失とタイヤ磨耗を頭の中で完全に数値化。限界の99%でリスクを1%も踏み越えない究極の安定周回。",
+      preferredCircuitTypes: [
+        "高速サーキット (モンツァ、ザントフォールト、ワトキンスグレン)"
+      ],
+      summary: "リスクとリターンを冷徹に計算し、感情に流されず最速かつ安全なラインを走る「走るコンピューター」。1976年の死線からの奇跡の復帰はスポーツ史上最大の英雄譚。"
+    },
+    biography: {
+      personality: "率直かつ無駄を嫌う合理主義者。映画『RUSH』でも描かれたジェームス・ハントとのライバル関係はモータースポーツの永遠の象徴。",
+      rivalries: "ジェームス・ハントとは1976年の伝説的タイトル争いを繰り広げ生涯の友となった。アラン・プロストとは1984年0.5点差の死闘を演じた。",
+      iconicRaces: [
+        {
+          gp: "1976 イタリアGP (モンツァ)",
+          year: 1976,
+          description: "ニュルブルクリンクの炎上大事故で瀕死の重傷を負ってからわずか42日後、包帯を血で滲ませながらモンツァで奇跡の4位完走。世界を震撼させた。",
+          tacticalMasterclass: "激痛と恐怖を克服し、驚異の精神力で首位集団と互角のラップを刻み続けた。"
+        }
+      ],
+      quotes: [
+        "「成功から学ぶことは何もない。人は失敗と逆境からのみ強くなる。」",
+        "「私は頭脳でレースに勝つ。感情はガレージに置いていく。」"
+      ],
+      offTrack: "ラウダ航空を創業した航空会社オーナー。晩年はメルセデスF1チームの非常勤会長としてハミルトンらを率い黄金期を築いた。"
+    },
+    milestones: [
+      {
+        date: "1974-04-28",
+        event: "スペインGP（ハラマ）でフェラーリからF1初優勝",
+        refId: 1
+      },
+      {
+        date: "1975-09-07",
+        event: "モンツァで自身初となるドライバーズワールドチャンピオン戴冠",
+        refId: 1
+      },
+      {
+        date: "1976-09-12",
+        event: "炎上大事故からわずか42日後にモンツァで奇跡の4位復帰",
+        refId: 2
+      },
+      {
+        date: "1984-10-21",
+        event: "ポルトガルGPでプロストを0.5点差で抑え3度目の世界王者に輝く",
+        refId: 2
+      }
+    ],
+    references: [
+      {
+        id: 1,
+        title: "Niki Lauda: The Computer and the Phoenix",
+        publisher: "Scuderia Ferrari Historical Archives",
+        url: "https://www.ferrari.com",
+        verifiedDate: "2023-01-15"
+      },
+      {
+        id: 2,
+        title: "FIA Hall of Fame: Andreas Nikolaus Lauda",
+        publisher: "FIA Official Publications",
+        url: "https://www.fia.com",
+        verifiedDate: "2023-01-15"
+      }
+    ]
+  },
 ];
 
 

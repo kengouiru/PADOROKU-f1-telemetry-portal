@@ -341,6 +341,16 @@ export default function DashboardPage() {
       '11': 'PER',
       '14': 'ALO',
       '22': 'TSU',
+      '10': 'GAS',
+      '31': 'OCO',
+      '23': 'ALB',
+      '43': 'COL',
+      '18': 'STR',
+      '27': 'HUL',
+      '20': 'MAG',
+      '77': 'BOT',
+      '24': 'ZHO',
+      '3': 'RIC',
     };
 
     const targetCode = target.targetDriver ? (DRIVER_NUM_TO_CODE[target.targetDriver] ?? 'VER') : 'VER';

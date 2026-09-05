@@ -193,8 +193,20 @@ const DRIVER_TRAITS: Record<string, DriverTrait> = {
   'PER': { topSpeedBias: +0.8, brakingPointBias: +0.2, apexSpeedBias: -0.5, exitThrottleBias: +0.2, gearSmoothness: 0.9 },
   'ALO': { topSpeedBias: -0.5, brakingPointBias: -0.3, apexSpeedBias: +2.0, exitThrottleBias: +0.3, gearSmoothness: 0.95 },
   'TSU': { topSpeedBias: +0.0, brakingPointBias: -0.4, apexSpeedBias: +1.0, exitThrottleBias: +0.1, gearSmoothness: 0.85 },
+  'GAS': { topSpeedBias: +0.2, brakingPointBias: -0.2, apexSpeedBias: +0.5, exitThrottleBias: +0.2, gearSmoothness: 0.9 },
+  'OCO': { topSpeedBias: +0.4, brakingPointBias: -0.3, apexSpeedBias: +0.4, exitThrottleBias: +0.1, gearSmoothness: 0.88 },
+  'ALB': { topSpeedBias: +1.0, brakingPointBias: -0.2, apexSpeedBias: +0.8, exitThrottleBias: +0.3, gearSmoothness: 0.9 },
+  'COL': { topSpeedBias: +0.6, brakingPointBias: -0.4, apexSpeedBias: +1.0, exitThrottleBias: +0.2, gearSmoothness: 0.85 },
+  'STR': { topSpeedBias: +0.0, brakingPointBias: +0.1, apexSpeedBias: -0.2, exitThrottleBias: +0.3, gearSmoothness: 0.88 },
+  'HUL': { topSpeedBias: +0.8, brakingPointBias: -0.4, apexSpeedBias: +1.2, exitThrottleBias: +0.2, gearSmoothness: 0.92 },
+  'MAG': { topSpeedBias: +0.3, brakingPointBias: -0.5, apexSpeedBias: +0.6, exitThrottleBias: +0.1, gearSmoothness: 0.85 },
+  'BOT': { topSpeedBias: +0.5, brakingPointBias: -0.1, apexSpeedBias: +0.9, exitThrottleBias: +0.35, gearSmoothness: 0.95 },
+  'ZHO': { topSpeedBias: -0.2, brakingPointBias: +0.0, apexSpeedBias: +0.3, exitThrottleBias: +0.2, gearSmoothness: 0.9 },
+  'RIC': { topSpeedBias: +0.5, brakingPointBias: -0.5, apexSpeedBias: +1.5, exitThrottleBias: +0.25, gearSmoothness: 0.9 },
   'SEN': { topSpeedBias: +3.0, brakingPointBias: -0.6, apexSpeedBias: +4.0, exitThrottleBias: +0.5, gearSmoothness: 0.8 },
   'MSC': { topSpeedBias: +2.5, brakingPointBias: -0.5, apexSpeedBias: +3.5, exitThrottleBias: +0.4, gearSmoothness: 0.95 },
+  'PRO': { topSpeedBias: +1.5, brakingPointBias: -0.2, apexSpeedBias: +3.0, exitThrottleBias: +0.4, gearSmoothness: 0.98 },
+  'LAU': { topSpeedBias: +1.2, brakingPointBias: -0.3, apexSpeedBias: +2.8, exitThrottleBias: +0.35, gearSmoothness: 0.96 },
 };
 
 function getDriverTrait(code: string): DriverTrait {
