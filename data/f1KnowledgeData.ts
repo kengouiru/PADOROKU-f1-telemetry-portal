@@ -220,7 +220,7 @@ export interface CircuitProfile {
   turns: number;
   drsZones: number;
   downforceLevel: 'High' | 'Medium-High' | 'Medium' | 'Low';
-  tyreStress: 'Very High' | 'High' | 'Medium' | 'Low';
+  tyreStress: 'Very High' | 'High' | 'Medium-High' | 'Medium' | 'Low';
   typicalPitLossSec: number;
   safetyCarProbability?: string;
   undercutImpact?: string;
@@ -4710,6 +4710,2725 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       },
     ],
   },
+  {
+    "id": "albert-park",
+    "name": "アルバート・パーク・サーキット",
+    "officialName": "Melbourne Grand Prix Circuit (Albert Park)",
+    "country": "オーストラリア 🇦🇺",
+    "lengthKm": 5.278,
+    "turns": 14,
+    "drsZones": 4,
+    "downforceLevel": "Medium-High",
+    "tyreStress": "Medium",
+    "typicalPitLossSec": 20.2,
+    "safetyCarProbability": "65% (高)",
+    "undercutImpact": "中程度（トラックポジション優先、SC頻度高）",
+    "lapRecord": {
+      "time": "1:19.813",
+      "driver": "Charles Leclerc (Ferrari)",
+      "year": 2024
+    },
+    "characteristics": "湖の周りの公道を改修した高速セミストリートサーキット。2022年の大改修で旧シケインが撤去され全開区間が急増、DRSゾーンが最大4箇所設定される高速バトルコースへと進化 [1]。ウォールとの距離が近く、SC出動率が非常に高い [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_albert_park.jpg",
+      "credit": "Ozzmosis",
+      "license": "CC BY-SA 2.5",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Melbourne_Grand_Prix_Circuit_pit_building.jpg"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_albert_park.jpg",
+        "credit": "Ozzmosis",
+        "license": "CC BY-SA 2.5",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Melbourne_Grand_Prix_Circuit_pit_building.jpg"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_albert_park.jpg",
+        "caption": "アルバート・パークのピットレーンとメインストレート風景",
+        "tag": "Panoramic",
+        "credit": "Ozzmosis",
+        "license": "CC BY-SA 2.5",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Melbourne_Grand_Prix_Circuit_pit_building.jpg"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 2.6,
+      "longestStraightMeters": 850,
+      "gForceMax": {
+        "lateral": 4.3,
+        "longitudinal": 4.5
+      },
+      "keyCorners": [
+        {
+          "number": "T1-T2",
+          "name": "Jones / Brabham",
+          "characteristic": "315km/hから進入するスタート直後の難所シケイン。"
+        },
+        {
+          "number": "T9-T10",
+          "name": "Lakeside Fast Chicanes",
+          "characteristic": "旧シケイン撤去後の超高速250km/hフローセクション。"
+        },
+        {
+          "number": "T11-T12",
+          "name": "Waite Corner",
+          "characteristic": "全開で駆け抜ける左〜右の高速切り返し。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1-T2",
+        "name": "Jones & Brabham",
+        "gearEstimated": "3rd",
+        "speedEstimated": "135 km/h",
+        "engineeringTip": "縁石をアグレッシブにカットしつつT2でのトラクションを確保。"
+      },
+      {
+        "number": "T3",
+        "name": "Sports Complex (T3)",
+        "gearEstimated": "2nd",
+        "speedEstimated": "90 km/h",
+        "engineeringTip": "ブレーキングでのフロントロックに警戒。オーバーテイク可能ポイント。"
+      },
+      {
+        "number": "T4",
+        "name": "T4 Exit",
+        "gearEstimated": "3rd",
+        "speedEstimated": "140 km/h",
+        "engineeringTip": "外側の人工芝・ウォールに近づきすぎないようスロットルコントロール。"
+      },
+      {
+        "number": "T6-T7",
+        "name": "Marina Complex",
+        "gearEstimated": "4th",
+        "speedEstimated": "160 km/h",
+        "engineeringTip": "高速進入から素早い荷重移動で右へターンイン。"
+      },
+      {
+        "number": "T9-T10",
+        "name": "Lakeside Sweeper",
+        "gearEstimated": "7th",
+        "speedEstimated": "260 km/h",
+        "engineeringTip": "アクセル全開で湖畔を駆け抜ける超高速ダウンフォーステスト区間。"
+      },
+      {
+        "number": "T11-T12",
+        "name": "Waite",
+        "gearEstimated": "6th",
+        "speedEstimated": "225 km/h",
+        "engineeringTip": "6速全開に近い高速シケイン。フロアのボトミングと縁石衝撃に注意。"
+      },
+      {
+        "number": "T13-T14",
+        "name": "Prost Turn",
+        "gearEstimated": "2nd",
+        "speedEstimated": "85 km/h",
+        "engineeringTip": "ホームストレートへ繋がる最終減速。リアトラクションが最重要。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2023,
+        "title": "3度の赤旗中断と最終リスタートのカオス",
+        "description": "レース終盤のクラッシュで赤旗が連発、残り2周のスタンディングスタートで多重クラッシュが発生した歴史的波乱劇。",
+        "detailedStory": "2023年オーストラリアGP。終盤マグヌッセンのクラッシュで2度目の赤旗。残り2周で再開されたスタンディングスタートで、ターン1にかけてサージェントがデ・フリースに追突、アルピーヌ同門（オコンとガスリー）が同士討ち、サインツがアロンソをスピンさせる大混乱が発生。審判団はセクター1通過前の中断と判断し、赤旗前の順位でSC先導フィニッシュとする異例の結末となった。",
+        "significance": "赤旗リスタートの安全性と公平性に関するFIA規則運用の大きな転換点。",
+        "historicalImpact": "スタンディングスタート時の路面コンディションとドライバー心理の極限状態が議論され、リスタート規定の見直しへと繋がった。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "改修により最高速重視の低〜中ドラッグセッティングが求められるようになった。",
+      "kerbUsage": "公道ベースのため縁石が高く、サスペンションのしなやかな減衰特性が不可欠。",
+      "brakeDemands": "T1、T3、T13での急減速。冷却風路を絞りすぎると後半に熱フェードが発生。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Albert Park Circuit 2022 Track Modifications Review",
+        "publisher": "Australian Grand Prix Corporation",
+        "url": "https://www.grandprix.com.au",
+        "verifiedDate": "2024-03-20"
+      },
+      {
+        "id": 2,
+        "title": "FIA Melbourne Technical Dossier & High-Speed Aerodynamics",
+        "publisher": "FIA Official Publications",
+        "url": "https://www.fia.com",
+        "verifiedDate": "2024-03-22"
+      }
+    ]
+  },
+  {
+    "id": "shanghai",
+    "name": "上海インターナショナル・サーキット",
+    "officialName": "Shanghai International Circuit",
+    "country": "中国 🇨🇳",
+    "lengthKm": 5.451,
+    "turns": 16,
+    "drsZones": 2,
+    "downforceLevel": "Medium-High",
+    "tyreStress": "High",
+    "typicalPitLossSec": 22.8,
+    "safetyCarProbability": "40% (中程度)",
+    "undercutImpact": "大（フロント左タイヤのグレイニングが著しく、早めの交換が有効）",
+    "lapRecord": {
+      "time": "1:32.238",
+      "driver": "Michael Schumacher (Ferrari)",
+      "year": 2004
+    },
+    "characteristics": "漢字の「上」をモチーフにヘルマン・ティルケが設計。名物ターン1〜4の270度カタツムリコーナーと、1.2kmにおよぶ超長大バックストレートの対比が極めてユニーク [1]。フロント左タイヤへの荷重負荷がグリッド最高峰 [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_shanghai.jpg",
+      "credit": "Wikimedia Commons",
+      "license": "CC BY-SA 2.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Shanghai_F1_Circui_01.jpg"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_shanghai.jpg",
+        "credit": "Wikimedia Commons",
+        "license": "CC BY-SA 2.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Shanghai_F1_Circui_01.jpg"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_shanghai.jpg",
+        "caption": "上海インターナショナル・サーキットの壮大なメインスタンド風景",
+        "tag": "Panoramic",
+        "credit": "Wikimedia Commons",
+        "license": "CC BY-SA 2.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Shanghai_F1_Circui_01.jpg"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 7.4,
+      "longestStraightMeters": 1170,
+      "gForceMax": {
+        "lateral": 4.1,
+        "longitudinal": 4.6
+      },
+      "keyCorners": [
+        {
+          "number": "T1-T4",
+          "name": "Snails Corner (カタツムリ)",
+          "characteristic": "300km/hから徐々に半径が縮まるエンドレス複合右コーナー。"
+        },
+        {
+          "number": "T7-T8",
+          "name": "High Speed Sweep",
+          "characteristic": "横Gに耐えながら全開で旋回する高速S字。"
+        },
+        {
+          "number": "T14",
+          "name": "Hairpin (Back Straight End)",
+          "characteristic": "1.2kmストレートの先にある65km/hヘアピン。最大の抜き所。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1-T2",
+        "name": "ターン1 〜 ターン2",
+        "gearEstimated": "7th ➔ 2nd",
+        "speedEstimated": "305 ➔ 80 km/h",
+        "engineeringTip": "進入からエイペックスまでステアリングを切り込み続けながらトレイルブレーキング。フロント左タイヤ酷使。"
+      },
+      {
+        "number": "T3-T4",
+        "name": "ターン3 〜 ターン4",
+        "gearEstimated": "2nd ➔ 3rd",
+        "speedEstimated": "85 ➔ 130 km/h",
+        "engineeringTip": "左へタイトに切り返して立ち上がり。トラクション性能が試される。"
+      },
+      {
+        "number": "T6",
+        "name": "低速ヘアピン (T6)",
+        "gearEstimated": "2nd",
+        "speedEstimated": "75 km/h",
+        "engineeringTip": "確実な制動とエイペックスヒットで立ち上がりのスロットルオンを早める。"
+      },
+      {
+        "number": "T7-T8",
+        "name": "高速エッセ (T7-T8)",
+        "gearEstimated": "5th ➔ 6th",
+        "speedEstimated": "210 ➔ 250 km/h",
+        "engineeringTip": "マシンのダウンフォースとフロントの入りが鍵。タイヤが悲鳴を上げる。"
+      },
+      {
+        "number": "T9-T10",
+        "name": "中速ツインレフト",
+        "gearEstimated": "4th",
+        "speedEstimated": "160 km/h",
+        "engineeringTip": "バックストレート前バンクへの助走。"
+      },
+      {
+        "number": "T11-T13",
+        "name": "バンク付きロングライト",
+        "gearEstimated": "4th ➔ 6th",
+        "speedEstimated": "170 ➔ 240 km/h",
+        "engineeringTip": "徐々に加速しながらバックストレートへ飛び出す。"
+      },
+      {
+        "number": "T14",
+        "name": "バックストレートエンド ヘアピン",
+        "gearEstimated": "2nd",
+        "speedEstimated": "65 km/h",
+        "engineeringTip": "335km/hからのヘビーブレーキング。DRSオーバーテイクの主戦場。"
+      },
+      {
+        "number": "T16",
+        "name": "最終コーナー",
+        "gearEstimated": "4th",
+        "speedEstimated": "165 km/h",
+        "engineeringTip": "ホームストレートへ最高速を乗せるため縁石を広く活用。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2006,
+        "title": "ミハエル・シューマッハ F1通算91勝目（キャリア最後の優勝）",
+        "description": "ウェットからドライへ変化する路面でルノー勢を戦略と圧倒的タイヤマネジメントで逆転した皇帝最後の勝利。",
+        "detailedStory": "2006年中国GP。予選6位のフェラーリ・シューマッハは、濡れた路面でミシュランを履くアロンソとフィジケラを追走。路面が乾き始める中でブリヂストンタイヤの作動ウィンドウを完璧に捉え、ピットストップとターン1の鮮やかなオーバーテイクでトップに浮上。これがシューマッハのキャリア通算91勝目、そして生涯最後のF1表彰台頂点となった。",
+        "significance": "皇帝シューマッハの伝説的キャリアの集大成となった名勝負。",
+        "historicalImpact": "2006年のアロンソとの熾烈なタイトル争いを同ポイントに持ち込み、F1史に残る名勝負として語り継がれている。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "長大なバックストレートでの最高速と、T1-4・T7-8での強力なダウンフォースの両立が最難問。",
+      "kerbUsage": "縁石は比較的フラットだが、T13の立ち上がりでのスナップオーバーステアに注意。",
+      "brakeDemands": "1.2kmストレート後のT14での強烈なブレーキング熱負荷。ディスク温度が1000℃を超える。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Shanghai International Circuit Engineering Blueprint",
+        "publisher": "Tilke Engineers & Architects",
+        "url": "https://tilke.de",
+        "verifiedDate": "2024-04-10"
+      },
+      {
+        "id": 2,
+        "title": "Front Tyre Graining Dynamics at Shanghai Turn 1-4",
+        "publisher": "Pirelli Motorsport Technical Notes",
+        "url": "https://www.pirelli.com",
+        "verifiedDate": "2024-04-12"
+      }
+    ]
+  },
+  {
+    "id": "miami",
+    "name": "マイアミ・インターナショナル・オートドローム",
+    "officialName": "Miami International Autodrome",
+    "country": "アメリカ 🇺🇸",
+    "lengthKm": 5.412,
+    "turns": 19,
+    "drsZones": 3,
+    "downforceLevel": "Medium",
+    "tyreStress": "High",
+    "typicalPitLossSec": 20.5,
+    "safetyCarProbability": "60% (高)",
+    "undercutImpact": "大（高路面温度によるタイヤ表面オーバーヒート）",
+    "lapRecord": {
+      "time": "1:29.708",
+      "driver": "Max Verstappen (Red Bull)",
+      "year": 2023
+    },
+    "characteristics": "NFLハードロック・スタジアムの敷地内に特設されたテクニカル市街地サーキット。マリーナ風パドックや立体交差下を抜ける超タイトなシケイン（T14-15）と、3本の長大な全開ストレートが同居 [1]。フロリダの強烈な日差しによる路面温度55℃超の熱負荷がタイヤを痛めつける [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_miami.jpg",
+      "credit": "USACJack",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Start_of_the_Porsche_Sprint_Challenge_North_America_at_the_F1_Miami_GP_-_2022.jpg"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_miami.jpg",
+        "credit": "USACJack",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Start_of_the_Porsche_Sprint_Challenge_North_America_at_the_F1_Miami_GP_-_2022.jpg"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_miami.jpg",
+        "caption": "ハードロック・スタジアムを背景に疾走するマイアミGPの熱気",
+        "tag": "Panoramic",
+        "credit": "USACJack",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Start_of_the_Porsche_Sprint_Challenge_North_America_at_the_F1_Miami_GP_-_2022.jpg"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 4.5,
+      "longestStraightMeters": 1280,
+      "gForceMax": {
+        "lateral": 4.2,
+        "longitudinal": 4.7
+      },
+      "keyCorners": [
+        {
+          "number": "T1",
+          "name": "ターン1",
+          "characteristic": "メインストレートエンドの直角右コーナー。スタート直後の混乱地帯。"
+        },
+        {
+          "number": "T14-T15",
+          "name": "高速道路高架下シケイン",
+          "characteristic": "上り勾配からブラインドで切り返す超低速シケイン。"
+        },
+        {
+          "number": "T17",
+          "name": "バックストレートエンド ヘアピン",
+          "characteristic": "340km/hから65km/hへ急減速する最大の抜き所。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1",
+        "name": "ターン1",
+        "gearEstimated": "2nd",
+        "speedEstimated": "85 km/h",
+        "engineeringTip": "ハードブレーキングからの立ち上がりトラクションが重要。"
+      },
+      {
+        "number": "T2-T3",
+        "name": "テクニカルベンド",
+        "gearEstimated": "3rd",
+        "speedEstimated": "130 km/h",
+        "engineeringTip": "リズミカルな荷重移動で高速セクションへアプローチ。"
+      },
+      {
+        "number": "T4-T8",
+        "name": "高速エッセ (スタジアム周回)",
+        "gearEstimated": "5th ➔ 6th",
+        "speedEstimated": "200 ➔ 245 km/h",
+        "engineeringTip": "鈴鹿やCOTAに似た高速連続コーナー。フロントの応答性が鍵。"
+      },
+      {
+        "number": "T11-T13",
+        "name": "中速コンプレックス",
+        "gearEstimated": "3rd",
+        "speedEstimated": "110 km/h",
+        "engineeringTip": "高架下シケインへ向けて速度を落とし込むアプローチ。"
+      },
+      {
+        "number": "T14-T15",
+        "name": "高架下超低速シケイン",
+        "gearEstimated": "1st ➔ 2nd",
+        "speedEstimated": "55 km/h",
+        "engineeringTip": "縁石に乗りすぎるとマシンがジャンプしてコントロール不能に。"
+      },
+      {
+        "number": "T16",
+        "name": "バックストレートアプローチ",
+        "gearEstimated": "3rd",
+        "speedEstimated": "120 km/h",
+        "engineeringTip": "1.3kmストレートへ全開加速を乗せる最重要立ち上がり。"
+      },
+      {
+        "number": "T17",
+        "name": "ターン17 ヘアピン",
+        "gearEstimated": "2nd",
+        "speedEstimated": "68 km/h",
+        "engineeringTip": "340km/hからのヘビーブレーキング。DRSオーバーテイクの決め手。"
+      },
+      {
+        "number": "T19",
+        "name": "最終コーナー",
+        "gearEstimated": "4th",
+        "speedEstimated": "150 km/h",
+        "engineeringTip": "メインストレートへの立ち上がりラインを確保。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2024,
+        "title": "ランド・ノリス 念願のF1初優勝",
+        "description": "参戦110戦目、セーフティカーの好機を完璧に活かしフェルスタッペンを突き放して掴んだ感動の初勝利。",
+        "detailedStory": "2024年マイアミGP。マクラーレンの大規模アップグレードを投入したノリスは、中盤サージェントとマグヌッセンの接触によるセーフティカーのタイミングで首位に浮上。リスタート後、ノリスはフェルスタッペンを毎周0.5秒突き放す驚異のファステストラップを連発。110戦目にして待望のグランプリ初優勝を飾り、パドック中が歓喜に包まれた。",
+        "significance": "レッドブル一強時代に風穴を開け、2024年コンストラクターズ選手権争いの狼煙を上げた歴史的一戦。",
+        "historicalImpact": "マクラーレンの完全復活を象徴し、ノリスが正真正銘のトップドライバーとして覚醒した瞬間。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "スタジアム周囲の高速エッセと、2本の長大なストレートのトップスピードを両立するミディアムダウンフォース。",
+      "kerbUsage": "T14-15シケインの縁石は極めて高く、フロア損傷のリスクが非常に大きい。",
+      "brakeDemands": "T17ヘアピンでの超強力な減速負荷。ストレートでの冷却と急減速の温度差が激しい。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Miami International Autodrome Track Specification & Logistics",
+        "publisher": "South Florida Motorsports",
+        "url": "https://f1miamigp.com",
+        "verifiedDate": "2024-05-02"
+      },
+      {
+        "id": 2,
+        "title": "Surface Thermal Degradation and Tyre Blistering in Miami Heat",
+        "publisher": "Pirelli Technical Analysis",
+        "url": "https://www.pirelli.com",
+        "verifiedDate": "2024-05-05"
+      }
+    ]
+  },
+  {
+    "id": "imola",
+    "name": "イモラ・サーキット（エンツォ・エ・ディーノ・フェラーリ）",
+    "officialName": "Autodromo Internazionale Enzo e Dino Ferrari",
+    "country": "イタリア 🇮🇹",
+    "lengthKm": 4.909,
+    "turns": 19,
+    "drsZones": 1,
+    "downforceLevel": "High",
+    "tyreStress": "Medium-High",
+    "typicalPitLossSec": 28.5,
+    "safetyCarProbability": "55% (中〜高)",
+    "undercutImpact": "大（コース上の追い抜きが極めて困難なため、ピット戦略が順位を決定）",
+    "lapRecord": {
+      "time": "1:15.484",
+      "driver": "Lewis Hamilton (Mercedes)",
+      "year": 2020
+    },
+    "characteristics": "フェラーリの聖地エミリア・ロマーニャに位置する伝統のオールドスクールサーキット。反時計回りで激しい高低差があり、タンブレロ、トサ、ピラテッラ、アクエ・ミネラリなど伝説的コーナーが連続 [1]。コース幅が狭くグラベルトラップに囲まれており、ミスが即クラッシュに繋がる [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_imola.jpg",
+      "credit": "Monia Mascagni",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Autodromo_Internazionale_Enzo_e_Dino_Ferrari_Imola.jpg"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_imola.jpg",
+        "credit": "Monia Mascagni",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Autodromo_Internazionale_Enzo_e_Dino_Ferrari_Imola.jpg"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_imola.jpg",
+        "caption": "イモラの丘陵地帯とピラテッラからアクエ・ミネラリへの急激な下り勾配",
+        "tag": "Panoramic",
+        "credit": "Monia Mascagni",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Autodromo_Internazionale_Enzo_e_Dino_Ferrari_Imola.jpg"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 38,
+      "longestStraightMeters": 620,
+      "gForceMax": {
+        "lateral": 4.4,
+        "longitudinal": 4.6
+      },
+      "keyCorners": [
+        {
+          "number": "T2-T4",
+          "name": "Variante Tamburello",
+          "characteristic": "高速シケイン。高い縁石を大胆に跨ぐアタックが必要。"
+        },
+        {
+          "number": "T7",
+          "name": "Tosa",
+          "characteristic": "急勾配を上りきった先にあるタイトな低速ヘアピン。"
+        },
+        {
+          "number": "T9",
+          "name": "Piratella",
+          "characteristic": "ブラインドで下りながら駆け抜ける度胸試しの超高速左。"
+        },
+        {
+          "number": "T11-T13",
+          "name": "Acque Minerali",
+          "characteristic": "下りから強烈な圧縮Gを受けながら右へ切り返す難関。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T2-T4",
+        "name": "タンブレロ・シケイン",
+        "gearEstimated": "3rd ➔ 4th",
+        "speedEstimated": "135 ➔ 180 km/h",
+        "engineeringTip": "左右のソーセージ縁石を直線的に跨ぐ。サスペンションの吸収性がタイムに直結。"
+      },
+      {
+        "number": "T5-T6",
+        "name": "ヴィルヌーヴ・シケイン",
+        "gearEstimated": "4th",
+        "speedEstimated": "165 km/h",
+        "engineeringTip": "左・右の切り返し。外側のグラベルに落とさないギリギリのクリッピング。"
+      },
+      {
+        "number": "T7",
+        "name": "トサ・ヘアピン",
+        "gearEstimated": "2nd",
+        "speedEstimated": "85 km/h",
+        "engineeringTip": "急激な上り勾配でのフルブレーキング。立ち上がりのトラクション重視。"
+      },
+      {
+        "number": "T9",
+        "name": "ピラテッラ",
+        "gearEstimated": "5th",
+        "speedEstimated": "210 km/h",
+        "engineeringTip": "下りながらのブラインド左コーナー。フロントのダウンフォースが抜けると即グラベルへ。"
+      },
+      {
+        "number": "T11-T13",
+        "name": "アクエ・ミネラリ",
+        "gearEstimated": "3rd ➔ 4th",
+        "speedEstimated": "120 ➔ 170 km/h",
+        "engineeringTip": "すり鉢状の底で強烈な縦Gと横Gが同時にかかる最難関コンプレックス。"
+      },
+      {
+        "number": "T14-T15",
+        "name": "ヴァリアンテ・アルタ",
+        "gearEstimated": "2nd ➔ 3rd",
+        "speedEstimated": "100 km/h",
+        "engineeringTip": "高い縁石を左右に跳ねながら通過するタイトシケイン。"
+      },
+      {
+        "number": "T17-T18",
+        "name": "リバッツァ 1 & 2",
+        "gearEstimated": "3rd",
+        "speedEstimated": "125 km/h",
+        "engineeringTip": "下り坂でのダブルレフト。イン側のロックアップに細心の注意。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2005,
+        "title": "アロンソ vs シューマッハ 伝説の12周テール・トゥ・ノーズ",
+        "description": "若きアロンソのルノーと、圧倒的な速さで猛追する皇帝シューマッハが12周にわたり0.2秒差で演じた歴史的防戦劇。",
+        "detailedStory": "2005年サンマリノGP。予選13番手から驚異のペースで全車を抜き去ったフェラーリのシューマッハが、首位アロンソの背後に迫る。残り12周、毎周1秒以上速いシューマッハはリバッツァやトサで激しくインを突くが、アロンソは完璧なポジショニングと冷静沈着な立ち上がり重視ラインでミリ単位のブロックを継続。わずか0.215秒差でアロンソが逃げ切り、世代交代を世界に知らしめた。",
+        "significance": "近代F1における「ディフェンス技術の最高峰」として世界中のドライバーに手本とされる名勝負。",
+        "historicalImpact": "アロンソがこの年のワールドチャンピオンを獲得する決定的な自信となり、F1の歴史が新時代へと移行した。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "オーバーテイクが困難なため予選一発重視のハイダウンフォースセッティングが基本。",
+      "kerbUsage": "タンブレロやアルタの凶悪な縁石を攻略するため、柔らかめのダンパー設定が必須。",
+      "brakeDemands": "ピットレーン制限速度区間が長く、ピットロスタイムが約29秒とグリッド最長級。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Autodromo Enzo e Dino Ferrari Historic & Technical Profile",
+        "publisher": "Autodromo di Imola Official",
+        "url": "https://www.autodromoimola.it",
+        "verifiedDate": "2024-05-15"
+      },
+      {
+        "id": 2,
+        "title": "Chassis Dynamics over Kerbs at Tamburello and Variante Alta",
+        "publisher": "Scuderia Ferrari Technical Papers",
+        "url": "https://www.ferrari.com",
+        "verifiedDate": "2024-05-18"
+      }
+    ]
+  },
+  {
+    "id": "villeneuve",
+    "name": "ジル・ヴィルヌーヴ・サーキット",
+    "officialName": "Circuit Gilles Villeneuve (Montreal)",
+    "country": "カナダ 🇨🇦",
+    "lengthKm": 4.361,
+    "turns": 14,
+    "drsZones": 3,
+    "downforceLevel": "Low",
+    "tyreStress": "Medium",
+    "typicalPitLossSec": 18.5,
+    "safetyCarProbability": "75% (極めて高い)",
+    "undercutImpact": "大（タイヤ作動温度に達しやすく、ピット直後のアタックが強烈）",
+    "lapRecord": {
+      "time": "1:13.078",
+      "driver": "Valtteri Bottas (Mercedes)",
+      "year": 2019
+    },
+    "characteristics": "セント・ローレンス川に浮かぶ人工島ノートルダム島に設置された伝統のストップ＆ゴー型セミパーマネントコース。ロングストレートとタイトシケインが交互に現れ、最終コーナー外側には数々の王者を葬ってきた伝説の「ウォール・オブ・チャンピオンズ」が待ち構える [1]。ブレーキ熱負荷がシーズン屈指 [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_villeneuve.jpg",
+      "credit": "Planet Labs, Inc.",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Circuit_Gilles-Villeneuve,_May_29,_2018_SkySat.jpg"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_villeneuve.jpg",
+        "credit": "Planet Labs, Inc.",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Circuit_Gilles-Villeneuve,_May_29,_2018_SkySat.jpg"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_villeneuve.jpg",
+        "caption": "ノートルダム島の緑と運河に囲まれたジル・ヴィルヌーヴ・サーキット全景",
+        "tag": "Panoramic",
+        "credit": "Planet Labs, Inc.",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Circuit_Gilles-Villeneuve,_May_29,_2018_SkySat.jpg"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 5.2,
+      "longestStraightMeters": 1060,
+      "gForceMax": {
+        "lateral": 3.9,
+        "longitudinal": 5.2
+      },
+      "keyCorners": [
+        {
+          "number": "T1-T2",
+          "name": "Senna S",
+          "characteristic": "ピット出口と交差する低速複合左・右コーナー。"
+        },
+        {
+          "number": "T10",
+          "name": "L’Epingle (ヘアピン)",
+          "characteristic": "300km/hから60km/hへ急減速する大観衆前の名物ヘアピン。"
+        },
+        {
+          "number": "T13-T14",
+          "name": "Wall of Champions",
+          "characteristic": "最終シケイン立ち上がり、外側コンクリートウォールが迫る名所。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1-T2",
+        "name": "セナ・エス (Virage Senna)",
+        "gearEstimated": "2nd ➔ 3rd",
+        "speedEstimated": "90 ➔ 115 km/h",
+        "engineeringTip": "急減速からT2のエイペックスをタイトに捉えて立ち上がる。"
+      },
+      {
+        "number": "T3-T4",
+        "name": "シケイン (T3-T4)",
+        "gearEstimated": "3rd",
+        "speedEstimated": "130 km/h",
+        "engineeringTip": "右側の壁が近く、縁石をカットしながらもマシンの挙動を即座に収める。"
+      },
+      {
+        "number": "T6-T7",
+        "name": "ポン・ド・ラ・コンコルド",
+        "gearEstimated": "3rd ➔ 4th",
+        "speedEstimated": "110 ➔ 155 km/h",
+        "engineeringTip": "左・右の中速切り返し。縁石の踏み方次第でタイムが激変。"
+      },
+      {
+        "number": "T8-T9",
+        "name": "高速シケイン (T8-T9)",
+        "gearEstimated": "4th",
+        "speedEstimated": "160 km/h",
+        "engineeringTip": "地下鉄高架下を抜けるシケイン。出口のウォールへの接近に注意。"
+      },
+      {
+        "number": "T10",
+        "name": "ヘアピン (L’Epingle)",
+        "gearEstimated": "2nd",
+        "speedEstimated": "62 km/h",
+        "engineeringTip": "カジノストレートへ向けた最重要ヘアピン。立ち上がりトラクションが命。"
+      },
+      {
+        "number": "T13-T14",
+        "name": "最終シケイン＆チャンピオンの壁",
+        "gearEstimated": "3rd ➔ 4th",
+        "speedEstimated": "135 ➔ 180 km/h",
+        "engineeringTip": "左右の大きな縁石を直線的にジャンプし、外側ウォール数ミリで全開脱出。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 1999,
+        "title": "ウォール・オブ・チャンピオンズ（王者の壁）の誕生",
+        "description": "1レース中にデイモン・ヒル、ミハエル・シューマッハ、ジャック・ヴィルヌーヴの歴代世界王者3名が同じ壁にクラッシュ。",
+        "detailedStory": "1999年カナダGP。最終シケインの立ち上がりにある外側コンクリートウォールに、1996年王者デーモン・ヒル、1997年王者ジャック・ヴィルヌーヴ、そして現役最強のフェラーリ王者ミハエル・シューマッハが次々と右リアをヒットさせてリタイア。さらにFIA GT王者リカルド・ゾンタも餌食となり、この壁は「ウォール・オブ・チャンピオンズ」と名付けられ、F1界最も恐れられるアイコンとなった。",
+        "significance": "サーキットの過酷さとミリ単位の極限コントロールを象徴する伝説のエピソード。",
+        "historicalImpact": "ランオフエリアの狭いストリートサーキットにおけるドライバーの集中力維持の難しさが再認識された。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "長大なカジノストレートでのオーバーテイクを重視したロードラッグ設定。",
+      "kerbUsage": "最終シケインの縁石をアグレッシブに跳べるサスペンションのストローク設計が不可欠。",
+      "brakeDemands": "年間最大のブレーキ酷使サーキット。ディスク厚み摩耗とキャリパー温度の管理が生死を分ける。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Circuit Gilles Villeneuve Braking Energy Dissipation Report",
+        "publisher": "Brembo S.p.A. Motorsport Division",
+        "url": "https://www.brembo.com",
+        "verifiedDate": "2024-06-08"
+      },
+      {
+        "id": 2,
+        "title": "The Wall of Champions: Montreal F1 Safety Analysis",
+        "publisher": "FIA Circuit Safety Commission",
+        "url": "https://www.fia.com",
+        "verifiedDate": "2024-06-10"
+      }
+    ]
+  },
+  {
+    "id": "catalunya",
+    "name": "カタロニア・サーキット（バルセロナ）",
+    "officialName": "Circuit de Barcelona-Catalunya (Montmeló)",
+    "country": "スペイン 🇪🇸",
+    "lengthKm": 4.657,
+    "turns": 14,
+    "drsZones": 2,
+    "downforceLevel": "High",
+    "tyreStress": "Very High",
+    "typicalPitLossSec": 22,
+    "safetyCarProbability": "30% (低)",
+    "undercutImpact": "大（タイヤのデグラデーションが著しく、新品タイヤの優位性が極大）",
+    "lapRecord": {
+      "time": "1:16.330",
+      "driver": "Max Verstappen (Red Bull)",
+      "year": 2023
+    },
+    "characteristics": "F1公式テストの舞台としてマシン総合力が完全に暴かれるエアロダイナミクス性能のベンチマークコース。2023年に最終セクターのシケインが撤去され、往年の超高速右2連続コーナーが復活 [1]。ターン3の長大な高速ロングコーナーで左フロントタイヤに強烈な横Gがかかり続ける [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_catalunya.jpg",
+      "credit": "Wilnel José Verdú Guerrero",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Curva_10_de_Circuit_de_Barcelona-Catalunya_Montmel%C3%B3_(2023).jpg"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_catalunya.jpg",
+        "credit": "Wilnel José Verdú Guerrero",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Curva_10_de_Circuit_de_Barcelona-Catalunya_Montmel%C3%B3_(2023).jpg"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_catalunya.jpg",
+        "caption": "カタロニア・サーキットの改修されたターン10と高速レイアウトの全景",
+        "tag": "Panoramic",
+        "credit": "Wilnel José Verdú Guerrero",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Curva_10_de_Circuit_de_Barcelona-Catalunya_Montmel%C3%B3_(2023).jpg"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 29.6,
+      "longestStraightMeters": 1047,
+      "gForceMax": {
+        "lateral": 4.7,
+        "longitudinal": 4.8
+      },
+      "keyCorners": [
+        {
+          "number": "T1-T2",
+          "name": "Elf",
+          "characteristic": "メインストレート後の下りシケイン。オーバーテイクの主戦場。"
+        },
+        {
+          "number": "T3",
+          "name": "Curva Renault",
+          "characteristic": "全開で駆け抜ける長大な登り高速右ロングコーナー。左前輪を破壊。"
+        },
+        {
+          "number": "T9",
+          "name": "Campsa",
+          "characteristic": "ブラインドの登り超高速右ベンド。マシンのダウンフォース限界を試す。"
+        },
+        {
+          "number": "T13-T14",
+          "name": "New Final Sweep",
+          "characteristic": "シケイン撤去で復活した260km/hの超高速最終スプリント。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1-T2",
+        "name": "エルフ・シケイン (T1-T2)",
+        "gearEstimated": "3rd",
+        "speedEstimated": "135 km/h",
+        "engineeringTip": "右から左への素早い切り返し。T2イン側の縁石ヒットが鍵。"
+      },
+      {
+        "number": "T3",
+        "name": "ルノー・コーナー (T3)",
+        "gearEstimated": "6th ➔ 7th",
+        "speedEstimated": "230 ➔ 265 km/h",
+        "engineeringTip": "首にかかる強烈な横Gと左前タイヤの熱ダレに耐えながら全開加速。"
+      },
+      {
+        "number": "T4",
+        "name": "レプソル (T4)",
+        "gearEstimated": "4th",
+        "speedEstimated": "150 km/h",
+        "engineeringTip": "下りながら右に回り込む中速。フロントがアンダーになりやすい。"
+      },
+      {
+        "number": "T5",
+        "name": "セアト (T5)",
+        "gearEstimated": "2nd",
+        "speedEstimated": "75 km/h",
+        "engineeringTip": "下りの急減速左ヘアピン。左フロントのロックアップ頻発地点。"
+      },
+      {
+        "number": "T7-T8",
+        "name": "ウルト (T7-T8)",
+        "gearEstimated": "4th",
+        "speedEstimated": "160 km/h",
+        "engineeringTip": "登り勾配の切り返し。縁石を使い切って車速を維持。"
+      },
+      {
+        "number": "T9",
+        "name": "カンプサ (T9)",
+        "gearEstimated": "6th",
+        "speedEstimated": "240 km/h",
+        "engineeringTip": "登り切った先にあるブラインド高速右。度胸と空力信頼性が試される。"
+      },
+      {
+        "number": "T10",
+        "name": "カイシャ (T10)",
+        "gearEstimated": "2nd ➔ 3rd",
+        "speedEstimated": "100 km/h",
+        "engineeringTip": "改修された中速左コーナー。バックストレート後の抜き所。"
+      },
+      {
+        "number": "T13-T14",
+        "name": "最終複合高速ベンド",
+        "gearEstimated": "6th ➔ 7th",
+        "speedEstimated": "235 ➔ 270 km/h",
+        "engineeringTip": "全開で駆け抜けメインストレートへ飛び出すスリリングな高速ターン。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2016,
+        "title": "メルセデス同士討ち ＆ マックス・フェルスタッペン史上最年少初優勝",
+        "description": "オープニングラップでハミルトンとロズベルグが激突リタイア、移籍初戦の18歳フェルスタッペンがライコネンを抑えきり最年少優勝。",
+        "detailedStory": "2016年スペインGP。スタート直後のターン4進入で、トップを走るロズベルグを抜こうとしたハミルトンが芝生に押し出されてスピン、2台が絡んでダブルリタイア。これにより首位争いはレッドブル対フェラーリへ。トロロッソから電撃昇格したばかりの18歳マックス・フェルスタッペンが2ストップ作戦を完璧に遂行し、背後に迫る元王者キミ・ライコネンの猛攻を30周耐え抜いてF1史上最年少優勝（18歳228日）を達成した。",
+        "significance": "新たな絶対王者フェルスタッペンの伝説が幕を開けた瞬間。",
+        "historicalImpact": "F1史上最年少優勝記録は現在も破られておらず、メルセデスのチーム内緊張関係が極限に達した契機となった。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "ターン3やターン9の高速コーナリングと最終コーナーでの全開追従を支えるハイダウンフォース。",
+      "kerbUsage": "T1-2やT7-8の縁石を大胆に跨げるフロア剛性とライドハイトの最適化。",
+      "brakeDemands": "T1でのブレーキング以外は中高速流体レイアウトのため、タイヤの摩耗熱ダレ対策が最優先課題。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Circuit de Barcelona-Catalunya Removal of Chicane and Aero Impact",
+        "publisher": "FIA World Motor Sport Council",
+        "url": "https://www.fia.com",
+        "verifiedDate": "2023-03-10"
+      },
+      {
+        "id": 2,
+        "title": "Tyre Energy Dissipation at High Lateral Load Corners: Barcelona Case Study",
+        "publisher": "Pirelli Motorsport Journal",
+        "url": "https://www.pirelli.com",
+        "verifiedDate": "2024-06-20"
+      }
+    ]
+  },
+  {
+    "id": "redbull-ring",
+    "name": "レッドブル・リンク（シュピールベルク）",
+    "officialName": "Red Bull Ring (Spielberg)",
+    "country": "オーストリア 🇦🇹",
+    "lengthKm": 4.318,
+    "turns": 10,
+    "drsZones": 3,
+    "downforceLevel": "Medium",
+    "tyreStress": "Medium",
+    "typicalPitLossSec": 20,
+    "safetyCarProbability": "45% (中程度)",
+    "undercutImpact": "大（ラップタイムが65秒前後と短く、1周のアンダーカット効果が絶大）",
+    "lapRecord": {
+      "time": "1:05.619",
+      "driver": "Carlos Sainz (McLaren)",
+      "year": 2020
+    },
+    "characteristics": "アルプス山脈の雄大な自然に抱かれた高低差65mの超高速山岳コース。コーナー数はわずか10個、ラップタイムはカレンダー最短の約1分5秒 [1]。登り坂のハードブレーキング（T1, T3, T4）と、後半の凶悪なソーセージ縁石がサスペンションを破壊する [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_redbull_ring.jpg",
+      "credit": "Road Atlanta Turn 5",
+      "license": "CC BY 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:FRECA_2024_-_Red_Bull_Ring_-_Rafael_Camara.jpg"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_redbull_ring.jpg",
+        "credit": "Road Atlanta Turn 5",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:FRECA_2024_-_Red_Bull_Ring_-_Rafael_Camara.jpg"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_redbull_ring.jpg",
+        "caption": "シュピールベルクの緑豊かな丘陵と名物ブルのモニュメントを臨む",
+        "tag": "Panoramic",
+        "credit": "Road Atlanta Turn 5",
+        "license": "CC BY 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:FRECA_2024_-_Red_Bull_Ring_-_Rafael_Camara.jpg"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 65,
+      "longestStraightMeters": 800,
+      "gForceMax": {
+        "lateral": 4.5,
+        "longitudinal": 4.9
+      },
+      "keyCorners": [
+        {
+          "number": "T1",
+          "name": "Niki Lauda Kurve",
+          "characteristic": "急な登り坂の直角右コーナー。縁石でのトラックリミット違反多発。"
+        },
+        {
+          "number": "T3",
+          "name": "Remus",
+          "characteristic": "山頂にある激坂の超タイトヘアピン。最大のオーバーテイク地点。"
+        },
+        {
+          "number": "T9-T10",
+          "name": "Jochen Rindt Kurve",
+          "characteristic": "下り坂で外側へ流される超高速ダブルライト。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1",
+        "name": "ニキ・ラウダ・カーブ (T1)",
+        "gearEstimated": "3rd",
+        "speedEstimated": "140 km/h",
+        "engineeringTip": "急激な登り坂を利用した深めのブレーキング。出口外側縁石での白線オーバーに注意。"
+      },
+      {
+        "number": "T3",
+        "name": "レムス・ヘアピン (T3)",
+        "gearEstimated": "2nd",
+        "speedEstimated": "65 km/h",
+        "engineeringTip": "コース最高地点での右直角ヘアピン。登りでフロント荷重が抜けるためロックしやすい。"
+      },
+      {
+        "number": "T4",
+        "name": "ラウフ (T4)",
+        "gearEstimated": "3rd",
+        "speedEstimated": "120 km/h",
+        "engineeringTip": "急な下り坂での右コーナー。イン側グラベルに落とさずトラクションを稼ぐ。"
+      },
+      {
+        "number": "T6-T7",
+        "name": "ゲルハルト・ベルガー・カーブ",
+        "gearEstimated": "4th ➔ 5th",
+        "speedEstimated": "175 ➔ 205 km/h",
+        "engineeringTip": "下りながら回り込む高速左複合。サスペンションの減衰が重要。"
+      },
+      {
+        "number": "T9",
+        "name": "ヨッヘン・リント (T9)",
+        "gearEstimated": "6th",
+        "speedEstimated": "225 km/h",
+        "engineeringTip": "下り坂でリアがスライドしやすい高速右。"
+      },
+      {
+        "number": "T10",
+        "name": "最終コーナー (T10)",
+        "gearEstimated": "5th",
+        "speedEstimated": "200 km/h",
+        "engineeringTip": "ホームストレートへ向けて全開。外側ソーセージ縁石でのフロア破損に注意。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2019,
+        "title": "マックス・フェルスタッペン ホンダPUに13年ぶりの歓喜の勝利",
+        "description": "スタート出遅れから驚異の全車ゴボウ抜き、残り3周でルクレールとの接触バトルを制しホンダF1復帰後初優勝。",
+        "detailedStory": "2019年オーストリアGP。アングラグでスタートに失敗し7番手まで後退したフェルスタッペンは、猛烈なファステストラップを連発してフェラーリのルクレールを追走。残り3周、ターン3のインに飛び込みホイールを接触させながらオーバーテイク。ホンダにとって2006年ハンガリーGP（ジェンソン・バトン）以来13年ぶりとなる魂の勝利をもたらし、表彰台で胸のホンダロゴを誇らしげに指差した。",
+        "significance": "ホンダ第4期ハイブリッドPUプロジェクトが結実し、黄金期へと邁進する契機となった歴史的瞬間。",
+        "historicalImpact": "ハードなホイール・トゥ・ホイールバトルにおけるレーシングインシデント判定の基準を確立した。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "3本のDRSストレートでのトップスピードを維持しつつ、セクター2・3の高速コーナリングを支えるセッティング。",
+      "kerbUsage": "外側のイエローソーセージ縁石はサスペンションやフロントウイングの翼端板を破壊する危険地帯。",
+      "brakeDemands": "T1・T3・T4の連続する激しい制動により、短時間でブレーキキャリパーが過熱しやすい。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Red Bull Ring Spielberg Circuit Topology and Elevation Metrics",
+        "publisher": "Projekt Spielberg Archives",
+        "url": "https://www.redbullring.com",
+        "verifiedDate": "2024-06-25"
+      },
+      {
+        "id": 2,
+        "title": "Suspension Damage Analysis over High-Frequency Kerbs in Spielberg",
+        "publisher": "Red Bull Technology Papers",
+        "url": "https://www.redbullracing.com",
+        "verifiedDate": "2024-06-28"
+      }
+    ]
+  },
+  {
+    "id": "hungaroring",
+    "name": "ハンガロリンク（ブダペスト）",
+    "officialName": "Hungaroring (Mogyoród)",
+    "country": "ハンガリー 🇭🇺",
+    "lengthKm": 4.381,
+    "turns": 14,
+    "drsZones": 2,
+    "downforceLevel": "High",
+    "tyreStress": "Medium-High",
+    "typicalPitLossSec": 21,
+    "safetyCarProbability": "25% (極めて低い)",
+    "undercutImpact": "絶大（「壁のないモナコ」と呼ばれ、コース上での抜きが至難）",
+    "lapRecord": {
+      "time": "1:16.627",
+      "driver": "Lewis Hamilton (Mercedes)",
+      "year": 2020
+    },
+    "characteristics": "すり鉢状の盆地に位置し「壁のないモナコ」の異名をとるツイスティな低中速テクニカルコース。ストレートはホームストレートのみで、休む間もなく中低速コーナーが連続 [1]。真夏の猛暑による路面温度55℃超と、砂埃が舞うダスティな低グリップ路面がドライバーとマシンを痛めつける [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_hungaroring.jpg",
+      "credit": "Ank Kumar",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Fernando_Alonso_bust,_Hungaroring_(Ank_Kumar)_02.jpg"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_hungaroring.jpg",
+        "credit": "Ank Kumar",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Fernando_Alonso_bust,_Hungaroring_(Ank_Kumar)_02.jpg"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_hungaroring.jpg",
+        "caption": "ブダペスト郊外の丘陵地に広がるハンガロリンクのテクニカルコーナー群",
+        "tag": "Panoramic",
+        "credit": "Ank Kumar",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Fernando_Alonso_bust,_Hungaroring_(Ank_Kumar)_02.jpg"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 34,
+      "longestStraightMeters": 790,
+      "gForceMax": {
+        "lateral": 4.3,
+        "longitudinal": 4.5
+      },
+      "keyCorners": [
+        {
+          "number": "T1",
+          "name": "ターン1",
+          "characteristic": "メインストレートエンドの下り急減速右コーナー。コース唯一のオーバーテイク地点。"
+        },
+        {
+          "number": "T4",
+          "name": "Mansell Corner",
+          "characteristic": "登り坂のブラインド超高速左。コースアウトするとグラベルへ直行。"
+        },
+        {
+          "number": "T11",
+          "name": "Chicane & Fast Left",
+          "characteristic": "マシンの回頭性とリアのスタビリティが問われる中速コーナー。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1",
+        "name": "ターン1",
+        "gearEstimated": "2nd",
+        "speedEstimated": "95 km/h",
+        "engineeringTip": "下り勾配でのフルブレーキング。ラインが交錯する最大の抜き所。"
+      },
+      {
+        "number": "T2",
+        "name": "ターン2",
+        "gearEstimated": "3rd",
+        "speedEstimated": "130 km/h",
+        "engineeringTip": "下りながら左へ回り込む。オーバーステアを抑えつつT3へ。"
+      },
+      {
+        "number": "T3",
+        "name": "ターン3",
+        "gearEstimated": "4th",
+        "speedEstimated": "190 km/h",
+        "engineeringTip": "全開で駆け抜け登りセクターへ。"
+      },
+      {
+        "number": "T4",
+        "name": "マンセル・コーナー (T4)",
+        "gearEstimated": "5th",
+        "speedEstimated": "225 km/h",
+        "engineeringTip": "登り勾配のブラインド高速左。外側縁石トラックリミットの限界を攻める。"
+      },
+      {
+        "number": "T5",
+        "name": "ターン5 (ロングライト)",
+        "gearEstimated": "3rd",
+        "speedEstimated": "135 km/h",
+        "engineeringTip": "横Gがかかり続ける長大な右コーナー。左タイヤの熱ダレ警戒。"
+      },
+      {
+        "number": "T6-T7",
+        "name": "シケイン (T6-T7)",
+        "gearEstimated": "2nd",
+        "speedEstimated": "85 km/h",
+        "engineeringTip": "右から左へのタイトシケイン。縁石を跳ねるマシンの挙動を即制御。"
+      },
+      {
+        "number": "T8-T11",
+        "name": "連続中速S字セクション",
+        "gearEstimated": "4th",
+        "speedEstimated": "160 km/h",
+        "engineeringTip": "リズムがすべて。1つのミスが次のコーナーすべてを台無しにする。"
+      },
+      {
+        "number": "T12",
+        "name": "ターン12 (右90度)",
+        "gearEstimated": "3rd",
+        "speedEstimated": "125 km/h",
+        "engineeringTip": "直角右ターン。フロントの正確なノーズ入りが必要。"
+      },
+      {
+        "number": "T13-T14",
+        "name": "最終ツインベンド",
+        "gearEstimated": "3rd ➔ 4th",
+        "speedEstimated": "115 ➔ 160 km/h",
+        "engineeringTip": "メインストレートへ速度を乗せるため、パーシャルスロットルで粘り強く旋回。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2021,
+        "title": "エステバン・オコン 奇跡の初優勝 ＆ ハミルトン単独スタート",
+        "description": "ウェットスタートでの多重クラッシュ、全車ピットインでハミルトン1台のみグリッドスタートという前代未聞のレースをオコンが制覇。",
+        "detailedStory": "2021年ハンガリーGP。ウェット宣言でのスタート直後、ボッタスとストロールが多重クラッシュを引き起こし赤旗中断。フォーメーションラップで路面が急激に乾き、グリッド上の全車がピットへ飛び込みスリックタイヤへ交換する中、ハミルトンだけが唯一グリッドについて1台だけでスタートする珍事が発生。首位に立ったアルピーヌのエステバン・オコンは、チームメイトのアロンソがハミルトンを10周にわたり鬼神のディフェンスでブロックした援護を受け、自身F1初優勝を成し遂げた。",
+        "significance": "現代F1で最もドラマチックかつ予測不能なレース展開の最高峰。",
+        "historicalImpact": "アロンソのディフェンス技術の真髄が讃えられ、アルピーヌに改称後初のグランプリ勝利をもたらした。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "ストレートが短いためモナコに次ぐ最大ダウンフォースセッティングを選択。",
+      "kerbUsage": "シケインやT11の縁石をスムーズに跨ぐためフロントのロール剛性を最適化。",
+      "brakeDemands": "コーナーが連続して冷却風が当たりにくく、ブレーキとタイヤが過熱地獄に陥りやすい。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Hungaroring Circuit Layout and Downforce Efficiency Study",
+        "publisher": "Hungaroring Sport Zrt.",
+        "url": "https://www.hungaroring.hu",
+        "verifiedDate": "2024-07-15"
+      },
+      {
+        "id": 2,
+        "title": "Thermal Stress and Track Position Strategy at Hungaroring",
+        "publisher": "Alpine F1 Team Race Reviews",
+        "url": "https://www.alpinef1team.com",
+        "verifiedDate": "2024-07-20"
+      }
+    ]
+  },
+  {
+    "id": "zandvoort",
+    "name": "ザントフォールト・サーキット",
+    "officialName": "Circuit Zandvoort",
+    "country": "オランダ 🇳🇱",
+    "lengthKm": 4.259,
+    "turns": 14,
+    "drsZones": 2,
+    "downforceLevel": "High",
+    "tyreStress": "Very High",
+    "typicalPitLossSec": 21.5,
+    "safetyCarProbability": "65% (高)",
+    "undercutImpact": "大（狭くツイスティで抜きにくいため、アンダーカットが戦略の軸）",
+    "lapRecord": {
+      "time": "1:11.097",
+      "driver": "Lewis Hamilton (Mercedes)",
+      "year": 2021
+    },
+    "characteristics": "北海の砂丘地帯を縫うように走るオールドスクールコース。名物はインディアナポリスの2倍以上急な18度のバンク角を誇るターン3（ハューゲンホルツ）と最終ターン14（アリー・ルイエンダイク）[1]。バンク角による垂直荷重と砂浜からの海風・砂埃がタイヤを極限まで苛め抜く [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_zandvoort.jpg",
+      "credit": "Ymnes",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Circuit_Zandvoort_-_Tarzanbocht_en_Paddock_Club.JPG"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_zandvoort.jpg",
+        "credit": "Ymnes",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Circuit_Zandvoort_-_Tarzanbocht_en_Paddock_Club.JPG"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_zandvoort.jpg",
+        "caption": "名物ターザンボフツとバンクコーナーを臨むザントフォールトの熱狂",
+        "tag": "Panoramic",
+        "credit": "Ymnes",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Circuit_Zandvoort_-_Tarzanbocht_en_Paddock_Club.JPG"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 8.9,
+      "longestStraightMeters": 650,
+      "gForceMax": {
+        "lateral": 4.8,
+        "longitudinal": 4.6
+      },
+      "keyCorners": [
+        {
+          "number": "T1",
+          "name": "Tarzanbocht",
+          "characteristic": "すり鉢状のキャンバーがついた伝統の第1コーナー。最大の抜き所。"
+        },
+        {
+          "number": "T3",
+          "name": "Hugenholtzbocht",
+          "characteristic": "最大傾斜18度のすり鉢バンクヘアピン。複数ラインが存在。"
+        },
+        {
+          "number": "T14",
+          "name": "Arie Luyendykbocht",
+          "characteristic": "18度バンクを全開DRSで駆け抜ける超迫力の最終コーナー。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1",
+        "name": "ターザンボフツ (T1)",
+        "gearEstimated": "3rd",
+        "speedEstimated": "110 km/h",
+        "engineeringTip": "キャンバーを利用してインにもアウトにもラインが取れる名物ターン。"
+      },
+      {
+        "number": "T2",
+        "name": "ヘルケボフツ (T2)",
+        "gearEstimated": "4th",
+        "speedEstimated": "170 km/h",
+        "engineeringTip": "全開でバンクヘアピンへ飛び込むアプローチ。"
+      },
+      {
+        "number": "T3",
+        "name": "ハューゲンホルツ (18度バンク)",
+        "gearEstimated": "2nd ➔ 3rd",
+        "speedEstimated": "90 ➔ 125 km/h",
+        "engineeringTip": "外側の高いバンクラインを通ることで遠心力をグリップに変換し高速脱出。"
+      },
+      {
+        "number": "T7-T8",
+        "name": "シェイヴラハ (高速S字)",
+        "gearEstimated": "6th",
+        "speedEstimated": "240 km/h",
+        "engineeringTip": "砂丘を登りながらブラインドで駆け抜ける超高速セクション。度胸が問われる。"
+      },
+      {
+        "number": "T9-T10",
+        "name": "中速コンプレックス",
+        "gearEstimated": "3rd",
+        "speedEstimated": "135 km/h",
+        "engineeringTip": "風向きによりフロントのダウンフォースが急激に変化。"
+      },
+      {
+        "number": "T11-T12",
+        "name": "ハンス・エルンスト・シケイン",
+        "gearEstimated": "2nd",
+        "speedEstimated": "85 km/h",
+        "engineeringTip": "低速切り返し。縁石を使って素早くマシンの向きを変える。"
+      },
+      {
+        "number": "T14",
+        "name": "アリー・ルイエンダイク (最終バンク)",
+        "gearEstimated": "7th ➔ 8th",
+        "speedEstimated": "265 km/h",
+        "engineeringTip": "18度のバンクをDRS全開で駆け抜ける。マシンがフロアを激しく擦り火花を散らす。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2021,
+        "title": "36年ぶりの母国GP復活 ＆ フェルスタッペンオレンジアーミー歓喜の優勝",
+        "description": "1985年以来の復活、サーキットを埋め尽くしたオレンジの煙と大歓声の中、ハミルトンの追撃を退け完全優勝。",
+        "detailedStory": "2021年オランダGP。36年ぶりにカレンダーに復活したザントフォールトは、10万人を超えるオランダ人ファンがオレンジ色の発煙筒を焚いて狂乱の熱気に包まれた。フェルスタッペンはメルセデスのハミルトンとボッタスによる2台がかりの戦略的包囲網を、圧倒的なペースと冷静沈着なピットワークで粉砕。ポール・トゥ・ウィンで勝利を飾り、母国の英雄としてオランダ国王から祝福を受けた。",
+        "significance": "近代F1における「スポーツの国家的熱狂」を象徴する最高のイベント。",
+        "historicalImpact": "特異なバンクコーナーの成功により、他サーキットの改修計画にもバンク導入の機運が高まった。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "ツイスティなセクションを攻略するためのハイダウンフォースセッティング。",
+      "kerbUsage": "砂丘沿いのランオフが狭く、アスファルト外は即グラベルトラップのため精密なドライビングが要求される。",
+      "brakeDemands": "バンクによる特異な縦方向垂直荷重に対応するため、ピレリは特別な高空気圧指定を適用する。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Circuit Zandvoort Banking Reconstruction Engineering Report",
+        "publisher": "Dromo Circuit Design",
+        "url": "https://www.dromo.it",
+        "verifiedDate": "2021-08-25"
+      },
+      {
+        "id": 2,
+        "title": "Vertical G-load and Tyre Sidewall Fatigue in 18-degree Banked Turns",
+        "publisher": "Pirelli Technical Bulletin",
+        "url": "https://www.pirelli.com",
+        "verifiedDate": "2024-08-15"
+      }
+    ]
+  },
+  {
+    "id": "baku",
+    "name": "バクー・シティ・サーキット",
+    "officialName": "Baku City Circuit",
+    "country": "アゼルバイジャン 🇦🇿",
+    "lengthKm": 6.003,
+    "turns": 20,
+    "drsZones": 2,
+    "downforceLevel": "Low",
+    "tyreStress": "Low",
+    "typicalPitLossSec": 20.8,
+    "safetyCarProbability": "80% (極めて高い)",
+    "undercutImpact": "中程度（セーフティカーによる波乱とオーバーテイクの容易さが支配）",
+    "lapRecord": {
+      "time": "1:43.009",
+      "driver": "Charles Leclerc (Ferrari)",
+      "year": 2019
+    },
+    "characteristics": "旧市街の世界遺産をすり抜けるコース幅7.6mの超極狭「城壁セクション」と、時速350km超を記録するカレンダー最長2.2kmの超長大メインストレートが同居する極端なサーキット [1]。カオスとドラマの代名詞 [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_baku.jpg",
+      "credit": "Planet Labs, Inc.",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Baku_City_Circuit,_April_9,_2018_SkySat.jpg"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_baku.jpg",
+        "credit": "Planet Labs, Inc.",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Baku_City_Circuit,_April_9,_2018_SkySat.jpg"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_baku.jpg",
+        "caption": "歴史的城壁と近代都市バクーのコントラストを抜ける市街地コース",
+        "tag": "Panoramic",
+        "credit": "Planet Labs, Inc.",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Baku_City_Circuit,_April_9,_2018_SkySat.jpg"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 26.5,
+      "longestStraightMeters": 2220,
+      "gForceMax": {
+        "lateral": 4.1,
+        "longitudinal": 4.7
+      },
+      "keyCorners": [
+        {
+          "number": "T1",
+          "name": "ターン1",
+          "characteristic": "350km/hからのヘビーブレーキング。複数台が飛び込む大混戦スポット。"
+        },
+        {
+          "number": "T8-T11",
+          "name": "Castle Section (城壁セクション)",
+          "characteristic": "幅わずか7.6mの石畳沿い超極狭ブラインド登り坂。"
+        },
+        {
+          "number": "T16",
+          "name": "ターン16",
+          "characteristic": "2.2km全開ストレートへの合流点。脱出速度がすべてを決める。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1-T3",
+        "name": "直角90度セクション",
+        "gearEstimated": "3rd",
+        "speedEstimated": "110 km/h",
+        "engineeringTip": "ビル街を直角に曲がるストップ＆ゴー。リアのトラクション重視。"
+      },
+      {
+        "number": "T8-T10",
+        "name": "城壁セクション (Old Town)",
+        "gearEstimated": "2nd",
+        "speedEstimated": "75 km/h",
+        "engineeringTip": "幅7.6m。ミラーとホイールを石壁数ミリにかすめながら登る職人芸。"
+      },
+      {
+        "number": "T11-T12",
+        "name": "城壁脱出ベンド",
+        "gearEstimated": "3rd",
+        "speedEstimated": "120 km/h",
+        "engineeringTip": "登り切った先から一気に下りへ転じる。"
+      },
+      {
+        "number": "T15",
+        "name": "下り直角レフト",
+        "gearEstimated": "3rd",
+        "speedEstimated": "105 km/h",
+        "engineeringTip": "下り坂でフロントタイヤがロックしやすく、ウォールへの直撃事故多発。"
+      },
+      {
+        "number": "T16",
+        "name": "2.2kmストレート進入ターン",
+        "gearEstimated": "3rd",
+        "speedEstimated": "115 km/h",
+        "engineeringTip": "早めのスロットルオンでメインストレートのトップスピードを最大化。"
+      },
+      {
+        "number": "T17-T20",
+        "name": "カスピ海沿い全開ベンド",
+        "gearEstimated": "8th",
+        "speedEstimated": "340 km/h",
+        "engineeringTip": "緩やかなS字を描く全開ストレート。トウ（スリップストリーム）の奪い合い。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2017,
+        "title": "ベッテル vs ハミルトン セーフティカー先導中の激突事件",
+        "description": "SCラン中の急減速に激怒したベッテルがハミルトンに横並びで体当たり、リカルドが伝説の3台抜きで勝利。",
+        "detailedStory": "2017年アゼルバイジャンGP。セーフティカー先導中、トップのハミルトンが減速したことに追突したベッテル（フェラーリ）が激怒。マシンを横に並べてハミルトンのマシンにタイヤをぶつける前代未聞の報復行為を犯し、10秒ストップ＆ゴーペナルティを受けた。レースは赤旗や波乱が相次ぎ、予選10位から冷静に走り抜いたレッドブルのダニエル・リカルドがターン1で3台を一気抜きして劇的優勝を飾った。",
+        "significance": "F1史に残る最もスキャンダラスでドラマチックな市街地レース。",
+        "historicalImpact": "ドライバーの激昂行為に対するFIAのペナルティ基準と倫理規定が大幅に厳罰化された。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "2.2kmのストレートでカモにされないための超ロードラッグウイング設定が絶対必須。",
+      "kerbUsage": "市街地の縁石は低めだが、城壁セクションでは縁石を踏むと即座に石壁に接触する。",
+      "brakeDemands": "長大なストレートでブレーキとタイヤが完全に冷え切った直後にT1のハードブレーキングが訪れるため、ロックアップが極めて起きやすい。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Baku City Circuit Urban Architecture and Top Speed Record Analysis",
+        "publisher": "Baku City Circuit Operations",
+        "url": "https://www.bakucitycircuit.com",
+        "verifiedDate": "2024-04-25"
+      },
+      {
+        "id": 2,
+        "title": "Braking Temperature Drop over 2.2km Straight at Baku",
+        "publisher": "Brembo Engineering Review",
+        "url": "https://www.brembo.com",
+        "verifiedDate": "2024-04-28"
+      }
+    ]
+  },
+  {
+    "id": "singapore",
+    "name": "マリーナベイ・ストリート・サーキット",
+    "officialName": "Marina Bay Street Circuit (Singapore)",
+    "country": "シンガポール 🇸🇬",
+    "lengthKm": 4.94,
+    "turns": 19,
+    "drsZones": 4,
+    "downforceLevel": "High",
+    "tyreStress": "Medium",
+    "typicalPitLossSec": 28,
+    "safetyCarProbability": "100% (歴代全レースで出動)",
+    "undercutImpact": "大（ピットロスタイムは大きいが、新品タイヤでのアウトラップが強烈）",
+    "lapRecord": {
+      "time": "1:34.486",
+      "driver": "Daniel Ricciardo (RB)",
+      "year": 2024
+    },
+    "characteristics": "赤道直下の湿度80%・気温32℃の中で行われるF1屈指の超過酷ナイトレース。2時間制限ぎりぎりまで戦う肉体破壊サーキット [1]。セーフティカー出動率はF1史上唯一の100%を維持 [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_singapore.jpg",
+      "credit": "Ong Chi Hang",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Singapore_Marina_Bay_Night_View_-_panoramio.jpg"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_singapore.jpg",
+        "credit": "Ong Chi Hang",
+        "license": "CC BY-SA 3.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Singapore_Marina_Bay_Night_View_-_panoramio.jpg"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_singapore.jpg",
+        "caption": "マリーナベイの摩天楼を背景に光り輝くナイトレース照明の壮大な光景",
+        "tag": "Panoramic",
+        "credit": "Ong Chi Hang",
+        "license": "CC BY-SA 3.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Singapore_Marina_Bay_Night_View_-_panoramio.jpg"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 5.3,
+      "longestStraightMeters": 780,
+      "gForceMax": {
+        "lateral": 4.2,
+        "longitudinal": 4.5
+      },
+      "keyCorners": [
+        {
+          "number": "T1-T3",
+          "name": "Sheares",
+          "characteristic": "強力な投光器に照らされたピット直後のシケイン。"
+        },
+        {
+          "number": "T7",
+          "name": "Memorial",
+          "characteristic": "ラッフルズ大通りエンドの低速左直角ターン。"
+        },
+        {
+          "number": "T13",
+          "name": "Anderson Bridge Exit",
+          "characteristic": "アンダーソン橋を渡った直後の超タイトヘアピン。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1-T3",
+        "name": "シェアーズ・シケイン",
+        "gearEstimated": "3rd",
+        "speedEstimated": "115 km/h",
+        "engineeringTip": "左から右、そして左へとタイトに切り返す。"
+      },
+      {
+        "number": "T7",
+        "name": "メモリアル・ターン",
+        "gearEstimated": "2nd",
+        "speedEstimated": "85 km/h",
+        "engineeringTip": "大通りエンドの急減速。オーバーテイクの数少ないチャンス。"
+      },
+      {
+        "number": "T8-T9",
+        "name": "市街地スクエアターン",
+        "gearEstimated": "3rd",
+        "speedEstimated": "120 km/h",
+        "engineeringTip": "バリアに囲まれた直角コーナー群。"
+      },
+      {
+        "number": "T11-T13",
+        "name": "アンダーソン橋コンプレックス",
+        "gearEstimated": "2nd",
+        "speedEstimated": "60 km/h",
+        "engineeringTip": "歴史ある狭い橋を渡り、急激にステアリングを切り込む。"
+      },
+      {
+        "number": "T14",
+        "name": "ターン14",
+        "gearEstimated": "2nd",
+        "speedEstimated": "80 km/h",
+        "engineeringTip": "改修されたストレート区間へ向けてリアトラクションを確保。"
+      },
+      {
+        "number": "T16-T19",
+        "name": "最終テクニカルセクター",
+        "gearEstimated": "3rd ➔ 4th",
+        "speedEstimated": "130 ➔ 165 km/h",
+        "engineeringTip": "タイヤ温度が極限に達する中で集中力を研ぎ澄ます。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2023,
+        "title": "カルロス・サインツ DRS知略ディフェンスでレッドブル全勝を阻止",
+        "description": "猛追するラッセルとハミルトンに対し、背後のノリスに意図的にDRSを与えて盾にする天才的戦術でフェラーリ勝利。",
+        "detailedStory": "2023年シンガポールGP。開幕14連勝中だったレッドブルがまさかの予選失速。ポールから逃げるフェラーリのカルロス・サインツは、終盤新品ミディアムタイヤで猛追するメルセデス2台の脅威に直面。サインツはあえてペースを落とし、2位ノリス（マクラーレン）を自身のDRS圏内（1秒以内）に意図的に維持。ノリスにDRSを使わせてメルセデスを防がせる「DRSトレイン戦術」を完璧に機能させ、レッドブルの全勝シーズンを阻止する歴史的勝利を挙げた。",
+        "significance": "ドライバーのIQと戦略的知略が純粋なマシンスピードを打ち負かした現代F1最高峰の名局。",
+        "historicalImpact": "サインツの戦略眼が世界中から絶賛され、DRSを防御壁として利用する戦術の模範例として確立された。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "ストレートが短くコーナー数が多いため最大ダウンフォース一択。",
+      "kerbUsage": "バンピーな公道舗装とマンホールの蓋による跳ねを抑えるため柔らかなサスペンションが必要。",
+      "brakeDemands": "冷却風が当たるストレートが皆無のため、ブレーキダクトを最大開放してもキャリパーがオーバーヒート危機に瀕する。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Marina Bay Street Circuit Extreme Heat and Physiological Load on Drivers",
+        "publisher": "FIA Medical Commission",
+        "url": "https://www.fia.com",
+        "verifiedDate": "2023-09-20"
+      },
+      {
+        "id": 2,
+        "title": "Carlos Sainz DRS Defense Strategy Telemetry Analysis Singapore 2023",
+        "publisher": "Formula 1 Technical Analysis",
+        "url": "https://www.formula1.com",
+        "verifiedDate": "2023-09-22"
+      }
+    ]
+  },
+  {
+    "id": "cota",
+    "name": "サーキット・オブ・ジ・アメリカズ（オースティン）",
+    "officialName": "Circuit of the Americas (Austin)",
+    "country": "アメリカ 🇺🇸",
+    "lengthKm": 5.513,
+    "turns": 20,
+    "drsZones": 2,
+    "downforceLevel": "High",
+    "tyreStress": "High",
+    "typicalPitLossSec": 20.2,
+    "safetyCarProbability": "50% (中程度)",
+    "undercutImpact": "大（激しいタイヤ摩耗によるデグラデーション勝負）",
+    "lapRecord": {
+      "time": "1:36.169",
+      "driver": "Charles Leclerc (Ferrari)",
+      "year": 2019
+    },
+    "characteristics": "シルバーストン（マゴッツ・ベケッツ）、ホッケンハイム（スタジアム）、イスタンブール（ターン8）など世界の伝説的コーナーを融合したヘルマン・ティルケの傑作コース。名物ターン1はビル11階分（高低差41m）を駆け上がるブラインドの激坂ヘアピン [1]。テキサスの地盤沈下による激しいバンプがフロアを直撃する [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_cota.jpg",
+      "credit": "RM VM",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:COTA_Observation_Tower_with_X_Games_2014_Signage.jpg"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_cota.jpg",
+        "credit": "RM VM",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:COTA_Observation_Tower_with_X_Games_2014_Signage.jpg"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_cota.jpg",
+        "caption": "テキサスの広大な大地にそびえ立つ象徴的なCOTA展望タワーとコース全景",
+        "tag": "Panoramic",
+        "credit": "RM VM",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:COTA_Observation_Tower_with_X_Games_2014_Signage.jpg"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 40.9,
+      "longestStraightMeters": 1016,
+      "gForceMax": {
+        "lateral": 4.6,
+        "longitudinal": 4.9
+      },
+      "keyCorners": [
+        {
+          "number": "T1",
+          "name": "Big Red (Turn 1)",
+          "characteristic": "41m登り坂の頂点にある超ワイドなブラインド左ヘアピン。"
+        },
+        {
+          "number": "T3-T6",
+          "name": "Maggotts-Becketts Replica",
+          "characteristic": "シルバーストンを模した超高速流体S字セクション。"
+        },
+        {
+          "number": "T16-T18",
+          "name": "Multi-Apex Carousel",
+          "characteristic": "イスタンブールT8を彷彿とさせるトリプルエイペックスの高速右。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1",
+        "name": "ビッグ・レッド (T1ヘアピン)",
+        "gearEstimated": "2nd",
+        "speedEstimated": "80 km/h",
+        "engineeringTip": "急な登りでブレーキがよく効く。ワイドなランオフを活かした複数ライン。"
+      },
+      {
+        "number": "T2",
+        "name": "下り高速アプローチ",
+        "gearEstimated": "5th",
+        "speedEstimated": "210 km/h",
+        "engineeringTip": "下りながら高速エッセへ突入。"
+      },
+      {
+        "number": "T3-T6",
+        "name": "高速エッセ (S-Curves)",
+        "gearEstimated": "6th ➔ 7th",
+        "speedEstimated": "230 ➔ 270 km/h",
+        "engineeringTip": "強烈な横Gとダウンフォースの極限。ステアリング操作の正確さが必須。"
+      },
+      {
+        "number": "T11",
+        "name": "バックストレート進入ヘアピン",
+        "gearEstimated": "2nd",
+        "speedEstimated": "65 km/h",
+        "engineeringTip": "1kmバックストレートへ速度を乗せる重要立ち上がり。"
+      },
+      {
+        "number": "T12",
+        "name": "バックストレートエンド",
+        "gearEstimated": "2nd",
+        "speedEstimated": "85 km/h",
+        "engineeringTip": "330km/hからのヘビーブレーキング。DRSオーバーテイクの主戦場。"
+      },
+      {
+        "number": "T13-T15",
+        "name": "スタジアムセクション",
+        "gearEstimated": "3rd",
+        "speedEstimated": "110 km/h",
+        "engineeringTip": "低速切り返しが続くテクニカルゾーン。"
+      },
+      {
+        "number": "T16-T18",
+        "name": "カルーセル (トリプルエイペックス)",
+        "gearEstimated": "5th",
+        "speedEstimated": "215 km/h",
+        "engineeringTip": "横Gに耐えながら3つのクリップを繋ぐ。右フロントタイヤの摩耗激甚。"
+      },
+      {
+        "number": "T19-T20",
+        "name": "最終ダブルレフト",
+        "gearEstimated": "4th",
+        "speedEstimated": "145 km/h",
+        "engineeringTip": "メインストレートへ向けて全開脱出。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2021,
+        "title": "フェルスタッペン vs ハミルトン 戦略と心理戦の極限チェイス",
+        "description": "先行したフェルスタッペンに対し、終盤タイヤの新しいハミルトンが毎周差を縮めるも、1.3秒差で逃げ切った名勝負。",
+        "detailedStory": "2021年アメリカGP。2ストップ作戦でアンダーカットを仕掛けて首位を奪ったレッドブルのフェルスタッペンに対し、メルセデスのハミルトンはタイヤ履歴をずらして終盤猛追。残り10周で8秒あったギャップは毎周削り取られ、ファイナルラップには1秒未満のDRS圏内に突入。しかしフェルスタッペンは周回遅れのシューマッハから得たDRSも巧みに利用し、わずか1.333秒差でトップチェッカーを受けた。",
+        "significance": "2021年の歴史的タイトル争いにおける最大のハイライトの一つ。",
+        "historicalImpact": "アンダーカットとステイアウトの戦略的駆け引きの奥深さを世界に証明したレースとなった。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "セクター1の高速S字とセクター3のカルーセルに対応するハイダウンフォース。",
+      "kerbUsage": "バンプによるフロアスキッドブロックの過度な摩耗（2023年ハミルトン＆ルクレールの失格事案）を防ぐ車高設定が最重要。",
+      "brakeDemands": "T1およびT12での超強烈なブレーキングG。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Circuit of the Americas Track Engineering and Elevation Profile",
+        "publisher": "COTA Operations Bureau",
+        "url": "https://circuitoftheamericas.com",
+        "verifiedDate": "2024-10-15"
+      },
+      {
+        "id": 2,
+        "title": "FIA Technical Delegate Report on Plank Wear and Ride Height at COTA",
+        "publisher": "FIA Technical Working Group",
+        "url": "https://www.fia.com",
+        "verifiedDate": "2023-10-23"
+      }
+    ]
+  },
+  {
+    "id": "mexico",
+    "name": "エルマノス・ロドリゲス・サーキット（メキシコシティ）",
+    "officialName": "Autódromo Hermanos Rodríguez",
+    "country": "メキシコ 🇲🇽",
+    "lengthKm": 4.304,
+    "turns": 17,
+    "drsZones": 3,
+    "downforceLevel": "High",
+    "tyreStress": "Low",
+    "typicalPitLossSec": 22,
+    "safetyCarProbability": "55% (中程度)",
+    "undercutImpact": "中程度（空気密度が低く追従しやすいためオーバーテイク可能）",
+    "lapRecord": {
+      "time": "1:17.774",
+      "driver": "Valtteri Bottas (Mercedes)",
+      "year": 2021
+    },
+    "characteristics": "海抜2,285mという超高地に位置し、平地の約75%という極薄の空気密度が支配する異次元サーキット。モナコ並みの最大ダウンフォースウイングを装着しても、空気抵抗が少なすぎてモンツァ並みの最高速（355km/h超）に達する [1]。旧野球場フォロ・ソル（Foro Sol）を通過する3万人のスタジアムセクションは圧巻 [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_mexico.png",
+      "credit": "WL2392",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Autodromo_Hermanos_Rodriguez_(National_Circuit_with_Foro_Sol).png"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_mexico.png",
+        "credit": "WL2392",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Autodromo_Hermanos_Rodriguez_(National_Circuit_with_Foro_Sol).png"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_mexico.png",
+        "caption": "熱狂の野球場スタジアム「フォロ・ソル」を通過するスタジアムセクション",
+        "tag": "Panoramic",
+        "credit": "WL2392",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Autodromo_Hermanos_Rodriguez_(National_Circuit_with_Foro_Sol).png"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 2.8,
+      "longestStraightMeters": 1314,
+      "gForceMax": {
+        "lateral": 4,
+        "longitudinal": 4.6
+      },
+      "keyCorners": [
+        {
+          "number": "T1",
+          "name": "ターン1 (メインストレートエンド)",
+          "characteristic": "1.3km全開ストレートから355km/hで突入する超絶ブレーキ勝負。"
+        },
+        {
+          "number": "T7-T11",
+          "name": "高速エッセ",
+          "characteristic": "薄い空気で空力グリップが激減する中での高速切り返し。"
+        },
+        {
+          "number": "T12-T16",
+          "name": "Foro Sol Stadium",
+          "characteristic": "3万人の大観衆スタジアムを潜り抜ける超低速複合コーナー。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1-T3",
+        "name": "モイセス・ソラーナ・シケイン",
+        "gearEstimated": "3rd",
+        "speedEstimated": "110 km/h",
+        "engineeringTip": "1.3kmストレートからの減速。薄い空気でブレーキ冷却風が足りずフェードに警戒。"
+      },
+      {
+        "number": "T4-T5",
+        "name": "中速切り返し",
+        "gearEstimated": "3rd",
+        "speedEstimated": "125 km/h",
+        "engineeringTip": "ダウンフォース不足でマシンが浮遊するようにスライドしやすい。"
+      },
+      {
+        "number": "T7-T11",
+        "name": "エッセ (Esses)",
+        "gearEstimated": "5th ➔ 6th",
+        "speedEstimated": "190 ➔ 235 km/h",
+        "engineeringTip": "薄い空気密度の影響でダウンフォースが抜け、マシンのグリップ限界が急激に訪れる。"
+      },
+      {
+        "number": "T12-T15",
+        "name": "フォロ・ソル・スタジアム進入",
+        "gearEstimated": "2nd",
+        "speedEstimated": "70 km/h",
+        "engineeringTip": "スタジアムの大歓声の中を抜ける低速テクニカル区間。"
+      },
+      {
+        "number": "T17",
+        "name": "ナイジェル・マンセル・ターン",
+        "gearEstimated": "4th",
+        "speedEstimated": "150 km/h",
+        "engineeringTip": "往年の超危険ペラルターダの後半部分。メインストレートへ全開加速。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2021,
+        "title": "マックス・フェルスタッペン ターン1のアウト側3台抜き大外刈り",
+        "description": "予選でフロントローを独占したメルセデス2台に対し、3番手スタートから時速350kmで大外へ飛び込み首位を強奪。",
+        "detailedStory": "2021年メキシコGP。メルセデスのボッタスとハミルトンが予選1-2を占める中、3番手スタートのフェルスタッペンは1.3kmストレートのスリップストリームをフル活用。ターン1のブレーキングポイントで一番外側のレコードラインにマシンを振ると、アウト側から超レイトブレーキングでメルセデス2台を一気にオーバーテイク。この鮮やかな大外刈りで首位に立ち、そのまま独走勝利を飾った。",
+        "significance": "ストレートエンドのブレーキングにおける度胸とポジショニングの完璧な勝利。",
+        "historicalImpact": "フェルスタッペンの攻撃的ドライビングの真骨頂として語り継がれる伝説のスタートとなった。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "空気が薄いため最大ダウンフォース仕様のウイングを装着してもドラッグが少なく、冷却風路の確保が最優先。",
+      "kerbUsage": "スタジアムセクションの縁石を使ってマシンの回頭性を補う。",
+      "brakeDemands": "酸素が薄く空気による熱放散能力が低下するため、ブレーキとPUパワーユニットのオーバーヒートが最重要リスク。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Aerodynamic and Cooling Challenges at High Altitude in Mexico City",
+        "publisher": "FIA Technical Working Group Paper",
+        "url": "https://www.fia.com",
+        "verifiedDate": "2024-10-25"
+      },
+      {
+        "id": 2,
+        "title": "Autódromo Hermanos Rodríguez Air Density and PU Turbo Efficiency Study",
+        "publisher": "Honda Racing Corporation",
+        "url": "https://honda.racing",
+        "verifiedDate": "2024-10-28"
+      }
+    ]
+  },
+  {
+    "id": "interlagos",
+    "name": "インテルラゴス・サーキット（ホセ・カルロス・パーチェ）",
+    "officialName": "Autódromo José Carlos Pace (Interlagos)",
+    "country": "ブラジル 🇧🇷",
+    "lengthKm": 4.309,
+    "turns": 15,
+    "drsZones": 2,
+    "downforceLevel": "Medium-High",
+    "tyreStress": "High",
+    "typicalPitLossSec": 21,
+    "safetyCarProbability": "70% (極めて高い)",
+    "undercutImpact": "大（高低差と天候急変による戦略の柔軟性が勝負を分ける）",
+    "lapRecord": {
+      "time": "1:10.540",
+      "driver": "Valtteri Bottas (Mercedes)",
+      "year": 2018
+    },
+    "characteristics": "サンパウロの熱狂に包まれる反時計回りの名門天然すり鉢サーキット。名物エス・ド・セナから下り、湖の周囲を中低速で駆け抜け、全開の急坂登りストレートでホームに戻る [1]。急激な天候変化（スコール）と数々の王座決定戦を生んできたドラマの聖地 [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_interlagos.png",
+      "credit": "MotorOilStains",
+      "license": "CC BY-SA 3.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Autodromo-jose-_carlos-pace-interlagos-1999.png"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_interlagos.png",
+        "credit": "MotorOilStains",
+        "license": "CC BY-SA 3.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Autodromo-jose-_carlos-pace-interlagos-1999.png"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_interlagos.png",
+        "caption": "サンパウロの丘陵に広がるインテルラゴスの自然なすり鉢状コース",
+        "tag": "Panoramic",
+        "credit": "MotorOilStains",
+        "license": "CC BY-SA 3.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Autodromo-jose-_carlos-pace-interlagos-1999.png"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 43,
+      "longestStraightMeters": 650,
+      "gForceMax": {
+        "lateral": 4.5,
+        "longitudinal": 4.8
+      },
+      "keyCorners": [
+        {
+          "number": "T1-T2",
+          "name": "S do Senna (エス・ド・セナ)",
+          "characteristic": "下り勾配で切り返すブラジル英雄の名を冠したシケイン。最大の抜き所。"
+        },
+        {
+          "number": "T3",
+          "name": "Curva do Sol",
+          "characteristic": "全開で駆け抜けるロング左コーナー。バックストレートへ繋がる。"
+        },
+        {
+          "number": "T12",
+          "name": "Junção (ジュンソン)",
+          "characteristic": "急勾配登りストレートへの脱出速度を決定する超重要左コーナー。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1-T2",
+        "name": "エス・ド・セナ (S do Senna)",
+        "gearEstimated": "3rd",
+        "speedEstimated": "115 km/h",
+        "engineeringTip": "下り坂での強烈な減速から左へダイブ、すぐさま右へ切り返す。"
+      },
+      {
+        "number": "T3",
+        "name": "クルヴァ・ド・ソル (Curva do Sol)",
+        "gearEstimated": "5th ➔ 6th",
+        "speedEstimated": "220 km/h",
+        "engineeringTip": "アクセル全開でバックストレートへ飛び出す。"
+      },
+      {
+        "number": "T4",
+        "name": "デスシダ・ド・ラゴ (湖への下り)",
+        "gearEstimated": "3rd",
+        "speedEstimated": "145 km/h",
+        "engineeringTip": "バックストレート後のハードブレーキング。オーバーテイクの第2拠点。"
+      },
+      {
+        "number": "T6-T7",
+        "name": "フェハドゥーラ (蹄鉄コーナー)",
+        "gearEstimated": "4th",
+        "speedEstimated": "175 km/h",
+        "engineeringTip": "上り坂の中速右。リアのトラクション抜けに警戒。"
+      },
+      {
+        "number": "T8-T10",
+        "name": "インフィールド低速セクション",
+        "gearEstimated": "2nd ➔ 3rd",
+        "speedEstimated": "85 ➔ 120 km/h",
+        "engineeringTip": "すり鉢の底をうねるように走る。フロントの回頭性が重要。"
+      },
+      {
+        "number": "T12",
+        "name": "ジュンソン (Junção)",
+        "gearEstimated": "3rd",
+        "speedEstimated": "125 km/h",
+        "engineeringTip": "ホームストレートへ向かう登り坂前の最重要エイペックス。"
+      },
+      {
+        "number": "T13-T15",
+        "name": "スビダ・ドス・ボシス (ピットへの登り坂)",
+        "gearEstimated": "7th ➔ 8th",
+        "speedEstimated": "280 km/h",
+        "engineeringTip": "全開で駆け上がる左ベンド。豪雨時には川ができる難所。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2008,
+        "title": "ルイス・ハミルトン 最終コーナー奇跡の大逆転タイトル獲得",
+        "description": "マッサがトップチェッカーを受けフェラーリが戴冠を確信した30秒後、最終コーナーでグロックを抜き初王者。",
+        "detailedStory": "2008年ブラジルGP。残り数周で豪雨が襲来。母国のフェリペ・マッサ（フェラーリ）がトップでチェッカーを受け、フェラーリ陣営が歓喜の涙を流す中、タイトル獲得条件の5位を走っていたハミルトンはドライタイヤで苦しむティモ・グロック（トヨタ）を最終コーナー（ジュンソン脱出後）で劇的オーバーテイク。わずか1ポイント差で自身初の世界チャンピオンに輝いた。F1史上最も劇的なタイトル決着。",
+        "significance": "チェッカーフラッグの瞬間まで何が起きるか分からないモータースポーツの究極のドラマ。",
+        "historicalImpact": "F1史に残る最もセンセーショナルなフィニッシュとして、今なお語り継がれている。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "インフィールドのテクニカルセクションと、長い登りストレートでの最高速の妥協点を見出すミディアムハイ設定。",
+      "kerbUsage": "バンピーな路面と縁石の衝撃を受け止めるサスペンションコンプライアンスが不可欠。",
+      "brakeDemands": "エス・ド・セナでの下りブレーキング。突然のスコールで路面に川ができるため排水性・車高管理が極めてシビア。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Autódromo José Carlos Pace Historical Weather Radar and Track Evolution",
+        "publisher": "Confederação Brasileira de Automobilismo",
+        "url": "https://cba.org.br",
+        "verifiedDate": "2024-11-02"
+      },
+      {
+        "id": 2,
+        "title": "2008 Brazilian GP Lap 71 Telemetry Sequence: Hamilton vs Glock",
+        "publisher": "McLaren Racing Archives",
+        "url": "https://www.mclaren.com",
+        "verifiedDate": "2022-11-05"
+      }
+    ]
+  },
+  {
+    "id": "las-vegas",
+    "name": "ラスベガス・ストリップ・サーキット",
+    "officialName": "Las Vegas Strip Circuit",
+    "country": "アメリカ 🇺🇸",
+    "lengthKm": 6.201,
+    "turns": 17,
+    "drsZones": 2,
+    "downforceLevel": "Low",
+    "tyreStress": "Low",
+    "typicalPitLossSec": 20,
+    "safetyCarProbability": "70% (高)",
+    "undercutImpact": "大（タイヤ温度が上がりにくく、ウォームアップが勝負の鍵）",
+    "lapRecord": {
+      "time": "1:35.490",
+      "driver": "Oscar Piastri (McLaren)",
+      "year": 2023
+    },
+    "characteristics": "世界最大の歓楽街ラスベガス・ストリップの大通りを封鎖した超高速ストリートサーキット。巨大LED球体スフィア（Sphere）やベラージオの噴水の横を時速350km超で駆け抜ける1.9kmの長大ストレートが目玉 [1]。深夜の気温10℃前後という極寒環境で、タイヤ作動温度の確保が全チームの頭痛の種 [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_las_vegas.png",
+      "credit": "Nasho3498",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Las_Vegas_Strip_Circuit_2023.png"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_las_vegas.png",
+        "credit": "Nasho3498",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Las_Vegas_Strip_Circuit_2023.png"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_las_vegas.png",
+        "caption": "ラスベガスのネオンと巨大スフィアを背景に疾走するストリップ大通り",
+        "tag": "Panoramic",
+        "credit": "Nasho3498",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Las_Vegas_Strip_Circuit_2023.png"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 4,
+      "longestStraightMeters": 1900,
+      "gForceMax": {
+        "lateral": 3.8,
+        "longitudinal": 4.8
+      },
+      "keyCorners": [
+        {
+          "number": "T1",
+          "name": "ターン1 ヘアピン",
+          "characteristic": "ピットビル直後のタイト左ヘアピン。スタート時の混乱地点。"
+        },
+        {
+          "number": "T5-T9",
+          "name": "Sphere Complex",
+          "characteristic": "巨大スフィアの足元を回り込むテクニカルゾーン。"
+        },
+        {
+          "number": "T14",
+          "name": "Strip Straight End Chicane",
+          "characteristic": "1.9kmストレートエンド、350km/hからのヘビーブレーキングシケイン。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1-T2",
+        "name": "ピット前ヘアピン (T1-T2)",
+        "gearEstimated": "2nd",
+        "speedEstimated": "75 km/h",
+        "engineeringTip": "急減速からの立ち上がり。冷えたタイヤでのホイールスピンに注意。"
+      },
+      {
+        "number": "T3-T4",
+        "name": "コバール・レーン",
+        "gearEstimated": "4th",
+        "speedEstimated": "170 km/h",
+        "engineeringTip": "スフィアへ向かう全開加速区間。"
+      },
+      {
+        "number": "T5-T9",
+        "name": "スフィア・コンプレックス",
+        "gearEstimated": "3rd",
+        "speedEstimated": "120 km/h",
+        "engineeringTip": "低グリップ路面でのアンダーステアに耐えながら滑らかに向きを変える。"
+      },
+      {
+        "number": "T12",
+        "name": "ストリップ大通り合流",
+        "gearEstimated": "3rd",
+        "speedEstimated": "110 km/h",
+        "engineeringTip": "1.9kmストリップストレートへの全開脱出。トラクションが最重要。"
+      },
+      {
+        "number": "T14-T15",
+        "name": "ストリップエンド・シケイン",
+        "gearEstimated": "2nd ➔ 3rd",
+        "speedEstimated": "85 ➔ 130 km/h",
+        "engineeringTip": "350km/hからのフルブレーキング。DRSオーバーテイクの最大拠点。"
+      },
+      {
+        "number": "T17",
+        "name": "最終コーナー",
+        "gearEstimated": "4th",
+        "speedEstimated": "160 km/h",
+        "engineeringTip": "メインストレートへ向けて全開脱出。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2023,
+        "title": "フェルスタッペン vs ルクレール vs ペレス 激闘のオーバーテイク合戦",
+        "description": "ペナルティやダメージを乗り越えたフェルスタッペンが優勝、ルクレールが最終ラップのT14でペレスを劇的逆転。",
+        "detailedStory": "2023年ラスベガスGP。スタート時の押し出しペナルティやラッセルとの接触ダメージを負ったフェルスタッペンが驚異の追い上げを見せ首位を奪還。一方、2位争いはペレスとルクレールが幾度も首位を入れ替える死闘を展開。迎えたファイナルラップ、1.9kmのストリップ大通りエンド（ターン14）で、ルクレールが電光石火のレイトブレーキングでペレスのインを刺し、0.171秒差で2位をもぎ取った。",
+        "significance": "エンターテインメント重視と批判された新設グランプリが、最高峰のレース内容で世界を熱狂させた一戦。",
+        "historicalImpact": "超高速ストリートサーキットの安全設計とスリリングなレース展開の両立を証明した。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "1.9kmストリップストレートでのトップスピードを最優先した超ロードラッグセッティング。",
+      "kerbUsage": "公道のマンホール蓋溶接と路面凹凸へのボトミング対策。",
+      "brakeDemands": "10℃前後の極寒の中で1.9kmストレートを走るため、ブレーキローターとタイヤ表面が急速に冷却され冷え切る。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Las Vegas Strip Circuit Civil Engineering and Top Speed Data",
+        "publisher": "Formula 1 Las Vegas Operations",
+        "url": "https://www.f1lasvegasgp.com",
+        "verifiedDate": "2023-11-20"
+      },
+      {
+        "id": 2,
+        "title": "Low Ambient Temperature Tyre Working Window Analysis in Las Vegas",
+        "publisher": "Pirelli Motorsport Journal",
+        "url": "https://www.pirelli.com",
+        "verifiedDate": "2023-11-22"
+      }
+    ]
+  },
+  {
+    "id": "losail",
+    "name": "ルサイル・インターナショナル・サーキット",
+    "officialName": "Lusail International Circuit (Qatar)",
+    "country": "カタール 🇶🇦",
+    "lengthKm": 5.419,
+    "turns": 16,
+    "drsZones": 1,
+    "downforceLevel": "High",
+    "tyreStress": "Very High",
+    "typicalPitLossSec": 24.5,
+    "safetyCarProbability": "35% (低〜中)",
+    "undercutImpact": "大（超高速コーナリングによる極度のタイヤ剥離・デグラデーション）",
+    "lapRecord": {
+      "time": "1:24.319",
+      "driver": "Max Verstappen (Red Bull)",
+      "year": 2023
+    },
+    "characteristics": "MotoGPの聖地として知られる超中高速流体サーキット。1kmのメインストレート以外は息つく間もなく超高速コーナーが連続 [1]。2023年には過酷な酷暑と湿気、ピラミッド型縁石によるタイヤ内部構造破壊により「最大18周縛り（義務的3ストップ）」が発令されたF1史上最も肉体的に過酷なサーキット [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_losail.jpg",
+      "credit": "Dmitry Racer",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:WTCC_2016,_Qatar.jpg"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_losail.jpg",
+        "credit": "Dmitry Racer",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:WTCC_2016,_Qatar.jpg"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_losail.jpg",
+        "caption": "砂漠の中のオアシスのように輝くルサイルのナイトレース照明と高速複合コーナー",
+        "tag": "Panoramic",
+        "credit": "Dmitry Racer",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:WTCC_2016,_Qatar.jpg"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 4.2,
+      "longestStraightMeters": 1068,
+      "gForceMax": {
+        "lateral": 5.1,
+        "longitudinal": 4.7
+      },
+      "keyCorners": [
+        {
+          "number": "T1",
+          "name": "ターン1",
+          "characteristic": "メインストレートエンドの直角右。唯一のクリアな抜き所。"
+        },
+        {
+          "number": "T12-T14",
+          "name": "Triple Apex Fast Right",
+          "characteristic": "時速260kmで持続的な5Gの横Gがかかり続ける超高速コーナー。"
+        },
+        {
+          "number": "T16",
+          "name": "最終コーナー",
+          "characteristic": "メインストレートへ速度を乗せる中高速左ベンド。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1",
+        "name": "ターン1",
+        "gearEstimated": "3rd",
+        "speedEstimated": "120 km/h",
+        "engineeringTip": "1kmストレート後のハードブレーキング。"
+      },
+      {
+        "number": "T2",
+        "name": "ターン2 (ロングレフト)",
+        "gearEstimated": "4th",
+        "speedEstimated": "160 km/h",
+        "engineeringTip": "左へ長く回り込む。右タイヤの熱負荷大。"
+      },
+      {
+        "number": "T4-T5",
+        "name": "中速S字",
+        "gearEstimated": "4th ➔ 5th",
+        "speedEstimated": "175 ➔ 210 km/h",
+        "engineeringTip": "滑らかな荷重移動で速度を維持。"
+      },
+      {
+        "number": "T6",
+        "name": "ヘアピン (T6)",
+        "gearEstimated": "2nd",
+        "speedEstimated": "85 km/h",
+        "engineeringTip": "コース唯一の低速ヘアピン。"
+      },
+      {
+        "number": "T7-T11",
+        "name": "流体高速セクション",
+        "gearEstimated": "5th ➔ 6th",
+        "speedEstimated": "220 ➔ 250 km/h",
+        "engineeringTip": "マシンのダウンフォースとドライバーの首筋を破壊する連続高速ターン。"
+      },
+      {
+        "number": "T12-T14",
+        "name": "トリプルエイペックス (T12-14)",
+        "gearEstimated": "6th ➔ 7th",
+        "speedEstimated": "260 km/h",
+        "engineeringTip": "5Gを超える強烈な横Gが連続。ピラミッド縁石に乗るとタイヤが破損。"
+      },
+      {
+        "number": "T16",
+        "name": "最終コーナー",
+        "gearEstimated": "4th",
+        "speedEstimated": "150 km/h",
+        "engineeringTip": "メインストレートへ向けて全開脱出。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2023,
+        "title": "極限酷暑サバイバル ＆ ピレリ「18周タイヤ制限」義務化",
+        "description": "ピラミッド縁石によるタイヤ構造剥離でFIAが異例の周回数制限を発令、脱水症状でドライバーが次々と倒れた極限レース。",
+        "detailedStory": "2023年カタールGP。高速コーナー外側のピラミッド型縁石によりピレリタイヤのサイドウォール内部コードが剥離する深刻な安全問題が発覚。FIAは急遽「全タイヤ最大18周まで使用可能」という強制3ストップ以上のレギュレーションを適用。さらに気温35℃・湿度80%の過酷な環境で全周予選アタックペースの走行を強いられたドライバーたちは、脱水症状や熱中症で走行中に嘔吐、意識朦朧となりながらチェッカーを受ける極限サバイバルとなった。",
+        "significance": "ドライバーの安全限界とサーキット縁石設計に関するFIA規定の大改革をもたらしたレース。",
+        "historicalImpact": "コックピット内の強制冷却ダクト義務化や、過酷環境下でのレース開催時期見直しが決定された。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "息つく間もない中高速コーナーでのマシンの回頭性を支える最大ダウンフォース。",
+      "kerbUsage": "ピラミッド型縁石に乗るとタイヤの内部コードが破断するため、縁石回避のライン取りが必須。",
+      "brakeDemands": "ブレーキ負荷は低いが、持続的な高横Gによるタイヤ内部構造の熱膨張管理が最大の課題。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "FIA Official Safety Directive: Maximum Stint Length at 2023 Qatar GP",
+        "publisher": "FIA Formula One Regulations",
+        "url": "https://www.fia.com",
+        "verifiedDate": "2023-10-08"
+      },
+      {
+        "id": 2,
+        "title": "Lusail Circuit Pyramid Kerbs Impact on Radial Tyre Carcass",
+        "publisher": "Pirelli Motorsport Technical Report",
+        "url": "https://www.pirelli.com",
+        "verifiedDate": "2023-10-10"
+      }
+    ]
+  },
+  {
+    "id": "yas-marina",
+    "name": "ヤス・マリーナ・サーキット",
+    "officialName": "Yas Marina Circuit (Abu Dhabi)",
+    "country": "UAE 🇦🇪",
+    "lengthKm": 5.281,
+    "turns": 16,
+    "drsZones": 2,
+    "downforceLevel": "Medium",
+    "tyreStress": "Medium",
+    "typicalPitLossSec": 22,
+    "safetyCarProbability": "40% (中程度)",
+    "undercutImpact": "大（トワイライトからナイトへ急激に路面温度が低下し、戦略が激変）",
+    "lapRecord": {
+      "time": "1:26.103",
+      "driver": "Max Verstappen (Red Bull)",
+      "year": 2021
+    },
+    "characteristics": "夕暮れから闇夜へと移り変わる豪華絢爛なトワイライトレース。2021年に大改修が行われ、北ヘアピンのシケイン撤去とマリーナ周辺のバンクコーナー（T9）新設により超高速バトルコースへ変貌 [1]。シーズン最終戦の舞台として幾多の世界王者誕生を見届けてきた [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_yas_marina.jpg",
+      "credit": "TravelPhotosNL",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:North_Grandstand_at_the_Yas_Marina_circuit_in_Abu_Dhabi.jpg"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_yas_marina.jpg",
+        "credit": "TravelPhotosNL",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:North_Grandstand_at_the_Yas_Marina_circuit_in_Abu_Dhabi.jpg"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_yas_marina.jpg",
+        "caption": "ヤス・ヴァイスロイ・ホテルを潜り抜けるヤス・マリーナの夕暮れトワイライト風景",
+        "tag": "Panoramic",
+        "credit": "TravelPhotosNL",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:North_Grandstand_at_the_Yas_Marina_circuit_in_Abu_Dhabi.jpg"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 10.7,
+      "longestStraightMeters": 1200,
+      "gForceMax": {
+        "lateral": 4.2,
+        "longitudinal": 4.7
+      },
+      "keyCorners": [
+        {
+          "number": "T5",
+          "name": "North Hairpin",
+          "characteristic": "改修された鋭角ヘアピン。1.2kmバックストレートへの発射台。"
+        },
+        {
+          "number": "T9",
+          "name": "Marsa Corner (バンクヘアピン)",
+          "characteristic": "旧直角コーナー群を廃止して新設された高速すり鉢バンク。"
+        },
+        {
+          "number": "T12-T15",
+          "name": "Hotel Complex",
+          "characteristic": "イルミネーションホテル下を潜るテクニカルセクション。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1",
+        "name": "ターン1",
+        "gearEstimated": "4th",
+        "speedEstimated": "140 km/h",
+        "engineeringTip": "ピット後の左中速。縁石を使って立ち上がり速度を稼ぐ。"
+      },
+      {
+        "number": "T2-T4",
+        "name": "高速エッセ",
+        "gearEstimated": "5th ➔ 6th",
+        "speedEstimated": "220 ➔ 255 km/h",
+        "engineeringTip": "全開で駆け抜ける上り勾配セクション。"
+      },
+      {
+        "number": "T5",
+        "name": "北ヘアピン (T5)",
+        "gearEstimated": "2nd",
+        "speedEstimated": "75 km/h",
+        "engineeringTip": "1.2kmバックストレートへ繋がる最重要エイペックス。"
+      },
+      {
+        "number": "T6-T7",
+        "name": "バックストレートエンド シケイン",
+        "gearEstimated": "2nd ➔ 3rd",
+        "speedEstimated": "85 ➔ 125 km/h",
+        "engineeringTip": "335km/hからのヘビーブレーキング。DRSオーバーテイクの主戦場。"
+      },
+      {
+        "number": "T9",
+        "name": "マルサ・コーナー (すり鉢バンク)",
+        "gearEstimated": "4th",
+        "speedEstimated": "180 km/h",
+        "engineeringTip": "キャンバーを利用して高速旋回。オーバーテイクも可能。"
+      },
+      {
+        "number": "T12-T15",
+        "name": "マリーナホテル・コンプレックス",
+        "gearEstimated": "3rd",
+        "speedEstimated": "110 km/h",
+        "engineeringTip": "LEDで光るホテルの下を潜る直角コーナー群。リアのトラクション重視。"
+      },
+      {
+        "number": "T16",
+        "name": "最終コーナー",
+        "gearEstimated": "4th",
+        "speedEstimated": "150 km/h",
+        "engineeringTip": "メインストレートへ向けて全開脱出。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2021,
+        "title": "運命の最終周 — フェルスタッペン vs ハミルトン 歴史的決着",
+        "description": "同ポイントで迎えた最終戦、最終ラップのセーフティカー解除直後にフェルスタッペンが逆転オーバーテイクし初戴冠。",
+        "detailedStory": "2021年アブダビGP。フェルスタッペンとハミルトンが全くの同点で迎えた運命の最終決戦。レースを支配していたハミルトンに対し、残り5周でラティフィがクラッシュしてセーフティカーが導入。レッドブルは新品ソフトタイヤに交換する賭けに出る。レースディレクターのマイケル・マシは周回遅れの5台のみをパスさせて最終ラップ直前にSCを解除。ターン5でフェルスタッペンがインに飛び込み劇的な逆転優勝、悲願の初タイトルを獲得した。",
+        "significance": "近代モータースポーツ史において最も議論を呼び、最もドラマチックだった選手権決着。",
+        "historicalImpact": "FIAのセーフティカー運用規則の抜本的改定と、レースコントロール体制の再編へと繋がった。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "2本の長大なストレートでのトップスピードと、ホテル周辺の低速グリップを両立するミディアム設定。",
+      "kerbUsage": "改修により縁石が滑らかになり、フロアへの攻撃性は低下した。",
+      "brakeDemands": "レース中に日没を迎え路面温度が15℃近く急降下するため、タイヤ空気圧とブレーキ温度の動的アジャストが必須。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Yas Marina Circuit 2021 Layout Modifications Engineering Dossier",
+        "publisher": "Abu Dhabi Motorsports Management",
+        "url": "https://www.yasmarinacircuit.com",
+        "verifiedDate": "2021-12-05"
+      },
+      {
+        "id": 2,
+        "title": "2021 Abu Dhabi Grand Prix Stewards Decisions & Safety Car Procedure Review",
+        "publisher": "FIA World Motor Sport Council",
+        "url": "https://www.fia.com",
+        "verifiedDate": "2022-03-19"
+      }
+    ]
+  },
+  {
+    "id": "jeddah",
+    "name": "ジェッダ・コーニッシュ・サーキット",
+    "officialName": "Jeddah Corniche Circuit",
+    "country": "サウジアラビア 🇸🇦",
+    "lengthKm": 6.174,
+    "turns": 27,
+    "drsZones": 3,
+    "downforceLevel": "Low",
+    "tyreStress": "High",
+    "typicalPitLossSec": 20,
+    "safetyCarProbability": "85% (極めて高い)",
+    "undercutImpact": "中程度（高速コースのためSCや赤旗によるピットギャンブルが支配）",
+    "lapRecord": {
+      "time": "1:30.734",
+      "driver": "Lewis Hamilton (Mercedes)",
+      "year": 2021
+    },
+    "characteristics": "紅海沿岸に建設された「世界最速の市街地サーキット」。平均時速250km/h超、コーナー数27箇所という驚異のスペック [1]。コンクリートウォールに挟まれたブラインドの超高速スラロームが延々と続き、わずかな判断ミスが壊滅的クラッシュに直結する狂気のスピードウェイ [2]。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_jeddah.png",
+      "credit": "Kilawyn Punx",
+      "license": "CC BY-SA 4.0",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Saudi_Arabian_Grand_Prix-2021.png"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_jeddah.png",
+        "credit": "Kilawyn Punx",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Saudi_Arabian_Grand_Prix-2021.png"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_jeddah.png",
+        "caption": "紅海沿いの夜空を切り裂くジェッダの超高速スラロームストリート",
+        "tag": "Panoramic",
+        "credit": "Kilawyn Punx",
+        "license": "CC BY-SA 4.0",
+        "sourceUrl": "https://commons.wikimedia.org/wiki/File:Saudi_Arabian_Grand_Prix-2021.png"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 4.1,
+      "longestStraightMeters": 1000,
+      "gForceMax": {
+        "lateral": 4.9,
+        "longitudinal": 4.6
+      },
+      "keyCorners": [
+        {
+          "number": "T1-T2",
+          "name": "First Chicane",
+          "characteristic": "狭いコンクリートウォールに囲まれた低速S字。スタート時の関門。"
+        },
+        {
+          "number": "T13",
+          "name": "Banked Hairpin (12度バンク)",
+          "characteristic": "12度のバンクがついた超高速進入ヘアピン。"
+        },
+        {
+          "number": "T22-T24",
+          "name": "High Speed Blind Chicane",
+          "characteristic": "時速260kmでブラインドの壁の間を縫う度胸試しセクション。"
+        },
+        {
+          "number": "T27",
+          "name": "最終ヘアピン",
+          "characteristic": "メインストレートへの合流ヘアピン。DRS検知ポイントの心理戦。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1-T2",
+        "name": "第1シケイン (T1-T2)",
+        "gearEstimated": "3rd",
+        "speedEstimated": "105 km/h",
+        "engineeringTip": "左から右への切り返し。イン側のウォールを恐れず攻める。"
+      },
+      {
+        "number": "T4-T10",
+        "name": "高速スラローム (T4-T10)",
+        "gearEstimated": "5th ➔ 7th",
+        "speedEstimated": "220 ➔ 280 km/h",
+        "engineeringTip": "ブラインドの連続高速ベンド。わずかなステア修正も許されない。"
+      },
+      {
+        "number": "T13",
+        "name": "12度バンクヘアピン (T13)",
+        "gearEstimated": "3rd",
+        "speedEstimated": "125 km/h",
+        "engineeringTip": "12度のバンク角を利用し高い車速を保って立ち上がる。"
+      },
+      {
+        "number": "T16-T21",
+        "name": "紅海沿い超高速スプリント",
+        "gearEstimated": "7th ➔ 8th",
+        "speedEstimated": "290 km/h",
+        "engineeringTip": "ほぼ全開で駆け抜ける壁のトンネル。"
+      },
+      {
+        "number": "T22-T24",
+        "name": "ブラインド高速シケイン",
+        "gearEstimated": "6th",
+        "speedEstimated": "255 km/h",
+        "engineeringTip": "マシンのボトミングとウォールへの近接が極限に達する難関。"
+      },
+      {
+        "number": "T27",
+        "name": "最終ヘアピン (T27)",
+        "gearEstimated": "2nd",
+        "speedEstimated": "85 km/h",
+        "engineeringTip": "メインストレート前の急減速。DRS検知ラインを踏むタイミングの駆け引き。"
+      }
+    ],
+    "historicalMoments": [
+      {
+        "year": 2021,
+        "title": "ハミルトン vs フェルスタッペン 追突事件とカオスの第21戦",
+        "description": "赤旗2回、VSC連発、順位譲渡を巡る追突事故など、タイトル争いが修羅場と化した前代未聞の死闘。",
+        "detailedStory": "2021年サウジアラビアGP初開催。タイトルを争うハミルトンとフェルスタッペンはコース上で何度も接触。レース終盤、コース外走行のアドバンテージを戻すよう命じられたフェルスタッペンがストレートで減速した際、意図が伝わっていなかったハミルトンが追突しフロントウイングを破損。ハミルトンはウイングを壊したままファステストラップを連発して優勝。両者同ポイントで最終戦アブダビへ向かうという狂気の結末を迎えた。",
+        "significance": "近代F1における最も敵対的かつ混沌としたライバル対決の頂点。",
+        "historicalImpact": "順位譲渡プロトコルの明確化と、ジェッダのブラインドコーナー視認性改善改修へと繋がった。"
+      }
+    ],
+    "setupNotes": {
+      "aeroTradeoff": "平均速度250km/hの超高速コースのためロードラッグセッティングを選択。",
+      "kerbUsage": "縁石は低く設定されているが、ブラインドコーナーでウォールに触れると即全損の危機。",
+      "brakeDemands": "ブレーキ負荷は低いが、赤旗やSCが極めて高確率で発生するためリスタート時のタイヤ発熱管理が勝負を左右する。"
+    },
+    "references": [
+      {
+        "id": 1,
+        "title": "Jeddah Corniche Circuit High-Speed Street Track Design and Safety Report",
+        "publisher": "Saudi Automobile & Motorcycle Federation",
+        "url": "https://www.saudimotorsport.com",
+        "verifiedDate": "2021-12-01"
+      },
+      {
+        "id": 2,
+        "title": "Analysis of Visual Sightlines and Barrier Adjustments at Jeddah",
+        "publisher": "FIA Safety Department",
+        "url": "https://www.fia.com",
+        "verifiedDate": "2023-03-15"
+      }
+    ]
+  }
 ];
 
 // ─────────────────────────────────────────────────────────────

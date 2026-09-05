@@ -303,7 +303,7 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
           [
             ['teams', '🏎️ チーム紹介 (全10チーム)'],
             ['drivers', '👤 ドライバー名鑑 (詳細ビュー)'],
-            ['circuits', '🏁 サーキット解説'],
+            ['circuits', '🏁 サーキット解説 (全24戦カレンダー)'],
             ['strategy', '🛞 戦略 & 規則'],
             ['history', '🏛️ 歴史アーカイブ'],
           ] as [SubTab, string][]
