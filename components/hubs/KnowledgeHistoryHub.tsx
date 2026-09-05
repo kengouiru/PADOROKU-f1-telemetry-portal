@@ -9,26 +9,21 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   KNOWLEDGE_TEAMS,
-  KNOWLEDGE_DRIVERS,
-  KNOWLEDGE_CIRCUITS,
   KNOWLEDGE_STRATEGIES,
   KNOWLEDGE_HISTORY,
   type Reference,
   type TeamProfile,
-  type DriverProfile,
-  type CircuitProfile,
   type StrategyConcept,
   type HistoryArchive,
   type EmbeddedRadio,
   type TelemetryTarget,
 } from '@/data/f1KnowledgeData';
 import { getProxiedAudioUrl } from '@/lib/telemetryUtils';
-import DriverDetailModal from './DriverDetailModal';
 import TeamDetailModal from './TeamDetailModal';
-import CircuitDetailModal from './CircuitDetailModal';
+import DriversHub from './DriversHub';
+import CircuitsHub from './CircuitsHub';
 
 type SubTab = 'teams' | 'drivers' | 'circuits' | 'strategy' | 'history';
-type DriverStatusFilter = 'ALL' | 'Current' | 'Legend';
 
 interface KnowledgeHistoryHubProps {
   onNavigateToTelemetry?: (target?: TelemetryTarget) => void;
@@ -154,11 +149,7 @@ function EmbeddedRadioCard({ radio }: { radio: EmbeddedRadio }) {
 export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: KnowledgeHistoryHubProps) {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('teams');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [driverStatusFilter, setDriverStatusFilter] = useState<DriverStatusFilter>('ALL');
-  const [driverTeamFilter, setDriverTeamFilter] = useState<string>('ALL');
-  const [selectedDriverDetail, setSelectedDriverDetail] = useState<DriverProfile | null>(null);
   const [selectedTeamDetail, setSelectedTeamDetail] = useState<TeamProfile | null>(null);
-  const [selectedCircuitDetail, setSelectedCircuitDetail] = useState<CircuitProfile | null>(null);
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
 
   // Jump to Reference list & highlight target reference
@@ -252,20 +243,6 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
       </div>
     );
   };
-
-  // Filtered drivers logic
-  const filteredDrivers = KNOWLEDGE_DRIVERS.filter((d) => {
-    const matchesSearch =
-      d.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      d.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      d.team.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      d.driverType.toLowerCase().includes(searchQuery.toLowerCase());
-
-    const matchesStatus = driverStatusFilter === 'ALL' || d.status === driverStatusFilter;
-    const matchesTeam = driverTeamFilter === 'ALL' || d.team.toLowerCase().includes(driverTeamFilter.toLowerCase());
-
-    return matchesSearch && matchesStatus && matchesTeam;
-  });
 
   return (
     <div className="flex flex-col gap-5 max-w-6xl mx-auto animate-fade-in">
@@ -365,36 +342,31 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
                         </h3>
                       </div>
                     </div>
-
                     {team.constructorTitles > 0 && (
-                      <span className="text-[10px] font-mono font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-md flex-shrink-0">
-                        🏆 {team.constructorTitles}回
+                      <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-1 flex-shrink-0">
+                        <span>🏆</span>
+                        <span>{team.constructorTitles}冠</span>
                       </span>
                     )}
                   </div>
 
-                  {/* Team Meta Badges */}
-                  <div className="flex items-center gap-1.5 flex-wrap text-[10px] font-mono">
-                    <span className="bg-slate-800/90 text-slate-300 px-2 py-0.5 rounded-md border border-white/5">
-                      ⚡ {team.powerUnit}
+                  {/* Quick specs pill bar */}
+                  <div className="flex flex-wrap gap-1 text-[10px] font-mono">
+                    <span className="bg-slate-900/80 px-2 py-0.5 rounded-md text-slate-300 border border-white/5">
+                      PU: <strong className="text-sky-300">{team.powerUnit}</strong>
                     </span>
-                    <span className="bg-slate-800/90 text-slate-400 px-2 py-0.5 rounded-md border border-white/5">
-                      代表: {team.teamPrincipal.split(' ')[1] || team.teamPrincipal}
+                    <span className="bg-slate-900/80 px-2 py-0.5 rounded-md text-slate-300 border border-white/5">
+                      代表: <strong className="text-slate-200">{team.teamPrincipal}</strong>
                     </span>
                   </div>
 
-                  {/* Drivers Tags */}
-                  <div className="flex items-center gap-1 text-[11px] font-mono">
-                    <span className="text-[10px] text-slate-500 mr-1">DRV:</span>
+                  {/* Drivers badge list */}
+                  <div className="flex items-center gap-1.5 text-[10px] font-mono text-slate-400">
+                    <span>ドライバー:</span>
                     {team.drivers.map((d) => (
                       <span
                         key={d}
-                        className="px-1.5 py-0.5 rounded text-[10px] font-bold border"
-                        style={{
-                          color: team.color,
-                          borderColor: `${team.color}40`,
-                          backgroundColor: `${team.color}10`,
-                        }}
+                        className="px-1.5 py-0.5 rounded bg-slate-800 text-white font-bold border border-white/10"
                       >
                         {d}
                       </span>
@@ -433,231 +405,22 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
         </div>
       )}
 
-      {/* ── Sub-Tab 2: DRIVERS (Compact Grid + Detail Modal) ── */}
+      {/* ── Sub-Tab 2: DRIVERS (Team Grouped / Flat / Legends + Detail Modal) ── */}
       {activeSubTab === 'drivers' && (
-        <div className="flex flex-col gap-4 animate-fade-in">
-          {/* Driver Filters Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-950/60 p-3 rounded-2xl border border-white/10">
-            {/* Status Filter Tabs */}
-            <div className="flex items-center gap-1 bg-slate-900/90 p-1 rounded-xl border border-white/5">
-              {(
-                [
-                  ['ALL', '全選手'],
-                  ['Current', '🏁 現役グリッド'],
-                  ['Legend', '👑 歴代レジェンド'],
-                ] as [DriverStatusFilter, string][]
-              ).map(([status, label]) => (
-                <button
-                  key={status}
-                  onClick={() => setDriverStatusFilter(status)}
-                  className={`px-3 py-1 rounded-lg text-xs font-racing font-bold transition-all ${
-                    driverStatusFilter === status
-                      ? 'bg-blue-600 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-
-            {/* Team Filter Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-0.5 text-xs">
-              <span className="text-[10px] text-slate-500 font-mono mr-1">TEAM:</span>
-              {['ALL', 'Red Bull', 'Ferrari', 'McLaren', 'Mercedes', 'Aston Martin', 'RB'].map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setDriverTeamFilter(t)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-mono transition-all flex-shrink-0 ${
-                    driverTeamFilter === t
-                      ? 'bg-slate-700 text-sky-400 font-bold border border-sky-400/40'
-                      : 'bg-slate-900/60 text-slate-400 hover:bg-slate-800'
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Compact Driver Grid Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-            {filteredDrivers.map((driver) => (
-              <div
-                key={driver.id}
-                onClick={() => setSelectedDriverDetail(driver)}
-                className="glass-card p-4 flex flex-col justify-between gap-3 border-l-4 cursor-pointer hover:border-sky-400 hover:bg-slate-900/90 transition-all hover:scale-[1.02] shadow-md group relative overflow-hidden"
-                style={{ borderLeftColor: driver.teamColor }}
-              >
-                <div className="space-y-2">
-                  {/* Card Top: Number, Code, Country, Title Badge */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="text-xs font-racing font-black px-2 py-0.5 rounded-lg border"
-                        style={{
-                          color: driver.teamColor,
-                          borderColor: `${driver.teamColor}60`,
-                          backgroundColor: `${driver.teamColor}15`,
-                        }}
-                      >
-                        #{driver.number} {driver.code}
-                      </span>
-                      <span className="text-xs text-slate-400 font-mono">{driver.country}</span>
-                    </div>
-
-                    {driver.status === 'Legend' ? (
-                      <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono flex items-center gap-1 shadow-sm">
-                        <span>👑</span>
-                        <span>殿堂入り ({driver.championships}冠)</span>
-                      </span>
-                    ) : driver.championships > 0 ? (
-                      <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono flex items-center gap-1">
-                        <span>🏆</span>
-                        <span>{driver.championships}冠</span>
-                      </span>
-                    ) : null}
-                  </div>
-
-                  {/* Driver Name & Team */}
-                  <div>
-                    <h3 className="text-base font-bold text-white leading-tight group-hover:text-sky-300 transition-colors flex items-center gap-1.5">
-                      <span>{driver.fullName}</span>
-                      {driver.status === 'Legend' && <span className="text-amber-400 text-xs">👑</span>}
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">{driver.team}</p>
-                  </div>
-
-
-                  {/* Driver Type Tag */}
-                  <div className="bg-slate-950/60 px-2.5 py-1 rounded-lg border border-white/5 text-[11px] text-sky-200/90 truncate">
-                    🏷️ {driver.driverType}
-                  </div>
-                </div>
-
-                {/* Card Bottom: Quick Stats Bar & Action Indicator */}
-                <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-400">
-                  <div className="flex items-center gap-3">
-                    <span>
-                      勝: <strong className="text-amber-400">{driver.wins}</strong>
-                    </span>
-                    <span>
-                      登壇: <strong className="text-sky-400">{driver.podiums}</strong>
-                    </span>
-                    <span>
-                      PP: <strong className="text-purple-400">{driver.polePositions}</strong>
-                    </span>
-                  </div>
-
-                  <span className="text-sky-400 group-hover:translate-x-1 transition-transform font-bold text-xs flex items-center gap-0.5">
-                    <span>詳細</span>
-                    <span>➔</span>
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Driver Detail Modal */}
-          {selectedDriverDetail && (
-            <DriverDetailModal
-              driver={selectedDriverDetail}
-              allDrivers={filteredDrivers}
-              onSelectDriver={(d) => setSelectedDriverDetail(d)}
-              onNavigateToTelemetry={onNavigateToTelemetry}
-              onClose={() => setSelectedDriverDetail(null)}
-            />
-          )}
-        </div>
+        <DriversHub
+          searchQuery={searchQuery}
+          onClearSearch={() => setSearchQuery('')}
+          onNavigateToTelemetry={onNavigateToTelemetry}
+        />
       )}
 
-      {/* ── Sub-Tab 3: CIRCUITS (Compact Grid + Detail Modal) ── */}
+      {/* ── Sub-Tab 3: CIRCUITS (Quick Region/Characteristic Filters + Detail Modal) ── */}
       {activeSubTab === 'circuits' && (
-        <div className="flex flex-col gap-4 animate-fade-in">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-            {KNOWLEDGE_CIRCUITS.filter(
-              (c) =>
-                c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                c.country.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                c.officialName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                c.characteristics.toLowerCase().includes(searchQuery.toLowerCase())
-            ).map((circuit) => (
-              <div
-                key={circuit.id}
-                onClick={() => setSelectedCircuitDetail(circuit)}
-                className="glass-card p-4 flex flex-col justify-between gap-3 border-l-4 border-l-sky-500 cursor-pointer hover:border-sky-400 hover:bg-slate-900/90 transition-all hover:scale-[1.02] shadow-md group relative overflow-hidden"
-              >
-                <div className="space-y-2.5">
-                  {/* Card Header: Country, Name, Length */}
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <span className="text-[10px] text-slate-400 font-mono block">
-                        {circuit.country}
-                      </span>
-                      <h3 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors leading-tight">
-                        {circuit.name}
-                      </h3>
-                    </div>
-                    <span className="text-[11px] font-mono font-bold text-sky-400 bg-sky-950/60 border border-sky-500/30 px-2 py-0.5 rounded-md flex-shrink-0">
-                      {circuit.lengthKm} km
-                    </span>
-                  </div>
-
-                  {/* Circuit Specs Badges */}
-                  <div className="grid grid-cols-3 gap-1.5 bg-slate-950/50 p-2 rounded-xl border border-white/5 text-center text-[10px] font-mono">
-                    <div>
-                      <span className="text-slate-500 block text-[9px]">DF要求</span>
-                      <strong className="text-sky-300">{circuit.downforceLevel}</strong>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 block text-[9px]">タイヤ負荷</span>
-                      <strong className="text-amber-400">{circuit.tyreStress}</strong>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 block text-[9px]">ピットロス</span>
-                      <strong className="text-slate-200">約{circuit.typicalPitLossSec}s</strong>
-                    </div>
-                  </div>
-
-                  {/* Characteristics snippet */}
-                  <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed bg-slate-900/40 p-2 rounded-lg border border-white/5">
-                    {circuit.characteristics.replace(/\[\d+\]/g, '')}
-                  </p>
-
-                  {/* Lap Record Snippet */}
-                  <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between">
-                    <span>⏱️ レコード:</span>
-                    <span className="text-slate-200 font-bold">
-                      {circuit.lapRecord.time} ({circuit.lapRecord.driver})
-                    </span>
-                  </div>
-                </div>
-
-                {/* Card Footer */}
-                <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[11px] font-mono text-slate-400">
-                  <span className="text-[10px] text-slate-500">
-                    {circuit.turns} ターン / DRS {circuit.drsZones}
-                  </span>
-                  <span className="text-sky-400 group-hover:underline flex items-center gap-0.5 font-bold">
-                    <span>詳細解説を見る</span>
-                    <span>➔</span>
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Circuit Detail Modal */}
-          {selectedCircuitDetail && (
-            <CircuitDetailModal
-              circuit={selectedCircuitDetail}
-              allCircuits={KNOWLEDGE_CIRCUITS}
-              onSelectCircuit={(c) => setSelectedCircuitDetail(c)}
-              onNavigateToTelemetry={onNavigateToTelemetry}
-              onClose={() => setSelectedCircuitDetail(null)}
-            />
-          )}
-        </div>
+        <CircuitsHub
+          searchQuery={searchQuery}
+          onClearSearch={() => setSearchQuery('')}
+          onNavigateToTelemetry={onNavigateToTelemetry}
+        />
       )}
 
       {/* ── Sub-Tab 4: STRATEGY & REGULATIONS ── */}
