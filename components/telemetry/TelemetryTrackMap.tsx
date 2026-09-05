@@ -4154,6 +4154,9 @@ export default function TelemetryTrackMap({
             <filter id="glow-apex" x="-50%" y="-50%" width="200%" height="200%">
               <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#f59e0b" />
             </filter>
+            <filter id="glow-corner" x="-50%" y="-50%" width="200%" height="200%">
+              <feDropShadow dx="0" dy="0" stdDeviation="3.5" floodColor="#38bdf8" />
+            </filter>
             <linearGradient id="trackGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.8" />
               <stop offset="100%" stopColor="#818cf8" stopOpacity="0.8" />
@@ -4233,40 +4236,95 @@ export default function TelemetryTrackMap({
             S/F
           </text>
 
-          {/* Clickable Corner Pins */}
+          {/* Clickable Corner Pins with Interactive Hover Animation & Tooltips */}
           {trackData.cornerPins.map((corner) => {
             const isSelected = activeCornerName === corner.name;
             return (
               <g
                 key={corner.number}
-                className="cursor-pointer group"
-                onClick={() => onSelectCorner?.({ name: corner.name, pct: corner.pct })}
+                className="cursor-pointer group select-none"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectCorner?.({ name: corner.name, pct: corner.pct });
+                }}
               >
-                {/* Hotspot circle */}
+                {/* Outer glowing aura ring on hover or selection */}
                 <circle
                   cx={corner.x}
                   cy={corner.y}
-                  r={isSelected ? '9' : '6'}
-                  fill={isSelected ? '#f59e0b' : '#1e293b'}
-                  stroke={isSelected ? '#fbbf24' : '#64748b'}
-                  strokeWidth={isSelected ? '2.5' : '1.5'}
-                  className="transition-all duration-200 group-hover:scale-125"
+                  r={isSelected ? 13 : 10}
+                  fill="none"
+                  stroke={isSelected ? '#f59e0b' : '#38bdf8'}
+                  strokeWidth="1.5"
+                  strokeDasharray="2 2"
+                  className={`transition-all duration-200 ${
+                    isSelected
+                      ? 'opacity-100 animate-spin-slow'
+                      : 'opacity-0 group-hover:opacity-100'
+                  }`}
+                  filter={isSelected ? 'url(#glow-apex)' : 'url(#glow-corner)'}
                 />
+
+                {/* Hotspot pin circle */}
+                <circle
+                  cx={corner.x}
+                  cy={corner.y}
+                  r={isSelected ? 8.5 : 6.5}
+                  fill={isSelected ? '#f59e0b' : '#0f172a'}
+                  stroke={isSelected ? '#fbbf24' : '#64748b'}
+                  strokeWidth={isSelected ? 2.5 : 1.5}
+                  className="transition-all duration-200 group-hover:stroke-sky-400 group-hover:fill-slate-800 drop-shadow-md"
+                />
+
+                {/* Corner Number label inside pin */}
                 <text
                   x={corner.x}
                   y={corner.y + 2.5}
                   textAnchor="middle"
-                  fontSize={isSelected ? '7.5' : '6.5'}
+                  fontSize={isSelected ? 7.5 : 6.5}
                   fontWeight="bold"
                   fontFamily="sans-serif"
                   fill={isSelected ? '#000000' : '#ffffff'}
-                  className="pointer-events-none select-none"
+                  className="pointer-events-none group-hover:fill-sky-300 transition-colors"
                 >
                   {corner.number}
                 </text>
 
-                {/* Hover corner name tooltip */}
-                <title>{`${corner.number}: ${corner.name} (${corner.pct}%) - クリックでズーム`}</title>
+                {/* Interactive On-Canvas Floating Tooltip Badge (Visible on hover or selected) */}
+                <g
+                  className={`transition-all duration-150 pointer-events-none ${
+                    isSelected
+                      ? 'opacity-100'
+                      : 'opacity-0 group-hover:opacity-100'
+                  }`}
+                  transform={`translate(${corner.x}, ${corner.y - (isSelected ? 16 : 14)})`}
+                >
+                  <rect
+                    x="-46"
+                    y="-7"
+                    width="92"
+                    height="14"
+                    rx="4"
+                    fill="#020617"
+                    stroke={isSelected ? '#f59e0b' : '#38bdf8'}
+                    strokeWidth="1"
+                    className="filter drop-shadow-[0_2px_6px_rgba(0,0,0,0.85)]"
+                  />
+                  <text
+                    x="0"
+                    y="3"
+                    textAnchor="middle"
+                    fontSize="6.8"
+                    fontFamily="sans-serif"
+                    fontWeight="bold"
+                    fill={isSelected ? '#f59e0b' : '#38bdf8'}
+                  >
+                    {isSelected ? `🎯 ${corner.number} ズーム中` : `🔍 ${corner.number} クリックでズーム`}
+                  </text>
+                </g>
+
+                {/* Native browser fallback tooltip */}
+                <title>{`${corner.number}: ${corner.name} (${corner.pct}%) - クリックでズーム解析`}</title>
               </g>
             );
           })}
@@ -4557,8 +4615,8 @@ export default function TelemetryTrackMap({
       {/* Footer Instructions / Corner Click hint */}
       <div className="w-full text-center">
         <p className="text-[10px] text-slate-400 font-mono flex items-center justify-center gap-1.5">
-          <span>💡</span>
-          <span>ピンでズーム / ホバーでDelta物理ゴースト演出</span>
+          <span className="text-amber-400">🔍</span>
+          <span>マップ上のピン（T1, T4等）をクリックで該当コーナーへ即時ズーム解析</span>
         </p>
       </div>
     </div>

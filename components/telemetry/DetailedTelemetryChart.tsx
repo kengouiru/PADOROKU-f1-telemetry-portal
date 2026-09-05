@@ -111,10 +111,11 @@ export default function DetailedTelemetryChart({
     setDriver2Code(c2);
   };
 
-  // Zoom to a specific corner (+/- 5% window)
+  // Zoom to a specific corner (approx 200m buffer)
   const handleSelectCorner = (corner: { name: string; pct: number }) => {
-    const start = Math.max(0, Math.round(corner.pct - 6));
-    const end = Math.min(100, Math.round(corner.pct + 6));
+    const bufferPct = Math.max(4, Math.round((200 / circuitLengthM) * 100));
+    const start = Math.max(0, Math.round(corner.pct - bufferPct));
+    const end = Math.min(100, Math.round(corner.pct + bufferPct));
     setZoomRange({ start, end });
     setSelectedCornerName(corner.name);
     setHoverDistPercent(corner.pct);
@@ -392,67 +393,6 @@ export default function DetailedTelemetryChart({
         </div>
       </div>
 
-      {/* ── Quick Corner Zoom Bar ── */}
-      <div className="bg-slate-900/80 rounded-2xl p-3 border border-white/10 space-y-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-racing font-bold text-amber-400 flex items-center gap-1">
-              <span>🔍</span>
-              <span>コーナー別クイックズーム:</span>
-            </span>
-            {selectedCornerName ? (
-              <span className="text-xs font-bold text-white px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40">
-                ズーム中: {selectedCornerName} ({zoomRange?.start}% 〜 {zoomRange?.end}%)
-              </span>
-            ) : (
-              <span className="text-xs text-slate-400 font-mono">全コース表示中 (100%)</span>
-            )}
-          </div>
-
-          {/* Reset Zoom Button */}
-          {zoomRange && (
-            <button
-              onClick={handleResetZoom}
-              className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-red-600/80 hover:bg-red-500 text-white transition-all shadow-md flex items-center gap-1"
-            >
-              <span>↺</span>
-              <span>全体表示に戻す</span>
-            </button>
-          )}
-        </div>
-
-        {/* Corner Selection Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
-          <button
-            onClick={handleResetZoom}
-            className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all flex-shrink-0 ${
-              !zoomRange
-                ? 'bg-sky-500 text-white shadow-md'
-                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'
-            }`}
-          >
-            全体 (Full Lap)
-          </button>
-          {availableCorners.map((corner) => {
-            const isCurrent = selectedCornerName === corner.name;
-            return (
-              <button
-                key={corner.number}
-                onClick={() => handleSelectCorner({ name: corner.name, pct: corner.pct })}
-                className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all flex-shrink-0 flex items-center gap-1.5 ${
-                  isCurrent
-                    ? 'bg-amber-500 text-slate-950 shadow-lg font-black'
-                    : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700 hover:text-white border border-white/5'
-                }`}
-              >
-                <span className="text-[10px] px-1 rounded bg-black/30">{corner.number}</span>
-                <span>{corner.name}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
       {/* ── Main Layout: Side-by-Side Interactive Mini-Map & 3-Tier Synchronized Charts ── */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
         {/* Left Column: Interactive Track Mini-Map (4 cols on xl) */}
@@ -562,6 +502,82 @@ export default function DetailedTelemetryChart({
 
         {/* Right Column: 3-Tier Synchronized Charts (8 cols on xl) */}
         <div className="xl:col-span-8 space-y-2 bg-slate-950/90 rounded-2xl p-3 sm:p-4 border border-white/10">
+          {/* ── Quick Corner Zoom Bar & Navigation Controls ── */}
+          <div className="bg-slate-900/90 rounded-xl p-2.5 border border-white/10 space-y-2 mb-2 shadow-lg">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-racing font-bold text-amber-400 flex items-center gap-1">
+                  <span>⚡</span>
+                  <span>クイックズーム:</span>
+                </span>
+                {selectedCornerName ? (
+                  <span className="text-xs font-mono font-bold text-amber-300 px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 flex items-center gap-1 shadow-sm">
+                    <span>🎯</span>
+                    <span>{selectedCornerName} (±200m / {zoomRange?.start}% 〜 {zoomRange?.end}%)</span>
+                  </span>
+                ) : (
+                  <span className="text-xs text-slate-400 font-mono">ラップ全体 (0% 〜 100%)</span>
+                )}
+              </div>
+
+              {/* Hover Operation Guide Badge & Reset */}
+              <div className="flex items-center gap-2">
+                <div className="px-2.5 py-1 rounded-lg bg-sky-500/15 border border-sky-500/30 text-sky-300 text-[11px] font-mono font-semibold flex items-center gap-1.5 shadow-sm">
+                  <span className="animate-pulse">↔</span>
+                  <span>グラフ上をマウス移動でコース追従（Deltaゴースト）</span>
+                </div>
+                {zoomRange && (
+                  <button
+                    onClick={handleResetZoom}
+                    className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-red-600/80 hover:bg-red-500 text-white transition-all shadow-md flex items-center gap-1 cursor-pointer"
+                    title="ラップ全体表示にリセット"
+                  >
+                    <span>↺</span>
+                    <span>全周に戻す</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Corner Selection Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
+              {/* Full Lap Pill */}
+              <button
+                onClick={handleResetZoom}
+                className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all flex-shrink-0 cursor-pointer flex items-center gap-1.5 ${
+                  !zoomRange
+                    ? 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/30 ring-1 ring-sky-400'
+                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white border border-white/5'
+                }`}
+              >
+                <span>🌐</span>
+                <span>ラップ全体</span>
+              </button>
+
+              {/* Corner Pills */}
+              {availableCorners.map((corner) => {
+                const isCurrent = selectedCornerName === corner.name;
+                return (
+                  <button
+                    key={corner.number}
+                    onClick={() => handleSelectCorner({ name: corner.name, pct: corner.pct })}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all flex-shrink-0 flex items-center gap-1.5 cursor-pointer ${
+                      isCurrent
+                        ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/30 font-black ring-2 ring-amber-300 scale-105'
+                        : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700 hover:text-white border border-white/5'
+                    }`}
+                    title={`${corner.number}: ${corner.name} (${corner.pct}%) - 前後±200mをズーム`}
+                  >
+                    <span className={`text-[10px] px-1 rounded ${isCurrent ? 'bg-black/30 text-slate-950 font-black' : 'bg-black/30 text-amber-400'}`}>
+                      🔍 {corner.number}
+                    </span>
+                    <span className="truncate max-w-[120px]">{corner.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* ── TIER 1: SPEED OVERLAY (km/h) ── */}
           <div>
             <div className="flex items-center justify-between mb-1 px-1 flex-wrap gap-1">
@@ -604,6 +620,7 @@ export default function DetailedTelemetryChart({
                   />
                   <Tooltip
                     content={<CustomTelemetryTooltip d1={d1} d2={d2} mode="speed" />}
+                    cursor={{ stroke: '#38bdf8', strokeWidth: 1.5, strokeDasharray: '3 3' }}
                   />
 
                   {/* Corner Markers */}
@@ -693,7 +710,10 @@ export default function DetailedTelemetryChart({
                     type="number"
                   />
                   <YAxis domain={[0, 105]} stroke="#94a3b8" fontSize={10} tickCount={3} />
-                  <Tooltip content={<CustomTelemetryTooltip d1={d1} d2={d2} mode="pedals" />} />
+                  <Tooltip
+                    content={<CustomTelemetryTooltip d1={d1} d2={d2} mode="pedals" />}
+                    cursor={{ stroke: '#38bdf8', strokeWidth: 1.5, strokeDasharray: '3 3' }}
+                  />
 
                   {/* Brake filled zones */}
                   <Area
@@ -785,7 +805,10 @@ export default function DetailedTelemetryChart({
                     fontSize={10}
                     tickFormatter={(val) => `${val > 0 ? '+' : ''}${val}s`}
                   />
-                  <Tooltip content={<CustomTelemetryTooltip d1={d1} d2={d2} mode="gearDelta" />} />
+                  <Tooltip
+                    content={<CustomTelemetryTooltip d1={d1} d2={d2} mode="gearDelta" />}
+                    cursor={{ stroke: '#38bdf8', strokeWidth: 1.5, strokeDasharray: '3 3' }}
+                  />
                   <ReferenceLine yAxisId="right" y={0} stroke="#64748b" strokeDasharray="2 2" />
 
                   {/* Driver 1 Gear */}
