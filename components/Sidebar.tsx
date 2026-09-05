@@ -92,18 +92,6 @@ export default function Sidebar({
 
   return (
     <aside className="flex flex-col gap-5 min-h-0">
-      {/* API Status Badge */}
-      <div
-        className={`flex items-center gap-2 text-xs px-3 py-1.5 rounded-full border w-fit ${
-          isDemoMode
-            ? 'border-yellow-500/40 bg-yellow-500/10 text-yellow-300'
-            : 'border-green-500/40 bg-green-500/10 text-green-300'
-        }`}
-      >
-        <span className={`w-2 h-2 rounded-full ${isDemoMode ? 'bg-yellow-400' : 'bg-green-400 animate-pulse'}`} />
-        {isDemoMode ? 'DEMO MODE' : 'LIVE API'}
-      </div>
-
       {/* ── Session Selectors ── */}
       <section>
         <SectionTitle>SESSION</SectionTitle>

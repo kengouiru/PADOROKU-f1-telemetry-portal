@@ -538,8 +538,8 @@ export default function DashboardPage() {
             <h1 className="font-racing text-sm font-bold text-white tracking-widest leading-tight hidden sm:block">
               F1 TELEMETRY ANALYZER
             </h1>
-            <p className="text-slate-500 text-[11px] hidden md:block">
-              {state.isDemoMode ? 'DEMO — 2024 Bahrain GP' : 'LIVE — OpenF1 API'}
+            <p className="text-slate-400 text-[10px] font-mono tracking-wider hidden md:block">
+              ADVANCED MOTORSPORT INTELLIGENCE
             </p>
           </div>
         </div>

@@ -3,15 +3,19 @@
 /**
  * components/telemetry/DetailedTelemetryChart.tsx
  * 3-Tier Synchronized Car Telemetry Comparison Chart (Speed, Pedals, Gear & Delta)
+ * Integrated with Interactive Track Mini-Map & Dynamic Corner Zoom
  *
  * Features:
  * - 3 synchronized charts via Recharts syncId:
  *   1. Speed Overlay (0~350 km/h) with Corner markers
  *   2. Pedals (Throttle 0~100% & Brake zones)
  *   3. Gear (1~8) & Lap Delta (+/- seconds)
+ * - Track Mini-Map: Dynamic glowing pointers tracking chart hover (0% ~ 100%)
+ * - Corner Zoom: Quick zoom buttons & map pin clicks zoom chart into specific corner window
+ * - Dynamic Zoom Segment Insights: Entry speed delta, Apex speed delta, Local time delta
  * - Synchronized vertical hover crosshair and rich tooltip across all 3 tiers
- * - Quick driver comparison presets (VER vs NOR, HAM vs LEC, VER vs HAM)
- * - Driving Style Decoded Intelligence Insights (Braking delta, Apex minimum speed, Throttle pick-up)
+ * - Quick driver comparison presets (VER vs NOR, HAM vs LEC, VER vs HAM, TSU vs ALO)
+ * - Driving Style Decoded Intelligence Insights
  */
 
 import React, { useState, useMemo } from 'react';
@@ -33,6 +37,7 @@ import {
   type TelemetryComparisonData,
 } from '@/lib/carTelemetryService';
 import { KNOWLEDGE_CIRCUITS, KNOWLEDGE_DRIVERS } from '@/data/f1KnowledgeData';
+import TelemetryTrackMap, { CIRCUIT_TRACK_MAPS } from './TelemetryTrackMap';
 
 interface DetailedTelemetryChartProps {
   initialCircuitId?: string;
@@ -50,7 +55,13 @@ export default function DetailedTelemetryChart({
   const [selectedCircuit, setSelectedCircuit] = useState(initialCircuitId);
   const [driver1Code, setDriver1Code] = useState(initialDriver1Code);
   const [driver2Code, setDriver2Code] = useState(initialDriver2Code);
-  const [activeTab, setActiveTab] = useState<'chart' | 'insights'>('chart');
+
+  // Synchronized hover position (0 ~ 100%)
+  const [hoverDistPercent, setHoverDistPercent] = useState<number | null>(null);
+
+  // Corner Zoom State: { start: number; end: number } or null for full circuit
+  const [zoomRange, setZoomRange] = useState<{ start: number; end: number } | null>(null);
+  const [selectedCornerName, setSelectedCornerName] = useState<string | null>(null);
 
   // Driver definitions
   const d1 = useMemo(() => {
@@ -74,10 +85,25 @@ export default function DetailedTelemetryChart({
 
   const { points, insights, circuitName, circuitLengthM } = telemetryData;
 
-  // Extract key corner points for reference lines
+  // Key corner points for reference lines
   const cornerMarkers = useMemo(() => {
     return points.filter((p) => p.cornerName);
   }, [points]);
+
+  // Corner list from CIRCUIT_TRACK_MAPS for quick zoom pills
+  const availableCorners = useMemo(() => {
+    const track = CIRCUIT_TRACK_MAPS[selectedCircuit];
+    if (track && track.cornerPins.length > 0) {
+      return track.cornerPins;
+    }
+    return cornerMarkers.map((cm, idx) => ({
+      number: `T${idx + 1}`,
+      name: cm.cornerName || `Corner ${idx + 1}`,
+      pct: cm.distPercent,
+      x: 0,
+      y: 0,
+    }));
+  }, [selectedCircuit, cornerMarkers]);
 
   // Quick preset matchups
   const applyPreset = (c1: string, c2: string) => {
@@ -85,17 +111,88 @@ export default function DetailedTelemetryChart({
     setDriver2Code(c2);
   };
 
+  // Zoom to a specific corner (+/- 5% window)
+  const handleSelectCorner = (corner: { name: string; pct: number }) => {
+    const start = Math.max(0, Math.round(corner.pct - 6));
+    const end = Math.min(100, Math.round(corner.pct + 6));
+    setZoomRange({ start, end });
+    setSelectedCornerName(corner.name);
+    setHoverDistPercent(corner.pct);
+  };
+
+  // Reset zoom to 0% ~ 100%
+  const handleResetZoom = () => {
+    setZoomRange(null);
+    setSelectedCornerName(null);
+  };
+
+  // Filtered or active data points in view
+  const currentDomain: [number, number] = zoomRange
+    ? [zoomRange.start, zoomRange.end]
+    : [0, 100];
+
+  // Calculate Zoom Section Insight Metrics
+  const zoomMetrics = useMemo(() => {
+    if (!zoomRange) return null;
+    const sectionPoints = points.filter(
+      (p) => p.distPercent >= zoomRange.start && p.distPercent <= zoomRange.end
+    );
+    if (sectionPoints.length === 0) return null;
+
+    const entryPoint = sectionPoints[0];
+    const exitPoint = sectionPoints[sectionPoints.length - 1];
+
+    // Minimum apex speed
+    let minSpeed1 = entryPoint.speed1;
+    let minSpeed2 = entryPoint.speed2;
+    sectionPoints.forEach((p) => {
+      if (p.speed1 < minSpeed1) minSpeed1 = p.speed1;
+      if (p.speed2 < minSpeed2) minSpeed2 = p.speed2;
+    });
+
+    const entrySpeedDelta = entryPoint.speed1 - entryPoint.speed2;
+    const apexSpeedDelta = minSpeed1 - minSpeed2;
+    const exitDeltaDiff = (exitPoint.delta || 0) - (entryPoint.delta || 0);
+
+    return {
+      cornerName: selectedCornerName || 'Selected Section',
+      span: `${zoomRange.start}% ~ ${zoomRange.end}%`,
+      entrySpeed1: entryPoint.speed1,
+      entrySpeed2: entryPoint.speed2,
+      entrySpeedDelta,
+      apexSpeed1: minSpeed1,
+      apexSpeed2: minSpeed2,
+      apexSpeedDelta,
+      exitDeltaDiff,
+    };
+  }, [zoomRange, points, selectedCornerName]);
+
+  // Chart hover mouse movement handler
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleChartMouseMove = (state: any) => {
+    if (state && state.activePayload && state.activePayload.length > 0) {
+      const payload = state.activePayload[0].payload as NormalizedTelemetryPoint;
+      if (payload && typeof payload.distPercent === 'number') {
+        setHoverDistPercent(payload.distPercent);
+      }
+    }
+  };
+
+  const handleChartMouseLeave = () => {
+    // Keep last hover or set null
+  };
+
   return (
     <div className={`glass-card bg-slate-950/95 border border-white/10 rounded-3xl p-4 sm:p-6 shadow-2xl space-y-6 ${className}`}>
-      {/* Top Header: Title & Circuit/Driver Selectors */}
+      {/* ── Top Header: Title & Quick Presets ── */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-white/10">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40">
-              CAR DATA COMPARISON
+              TELEMETRY INTELLIGENCE
             </span>
             <span className="text-xs font-mono text-slate-400">
-              3段同期テレメトリー (Speed / Pedals / Gear & Delta)
+              3段同期テレメトリー & トラックミニマップ連動解析
             </span>
           </div>
           <h3 className="text-lg sm:text-xl font-racing font-black text-white mt-1 flex items-center gap-2">
@@ -150,7 +247,7 @@ export default function DetailedTelemetryChart({
         </div>
       </div>
 
-      {/* Selectors Bar: Driver 1 vs Driver 2 & Circuit */}
+      {/* ── Selectors Bar: Driver 1 vs Driver 2 & Circuit ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-900/60 p-3 rounded-2xl border border-white/5">
         {/* Driver 1 Selector */}
         <div className="flex items-center gap-2">
@@ -205,7 +302,10 @@ export default function DetailedTelemetryChart({
             <span className="text-[10px] font-mono text-slate-400 block uppercase">対象サーキット</span>
             <select
               value={selectedCircuit}
-              onChange={(e) => setSelectedCircuit(e.target.value)}
+              onChange={(e) => {
+                setSelectedCircuit(e.target.value);
+                handleResetZoom();
+              }}
               className="w-full bg-slate-950 border border-white/10 rounded-xl px-2.5 py-1 text-xs font-bold text-white font-racing focus:outline-none focus:border-sky-500"
             >
               {KNOWLEDGE_CIRCUITS.map((c) => (
@@ -218,7 +318,7 @@ export default function DetailedTelemetryChart({
         </div>
       </div>
 
-      {/* Driver Legend Badges */}
+      {/* ── Driver Legend Badges & Lap Times ── */}
       <div className="flex items-center justify-between gap-3 px-2 flex-wrap">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
@@ -247,239 +347,388 @@ export default function DetailedTelemetryChart({
         </div>
 
         <div className="text-[11px] font-mono text-slate-400 flex items-center gap-2">
-          <span>横軸: コース進行度 (0% 〜 100% / {circuitLengthM}m)</span>
+          <span>横軸: コース進行度 ({zoomRange ? `${zoomRange.start}% ~ ${zoomRange.end}%` : `0% ~ 100% / ${circuitLengthM}m`})</span>
           <span className="hidden md:inline text-slate-600">|</span>
-          <span className="hidden md:inline text-emerald-400 font-medium">✨ 3段完全同期カーソル</span>
+          <span className="text-emerald-400 font-medium">✨ ミニマップ連動同期</span>
         </div>
       </div>
 
-      {/* ─────────────────────────────────────────────────────────────
-          3-TIER SYNCHRONIZED CHARTS (syncId="f1-telemetry-car-data")
-      ───────────────────────────────────────────────────────────── */}
-      <div className="space-y-2 bg-slate-950/80 rounded-2xl p-3 sm:p-4 border border-white/5">
-        {/* ── TIER 1: SPEED OVERLAY (km/h) ────────────────────────── */}
-        <div>
-          <div className="flex items-center justify-between mb-1 px-1">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-racing font-bold text-sky-400">① SPEED</span>
-              <span className="text-[10px] font-mono text-slate-400">車速重ね合わせ (0 ~ 350 km/h)</span>
-            </div>
-            <span className="text-[10px] font-mono text-slate-500">Unit: km/h</span>
+      {/* ── Quick Corner Zoom Bar ── */}
+      <div className="bg-slate-900/80 rounded-2xl p-3 border border-white/10 space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-racing font-bold text-amber-400 flex items-center gap-1">
+              <span>🔍</span>
+              <span>コーナー別クイックズーム:</span>
+            </span>
+            {selectedCornerName ? (
+              <span className="text-xs font-bold text-white px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40">
+                ズーム中: {selectedCornerName} ({zoomRange?.start}% 〜 {zoomRange?.end}%)
+              </span>
+            ) : (
+              <span className="text-xs text-slate-400 font-mono">全コース表示中 (100%)</span>
+            )}
           </div>
 
-          <div className="h-48 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={points}
-                syncId="f1-telemetry-car-data"
-                margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
-                <XAxis
-                  dataKey="distPercent"
-                  hide
-                  domain={[0, 100]}
-                />
-                <YAxis
-                  domain={[40, 360]}
-                  stroke="#94a3b8"
-                  fontSize={10}
-                  tickCount={5}
-                />
-                <Tooltip
-                  content={<CustomTelemetryTooltip d1={d1} d2={d2} mode="speed" />}
-                />
+          {/* Reset Zoom Button */}
+          {zoomRange && (
+            <button
+              onClick={handleResetZoom}
+              className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-red-600/80 hover:bg-red-500 text-white transition-all shadow-md flex items-center gap-1"
+            >
+              <span>↺</span>
+              <span>全体表示に戻す</span>
+            </button>
+          )}
+        </div>
 
-                {/* Corner Markers */}
-                {cornerMarkers.map((marker, idx) => (
-                  <ReferenceLine
-                    key={idx}
-                    x={marker.distPercent}
-                    stroke="#475569"
-                    strokeDasharray="2 2"
-                    label={{
-                      value: marker.cornerName,
-                      position: 'insideTop',
-                      fill: '#94a3b8',
-                      fontSize: 9,
-                      fontWeight: 'bold',
-                    }}
+        {/* Corner Selection Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
+          <button
+            onClick={handleResetZoom}
+            className={`px-3 py-1 rounded-lg text-xs font-mono font-bold transition-all flex-shrink-0 ${
+              !zoomRange
+                ? 'bg-sky-500 text-white shadow-md'
+                : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'
+            }`}
+          >
+            全体 (Full Lap)
+          </button>
+          {availableCorners.map((corner) => {
+            const isCurrent = selectedCornerName === corner.name;
+            return (
+              <button
+                key={corner.number}
+                onClick={() => handleSelectCorner({ name: corner.name, pct: corner.pct })}
+                className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all flex-shrink-0 flex items-center gap-1.5 ${
+                  isCurrent
+                    ? 'bg-amber-500 text-slate-950 shadow-lg font-black'
+                    : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700 hover:text-white border border-white/5'
+                }`}
+              >
+                <span className="text-[10px] px-1 rounded bg-black/30">{corner.number}</span>
+                <span>{corner.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Main Layout: Side-by-Side Interactive Mini-Map & 3-Tier Synchronized Charts ── */}
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Interactive Track Mini-Map (4 cols on xl) */}
+        <div className="xl:col-span-4 space-y-4">
+          <TelemetryTrackMap
+            circuitId={selectedCircuit}
+            hoverDistPercent={hoverDistPercent}
+            driver1={d1}
+            driver2={d2}
+            onSelectCorner={handleSelectCorner}
+            activeCornerName={selectedCornerName}
+          />
+
+          {/* Zoom Section Tactical Mini-Insight Card */}
+          {zoomMetrics ? (
+            <div className="bg-slate-900/90 rounded-2xl p-4 border border-amber-500/30 space-y-3 shadow-xl">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-amber-400" />
+                  <span className="font-racing font-bold text-xs text-white uppercase">
+                    {zoomMetrics.cornerName} セクション分析
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono text-amber-300 font-bold">{zoomMetrics.span}</span>
+              </div>
+
+              {/* Metrics Grid */}
+              <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                {/* Entry Speed */}
+                <div className="bg-slate-950/80 p-2.5 rounded-xl border border-white/5 space-y-1">
+                  <span className="text-[10px] text-slate-400 block">進入速度 (Entry)</span>
+                  <div className="flex items-baseline justify-between">
+                    <span style={{ color: d1.color }} className="font-bold">{zoomMetrics.entrySpeed1} km/h</span>
+                    <span className="text-slate-600">vs</span>
+                    <span style={{ color: d2.color }} className="font-bold">{zoomMetrics.entrySpeed2} km/h</span>
+                  </div>
+                  <div className="text-[10px] text-right font-bold text-sky-400">
+                    {zoomMetrics.entrySpeedDelta >= 0
+                      ? `+${zoomMetrics.entrySpeedDelta} km/h (${d1.code})`
+                      : `${zoomMetrics.entrySpeedDelta} km/h (${d2.code})`}
+                  </div>
+                </div>
+
+                {/* Apex Speed */}
+                <div className="bg-slate-950/80 p-2.5 rounded-xl border border-white/5 space-y-1">
+                  <span className="text-[10px] text-slate-400 block">ボトム速度 (Apex)</span>
+                  <div className="flex items-baseline justify-between">
+                    <span style={{ color: d1.color }} className="font-bold">{zoomMetrics.apexSpeed1} km/h</span>
+                    <span className="text-slate-600">vs</span>
+                    <span style={{ color: d2.color }} className="font-bold">{zoomMetrics.apexSpeed2} km/h</span>
+                  </div>
+                  <div className="text-[10px] text-right font-bold text-emerald-400">
+                    {zoomMetrics.apexSpeedDelta >= 0
+                      ? `+${zoomMetrics.apexSpeedDelta} km/h (${d1.code})`
+                      : `${zoomMetrics.apexSpeedDelta} km/h (${d2.code})`}
+                  </div>
+                </div>
+              </div>
+
+              {/* Section Time Delta Insight */}
+              <div className="bg-slate-950/60 p-2.5 rounded-xl border border-white/5 flex items-center justify-between text-xs font-mono">
+                <span className="text-slate-400">区間タイムゲイン:</span>
+                <span className={`font-bold ${zoomMetrics.exitDeltaDiff >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {zoomMetrics.exitDeltaDiff >= 0
+                    ? `+${zoomMetrics.exitDeltaDiff.toFixed(3)}s (${d1.code}有利)`
+                    : `${zoomMetrics.exitDeltaDiff.toFixed(3)}s (${d2.code}有利)`}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-slate-900/50 rounded-2xl p-4 border border-white/5 text-center text-xs font-mono text-slate-400">
+              <span>🎯 上のコーナーボタンまたはミニマップのピンをクリックすると、該当コーナーの精密テレメトリー差分がここに表示されます。</span>
+            </div>
+          )}
+        </div>
+
+        {/* Right Column: 3-Tier Synchronized Charts (8 cols on xl) */}
+        <div className="xl:col-span-8 space-y-2 bg-slate-950/90 rounded-2xl p-3 sm:p-4 border border-white/10">
+          {/* ── TIER 1: SPEED OVERLAY (km/h) ── */}
+          <div>
+            <div className="flex items-center justify-between mb-1 px-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-racing font-bold text-sky-400">① SPEED</span>
+                <span className="text-[10px] font-mono text-slate-400">車速重ね合わせ (0 ~ 350 km/h)</span>
+              </div>
+              <span className="text-[10px] font-mono text-slate-500">Unit: km/h</span>
+            </div>
+
+            <div className="h-44 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={points}
+                  syncId="f1-telemetry-car-data"
+                  margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
+                  onMouseMove={handleChartMouseMove}
+                  onMouseLeave={handleChartMouseLeave}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
+                  <XAxis
+                    dataKey="distPercent"
+                    hide
+                    domain={currentDomain}
+                    type="number"
                   />
-                ))}
+                  <YAxis
+                    domain={[40, 360]}
+                    stroke="#94a3b8"
+                    fontSize={10}
+                    tickCount={5}
+                  />
+                  <Tooltip
+                    content={<CustomTelemetryTooltip d1={d1} d2={d2} mode="speed" />}
+                  />
 
-                {/* Driver 1 Speed */}
-                <Line
-                  type="monotone"
-                  dataKey="speed1"
-                  name={d1.code}
-                  stroke={d1.color}
-                  strokeWidth={2.2}
-                  dot={false}
-                  isAnimationActive={false}
-                />
-                {/* Driver 2 Speed */}
-                <Line
-                  type="monotone"
-                  dataKey="speed2"
-                  name={d2.code}
-                  stroke={d2.color}
-                  strokeWidth={2.2}
-                  strokeDasharray="4 2"
-                  dot={false}
-                  isAnimationActive={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+                  {/* Corner Markers */}
+                  {cornerMarkers.map((marker, idx) => (
+                    <ReferenceLine
+                      key={idx}
+                      x={marker.distPercent}
+                      stroke="#475569"
+                      strokeDasharray="2 2"
+                      label={{
+                        value: marker.cornerName,
+                        position: 'insideTop',
+                        fill: '#94a3b8',
+                        fontSize: 9,
+                        fontWeight: 'bold',
+                      }}
+                    />
+                  ))}
 
-        {/* ── TIER 2: PEDALS (Throttle % & Brake) ─────────────────── */}
-        <div className="pt-2 border-t border-white/5">
-          <div className="flex items-center justify-between mb-1 px-1">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-racing font-bold text-emerald-400">② PEDALS</span>
-              <span className="text-[10px] font-mono text-slate-400">スロットル開度 (0~100%) & ブレーキ急減速帯</span>
+                  {/* Driver 1 Speed */}
+                  <Line
+                    type="monotone"
+                    dataKey="speed1"
+                    name={d1.code}
+                    stroke={d1.color}
+                    strokeWidth={2.2}
+                    dot={false}
+                    isAnimationActive={false}
+                  />
+                  {/* Driver 2 Speed */}
+                  <Line
+                    type="monotone"
+                    dataKey="speed2"
+                    name={d2.code}
+                    stroke={d2.color}
+                    strokeWidth={2.2}
+                    strokeDasharray="4 2"
+                    dot={false}
+                    isAnimationActive={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
-            <span className="text-[10px] font-mono text-slate-500">Throttle % / Brake</span>
           </div>
 
-          <div className="h-32 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={points}
-                syncId="f1-telemetry-car-data"
-                margin={{ top: 5, right: 10, left: -15, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
-                <XAxis dataKey="distPercent" hide domain={[0, 100]} />
-                <YAxis domain={[0, 105]} stroke="#94a3b8" fontSize={10} tickCount={3} />
-                <Tooltip content={<CustomTelemetryTooltip d1={d1} d2={d2} mode="pedals" />} />
-
-                {/* Brake filled zones */}
-                <Area
-                  type="stepAfter"
-                  dataKey="brake1"
-                  name={`${d1.code} Brake`}
-                  stroke="transparent"
-                  fill="#ef4444"
-                  fillOpacity={0.25}
-                  isAnimationActive={false}
-                />
-                <Area
-                  type="stepAfter"
-                  dataKey="brake2"
-                  name={`${d2.code} Brake`}
-                  stroke="transparent"
-                  fill="#f59e0b"
-                  fillOpacity={0.2}
-                  isAnimationActive={false}
-                />
-
-                {/* Throttle lines */}
-                <Line
-                  type="monotone"
-                  dataKey="throttle1"
-                  name={`${d1.code} Throttle`}
-                  stroke={d1.color}
-                  strokeWidth={2}
-                  dot={false}
-                  isAnimationActive={false}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="throttle2"
-                  name={`${d2.code} Throttle`}
-                  stroke={d2.color}
-                  strokeWidth={2}
-                  strokeDasharray="3 2"
-                  dot={false}
-                  isAnimationActive={false}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* ── TIER 3: GEAR & DELTA (Time difference) ─────────────── */}
-        <div className="pt-2 border-t border-white/5">
-          <div className="flex items-center justify-between mb-1 px-1">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-racing font-bold text-purple-400">③ GEAR & DELTA</span>
-              <span className="text-[10px] font-mono text-slate-400">シフト段数 (1~8) & 累積タイム差 (Delta sec)</span>
+          {/* ── TIER 2: PEDALS (Throttle % & Brake) ── */}
+          <div className="pt-2 border-t border-white/5">
+            <div className="flex items-center justify-between mb-1 px-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-racing font-bold text-emerald-400">② PEDALS</span>
+                <span className="text-[10px] font-mono text-slate-400">スロットル開度 (0~100%) & ブレーキ急減速帯</span>
+              </div>
+              <span className="text-[10px] font-mono text-slate-500">Throttle % / Brake</span>
             </div>
-            <span className="text-[10px] font-mono text-slate-500">Gear / Delta (s)</span>
+
+            <div className="h-32 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={points}
+                  syncId="f1-telemetry-car-data"
+                  margin={{ top: 5, right: 10, left: -15, bottom: 0 }}
+                  onMouseMove={handleChartMouseMove}
+                  onMouseLeave={handleChartMouseLeave}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
+                  <XAxis
+                    dataKey="distPercent"
+                    hide
+                    domain={currentDomain}
+                    type="number"
+                  />
+                  <YAxis domain={[0, 105]} stroke="#94a3b8" fontSize={10} tickCount={3} />
+                  <Tooltip content={<CustomTelemetryTooltip d1={d1} d2={d2} mode="pedals" />} />
+
+                  {/* Brake filled zones */}
+                  <Area
+                    type="stepAfter"
+                    dataKey="brake1"
+                    name={`${d1.code} Brake`}
+                    stroke="transparent"
+                    fill="#ef4444"
+                    fillOpacity={0.25}
+                    isAnimationActive={false}
+                  />
+                  <Area
+                    type="stepAfter"
+                    dataKey="brake2"
+                    name={`${d2.code} Brake`}
+                    stroke="transparent"
+                    fill="#f59e0b"
+                    fillOpacity={0.2}
+                    isAnimationActive={false}
+                  />
+
+                  {/* Throttle lines */}
+                  <Line
+                    type="monotone"
+                    dataKey="throttle1"
+                    name={`${d1.code} Throttle`}
+                    stroke={d1.color}
+                    strokeWidth={2}
+                    dot={false}
+                    isAnimationActive={false}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="throttle2"
+                    name={`${d2.code} Throttle`}
+                    stroke={d2.color}
+                    strokeWidth={2}
+                    strokeDasharray="3 2"
+                    dot={false}
+                    isAnimationActive={false}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
 
-          <div className="h-32 w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={points}
-                syncId="f1-telemetry-car-data"
-                margin={{ top: 5, right: 10, left: -15, bottom: 20 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
-                <XAxis
-                  dataKey="distPercent"
-                  unit="%"
-                  stroke="#94a3b8"
-                  fontSize={10}
-                  domain={[0, 100]}
-                />
-                {/* Left Axis: Gear */}
-                <YAxis
-                  yAxisId="left"
-                  domain={[1, 8]}
-                  ticks={[1, 3, 5, 7, 8]}
-                  stroke="#94a3b8"
-                  fontSize={10}
-                />
-                {/* Right Axis: Delta */}
-                <YAxis
-                  yAxisId="right"
-                  orientation="right"
-                  domain={[-0.5, 0.5]}
-                  stroke="#a855f7"
-                  fontSize={10}
-                  tickFormatter={(val) => `${val > 0 ? '+' : ''}${val}s`}
-                />
-                <Tooltip content={<CustomTelemetryTooltip d1={d1} d2={d2} mode="gearDelta" />} />
-                <ReferenceLine yAxisId="right" y={0} stroke="#64748b" strokeDasharray="2 2" />
+          {/* ── TIER 3: GEAR & DELTA (Time difference) ── */}
+          <div className="pt-2 border-t border-white/5">
+            <div className="flex items-center justify-between mb-1 px-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-racing font-bold text-purple-400">③ GEAR & DELTA</span>
+                <span className="text-[10px] font-mono text-slate-400">シフト段数 (1~8) & 累積タイム差 (Delta sec)</span>
+              </div>
+              <span className="text-[10px] font-mono text-slate-500">Gear / Delta (s)</span>
+            </div>
 
-                {/* Driver 1 Gear */}
-                <Line
-                  yAxisId="left"
-                  type="stepAfter"
-                  dataKey="gear1"
-                  stroke={d1.color}
-                  strokeWidth={1.8}
-                  dot={false}
-                  isAnimationActive={false}
-                />
-                {/* Driver 2 Gear */}
-                <Line
-                  yAxisId="left"
-                  type="stepAfter"
-                  dataKey="gear2"
-                  stroke={d2.color}
-                  strokeWidth={1.8}
-                  strokeDasharray="2 2"
-                  dot={false}
-                  isAnimationActive={false}
-                />
+            <div className="h-32 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={points}
+                  syncId="f1-telemetry-car-data"
+                  margin={{ top: 5, right: 10, left: -15, bottom: 20 }}
+                  onMouseMove={handleChartMouseMove}
+                  onMouseLeave={handleChartMouseLeave}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
+                  <XAxis
+                    dataKey="distPercent"
+                    unit="%"
+                    stroke="#94a3b8"
+                    fontSize={10}
+                    domain={currentDomain}
+                    type="number"
+                  />
+                  {/* Left Axis: Gear */}
+                  <YAxis
+                    yAxisId="left"
+                    domain={[1, 8]}
+                    ticks={[1, 3, 5, 7, 8]}
+                    stroke="#94a3b8"
+                    fontSize={10}
+                  />
+                  {/* Right Axis: Delta */}
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    domain={[-0.5, 0.5]}
+                    stroke="#a855f7"
+                    fontSize={10}
+                    tickFormatter={(val) => `${val > 0 ? '+' : ''}${val}s`}
+                  />
+                  <Tooltip content={<CustomTelemetryTooltip d1={d1} d2={d2} mode="gearDelta" />} />
+                  <ReferenceLine yAxisId="right" y={0} stroke="#64748b" strokeDasharray="2 2" />
 
-                {/* Delta Time Area/Line */}
-                <Line
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="delta"
-                  name="Delta"
-                  stroke="#a855f7"
-                  strokeWidth={2}
-                  dot={false}
-                  isAnimationActive={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+                  {/* Driver 1 Gear */}
+                  <Line
+                    yAxisId="left"
+                    type="stepAfter"
+                    dataKey="gear1"
+                    stroke={d1.color}
+                    strokeWidth={1.8}
+                    dot={false}
+                    isAnimationActive={false}
+                  />
+                  {/* Driver 2 Gear */}
+                  <Line
+                    yAxisId="left"
+                    type="stepAfter"
+                    dataKey="gear2"
+                    stroke={d2.color}
+                    strokeWidth={1.8}
+                    strokeDasharray="2 2"
+                    dot={false}
+                    isAnimationActive={false}
+                  />
+
+                  {/* Delta Time Area/Line */}
+                  <Line
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="delta"
+                    name="Delta"
+                    stroke="#a855f7"
+                    strokeWidth={2}
+                    dot={false}
+                    isAnimationActive={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
       </div>
