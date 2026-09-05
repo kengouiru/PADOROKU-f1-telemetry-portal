@@ -13,6 +13,7 @@
  */
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import type { Driver, Lap, Stint, PitStop, Session } from '@/lib/types';
 import type { StrategistMessage } from '@/app/api/strategist/route';
 import { buildTelemetryContext } from '@/lib/telemetryContext';
@@ -35,6 +36,7 @@ interface AIStrategistProps {
   geminiApiKey: string;
   session?: Session | null;
   onAddToNotebook: (content: string, source: 'ai') => void;
+  onRequireAuth?: () => void;
 }
 
 // ── Quick prompts ──────────────────────────────────────────────────────────────
@@ -68,7 +70,9 @@ export default function AIStrategist({
   geminiApiKey,
   session,
   onAddToNotebook,
+  onRequireAuth,
 }: AIStrategistProps) {
+  const { data: authSession } = useSession();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
@@ -91,12 +95,17 @@ export default function AIStrategist({
   );
 
   // Core: send message and stream response
-  const sendMessage = useCallback(async (userText: string) => {
-    const trimmed = userText.trim();
+  const sendMessage = useCallback(async (textToSend: string) => {
+    const trimmed = textToSend.trim();
     if (!trimmed || isStreaming) return;
 
-    const userMsgId = crypto.randomUUID();
-    const aiMsgId = crypto.randomUUID();
+    if (!authSession?.user) {
+      onRequireAuth?.();
+      return;
+    }
+
+    const userMsgId = `user_${Date.now()}`;
+    const aiMsgId = `ai_${Date.now()}`;
 
     const userMsg: ChatMessage = { id: userMsgId, role: 'user', content: trimmed };
     const aiMsg: ChatMessage = { id: aiMsgId, role: 'model', content: '', isStreaming: true };
@@ -123,6 +132,11 @@ export default function AIStrategist({
         signal: abortRef.current.signal,
         body: JSON.stringify({ messages: history, context: getContext(), model: modelChoice }),
       });
+
+      if (res.status === 401) {
+        onRequireAuth?.();
+        throw new Error('ログインが必要です。メンバーログインまたはデモアカウントでサインインしてください。');
+      }
 
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
@@ -160,7 +174,7 @@ export default function AIStrategist({
       setIsStreaming(false);
       inputRef.current?.focus();
     }
-  }, [isStreaming, messages, geminiApiKey, getContext, modelChoice]);
+  }, [isStreaming, messages, geminiApiKey, getContext, modelChoice, authSession, onRequireAuth]);
 
   const handleStop = () => {
     abortRef.current?.abort();
@@ -245,6 +259,26 @@ export default function AIStrategist({
         className="flex-1 overflow-y-auto p-3 flex flex-col gap-3"
         style={{ maxHeight: 380, minHeight: 100 }}
       >
+        {!authSession?.user && (
+          <div className="p-3 mb-2 rounded-2xl bg-gradient-to-r from-blue-950/70 to-indigo-950/70 border border-sky-500/40 text-xs text-sky-200 flex items-center justify-between gap-3 shadow-lg">
+            <div className="space-y-0.5">
+              <p className="font-racing font-bold text-white flex items-center gap-1.5">
+                <span>🔒</span>
+                <span>PROメンバー専用機能</span>
+              </p>
+              <p className="text-[11px] text-slate-300">
+                AI戦略アナリストの利用にはログイン（またはデモアカウント）が必要です。
+              </p>
+            </div>
+            <button
+              onClick={() => onRequireAuth?.()}
+              className="flex-shrink-0 px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-racing font-bold text-xs shadow-md transition-all cursor-pointer"
+            >
+              ログイン
+            </button>
+          </div>
+        )}
+
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-24 text-slate-600 text-xs gap-2 text-center">
             <span className="text-2xl">🏎</span>

@@ -7,6 +7,7 @@
  */
 
 import React, { useState, useRef, useCallback, useEffect, useMemo, useImperativeHandle, forwardRef } from 'react';
+import { useSession } from 'next-auth/react';
 import type { Driver, Lap, TeamRadio, PitStop, RaceControlMessage } from '@/lib/types';
 import { formatColor, mapRadioRecordingsToLaps, formatLapTime, getProxiedAudioUrl } from '@/lib/telemetryUtils';
 
@@ -49,6 +50,7 @@ interface TeamRadioTimelineProps {
   geminiApiKey: string;
   transcriptsCache: Record<string, { transcript: string; translation: string; aiSummary?: string; category: string }>;
   onTranscriptFetched: (url: string, data: { transcript: string; translation: string; aiSummary?: string; category: string }) => void;
+  onRequireAuth?: () => void;
 }
 
 // ── Category filter config ───────────────────────────────────────────────────
@@ -87,9 +89,10 @@ function formatTime(iso: string): string {
 // ── Main Component ────────────────────────────────────────────────────────────
 
 const TeamRadioTimeline = forwardRef<TeamRadioTimelineHandle, TeamRadioTimelineProps>(function TeamRadioTimeline(
-  { selectedDrivers, teamRadioCache, pitStopsCache, raceControlMessages, drivers, lapsCache, geminiApiKey, transcriptsCache, onTranscriptFetched },
+  { selectedDrivers, teamRadioCache, pitStopsCache, raceControlMessages, drivers, lapsCache, geminiApiKey, transcriptsCache, onTranscriptFetched, onRequireAuth },
   ref
 ) {
+  const { data: authSession } = useSession();
   const [activeFilter, setActiveFilter] = useState<FilterType>('ALL');
   const [loadingUrls, setLoadingUrls] = useState<Set<string>>(new Set());
   const cardRefs = useRef<Record<string, Record<number, HTMLDivElement | null>>>({});
@@ -162,6 +165,12 @@ const TeamRadioTimeline = forwardRef<TeamRadioTimelineHandle, TeamRadioTimelineP
   const fetchTranscript = useCallback(
     async (url: string, driverNum?: string, lapNumber?: number | null) => {
       if (transcriptsCache[url] || loadingUrls.has(url)) return;
+
+      if (!authSession?.user) {
+        onRequireAuth?.();
+        return;
+      }
+
       setLoadingUrls(prev => new Set(prev).add(url));
       try {
         const endpoint = '/api/transcribe';
@@ -185,6 +194,10 @@ const TeamRadioTimeline = forwardRef<TeamRadioTimelineHandle, TeamRadioTimelineP
             lapContext,
           }),
         });
+        if (res.status === 401) {
+          onRequireAuth?.();
+          throw new Error('Unauthorized');
+        }
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = (await res.json()) as { transcript: string; translation: string; aiSummary?: string; category: string };
         onTranscriptFetched(url, data);
@@ -194,7 +207,7 @@ const TeamRadioTimeline = forwardRef<TeamRadioTimelineHandle, TeamRadioTimelineP
         setLoadingUrls(prev => { const s = new Set(prev); s.delete(url); return s; });
       }
     },
-    [geminiApiKey, transcriptsCache, loadingUrls, onTranscriptFetched, drivers, lapsCache]
+    [geminiApiKey, transcriptsCache, loadingUrls, onTranscriptFetched, drivers, lapsCache, authSession, onRequireAuth]
   );
 
   if (selectedDrivers.length === 0) {

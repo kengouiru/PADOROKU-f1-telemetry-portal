@@ -10,8 +10,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { auth } from '@/auth';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export interface TranscribeRequest {
   audioUrl: string;
@@ -68,6 +70,14 @@ async function fetchAudioAsBase64(url: string): Promise<{ data: string; mimeType
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized: チーム無線AI解析の利用にはログイン（またはデモアカウント）が必要です。' },
+        { status: 401 }
+      );
+    }
+
     const body = (await req.json()) as TranscribeRequest;
     const { audioUrl, driverName, lapNumber, lapContext } = body;
 

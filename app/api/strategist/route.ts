@@ -9,6 +9,7 @@
 
 import { NextRequest } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { auth } from '@/auth';
 
 export const runtime = 'nodejs';
 
@@ -83,6 +84,15 @@ async function tryModels(
 // ── POST handler ───────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest): Promise<Response> {
   try {
+    // ── Session Guard ──
+    const session = await auth();
+    if (!session?.user) {
+      return Response.json(
+        { error: 'Unauthorized: AI戦略アナリストの利用にはメンバー認証（ログイン）が必要です。' },
+        { status: 401 }
+      );
+    }
+
     const body = (await req.json()) as StrategistRequest;
     const { messages, context, model: modelChoice = 'flash' } = body;
 

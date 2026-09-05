@@ -47,6 +47,9 @@ import KnowledgeHistoryHub from '@/components/hubs/KnowledgeHistoryHub';
 import RaceNotesReportHub from '@/components/hubs/RaceNotesReportHub';
 import type { TelemetryTarget } from '@/data/f1KnowledgeData';
 
+import AuthButton from '@/components/auth/AuthButton';
+import AuthModal from '@/components/auth/AuthModal';
+
 // ── App State ─────────────────────────────────────────────────────────────────
 
 export type ActiveHub = 'telemetry' | 'news' | 'knowledge' | 'notes';
@@ -144,6 +147,8 @@ export default function DashboardPage() {
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>('ai');
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile sidebar drawer
   const [aiDrawerOpen, setAiDrawerOpen] = useState(false); // AI & Notebook slide drawer
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authModalConfig, setAuthModalConfig] = useState<{ title?: string; description?: string }>({});
   const [detailedTelemetryParams, setDetailedTelemetryParams] = useState<{
     circuitId: string;
     driver1: string;
@@ -156,6 +161,14 @@ export default function DashboardPage() {
 
   const timelineRef = useRef<TeamRadioTimelineHandle>(null);
   const notebookRef = useRef<RaceNotebookHandle>(null);
+
+  const handleRequireAuth = useCallback((title?: string, description?: string) => {
+    setAuthModalConfig({
+      title: title ?? 'F1 Intelligence メンバー認証',
+      description: description ?? 'AI戦略アナリストおよびチーム無線AI解析は認証メンバー専用機能です。',
+    });
+    setAuthModalOpen(true);
+  }, []);
 
   // Persist Gemini key
   useEffect(() => {
@@ -485,6 +498,7 @@ export default function DashboardPage() {
           geminiApiKey={state.geminiApiKey}
           transcriptsCache={state.transcriptsCache}
           onTranscriptFetched={handleTranscriptFetched}
+          onRequireAuth={() => handleRequireAuth('チーム無線 AI解析', 'チーム無線のリアルタイム文字起こしおよびAI戦術要約は認証メンバー専用機能です。')}
         />
       </section>
     </div>
@@ -502,6 +516,7 @@ export default function DashboardPage() {
         geminiApiKey={state.geminiApiKey}
         session={state.currentSession}
         onAddToNotebook={handleAddToNotebook}
+        onRequireAuth={() => handleRequireAuth('AI 戦略アナリスト', 'AI戦略アナリストによるレース分析・戦略提案は認証メンバー専用機能です。')}
       />
     </div>
   );
@@ -607,6 +622,9 @@ export default function DashboardPage() {
             <span className="hidden sm:inline">AI STRATEGIST</span>
             {aiDrawerOpen && <span className="text-[10px] ml-0.5">✕</span>}
           </button>
+
+          {/* Auth Button (Login / User Profile Dropdown) */}
+          <AuthButton onOpenAuthModal={() => handleRequireAuth()} />
         </div>
       </header>
 
@@ -772,6 +790,14 @@ export default function DashboardPage() {
           <span>AI STRATEGIST</span>
         </button>
       )}
+
+      {/* ── Auth Modal ── */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+        title={authModalConfig.title}
+        description={authModalConfig.description}
+      />
     </div>
   );
 }
