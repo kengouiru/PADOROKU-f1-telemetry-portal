@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <filter id="track-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <linearGradient id="track-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#00f0ff" />
+      <stop offset="100%" stop-color="#818cf8" />
+    </linearGradient>
+  </defs>
+
+  <!-- Track Glow Background Outline -->
+  <path d="M 253.6 137.8 L 229.5 176.1 L 216.1 197.6 L 202.3 219.5 L 187.8 242.8 L 182.8 250.7 L 181.2 252.5 L 179.8 253.7 L 178.6 254.3 L 176.4 254.6 L 174.4 254.4 L 172.9 254.1 L 171.4 253.3 L 166.4 250.1 L 164.9 249.4 L 162 248.7 L 159.7 248.7 L 156.4 249.5 L 154.6 250.6 L 140.7 261 L 138.8 262 L 136.8 262.7 L 134.1 263.6 L 131.6 264 L 129.3 264 L 126.9 263.9 L 124.3 263.5 L 121.7 262.7 L 118.5 261.1 L 116.9 259.9 L 115.4 258.6 L 114.1 257.4 L 110.5 252.8 L 108.8 249.2 L 107.5 245.2 L 107.2 242.3 L 106.9 239 L 107 235.4 L 107.5 231.6 L 109 225.6 L 110.6 220.8 L 112.4 217 L 114.3 214 L 138.4 175.6 L 139.9 174.3 L 141.9 173.1 L 145.7 172.2 L 148.1 172.4 L 150 173 L 152.2 174.3 L 154.8 176.3 L 156.4 178.1 L 158.3 182 L 159 184.9 L 159.2 189.5 L 159 192.2 L 158.4 195.3 L 157 198.3 L 154.6 202.9 L 137.1 230.3 L 136.6 232.2 L 136.6 233.8 L 137 235.7 L 137.8 237.1 L 138.7 238.2 L 140.1 239.2 L 141.8 239.8 L 143.2 240 L 145.4 239.6 L 146.4 239.2 L 172.8 227.2 L 176.4 225 L 180 222.2 L 183.7 218.7 L 186.3 215.6 L 196.7 199.2 L 197.9 196.7 L 198.4 195 L 197.9 192.3 L 196.6 189.9 L 194.5 188 L 189.7 185.1 L 187.1 183 L 185.7 181.4 L 184.3 179.3 L 183.5 177.9 L 176.9 162.2 L 169.4 144.5 L 168.8 141.5 L 168.8 138.4 L 169.1 136 L 169.6 133.7 L 171.1 131 L 172.2 129.2 L 174.6 126.5 L 177 124.7 L 260.8 81.7 L 263.8 80 L 265.3 78.4 L 266.1 76.8 L 266.3 74.9 L 265.7 72.8 L 264.7 71.1 L 263.3 69.7 L 261.2 68.1 L 257.8 66.7 L 255.8 66.2 L 252.9 65.8 L 250.5 65.7 L 248 65.8 L 245.3 66.5 L 241.6 68.3 L 239 69.8 L 235.4 73 L 231.8 75.5 L 229.4 76.6 L 225.6 76.9 L 223.3 76.4 L 220.6 75 L 218.5 73.2 L 217.1 71.1 L 216.1 68.7 L 215.7 66.1 L 215.6 64.9 L 216.4 61.4 L 217.7 59 L 219.8 57 L 239.7 40.5 L 241.7 38.8 L 244.2 37.4 L 246.4 36.6 L 249.6 36.1 L 252.7 36 L 255.5 36.6 L 257.9 37.6 L 262.6 40.6 L 267.8 44 L 272.4 47.1 L 275.3 48.8 L 285.3 55.1 L 287.6 56.8 L 289.2 58.4 L 290.5 60.3 L 291.7 62.4 L 292.6 65.2 L 293.1 67.9 L 293.1 71.7 L 292.6 75.1 L 289.8 80.6 L 253.6 137.8 Z" fill="none" stroke="#00f0ff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity="0.3" filter="url(#track-glow)" />
+
+  <!-- Authentic Circuit Centerline -->
+  <path d="M 253.6 137.8 L 229.5 176.1 L 216.1 197.6 L 202.3 219.5 L 187.8 242.8 L 182.8 250.7 L 181.2 252.5 L 179.8 253.7 L 178.6 254.3 L 176.4 254.6 L 174.4 254.4 L 172.9 254.1 L 171.4 253.3 L 166.4 250.1 L 164.9 249.4 L 162 248.7 L 159.7 248.7 L 156.4 249.5 L 154.6 250.6 L 140.7 261 L 138.8 262 L 136.8 262.7 L 134.1 263.6 L 131.6 264 L 129.3 264 L 126.9 263.9 L 124.3 263.5 L 121.7 262.7 L 118.5 261.1 L 116.9 259.9 L 115.4 258.6 L 114.1 257.4 L 110.5 252.8 L 108.8 249.2 L 107.5 245.2 L 107.2 242.3 L 106.9 239 L 107 235.4 L 107.5 231.6 L 109 225.6 L 110.6 220.8 L 112.4 217 L 114.3 214 L 138.4 175.6 L 139.9 174.3 L 141.9 173.1 L 145.7 172.2 L 148.1 172.4 L 150 173 L 152.2 174.3 L 154.8 176.3 L 156.4 178.1 L 158.3 182 L 159 184.9 L 159.2 189.5 L 159 192.2 L 158.4 195.3 L 157 198.3 L 154.6 202.9 L 137.1 230.3 L 136.6 232.2 L 136.6 233.8 L 137 235.7 L 137.8 237.1 L 138.7 238.2 L 140.1 239.2 L 141.8 239.8 L 143.2 240 L 145.4 239.6 L 146.4 239.2 L 172.8 227.2 L 176.4 225 L 180 222.2 L 183.7 218.7 L 186.3 215.6 L 196.7 199.2 L 197.9 196.7 L 198.4 195 L 197.9 192.3 L 196.6 189.9 L 194.5 188 L 189.7 185.1 L 187.1 183 L 185.7 181.4 L 184.3 179.3 L 183.5 177.9 L 176.9 162.2 L 169.4 144.5 L 168.8 141.5 L 168.8 138.4 L 169.1 136 L 169.6 133.7 L 171.1 131 L 172.2 129.2 L 174.6 126.5 L 177 124.7 L 260.8 81.7 L 263.8 80 L 265.3 78.4 L 266.1 76.8 L 266.3 74.9 L 265.7 72.8 L 264.7 71.1 L 263.3 69.7 L 261.2 68.1 L 257.8 66.7 L 255.8 66.2 L 252.9 65.8 L 250.5 65.7 L 248 65.8 L 245.3 66.5 L 241.6 68.3 L 239 69.8 L 235.4 73 L 231.8 75.5 L 229.4 76.6 L 225.6 76.9 L 223.3 76.4 L 220.6 75 L 218.5 73.2 L 217.1 71.1 L 216.1 68.7 L 215.7 66.1 L 215.6 64.9 L 216.4 61.4 L 217.7 59 L 219.8 57 L 239.7 40.5 L 241.7 38.8 L 244.2 37.4 L 246.4 36.6 L 249.6 36.1 L 252.7 36 L 255.5 36.6 L 257.9 37.6 L 262.6 40.6 L 267.8 44 L 272.4 47.1 L 275.3 48.8 L 285.3 55.1 L 287.6 56.8 L 289.2 58.4 L 290.5 60.3 L 291.7 62.4 L 292.6 65.2 L 293.1 67.9 L 293.1 71.7 L 292.6 75.1 L 289.8 80.6 L 253.6 137.8 Z" fill="none" stroke="url(#track-grad)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Start / Finish Line Indicator -->
+  <g transform="translate(253.6, 137.8)">
+    <circle r="9" fill="#10b981" fill-opacity="0.3" filter="url(#track-glow)" />
+    <circle r="5" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+    <text y="-9" font-size="8" font-family="monospace" font-weight="bold" fill="#34d399" text-anchor="middle">FINISH</text>
+  </g>
+
+  <!-- Key Corner Hotspot Pins -->
+  
+    <g transform="translate(181.2, 252.5)">
+      <circle r="7" fill="#030712" stroke="#f59e0b" stroke-width="1.8" filter="drop-shadow(0 0 4px rgba(245,158,11,0.6))" />
+      <text y="3" font-size="7" font-family="monospace" font-weight="bold" fill="#fef08a" text-anchor="middle">T1-2</text>
+    </g>
+    <g transform="translate(107, 235.4)">
+      <circle r="7" fill="#030712" stroke="#f59e0b" stroke-width="1.8" filter="drop-shadow(0 0 4px rgba(245,158,11,0.6))" />
+      <text y="3" font-size="7" font-family="monospace" font-weight="bold" fill="#fef08a" text-anchor="middle">T3</text>
+    </g>
+    <g transform="translate(154.6, 202.9)">
+      <circle r="7" fill="#030712" stroke="#f59e0b" stroke-width="1.8" filter="drop-shadow(0 0 4px rgba(245,158,11,0.6))" />
+      <text y="3" font-size="7" font-family="monospace" font-weight="bold" fill="#fef08a" text-anchor="middle">T4-5</text>
+    </g>
+    <g transform="translate(187.1, 183)">
+      <circle r="7" fill="#030712" stroke="#f59e0b" stroke-width="1.8" filter="drop-shadow(0 0 4px rgba(245,158,11,0.6))" />
+      <text y="3" font-size="7" font-family="monospace" font-weight="bold" fill="#fef08a" text-anchor="middle">T7-8</text>
+    </g>
+    <g transform="translate(260.8, 81.7)">
+      <circle r="7" fill="#030712" stroke="#f59e0b" stroke-width="1.8" filter="drop-shadow(0 0 4px rgba(245,158,11,0.6))" />
+      <text y="3" font-size="7" font-family="monospace" font-weight="bold" fill="#fef08a" text-anchor="middle">T10</text>
+    </g>
+    <g transform="translate(292.6, 75.1)">
+      <circle r="7" fill="#030712" stroke="#f59e0b" stroke-width="1.8" filter="drop-shadow(0 0 4px rgba(245,158,11,0.6))" />
+      <text y="3" font-size="7" font-family="monospace" font-weight="bold" fill="#fef08a" text-anchor="middle">T13-14</text>
+    </g>
+</svg>

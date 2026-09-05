@@ -264,11 +264,23 @@ export default function CircuitDetailModal({
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[10px] font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
                       <span>🗺️</span>
-                      <span>公式コースレイアウト図 (Vector Blueprint)</span>
+                      <span>公式コースレイアウト図 (GPS準拠ベクター)</span>
                     </span>
-                    <span className="text-[10px] font-mono text-slate-400">
-                      {circuit.lengthKm}km • {circuit.turns}T
-                    </span>
+                    <div className="flex items-center gap-2 text-[10px] font-mono">
+                      <span className="text-slate-400">
+                        {circuit.lengthKm}km • {circuit.turns}T
+                      </span>
+                      <a
+                        href={`/images/circuits/maps/${circuit.id}.svg`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sky-400 hover:text-sky-300 hover:underline flex items-center gap-0.5 font-bold ml-1"
+                        title="公式SVGベクターマップを別タブで表示"
+                      >
+                        <span>公式SVG</span>
+                        <span>↗</span>
+                      </a>
+                    </div>
                   </div>
 
                   {/* Vector SVG Canvas */}

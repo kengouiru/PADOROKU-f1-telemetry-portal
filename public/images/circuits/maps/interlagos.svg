@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <filter id="track-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <linearGradient id="track-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#00f0ff" />
+      <stop offset="100%" stop-color="#818cf8" />
+    </linearGradient>
+  </defs>
+
+  <!-- Track Glow Background Outline -->
+  <path d="M 179.9 71.9 L 251.9 72.4 L 261.8 73.6 L 269.3 77.2 L 276 84.5 L 280 91.3 L 282 99.2 L 282 108 L 280.3 116.6 L 274.8 123.5 L 269.4 129.1 L 262 131.9 L 258.1 132.3 L 218.4 131.2 L 211.6 133.8 L 207.5 137.8 L 204.5 142.2 L 203.2 147.9 L 203 195.6 L 204.9 201.3 L 207.8 205.6 L 211.4 209.2 L 217.9 212.7 L 223.7 214 L 230.6 214.4 L 235.6 214 L 243.8 209.5 L 289.2 177.8 L 307.7 158.8 L 311.8 154.6 L 312.5 151.2 L 312.3 99 L 314.7 93.6 L 321.4 90.2 L 330.1 89.3 L 340.4 93.5 L 347.1 95.9 L 354.2 96.4 L 359.9 91.9 L 364 83.8 L 363.7 75.5 L 359.2 68.4 L 352.9 63.2 L 347.4 61 L 295.2 50 L 152 47.4 L 61.6 50 L 53 53.1 L 45.9 57.8 L 40.9 64.3 L 38 71.7 L 36 79.2 L 36.1 85.5 L 36.8 92.9 L 38 99.5 L 41.1 105.5 L 45.5 111.7 L 51 117 L 57.5 121.3 L 67.1 124.4 L 79.5 127.3 L 89.1 130 L 92.3 133.3 L 96 139.1 L 96.5 144.2 L 95.7 150.6 L 87.6 195.1 L 87.2 199.6 L 87.3 205.5 L 88.5 209.8 L 90.7 214.8 L 93.5 219 L 96.9 221.8 L 134.7 250.8 L 139.2 252.5 L 144 252.6 L 149.8 251.1 L 154.7 248 L 159.5 242.1 L 160.9 236.9 L 162.5 135.6 L 160.5 130.8 L 157.1 127.5 L 151.8 124.6 L 68.6 104.7 L 63.9 100.6 L 61 95.1 L 59.8 89.3 L 61.8 82.8 L 64.5 77.8 L 69.4 73.9 L 76.6 71.6 L 179.9 71.9 Z" fill="none" stroke="#00f0ff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" opacity="0.3" filter="url(#track-glow)" />
+
+  <!-- Authentic Circuit Centerline -->
+  <path d="M 179.9 71.9 L 251.9 72.4 L 261.8 73.6 L 269.3 77.2 L 276 84.5 L 280 91.3 L 282 99.2 L 282 108 L 280.3 116.6 L 274.8 123.5 L 269.4 129.1 L 262 131.9 L 258.1 132.3 L 218.4 131.2 L 211.6 133.8 L 207.5 137.8 L 204.5 142.2 L 203.2 147.9 L 203 195.6 L 204.9 201.3 L 207.8 205.6 L 211.4 209.2 L 217.9 212.7 L 223.7 214 L 230.6 214.4 L 235.6 214 L 243.8 209.5 L 289.2 177.8 L 307.7 158.8 L 311.8 154.6 L 312.5 151.2 L 312.3 99 L 314.7 93.6 L 321.4 90.2 L 330.1 89.3 L 340.4 93.5 L 347.1 95.9 L 354.2 96.4 L 359.9 91.9 L 364 83.8 L 363.7 75.5 L 359.2 68.4 L 352.9 63.2 L 347.4 61 L 295.2 50 L 152 47.4 L 61.6 50 L 53 53.1 L 45.9 57.8 L 40.9 64.3 L 38 71.7 L 36 79.2 L 36.1 85.5 L 36.8 92.9 L 38 99.5 L 41.1 105.5 L 45.5 111.7 L 51 117 L 57.5 121.3 L 67.1 124.4 L 79.5 127.3 L 89.1 130 L 92.3 133.3 L 96 139.1 L 96.5 144.2 L 95.7 150.6 L 87.6 195.1 L 87.2 199.6 L 87.3 205.5 L 88.5 209.8 L 90.7 214.8 L 93.5 219 L 96.9 221.8 L 134.7 250.8 L 139.2 252.5 L 144 252.6 L 149.8 251.1 L 154.7 248 L 159.5 242.1 L 160.9 236.9 L 162.5 135.6 L 160.5 130.8 L 157.1 127.5 L 151.8 124.6 L 68.6 104.7 L 63.9 100.6 L 61 95.1 L 59.8 89.3 L 61.8 82.8 L 64.5 77.8 L 69.4 73.9 L 76.6 71.6 L 179.9 71.9 Z" fill="none" stroke="url(#track-grad)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Start / Finish Line Indicator -->
+  <g transform="translate(179.9, 71.9)">
+    <circle r="9" fill="#10b981" fill-opacity="0.3" filter="url(#track-glow)" />
+    <circle r="5" fill="#10b981" stroke="#ffffff" stroke-width="1.5" />
+    <text y="-9" font-size="8" font-family="monospace" font-weight="bold" fill="#34d399" text-anchor="middle">FINISH</text>
+  </g>
+
+  <!-- Key Corner Hotspot Pins -->
+  
+    <g transform="translate(211.6, 133.8)">
+      <circle r="7" fill="#030712" stroke="#f59e0b" stroke-width="1.8" filter="drop-shadow(0 0 4px rgba(245,158,11,0.6))" />
+      <text y="3" font-size="7" font-family="monospace" font-weight="bold" fill="#fef08a" text-anchor="middle">T1-2</text>
+    </g>
+    <g transform="translate(289.2, 177.8)">
+      <circle r="7" fill="#030712" stroke="#f59e0b" stroke-width="1.8" filter="drop-shadow(0 0 4px rgba(245,158,11,0.6))" />
+      <text y="3" font-size="7" font-family="monospace" font-weight="bold" fill="#fef08a" text-anchor="middle">T3</text>
+    </g>
+    <g transform="translate(347.4, 61)">
+      <circle r="7" fill="#030712" stroke="#f59e0b" stroke-width="1.8" filter="drop-shadow(0 0 4px rgba(245,158,11,0.6))" />
+      <text y="3" font-size="7" font-family="monospace" font-weight="bold" fill="#fef08a" text-anchor="middle">T4-5</text>
+    </g>
+    <g transform="translate(152, 47.4)">
+      <circle r="7" fill="#030712" stroke="#f59e0b" stroke-width="1.8" filter="drop-shadow(0 0 4px rgba(245,158,11,0.6))" />
+      <text y="3" font-size="7" font-family="monospace" font-weight="bold" fill="#fef08a" text-anchor="middle">T6-7</text>
+    </g>
+    <g transform="translate(95.7, 150.6)">
+      <circle r="7" fill="#030712" stroke="#f59e0b" stroke-width="1.8" filter="drop-shadow(0 0 4px rgba(245,158,11,0.6))" />
+      <text y="3" font-size="7" font-family="monospace" font-weight="bold" fill="#fef08a" text-anchor="middle">T8-9</text>
+    </g>
+    <g transform="translate(160.9, 236.9)">
+      <circle r="7" fill="#030712" stroke="#f59e0b" stroke-width="1.8" filter="drop-shadow(0 0 4px rgba(245,158,11,0.6))" />
+      <text y="3" font-size="7" font-family="monospace" font-weight="bold" fill="#fef08a" text-anchor="middle">T10-12</text>
+    </g>
+    <g transform="translate(76.6, 71.6)">
+      <circle r="7" fill="#030712" stroke="#f59e0b" stroke-width="1.8" filter="drop-shadow(0 0 4px rgba(245,158,11,0.6))" />
+      <text y="3" font-size="7" font-family="monospace" font-weight="bold" fill="#fef08a" text-anchor="middle">T13-15</text>
+    </g>
+</svg>
