@@ -838,7 +838,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '超攻撃的オーバーステア派',
     numberOrigin: '幼少期から好んでいたパーソナルナンバー「33」から、世界王者獲得に伴いチャンピオンナンバー「1」を行使。',
     visualAsset: {
-      imageUrl: '/images/drivers/driver_verstappen.jpg',
+      imageUrl: '/images/drivers/portraits/max-verstappen.jpg',
       caption: 'Max Verstappen (Red Bull Racing)',
       credit: 'Stepro / Wikimedia Commons',
       license: 'CC BY-SA 4.0',
@@ -846,7 +846,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: '/images/drivers/driver_verstappen.jpg',
+        imageUrl: '/images/drivers/portraits/max-verstappen.jpg',
         caption: 'Max Verstappen (Red Bull Racing)',
         credit: 'Stepro / Wikimedia Commons',
         license: 'CC BY-SA 4.0',
@@ -954,7 +954,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: 'V字コーナリング＆タイヤ長寿命派',
     numberOrigin: '父アンソニーの愛車のナンバープレート「F44」およびカート時代の初優勝番号に由来し、王座獲得後も「1」を使わず「44」を一貫して使用。',
     visualAsset: {
-      imageUrl: '/images/drivers/driver_hamilton.jpg',
+      imageUrl: '/images/drivers/portraits/lewis-hamilton.jpg',
       caption: 'Lewis Hamilton (Mercedes-AMG Petronas F1 Team)',
       credit: 'Wikimedia Commons',
       license: 'CC BY-SA 4.0',
@@ -962,7 +962,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: '/images/drivers/driver_hamilton.jpg',
+        imageUrl: '/images/drivers/portraits/lewis-hamilton.jpg',
         caption: 'Lewis Hamilton (Mercedes-AMG Petronas F1 Team)',
         credit: 'Wikimedia Commons',
         license: 'CC BY-SA 4.0',
@@ -1070,7 +1070,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '高ボトムスピード＆スムーズ派',
     numberOrigin: 'バレンティーノ・ロッシ（46番）の大ファンだが46を避け、ロゴ（LN4）のデザインに最適だった「4」を選択。',
     visualAsset: {
-      imageUrl: '/images/drivers/driver_norris.jpg',
+      imageUrl: '/images/drivers/portraits/lando-norris.jpg',
       caption: 'Lando Norris (McLaren F1 Team)',
       credit: 'Wikimedia Commons',
       license: 'CC BY-SA 4.0',
@@ -1078,7 +1078,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: '/images/drivers/driver_norris.jpg',
+        imageUrl: '/images/drivers/portraits/lando-norris.jpg',
         caption: 'Lando Norris (McLaren F1 Team)',
         credit: 'Wikimedia Commons',
         license: 'CC BY-SA 4.0',
@@ -1178,7 +1178,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '予選一撃＆壁際限界アタッカー',
     numberOrigin: '自身の誕生日（10月16日）に由来し、「1 + 6 = 7」の意味も込めて「16」を選択。',
     visualAsset: {
-      imageUrl: '/images/drivers/driver_leclerc.jpg',
+      imageUrl: '/images/drivers/portraits/charles-leclerc.jpg',
       caption: 'Charles Leclerc (Scuderia Ferrari)',
       credit: 'Wikimedia Commons',
       license: 'CC BY-SA 4.0',
@@ -1186,7 +1186,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: '/images/drivers/driver_leclerc.jpg',
+        imageUrl: '/images/drivers/portraits/charles-leclerc.jpg',
         caption: 'Charles Leclerc (Scuderia Ferrari)',
         credit: 'Wikimedia Commons',
         license: 'CC BY-SA 4.0',
@@ -1292,7 +1292,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '冷静沈着＆高精度ライン派',
     numberOrigin: 'カート時代に偶然割り当てられた「81」番で好成績を収めたことから、パーソナルナンバーとして定着。',
     visualAsset: {
-      imageUrl: '/images/drivers/driver_piastri.jpg',
+      imageUrl: '/images/drivers/portraits/oscar-piastri.jpg',
       caption: 'Oscar Piastri (McLaren F1 Team)',
       credit: 'Wikimedia Commons',
       license: 'CC BY-SA 4.0',
@@ -1300,7 +1300,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: '/images/drivers/driver_piastri.jpg',
+        imageUrl: '/images/drivers/portraits/oscar-piastri.jpg',
         caption: 'Oscar Piastri (McLaren F1 Team)',
         credit: 'Wikimedia Commons',
         license: 'CC BY-SA 4.0',
@@ -1394,7 +1394,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '頭脳派戦略＆タイヤウィスパラー',
     numberOrigin: '「Carlo5 5ainz」のスペルに見立てたダブル5（55）番。',
     visualAsset: {
-      imageUrl: '/images/drivers/driver_sainz.jpg',
+      imageUrl: '/images/drivers/portraits/carlos-sainz.jpg',
       caption: 'Carlos Sainz (Scuderia Ferrari)',
       credit: 'Wikimedia Commons',
       license: 'CC BY-SA 4.0',
@@ -1402,7 +1402,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: '/images/drivers/driver_sainz.jpg',
+        imageUrl: '/images/drivers/portraits/carlos-sainz.jpg',
         caption: 'Carlos Sainz (Scuderia Ferrari)',
         credit: 'Wikimedia Commons',
         license: 'CC BY-SA 4.0',
@@ -1496,7 +1496,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '予選一撃アタッカー＆アグレッシブ派',
     numberOrigin: '兄がカートで使用していた「63」番を受け継ぎ、GR63のロゴとしても愛用。',
     visualAsset: {
-      imageUrl: '/images/drivers/driver_russell.jpg',
+      imageUrl: '/images/drivers/portraits/george-russell.jpg',
       caption: 'George Russell (Mercedes-AMG Petronas F1 Team)',
       credit: 'Wikimedia Commons',
       license: 'CC BY-SA 4.0',
@@ -1504,7 +1504,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: '/images/drivers/driver_russell.jpg',
+        imageUrl: '/images/drivers/portraits/george-russell.jpg',
         caption: 'George Russell (Mercedes-AMG Petronas F1 Team)',
         credit: 'Wikimedia Commons',
         license: 'CC BY-SA 4.0',
@@ -1598,7 +1598,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '市街地スペシャリスト＆タイヤケア派',
     numberOrigin: '幼少期に憧れたクラブ・アメリカのサッカー選手イバン・サモラーノの背番号「11」に由来。',
     visualAsset: {
-      imageUrl: '/images/drivers/driver_perez.jpg',
+      imageUrl: '/images/drivers/portraits/sergio-perez.jpg',
       caption: 'Sergio Perez (Red Bull Racing)',
       credit: 'Wikimedia Commons',
       license: 'CC BY-SA 4.0',
@@ -1606,7 +1606,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: '/images/drivers/driver_perez.jpg',
+        imageUrl: '/images/drivers/portraits/sergio-perez.jpg',
         caption: 'Sergio Perez (Red Bull Racing)',
         credit: 'Wikimedia Commons',
         license: 'CC BY-SA 4.0',
@@ -1706,7 +1706,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '超絶順応＆総合力オールラウンダー',
     numberOrigin: '1996年7月14日、14歳の時にカート世界選手権で優勝した幸運の番号「14」に由来。',
     visualAsset: {
-      imageUrl: '/images/drivers/driver_alonso.jpg',
+      imageUrl: '/images/drivers/portraits/fernando-alonso.jpg',
       caption: 'Fernando Alonso (Aston Martin Aramco F1 Team)',
       credit: 'Wikimedia Commons',
       license: 'CC BY-SA 4.0',
@@ -1714,7 +1714,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: '/images/drivers/driver_alonso.jpg',
+        imageUrl: '/images/drivers/portraits/fernando-alonso.jpg',
         caption: 'Fernando Alonso (Aston Martin Aramco F1 Team)',
         credit: 'Wikimedia Commons',
         license: 'CC BY-SA 4.0',
@@ -1816,7 +1816,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '奥深いレイトブレーキング派',
     numberOrigin: 'カート時代に使用していた「11」番が空いていなかったため、倍の「22」番を選択（ジェンソン・バトンの王者番号でもある）。',
     visualAsset: {
-      imageUrl: '/images/drivers/driver_tsunoda.jpg',
+      imageUrl: '/images/drivers/portraits/yuki-tsunoda.jpg',
       caption: 'Yuki Tsunoda (Visa Cash App RB F1 Team)',
       credit: 'Wikimedia Commons',
       license: 'CC BY-SA 4.0',
@@ -1824,7 +1824,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: '/images/drivers/driver_tsunoda.jpg',
+        imageUrl: '/images/drivers/portraits/yuki-tsunoda.jpg',
         caption: 'Yuki Tsunoda (Visa Cash App RB F1 Team)',
         credit: 'Wikimedia Commons',
         license: 'CC BY-SA 4.0',
@@ -1925,7 +1925,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '異次元の予選アタック＆セナ足スロットル',
     numberOrigin: 'ロータスおよびマクラーレン・ホンダ黄金期に世界を席巻した象徴のゼッケン「12」番。',
     visualAsset: {
-      imageUrl: '/images/drivers/driver_senna.jpg',
+      imageUrl: '/images/drivers/portraits/ayrton-senna.jpg',
       caption: 'Ayrton Senna (Formula 1 World Champion)',
       credit: 'Instituto Ayrton Senna / Wikimedia Commons',
       license: 'CC BY-SA 3.0',
@@ -1933,7 +1933,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: '/images/drivers/driver_senna.jpg',
+        imageUrl: '/images/drivers/portraits/ayrton-senna.jpg',
         caption: 'Ayrton Senna (Formula 1 World Champion)',
         credit: 'Instituto Ayrton Senna / Wikimedia Commons',
         license: 'CC BY-SA 3.0',
@@ -2040,7 +2040,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: '予選ペース連続周回＆完全無欠マシン',
     numberOrigin: 'フェラーリ黄金期に5連覇を達成した不滅のチャンピオンナンバー「1」。',
     visualAsset: {
-      imageUrl: '/images/drivers/driver_schumacher.jpg',
+      imageUrl: '/images/drivers/portraits/michael-schumacher.jpg',
       caption: 'Michael Schumacher (7-time Formula 1 World Champion)',
       credit: 'Wikimedia Commons',
       license: 'CC BY-SA 3.0',
@@ -2048,7 +2048,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: '/images/drivers/driver_schumacher.jpg',
+        imageUrl: '/images/drivers/portraits/michael-schumacher.jpg',
         caption: 'Michael Schumacher (7-time Formula 1 World Champion)',
         credit: 'Wikimedia Commons',
         license: 'CC BY-SA 3.0',
@@ -2155,7 +2155,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: "粘り強いバトル＆勝機を逃さない一撃",
     numberOrigin: "フォーミュラ・ルノー2.0でタイトルを獲得した際のラッキーナンバー「10」。元フランス代表ジダンへの憧れも込める。",
     visualAsset: {
-      imageUrl: "/images/drivers/driver_gasly.jpg",
+      imageUrl: "/images/drivers/portraits/pierre-gasly.jpg",
       caption: "Pierre Gasly (BWT Alpine F1 Team, 2024)",
       credit: "Jen Ross",
       license: "CC BY 2.0",
@@ -2163,7 +2163,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: "/images/drivers/driver_gasly.jpg",
+        imageUrl: '/images/drivers/portraits/pierre-gasly.jpg',
         caption: "アルピーヌで中団グリッドの牽引役を担うピエール・ガスリー",
         tag: "Portrait",
         credit: "Jen Ross",
@@ -2282,7 +2282,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: "ミリ単位のブロック＆アグレッシブディフェンス",
     numberOrigin: "2007年に初めてカート選手権で優勝した際のカーナンバー「31」。",
     visualAsset: {
-      imageUrl: "/images/drivers/driver_ocon.jpg",
+      imageUrl: "/images/drivers/portraits/esteban-ocon.jpg",
       caption: "Esteban Ocon (BWT Alpine F1 Team, 2024)",
       credit: "Wikimedia Commons",
       license: "CC BY-SA 4.0",
@@ -2290,7 +2290,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: "/images/drivers/driver_ocon.jpg",
+        imageUrl: '/images/drivers/portraits/esteban-ocon.jpg',
         caption: "卓越したディフェンス力と鋭い反射神経を持つエステバン・オコン",
         tag: "Portrait",
         credit: "Wikimedia Commons",
@@ -2407,7 +2407,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: "超ロングスティント＆タイヤマネジメント職人",
     numberOrigin: "幼少期から憧れていたバスケットボール界の神マイケル・ジョーダンの「23」。",
     visualAsset: {
-      imageUrl: "/images/drivers/driver_albon.jpg",
+      imageUrl: "/images/drivers/portraits/alexander-albon.jpg",
       caption: "Alexander Albon (Williams Racing, 2024)",
       credit: "Wikimedia Commons",
       license: "CC BY-SA 4.0",
@@ -2415,7 +2415,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: "/images/drivers/driver_albon.jpg",
+        imageUrl: '/images/drivers/portraits/alexander-albon.jpg',
         caption: "ウィリアムズのエースとしてチームを牽引するアレクサンダー・アルボン",
         tag: "Portrait",
         credit: "Wikimedia Commons",
@@ -2532,7 +2532,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: "大胆不敵な度胸＆即応型ハイアダプテーション",
     numberOrigin: "カート時代にキャリア初期の勝利を積み重ねたパーソナルナンバー「43」。",
     visualAsset: {
-      imageUrl: "/images/drivers/driver_colapinto.jpg",
+      imageUrl: "/images/drivers/portraits/franco-colapinto.jpg",
       caption: "Franco Colapinto (Williams Racing, 2024)",
       credit: "Wikimedia Commons",
       license: "CC BY-SA 4.0",
@@ -2540,7 +2540,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: "/images/drivers/driver_colapinto.jpg",
+        imageUrl: '/images/drivers/portraits/franco-colapinto.jpg',
         caption: "2024年中盤に彗星の如く現れF1界に旋風を巻き起こしたフランコ・コラピント",
         tag: "Portrait",
         credit: "Wikimedia Commons",
@@ -2638,7 +2638,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: "豪雨コンディション＆スタート職人",
     numberOrigin: "イタリアF4とFIA F3でチャンピオンを獲得した際に背負っていた幸運の「18」。",
     visualAsset: {
-      imageUrl: "/images/drivers/driver_stroll.jpg",
+      imageUrl: "/images/drivers/portraits/lance-stroll.jpg",
       caption: "Lance Stroll (Aston Martin Aramco F1 Team, 2024)",
       credit: "Jen Ross",
       license: "CC BY 2.0",
@@ -2646,7 +2646,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: "/images/drivers/driver_stroll.jpg",
+        imageUrl: '/images/drivers/portraits/lance-stroll.jpg',
         caption: "雨のレースで無類の強さを発揮するランス・ストロール",
         tag: "Portrait",
         credit: "Jen Ross",
@@ -2660,6 +2660,14 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         credit: "Wikimedia Commons",
         license: "CC BY 2.0",
         sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: '/images/drivers/actions/lance-stroll.jpg',
+        caption: 'ランス・ストロール AMR23 走行アクション',
+        tag: 'Action',
+        credit: 'Wikimedia Commons',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: 'https://commons.wikimedia.org',
       }
     ],
     socialLinks: {
@@ -2759,7 +2767,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: "予選一発アタックの鬼＆正確無比なマシン開発者",
     numberOrigin: "ジル・ヴィルヌーヴを象徴する伝説の栄光ナンバー「27」。自身の誕生日（8月19日：8+19=27）でもある。",
     visualAsset: {
-      imageUrl: "/images/drivers/driver_hulkenberg.jpg",
+      imageUrl: "/images/drivers/portraits/nico-hulkenberg.jpg",
       caption: "Nico Hülkenberg (MoneyGram Haas F1 Team, 2024)",
       credit: "Wikimedia Commons",
       license: "CC BY-SA 4.0",
@@ -2767,7 +2775,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: "/images/drivers/driver_hulkenberg.jpg",
+        imageUrl: '/images/drivers/portraits/nico-hulkenberg.jpg',
         caption: "予選でマシンのポテンシャルを120%引き出すニコ・ヒュルケンベルグ",
         tag: "Portrait",
         credit: "Wikimedia Commons",
@@ -2781,6 +2789,14 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         credit: "Wikimedia Commons",
         license: "CC BY-SA 4.0",
         sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: '/images/drivers/actions/nico-hulkenberg.jpg',
+        caption: 'ニコ・ヒュルケンベルグ ハースVF-24 走行アクション',
+        tag: 'Action',
+        credit: 'Wikimedia Commons',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: 'https://commons.wikimedia.org',
       }
     ],
     socialLinks: {
@@ -2879,7 +2895,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: "肉弾戦上等の武闘派＆電撃スタート",
     numberOrigin: "フォーミュラ・ルノー3.5でタイトルを獲得した際のナンバー「20」。",
     visualAsset: {
-      imageUrl: "/images/drivers/driver_magnussen.jpg",
+      imageUrl: "/images/drivers/portraits/kevin-magnussen.jpg",
       caption: "Kevin Magnussen (MoneyGram Haas F1 Team, 2024)",
       credit: "Wikimedia Commons",
       license: "CC BY-SA 4.0",
@@ -2887,7 +2903,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: "/images/drivers/driver_magnussen.jpg",
+        imageUrl: '/images/drivers/portraits/kevin-magnussen.jpg',
         caption: "バイキング魂溢れる激しいホイール・トゥ・ホイールの鬼 ケビン・マグヌッセン",
         tag: "Portrait",
         credit: "Wikimedia Commons",
@@ -2901,6 +2917,14 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         credit: "Wikimedia Commons",
         license: "CC BY-SA 4.0",
         sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: '/images/drivers/actions/kevin-magnussen.jpg',
+        caption: 'ケビン・マグヌッセン ハースVF-24 走行アクション',
+        tag: 'Action',
+        credit: 'Wikimedia Commons',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: 'https://commons.wikimedia.org',
       }
     ],
     socialLinks: {
@@ -3000,7 +3024,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: "精密機械のようなクリーンアタック＆無類のクオリファイア",
     numberOrigin: "「Valt77i Bo77as」と名前に似ていることから選んだアイコニックな「77」。",
     visualAsset: {
-      imageUrl: "/images/drivers/driver_bottas.jpg",
+      imageUrl: "/images/drivers/portraits/valtteri-bottas.jpg",
       caption: "Valtteri Bottas (Stake F1 Team Kick Sauber, 2024)",
       credit: "Wikimedia Commons",
       license: "CC BY-SA 4.0",
@@ -3008,7 +3032,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: "/images/drivers/driver_bottas.jpg",
+        imageUrl: '/images/drivers/portraits/valtteri-bottas.jpg',
         caption: "通算10勝・67回表彰台を誇るフライング・フィン バルテリ・ボッタス",
         tag: "Portrait",
         credit: "Wikimedia Commons",
@@ -3126,7 +3150,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: "クレバーなタイヤ管理＆ミスフリーな堅実性",
     numberOrigin: "幼少期から崇拝していたバスケットボール界の伝説コービー・ブライアントの背番号「24」。",
     visualAsset: {
-      imageUrl: "/images/drivers/driver_zhou.jpg",
+      imageUrl: "/images/drivers/portraits/zhou-guanyu.jpg",
       caption: "Zhou Guanyu (Stake F1 Team Kick Sauber, 2024)",
       credit: "Wikimedia Commons",
       license: "CC BY-SA 4.0",
@@ -3134,7 +3158,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: "/images/drivers/driver_zhou.jpg",
+        imageUrl: '/images/drivers/portraits/zhou-guanyu.jpg',
         caption: "中国人初のF1フル参戦ドライバー 周冠宇（ジョー・グアンユー）",
         tag: "Portrait",
         credit: "Wikimedia Commons",
@@ -3148,6 +3172,14 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         credit: "Wikimedia Commons",
         license: "CC BY-SA 4.0",
         sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: '/images/drivers/actions/zhou-guanyu.jpg',
+        caption: '周冠宇 キック・ザウバー C44 走行アクション',
+        tag: 'Action',
+        credit: 'Wikimedia Commons',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: 'https://commons.wikimedia.org',
       }
     ],
     socialLinks: {
@@ -3248,7 +3280,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: "異次元のレイトブレーキング＆飛び込みオーバーテイク",
     numberOrigin: "デイル・アーンハートSr.への憧れと、自身のレースキャリア初期のナンバー「3」。",
     visualAsset: {
-      imageUrl: "/images/drivers/driver_ricciardo.jpg",
+      imageUrl: "/images/drivers/portraits/daniel-ricciardo.jpg",
       caption: "Daniel Ricciardo (Visa Cash App RB F1 Team, 2024)",
       credit: "Wikimedia Commons",
       license: "CC BY-SA 4.0",
@@ -3256,7 +3288,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: "/images/drivers/driver_ricciardo.jpg",
+        imageUrl: '/images/drivers/portraits/daniel-ricciardo.jpg',
         caption: "天下一品のレイトブレーキングで観客を魅了するダニエル・リカルド",
         tag: "Portrait",
         credit: "Wikimedia Commons",
@@ -3375,7 +3407,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: "完璧な知性＆レース全体の数学的マネジメント",
     numberOrigin: "4度のワールドチャンピオン獲得時に背負った栄光のナンバー「1」。",
     visualAsset: {
-      imageUrl: "/images/drivers/driver_prost.jpg",
+      imageUrl: "/images/drivers/portraits/alain-prost.jpg",
       caption: "Alain Prost (McLaren TAG Porsche, 1984)",
       credit: "Wikimedia Commons",
       license: "CC BY-SA 3.0",
@@ -3383,7 +3415,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: "/images/drivers/driver_prost.jpg",
+        imageUrl: '/images/drivers/portraits/alain-prost.jpg',
         caption: "F1史上屈指の頭脳と技術で4度の世界王者に輝いたアラン・プロスト",
         tag: "Portrait",
         credit: "Wikimedia Commons",
@@ -3405,6 +3437,14 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         credit: "Wikimedia Commons",
         license: "CC BY-SA 3.0",
         sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: '/images/drivers/actions/alain-prost.jpg',
+        caption: 'アラン・プロスト マクラーレン MP4/2 TAG 走行',
+        tag: 'Historic',
+        credit: 'Wikimedia Commons',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org',
       }
     ],
     socialLinks: {
@@ -3515,7 +3555,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     driverType: "冷静沈着な論理的分析＆奇跡の不屈精神",
     numberOrigin: "1975年フェラーリで自身初の世界タイトルを獲得した際に背負った伝説の「12」。",
     visualAsset: {
-      imageUrl: "/images/drivers/driver_lauda.jpg",
+      imageUrl: "/images/drivers/portraits/niki-lauda.jpg",
       caption: "Niki Lauda (Scuderia Ferrari, 1975)",
       credit: "Wikimedia Commons",
       license: "CC BY-SA 3.0",
@@ -3523,7 +3563,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     visualGallery: [
       {
-        imageUrl: "/images/drivers/driver_lauda.jpg",
+        imageUrl: '/images/drivers/portraits/niki-lauda.jpg',
         caption: "不屈の魂で3度のワールドチャンピオンに輝いた伝説のニキ・ラウダ",
         tag: "Portrait",
         credit: "Wikimedia Commons",
@@ -3545,6 +3585,14 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         credit: "Wikimedia Commons",
         license: "CC BY-SA 3.0",
         sourceUrl: "https://commons.wikimedia.org"
+      },
+      {
+        imageUrl: '/images/drivers/actions/niki-lauda.jpg',
+        caption: 'ニキ・ラウダ フェラーリ 312T 走行',
+        tag: 'Historic',
+        credit: 'Wikimedia Commons',
+        license: 'CC BY-SA 3.0',
+        sourceUrl: 'https://commons.wikimedia.org',
       }
     ],
     socialLinks: {
