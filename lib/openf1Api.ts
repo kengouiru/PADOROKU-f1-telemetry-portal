@@ -17,12 +17,21 @@ import type {
   RaceControlMessage,
 } from './types';
 
-const BASE_URL = 'https://api.openf1.org/v1';
-const DEFAULT_TIMEOUT_MS = 3000;
+const DEFAULT_TIMEOUT_MS = 3500;
 
 // ─────────────────────────────────────────────────────────────
 // Fetch Helper
 // ─────────────────────────────────────────────────────────────
+
+/** Helper to format target URL through /api/openf1 BFF proxy */
+function toProxyUrl(endpoint: string, queryParams: string): string {
+  if (typeof window !== 'undefined') {
+    // In browser: use relative proxy endpoint
+    return `/api/openf1?endpoint=${endpoint}${queryParams ? `&${queryParams}` : ''}`;
+  }
+  // Server-side: direct OpenF1
+  return `https://api.openf1.org/v1/${endpoint}${queryParams ? `?${queryParams}` : ''}`;
+}
 
 /** Fetch with AbortController timeout. Throws on non-OK or timeout. */
 async function fetchWithTimeout<T>(
@@ -77,12 +86,12 @@ export class OpenF1Error extends Error {
 
 /** Fetch all sessions for a given calendar year */
 export async function fetchSessions(year: number): Promise<Session[]> {
-  return fetchWithTimeout<Session[]>(`${BASE_URL}/sessions?year=${year}`);
+  return fetchWithTimeout<Session[]>(toProxyUrl('sessions', `year=${year}`));
 }
 
 /** Fetch a single session by its key */
 export async function fetchSession(sessionKey: number): Promise<Session[]> {
-  return fetchWithTimeout<Session[]>(`${BASE_URL}/sessions?session_key=${sessionKey}`);
+  return fetchWithTimeout<Session[]>(toProxyUrl('sessions', `session_key=${sessionKey}`));
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -91,7 +100,7 @@ export async function fetchSession(sessionKey: number): Promise<Session[]> {
 
 /** Fetch all drivers for a specific session */
 export async function fetchDrivers(sessionKey: number): Promise<Driver[]> {
-  return fetchWithTimeout<Driver[]>(`${BASE_URL}/drivers?session_key=${sessionKey}`);
+  return fetchWithTimeout<Driver[]>(toProxyUrl('drivers', `session_key=${sessionKey}`));
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -104,13 +113,13 @@ export async function fetchLaps(
   driverNumber: number
 ): Promise<Lap[]> {
   return fetchWithTimeout<Lap[]>(
-    `${BASE_URL}/laps?session_key=${sessionKey}&driver_number=${driverNumber}`
+    toProxyUrl('laps', `session_key=${sessionKey}&driver_number=${driverNumber}`)
   );
 }
 
 /** Fetch stint records for a session (all drivers) */
 export async function fetchStints(sessionKey: number): Promise<Stint[]> {
-  return fetchWithTimeout<Stint[]>(`${BASE_URL}/stints?session_key=${sessionKey}`);
+  return fetchWithTimeout<Stint[]>(toProxyUrl('stints', `session_key=${sessionKey}`));
 }
 
 /** Fetch team radio recordings for a driver in a session */
@@ -119,7 +128,7 @@ export async function fetchTeamRadio(
   driverNumber: number
 ): Promise<TeamRadio[]> {
   return fetchWithTimeout<TeamRadio[]>(
-    `${BASE_URL}/team_radio?session_key=${sessionKey}&driver_number=${driverNumber}`
+    toProxyUrl('team_radio', `session_key=${sessionKey}&driver_number=${driverNumber}`)
   );
 }
 
@@ -129,7 +138,7 @@ export async function fetchPitStops(
   driverNumber: number
 ): Promise<PitStop[]> {
   return fetchWithTimeout<PitStop[]>(
-    `${BASE_URL}/pit?session_key=${sessionKey}&driver_number=${driverNumber}`
+    toProxyUrl('pit', `session_key=${sessionKey}&driver_number=${driverNumber}`)
   );
 }
 
@@ -138,7 +147,7 @@ export async function fetchRaceControl(
   sessionKey: number
 ): Promise<RaceControlMessage[]> {
   return fetchWithTimeout<RaceControlMessage[]>(
-    `${BASE_URL}/race_control?session_key=${sessionKey}`
+    toProxyUrl('race_control', `session_key=${sessionKey}`)
   );
 }
 
@@ -215,8 +224,8 @@ export async function fetchCarData(
   dateStart?: string,
   dateEnd?: string
 ): Promise<RawCarData[]> {
-  let url = `${BASE_URL}/car_data?session_key=${sessionKey}&driver_number=${driverNumber}`;
-  if (dateStart) url += `&date>=${encodeURIComponent(dateStart)}`;
-  if (dateEnd) url += `&date<=${encodeURIComponent(dateEnd)}`;
-  return fetchWithTimeout<RawCarData[]>(url, 5000);
+  let q = `session_key=${sessionKey}&driver_number=${driverNumber}`;
+  if (dateStart) q += `&date>=${encodeURIComponent(dateStart)}`;
+  if (dateEnd) q += `&date<=${encodeURIComponent(dateEnd)}`;
+  return fetchWithTimeout<RawCarData[]>(toProxyUrl('car_data', q), 5000);
 }

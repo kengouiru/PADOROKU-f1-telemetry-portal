@@ -188,9 +188,10 @@ export default function DashboardPage() {
         const liveSessions = await fetchSessions(parseInt(state.selectedYear));
         if (cancelled || !liveSessions.length) return;
         setState(prev => ({ ...prev, sessions: liveSessions, isDemoMode: false }));
-      } catch (e) {
-        if (e instanceof OpenF1Error && e.code === 'RATE_LIMIT') {
-          console.warn('[API] Rate limited — demo mode');
+      } catch {
+        // Fallback safely to mock sessions without logging unhandled exceptions
+        if (!cancelled) {
+          setState(prev => ({ ...prev, isDemoMode: true }));
         }
       }
     })();

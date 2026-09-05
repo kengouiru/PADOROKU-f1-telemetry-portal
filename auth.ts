@@ -1,4 +1,4 @@
-﻿import NextAuth from 'next-auth';
+import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
 
@@ -29,7 +29,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             id: 'demo-pro-user-1',
             name: 'Demo Pro User',
             email: 'demo@f1telemetry.pro',
-            image: '/images/drivers/portraits/driver_verstappen.jpg',
+            image: '/images/drivers/portraits/max-verstappen.jpg',
             role: 'pro',
           };
         }

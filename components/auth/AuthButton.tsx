@@ -10,6 +10,7 @@ interface AuthButtonProps {
 export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
   const { data: session, status } = useSession();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
@@ -43,13 +44,14 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
           title="アカウント設定 & メンバー情報"
         >
           {/* User Avatar */}
-          {user.image ? (
+          {user.image && !avatarError ? (
             <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg overflow-hidden border border-amber-400/50 flex-shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={user.image}
                 alt={user.name || 'User'}
                 className="w-full h-full object-cover object-top"
+                onError={() => setAvatarError(true)}
               />
             </div>
           ) : (

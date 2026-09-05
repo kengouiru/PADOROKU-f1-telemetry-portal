@@ -18,7 +18,7 @@
  * - Driving Style Decoded Intelligence Insights
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   ResponsiveContainer,
   LineChart,
@@ -62,6 +62,11 @@ export default function DetailedTelemetryChart({
   // Corner Zoom State: { start: number; end: number } or null for full circuit
   const [zoomRange, setZoomRange] = useState<{ start: number; end: number } | null>(null);
   const [selectedCornerName, setSelectedCornerName] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Driver definitions
   const d1 = useMemo(() => {
