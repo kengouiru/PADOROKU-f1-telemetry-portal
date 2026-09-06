@@ -15,8 +15,8 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import type { Driver, Lap, Stint, PitStop, Session } from '@/lib/types';
-import type { StrategistMessage } from '@/app/api/strategist/route';
 import { buildTelemetryContext } from '@/lib/telemetryContext';
+import { playRadioSpeech, stopRadioSpeech } from '@/lib/radioAudioEffect';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -25,6 +25,11 @@ interface ChatMessage {
   role: 'user' | 'model';
   content: string;
   isStreaming?: boolean;
+}
+
+interface StrategistMessage {
+  role: 'user' | 'model';
+  content: string;
 }
 
 interface AIStrategistProps {
@@ -77,10 +82,18 @@ export default function AIStrategist({
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [modelChoice, setModelChoice] = useState<'flash' | 'pro'>('flash');
+  const [speakingMsgId, setSpeakingMsgId] = useState<string | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  // Stop radio speech on unmount
+  useEffect(() => {
+    return () => {
+      stopRadioSpeech();
+    };
+  }, []);
 
   // Auto-scroll chat to bottom
   useEffect(() => {
@@ -289,6 +302,19 @@ export default function AIStrategist({
             <MessageBubble
               key={msg.id}
               message={msg}
+              isSpeaking={speakingMsgId === msg.id}
+              onToggleRadio={() => {
+                if (speakingMsgId === msg.id) {
+                  stopRadioSpeech();
+                  setSpeakingMsgId(null);
+                } else {
+                  playRadioSpeech(msg.content, {
+                    onStart: () => setSpeakingMsgId(msg.id),
+                    onEnd: () => setSpeakingMsgId(null),
+                    onError: () => setSpeakingMsgId(null),
+                  });
+                }
+              }}
               onAddToNotebook={content => onAddToNotebook(content, 'ai')}
             />
           ))
@@ -337,9 +363,13 @@ export default function AIStrategist({
 
 function MessageBubble({
   message,
+  isSpeaking = false,
+  onToggleRadio,
   onAddToNotebook,
 }: {
   message: ChatMessage;
+  isSpeaking?: boolean;
+  onToggleRadio?: () => void;
   onAddToNotebook: (content: string) => void;
 }) {
   const isUser = message.role === 'user';
@@ -363,7 +393,22 @@ function MessageBubble({
 
       {/* AI message actions */}
       {!isUser && !message.isStreaming && message.content && (
-        <div className="flex gap-3 px-1">
+        <div className="flex items-center gap-2 px-1 mt-0.5">
+          {onToggleRadio && (
+            <button
+              type="button"
+              onClick={onToggleRadio}
+              className={`text-xs px-2 py-0.5 rounded-lg border transition-all flex items-center gap-1 font-mono cursor-pointer ${
+                isSpeaking
+                  ? 'bg-red-600 text-white border-red-400 animate-pulse shadow-sm shadow-red-500/40'
+                  : 'text-amber-300 hover:text-white bg-amber-950/50 border-amber-500/30 hover:bg-amber-900/60'
+              }`}
+              title="レースエンジニア風のチーム無線音声で聴く"
+            >
+              <span>{isSpeaking ? '⏹️' : '📻'}</span>
+              <span>{isSpeaking ? '交信中...' : '無線音声'}</span>
+            </button>
+          )}
           <button
             onClick={() => onAddToNotebook(message.content)}
             className="text-xs text-slate-500 hover:text-slate-300 transition-colors"

@@ -37,7 +37,7 @@ interface SidebarProps {
   isLoading: boolean;
 }
 
-const AVAILABLE_YEARS = ['2024', '2023', '2022', '2021'];
+const AVAILABLE_YEARS = ['2025', '2024', '2023', '2022', '2021'];
 
 function buildUniqueMeetings(sessions: Session[]): UniqueMeeting[] {
   const seen = new Set<number>();
@@ -113,10 +113,10 @@ export default function Sidebar({
               value={selectedMeetingKey ?? ''}
               onChange={e => onMeetingChange(Number(e.target.value))}
               className={selectClass}
-              disabled={isLoading || meetings.length === 0}
+              disabled={isLoading && meetings.length === 0}
             >
               {meetings.length === 0 && (
-                <option value="">読み込み中...</option>
+                <option value="">{isLoading ? '読み込み中...' : 'GPがありません'}</option>
               )}
               {meetings.map(m => (
                 <option key={m.meeting_key} value={m.meeting_key}>
@@ -133,10 +133,10 @@ export default function Sidebar({
               value={selectedSessionKey ?? ''}
               onChange={e => onSessionChange(Number(e.target.value))}
               className={selectClass}
-              disabled={isLoading || filteredSessions.length === 0}
+              disabled={isLoading && filteredSessions.length === 0}
             >
               {filteredSessions.length === 0 && (
-                <option value="">GPを選択してください</option>
+                <option value="">{isLoading ? '読み込み中...' : 'GPを選択してください'}</option>
               )}
               {filteredSessions.map(s => (
                 <option key={s.session_key} value={s.session_key}>
@@ -159,7 +159,7 @@ export default function Sidebar({
 
         {drivers.length === 0 ? (
           <div className="text-slate-500 text-xs text-center py-6">
-            セッションを選択してください
+            {isLoading ? '読み込み中...' : 'ドライバーを選択してください'}
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-1.5 overflow-y-auto max-h-72 pr-0.5">

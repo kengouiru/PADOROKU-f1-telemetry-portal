@@ -16,39 +16,26 @@ import type {
   RaceControlMessage,
 } from './types';
 
+import {
+  F1_CATALOG_ALL_SESSIONS,
+  getCatalogSessionsForYear,
+  getDriversForYear,
+  generateCatalogStints,
+  generateCatalogRaceControl,
+} from './f1GrandPrixCatalog';
+
+export {
+  getCatalogSessionsForYear,
+  getDriversForYear,
+  generateCatalogStints,
+  generateCatalogRaceControl,
+};
+
 // ─────────────────────────────────────────────────────────────
-// Sessions
+// Sessions (All 4 Seasons: 2024, 2023, 2022, 2021)
 // ─────────────────────────────────────────────────────────────
 
-export const MOCK_SESSIONS: Session[] = [
-  {
-    session_key: 9161,
-    meeting_key: 1234,
-    meeting_official_name: 'Bahrain Grand Prix (デモ用サンプル)',
-    session_name: 'Race',
-    session_type: 'Race',
-    date_start: '2024-03-02T15:00:00+03:00',
-    year: 2024,
-  },
-  {
-    session_key: 9162,
-    meeting_key: 1234,
-    meeting_official_name: 'Bahrain Grand Prix (デモ用サンプル)',
-    session_name: 'Qualifying',
-    session_type: 'Qualifying',
-    date_start: '2024-03-01T19:00:00+03:00',
-    year: 2024,
-  },
-  {
-    session_key: 9163,
-    meeting_key: 5678,
-    meeting_official_name: 'Japanese Grand Prix (デモ用サンプル)',
-    session_name: 'Race',
-    session_type: 'Race',
-    date_start: '2024-04-07T14:00:00+09:00',
-    year: 2024,
-  },
-];
+export const MOCK_SESSIONS: Session[] = F1_CATALOG_ALL_SESSIONS;
 
 // ─────────────────────────────────────────────────────────────
 // Drivers (keyed by session_key)

@@ -25,9 +25,10 @@ import CircuitsHub from './CircuitsHub';
 import TyreEncyclopediaHub from './TyreEncyclopediaHub';
 import F1DramaHub from './F1DramaHub';
 import F1GlossaryHub from './F1GlossaryHub';
+import F1RegulationsHub from './F1RegulationsHub';
 import { useUserPreferences } from '@/lib/userPreferences';
 
-export type SubTab = 'drivers' | 'teams' | 'circuits' | 'tyres' | 'glossary' | 'drama' | 'strategy' | 'history';
+export type SubTab = 'drivers' | 'teams' | 'circuits' | 'tyres' | 'glossary' | 'drama' | 'regulations' | 'strategy' | 'history';
 
 export interface KnowledgeHistoryHubProps {
   onNavigateToTelemetry?: (target?: TelemetryTarget) => void;
@@ -316,6 +317,9 @@ export default function KnowledgeHistoryHub({
 
       {/* ── Sub-Tab: F1 GLOSSARY ── */}
       {activeSubTab === 'glossary' && <F1GlossaryHub />}
+
+      {/* ── Sub-Tab: FIA REGULATIONS & RULES ── */}
+      {activeSubTab === 'regulations' && <F1RegulationsHub onNavigateToTab={(tab) => setActiveSubTab(tab as SubTab)} />}
 
       {/* ── Sub-Tab 1: TEAMS (Compact Grid + Detail Modal) ── */}
       {activeSubTab === 'teams' && (

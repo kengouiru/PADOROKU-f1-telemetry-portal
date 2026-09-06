@@ -20,8 +20,9 @@ import {
 import DriverDetailModal from './DriverDetailModal';
 import DriverComparisonTool from './DriverComparisonTool';
 import { useUserPreferences } from '@/lib/userPreferences';
+import { GRID_2025_TEAMS } from '@/data/f1SeasonData';
 
-export type DriverViewMode = 'grouped' | 'flat' | 'legends' | 'compare';
+export type DriverViewMode = 'grouped' | 'grid2025' | 'flat' | 'legends' | 'compare';
 export type DriverStatusFilter = 'ALL' | 'Current' | 'Legend' | 'Favorites';
 
 export interface DriversHubProps {
@@ -276,6 +277,21 @@ export default function DriversHub({
               <span>チーム別グループ表示</span>
               <span className="text-[10px] px-1.5 py-0.2 rounded bg-sky-400/20 text-sky-200 border border-sky-400/30 ml-0.5">
                 推奨
+              </span>
+            </button>
+
+            <button
+              onClick={() => setViewMode('grid2025')}
+              className={`px-3.5 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                viewMode === 'grid2025'
+                  ? 'bg-red-600 text-white shadow-md shadow-red-500/30 ring-1 ring-red-400/50'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
+              }`}
+            >
+              <span>🏎️</span>
+              <span>2025年最新グリッド</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-400/20 text-red-200 border border-red-400/30 ml-0.5">
+                新体制
               </span>
             </button>
 
@@ -580,6 +596,161 @@ export default function DriversHub({
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ── View Mode: 2025 OFFICIAL GRID (10 TEAMS x 2 DRIVERS) ── */}
+      {viewMode === 'grid2025' && (
+        <div className="flex flex-col gap-5 animate-fade-in">
+          {/* 2025 Grid Header Banner */}
+          <div className="bg-gradient-to-r from-red-950/40 via-slate-950 to-red-950/40 border border-red-500/30 rounded-2xl p-5 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-mono font-bold uppercase tracking-wider">
+                  2025 NEW ERA
+                </span>
+                <span className="text-xs text-slate-400 font-mono">
+                  全10チーム 20名 正式確定ロスター
+                </span>
+              </div>
+              <h2 className="text-xl md:text-2xl font-racing font-bold text-white tracking-wide">
+                2025年 F1世界選手権 公式グリッド体制
+              </h2>
+              <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
+                ルイス・ハミルトンの歴史的フェラーリ移籍、カルロス・サインツのウィリアムズ加入、18歳の超新星キミ・アントネッリ、角田裕毅のF1参戦5年目エース体制など、大激変を迎えた2025年の全容。
+              </p>
+            </div>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <span className="px-3 py-1.5 rounded-xl bg-slate-900 border border-white/10 text-xs font-mono text-slate-300">
+                移籍: <strong className="text-amber-400">5名</strong> / 新人: <strong className="text-sky-400">5名</strong>
+              </span>
+            </div>
+          </div>
+
+          {/* 10 Teams Grid */}
+          <div className="grid grid-cols-1 gap-4">
+            {GRID_2025_TEAMS.map((team) => (
+              <div
+                key={team.teamName}
+                className="glass-card rounded-2xl p-4 sm:p-5 border shadow-lg space-y-3.5 transition-all"
+                style={{ borderLeftColor: team.teamColor, borderLeftWidth: '5px' }}
+              >
+                {/* Team Info Bar */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-white/10">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center font-racing font-black text-xs border shadow-sm flex-shrink-0"
+                      style={{
+                        color: team.teamColor,
+                        borderColor: `${team.teamColor}80`,
+                        backgroundColor: `${team.teamColor}20`,
+                      }}
+                    >
+                      {team.teamName.slice(0, 3).toUpperCase()}
+                    </div>
+                    <div>
+                      <h3 className="text-base sm:text-lg font-racing font-bold text-white leading-tight">
+                        {team.teamName}
+                      </h3>
+                      <p className="text-xs text-slate-400 font-mono">{team.fullName}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 text-xs font-mono">
+                    <span className="bg-slate-900/90 border border-white/5 px-2.5 py-1 rounded-lg text-slate-300">
+                      ⚡ PU: <strong className="text-sky-300">{team.powerUnit}</strong>
+                    </span>
+                  </div>
+                </div>
+
+                {/* 2 Drivers Columns */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {team.drivers.map((drv) => {
+                    const profile = driverMap.get(drv.code);
+                    return (
+                      <div
+                        key={drv.code}
+                        onClick={() => profile && setSelectedDriverDetail(profile)}
+                        className={`bg-slate-900/80 hover:bg-slate-850 p-3.5 rounded-xl border border-white/5 hover:border-white/20 transition-all flex flex-col justify-between gap-2.5 shadow-sm group ${
+                          profile ? 'cursor-pointer' : ''
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex items-center gap-2.5">
+                            <span
+                              className="text-xs font-racing font-black px-2 py-0.5 rounded-lg border"
+                              style={{
+                                color: team.teamColor,
+                                borderColor: `${team.teamColor}60`,
+                                backgroundColor: `${team.teamColor}15`,
+                              }}
+                            >
+                              #{drv.number} {drv.code}
+                            </span>
+                            <div>
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-sm font-bold text-white">{drv.name}</span>
+                                <span className="text-xs">{drv.flag}</span>
+                              </div>
+                              <span className="text-[11px] text-slate-400 font-mono">{drv.country}</span>
+                            </div>
+                          </div>
+
+                          {/* Transfer / Rookie Badges */}
+                          <div className="flex items-center gap-1">
+                            {drv.isTransfer && (
+                              <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold font-mono">
+                                ⚡ 2025移籍
+                              </span>
+                            )}
+                            {drv.isRookie && (
+                              <span className="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/40 text-[10px] font-bold font-mono">
+                                🌟 ルーキー
+                              </span>
+                            )}
+                            {drv.code === 'TSU' && (
+                              <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/40 text-[10px] font-bold font-mono">
+                                🇯🇵 日本のエース
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Note Highlight */}
+                        {drv.note && (
+                          <div className="p-2 rounded-lg bg-white/[0.03] border border-white/5 text-[11px] text-slate-300 leading-relaxed">
+                            <span>💡 </span>
+                            <span className="text-slate-200">{drv.note}</span>
+                          </div>
+                        )}
+
+                        {/* Actions */}
+                        <div className="flex items-center justify-between pt-1 border-t border-white/5 text-xs">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCompareDriver1(drv.code);
+                              setViewMode('compare');
+                            }}
+                            className="text-[10px] text-purple-300 hover:text-white font-racing flex items-center gap-0.5 bg-purple-950/40 hover:bg-purple-900/60 px-2 py-0.5 rounded border border-purple-500/30 transition-all"
+                          >
+                            <span>⚔️ 比較</span>
+                          </button>
+
+                          {profile && (
+                            <span className="text-sky-400 group-hover:translate-x-0.5 transition-transform text-xs font-bold flex items-center gap-0.5">
+                              <span>詳細プロフィール</span>
+                              <span>➔</span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

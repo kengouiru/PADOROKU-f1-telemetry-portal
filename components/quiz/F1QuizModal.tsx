@@ -6,10 +6,13 @@
  * Features:
  * - 120 Curated Questions across 4 Categories & 4 Difficulty Levels (including Master/神域級).
  * - Multi-format questions: Standard, Scenarios, FIA Rule Dilemmas, Track Corner Recognition, Telemetry Tactics.
- * - Customizable Question Count (5 / 10 / 20 questions).
+ * - Game Modes:
+ *     1) 🎯 通常検定モード (じっくり考察 & 詳細解説)
+ *     2) ⚡ 10秒スプリント・タイムアタック (1問10秒制限の電光石火モード)
+ * - Animated 10s Countdown Bar with Dynamic Color Warnings.
  * - Live Instant Feedback with In-depth Explanations and F1大百科 Deep-links.
  * - Dynamic Certification Ranks (Rookie -> Chief Engineer / FIA Steward).
- * - Enhanced X (Twitter) Score Sharing with Category, Difficulty, Score & Title.
+ * - Enhanced X (Twitter) Score Sharing with Mode, Category, Difficulty, Score & Sprint Title.
  */
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -29,6 +32,7 @@ interface F1QuizModalProps {
   onNavigateToTab?: (tab: string) => void;
 }
 
+export type QuizGameMode = 'standard' | 'sprint';
 type QuizPhase = 'intro' | 'question' | 'result';
 type FilterDifficulty = 'all' | QuizDifficulty;
 type FilterCategory = 'all' | QuizCategory;
@@ -40,6 +44,7 @@ export default function F1QuizModal({
 }: F1QuizModalProps) {
   const [mounted, setMounted] = useState(false);
   const [phase, setPhase] = useState<QuizPhase>('intro');
+  const [gameMode, setGameMode] = useState<QuizGameMode>('standard');
   const [selectedDifficulty, setSelectedDifficulty] = useState<FilterDifficulty>('all');
   const [selectedCategory, setSelectedCategory] = useState<FilterCategory>('all');
   const [questionCount, setQuestionCount] = useState<number>(10);
@@ -48,6 +53,8 @@ export default function F1QuizModal({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
+  const [isTimeout, setIsTimeout] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<number>(10);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [maxStreak, setMaxStreak] = useState(0);
@@ -77,7 +84,6 @@ export default function F1QuizModal({
   // Start a new quiz session
   const startQuiz = () => {
     const pool = [...matchingPool];
-    // Shuffle pool
     const count = Math.min(questionCount, pool.length);
     const shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, count);
 
@@ -85,6 +91,8 @@ export default function F1QuizModal({
     setCurrentIndex(0);
     setSelectedOption(null);
     setIsAnswered(false);
+    setIsTimeout(false);
+    setTimeLeft(10);
     setScore(0);
     setStreak(0);
     setMaxStreak(0);
@@ -93,10 +101,37 @@ export default function F1QuizModal({
 
   const currentQ = activeQuestions[currentIndex];
 
+  // 10s Countdown timer for Sprint mode
+  useEffect(() => {
+    if (phase !== 'question' || isAnswered || gameMode !== 'sprint') return;
+
+    setTimeLeft(10);
+    setIsTimeout(false);
+    const startTime = Date.now();
+    const durationMs = 10000;
+
+    const timer = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const remaining = Math.max(0, Math.ceil((durationMs - elapsed) / 1000));
+      setTimeLeft(remaining);
+
+      if (elapsed >= durationMs) {
+        clearInterval(timer);
+        setIsTimeout(true);
+        setIsAnswered(true);
+        setSelectedOption(-1);
+        setStreak(0);
+      }
+    }, 100);
+
+    return () => clearInterval(timer);
+  }, [phase, currentIndex, isAnswered, gameMode]);
+
   const handleOptionClick = (index: number) => {
     if (isAnswered || !currentQ) return;
     setSelectedOption(index);
     setIsAnswered(true);
+    setIsTimeout(false);
 
     if (index === currentQ.correctIndex) {
       setScore((prev) => prev + 1);
@@ -115,6 +150,8 @@ export default function F1QuizModal({
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(null);
       setIsAnswered(false);
+      setIsTimeout(false);
+      setTimeLeft(10);
     } else {
       setPhase('result');
     }
@@ -124,31 +161,38 @@ export default function F1QuizModal({
   const rankInfo = useMemo(() => {
     const total = activeQuestions.length || 1;
     const percentage = Math.round((score / total) * 100);
+    const isSprint = gameMode === 'sprint';
 
     if (selectedDifficulty === 'master' && percentage === 100) {
       return {
-        title: '🟣 神域のFIAスチュワード / 伝説のチーフエンジニア',
-        subtitle: 'Supreme FIA Steward & Chief Engineer',
+        title: isSprint
+          ? '⚡ 神域のスプリント・マスター (Supreme Sprint Steward)'
+          : '🟣 神域のFIAスチュワード / 伝説のチーフエンジニア',
+        subtitle: isSprint ? 'F1ドライバー以上の反射神経と神域の知識' : 'Supreme FIA Steward & Chief Engineer',
         color: 'text-rose-400',
         bg: 'from-rose-500/25 via-purple-600/20 to-transparent border-rose-500/40',
-        badge: '神域到達 (Rank SSS)',
-        comment: '信じられない快挙！FIA国際審判団のスチュワード判定、極限の熱力学、そして神懸かりのピット戦略を100%完璧に見抜きました。あなたは世界最高峰のF1頭脳です！',
+        badge: isSprint ? '神速神域 (Rank SSS+)' : '神域到達 (Rank SSS)',
+        comment: isSprint
+          ? '驚愕の神業！10秒の過酷な制限時間の中で神域級クイズを全問完全正解！F1ドライバーを凌駕する反射速度と頭脳です！'
+          : '信じられない快挙！FIA国際審判団のスチュワード判定、極限の熱力学、そして神懸かりのピット戦略を100%完璧に見抜きました。あなたは世界最高峰のF1頭脳です！',
       };
     }
     if ((selectedDifficulty === 'master' && percentage >= 80) || (selectedDifficulty === 'expert' && percentage === 100)) {
       return {
-        title: '🏆 チーフストラテジスト (Chief Strategist)',
-        subtitle: 'Head of F1 Race Strategy',
+        title: isSprint ? '⚡ 電光石火のチーフストラテジスト' : '🏆 チーフストラテジスト (Chief Strategist)',
+        subtitle: isSprint ? 'Lightning Race Strategist' : 'Head of F1 Race Strategy',
         color: 'text-amber-300',
         bg: 'from-amber-500/20 via-yellow-500/10 to-transparent border-amber-500/40',
-        badge: '超一流 (Rank SS)',
-        comment: '驚異的な知識量と戦術眼！ピットウォールでトップチームのチーフストラテジストとして即座にサインを出せるレベルです。',
+        badge: isSprint ? '超速頭脳 (Rank SS)' : '超一流 (Rank SS)',
+        comment: isSprint
+          ? '電光石火の判断力！緊迫したセーフティカー導入時のピット判断をわずか数秒で下せるトップストラテジストの器です！'
+          : '驚異的な知識量と戦術眼！ピットウォールでトップチームのチーフストラテジストとして即座にサインを出せるレベルです。',
       };
     }
     if (percentage >= 80) {
       return {
-        title: '🏁 パドックVIPアナリスト (Paddock VIP Analyst)',
-        subtitle: 'Senior Paddock Analyst',
+        title: isSprint ? '⚡ スプリント・エキスパート' : '🏁 パドックVIPアナリスト (Paddock VIP Analyst)',
+        subtitle: isSprint ? 'Sprint Speed Master' : 'Senior Paddock Analyst',
         color: 'text-sky-300',
         bg: 'from-sky-500/20 via-blue-500/10 to-transparent border-sky-500/40',
         badge: '上級ファン (Rank S)',
@@ -183,7 +227,7 @@ export default function F1QuizModal({
       badge: '勉強中 (Rank C)',
       comment: 'ナイスチャレンジ！F1大百科や用語辞典を読み込めば、すぐに知識がグングン伸びます。再挑戦をお待ちしています！',
     };
-  }, [score, activeQuestions.length, selectedDifficulty]);
+  }, [score, activeQuestions.length, selectedDifficulty, gameMode]);
 
   // X (Twitter) Share intent
   const handleShareTwitter = () => {
@@ -200,12 +244,14 @@ export default function F1QuizModal({
         ? '全ジャンル総合'
         : QUIZ_CATEGORY_CONFIG[selectedCategory].label.split(' ')[1];
 
+    const modeText = gameMode === 'sprint' ? '⚡10秒スプリントモード' : '🎯通常検定モード';
+
     const text = encodeURIComponent(
-      `【F1クイズ＆トリビア検定】\n` +
+      `【F1クイズ＆トリビア検定 (${modeText})】\n` +
       `ジャンル: ${catText} | 難易度: ${diffText}\n` +
       `成績: ${score} / ${total}問 正解 (${pct}点) 🔥最大${maxStreak}連問正解\n` +
       `私のF1認定称号は「${rankInfo.title.split(' (')[0]}」でした！🏎️💨\n\n` +
-      `#PADOROKU #F1 #F1JP #F1クイズ #F1雑学`
+      `#PADOROKU #F1 #F1JP #F1クイズ #F1スプリント`
     );
     const url = encodeURIComponent(window.location.origin);
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
@@ -249,6 +295,61 @@ export default function F1QuizModal({
         {/* ── PHASE 1: INTRO / FILTER & START SCREEN ── */}
         {phase === 'intro' && (
           <div className="p-5 sm:p-7 space-y-6 overflow-y-auto">
+            {/* Step 0: Game Mode Selection */}
+            <div className="space-y-2">
+              <label className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <span>🎮</span>
+                <span>挑戦モードを選択</span>
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <button
+                  onClick={() => setGameMode('standard')}
+                  className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 ${
+                    gameMode === 'standard'
+                      ? 'bg-amber-500/15 border-amber-400 text-white shadow-md ring-1 ring-amber-400/40'
+                      : 'bg-slate-900/60 hover:bg-slate-900 border-white/5 text-slate-400'
+                  }`}
+                >
+                  <span className="text-2xl mt-0.5">🎯</span>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-racing font-bold text-white">通常検定モード</span>
+                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/10 text-slate-300">
+                        時間無制限
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                      制限時間なし。じっくり思考し、問題ごとの詳細解説やF1大百科リンクを深く読み込めます。
+                    </p>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => setGameMode('sprint')}
+                  className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex items-start gap-3 relative overflow-hidden ${
+                    gameMode === 'sprint'
+                      ? 'bg-gradient-to-br from-rose-500/20 via-orange-500/15 to-transparent border-orange-400 text-white shadow-md ring-1 ring-orange-400/50'
+                      : 'bg-slate-900/60 hover:bg-slate-900 border-white/5 text-slate-400'
+                  }`}
+                >
+                  <span className="text-2xl mt-0.5 animate-pulse">⚡</span>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-racing font-bold text-orange-300">
+                        10秒スプリント・アタック
+                      </span>
+                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-orange-500/20 text-orange-300 border border-orange-500/30 font-bold">
+                        1問10秒
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                      1問わずか10秒の制限時間！F1ドライバー並みの反射神経と瞬時の決断力を試す電光石火モード。
+                    </p>
+                  </div>
+                </button>
+              </div>
+            </div>
+
             {/* Step 1: Category Filter */}
             <div className="space-y-2">
               <label className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -389,9 +490,13 @@ export default function F1QuizModal({
               <button
                 onClick={startQuiz}
                 disabled={matchingPool.length === 0}
-                className="w-full py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 hover:from-amber-400 hover:to-orange-400 text-black font-racing font-extrabold text-base shadow-lg shadow-amber-500/25 transition-all transform hover:scale-[1.01] cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className={`w-full py-4 rounded-2xl text-black font-racing font-extrabold text-base shadow-lg transition-all transform hover:scale-[1.01] cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+                  gameMode === 'sprint'
+                    ? 'bg-gradient-to-r from-orange-500 via-rose-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 shadow-orange-500/30'
+                    : 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-500 hover:from-amber-400 hover:to-orange-400 shadow-amber-500/25'
+                }`}
               >
-                <span>🚀 検定スタート</span>
+                <span>{gameMode === 'sprint' ? '⚡ 10秒スプリントスタート' : '🚀 検定スタート'}</span>
                 <span className="text-xs opacity-80 font-normal">
                   (該当{matchingPool.length}問から{Math.min(questionCount, matchingPool.length)}問を出題)
                 </span>
@@ -417,6 +522,12 @@ export default function F1QuizModal({
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-lg bg-sky-950/60 text-sky-300 border border-sky-500/20">
                     {currentQ.formatLabel}
                   </span>
+                  {gameMode === 'sprint' && (
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-lg bg-orange-500/20 text-orange-300 border border-orange-500/30 font-bold flex items-center gap-1">
+                      <span>⚡</span>
+                      <span>10秒スプリント</span>
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -434,12 +545,64 @@ export default function F1QuizModal({
                 </div>
               </div>
 
+              {/* Sprint 10s Countdown Bar (Only active in Sprint mode) */}
+              {gameMode === 'sprint' && (
+                <div className="space-y-1.5 p-3 rounded-2xl bg-slate-900/80 border border-white/10">
+                  <div className="flex items-center justify-between text-xs font-mono font-bold">
+                    <span className="flex items-center gap-1.5 text-slate-300">
+                      <span className={timeLeft <= 3 && !isAnswered ? 'animate-spin' : ''}>⏱️</span>
+                      <span>残り思考時間</span>
+                    </span>
+                    <span
+                      className={`px-2.5 py-0.5 rounded-full font-racing text-xs font-bold transition-all ${
+                        isAnswered
+                          ? 'bg-slate-800 text-slate-400'
+                          : timeLeft <= 3
+                          ? 'bg-rose-500/30 text-rose-300 border border-rose-500/50 animate-pulse'
+                          : timeLeft <= 5
+                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                          : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                      }`}
+                    >
+                      {isAnswered ? '回答済' : `${timeLeft} 秒`}
+                    </span>
+                  </div>
+                  <div className="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-white/5">
+                    <div
+                      className={`h-full transition-all duration-150 rounded-full ${
+                        isAnswered
+                          ? 'bg-slate-700'
+                          : timeLeft <= 3
+                          ? 'bg-gradient-to-r from-rose-600 via-rose-500 to-red-400 animate-pulse'
+                          : timeLeft <= 5
+                          ? 'bg-gradient-to-r from-amber-500 to-orange-400'
+                          : 'bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400'
+                      }`}
+                      style={{ width: isAnswered ? '100%' : `${(timeLeft / 10) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Question Box */}
               <div className="bg-slate-900/70 p-4 rounded-2xl border border-white/10 shadow-inner">
                 <h3 className="text-sm sm:text-base font-bold text-white leading-relaxed">
                   {currentQ.question}
                 </h3>
               </div>
+
+              {/* Timeout Warning banner if timed out */}
+              {isTimeout && (
+                <div className="p-3 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs font-bold flex items-center gap-2">
+                  <span className="text-base">⏰</span>
+                  <div>
+                    <span className="font-racing">タイムアップ！</span>
+                    <span className="font-normal text-rose-200 ml-1">
+                      10秒以内に回答がありませんでした（不正解扱い）。瞬時の決断力が求められます！
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {/* 4 Options Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
@@ -480,16 +643,20 @@ export default function F1QuizModal({
                 })}
               </div>
 
-              {/* Explanation Box (Revealed upon answer) */}
+              {/* Explanation Box (Revealed upon answer or timeout) */}
               {isAnswered && (
                 <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-black border border-white/10 space-y-2 animate-fade-in shadow-inner">
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <span className="text-lg">
-                        {selectedOption === currentQ.correctIndex ? '🎉 正解！' : '😢 残念...'}
+                        {isTimeout ? '⏰ タイムアップ！' : selectedOption === currentQ.correctIndex ? '🎉 正解！' : '😢 残念...'}
                       </span>
                       <span className="text-xs font-racing font-bold text-slate-300">
-                        {selectedOption === currentQ.correctIndex ? '素晴らしい戦術眼です！' : '正解はこちらです'}
+                        {isTimeout
+                          ? '一瞬の迷いが命取り！正解はこちらです'
+                          : selectedOption === currentQ.correctIndex
+                          ? '素晴らしい戦術眼です！'
+                          : '正解はこちらです'}
                       </span>
                     </div>
 
@@ -551,9 +718,16 @@ export default function F1QuizModal({
               </span>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
-                  あなたのF1知識力認定称号 ({rankInfo.badge})
-                </span>
+                <div className="flex items-center justify-center gap-2">
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">
+                    あなたのF1知識力認定称号 ({rankInfo.badge})
+                  </span>
+                  {gameMode === 'sprint' && (
+                    <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/40 font-bold">
+                      ⚡ 10秒スプリント完走
+                    </span>
+                  )}
+                </div>
                 <h3 className={`text-lg sm:text-2xl font-racing font-black ${rankInfo.color}`}>
                   {rankInfo.title}
                 </h3>
@@ -593,16 +767,15 @@ export default function F1QuizModal({
                 onClick={() => setPhase('intro')}
                 className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-racing font-bold text-xs border border-white/10 transition-all cursor-pointer flex items-center justify-center gap-1.5"
               >
-                <span>⚙️ ジャンル・難易度変更</span>
+                <span>⚙️ モード・ジャンル変更</span>
               </button>
 
               <button
                 onClick={handleShareTwitter}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-black hover:bg-slate-900 text-white font-racing font-bold text-xs border border-sky-500/40 hover:border-sky-400 shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5"
-                title="X (旧Twitter) でスコアをシェア"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-black hover:bg-slate-900 text-white font-racing font-bold text-xs border border-white/20 shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5"
               >
-                <span>𝕏</span>
-                <span>結果をシェアする</span>
+                <span className="text-sm">𝕏</span>
+                <span>結果をポストする</span>
               </button>
             </div>
           </div>

@@ -24,6 +24,8 @@ import {
   MOCK_SESSIONS, MOCK_DRIVERS, MOCK_STINTS,
   MOCK_TEAM_RADIO, MOCK_PIT_STOPS, MOCK_RACE_CONTROL,
   MOCK_LAPS, generateMockLaps,
+  getCatalogSessionsForYear, getDriversForYear,
+  generateCatalogStints, generateCatalogRaceControl,
 } from '@/lib/mockData';
 import { detectSafetyCarPeriods, enrichLapsWithStints } from '@/lib/telemetryUtils';
 import {
@@ -234,80 +236,210 @@ export default function DashboardPage() {
   const handleYearChange = useCallback(async (year: string) => {
     setState(prev => ({ ...prev, selectedYear: year, isLoading: true }));
     try {
-      const liveSessions = await fetchSessions(parseInt(year));
-      const sessions = liveSessions.length > 0 ? liveSessions : MOCK_SESSIONS.filter(s => s.year === parseInt(year));
+      const yrNum = parseInt(year);
+      const liveSessions = await fetchSessions(yrNum).catch(() => []);
+      const catalogSessions = getCatalogSessionsForYear(yrNum);
+      const sessions = (liveSessions && liveSessions.length > 0) ? liveSessions : catalogSessions;
+      
       const firstMeeting = sessions[0]?.meeting_key ?? null;
+      const meetingSessions = sessions.filter(s => s.meeting_key === firstMeeting);
+      const targetSession = meetingSessions.find(s => s.session_name === 'Race' || s.session_type === 'Race')
+        ?? meetingSessions[0]
+        ?? sessions[0]
+        ?? null;
+
+      const sessionKey = targetSession?.session_key ?? null;
+      let drivers: Driver[] = [];
+      let stints: Stint[] = [];
+      let raceControlMessages: RaceControlMessage[] = [];
+
+      if (sessionKey) {
+        try {
+          const [d, st, rc] = await Promise.all([
+            fetchDrivers(sessionKey).catch(() => []),
+            fetchStints(sessionKey).catch(() => []),
+            fetchRaceControl(sessionKey).catch(() => []),
+          ]);
+          drivers = d;
+          stints = st;
+          raceControlMessages = rc;
+        } catch {}
+      }
+
+      if (!drivers || drivers.length === 0) {
+        drivers = (sessionKey && MOCK_DRIVERS[sessionKey]) ? MOCK_DRIVERS[sessionKey] : getDriversForYear(yrNum);
+      }
+      if (!stints || stints.length === 0) {
+        stints = (sessionKey && MOCK_STINTS[sessionKey]) ? MOCK_STINTS[sessionKey] : generateCatalogStints(drivers);
+      }
+      if (!raceControlMessages || raceControlMessages.length === 0) {
+        raceControlMessages = (sessionKey && MOCK_RACE_CONTROL[sessionKey]) ? MOCK_RACE_CONTROL[sessionKey] : generateCatalogRaceControl(sessionKey ?? 0);
+      }
+
+      const top2Nums = drivers.slice(0, 2).map(d => d.driver_number.toString());
+      const selectedDrivers = top2Nums.length > 0 ? top2Nums : ['1', '44'];
+
+      const lapsCache: Record<string, Lap[]> = {};
+      for (const num of selectedDrivers) {
+        const mk = `${sessionKey}_${num}`;
+        const rawLaps = MOCK_LAPS[mk] ?? generateMockLaps(parseInt(num), sessionKey ?? 9161);
+        lapsCache[num] = enrichLapsWithStints(rawLaps, stints, num);
+      }
+
+      const allLaps = Object.values(lapsCache).flat();
+      const safetyCarPeriods = detectSafetyCarPeriods(raceControlMessages, allLaps);
+
       setState(prev => ({
-        ...prev, sessions, selectedMeetingKey: firstMeeting,
-        selectedSessionKey: null, currentSession: null,
-        drivers: [], selectedDrivers: [], lapsCache: {},
-        teamRadioCache: {}, pitStopsCache: {},
-        raceControlMessages: [], safetyCarPeriods: [],
-        isDemoMode: liveSessions.length === 0, isLoading: false,
+        ...prev,
+        selectedYear: year,
+        sessions,
+        selectedMeetingKey: firstMeeting,
+        selectedSessionKey: sessionKey,
+        currentSession: targetSession,
+        drivers,
+        stints,
+        selectedDrivers,
+        lapsCache,
+        teamRadioCache: {},
+        pitStopsCache: {},
+        raceControlMessages,
+        safetyCarPeriods,
+        isDemoMode: liveSessions.length === 0,
+        isLoading: false,
       }));
-    } catch {
+    } catch (err) {
+      console.error('[handleYearChange error]', err);
       setState(prev => ({ ...prev, isLoading: false }));
     }
   }, []);
 
-  const handleMeetingChange = useCallback((key: number) => {
-    setState(prev => ({
-      ...prev, selectedMeetingKey: key, selectedSessionKey: null,
-      currentSession: null, drivers: [], selectedDrivers: [],
-      lapsCache: {}, teamRadioCache: {}, pitStopsCache: {},
-      raceControlMessages: [], safetyCarPeriods: [],
-    }));
-  }, []);
+  const handleMeetingChange = useCallback(async (key: number) => {
+    setState(prev => ({ ...prev, selectedMeetingKey: key, isLoading: true }));
 
-  const handleSessionChange = useCallback(async (sessionKey: number) => {
-    setState(prev => ({ ...prev, selectedSessionKey: sessionKey, isLoading: true, selectedDrivers: [] }));
+    const meetingSessions = state.sessions.filter(s => s.meeting_key === key);
+    const targetSession = meetingSessions.find(s => s.session_name === 'Race' || s.session_type === 'Race')
+      ?? meetingSessions[0]
+      ?? null;
+
+    const sessionKey = targetSession?.session_key ?? null;
+    const yrNum = parseInt(state.selectedYear);
 
     let drivers: Driver[] = [];
     let stints: Stint[] = [];
     let raceControlMessages: RaceControlMessage[] = [];
-    let isDemoMode = false;
-    let currentSession: Session | null = null;
 
-    try {
-      [drivers, stints, raceControlMessages] = await Promise.all([
-        fetchDrivers(sessionKey), fetchStints(sessionKey), fetchRaceControl(sessionKey),
-      ]);
-    } catch {
-      isDemoMode = true;
-      drivers = MOCK_DRIVERS[sessionKey] ?? [];
-      stints = MOCK_STINTS[sessionKey] ?? [];
-      raceControlMessages = MOCK_RACE_CONTROL[sessionKey] ?? [];
+    if (sessionKey) {
+      try {
+        const [d, st, rc] = await Promise.all([
+          fetchDrivers(sessionKey).catch(() => []),
+          fetchStints(sessionKey).catch(() => []),
+          fetchRaceControl(sessionKey).catch(() => []),
+        ]);
+        drivers = d;
+        stints = st;
+        raceControlMessages = rc;
+      } catch {}
     }
 
-    currentSession =
-      MOCK_SESSIONS.find(s => s.session_key === sessionKey) ??
-      { session_key: sessionKey, session_name: 'Session', session_type: 'Race', meeting_key: 0, date_start: '', year: 2024 };
+    if (!drivers || drivers.length === 0) {
+      drivers = (sessionKey && MOCK_DRIVERS[sessionKey]) ? MOCK_DRIVERS[sessionKey] : getDriversForYear(yrNum);
+    }
+    if (!stints || stints.length === 0) {
+      stints = (sessionKey && MOCK_STINTS[sessionKey]) ? MOCK_STINTS[sessionKey] : generateCatalogStints(drivers);
+    }
+    if (!raceControlMessages || raceControlMessages.length === 0) {
+      raceControlMessages = (sessionKey && MOCK_RACE_CONTROL[sessionKey]) ? MOCK_RACE_CONTROL[sessionKey] : generateCatalogRaceControl(sessionKey ?? 0);
+    }
+
+    const validSelected = state.selectedDrivers.filter(num => drivers.some(d => d.driver_number.toString() === num));
+    const selectedDrivers = validSelected.length > 0 ? validSelected : drivers.slice(0, 2).map(d => d.driver_number.toString());
 
     const lapsCache: Record<string, Lap[]> = {};
-    for (const drv of drivers) {
-      const num = drv.driver_number.toString();
-      const mk = `${sessionKey}_${drv.driver_number}`;
-      if (MOCK_LAPS[mk]) lapsCache[num] = enrichLapsWithStints(MOCK_LAPS[mk], stints, num);
+    for (const num of selectedDrivers) {
+      const mk = `${sessionKey}_${num}`;
+      const rawLaps = MOCK_LAPS[mk] ?? generateMockLaps(parseInt(num), sessionKey ?? 9161);
+      lapsCache[num] = enrichLapsWithStints(rawLaps, stints, num);
     }
 
     const allLaps = Object.values(lapsCache).flat();
     const safetyCarPeriods = detectSafetyCarPeriods(raceControlMessages, allLaps);
 
-    const teamRadioCache: Record<string, TeamRadio[]> = {};
-    const pitStopsCache: Record<string, PitStop[]> = {};
-    for (const drv of drivers) {
-      const num = drv.driver_number.toString();
-      const mk = `${sessionKey}_${drv.driver_number}`;
-      teamRadioCache[num] = MOCK_TEAM_RADIO[mk] ?? [];
-      pitStopsCache[num] = MOCK_PIT_STOPS[mk] ?? [];
+    setState(prev => ({
+      ...prev,
+      selectedMeetingKey: key,
+      selectedSessionKey: sessionKey,
+      currentSession: targetSession,
+      drivers,
+      stints,
+      selectedDrivers,
+      lapsCache,
+      teamRadioCache: {},
+      pitStopsCache: {},
+      raceControlMessages,
+      safetyCarPeriods,
+      isLoading: false,
+    }));
+  }, [state.sessions, state.selectedYear, state.selectedDrivers]);
+
+  const handleSessionChange = useCallback(async (sessionKey: number) => {
+    setState(prev => ({ ...prev, selectedSessionKey: sessionKey, isLoading: true }));
+
+    const targetSession = state.sessions.find(s => s.session_key === sessionKey) ?? null;
+    const yrNum = parseInt(state.selectedYear);
+
+    let drivers: Driver[] = [];
+    let stints: Stint[] = [];
+    let raceControlMessages: RaceControlMessage[] = [];
+
+    try {
+      const [d, st, rc] = await Promise.all([
+        fetchDrivers(sessionKey).catch(() => []),
+        fetchStints(sessionKey).catch(() => []),
+        fetchRaceControl(sessionKey).catch(() => []),
+      ]);
+      drivers = d;
+      stints = st;
+      raceControlMessages = rc;
+    } catch {}
+
+    if (!drivers || drivers.length === 0) {
+      drivers = (sessionKey && MOCK_DRIVERS[sessionKey]) ? MOCK_DRIVERS[sessionKey] : getDriversForYear(yrNum);
+    }
+    if (!stints || stints.length === 0) {
+      stints = (sessionKey && MOCK_STINTS[sessionKey]) ? MOCK_STINTS[sessionKey] : generateCatalogStints(drivers);
+    }
+    if (!raceControlMessages || raceControlMessages.length === 0) {
+      raceControlMessages = (sessionKey && MOCK_RACE_CONTROL[sessionKey]) ? MOCK_RACE_CONTROL[sessionKey] : generateCatalogRaceControl(sessionKey);
     }
 
+    const validSelected = state.selectedDrivers.filter(num => drivers.some(d => d.driver_number.toString() === num));
+    const selectedDrivers = validSelected.length > 0 ? validSelected : drivers.slice(0, 2).map(d => d.driver_number.toString());
+
+    const lapsCache: Record<string, Lap[]> = {};
+    for (const num of selectedDrivers) {
+      const mk = `${sessionKey}_${num}`;
+      const rawLaps = MOCK_LAPS[mk] ?? generateMockLaps(parseInt(num), sessionKey);
+      lapsCache[num] = enrichLapsWithStints(rawLaps, stints, num);
+    }
+
+    const allLaps = Object.values(lapsCache).flat();
+    const safetyCarPeriods = detectSafetyCarPeriods(raceControlMessages, allLaps);
+
     setState(prev => ({
-      ...prev, drivers, stints, raceControlMessages, safetyCarPeriods,
-      lapsCache, teamRadioCache, pitStopsCache, currentSession,
-      isDemoMode: prev.isDemoMode || isDemoMode, isLoading: false,
+      ...prev,
+      selectedSessionKey: sessionKey,
+      currentSession: targetSession,
+      drivers,
+      stints,
+      selectedDrivers,
+      lapsCache,
+      teamRadioCache: {},
+      pitStopsCache: {},
+      raceControlMessages,
+      safetyCarPeriods,
+      isLoading: false,
     }));
-  }, []);
+  }, [state.sessions, state.selectedYear, state.selectedDrivers]);
 
   const handleDriverToggle = useCallback(async (driverNum: string, checked: boolean) => {
     setState(prev => {
@@ -326,9 +458,10 @@ export default function DashboardPage() {
       ]);
       setState(prev => {
         const mk = `${state.selectedSessionKey}_${driverNum}`;
-        const enriched = laps?.length
-          ? enrichLapsWithStints(laps, prev.stints, driverNum)
-          : (MOCK_LAPS[mk] ? enrichLapsWithStints(MOCK_LAPS[mk], prev.stints, driverNum) : generateMockLaps(parseInt(driverNum), state.selectedSessionKey!));
+        const rawLaps = (laps && laps.length > 0)
+          ? laps
+          : (MOCK_LAPS[mk] ?? generateMockLaps(parseInt(driverNum), state.selectedSessionKey!));
+        const enriched = enrichLapsWithStints(rawLaps, prev.stints, driverNum);
         const allLaps = { ...prev.lapsCache, [driverNum]: enriched };
         return {
           ...prev,
@@ -732,7 +865,7 @@ export default function DashboardPage() {
               }`}
             >
               <span>🏁</span>
-              <span className="hidden lg:inline">観戦・シーズン</span>
+              <span className="hidden lg:inline">レース観戦</span>
               <span className="lg:hidden">観戦</span>
             </button>
             <button
@@ -757,7 +890,7 @@ export default function DashboardPage() {
             <nav className="flex items-center bg-slate-900/90 rounded-2xl p-1 border border-white/10 shadow-inner">
               {(
                 [
-                  ['season', '🏁 2025 シーズン'],
+                  ['season', '🏁 レース観戦＆カレンダー'],
                   ['telemetry', '🏎️ テレメトリー＆Live'],
                   ['news', '📰 ニュース＆パドック'],
                   ['notes', '📝 レースノート＆AI'],
@@ -862,14 +995,15 @@ export default function DashboardPage() {
           <div className="border-t border-white/10 bg-slate-900/95 px-4 py-2 shadow-inner">
             <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
               {/* Desktop: All 6 Categories in 1 clean row */}
-              <div className="hidden lg:flex items-center justify-between gap-1.5 w-full bg-slate-900/90 p-1.5 rounded-2xl border border-white/10 shadow-inner">
+              <div className="hidden lg:flex items-center justify-between gap-1 w-full bg-slate-900/90 p-1.5 rounded-2xl border border-white/10 shadow-inner">
                 {(
                   [
                     ['drivers', '👤', '選手名鑑'],
                     ['teams', '🏎️', 'チーム名鑑'],
                     ['circuits', '🏁', 'コース解説'],
                     ['tyres', '🛞', 'タイヤ大百科'],
-                    ['glossary', '🧠', 'F1用語辞典'],
+                    ['regulations', '📜', '規定・ルール'],
+                    ['glossary', '🧠', '用語辞典'],
                     ['drama', '🎬', 'ドラマ・歴史'],
                   ] as [SubTab, string, string][]
                 ).map(([tab, icon, label]) => {
@@ -882,15 +1016,17 @@ export default function DashboardPage() {
                         desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
                         mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
                       }}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1.5 flex-1 whitespace-nowrap ${
+                      className={`px-2.5 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1.5 flex-1 whitespace-nowrap ${
                         isActive
                           ? tab === 'drama'
                             ? 'bg-rose-600 text-white shadow-md shadow-rose-500/30 ring-1 ring-rose-400/40'
-                            : tab === 'glossary'
+                          : tab === 'regulations'
+                            ? 'bg-purple-600 text-white shadow-md shadow-purple-500/30 ring-1 ring-purple-400/40'
+                          : tab === 'glossary'
                             ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/30 ring-1 ring-emerald-400/40'
-                            : tab === 'tyres'
+                          : tab === 'tyres'
                             ? 'bg-amber-600 text-white shadow-md shadow-amber-500/30 ring-1 ring-amber-400/40'
-                            : 'bg-blue-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-400/40'
+                          : 'bg-blue-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-400/40'
                           : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
                       }`}
                     >
@@ -909,6 +1045,7 @@ export default function DashboardPage() {
                     ['teams', '🏎️', 'チーム名鑑'],
                     ['circuits', '🏁', 'コース解説'],
                     ['tyres', '🛞', 'タイヤ大百科'],
+                    ['regulations', '📜', '規定・ルール'],
                     ['glossary', '🧠', '用語辞典'],
                     ['drama', '🎬', 'ドラマ・歴史'],
                   ] as [SubTab, string, string][]
@@ -926,11 +1063,13 @@ export default function DashboardPage() {
                         isActive
                           ? tab === 'drama'
                             ? 'bg-rose-600 text-white shadow-md'
-                            : tab === 'glossary'
+                          : tab === 'regulations'
+                            ? 'bg-purple-600 text-white shadow-md'
+                          : tab === 'glossary'
                             ? 'bg-emerald-600 text-white shadow-md'
-                            : tab === 'tyres'
+                          : tab === 'tyres'
                             ? 'bg-amber-600 text-white shadow-md'
-                            : 'bg-blue-600 text-white shadow-md'
+                          : 'bg-blue-600 text-white shadow-md'
                           : 'text-slate-400 hover:text-slate-200 bg-slate-900/60 border border-white/5'
                       }`}
                     >
@@ -989,7 +1128,7 @@ export default function DashboardPage() {
           {appMode === 'season' ? (
             (
               [
-                ['season',    '🏁', 'シーズン'],
+                ['season',    '🏁', '観戦'],
                 ['telemetry', '🏎️', '分析'],
                 ['news',      '📰', 'ニュース'],
                 ['notes',     '📝', 'ノート'],
