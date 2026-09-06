@@ -29,9 +29,9 @@ interface SidebarProps {
   drivers: Driver[];
   selectedDrivers: string[];
   onDriverToggle: (num: string, checked: boolean) => void;
-  // Gemini
-  geminiApiKey: string;
-  onGeminiKeyChange: (key: string) => void;
+  // Optional legacy props (deprecated, handled via backend/env)
+  geminiApiKey?: string;
+  onGeminiKeyChange?: (key: string) => void;
   // Status
   isDemoMode: boolean;
   isLoading: boolean;
@@ -73,13 +73,9 @@ export default function Sidebar({
   drivers,
   selectedDrivers,
   onDriverToggle,
-  geminiApiKey,
-  onGeminiKeyChange,
   isDemoMode,
   isLoading,
 }: SidebarProps) {
-  const [showKey, setShowKey] = useState(false);
-
   const meetings = useMemo(() => buildUniqueMeetings(sessions), [sessions]);
 
   const filteredSessions = useMemo(
@@ -218,30 +214,6 @@ export default function Sidebar({
         )}
       </section>
 
-      {/* ── Gemini API Key ── */}
-      <section>
-        <SectionTitle>AI SETTINGS</SectionTitle>
-        <label className="text-xs text-slate-500 mb-1.5 block">GEMINI API KEY</label>
-        <div className="relative">
-          <input
-            type={showKey ? 'text' : 'password'}
-            value={geminiApiKey}
-            onChange={e => onGeminiKeyChange(e.target.value)}
-            placeholder="AIza..."
-            className="w-full bg-slate-800/60 border border-white/10 text-slate-200 text-xs rounded-lg px-3 py-2 pr-9 focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 font-mono"
-          />
-          <button
-            type="button"
-            onClick={() => setShowKey(v => !v)}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs"
-          >
-            {showKey ? '🙈' : '👁'}
-          </button>
-        </div>
-        <p className="text-xs text-slate-600 mt-1">
-          チーム無線の文字起こしに使用（未入力でも動作可）
-        </p>
-      </section>
     </aside>
   );
 }

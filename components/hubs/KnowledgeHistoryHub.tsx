@@ -274,32 +274,62 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
         </div>
       </div>
 
-      {/* 5 Main Sub-Tabs Navigation */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 bg-slate-950/60 p-1.5 rounded-2xl border border-white/10 shadow-inner">
-        {(
-          [
-            ['teams', '🏎️ チーム紹介 (全10チーム)'],
-            ['drivers', '👤 ドライバー名鑑 (詳細ビュー)'],
-            ['circuits', '🏁 サーキット解説 (全24戦カレンダー)'],
-            ['strategy', '🛞 戦略 & 規則'],
-            ['history', '🏛️ 歴史アーカイブ'],
-          ] as [SubTab, string][]
-        ).map(([tab, label]) => (
-          <button
-            key={tab}
-            onClick={() => {
-              setActiveSubTab(tab);
-              setSearchQuery('');
-            }}
-            className={`px-4 py-2 rounded-xl text-xs font-racing font-bold transition-all flex-shrink-0 flex items-center gap-1.5 ${
-              activeSubTab === tab
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      {/* 5 Main Sub-Tabs Navigation (Mobile Segmented Grid & Desktop Row) */}
+      <div className="flex flex-col md:flex-row gap-1.5 bg-slate-950/70 p-1.5 rounded-2xl border border-white/10 shadow-inner">
+        {/* Row 1 for Mobile (Grid 3) / Combined flex on Desktop */}
+        <div className="grid grid-cols-3 gap-1.5 md:flex md:gap-2 flex-1">
+          {(
+            [
+              ['teams', '🏎️', 'チーム', '🏎️ チーム紹介 (全10チーム)'],
+              ['drivers', '👤', 'ドライバー', '👤 ドライバー名鑑 (詳細ビュー)'],
+              ['circuits', '🏁', 'サーキット', '🏁 サーキット解説 (全24戦)'],
+            ] as [SubTab, string, string, string][]
+          ).map(([tab, icon, shortLabel, fullLabel]) => (
+            <button
+              key={tab}
+              onClick={() => {
+                setActiveSubTab(tab);
+                setSearchQuery('');
+              }}
+              className={`px-2 py-2.5 md:px-4 md:py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1.5 text-center flex-1 ${
+                activeSubTab === tab
+                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/80 bg-slate-900/30 md:bg-transparent'
+              }`}
+            >
+              <span className="text-sm md:text-xs">{icon}</span>
+              <span className="inline md:hidden">{shortLabel}</span>
+              <span className="hidden md:inline">{fullLabel.replace(icon + ' ', '')}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Row 2 for Mobile (Grid 2) / Combined flex on Desktop */}
+        <div className="grid grid-cols-2 gap-1.5 md:flex md:gap-2">
+          {(
+            [
+              ['strategy', '🛞', '戦略 & 規則', '🛞 戦略 & 規則'],
+              ['history', '🏛️', '歴史アーカイブ', '🏛️ 歴史アーカイブ'],
+            ] as [SubTab, string, string, string][]
+          ).map(([tab, icon, shortLabel, fullLabel]) => (
+            <button
+              key={tab}
+              onClick={() => {
+                setActiveSubTab(tab);
+                setSearchQuery('');
+              }}
+              className={`px-2 py-2.5 md:px-4 md:py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1.5 text-center flex-1 ${
+                activeSubTab === tab
+                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/80 bg-slate-900/30 md:bg-transparent'
+              }`}
+            >
+              <span className="text-sm md:text-xs">{icon}</span>
+              <span className="inline md:hidden">{shortLabel}</span>
+              <span className="hidden md:inline">{fullLabel.replace(icon + ' ', '')}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* ── Sub-Tab 1: TEAMS (Compact Grid + Detail Modal) ── */}

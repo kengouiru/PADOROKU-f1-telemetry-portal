@@ -111,7 +111,6 @@ function buildInitialState(): AppState {
     }
   }
 
-  const storedKey = typeof window !== 'undefined' ? (localStorage.getItem('gemini_api_key') ?? '') : '';
   const storedTranscripts = typeof window !== 'undefined'
     ? JSON.parse(localStorage.getItem('f1_transcripts_cache') ?? '{}') : {};
 
@@ -132,7 +131,7 @@ function buildInitialState(): AppState {
     raceControlMessages,
     safetyCarPeriods,
     isDemoMode: true,
-    geminiApiKey: storedKey,
+    geminiApiKey: '',
     transcriptsCache: storedTranscripts,
     isLoading: false,
   };
@@ -170,10 +169,12 @@ export default function DashboardPage() {
     setAuthModalOpen(true);
   }, []);
 
-  // Persist Gemini key
+  // Clean up any legacy localStorage Gemini key (now handled server-side)
   useEffect(() => {
-    if (state.geminiApiKey) localStorage.setItem('gemini_api_key', state.geminiApiKey);
-  }, [state.geminiApiKey]);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('gemini_api_key');
+    }
+  }, []);
 
   // Persist transcripts cache
   useEffect(() => {
@@ -425,8 +426,6 @@ export default function DashboardPage() {
       drivers={state.drivers}
       selectedDrivers={state.selectedDrivers}
       onDriverToggle={handleDriverToggle}
-      geminiApiKey={state.geminiApiKey}
-      onGeminiKeyChange={key => setState(prev => ({ ...prev, geminiApiKey: key }))}
       isDemoMode={state.isDemoMode}
       isLoading={state.isLoading}
     />
@@ -613,7 +612,7 @@ export default function DashboardPage() {
           {/* AI Strategist Toggle Button (Header: Desktop & Tablet only) */}
           <button
             onClick={() => setAiDrawerOpen((v) => !v)}
-            className={`hidden sm:flex px-3 py-1.5 rounded-xl text-xs font-racing font-bold items-center gap-1.5 transition-all shadow-md flex-shrink-0 ${
+            className={`hidden md:flex px-3 py-1.5 rounded-xl text-xs font-racing font-bold items-center gap-1.5 transition-all shadow-md flex-shrink-0 ${
               aiDrawerOpen
                 ? 'bg-blue-600 text-white border border-blue-400 shadow-[0_0_12px_rgba(37,99,235,0.4)]'
                 : 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-white/10 hover:border-white/25'
@@ -666,12 +665,12 @@ export default function DashboardPage() {
         {sidebarOpen && (
           <div className="fixed inset-0 z-40 flex">
             <div
-              className="absolute inset-0 bg-black/60"
+              className="absolute inset-0 bg-black/60 backdrop-blur-xs"
               onClick={() => setSidebarOpen(false)}
             />
             <aside className="relative z-50 w-72 bg-slate-900 border-r border-white/10 p-4 overflow-y-auto h-full">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-racing text-white tracking-widest">SETTINGS</span>
+                <span className="text-xs font-racing text-white tracking-widest">RACE SETTINGS</span>
                 <button onClick={() => setSidebarOpen(false)} className="text-slate-400 text-lg">✕</button>
               </div>
               {sidebarContent}
@@ -679,14 +678,14 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Tab content */}
-        <div className="flex-1 min-h-0 overflow-y-auto p-4">
-          {mobileTab === 'telemetry' && analysisContent}
-          {mobileTab === 'news' && <NewsPaddockHub geminiApiKey={state.geminiApiKey} />}
-          {mobileTab === 'knowledge' && (
+        {/* Tab content (with bottom padding pb-20 so fixed navigation doesn't hide content) */}
+        <div className="flex-1 min-h-0 overflow-y-auto p-4 pb-20 md:pb-6">
+          {activeHub === 'telemetry' && analysisContent}
+          {activeHub === 'news' && <NewsPaddockHub geminiApiKey={state.geminiApiKey} />}
+          {activeHub === 'knowledge' && (
             <KnowledgeHistoryHub onNavigateToTelemetry={handleNavigateToTelemetry} />
           )}
-          {mobileTab === 'notes' && (
+          {activeHub === 'notes' && (
             <RaceNotesReportHub
               selectedDrivers={state.selectedDrivers}
               drivers={state.drivers}
@@ -698,11 +697,10 @@ export default function DashboardPage() {
               geminiApiKey={state.geminiApiKey}
             />
           )}
-          {mobileTab === 'ai' && aiContent}
         </div>
 
-        {/* Bottom tab bar */}
-        <nav className="flex-shrink-0 flex border-t border-white/10 bg-slate-950/90 backdrop-blur-sm safe-bottom">
+        {/* ── Fixed Mobile Bottom Navigation Bar (< md) ── */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-black/90 backdrop-blur-md border-t border-white/10 flex items-center justify-around safe-bottom shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
           {(
             [
               ['telemetry', '🏎️', '分析'],
@@ -710,41 +708,53 @@ export default function DashboardPage() {
               ['knowledge', '📚', 'ナレッジ'],
               ['notes',     '📝', 'ノート'],
               ['ai',        '🤖', 'AI'],
-            ] as [MobileTab, string, string][]
-          ).map(([tab, icon, label]) => (
-            <button
-              key={tab}
-              onClick={() => {
-                setMobileTab(tab);
-                if (tab !== 'ai') setActiveHub(tab as ActiveHub);
-              }}
-              className={`flex-1 flex flex-col items-center py-2.5 gap-0.5 text-xs transition-colors ${
-                mobileTab === tab ? 'text-white font-bold' : 'text-slate-500 hover:text-slate-300'
-              }`}
-            >
-              <span className="text-base">{icon}</span>
-              <span className="text-[10px]">{label}</span>
-              {mobileTab === tab && (
-                <span className="w-6 h-0.5 bg-f1-red rounded-full mt-0.5" />
-              )}
-            </button>
-          ))}
+            ] as [string, string, string][]
+          ).map(([tab, icon, label]) => {
+            const isAiTab = tab === 'ai';
+            const isActive = isAiTab ? aiDrawerOpen : activeHub === tab && !aiDrawerOpen;
+
+            return (
+              <button
+                key={tab}
+                onClick={() => {
+                  if (isAiTab) {
+                    setAiDrawerOpen((prev) => !prev);
+                  } else {
+                    setActiveHub(tab as ActiveHub);
+                    setMobileTab(tab as MobileTab);
+                    if (aiDrawerOpen) setAiDrawerOpen(false);
+                  }
+                }}
+                className={`flex-1 flex flex-col items-center py-2.5 px-1 gap-0.5 text-xs transition-all relative ${
+                  isActive
+                    ? 'text-sky-400 font-bold'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <span className={`text-base transition-transform ${isActive ? 'scale-110' : ''}`}>{icon}</span>
+                <span className="text-[10px] tracking-tight">{label}</span>
+                {isActive && (
+                  <span className="absolute bottom-1 w-6 h-0.5 bg-f1-red rounded-full shadow-[0_0_8px_#ef4444]" />
+                )}
+              </button>
+            );
+          })}
         </nav>
       </div>
 
-      {/* ── Slide-over AI Strategist & Notebook Drawer (Desktop & Tablet) ── */}
+      {/* ── Slide-over AI Strategist & Notebook Drawer (Desktop, Tablet & Mobile) ── */}
       {aiDrawerOpen && (
         <div className="fixed inset-0 z-50 flex justify-end animate-fade-in">
           {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
             onClick={() => setAiDrawerOpen(false)}
           />
 
           {/* Drawer Panel */}
-          <div className="relative z-10 w-full sm:w-[420px] md:w-[460px] h-full bg-slate-900/95 border-l border-white/15 shadow-2xl flex flex-col overflow-hidden animate-slide-left">
+          <div className="relative z-10 w-[88vw] max-w-[440px] sm:w-[420px] md:w-[460px] h-full bg-slate-900/95 border-l border-white/15 shadow-2xl flex flex-col overflow-hidden animate-slide-left">
             {/* Drawer Header & Tabs */}
-            <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-white/10 bg-slate-950/60">
+            <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-white/10 bg-slate-950/60 flex-shrink-0">
               {/* Tab switcher */}
               <div className="flex bg-slate-800/80 rounded-xl p-1 border border-white/10">
                 {([['ai', '🤖 AI分析'], ['notebook', '📓 レースノート']] as [RightPanelTab, string][]).map(([tab, label]) => (
@@ -765,7 +775,7 @@ export default function DashboardPage() {
               {/* Close Button */}
               <button
                 onClick={() => setAiDrawerOpen(false)}
-                className="w-7 h-7 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-xs transition-colors"
+                className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm font-bold transition-colors border border-white/10"
                 title="閉じる"
               >
                 ✕

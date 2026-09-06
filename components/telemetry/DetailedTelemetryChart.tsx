@@ -620,96 +620,101 @@ export default function DetailedTelemetryChart({
             </div>
 
             <div className="h-44 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={displayPoints}
-                  syncId="f1-telemetry-car-data"
-                  margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
-                  onMouseMove={handleChartMouseMove}
-                  onMouseLeave={handleChartMouseLeave}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
-                  <XAxis
-                    dataKey="distPercent"
-                    hide
-                    domain={currentDomain}
-                    type="number"
-                    allowDataOverflow={true}
-                  />
-                  <YAxis
-                    domain={[40, 360]}
-                    stroke="#94a3b8"
-                    fontSize={10}
-                    tickCount={5}
-                  />
-                  <Tooltip
-                    content={<CustomTelemetryTooltip d1={d1} d2={d2} mode="speed" />}
-                    cursor={{ stroke: '#38bdf8', strokeWidth: 1.5, strokeDasharray: '3 3' }}
-                  />
+              {isMounted ? (
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={176}>
+                  <LineChart
+                    data={displayPoints}
+                    syncId="f1-telemetry-car-data"
+                    margin={{ top: 10, right: 10, left: -15, bottom: 0 }}
+                    onMouseMove={handleChartMouseMove}
+                    onMouseLeave={handleChartMouseLeave}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.3} />
+                    <XAxis
+                      dataKey="distPercent"
+                      hide
+                      domain={currentDomain}
+                      type="number"
+                      allowDataOverflow={true}
+                    />
+                    <YAxis
+                      domain={[40, 360]}
+                      stroke="#94a3b8"
+                      fontSize={10}
+                      tickCount={5}
+                    />
+                    <Tooltip
+                      content={<CustomTelemetryTooltip d1={d1} d2={d2} mode="speed" />}
+                      cursor={{ stroke: '#38bdf8', strokeWidth: 1.5, strokeDasharray: '3 3' }}
+                    />
 
-                  {/* Corner Markers */}
-                  {cornerMarkers
-                    .filter(
-                      (marker) =>
-                        !zoomRange ||
-                        (marker.distPercent >= zoomRange.start && marker.distPercent <= zoomRange.end)
-                    )
-                    .map((marker, idx) => (
+                    {/* Corner Markers */}
+                    {cornerMarkers
+                      .filter(
+                        (marker) =>
+                          !zoomRange ||
+                          (marker.distPercent >= zoomRange.start && marker.distPercent <= zoomRange.end)
+                      )
+                      .map((marker, idx) => (
+                        <ReferenceLine
+                          key={idx}
+                          x={marker.distPercent}
+                          stroke="#475569"
+                          strokeDasharray="2 2"
+                          label={{
+                            value: marker.cornerName,
+                            position: 'insideTop',
+                            fill: '#94a3b8',
+                            fontSize: 9,
+                            fontWeight: 'bold',
+                          }}
+                        />
+                      ))}
+
+                    {/* Active Section Apex Speed Reference Marker */}
+                    {zoomMetrics && (
                       <ReferenceLine
-                        key={idx}
-                        x={marker.distPercent}
-                        stroke="#475569"
-                        strokeDasharray="2 2"
+                        x={zoomMetrics.apexPct}
+                        stroke="#f59e0b"
+                        strokeWidth={2}
+                        strokeDasharray="4 2"
                         label={{
-                          value: marker.cornerName,
-                          position: 'insideTop',
-                          fill: '#94a3b8',
-                          fontSize: 9,
+                          value: `🎯 APEX (${zoomMetrics.apexSpeed1} vs ${zoomMetrics.apexSpeed2} km/h)`,
+                          position: 'insideBottomRight',
+                          fill: '#f59e0b',
+                          fontSize: 9.5,
                           fontWeight: 'bold',
                         }}
                       />
-                    ))}
+                    )}
 
-                  {/* Active Section Apex Speed Reference Marker */}
-                  {zoomMetrics && (
-                    <ReferenceLine
-                      x={zoomMetrics.apexPct}
-                      stroke="#f59e0b"
-                      strokeWidth={2}
-                      strokeDasharray="4 2"
-                      label={{
-                        value: `🎯 APEX (${zoomMetrics.apexSpeed1} vs ${zoomMetrics.apexSpeed2} km/h)`,
-                        position: 'insideBottomRight',
-                        fill: '#f59e0b',
-                        fontSize: 9.5,
-                        fontWeight: 'bold',
-                      }}
+                    {/* Driver 1 Speed */}
+                    <Line
+                      type="monotone"
+                      dataKey="speed1"
+                      name={d1.code}
+                      stroke={d1.color}
+                      strokeWidth={2.2}
+                      dot={false}
+                      isAnimationActive={false}
                     />
-                  )}
 
-                  {/* Driver 1 Speed */}
-                  <Line
-                    type="monotone"
-                    dataKey="speed1"
-                    name={d1.code}
-                    stroke={d1.color}
-                    strokeWidth={2.2}
-                    dot={false}
-                    isAnimationActive={false}
-                  />
-                  {/* Driver 2 Speed */}
-                  <Line
-                    type="monotone"
-                    dataKey="speed2"
-                    name={d2.code}
-                    stroke={d2.color}
-                    strokeWidth={2.2}
-                    strokeDasharray="4 2"
-                    dot={false}
-                    isAnimationActive={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+                    {/* Driver 2 Speed */}
+                    <Line
+                      type="monotone"
+                      dataKey="speed2"
+                      name={d2.code}
+                      stroke={d2.color}
+                      strokeWidth={2.2}
+                      strokeDasharray="4 2"
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="w-full h-full bg-slate-900/40 rounded-xl animate-pulse" />
+              )}
             </div>
           </div>
 
@@ -724,8 +729,9 @@ export default function DetailedTelemetryChart({
             </div>
 
             <div className="h-32 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart
+              {isMounted ? (
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={128}>
+                  <AreaChart
                   data={displayPoints}
                   syncId="f1-telemetry-car-data"
                   margin={{ top: 5, right: 10, left: -15, bottom: 0 }}
@@ -787,7 +793,10 @@ export default function DetailedTelemetryChart({
                     isAnimationActive={false}
                   />
                 </AreaChart>
-              </ResponsiveContainer>
+                </ResponsiveContainer>
+              ) : (
+                <div className="w-full h-full bg-slate-900/40 rounded-xl animate-pulse" />
+              )}
             </div>
           </div>
 
@@ -802,11 +811,12 @@ export default function DetailedTelemetryChart({
             </div>
 
             <div className="h-32 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={displayPoints}
-                  syncId="f1-telemetry-car-data"
-                  margin={{ top: 5, right: 10, left: -15, bottom: 20 }}
+              {isMounted ? (
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={128}>
+                  <LineChart
+                    data={displayPoints}
+                    syncId="f1-telemetry-car-data"
+                    margin={{ top: 5, right: 10, left: -15, bottom: 20 }}
                   onMouseMove={handleChartMouseMove}
                   onMouseLeave={handleChartMouseLeave}
                 >
@@ -878,7 +888,10 @@ export default function DetailedTelemetryChart({
                     isAnimationActive={false}
                   />
                 </LineChart>
-              </ResponsiveContainer>
+                </ResponsiveContainer>
+              ) : (
+                <div className="w-full h-full bg-slate-900/40 rounded-xl animate-pulse" />
+              )}
             </div>
           </div>
         </div>

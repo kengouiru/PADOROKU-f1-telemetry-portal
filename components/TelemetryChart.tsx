@@ -14,7 +14,7 @@
  *  - Quick radio lap jump pills
  */
 
-import React, { useMemo, useRef, useState, useCallback } from 'react';
+import React, { useMemo, useRef, useState, useCallback, useEffect } from 'react';
 import {
   Chart as ChartJS,
   LinearScale,
@@ -109,6 +109,11 @@ export default function TelemetryChart({
   const chartRef = useRef<ChartJS<'line', ChartPoint[]>>(null);
   const [chartMode, setChartMode] = useState<ChartMode>('laps');
   const [activeRadioContext, setActiveRadioContext] = useState<ActiveRadioContext | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // ── Mapped Radios per Driver ───────────────────────────────────────────────
   const mappedRadios = useMemo(() => {
@@ -633,12 +638,18 @@ export default function TelemetryChart({
 
       {/* Chart Canvas Area */}
       <div style={{ position: 'relative', width: '100%', height: 285 }}>
-        <Line
-          ref={chartRef}
-          data={{ datasets: currentDatasets as ChartDataset<'line', ChartPoint[]>[] }}
-          options={options}
-          plugins={[scPlugin, markersPlugin]}
-        />
+        {isMounted ? (
+          <Line
+            ref={chartRef}
+            data={{ datasets: currentDatasets as ChartDataset<'line', ChartPoint[]>[] }}
+            options={options}
+            plugins={[scPlugin, markersPlugin]}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-slate-900/40 rounded-xl border border-white/5 animate-pulse">
+            <span className="text-xs font-mono text-slate-500">チャート読み込み中...</span>
+          </div>
+        )}
       </div>
 
       {/* Quick Radio Lap Jump Bar (Pills directly below chart) */}
