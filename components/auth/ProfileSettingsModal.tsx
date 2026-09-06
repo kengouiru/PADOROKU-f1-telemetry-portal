@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import {
   KNOWLEDGE_TEAMS,
   KNOWLEDGE_DRIVERS,
+  KNOWLEDGE_CIRCUITS,
   type DriverProfile,
   type TeamProfile,
 } from '@/data/f1KnowledgeData';
@@ -25,7 +26,7 @@ const FAN_TYPES = [
 
 export default function ProfileSettingsModal({ onClose }: ProfileSettingsModalProps) {
   const { data: session } = useSession();
-  const { prefs, update } = useUserPreferences();
+  const { prefs, update, toggleDriver, toggleTeam, toggleCircuit } = useUserPreferences();
   const [mounted, setMounted] = useState(false);
 
   // Local form state initialized directly from stored preferences
@@ -397,6 +398,129 @@ export default function ProfileSettingsModal({ onClose }: ProfileSettingsModalPr
                       </button>
                     );
                   })}
+                </div>
+              </div>
+
+              {/* ── Phase 3-D: My Paddock Bookmarks Grid ── */}
+              <div className="pt-3 border-t border-white/10 space-y-3.5">
+                <div className="flex items-center justify-between">
+                  <h4 className="text-xs font-racing font-bold text-amber-300 flex items-center gap-1.5">
+                    <span>⭐</span>
+                    <span>マイパドック・お気に入り登録一覧</span>
+                  </h4>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    計 {(prefs.favoriteDriverCodes?.length || 0) + (prefs.favoriteTeamIds?.length || 0) + (prefs.favoriteCircuitIds?.length || 0)} 件
+                  </span>
+                </div>
+
+                {/* Starred Drivers */}
+                <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5 space-y-2">
+                  <span className="text-[11px] font-racing font-bold text-slate-300 flex items-center gap-1">
+                    <span>🏎️</span>
+                    <span>お気に入りドライバー ({prefs.favoriteDriverCodes?.length || 0})</span>
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(prefs.favoriteDriverCodes || []).map((code) => {
+                      const d = KNOWLEDGE_DRIVERS.find((drv) => drv.code === code);
+                      return (
+                        <span
+                          key={code}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800/90 text-xs font-racing border border-white/10 text-white"
+                          style={{ borderColor: d ? `${d.teamColor}60` : undefined }}
+                        >
+                          <span className="font-bold" style={{ color: d?.teamColor }}>
+                            #{d?.number ?? ''} {code}
+                          </span>
+                          <span className="text-[10px] text-slate-400 truncate max-w-[80px]">
+                            {d?.fullName.split(' ')[1] || code}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => toggleDriver(code)}
+                            className="text-slate-400 hover:text-rose-400 text-xs ml-0.5 cursor-pointer"
+                            title="解除"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      );
+                    })}
+                    {(!prefs.favoriteDriverCodes || prefs.favoriteDriverCodes.length === 0) && (
+                      <span className="text-xs text-slate-500 font-mono">未登録</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Starred Teams */}
+                <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5 space-y-2">
+                  <span className="text-[11px] font-racing font-bold text-slate-300 flex items-center gap-1">
+                    <span>🏁</span>
+                    <span>お気に入りチーム ({prefs.favoriteTeamIds?.length || 0})</span>
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(prefs.favoriteTeamIds || []).map((teamId) => {
+                      const t = KNOWLEDGE_TEAMS.find((tm) => tm.id === teamId);
+                      return (
+                        <span
+                          key={teamId}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800/90 text-xs font-racing border border-white/10 text-white"
+                          style={{ borderColor: t ? `${t.color}60` : undefined }}
+                        >
+                          <span
+                            className="w-2 h-2 rounded-full"
+                            style={{ backgroundColor: t?.color }}
+                          />
+                          <span className="font-bold">{t?.name || teamId}</span>
+                          <button
+                            type="button"
+                            onClick={() => toggleTeam(teamId)}
+                            className="text-slate-400 hover:text-rose-400 text-xs ml-0.5 cursor-pointer"
+                            title="解除"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      );
+                    })}
+                    {(!prefs.favoriteTeamIds || prefs.favoriteTeamIds.length === 0) && (
+                      <span className="text-xs text-slate-500 font-mono">未登録</span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Starred Circuits */}
+                <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5 space-y-2">
+                  <span className="text-[11px] font-racing font-bold text-slate-300 flex items-center gap-1">
+                    <span>📍</span>
+                    <span>お気に入りサーキット ({prefs.favoriteCircuitIds?.length || 0})</span>
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(prefs.favoriteCircuitIds || []).map((cid) => {
+                      const c = KNOWLEDGE_CIRCUITS.find((cr) => cr.id === cid);
+                      return (
+                        <span
+                          key={cid}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800/90 text-xs font-racing border border-sky-500/30 text-white"
+                        >
+                          <span className="text-sky-300 font-bold">{c?.name || cid}</span>
+                          <span className="text-[10px] text-slate-400 font-mono">
+                            {c?.country}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => toggleCircuit(cid)}
+                            className="text-slate-400 hover:text-rose-400 text-xs ml-0.5 cursor-pointer"
+                            title="解除"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      );
+                    })}
+                    {(!prefs.favoriteCircuitIds || prefs.favoriteCircuitIds.length === 0) && (
+                      <span className="text-xs text-slate-500 font-mono">未登録</span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

@@ -47,6 +47,7 @@ import KnowledgeHistoryHub, { type SubTab } from '@/components/hubs/KnowledgeHis
 import RaceNotesReportHub from '@/components/hubs/RaceNotesReportHub';
 import SeasonHub from '@/components/hubs/SeasonHub';
 import QuickGlossaryModal from '@/components/glossary/QuickGlossaryModal';
+import GlobalSearchModal from '@/components/search/GlobalSearchModal';
 import type { TelemetryTarget } from '@/data/f1KnowledgeData';
 
 import AuthButton from '@/components/auth/AuthButton';
@@ -149,6 +150,7 @@ export default function DashboardPage() {
   const [activeHub, setActiveHub] = useState<ActiveHub>('season');
   const [librarySubTab, setLibrarySubTab] = useState<SubTab>('drivers');
   const [quickGlossaryOpen, setQuickGlossaryOpen] = useState(false);
+  const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>('telemetry');
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>('ai');
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile sidebar drawer
@@ -164,11 +166,24 @@ export default function DashboardPage() {
     driver1: 'VER',
     driver2: 'NOR',
   });
+  const [targetCircuitId, setTargetCircuitId] = useState<string | undefined>(undefined);
 
   const timelineRef = useRef<TeamRadioTimelineHandle>(null);
   const notebookRef = useRef<RaceNotebookHandle>(null);
   const desktopScrollRef = useRef<HTMLElement>(null);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
+
+  // Global Ctrl+K / Cmd+K shortcut listener for Global Search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setGlobalSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleRequireAuth = useCallback((title?: string, description?: string) => {
     setAuthModalConfig({
@@ -555,6 +570,12 @@ export default function DashboardPage() {
               setActiveHub('knowledge');
             }}
             onNavigateToGlossary={() => setQuickGlossaryOpen(true)}
+            onNavigateToCircuit={(circuitId) => {
+              setTargetCircuitId(circuitId);
+              setAppMode('library');
+              setLibrarySubTab('circuits');
+              setActiveHub('knowledge');
+            }}
           />
         </ErrorBoundary>
       )}
@@ -565,6 +586,7 @@ export default function DashboardPage() {
           <KnowledgeHistoryHub
             activeSubTab={librarySubTab}
             onSubTabChange={setLibrarySubTab}
+            targetCircuitId={targetCircuitId}
             onNavigateToTelemetry={(target) => {
               setAppMode('season');
               setActiveHub('telemetry');
@@ -715,14 +737,27 @@ export default function DashboardPage() {
 
         {/* Right: Quick Glossary + Driver Pills + AI Strategist Toggle + Auth */}
         <div className="flex items-center gap-2">
+          {/* Global Command Palette / Search Button (Ctrl+K) */}
+          <button
+            onClick={() => setGlobalSearchOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-racing font-bold bg-slate-800/90 hover:bg-slate-700 text-sky-300 hover:text-white border border-sky-500/30 hover:border-sky-400 shadow-sm transition-all flex-shrink-0 cursor-pointer"
+            title="選手・チーム・コース・タイヤ・用語の横断検索 (Ctrl+K)"
+          >
+            <span>🔍</span>
+            <span className="hidden sm:inline">総合検索</span>
+            <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 rounded bg-black/50 text-[9px] text-slate-400 font-mono border border-white/10 ml-0.5">
+              Ctrl K
+            </kbd>
+          </button>
+
           {/* Quick Glossary Search Button (Global Action) */}
           <button
             onClick={() => setQuickGlossaryOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-racing font-bold bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-500/40 hover:border-emerald-400 shadow-sm transition-all flex-shrink-0"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-racing font-bold bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-500/40 hover:border-emerald-400 shadow-sm transition-all flex-shrink-0 cursor-pointer"
             title="レース観戦中の用語クイック検索"
           >
-            <span>🔍</span>
-            <span className="hidden sm:inline">用語検索</span>
+            <span>📖</span>
+            <span className="hidden sm:inline">用語</span>
           </button>
 
           {/* Selected driver pills (desktop, in telemetry hub) */}
@@ -1047,6 +1082,22 @@ export default function DashboardPage() {
       <QuickGlossaryModal
         isOpen={quickGlossaryOpen}
         onClose={() => setQuickGlossaryOpen(false)}
+      />
+
+      {/* ── Global Search Command Palette (Ctrl+K) ── */}
+      <GlobalSearchModal
+        isOpen={globalSearchOpen}
+        onClose={() => setGlobalSearchOpen(false)}
+        onNavigate={(action) => {
+          setAppMode(action.appMode);
+          setActiveHub(action.hub);
+          if (action.subTab) {
+            setLibrarySubTab(action.subTab);
+          }
+          if (action.subTab === 'circuits' && action.targetId) {
+            setTargetCircuitId(action.targetId);
+          }
+        }}
       />
     </div>
   );

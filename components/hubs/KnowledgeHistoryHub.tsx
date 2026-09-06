@@ -25,6 +25,7 @@ import CircuitsHub from './CircuitsHub';
 import TyreEncyclopediaHub from './TyreEncyclopediaHub';
 import F1DramaHub from './F1DramaHub';
 import F1GlossaryHub from './F1GlossaryHub';
+import { useUserPreferences } from '@/lib/userPreferences';
 
 export type SubTab = 'drivers' | 'teams' | 'circuits' | 'tyres' | 'glossary' | 'drama' | 'strategy' | 'history';
 
@@ -33,6 +34,7 @@ export interface KnowledgeHistoryHubProps {
   initialSubTab?: SubTab;
   activeSubTab?: SubTab;
   onSubTabChange?: (tab: SubTab) => void;
+  targetCircuitId?: string;
 }
 
 /** Individual Team Radio Audio Player with Play/Pause and Seek Bar */
@@ -157,6 +159,7 @@ export default function KnowledgeHistoryHub({
   initialSubTab = 'drivers',
   activeSubTab: controlledSubTab,
   onSubTabChange,
+  targetCircuitId,
 }: KnowledgeHistoryHubProps) {
   const [internalSubTab, setInternalSubTab] = useState<SubTab>(initialSubTab);
   const activeSubTab = controlledSubTab ?? internalSubTab;
@@ -164,6 +167,8 @@ export default function KnowledgeHistoryHub({
     if (onSubTabChange) onSubTabChange(tab);
     setInternalSubTab(tab);
   };
+  const { prefs, isFavoriteTeam, toggleTeam } = useUserPreferences();
+  const [teamsFilterStarred, setTeamsFilterStarred] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedTeamDetail, setSelectedTeamDetail] = useState<TeamProfile | null>(null);
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
@@ -313,14 +318,37 @@ export default function KnowledgeHistoryHub({
       {/* ── Sub-Tab 1: TEAMS (Compact Grid + Detail Modal) ── */}
       {activeSubTab === 'teams' && (
         <div className="flex flex-col gap-4 animate-fade-in">
+          {/* Teams Filter & Counter Bar */}
+          <div className="flex items-center justify-between gap-3 bg-slate-950/70 border border-white/10 rounded-2xl p-3 px-4 shadow-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono font-bold text-slate-300">
+                F1 2025 全10コンストラクター
+              </span>
+            </div>
+            <button
+              onClick={() => setTeamsFilterStarred((prev) => !prev)}
+              className={`text-xs font-racing font-bold px-3 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 shadow-sm cursor-pointer ${
+                teamsFilterStarred
+                  ? 'bg-amber-500/25 border-amber-400 text-amber-300 ring-1 ring-amber-400/50'
+                  : 'bg-slate-900 border-white/10 text-slate-400 hover:text-amber-300 hover:border-amber-400/30'
+              }`}
+              title="推しチームのみ絞り込み"
+            >
+              <span>{teamsFilterStarred ? '★' : '☆'}</span>
+              <span>推しチーム ({prefs.favoriteTeamIds?.length || 0})</span>
+            </button>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-            {KNOWLEDGE_TEAMS.filter(
-              (t) =>
+            {KNOWLEDGE_TEAMS.filter((t) => {
+              if (teamsFilterStarred && !isFavoriteTeam(t.id)) return false;
+              return (
                 t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 t.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 t.philosophy.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 t.base.toLowerCase().includes(searchQuery.toLowerCase())
-            ).map((team) => (
+              );
+            }).map((team) => (
               <div
                 key={team.id}
                 onClick={() => setSelectedTeamDetail(team)}
@@ -328,7 +356,7 @@ export default function KnowledgeHistoryHub({
                 style={{ borderLeftColor: team.color }}
               >
                 <div className="space-y-2.5">
-                  {/* Card Header: Initial Badge, Name, Titles */}
+                  {/* Card Header: Initial Badge, Name, Titles & Favorite Star */}
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2.5">
                       <div
@@ -350,12 +378,32 @@ export default function KnowledgeHistoryHub({
                         </h3>
                       </div>
                     </div>
-                    {team.constructorTitles > 0 && (
-                      <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-1 flex-shrink-0">
-                        <span>🏆</span>
-                        <span>{team.constructorTitles}冠</span>
-                      </span>
-                    )}
+
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      {team.constructorTitles > 0 && (
+                        <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-1">
+                          <span>🏆</span>
+                          <span>{team.constructorTitles}冠</span>
+                        </span>
+                      )}
+
+                      {/* Favorite Star Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleTeam(team.id);
+                        }}
+                        className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all cursor-pointer ${
+                          isFavoriteTeam(team.id)
+                            ? 'bg-amber-400/20 border-amber-400/60 text-amber-300 hover:bg-amber-400/30 shadow-sm'
+                            : 'bg-slate-900/60 border-white/10 text-slate-500 hover:text-amber-300 hover:border-amber-400/40'
+                        }`}
+                        title={isFavoriteTeam(team.id) ? '推しチームから外す' : '推しチーム (マイパドック) に登録'}
+                      >
+                        <span className="text-xs">{isFavoriteTeam(team.id) ? '★' : '☆'}</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Quick specs pill bar */}
@@ -419,6 +467,7 @@ export default function KnowledgeHistoryHub({
           searchQuery={searchQuery}
           onClearSearch={() => setSearchQuery('')}
           onNavigateToTelemetry={onNavigateToTelemetry}
+          onNavigateToDrama={() => setActiveSubTab('drama')}
         />
       )}
 
@@ -426,6 +475,7 @@ export default function KnowledgeHistoryHub({
       {activeSubTab === 'circuits' && (
         <CircuitsHub
           searchQuery={searchQuery}
+          initialCircuitId={targetCircuitId}
           onClearSearch={() => setSearchQuery('')}
           onNavigateToTelemetry={onNavigateToTelemetry}
         />

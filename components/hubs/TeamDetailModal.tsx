@@ -12,6 +12,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import type { TeamProfile, Reference } from '@/data/f1KnowledgeData';
 import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
+import { useUserPreferences } from '@/lib/userPreferences';
 
 interface TeamDetailModalProps {
   team: TeamProfile;
@@ -30,6 +31,7 @@ export default function TeamDetailModal({
 }: TeamDetailModalProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
+  const { isFavoriteTeam, toggleTeam } = useUserPreferences();
   const [activeTab, setActiveTab] = useState<TeamTab>('factory');
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
   const modalContentRef = useRef<HTMLDivElement>(null);
@@ -119,7 +121,23 @@ export default function TeamDetailModal({
             </button>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Star Favorite Button */}
+            <button
+              onClick={() => toggleTeam(team.id)}
+              className={`px-2.5 py-1 rounded-xl text-xs font-racing flex items-center gap-1.5 transition-all cursor-pointer shadow-sm border ${
+                isFavoriteTeam(team.id)
+                  ? 'bg-amber-400/25 border-amber-400/70 text-amber-300 hover:bg-amber-400/35'
+                  : 'bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-300 border-white/10'
+              }`}
+              title={isFavoriteTeam(team.id) ? '推しチームから外す' : '推しチーム (マイパドック) に登録'}
+            >
+              <span>{isFavoriteTeam(team.id) ? '★' : '☆'}</span>
+              <span className="hidden sm:inline">
+                {isFavoriteTeam(team.id) ? '推しチーム登録中' : '推しチーム登録'}
+              </span>
+            </button>
+
             <span className="text-[10px] text-slate-500 font-mono hidden md:inline">
               キーボード [←] [→] でチーム切り替え / [ESC] で閉じる
             </span>

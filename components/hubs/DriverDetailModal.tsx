@@ -12,12 +12,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import type { DriverProfile, Reference, TelemetryTarget } from '@/data/f1KnowledgeData';
 import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
+import { useUserPreferences } from '@/lib/userPreferences';
 
 interface DriverDetailModalProps {
   driver: DriverProfile;
   allDrivers: DriverProfile[];
   onSelectDriver: (driver: DriverProfile) => void;
   onNavigateToTelemetry?: (target?: TelemetryTarget) => void;
+  onCompareDriver?: (driverCode: string) => void;
   onClose: () => void;
 }
 
@@ -28,10 +30,12 @@ export default function DriverDetailModal({
   allDrivers,
   onSelectDriver,
   onNavigateToTelemetry,
+  onCompareDriver,
   onClose,
 }: DriverDetailModalProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
+  const { isFavoriteDriver, toggleDriver } = useUserPreferences();
   const [activeTab, setActiveTab] = useState<DetailTab>('overview');
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
   const [imgLoaded, setImgLoaded] = useState<boolean>(false);
@@ -143,6 +147,35 @@ export default function DriverDetailModal({
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            {/* Star Favorite Button */}
+            <button
+              onClick={() => toggleDriver(driver.code)}
+              className={`px-2.5 py-1 rounded-xl text-xs font-racing flex items-center gap-1.5 transition-all cursor-pointer shadow-sm border ${
+                isFavoriteDriver(driver.code)
+                  ? 'bg-amber-400/25 border-amber-400/70 text-amber-300 hover:bg-amber-400/35'
+                  : 'bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-300 border-white/10'
+              }`}
+              title={isFavoriteDriver(driver.code) ? 'お気に入りから外す' : 'お気に入り (マイパドック) に登録'}
+            >
+              <span>{isFavoriteDriver(driver.code) ? '★' : '☆'}</span>
+              <span className="hidden sm:inline">
+                {isFavoriteDriver(driver.code) ? '推し登録中' : '推し登録'}
+              </span>
+            </button>
+
+            {onCompareDriver && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onCompareDriver(driver.code);
+                }}
+                className="px-2.5 py-1 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/40 text-purple-200 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm"
+                title="この選手を直接比較ツールに送る"
+              >
+                <span>⚔️</span>
+                <span className="hidden sm:inline">2名直接比較</span>
+              </button>
+            )}
             <span className="text-[10px] text-slate-500 font-mono hidden md:inline">
               キーボード [←] [→] で選手切り替え / [ESC] で閉じる
             </span>

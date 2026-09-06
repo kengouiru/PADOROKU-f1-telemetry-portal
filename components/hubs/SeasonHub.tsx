@@ -28,7 +28,35 @@ interface SeasonHubProps {
   onNavigateToTyres?: () => void;
   onNavigateToDrama?: () => void;
   onNavigateToGlossary?: () => void;
+  onNavigateToCircuit?: (circuitId: string) => void;
 }
+
+const ROUND_TO_CIRCUIT_ID: Record<number, string> = {
+  1: 'albert-park',
+  2: 'shanghai',
+  3: 'suzuka',
+  4: 'bahrain-international',
+  5: 'jeddah',
+  6: 'miami',
+  7: 'imola',
+  8: 'circuit-de-monaco',
+  9: 'catalunya',
+  10: 'villeneuve',
+  11: 'redbull-ring',
+  12: 'silverstone',
+  13: 'hungaroring',
+  14: 'spa-francorchamps',
+  15: 'zandvoort',
+  16: 'monza',
+  17: 'baku',
+  18: 'singapore',
+  19: 'cota',
+  20: 'mexico',
+  21: 'interlagos',
+  22: 'las-vegas',
+  23: 'losail',
+  24: 'yas-marina',
+};
 
 type MainTab = 'calendar' | 'standings' | 'grid';
 
@@ -37,6 +65,7 @@ export default function SeasonHub({
   onNavigateToTyres,
   onNavigateToDrama,
   onNavigateToGlossary,
+  onNavigateToCircuit,
 }: SeasonHubProps) {
   const [activeTab, setActiveTab] = useState<MainTab>('calendar');
   const [selectedRound, setSelectedRound] = useState<number>(1);
@@ -207,6 +236,16 @@ export default function SeasonHub({
                   <span className="hidden sm:inline">タイヤ戦略</span>
                 </button>
               )}
+              {onNavigateToCircuit && (
+                <button
+                  onClick={() => onNavigateToCircuit(ROUND_TO_CIRCUIT_ID[selectedRace.round] || 'suzuka')}
+                  className="py-2.5 px-3 rounded-xl bg-sky-600/20 hover:bg-sky-600/30 border border-sky-500/30 text-sky-300 hover:text-white font-racing font-bold text-xs transition-all flex items-center justify-center gap-1 shadow-sm"
+                  title="サーキット諸元・コース解説を見る"
+                >
+                  <span>🏁</span>
+                  <span className="hidden sm:inline">コース解説</span>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -351,7 +390,21 @@ export default function SeasonHub({
 
                   <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-[11px]">
                     <span className="font-mono text-slate-300">{gp.dates.replace('2025年 ', '')}</span>
-                    <span className="text-[10px] text-amber-400 font-mono">{gp.pirelliCompounds}</span>
+                    {onNavigateToCircuit ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onNavigateToCircuit(ROUND_TO_CIRCUIT_ID[gp.round] || 'suzuka');
+                        }}
+                        className="text-[10px] text-sky-400 hover:text-sky-300 flex items-center gap-1 font-mono font-medium hover:underline bg-sky-950/40 px-2 py-0.5 rounded border border-sky-500/20"
+                        title="サーキット詳細を見る"
+                      >
+                        <span>🏁 コース解説</span>
+                        <span>➔</span>
+                      </button>
+                    ) : (
+                      <span className="text-[10px] text-amber-400 font-mono">{gp.pirelliCompounds}</span>
+                    )}
                   </div>
                 </div>
               );

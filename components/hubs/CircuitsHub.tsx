@@ -6,19 +6,21 @@
  * Integrated Free-word Search, Live Result Counter, Condition Reset, and Detail Modal.
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   KNOWLEDGE_CIRCUITS,
   type CircuitProfile,
   type TelemetryTarget,
 } from '@/data/f1KnowledgeData';
 import CircuitDetailModal from './CircuitDetailModal';
+import { useUserPreferences } from '@/lib/userPreferences';
 
 export type CircuitRegion = 'ALL' | 'EUROPE' | 'ASIA_ME' | 'AMERICAS' | 'OCEANIA';
 export type CircuitCharacteristic = 'ALL' | 'POWER' | 'STREET' | 'TECHNICAL';
 
 export interface CircuitsHubProps {
   searchQuery?: string;
+  initialCircuitId?: string;
   onClearSearch?: () => void;
   onSearchChange?: (q: string) => void;
   onNavigateToTelemetry?: (target?: TelemetryTarget) => void;
@@ -137,20 +139,37 @@ export function getCircuitCharacteristics(circuit: CircuitProfile): CircuitChara
 
 export default function CircuitsHub({
   searchQuery = '',
+  initialCircuitId,
   onClearSearch,
   onSearchChange,
   onNavigateToTelemetry,
 }: CircuitsHubProps) {
+  const { prefs, isFavoriteCircuit, toggleCircuit } = useUserPreferences();
   const [regionFilter, setRegionFilter] = useState<CircuitRegion>('ALL');
   const [characteristicFilter, setCharacteristicFilter] = useState<CircuitCharacteristic>('ALL');
+  const [onlyFavorites, setOnlyFavorites] = useState(false);
   const [localSearch, setLocalSearch] = useState<string>('');
   const [selectedCircuitDetail, setSelectedCircuitDetail] = useState<CircuitProfile | null>(null);
+
+  // Automatically select & open modal when initialCircuitId is supplied
+  useEffect(() => {
+    if (initialCircuitId) {
+      const found = KNOWLEDGE_CIRCUITS.find((c) => c.id === initialCircuitId);
+      if (found) {
+        setSelectedCircuitDetail(found);
+      }
+    }
+  }, [initialCircuitId]);
 
   // Sync effective search between prop and local state
   const effectiveSearch = searchQuery || localSearch;
 
   const filteredCircuits = useMemo(() => {
     return KNOWLEDGE_CIRCUITS.filter((c) => {
+      // Favorite filter
+      if (onlyFavorites && !isFavoriteCircuit(c.id)) {
+        return false;
+      }
       // Region filter
       if (regionFilter !== 'ALL' && getCircuitRegion(c.id) !== regionFilter) {
         return false;
@@ -174,16 +193,18 @@ export default function CircuitsHub({
       }
       return true;
     });
-  }, [regionFilter, characteristicFilter, effectiveSearch]);
+  }, [regionFilter, characteristicFilter, effectiveSearch, onlyFavorites, isFavoriteCircuit]);
 
   const isFiltered =
     regionFilter !== 'ALL' ||
     characteristicFilter !== 'ALL' ||
+    onlyFavorites ||
     effectiveSearch.trim() !== '';
 
   const handleResetFilters = () => {
     setRegionFilter('ALL');
     setCharacteristicFilter('ALL');
+    setOnlyFavorites(false);
     setLocalSearch('');
     if (onClearSearch) {
       onClearSearch();
@@ -245,6 +266,20 @@ export default function CircuitsHub({
               </strong>{' '}
               / {KNOWLEDGE_CIRCUITS.length} 件
             </span>
+
+            {/* Quick Starred Only Filter Toggle */}
+            <button
+              onClick={() => setOnlyFavorites((prev) => !prev)}
+              className={`text-xs font-racing font-bold px-3 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 shadow-sm cursor-pointer ${
+                onlyFavorites
+                  ? 'bg-amber-500/25 border-amber-400 text-amber-300 ring-1 ring-amber-400/50'
+                  : 'bg-slate-900 border-white/10 text-slate-400 hover:text-amber-300 hover:border-amber-400/30'
+              }`}
+              title="お気に入りに登録したサーキットのみ表示"
+            >
+              <span>{onlyFavorites ? '★' : '☆'}</span>
+              <span>推しコース ({prefs.favoriteCircuitIds?.length || 0})</span>
+            </button>
 
             {isFiltered && (
               <button
@@ -361,9 +396,27 @@ export default function CircuitsHub({
                       {circuit.name}
                     </h3>
                   </div>
-                  <span className="text-[11px] font-mono font-bold text-sky-400 bg-sky-950/60 border border-sky-500/30 px-2 py-0.5 rounded-md flex-shrink-0">
-                    {circuit.lengthKm} km
-                  </span>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    <span className="text-[11px] font-mono font-bold text-sky-400 bg-sky-950/60 border border-sky-500/30 px-2 py-0.5 rounded-md">
+                      {circuit.lengthKm} km
+                    </span>
+                    {/* Favorite Star Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleCircuit(circuit.id);
+                      }}
+                      className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all cursor-pointer ${
+                        isFavoriteCircuit(circuit.id)
+                          ? 'bg-amber-400/20 border-amber-400/60 text-amber-300 hover:bg-amber-400/30 shadow-sm'
+                          : 'bg-slate-900/60 border-white/10 text-slate-500 hover:text-amber-300 hover:border-amber-400/40'
+                      }`}
+                      title={isFavoriteCircuit(circuit.id) ? '推しコースから外す' : '推しコース (マイパドック) に登録'}
+                    >
+                      <span className="text-xs">{isFavoriteCircuit(circuit.id) ? '★' : '☆'}</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Circuit Specs Badges */}
