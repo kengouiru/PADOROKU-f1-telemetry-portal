@@ -669,17 +669,24 @@ export default function DashboardPage() {
             ☰
           </button>
 
-          {/* Logo */}
-          <div className="w-7 h-7 bg-f1-red rounded flex items-center justify-center flex-shrink-0 shadow-md">
-            <span className="font-racing text-white text-xs font-black">F1</span>
-          </div>
-          <div>
-            <h1 className="font-racing text-sm font-bold text-white tracking-widest leading-tight hidden sm:block">
-              F1 TELEMETRY ANALYZER
-            </h1>
-            <p className="text-slate-400 text-[10px] font-mono tracking-wider hidden md:block">
-              ADVANCED MOTORSPORT INTELLIGENCE
-            </p>
+          {/* Logo & Brand Title */}
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 bg-gradient-to-br from-red-600 via-red-500 to-rose-700 rounded flex items-center justify-center flex-shrink-0 shadow-md shadow-red-950/40 border border-red-400/30">
+              <span className="font-racing text-white text-xs font-black tracking-tight">P1</span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="font-racing text-sm sm:text-base font-bold text-white tracking-widest leading-tight">
+                  PADOROKU
+                </h1>
+                <span className="hidden xl:inline-block px-1.5 py-0.5 rounded bg-red-950/70 border border-red-500/30 text-[9px] font-mono text-red-300 font-semibold">
+                  F1 PORTAL
+                </span>
+              </div>
+              <p className="text-slate-400 text-[10px] font-mono tracking-wider hidden md:block">
+                ADVANCED MOTORSPORT INTELLIGENCE
+              </p>
+            </div>
           </div>
 
           {/* Mobile Mode Switcher (< md) */}
