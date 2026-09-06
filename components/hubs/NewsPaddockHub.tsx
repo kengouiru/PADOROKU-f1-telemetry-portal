@@ -228,16 +228,17 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
           )}
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:flex md:flex-row md:items-center gap-1.5 md:gap-2">
           <button
             onClick={() => setSelectedTopic('ALL')}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all flex-shrink-0 border ${
+            className={`col-span-2 sm:col-span-1 md:col-auto px-3.5 py-2.5 md:py-1.5 rounded-xl text-xs font-medium transition-all border flex items-center justify-center gap-1.5 ${
               selectedTopic === 'ALL'
-                ? 'bg-blue-600 text-white border-blue-400 font-bold shadow-md'
-                : 'bg-slate-900/60 border-white/10 text-slate-400 hover:text-white hover:border-white/20'
+                ? 'bg-blue-600 text-white border-blue-400 font-bold shadow-md shadow-blue-500/30 ring-1 ring-blue-400/40'
+                : 'bg-slate-900/70 border-white/10 text-slate-400 hover:text-white hover:border-white/20 hover:bg-slate-800/80'
             }`}
           >
-            すべてのトピック
+            <span>🌐</span>
+            <span>すべてのトピック</span>
           </button>
 
           {(Object.keys(TOPIC_ICONS) as TopicTag[]).map((topic) => {
@@ -247,10 +248,10 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
               <button
                 key={topic}
                 onClick={() => setSelectedTopic(isSelected ? 'ALL' : topic)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all flex-shrink-0 border flex items-center gap-1.5 ${
+                className={`px-3 py-2.5 md:py-1.5 rounded-xl text-xs font-medium transition-all border flex items-center justify-center gap-1.5 ${
                   isSelected
-                    ? 'bg-sky-600 text-white border-sky-400 font-bold shadow-md'
-                    : 'bg-slate-900/60 border-white/10 text-slate-300 hover:text-white hover:border-white/20'
+                    ? 'bg-sky-600 text-white border-sky-400 font-bold shadow-md shadow-sky-500/30 ring-1 ring-sky-400/40'
+                    : 'bg-slate-900/70 border-white/10 text-slate-300 hover:text-white hover:border-white/20 hover:bg-slate-800/80'
                 }`}
               >
                 <span>{info.icon}</span>
