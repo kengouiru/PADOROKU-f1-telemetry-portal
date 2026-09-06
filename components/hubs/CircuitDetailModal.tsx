@@ -16,6 +16,7 @@ import type { CircuitProfile, Reference, TelemetryTarget } from '@/data/f1Knowle
 import { CIRCUIT_TRACK_MAPS } from '@/components/telemetry/TelemetryTrackMap';
 import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
 import { useUserPreferences } from '@/lib/userPreferences';
+import { getCircuitWeather } from '@/data/f1WeatherData';
 
 interface CircuitDetailModalProps {
   circuit: CircuitProfile;
@@ -44,6 +45,7 @@ export default function CircuitDetailModal({
   const [atmosphereError, setAtmosphereError] = useState<boolean>(false);
   const [activeCornerHover, setActiveCornerHover] = useState<string | null>(null);
   const modalContentRef = useRef<HTMLDivElement>(null);
+  const weather = getCircuitWeather(circuit.id);
 
   // Reset image states on circuit change
   useEffect(() => {
@@ -625,6 +627,66 @@ export default function CircuitDetailModal({
                       <p className="text-slate-300 text-xs leading-relaxed">
                         {circuit.setupNotes.brakeDemands}
                       </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Circuit Weather & Meteorological Tactical Profile */}
+              {weather && (
+                <div className="bg-slate-950/80 border border-sky-500/30 p-4 rounded-2xl space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h4 className="text-xs font-racing font-bold text-sky-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <span>🌤️</span>
+                      <span>気象・路面温度プロファイル & 戦術影響 ({weather.conditionText})</span>
+                    </h4>
+                    <span className="text-[10px] font-mono text-slate-400">
+                      降水確率: <strong className={weather.rainProb > 30 ? 'text-sky-400' : 'text-slate-300'}>{weather.rainProb}%</strong>
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <div className="bg-slate-900/90 border border-white/5 p-3 rounded-xl text-center">
+                      <span className="text-[10px] text-slate-400 font-mono block">気温 / 天候</span>
+                      <span className="text-base font-bold text-white font-mono mt-0.5 block">
+                        {weather.weatherIcon} {weather.airTempC}℃
+                      </span>
+                    </div>
+                    <div className="bg-slate-900/90 border border-white/5 p-3 rounded-xl text-center">
+                      <span className="text-[10px] text-slate-400 font-mono block">路面温度 (Track)</span>
+                      <span className="text-base font-bold text-amber-400 font-mono mt-0.5 block">
+                        🔥 {weather.trackTempC}℃
+                      </span>
+                    </div>
+                    <div className="bg-slate-900/90 border border-white/5 p-3 rounded-xl text-center">
+                      <span className="text-[10px] text-slate-400 font-mono block">湿度 / 降水リスク</span>
+                      <span className="text-base font-bold text-sky-300 font-mono mt-0.5 block">
+                        💧 {weather.humidity}% / {weather.rainProb}%
+                      </span>
+                    </div>
+                    <div className="bg-slate-900/90 border border-white/5 p-3 rounded-xl text-center">
+                      <span className="text-[10px] text-slate-400 font-mono block">風速 & 風向</span>
+                      <span className="text-xs font-bold text-emerald-300 font-mono mt-1 block truncate" title={weather.windDirection}>
+                        💨 {weather.windSpeedKmh}km/h
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 pt-1">
+                    <div className="p-3 rounded-xl bg-slate-900/90 border border-sky-500/20 text-xs text-slate-300 leading-relaxed">
+                      <strong className="text-sky-300 font-racing mr-1 block sm:inline">🏎️ レースエンジニア戦術分析:</strong>
+                      <span>{weather.tacticalImpact}</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                      <div className="p-2.5 rounded-xl bg-amber-950/20 border border-amber-500/20 text-slate-300">
+                        <strong className="text-amber-300 font-mono block text-[11px] mb-0.5">🛞 タイヤ作動・温度管理指針:</strong>
+                        <span>{weather.tyreOperatingNote}</span>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-purple-950/20 border border-purple-500/20 text-slate-300">
+                        <strong className="text-purple-300 font-mono block text-[11px] mb-0.5">🌧️ 過去の雨天・波乱レース記録:</strong>
+                        <span>{weather.historicalRainRaces}</span>
+                      </div>
                     </div>
                   </div>
                 </div>

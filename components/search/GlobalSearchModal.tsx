@@ -19,12 +19,13 @@ import {
 } from '@/data/f1KnowledgeData';
 import { GLOSSARY_TERMS } from '@/data/f1GlossaryData';
 import { SEASON_2025_CALENDAR } from '@/data/f1SeasonData';
+import { VAULT_TEAM_RADIOS } from '@/data/f1RadioVaultData';
 
-export type SearchCategory = 'ALL' | 'driver' | 'team' | 'circuit' | 'tyre' | 'glossary' | 'drama' | 'race';
+export type SearchCategory = 'ALL' | 'driver' | 'team' | 'circuit' | 'tyre' | 'glossary' | 'drama' | 'race' | 'radio' | 'quiz';
 
 export interface SearchResultItem {
   id: string;
-  category: 'driver' | 'team' | 'circuit' | 'tyre' | 'glossary' | 'drama' | 'race';
+  category: 'driver' | 'team' | 'circuit' | 'tyre' | 'glossary' | 'drama' | 'race' | 'radio' | 'quiz';
   title: string;
   subtitle: string;
   badge: string;
@@ -42,13 +43,16 @@ interface GlobalSearchModalProps {
     hub: 'season' | 'telemetry' | 'news' | 'knowledge' | 'notes';
     subTab?: 'drivers' | 'teams' | 'circuits' | 'tyres' | 'glossary' | 'drama';
     targetId?: string;
+    dramaTab?: 'storylines' | 'moments' | 'rivalries' | 'paddock' | 'radios';
   }) => void;
+  onOpenQuiz?: () => void;
 }
 
 export default function GlobalSearchModal({
   isOpen,
   onClose,
   onNavigate,
+  onOpenQuiz,
 }: GlobalSearchModalProps) {
   const [mounted, setMounted] = useState(false);
   const [query, setQuery] = useState('');
@@ -258,8 +262,49 @@ export default function GlobalSearchModal({
       });
     });
 
+    // 9. Team Radio Vault (全16選) - F1大百科 ドラマ・歴史に統合
+    VAULT_TEAM_RADIOS.forEach((r) => {
+      items.push({
+        id: `radio-${r.id}`,
+        category: 'radio',
+        title: `🎙️「${r.title}」- ${r.speaker}`,
+        subtitle: `${r.year}年 ${r.gpName} • ${r.transcriptJa} (${r.categoryLabel})`,
+        badge: 'ドラマ・伝説の無線',
+        badgeBg: 'bg-amber-500/20 border-amber-500/30',
+        badgeText: 'text-amber-300',
+        icon: '🎙️',
+        onSelect: () => {
+          onClose();
+          onNavigate({
+            appMode: 'library',
+            hub: 'knowledge',
+            subTab: 'drama',
+            dramaTab: 'radios',
+          });
+        },
+      });
+    });
+
+    // 10. Interactive F1 Quiz
+    if (onOpenQuiz) {
+      items.push({
+        id: 'quiz-entry',
+        category: 'quiz',
+        title: '🏆 F1クイズ＆トリビア検定 (全120問・神域級収録)',
+        subtitle: 'ルール・歴史・コース攻略・戦術テレメトリー全120問から出題！FIAスチュワード級称号認定＆Xシェア',
+        badge: 'F1クイズ 2.0',
+        badgeBg: 'bg-purple-500/20 border-purple-500/30',
+        badgeText: 'text-purple-300',
+        icon: '🏆',
+        onSelect: () => {
+          onClose();
+          onOpenQuiz();
+        },
+      });
+    }
+
     return items;
-  }, [onNavigate, onClose]);
+  }, [onNavigate, onClose, onOpenQuiz]);
 
   // Filtered items based on query and category
   const filteredResults = useMemo(() => {
@@ -351,6 +396,8 @@ export default function GlobalSearchModal({
               ['glossary', '🧠 用語'],
               ['drama', '🎬 ドラマ'],
               ['race', '📅 カレンダー'],
+              ['radio', '🎙️ 無線'],
+              ['quiz', '🏆 クイズ'],
             ] as [SearchCategory, string][]
           ).map(([cat, label]) => (
             <button
@@ -369,6 +416,49 @@ export default function GlobalSearchModal({
             </button>
           ))}
         </div>
+
+        {/* Quick Launchers (when query is empty and category is ALL) */}
+        {query === '' && activeCategory === 'ALL' && (
+          <div className="px-4 py-3 bg-slate-950/40 border-b border-white/5 flex flex-wrap items-center gap-2 text-xs">
+            <button
+              onClick={() => {
+                onClose();
+                onNavigate({
+                  appMode: 'library',
+                  hub: 'knowledge',
+                  subTab: 'drama',
+                  dramaTab: 'radios',
+                });
+              }}
+              className="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-racing flex items-center gap-1 transition-all cursor-pointer"
+            >
+              <span>🎙️</span>
+              <span>伝説のチーム無線 (16選)</span>
+            </button>
+            {onOpenQuiz && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onOpenQuiz();
+                }}
+                className="px-2.5 py-1 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 font-racing flex items-center gap-1 transition-all"
+              >
+                <span>🏆</span>
+                <span>F1クイズ＆トリビア検定</span>
+              </button>
+            )}
+            <button
+              onClick={() => {
+                onClose();
+                onNavigate({ appMode: 'season', hub: 'season' });
+              }}
+              className="px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 font-racing flex items-center gap-1 transition-all"
+            >
+              <span>📅</span>
+              <span>2025年レースカレンダー</span>
+            </button>
+          </div>
+        )}
 
         {/* Results List */}
         <div className="flex-1 overflow-y-auto p-2 divide-y divide-white/5">

@@ -14,6 +14,7 @@ import {
 } from '@/data/f1KnowledgeData';
 import CircuitDetailModal from './CircuitDetailModal';
 import { useUserPreferences } from '@/lib/userPreferences';
+import { getCircuitWeather } from '@/data/f1WeatherData';
 
 export type CircuitRegion = 'ALL' | 'EUROPE' | 'ASIA_ME' | 'AMERICAS' | 'OCEANIA';
 export type CircuitCharacteristic = 'ALL' | 'POWER' | 'STREET' | 'TECHNICAL';
@@ -370,6 +371,7 @@ export default function CircuitsHub({
         {filteredCircuits.map((circuit) => {
           const chars = getCircuitCharacteristics(circuit);
           const region = getCircuitRegion(circuit.id);
+          const weather = getCircuitWeather(circuit.id);
 
           return (
             <div
@@ -458,6 +460,20 @@ export default function CircuitsHub({
                 <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed bg-slate-900/40 p-2 rounded-lg border border-white/5">
                   {circuit.characteristics.replace(/\[\d+\]/g, '')}
                 </p>
+
+                {/* Weather Pill */}
+                {weather && (
+                  <div className="flex items-center justify-between text-[10px] font-mono text-slate-300 bg-white/[0.03] px-2 py-1 rounded-lg border border-white/5">
+                    <span className="flex items-center gap-1">
+                      <span>{weather.weatherIcon}</span>
+                      <span>{weather.airTempC}℃</span>
+                      <span className="text-amber-400">/ 路面{weather.trackTempC}℃</span>
+                    </span>
+                    <span className={weather.rainProb > 30 ? 'text-sky-400 font-bold' : 'text-slate-400'}>
+                      ☔ {weather.rainProb}%
+                    </span>
+                  </div>
+                )}
 
                 {/* Lap Record Snippet */}
                 <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between">

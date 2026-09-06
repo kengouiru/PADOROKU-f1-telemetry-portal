@@ -17,11 +17,20 @@ import {
   type DramaticMoment,
   type PaddockRelationship,
 } from '@/data/f1DramaData';
+import TeamRadioVaultView from '@/components/radio/TeamRadioVaultView';
 
-type DramaTab = 'storylines' | 'moments' | 'rivalries' | 'paddock';
+export type DramaTab = 'storylines' | 'moments' | 'rivalries' | 'paddock' | 'radios';
 
-export default function F1DramaHub() {
-  const [activeTab, setActiveTab] = useState<DramaTab>('storylines');
+export interface F1DramaHubProps {
+  initialTab?: DramaTab;
+}
+
+export default function F1DramaHub({ initialTab = 'storylines' }: F1DramaHubProps) {
+  const [activeTab, setActiveTab] = useState<DramaTab>(initialTab);
+
+  React.useEffect(() => {
+    if (initialTab) setActiveTab(initialTab);
+  }, [initialTab]);
 
   // Storyline state
   const [selectedSeasonId, setSelectedSeasonId] = useState<string>(SEASON_STORYLINES[0].id);
@@ -64,11 +73,19 @@ export default function F1DramaHub() {
           <span className="text-base">🎬</span>
           <span className="text-xs font-racing font-bold text-slate-200">ドラマ・歴史:</span>
           <span className="text-[11px] text-rose-400 font-mono font-bold">
-            {activeTab === 'storylines' ? '【連載】シーズン通史' : activeTab === 'moments' ? '【名場面】感動と歴史' : activeTab === 'rivalries' ? '【対決】因縁のライバル' : '【相関図】パドック関係性'}
+            {activeTab === 'storylines'
+              ? '【連載】シーズン通史'
+              : activeTab === 'moments'
+              ? '【名場面】感動と歴史'
+              : activeTab === 'rivalries'
+              ? '【対決】因縁のライバル'
+              : activeTab === 'paddock'
+              ? '【相関図】パドック関係性'
+              : '【名言】伝説のチーム無線'}
           </span>
         </div>
 
-        {/* 4 Pillars Segmented Navigation */}
+        {/* 5 Pillars Segmented Navigation */}
         <div className="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-white/10 shadow-inner overflow-x-auto">
           <button
             onClick={() => {
@@ -129,6 +146,21 @@ export default function F1DramaHub() {
           >
             <span>📊</span>
             <span>パドック相関図</span>
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab('radios');
+              const mainEl = document.querySelector('main');
+              if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+              activeTab === 'radios'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-500/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <span>🎙️</span>
+            <span>伝説の無線 (16選)</span>
           </button>
         </div>
       </div>
@@ -583,6 +615,15 @@ export default function F1DramaHub() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          PILLAR 5: 伝説のチーム無線ベスト集 (Team Radio Vault)
+          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
+      {activeTab === 'radios' && (
+        <div className="animate-fade-in">
+          <TeamRadioVaultView />
         </div>
       )}
     </div>

@@ -13,7 +13,6 @@ const ALLOWED_HOSTS = [
   'livetiming.formula1.com',
   'api.openf1.org',
   'openf1.org',
-  'www.soundhelix.com',
 ];
 
 export async function GET(req: NextRequest) {

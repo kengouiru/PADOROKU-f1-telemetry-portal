@@ -22,6 +22,7 @@ import {
   type ConstructorStanding,
   type Grid2025Team,
 } from '@/data/f1SeasonData';
+import { getWeatherByRound } from '@/data/f1WeatherData';
 
 interface SeasonHubProps {
   onNavigateToTelemetry?: (gpName?: string) => void;
@@ -75,6 +76,10 @@ export default function SeasonHub({
   // Selected Race Weekend
   const selectedRace = useMemo(() => {
     return SEASON_2025_CALENDAR.find((r) => r.round === selectedRound) || SEASON_2025_CALENDAR[0];
+  }, [selectedRound]);
+
+  const selectedWeather = useMemo(() => {
+    return getWeatherByRound(selectedRound);
   }, [selectedRound]);
 
   // Countdown timer calculation
@@ -183,6 +188,54 @@ export default function SeasonHub({
                 ))}
               </div>
             </div>
+
+            {/* Weather & Track Condition Widget */}
+            {selectedWeather && (
+              <div className="mt-4 pt-3 border-t border-white/10">
+                <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
+                  <div className="text-[11px] font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>🌤️ 気象・路面コンディション予報</span>
+                    <span className="text-[10px] text-slate-400 font-mono">({selectedWeather.conditionText})</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    降水確率: <span className={selectedWeather.rainProb > 30 ? 'text-sky-400 font-bold' : 'text-slate-300'}>{selectedWeather.rainProb}%</span>
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <div className="bg-white/[0.03] border border-white/5 p-2.5 rounded-xl text-center">
+                    <span className="text-[10px] text-slate-400 block font-mono">気温 / 天候</span>
+                    <span className="text-sm font-bold text-white font-mono mt-0.5 block">
+                      {selectedWeather.weatherIcon} {selectedWeather.airTempC}℃
+                    </span>
+                  </div>
+                  <div className="bg-white/[0.03] border border-white/5 p-2.5 rounded-xl text-center">
+                    <span className="text-[10px] text-slate-400 block font-mono">路面温度 (Track)</span>
+                    <span className="text-sm font-bold text-amber-400 font-mono mt-0.5 block">
+                      🔥 {selectedWeather.trackTempC}℃
+                    </span>
+                  </div>
+                  <div className="bg-white/[0.03] border border-white/5 p-2.5 rounded-xl text-center">
+                    <span className="text-[10px] text-slate-400 block font-mono">湿度 / 降水リスク</span>
+                    <span className="text-sm font-bold text-sky-300 font-mono mt-0.5 block">
+                      💧 {selectedWeather.humidity}% / {selectedWeather.rainProb}%
+                    </span>
+                  </div>
+                  <div className="bg-white/[0.03] border border-white/5 p-2.5 rounded-xl text-center">
+                    <span className="text-[10px] text-slate-400 block font-mono">風速・風向き</span>
+                    <span className="text-xs font-bold text-emerald-300 font-mono mt-1 block truncate" title={selectedWeather.windDirection}>
+                      💨 {selectedWeather.windSpeedKmh}km/h
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-2.5 p-2.5 rounded-xl bg-sky-950/40 border border-sky-500/20 text-[11px] text-slate-300 leading-relaxed flex items-start gap-2">
+                  <span className="text-sky-400 flex-shrink-0 text-sm">💡</span>
+                  <div>
+                    <span className="font-bold text-sky-300 mr-1.5 font-racing">工学的戦術サマリー:</span>
+                    <span>{selectedWeather.tacticalImpact}</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Right: Countdown Clock & Quick Actions */}
@@ -351,6 +404,7 @@ export default function SeasonHub({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {filteredCalendar.map((gp) => {
               const isSelected = gp.round === selectedRound;
+              const gpWeather = getWeatherByRound(gp.round);
               return (
                 <div
                   key={gp.round}
@@ -386,6 +440,20 @@ export default function SeasonHub({
                       </h3>
                       <p className="text-[11px] text-slate-400 truncate mt-0.5">{gp.circuitName}</p>
                     </div>
+
+                    {/* Weather Pill */}
+                    {gpWeather && (
+                      <div className="flex items-center justify-between text-[10px] font-mono text-slate-300 bg-white/[0.03] px-2 py-1 rounded-md border border-white/5">
+                        <span className="flex items-center gap-1">
+                          <span>{gpWeather.weatherIcon}</span>
+                          <span>{gpWeather.airTempC}℃</span>
+                          <span className="text-amber-400">/ 路面{gpWeather.trackTempC}℃</span>
+                        </span>
+                        <span className={gpWeather.rainProb > 30 ? 'text-sky-400 font-bold' : 'text-slate-400'}>
+                          ☔ {gpWeather.rainProb}%
+                        </span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-[11px]">

@@ -39,6 +39,8 @@ import RaceNotebook, { type RaceNotebookHandle } from '@/components/RaceNotebook
 
 import TelemetryChart from '@/components/TelemetryChart';
 import DetailedTelemetryChart from '@/components/telemetry/DetailedTelemetryChart';
+import StintVisualizer from '@/components/telemetry/StintVisualizer';
+import PositionChangeChart from '@/components/telemetry/PositionChangeChart';
 import SectorAnalysis from '@/components/SectorAnalysis';
 import PitStrategySimulator from '@/components/PitStrategySimulator';
 
@@ -48,6 +50,7 @@ import RaceNotesReportHub from '@/components/hubs/RaceNotesReportHub';
 import SeasonHub from '@/components/hubs/SeasonHub';
 import QuickGlossaryModal from '@/components/glossary/QuickGlossaryModal';
 import GlobalSearchModal from '@/components/search/GlobalSearchModal';
+import F1QuizModal from '@/components/quiz/F1QuizModal';
 import type { TelemetryTarget } from '@/data/f1KnowledgeData';
 
 import AuthButton from '@/components/auth/AuthButton';
@@ -151,6 +154,8 @@ export default function DashboardPage() {
   const [librarySubTab, setLibrarySubTab] = useState<SubTab>('drivers');
   const [quickGlossaryOpen, setQuickGlossaryOpen] = useState(false);
   const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
+  const [targetDramaTab, setTargetDramaTab] = useState<'storylines' | 'moments' | 'rivalries' | 'paddock' | 'radios' | undefined>(undefined);
+  const [quizModalOpen, setQuizModalOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>('telemetry');
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>('ai');
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile sidebar drawer
@@ -471,6 +476,18 @@ export default function DashboardPage() {
         onTranscriptFetched={handleTranscriptFetched}
       />
 
+      {/* ── Lap-by-Lap Position Change Chart ── */}
+      <PositionChangeChart
+        drivers={state.drivers}
+        stints={state.stints}
+        safetyCarPeriods={state.safetyCarPeriods}
+        totalLaps={57}
+        selectedDrivers={state.selectedDrivers}
+        onDriverSelect={(driverNum) =>
+          handleDriverToggle(driverNum, !state.selectedDrivers.includes(driverNum))
+        }
+      />
+
       {/* 3-Tier Synchronized Detailed Telemetry (Car Data Comparison) */}
       <section id="detailed-telemetry-section">
         <DetailedTelemetryChart
@@ -479,6 +496,25 @@ export default function DashboardPage() {
           initialDriver2Code={detailedTelemetryParams.driver2}
         />
       </section>
+
+      {/* ── Full-Grid Tyre Stints & Strategy Timeline (Stint Visualizer) ── */}
+      <StintVisualizer
+        drivers={state.drivers}
+        stints={state.stints}
+        pitStopsCache={state.pitStopsCache}
+        totalLaps={57}
+        isLive={!state.isDemoMode}
+        isLoading={state.isLoading}
+        selectedDrivers={state.selectedDrivers}
+        onDriverSelect={(driverNum) =>
+          handleDriverToggle(driverNum, !state.selectedDrivers.includes(driverNum))
+        }
+        onRefresh={() => {
+          if (state.selectedSessionKey) {
+            handleSessionChange(state.selectedSessionKey);
+          }
+        }}
+      />
 
       {state.selectedDrivers.length > 0 && (
         <SectorAnalysis
@@ -587,6 +623,7 @@ export default function DashboardPage() {
             activeSubTab={librarySubTab}
             onSubTabChange={setLibrarySubTab}
             targetCircuitId={targetCircuitId}
+            initialDramaTab={targetDramaTab}
             onNavigateToTelemetry={(target) => {
               setAppMode('season');
               setActiveHub('telemetry');
@@ -758,6 +795,16 @@ export default function DashboardPage() {
           >
             <span>📖</span>
             <span className="hidden sm:inline">用語</span>
+          </button>
+
+          {/* F1 Quiz & Trivia Button */}
+          <button
+            onClick={() => setQuizModalOpen(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-racing font-bold bg-purple-950/40 hover:bg-purple-900/60 text-purple-300 border border-purple-500/40 hover:border-purple-400 shadow-sm transition-all flex-shrink-0 cursor-pointer"
+            title="対話型F1クイズ＆トリビア検定"
+          >
+            <span>🏆</span>
+            <span className="hidden sm:inline">クイズ</span>
           </button>
 
           {/* Selected driver pills (desktop, in telemetry hub) */}
@@ -1088,6 +1135,10 @@ export default function DashboardPage() {
       <GlobalSearchModal
         isOpen={globalSearchOpen}
         onClose={() => setGlobalSearchOpen(false)}
+        onOpenQuiz={() => {
+          setGlobalSearchOpen(false);
+          setQuizModalOpen(true);
+        }}
         onNavigate={(action) => {
           setAppMode(action.appMode);
           setActiveHub(action.hub);
@@ -1097,7 +1148,16 @@ export default function DashboardPage() {
           if (action.subTab === 'circuits' && action.targetId) {
             setTargetCircuitId(action.targetId);
           }
+          if (action.subTab === 'drama' && action.dramaTab) {
+            setTargetDramaTab(action.dramaTab);
+          }
         }}
+      />
+
+      {/* ── Interactive F1 Quiz Modal (4-B) ── */}
+      <F1QuizModal
+        isOpen={quizModalOpen}
+        onClose={() => setQuizModalOpen(false)}
       />
     </div>
   );

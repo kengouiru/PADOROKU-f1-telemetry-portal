@@ -35,6 +35,7 @@ export interface KnowledgeHistoryHubProps {
   activeSubTab?: SubTab;
   onSubTabChange?: (tab: SubTab) => void;
   targetCircuitId?: string;
+  initialDramaTab?: 'storylines' | 'moments' | 'rivalries' | 'paddock' | 'radios';
 }
 
 /** Individual Team Radio Audio Player with Play/Pause and Seek Bar */
@@ -160,6 +161,7 @@ export default function KnowledgeHistoryHub({
   activeSubTab: controlledSubTab,
   onSubTabChange,
   targetCircuitId,
+  initialDramaTab,
 }: KnowledgeHistoryHubProps) {
   const [internalSubTab, setInternalSubTab] = useState<SubTab>(initialSubTab);
   const activeSubTab = controlledSubTab ?? internalSubTab;
@@ -310,7 +312,7 @@ export default function KnowledgeHistoryHub({
       {activeSubTab === 'tyres' && <TyreEncyclopediaHub onNavigateToTelemetry={onNavigateToTelemetry} />}
 
       {/* ── Sub-Tab: F1 DRAMA & STORYLINES ── */}
-      {activeSubTab === 'drama' && <F1DramaHub />}
+      {activeSubTab === 'drama' && <F1DramaHub initialTab={initialDramaTab} />}
 
       {/* ── Sub-Tab: F1 GLOSSARY ── */}
       {activeSubTab === 'glossary' && <F1GlossaryHub />}

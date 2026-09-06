@@ -56,16 +56,26 @@ export const MOCK_SESSIONS: Session[] = [
 
 export const MOCK_DRIVERS: Record<number, Driver[]> = {
   9161: [
-    { driver_number: 1,  name_acronym: 'VER', first_name: 'Max',      last_name: 'Verstappen', full_name: 'Max Verstappen',   team_name: 'Red Bull Racing', team_colour: '3671C2' },
-    { driver_number: 11, name_acronym: 'PER', first_name: 'Sergio',   last_name: 'Perez',      full_name: 'Sergio Perez',     team_name: 'Red Bull Racing', team_colour: '3671C2' },
-    { driver_number: 16, name_acronym: 'LEC', first_name: 'Charles',  last_name: 'Leclerc',    full_name: 'Charles Leclerc',  team_name: 'Ferrari',         team_colour: 'E80020' },
-    { driver_number: 55, name_acronym: 'SAI', first_name: 'Carlos',   last_name: 'Sainz',      full_name: 'Carlos Sainz',     team_name: 'Ferrari',         team_colour: 'E80020' },
-    { driver_number: 63, name_acronym: 'RUS', first_name: 'George',   last_name: 'Russell',    full_name: 'George Russell',   team_name: 'Mercedes',        team_colour: '00A19B' },
-    { driver_number: 44, name_acronym: 'HAM', first_name: 'Lewis',    last_name: 'Hamilton',   full_name: 'Lewis Hamilton',   team_name: 'Mercedes',        team_colour: '00A19B' },
-    { driver_number: 4,  name_acronym: 'NOR', first_name: 'Lando',    last_name: 'Norris',     full_name: 'Lando Norris',     team_name: 'McLaren',         team_colour: 'FF8000' },
-    { driver_number: 81, name_acronym: 'PIA', first_name: 'Oscar',    last_name: 'Piastri',    full_name: 'Oscar Piastri',    team_name: 'McLaren',         team_colour: 'FF8000' },
-    { driver_number: 14, name_acronym: 'ALO', first_name: 'Fernando', last_name: 'Alonso',     full_name: 'Fernando Alonso',  team_name: 'Aston Martin',    team_colour: '229971' },
-    { driver_number: 18, name_acronym: 'STR', first_name: 'Lance',    last_name: 'Stroll',     full_name: 'Lance Stroll',     team_name: 'Aston Martin',    team_colour: '229971' },
+    { driver_number: 1,  name_acronym: 'VER', first_name: 'Max',       last_name: 'Verstappen', full_name: 'Max Verstappen',   team_name: 'Red Bull Racing', team_colour: '3671C2' },
+    { driver_number: 11, name_acronym: 'PER', first_name: 'Sergio',    last_name: 'Perez',      full_name: 'Sergio Perez',     team_name: 'Red Bull Racing', team_colour: '3671C2' },
+    { driver_number: 55, name_acronym: 'SAI', first_name: 'Carlos',    last_name: 'Sainz',      full_name: 'Carlos Sainz',     team_name: 'Ferrari',         team_colour: 'E80020' },
+    { driver_number: 16, name_acronym: 'LEC', first_name: 'Charles',   last_name: 'Leclerc',    full_name: 'Charles Leclerc',  team_name: 'Ferrari',         team_colour: 'E80020' },
+    { driver_number: 63, name_acronym: 'RUS', first_name: 'George',    last_name: 'Russell',    full_name: 'George Russell',   team_name: 'Mercedes',        team_colour: '00A19B' },
+    { driver_number: 4,  name_acronym: 'NOR', first_name: 'Lando',     last_name: 'Norris',     full_name: 'Lando Norris',     team_name: 'McLaren',         team_colour: 'FF8000' },
+    { driver_number: 44, name_acronym: 'HAM', first_name: 'Lewis',     last_name: 'Hamilton',   full_name: 'Lewis Hamilton',   team_name: 'Mercedes',        team_colour: '00A19B' },
+    { driver_number: 81, name_acronym: 'PIA', first_name: 'Oscar',     last_name: 'Piastri',    full_name: 'Oscar Piastri',    team_name: 'McLaren',         team_colour: 'FF8000' },
+    { driver_number: 14, name_acronym: 'ALO', first_name: 'Fernando',  last_name: 'Alonso',     full_name: 'Fernando Alonso',  team_name: 'Aston Martin',    team_colour: '229971' },
+    { driver_number: 18, name_acronym: 'STR', first_name: 'Lance',     last_name: 'Stroll',     full_name: 'Lance Stroll',     team_name: 'Aston Martin',    team_colour: '229971' },
+    { driver_number: 24, name_acronym: 'ZHO', first_name: 'Guanyu',    last_name: 'Zhou',       full_name: 'Guanyu Zhou',      team_name: 'Kick Sauber',     team_colour: '52E252' },
+    { driver_number: 20, name_acronym: 'MAG', first_name: 'Kevin',     last_name: 'Magnussen',  full_name: 'Kevin Magnussen',  team_name: 'Haas',            team_colour: 'B6BABD' },
+    { driver_number: 3,  name_acronym: 'RIC', first_name: 'Daniel',    last_name: 'Ricciardo',  full_name: 'Daniel Ricciardo', team_name: 'RB',              team_colour: '6692FF' },
+    { driver_number: 22, name_acronym: 'TSU', first_name: 'Yuki',      last_name: 'Tsunoda',    full_name: 'Yuki Tsunoda',    team_name: 'RB',              team_colour: '6692FF' },
+    { driver_number: 23, name_acronym: 'ALB', first_name: 'Alexander', last_name: 'Albon',      full_name: 'Alexander Albon',  team_name: 'Williams',        team_colour: '64C4FF' },
+    { driver_number: 27, name_acronym: 'HUL', first_name: 'Nico',      last_name: 'Hulkenberg', full_name: 'Nico Hulkenberg', team_name: 'Haas',            team_colour: 'B6BABD' },
+    { driver_number: 31, name_acronym: 'OCO', first_name: 'Esteban',   last_name: 'Ocon',       full_name: 'Esteban Ocon',     team_name: 'Alpine',          team_colour: '0093CC' },
+    { driver_number: 10, name_acronym: 'GAS', first_name: 'Pierre',    last_name: 'Gasly',      full_name: 'Pierre Gasly',     team_name: 'Alpine',          team_colour: '0093CC' },
+    { driver_number: 77, name_acronym: 'BOT', first_name: 'Valtteri',  last_name: 'Bottas',    full_name: 'Valtteri Bottas',  team_name: 'Kick Sauber',     team_colour: '52E252' },
+    { driver_number: 2,  name_acronym: 'SAR', first_name: 'Logan',     last_name: 'Sargeant',   full_name: 'Logan Sargeant',   team_name: 'Williams',        team_colour: '64C4FF' },
   ],
   9162: [
     { driver_number: 1,  name_acronym: 'VER', first_name: 'Max',     last_name: 'Verstappen', full_name: 'Max Verstappen',  team_name: 'Red Bull Racing', team_colour: '3671C2' },
@@ -88,18 +98,87 @@ export const MOCK_DRIVERS: Record<number, Driver[]> = {
 
 export const MOCK_STINTS: Record<number, Stint[]> = {
   9161: [
-    { driver_number: 1,  stint_number: 1, lap_start: 1,  lap_end: 17, compound: 'MEDIUM', tyre_age_at_start: 0 },
-    { driver_number: 1,  stint_number: 2, lap_start: 18, lap_end: 37, compound: 'HARD',   tyre_age_at_start: 0 },
-    { driver_number: 1,  stint_number: 3, lap_start: 38, lap_end: 57, compound: 'SOFT',   tyre_age_at_start: 0 },
-    { driver_number: 44, stint_number: 1, lap_start: 1,  lap_end: 15, compound: 'SOFT',   tyre_age_at_start: 0 },
-    { driver_number: 44, stint_number: 2, lap_start: 16, lap_end: 34, compound: 'HARD',   tyre_age_at_start: 0 },
-    { driver_number: 44, stint_number: 3, lap_start: 35, lap_end: 57, compound: 'MEDIUM', tyre_age_at_start: 0 },
-    { driver_number: 16, stint_number: 1, lap_start: 1,  lap_end: 14, compound: 'MEDIUM', tyre_age_at_start: 0 },
-    { driver_number: 16, stint_number: 2, lap_start: 15, lap_end: 35, compound: 'HARD',   tyre_age_at_start: 0 },
-    { driver_number: 16, stint_number: 3, lap_start: 36, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
-    { driver_number: 4,  stint_number: 1, lap_start: 1,  lap_end: 16, compound: 'MEDIUM', tyre_age_at_start: 0 },
-    { driver_number: 4,  stint_number: 2, lap_start: 17, lap_end: 36, compound: 'HARD',   tyre_age_at_start: 0 },
-    { driver_number: 4,  stint_number: 3, lap_start: 37, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
+    // 1. Max Verstappen (P1)
+    { driver_number: 1,  stint_number: 1, lap_start: 1,  lap_end: 17, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 1,  stint_number: 2, lap_start: 18, lap_end: 36, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 1,  stint_number: 3, lap_start: 37, lap_end: 57, compound: 'SOFT',   tyre_age_at_start: 0 },
+    // 2. Sergio Perez (P2)
+    { driver_number: 11, stint_number: 1, lap_start: 1,  lap_end: 12, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 11, stint_number: 2, lap_start: 13, lap_end: 36, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 11, stint_number: 3, lap_start: 37, lap_end: 57, compound: 'SOFT',   tyre_age_at_start: 0 },
+    // 3. Carlos Sainz (P3)
+    { driver_number: 55, stint_number: 1, lap_start: 1,  lap_end: 14, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 55, stint_number: 2, lap_start: 15, lap_end: 35, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 55, stint_number: 3, lap_start: 36, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
+    // 4. Charles Leclerc (P4)
+    { driver_number: 16, stint_number: 1, lap_start: 1,  lap_end: 11, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 16, stint_number: 2, lap_start: 12, lap_end: 34, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 16, stint_number: 3, lap_start: 35, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
+    // 5. George Russell (P5)
+    { driver_number: 63, stint_number: 1, lap_start: 1,  lap_end: 11, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 63, stint_number: 2, lap_start: 12, lap_end: 31, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 63, stint_number: 3, lap_start: 32, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
+    // 6. Lando Norris (P6)
+    { driver_number: 4,  stint_number: 1, lap_start: 1,  lap_end: 13, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 4,  stint_number: 2, lap_start: 14, lap_end: 33, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 4,  stint_number: 3, lap_start: 34, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
+    // 7. Lewis Hamilton (P7)
+    { driver_number: 44, stint_number: 1, lap_start: 1,  lap_end: 12, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 44, stint_number: 2, lap_start: 13, lap_end: 33, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 44, stint_number: 3, lap_start: 34, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
+    // 8. Oscar Piastri (P8)
+    { driver_number: 81, stint_number: 1, lap_start: 1,  lap_end: 12, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 81, stint_number: 2, lap_start: 13, lap_end: 34, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 81, stint_number: 3, lap_start: 35, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
+    // 9. Fernando Alonso (P9)
+    { driver_number: 14, stint_number: 1, lap_start: 1,  lap_end: 15, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 14, stint_number: 2, lap_start: 16, lap_end: 41, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 14, stint_number: 3, lap_start: 42, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
+    // 10. Lance Stroll (P10)
+    { driver_number: 18, stint_number: 1, lap_start: 1,  lap_end: 1,  compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 18, stint_number: 2, lap_start: 2,  lap_end: 27, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 18, stint_number: 3, lap_start: 28, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
+    // 11. Guanyu Zhou (P11)
+    { driver_number: 24, stint_number: 1, lap_start: 1,  lap_end: 9,  compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 24, stint_number: 2, lap_start: 10, lap_end: 28, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 24, stint_number: 3, lap_start: 29, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
+    // 12. Kevin Magnussen (P12)
+    { driver_number: 20, stint_number: 1, lap_start: 1,  lap_end: 12, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 20, stint_number: 2, lap_start: 13, lap_end: 32, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 20, stint_number: 3, lap_start: 33, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
+    // 13. Daniel Ricciardo (P13)
+    { driver_number: 3,  stint_number: 1, lap_start: 1,  lap_end: 13, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 3,  stint_number: 2, lap_start: 14, lap_end: 35, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 3,  stint_number: 3, lap_start: 36, lap_end: 57, compound: 'SOFT',   tyre_age_at_start: 0 },
+    // 14. Yuki Tsunoda (P14)
+    { driver_number: 22, stint_number: 1, lap_start: 1,  lap_end: 14, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 22, stint_number: 2, lap_start: 15, lap_end: 34, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 22, stint_number: 3, lap_start: 35, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
+    // 15. Alexander Albon (P15)
+    { driver_number: 23, stint_number: 1, lap_start: 1,  lap_end: 15, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 23, stint_number: 2, lap_start: 16, lap_end: 35, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 23, stint_number: 3, lap_start: 36, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
+    // 16. Nico Hulkenberg (P16)
+    { driver_number: 27, stint_number: 1, lap_start: 1,  lap_end: 1,  compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 27, stint_number: 2, lap_start: 2,  lap_end: 20, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 27, stint_number: 3, lap_start: 21, lap_end: 42, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 27, stint_number: 4, lap_start: 43, lap_end: 57, compound: 'SOFT',   tyre_age_at_start: 0 },
+    // 17. Esteban Ocon (P17)
+    { driver_number: 31, stint_number: 1, lap_start: 1,  lap_end: 10, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 31, stint_number: 2, lap_start: 11, lap_end: 30, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 31, stint_number: 3, lap_start: 31, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
+    // 18. Pierre Gasly (P18)
+    { driver_number: 10, stint_number: 1, lap_start: 1,  lap_end: 15, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 10, stint_number: 2, lap_start: 16, lap_end: 32, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 10, stint_number: 3, lap_start: 33, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
+    // 19. Valtteri Bottas (P19)
+    { driver_number: 77, stint_number: 1, lap_start: 1,  lap_end: 12, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 77, stint_number: 2, lap_start: 13, lap_end: 30, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 77, stint_number: 3, lap_start: 31, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
+    // 20. Logan Sargeant (P20)
+    { driver_number: 2,  stint_number: 1, lap_start: 1,  lap_end: 13, compound: 'SOFT',   tyre_age_at_start: 0 },
+    { driver_number: 2,  stint_number: 2, lap_start: 14, lap_end: 34, compound: 'HARD',   tyre_age_at_start: 0 },
+    { driver_number: 2,  stint_number: 3, lap_start: 35, lap_end: 57, compound: 'HARD',   tyre_age_at_start: 0 },
   ],
   9162: [
     { driver_number: 1,  stint_number: 1, lap_start: 1, lap_end: 5, compound: 'SOFT', tyre_age_at_start: 0 },
