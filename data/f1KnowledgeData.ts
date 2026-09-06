@@ -4,6 +4,20 @@
  * Telemetry Linking Metadata, Full 10 Teams, Key Drivers, and Iconic Circuits.
  */
 
+export interface TyreKnowledge {
+  id: string;
+  name: string;
+  color: string;
+  code: string;
+  description: string;
+  workingRange: string;
+  estimatedLaps: string;
+  gripLevel: number;
+  durabilityLevel: number;
+}
+
+export { TYRE_COMPOUNDS as KNOWLEDGE_TYRES } from './tyreEncyclopediaData';
+
 export interface Reference {
   id: number;
   title: string;
@@ -289,7 +303,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     powerUnit: 'Honda RBPT',
     base: 'Milton Keynes, United Kingdom',
     constructorTitles: 6,
-    drivers: ['VER', 'PER'],
+    drivers: ['VER', 'LAW'],
     color: '#38bdf8',
     visualGallery:     [
       {
@@ -348,7 +362,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     powerUnit: 'Ferrari 066/12',
     base: 'Maranello, Italy',
     constructorTitles: 16,
-    drivers: ['LEC', 'SAI'],
+    drivers: ['LEC', 'HAM'],
     color: '#f87171',
     visualGallery:     [
       {
@@ -466,7 +480,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     powerUnit: 'Mercedes-AMG M15 E Performance',
     base: 'Brackley, United Kingdom',
     constructorTitles: 8,
-    drivers: ['HAM', 'RUS'],
+    drivers: ['RUS', 'ANT'],
     color: '#2dd4bf',
     visualGallery:     [
       {
@@ -568,7 +582,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     powerUnit: 'Renault E-Tech RE24',
     base: 'Enstone, United Kingdom / Viry-Châtillon, France',
     constructorTitles: 2,
-    drivers: ['GAS', 'OCO'],
+    drivers: ['GAS', 'DOO'],
     color: '#0284c7',
     visualGallery:     [
       {
@@ -619,7 +633,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     powerUnit: 'Mercedes-AMG M15 E Performance',
     base: 'Grove, United Kingdom',
     constructorTitles: 9,
-    drivers: ['ALB', 'COL'],
+    drivers: ['ALB', 'SAI'],
     color: '#38bdf8',
     visualGallery:     [
       {
@@ -670,7 +684,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     powerUnit: 'Honda RBPT',
     base: 'Faenza, Italy / Bicester, United Kingdom',
     constructorTitles: 0,
-    drivers: ['TSU', 'RIC'],
+    drivers: ['TSU', 'HAD'],
     color: '#60a5fa',
     visualGallery:     [
       {
@@ -721,7 +735,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     powerUnit: 'Ferrari 066/12',
     base: 'Hinwil, Switzerland',
     constructorTitles: 0,
-    drivers: ['BOT', 'ZHO'],
+    drivers: ['HUL', 'BOR'],
     color: '#4ade80',
     visualGallery:     [
       {
@@ -772,7 +786,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     powerUnit: 'Ferrari 066/12',
     base: 'Kannapolis, United States / Banbury, United Kingdom',
     constructorTitles: 0,
-    drivers: ['HUL', 'MAG'],
+    drivers: ['OCO', 'BEA'],
     color: '#e2e8f0',
     visualGallery:     [
       {
@@ -944,8 +958,8 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     number: 44,
     fullName: 'Lewis Hamilton',
     country: 'イギリス 🇬🇧',
-    team: 'Mercedes-AMG / Ferrari',
-    teamColor: '#2dd4bf',
+    team: 'Scuderia Ferrari',
+    teamColor: '#f87171',
     status: 'Current',
     nickname: 'Billion Dollar Man / サー・ルイス',
     birthDate: '1985-01-07',
@@ -1384,8 +1398,8 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     number: 55,
     fullName: 'Carlos Sainz',
     country: 'スペイン 🇪🇸',
-    team: 'Scuderia Ferrari / Williams',
-    teamColor: '#f87171',
+    team: 'Williams',
+    teamColor: '#38bdf8',
     status: 'Current',
     nickname: 'Smooth Operator',
     birthDate: '1994-09-01',
@@ -1590,7 +1604,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     country: 'メキシコ 🇲🇽',
     team: 'Red Bull Racing',
     teamColor: '#38bdf8',
-    status: 'Current',
+    status: 'Reserve',
     nickname: 'Checo (チェコ) / メキシコ防衛大臣',
     birthDate: '1990-01-26',
     birthPlace: 'Guadalajara, Mexico',
@@ -2272,8 +2286,8 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     number: 31,
     fullName: "Esteban Ocon",
     country: "フランス 🇫🇷",
-    team: "Alpine",
-    teamColor: "#0093cc",
+    team: 'Haas F1 Team',
+    teamColor: '#e2e8f0',
     status: "Current",
     nickname: "エスティ・ベスティ / 鉄壁のディフェンダー",
     birthDate: "1996-09-17",
@@ -2524,7 +2538,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     country: "アルゼンチン 🇦🇷",
     team: "Williams",
     teamColor: "#00a0de",
-    status: "Current",
+    status: 'Reserve',
     nickname: "アルゼンチンの若獅子 / フランキート",
     birthDate: "2003-05-27",
     birthPlace: "Pilar, Buenos Aires, Argentina",
@@ -2757,8 +2771,8 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     number: 27,
     fullName: "Nico Hülkenberg",
     country: "ドイツ 🇩🇪",
-    team: "Haas",
-    teamColor: "#b6babd",
+    team: 'Stake F1 Team Kick Sauber',
+    teamColor: '#22c55e',
     status: "Current",
     nickname: "ハルク / 予選の魔術師 / スーパーサブ",
     birthDate: "1987-08-19",
@@ -2887,7 +2901,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     country: "デンマーク 🇩🇰",
     team: "Haas",
     teamColor: "#b6babd",
-    status: "Current",
+    status: 'Reserve',
     nickname: "K-Mag / 闘犬バイキング",
     birthDate: "1992-10-05",
     birthPlace: "Roskilde, Denmark",
@@ -3014,9 +3028,9 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     number: 77,
     fullName: "Valtteri Bottas",
     country: "フィンランド 🇫🇷",
-    team: "Stake Sauber",
-    teamColor: "#52e252",
-    status: "Current",
+    team: 'Mercedes-AMG',
+    teamColor: '#2dd4bf',
+    status: 'Reserve',
     nickname: "フライング・フィン / ボッタス2.0 / ウッドチョッパー",
     birthDate: "1989-08-28",
     birthPlace: "Nastola, Finland",
@@ -3140,9 +3154,9 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     number: 24,
     fullName: "Zhou Guanyu",
     country: "中国 🇨🇳",
-    team: "Stake Sauber",
-    teamColor: "#52e252",
-    status: "Current",
+    team: 'Scuderia Ferrari',
+    teamColor: '#f87171',
+    status: 'Reserve',
     nickname: "ジョー / 中国のパイオニア",
     birthDate: "1999-05-30",
     birthPlace: "Shanghai, China",
@@ -3272,7 +3286,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     country: "オーストラリア 🇦🇺",
     team: "RB / Visa Cash App RB",
     teamColor: "#6692ff",
-    status: "Current",
+    status: 'Legend',
     nickname: "ハニージャガー / ハニーバジャー / シューイー男爵",
     birthDate: "1989-07-01",
     birthPlace: "Perth, Western Australia",
@@ -3690,6 +3704,470 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       }
     ]
   },
+  {
+    id: 'liam-lawson',
+    code: 'LAW',
+    number: 30,
+    fullName: 'Liam Lawson',
+    country: 'ニュージーランド 🇳🇿',
+    team: 'Red Bull Racing',
+    teamColor: '#38bdf8',
+    status: 'Current',
+    nickname: 'キウイの稲妻',
+    birthDate: '2002-02-11',
+    birthPlace: 'Hastings, New Zealand',
+    f1Debut: '2023年 オランダGP (AlphaTauri 代役)',
+    driverType: '超攻撃的ブレーキング派',
+    numberOrigin: 'ジュニアフォーミュラ時代から愛用するラッキーナンバー。',
+    visualAsset: {
+      imageUrl: '/images/drivers/portraits/liam-lawson.jpg',
+      caption: 'Liam Lawson (Red Bull Racing)',
+      credit: 'Wikimedia Commons',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: '/images/drivers/portraits/liam-lawson.jpg'
+    },
+    visualGallery: [
+      {
+        imageUrl: '/images/drivers/portraits/liam-lawson.jpg',
+        caption: 'Liam Lawson (Red Bull Racing)',
+        tag: 'Portrait',
+        credit: 'Wikimedia Commons',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: '/images/drivers/portraits/liam-lawson.jpg'
+      }
+    ],
+    engineeringPreference: {
+      setupBalance: '鋭角にターンインできる回頭性と高いブレーキスタビリティを好む。',
+      pedalFeel: '超高剛性のショートストロークブレーキペダル。',
+      steeringWeight: 'ダイレクトで明確なインフォメーション。'
+    },
+    raceEngineer: {
+      name: 'Hugh Bird',
+      callsign: 'Hugh',
+      dynamic: '的確なギャップ管理とアグレッシブな作戦判断を共有。'
+    },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/liamlawson30/',
+      xTwitter: 'https://x.com/LiamLawson30'
+    },
+    careerSummary: '2023年オランダGPでリカルドの負傷代役として急遽F1デビューし、シンガポールGPで堂々の9位入賞。激しいバトルを恐れない勇敢な走りで評価を高め、2025年にレッドブルのレギュラーシートを射止めた。',
+    entries: 11,
+    wins: 0,
+    podiums: 0,
+    polePositions: 0,
+    championships: 0,
+    drivingStyle: {
+      traits: ['強烈なレイトブレーキング', 'サイド・バイ・サイドでの抜群の勝負強さ', '変化するコンディションへの即応性'],
+      brakingTechnique: '限界ギリギリまで突っ込み、イン側を死守する強気のブレーキング。',
+      tyreManagement: 'スティント序盤のプッシュと終盤のライフ維持のバランスを向上中。',
+      telemetrySignature: 'ブレーキング初期の踏力立ち上がりが非常に急峻で、V字ターンを好むフェルスタッペンに近い特性。',
+      preferredCircuitTypes: ['市街地コース (シンガポール、バクー)', 'ストップ＆ゴー型'],
+      summary: 'プレッシャーに極めて強く、不利な状況からでもポジションを奪い取る気迫溢れる走りが持ち味。'
+    },
+    biography: {
+      personality: '物静かだが闘志を内に秘めたファイター。チーム代表にも臆せずフィードバックを返す芯の強さを持つ。',
+      rivalries: '角田裕毅（RB時代のチームメイト＆シート争奪のライバル）',
+      iconicRaces: [
+        {
+          gp: '2023 シンガポールGP',
+          year: 2023,
+          description: '過酷なナイトレースで予選Q3進出、決勝でもフェルスタッペンらを抑えて9位フィニッシュ。',
+          tacticalMasterclass: 'セーフティカー後のリスタートでタイヤを素早く作動温度域に入れ、上位勢のプレッシャーを防ぎきった。'
+        }
+      ],
+      quotes: ['「シートが空いているなら、僕が座るべきだと証明するだけだ。」'],
+      offTrack: 'シムレースの腕前もプロ級で、オフシーズンはニュージーランドの大自然でトレーニングに励む。'
+    },
+    milestones: [
+      { date: '2023-08-27', event: '雨のオランダGPで急遽F1デビュー', refId: 1 },
+      { date: '2023-09-17', event: 'シンガポールGPで自身初のF1ポイント獲得(9位)', refId: 1 }
+    ],
+    references: [
+      { id: 1, title: 'Liam Lawson Career Profile', publisher: 'Red Bull Racing Media', url: 'https://www.redbullracing.com', verifiedDate: '2024-03-01' }
+    ]
+  },
+  {
+    id: 'andrea-kimi-antonelli',
+    code: 'ANT',
+    number: 12,
+    fullName: 'Andrea Kimi Antonelli',
+    country: 'イタリア 🇮🇹',
+    team: 'Mercedes-AMG',
+    teamColor: '#2dd4bf',
+    status: 'Current',
+    nickname: 'ボローニャの神童 / Kimi',
+    birthDate: '2006-08-25',
+    birthPlace: 'Bologna, Italy',
+    f1Debut: '2025年 オーストラリアGP (Mercedes)',
+    driverType: '天才肌のナチュラルスピード派',
+    numberOrigin: '幼少期のカート時代から着用してきた憧れのナンバー。',
+    visualAsset: {
+      imageUrl: '/images/drivers/portraits/andrea-kimi-antonelli.jpg',
+      caption: 'Andrea Kimi Antonelli (Mercedes-AMG)',
+      credit: 'Wikimedia Commons',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: '/images/drivers/portraits/andrea-kimi-antonelli.jpg'
+    },
+    visualGallery: [
+      {
+        imageUrl: '/images/drivers/portraits/andrea-kimi-antonelli.jpg',
+        caption: 'Andrea Kimi Antonelli (Mercedes-AMG)',
+        tag: 'Portrait',
+        credit: 'Wikimedia Commons',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: '/images/drivers/portraits/andrea-kimi-antonelli.jpg'
+      }
+    ],
+    engineeringPreference: {
+      setupBalance: 'フロントの応答性が極めて鋭く、進入でリアが軽やかに追従するセットアップ。',
+      pedalFeel: 'リニアな減速フィールと繊細なリリース制御。',
+      steeringWeight: '俊敏なインプットを可能にするやや軽快なフィードバック。'
+    },
+    raceEngineer: {
+      name: 'Peter Bonnington (Bono)',
+      callsign: 'Bono',
+      dynamic: 'ハミルトンを7冠へ導いた伝説的エンジニアが全面的にバックアップ。'
+    },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/andreakimiantonelli/'
+    },
+    careerSummary: 'カート、F4、フォーミュラ・リージョナルを全冠制覇し、F3をスキップしてF2へ飛び級。トト・ヴォルフの全面支援を受け、ルイス・ハミルトン移籍後のメルセデスの空席を若干18歳で射止めた歴史的ルーキー。',
+    entries: 0,
+    wins: 0,
+    podiums: 0,
+    polePositions: 0,
+    championships: 0,
+    drivingStyle: {
+      traits: ['天性のマシンコントロール', 'ステアリング角の少ないスムーズな旋回', '高速コーナーでの恐怖心の無さ'],
+      brakingTechnique: 'エイペックスに向けて踏力を滑らかにリリースする理想的なトレイルブレイキング。',
+      tyreManagement: '若さゆえに学習中だが、テスト走行でのロングランペースはすでにベテラン級。',
+      telemetrySignature: 'コーナーアプローチでのステアリング舵角修正が極めて少なく、1本の滑らかな円弧を描く。',
+      preferredCircuitTypes: ['超高速サーキット (モンツァ、シルバーストーン)', 'テクニカルコース'],
+      summary: '圧倒的な生来のスピードを持ち、限界領域でもマシンが乱れない驚異的なバランス感覚を誇る。'
+    },
+    biography: {
+      personality: '礼儀正しく明るい好青年だが、ヘルメットを被ると勝負に徹する冷徹な一面を見せる。',
+      rivalries: 'オリバー・ベアマン（ジュニア時代からの同期ライバル）',
+      iconicRaces: [],
+      quotes: ['「メルセデスのマシンで走ることは子供の頃からの夢。プレッシャーを喜びに変えたい。」'],
+      offTrack: '父マルコも元ツーリングカーレーサーで、家族全員でレース界に生きる。'
+    },
+    milestones: [
+      { date: '2024-08-31', event: 'メルセデスより2025年レギュラードライバー就任が正式発表', refId: 1 }
+    ],
+    references: [
+      { id: 1, title: 'Mercedes-AMG F1 Confirms Kimi Antonelli for 2025', publisher: 'Mercedes F1 News', url: 'https://www.mercedesamgf1.com', verifiedDate: '2024-08-31' }
+    ]
+  },
+  {
+    id: 'jack-doohan',
+    code: 'DOO',
+    number: 7,
+    fullName: 'Jack Doohan',
+    country: 'オーストラリア 🇦🇺',
+    team: 'Alpine',
+    teamColor: '#0284c7',
+    status: 'Current',
+    nickname: 'ミックの息子 / ブルー・ブレット',
+    birthDate: '2003-01-20',
+    birthPlace: 'Gold Coast, Australia',
+    f1Debut: '2025年 オーストラリアGP (Alpine)',
+    driverType: '徹底的なデータ分析＆スムーズ派',
+    numberOrigin: '自身が尊敬するナンバーであり、アルピーヌでの新たな挑戦を象徴するラッキーナンバー。',
+    visualAsset: {
+      imageUrl: '/images/drivers/portraits/jack-doohan.jpg',
+      caption: 'Jack Doohan (Alpine)',
+      credit: 'Wikimedia Commons',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: '/images/drivers/portraits/jack-doohan.jpg'
+    },
+    visualGallery: [
+      {
+        imageUrl: '/images/drivers/portraits/jack-doohan.jpg',
+        caption: 'Jack Doohan (Alpine)',
+        tag: 'Portrait',
+        credit: 'Wikimedia Commons',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: '/images/drivers/portraits/jack-doohan.jpg'
+      }
+    ],
+    engineeringPreference: {
+      setupBalance: 'ニュートラルから微弱なアンダーステアで、リアのトラクション抜けを防ぐセットアップ。',
+      pedalFeel: '剛性感重視のブレーキフィール。',
+      steeringWeight: '重めで路面抵抗がしっかり伝わるキャリブレーション。'
+    },
+    raceEngineer: {
+      name: 'Josh Peckett',
+      callsign: 'Josh',
+      dynamic: 'テスト走行で培った深い信頼関係と綿密なテレメトリ分析。'
+    },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/jackdoohan/'
+    },
+    careerSummary: 'ロードレース世界選手権5年連続王者ミック・ドゥーハンの長男。アルピーヌのアカデミーで数千キロに及ぶプライベートテストとシミュレータ開発を重ね、2025年の正ドライバーの座を掴み取った。',
+    entries: 0,
+    wins: 0,
+    podiums: 0,
+    polePositions: 0,
+    championships: 0,
+    drivingStyle: {
+      traits: ['冷静沈着な状況判断', 'タイヤ摩耗を抑えるスムーズなステアリング', '緻密なエンジニアリング対話'],
+      brakingTechnique: 'トレイルブレーキング時の減速Gが非常に安定しており、マシンのピッチング変化を抑える。',
+      tyreManagement: 'F2時代に培ったタイヤ温存技術で、レース終盤のオーバーテイクを得意とする。',
+      telemetrySignature: '急な舵角入力を避け、タイヤの横滑り角（スリップアングル）を最小に留める高効率走法。',
+      preferredCircuitTypes: ['アルバート・パーク (母国メルボルン)', 'シルバーストーン'],
+      summary: '派手さよりも再現性とチームへの確実なポイント還元を重視する現代的プロフェッショナルの典型。'
+    },
+    biography: {
+      personality: 'プロ意識が極めて高くストイック。偉大な父の影に甘えることなく四輪の世界で自らの道を切り拓いてきた。',
+      rivalries: 'オスカー・ピアストリ（同じオーストラリア出身の次世代スター同士）',
+      iconicRaces: [],
+      quotes: ['「父のレガシーに敬意を払いながら、僕は僕自身の名前をF1の歴史に刻む。」'],
+      offTrack: 'サーフィンやダートバイクを愛好し、オフロードでのバランス感覚をトレーニングに活かす。'
+    },
+    milestones: [
+      { date: '2024-08-23', event: 'アルピーヌF1チームより2025年レギュラードライバー昇格が発表', refId: 1 }
+    ],
+    references: [
+      { id: 1, title: 'Jack Doohan Profile', publisher: 'Alpine F1 Team', url: 'https://www.alpinef1team.com', verifiedDate: '2024-08-23' }
+    ]
+  },
+  {
+    id: 'isack-hadjar',
+    code: 'HAD',
+    number: 17,
+    fullName: 'Isack Hadjar',
+    country: 'フランス 🇫🇷',
+    team: 'Visa Cash App RB',
+    teamColor: '#60a5fa',
+    status: 'Current',
+    nickname: 'リトル・プロスト / 闘志の塊',
+    birthDate: '2004-09-28',
+    birthPlace: 'Paris, France',
+    f1Debut: '2025年 オーストラリアGP (RB)',
+    driverType: '獰猛な一発アタッカー派',
+    numberOrigin: '幼少期のレースキャリアから大切にしているラッキーナンバー。',
+    visualAsset: {
+      imageUrl: '/images/drivers/portraits/isack-hadjar.jpg',
+      caption: 'Isack Hadjar (Visa Cash App RB)',
+      credit: 'Wikimedia Commons',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: '/images/drivers/portraits/isack-hadjar.jpg'
+    },
+    visualGallery: [
+      {
+        imageUrl: '/images/drivers/portraits/isack-hadjar.jpg',
+        caption: 'Isack Hadjar (Visa Cash App RB)',
+        tag: 'Portrait',
+        credit: 'Wikimedia Commons',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: '/images/drivers/portraits/isack-hadjar.jpg'
+      }
+    ],
+    engineeringPreference: {
+      setupBalance: '前輪が吸い付くように曲がる強めのフロントダウンフォース配分。',
+      pedalFeel: 'ダイレクトな高踏力ペダル。',
+      steeringWeight: 'クイックレシオで俊敏な回頭性。'
+    },
+    raceEngineer: {
+      name: 'Pierre Hamelin',
+      callsign: 'Pierre',
+      dynamic: '若き情熱を受け止め、冷静な戦術とタイヤ管理をコーチング。'
+    },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/isackhadjar/'
+    },
+    careerSummary: 'ヘルムート・マルコが「才能は本物」と絶賛するレッドブル・ジュニアの切り込み隊長。F2でのタイトル争いを経て、2025年にVisa Cash App RBの正シートを獲得しF1ステップアップを果たした。',
+    entries: 0,
+    wins: 0,
+    podiums: 0,
+    polePositions: 0,
+    championships: 0,
+    drivingStyle: {
+      traits: ['鋭利なターンイン', '予選での神がかり的一発タイム', '闘志を前面に出すバトルスタイル'],
+      brakingTechnique: '非常にハードで深いブレーキング。マシンを急旋回させて即座に前を向かせる。',
+      tyreManagement: 'アグレッシブな走りのため摩耗が進みやすいが、マネジメント能力を急速に向上中。',
+      telemetrySignature: 'スロットル開度がオンかオフかのデジタル的な立ち上がりを見せる超攻撃的入力。',
+      preferredCircuitTypes: ['市街地コース (モナコ、バクー)', 'ストップ＆ゴー型'],
+      summary: '一瞬の隙も見逃さない野生的な攻撃力と、難攻不落のサーキットで光る天才的なひらめきを持つ。'
+    },
+    biography: {
+      personality: '感情表現がストレートで情熱的。無線での叫びはすでにパドックの注目を集めている。',
+      rivalries: '角田裕毅（チーム内の主導権とレッドブル昇格を巡るライバル関係）',
+      iconicRaces: [],
+      quotes: ['「僕は守るために走っているんじゃない。すべてのコーナーで攻め落とすために走っている。」'],
+      offTrack: 'パリ出身のおしゃれ好きで、音楽とスニーカーコレクションに熱中。'
+    },
+    milestones: [
+      { date: '2024-12-15', event: '2025年Visa Cash App RBのレギュラードライバーに決定', refId: 1 }
+    ],
+    references: [
+      { id: 1, title: 'Isack Hadjar Official Red Bull Junior Profile', publisher: 'Red Bull Junior Team', url: 'https://www.redbull.com', verifiedDate: '2024-12-15' }
+    ]
+  },
+  {
+    id: 'gabriel-bortoleto',
+    code: 'BOR',
+    number: 5,
+    fullName: 'Gabriel Bortoleto',
+    country: 'ブラジル 🇧🇷',
+    team: 'Stake F1 Team Kick Sauber',
+    teamColor: '#22c55e',
+    status: 'Current',
+    nickname: 'ガビ / サンパウロの閃光',
+    birthDate: '2004-10-14',
+    birthPlace: 'São Paulo, Brazil',
+    f1Debut: '2025年 オーストラリアGP (Kick Sauber)',
+    driverType: '冷静沈着なレース巧者派',
+    numberOrigin: '尊敬するセナの母国ブラジルの系譜を継ぎ、カート時代から愛用してきたナンバー。',
+    visualAsset: {
+      imageUrl: '/images/drivers/portraits/gabriel-bortoleto.jpg',
+      caption: 'Gabriel Bortoleto (Kick Sauber)',
+      credit: 'Wikimedia Commons',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: '/images/drivers/portraits/gabriel-bortoleto.jpg'
+    },
+    visualGallery: [
+      {
+        imageUrl: '/images/drivers/portraits/gabriel-bortoleto.jpg',
+        caption: 'Gabriel Bortoleto (Kick Sauber)',
+        tag: 'Portrait',
+        credit: 'Wikimedia Commons',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: '/images/drivers/portraits/gabriel-bortoleto.jpg'
+      }
+    ],
+    engineeringPreference: {
+      setupBalance: 'リアの安定感を最重要視し、コーナー脱出でのトラクションを確保。',
+      pedalFeel: '踏み始めがスムーズで奥でしっかり踏ん張るプログレッシブ特性。',
+      steeringWeight: '長距離レースでも疲労を抑える標準的な重さ。'
+    },
+    raceEngineer: {
+      name: 'Steven Petrik',
+      callsign: 'Steven',
+      dynamic: '丁寧なフィードバックと戦略シミュレーションの密な連携。'
+    },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/gabrielbortoleto_/'
+    },
+    careerSummary: '2023年FIA F3ルーキー王者、2024年FIA F2でも驚異的な追い上げ劇でチャンピオン争いを展開。フェルナンド・アロンソのマネジメントを受け、ブラジル人としてフェリペ・マッサ以来となる本格派F1ドライバーとしてザウバーからデビュー。',
+    entries: 0,
+    wins: 0,
+    podiums: 0,
+    polePositions: 0,
+    championships: 0,
+    drivingStyle: {
+      traits: ['計算され尽くしたタイヤマネジメント', '中盤〜終盤の驚異的な追い上げ', 'クリーンで隙のないオーバーテイク'],
+      brakingTechnique: 'タイヤに優しく、ステアリング舵角が少ない状態で直線的に減速する高効率ブレーキング。',
+      tyreManagement: 'ルーキー離れしたタイヤコントロール能力を持ち、デグラデーションの高い路面で本領を発揮。',
+      telemetrySignature: '舵角の戻しが素早く、タイヤの摩擦熱を抑えながら高いコーナリングスピードを維持。',
+      preferredCircuitTypes: ['インテルラゴス (母国コース)', 'モンツァ', 'バルセロナ'],
+      summary: 'アロンソ仕込みのレースクラフトと、冷静沈着にチャンスを待って確実にポイントをもぎ取る戦略眼。'
+    },
+    biography: {
+      personality: '謙虚で知性的。母国ブラジルのモータースポーツ復活の期待を背負いながらも気負わない自然体。',
+      rivalries: 'アイザック・ハジャー、アンドレア・キミ・アントネッリ（F2同期ライバル）',
+      iconicRaces: [
+        {
+          gp: '2024 F2 モンツァフィーチャーレース',
+          year: 2024,
+          description: '最後尾スタートから驚異のオーバーテイクショーを演じ、F2史上稀に見る最後尾からの優勝を達成。',
+          tacticalMasterclass: 'タイヤを完璧に持たせ、SC導入のタイミングを逃さず首位へ浮上した伝説的レース。'
+        }
+      ],
+      quotes: ['「ブラジルの国旗をF1のグリッドに戻すことができて誇りに思う。一歩一歩前進したい。」'],
+      offTrack: 'アロンソのA14マネジメントで育成され、アロンソ本人と頻繁にトレーニングを行う。'
+    },
+    milestones: [
+      { date: '2023-09-03', event: 'ルーキーイヤーにFIA F3世界選手権チャンピオン獲得', refId: 1 },
+      { date: '2024-11-06', event: 'ザウバー/アウディより2025年レギュラードライバー契約を発表', refId: 1 }
+    ],
+    references: [
+      { id: 1, title: 'Gabriel Bortoleto Joins Stake F1 Team Kick Sauber', publisher: 'Sauber Motorsport', url: 'https://www.sauber-group.com', verifiedDate: '2024-11-06' }
+    ]
+  },
+  {
+    id: 'oliver-bearman',
+    code: 'BEA',
+    number: 87,
+    fullName: 'Oliver Bearman',
+    country: 'イギリス 🇬🇧',
+    team: 'Haas F1 Team',
+    teamColor: '#e2e8f0',
+    status: 'Current',
+    nickname: 'オリー / フェラーリの秘蔵っ子',
+    birthDate: '2005-05-08',
+    birthPlace: 'Chelmsford, United Kingdom',
+    f1Debut: '2024年 サウジアラビアGP (Ferrari 代役)',
+    driverType: '天性の高速ストリート派',
+    numberOrigin: '父や弟も愛用してきたベアマン・ファミリーの伝統ナンバー87。',
+    visualAsset: {
+      imageUrl: '/images/drivers/portraits/oliver-bearman.jpg',
+      caption: 'Oliver Bearman (Haas)',
+      credit: 'Wikimedia Commons',
+      license: 'CC BY-SA 4.0',
+      sourceUrl: '/images/drivers/portraits/oliver-bearman.jpg'
+    },
+    visualGallery: [
+      {
+        imageUrl: '/images/drivers/portraits/oliver-bearman.jpg',
+        caption: 'Oliver Bearman (Haas)',
+        tag: 'Portrait',
+        credit: 'Wikimedia Commons',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: '/images/drivers/portraits/oliver-bearman.jpg'
+      }
+    ],
+    engineeringPreference: {
+      setupBalance: '高速コーナーでリアが安定し、ストリートのギャップをいなすしなやかなサスペンション。',
+      pedalFeel: '踏力の立ち上がりが明確でABS無しでもロックさせない高剛性フィール。',
+      steeringWeight: '路面からのキックバックを適度に伝えるダイレクト感。'
+    },
+    raceEngineer: {
+      name: 'Mark Slade',
+      callsign: 'Mark',
+      dynamic: 'キミ・ライコネンらを担当した伝説のエンジニアが若き才能を冷静にサポート。'
+    },
+    socialLinks: {
+      instagram: 'https://www.instagram.com/olliebearman/'
+    },
+    careerSummary: '2024年サウジアラビアGPで虫垂炎のサインツの代役としてフェラーリから急遽18歳でデビューし、最難関ジェッダで堂々7位入賞。同年のアゼルバイジャンGPでもハース代役で入賞し、2025年にハースの正ドライバーに抜擢。',
+    entries: 3,
+    wins: 0,
+    podiums: 0,
+    polePositions: 0,
+    championships: 0,
+    drivingStyle: {
+      traits: ['超高速ストリートコースへの抜群の適応', '冷静沈着なトラフィック処理', 'スムーズな荷重移動'],
+      brakingTechnique: '高速域からのフルブレーキングでの車体安定性が高く、ABSなしのマシンを即座に手懐ける。',
+      tyreManagement: 'ピレリタイヤのウォームアップ特性を素早く理解し、アウトラップから好ペースを刻む。',
+      telemetrySignature: 'ジェッダの高速S字のような難所でもステアリング蛇行が少なく、流れるようなラインを描く。',
+      preferredCircuitTypes: ['ジェッダ (初入賞の地)', 'バクー', 'シルバーストーン'],
+      summary: '代役参戦で即座にポイントを獲る驚異的な本番強さと、若さを感じさせない知的で落ち着いたレース運び。'
+    },
+    biography: {
+      personality: '礼儀正しく落ち着いた好青年。フェラーリ・ドライバー・アカデミー（FDA）のトップエリート。',
+      rivalries: 'キミ・アントネッリ（F2＆次世代F1の同期ライバル）',
+      iconicRaces: [
+        {
+          gp: '2024 サウジアラビアGP',
+          year: 2024,
+          description: '予選直前のFP3からフェラーリに乗り込み、予選11番手から決勝で見事ノリスやハミルトンを抑えて7位フィニッシュ。',
+          tacticalMasterclass: '世界一危険な超高速市街地で一度もウォールに触れることなく、完璧なペースコントロールを完遂。'
+        }
+      ],
+      quotes: ['「フェラーリのレーシングスーツに袖を通した瞬間、プレッシャーは消えて集中だけが残った。」'],
+      offTrack: 'ゲームやシムレースが得意で、休日は友人たちとモータースポーツ談義を楽しむ。'
+    },
+    milestones: [
+      { date: '2024-03-09', event: 'サウジアラビアGPでフェラーリ史上最年少デビュー＆7位初入賞', refId: 1 },
+      { date: '2024-07-04', event: 'ハースF1チームより2025年レギュラードライバー契約を発表', refId: 1 }
+    ],
+    references: [
+      { id: 1, title: 'Oliver Bearman Profile', publisher: 'Haas F1 Media', url: 'https://www.haasf1team.com', verifiedDate: '2024-07-04' }
+    ]
+  }
+
 ];
 
 

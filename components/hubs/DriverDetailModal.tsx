@@ -9,6 +9,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import type { DriverProfile, Reference, TelemetryTarget } from '@/data/f1KnowledgeData';
 import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
 
@@ -29,6 +30,8 @@ export default function DriverDetailModal({
   onNavigateToTelemetry,
   onClose,
 }: DriverDetailModalProps) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [activeTab, setActiveTab] = useState<DetailTab>('overview');
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
   const [imgLoaded, setImgLoaded] = useState<boolean>(false);
@@ -108,8 +111,10 @@ export default function DriverDetailModal({
       : `/api/image-proxy?url=${encodeURIComponent(driver.visualAsset.imageUrl)}`
     : null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-black/80 backdrop-blur-md animate-fade-in">
+  if (!mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fade-in">
       {/* Modal Card */}
       <div
         ref={modalContentRef}
@@ -836,6 +841,7 @@ export default function DriverDetailModal({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

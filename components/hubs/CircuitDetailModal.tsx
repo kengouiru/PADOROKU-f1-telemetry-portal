@@ -11,6 +11,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import type { CircuitProfile, Reference, TelemetryTarget } from '@/data/f1KnowledgeData';
 import { CIRCUIT_TRACK_MAPS } from '@/components/telemetry/TelemetryTrackMap';
 import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
@@ -32,6 +33,8 @@ export default function CircuitDetailModal({
   onNavigateToTelemetry,
   onClose,
 }: CircuitDetailModalProps) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const [activeTab, setActiveTab] = useState<CircuitTab>('map');
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
   const [highlightedCorner, setHighlightedCorner] = useState<string | null>(null);
@@ -130,8 +133,10 @@ export default function CircuitDetailModal({
 
   const atmosphereCaption: string = (atmosphereAsset && 'caption' in atmosphereAsset && typeof atmosphereAsset.caption === 'string') ? atmosphereAsset.caption : circuit.name;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-black/80 backdrop-blur-md animate-fade-in">
+  if (!mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fade-in">
       {/* Modal Card */}
       <div
         ref={modalContentRef}
@@ -839,6 +844,7 @@ export default function CircuitDetailModal({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

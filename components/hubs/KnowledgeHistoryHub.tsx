@@ -22,8 +22,10 @@ import { getProxiedAudioUrl } from '@/lib/telemetryUtils';
 import TeamDetailModal from './TeamDetailModal';
 import DriversHub from './DriversHub';
 import CircuitsHub from './CircuitsHub';
+import TyreEncyclopediaHub from './TyreEncyclopediaHub';
+import F1DramaHub from './F1DramaHub';
 
-type SubTab = 'teams' | 'drivers' | 'circuits' | 'strategy' | 'history';
+type SubTab = 'teams' | 'drivers' | 'circuits' | 'tyres' | 'drama' | 'strategy' | 'history';
 
 interface KnowledgeHistoryHubProps {
   onNavigateToTelemetry?: (target?: TelemetryTarget) => void;
@@ -274,63 +276,128 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
         </div>
       </div>
 
-      {/* 5 Main Sub-Tabs Navigation (Mobile Segmented Grid & Desktop Row) */}
-      <div className="flex flex-col md:flex-row gap-1.5 bg-slate-950/70 p-1.5 rounded-2xl border border-white/10 shadow-inner">
-        {/* Row 1 for Mobile (Grid 3) / Combined flex on Desktop */}
-        <div className="grid grid-cols-3 gap-1.5 md:flex md:gap-2 flex-1">
+      {/* 7 Main Sub-Tabs Navigation (Mobile Segmented Grid & Desktop Responsive Row) */}
+      <div className="flex flex-col gap-1.5 bg-slate-950/70 p-1.5 rounded-2xl border border-white/10 shadow-inner">
+        {/* Row 1 for Mobile (Grid 3) */}
+        <div className="grid grid-cols-3 gap-1.5 md:hidden">
           {(
             [
-              ['teams', '🏎️', 'チーム', '🏎️ チーム紹介 (全10チーム)'],
-              ['drivers', '👤', 'ドライバー', '👤 ドライバー名鑑 (詳細ビュー)'],
-              ['circuits', '🏁', 'サーキット', '🏁 サーキット解説 (全24戦)'],
-            ] as [SubTab, string, string, string][]
-          ).map(([tab, icon, shortLabel, fullLabel]) => (
+              ['teams', '🏎️', 'チーム'],
+              ['drivers', '👤', '選手名鑑'],
+              ['circuits', '🏁', 'コース'],
+            ] as [SubTab, string, string][]
+          ).map(([tab, icon, label]) => (
             <button
               key={tab}
               onClick={() => {
                 setActiveSubTab(tab);
                 setSearchQuery('');
               }}
-              className={`px-2 py-2.5 md:px-4 md:py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1.5 text-center flex-1 ${
+              className={`px-2 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1 text-center ${
                 activeSubTab === tab
                   ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/80 bg-slate-900/30 md:bg-transparent'
+                  : 'text-slate-400 hover:text-slate-200 bg-slate-900/40'
               }`}
             >
-              <span className="text-sm md:text-xs">{icon}</span>
-              <span className="inline md:hidden">{shortLabel}</span>
-              <span className="hidden md:inline">{fullLabel.replace(icon + ' ', '')}</span>
+              <span>{icon}</span>
+              <span>{label}</span>
             </button>
           ))}
         </div>
 
-        {/* Row 2 for Mobile (Grid 2) / Combined flex on Desktop */}
-        <div className="grid grid-cols-2 gap-1.5 md:flex md:gap-2">
+        {/* Row 2 for Mobile (Grid 2: Tyres & Drama) */}
+        <div className="grid grid-cols-2 gap-1.5 md:hidden">
           {(
             [
-              ['strategy', '🛞', '戦略 & 規則', '🛞 戦略 & 規則'],
-              ['history', '🏛️', '歴史アーカイブ', '🏛️ 歴史アーカイブ'],
-            ] as [SubTab, string, string, string][]
-          ).map(([tab, icon, shortLabel, fullLabel]) => (
+              ['tyres', '🛞', 'タイヤ大百科'],
+              ['drama', '🎬', '人間ドラマ'],
+            ] as [SubTab, string, string][]
+          ).map(([tab, icon, label]) => (
             <button
               key={tab}
               onClick={() => {
                 setActiveSubTab(tab);
                 setSearchQuery('');
               }}
-              className={`px-2 py-2.5 md:px-4 md:py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1.5 text-center flex-1 ${
+              className={`px-2 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1 text-center ${
                 activeSubTab === tab
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/80 bg-slate-900/30 md:bg-transparent'
+                  ? tab === 'drama'
+                    ? 'bg-rose-600 text-white shadow-md shadow-rose-500/30'
+                    : 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
+                  : 'text-slate-400 hover:text-slate-200 bg-slate-900/40'
               }`}
             >
-              <span className="text-sm md:text-xs">{icon}</span>
-              <span className="inline md:hidden">{shortLabel}</span>
-              <span className="hidden md:inline">{fullLabel.replace(icon + ' ', '')}</span>
+              <span>{icon}</span>
+              <span>{label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Row 3 for Mobile (Grid 2: Strategy & History) */}
+        <div className="grid grid-cols-2 gap-1.5 md:hidden">
+          {(
+            [
+              ['strategy', '📐', '戦略＆規則'],
+              ['history', '🏛️', '歴史アーカイブ'],
+            ] as [SubTab, string, string][]
+          ).map(([tab, icon, label]) => (
+            <button
+              key={tab}
+              onClick={() => {
+                setActiveSubTab(tab);
+                setSearchQuery('');
+              }}
+              className={`px-2 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1 text-center ${
+                activeSubTab === tab
+                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
+                  : 'text-slate-400 hover:text-slate-200 bg-slate-900/40'
+              }`}
+            >
+              <span>{icon}</span>
+              <span>{label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Desktop Single Row (hidden on mobile, flex on md+) */}
+        <div className="hidden md:flex flex-wrap items-center gap-1.5 w-full">
+          {(
+            [
+              ['teams', '🏎️', 'チーム'],
+              ['drivers', '👤', 'ドライバー名鑑'],
+              ['circuits', '🏁', 'サーキット解説'],
+              ['tyres', '🛞', 'タイヤ大百科'],
+              ['drama', '🎬', '人間ドラマ・因縁録'],
+              ['strategy', '📐', '戦略 & 規則'],
+              ['history', '🏛️', '歴史アーカイブ'],
+            ] as [SubTab, string, string][]
+          ).map(([tab, icon, fullLabel]) => (
+            <button
+              key={tab}
+              onClick={() => {
+                setActiveSubTab(tab);
+                setSearchQuery('');
+              }}
+              className={`px-3 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1.5 flex-1 whitespace-nowrap ${
+                activeSubTab === tab
+                  ? tab === 'drama'
+                    ? 'bg-rose-600 text-white shadow-md shadow-rose-500/30'
+                    : 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/80'
+              }`}
+            >
+              <span className="text-xs">{icon}</span>
+              <span>{fullLabel}</span>
             </button>
           ))}
         </div>
       </div>
+
+      {/* ── Sub-Tab: TYRES ENCYCLOPEDIA ── */}
+      {activeSubTab === 'tyres' && <TyreEncyclopediaHub onNavigateToTelemetry={onNavigateToTelemetry} />}
+
+      {/* ── Sub-Tab: F1 DRAMA & STORYLINES ── */}
+      {activeSubTab === 'drama' && <F1DramaHub />}
 
       {/* ── Sub-Tab 1: TEAMS (Compact Grid + Detail Modal) ── */}
       {activeSubTab === 'teams' && (
