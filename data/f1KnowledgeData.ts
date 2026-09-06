@@ -17,6 +17,15 @@ export interface TyreKnowledge {
 }
 
 export { TYRE_COMPOUNDS as KNOWLEDGE_TYRES } from './tyreEncyclopediaData';
+export type { SeasonStoryline, Rivalry, DramaticMoment, PaddockRelationship } from './f1DramaData';
+export {
+  SEASON_STORYLINES as KNOWLEDGE_SEASON_STORIES,
+  RIVALRIES as KNOWLEDGE_RIVALRIES,
+  DRAMATIC_MOMENTS as KNOWLEDGE_DRAMA_MOMENTS,
+  PADDOCK_DYNAMICS as KNOWLEDGE_PADDOCK_DYNAMICS,
+} from './f1DramaData';
+
+
 
 export interface Reference {
   id: number;

@@ -24,11 +24,15 @@ import DriversHub from './DriversHub';
 import CircuitsHub from './CircuitsHub';
 import TyreEncyclopediaHub from './TyreEncyclopediaHub';
 import F1DramaHub from './F1DramaHub';
+import F1GlossaryHub from './F1GlossaryHub';
 
-type SubTab = 'teams' | 'drivers' | 'circuits' | 'tyres' | 'drama' | 'strategy' | 'history';
+export type SubTab = 'teams' | 'drivers' | 'circuits' | 'tyres' | 'drama' | 'glossary' | 'strategy' | 'history';
 
-interface KnowledgeHistoryHubProps {
+export interface KnowledgeHistoryHubProps {
   onNavigateToTelemetry?: (target?: TelemetryTarget) => void;
+  initialSubTab?: SubTab;
+  activeSubTab?: SubTab;
+  onSubTabChange?: (tab: SubTab) => void;
 }
 
 /** Individual Team Radio Audio Player with Play/Pause and Seek Bar */
@@ -148,8 +152,18 @@ function EmbeddedRadioCard({ radio }: { radio: EmbeddedRadio }) {
   );
 }
 
-export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: KnowledgeHistoryHubProps) {
-  const [activeSubTab, setActiveSubTab] = useState<SubTab>('teams');
+export default function KnowledgeHistoryHub({
+  onNavigateToTelemetry,
+  initialSubTab = 'tyres',
+  activeSubTab: controlledSubTab,
+  onSubTabChange,
+}: KnowledgeHistoryHubProps) {
+  const [internalSubTab, setInternalSubTab] = useState<SubTab>(initialSubTab);
+  const activeSubTab = controlledSubTab ?? internalSubTab;
+  const setActiveSubTab = (tab: SubTab) => {
+    if (onSubTabChange) onSubTabChange(tab);
+    setInternalSubTab(tab);
+  };
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedTeamDetail, setSelectedTeamDetail] = useState<TeamProfile | null>(null);
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
@@ -276,9 +290,40 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
         </div>
       </div>
 
-      {/* 7 Main Sub-Tabs Navigation (Mobile Segmented Grid & Desktop Responsive Row) */}
+      {/* 8 Main Sub-Tabs Navigation (Mobile Segmented Grid & Desktop Responsive Row) */}
       <div className="flex flex-col gap-1.5 bg-slate-950/70 p-1.5 rounded-2xl border border-white/10 shadow-inner">
-        {/* Row 1 for Mobile (Grid 3) */}
+        {/* Row 1 for Mobile (Grid 3: Core Library) */}
+        <div className="grid grid-cols-3 gap-1.5 md:hidden">
+          {(
+            [
+              ['tyres', '🛞', 'タイヤ大百科'],
+              ['drama', '🎬', '人間ドラマ'],
+              ['glossary', '🧠', '用語辞典'],
+            ] as [SubTab, string, string][]
+          ).map(([tab, icon, label]) => (
+            <button
+              key={tab}
+              onClick={() => {
+                setActiveSubTab(tab);
+                setSearchQuery('');
+              }}
+              className={`px-2 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1 text-center ${
+                activeSubTab === tab
+                  ? tab === 'drama'
+                    ? 'bg-rose-600 text-white shadow-md shadow-rose-500/30'
+                    : tab === 'glossary'
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/30'
+                    : 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
+                  : 'text-slate-400 hover:text-slate-200 bg-slate-900/40'
+              }`}
+            >
+              <span>{icon}</span>
+              <span>{label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Row 2 for Mobile (Grid 3: Grids & Tracks) */}
         <div className="grid grid-cols-3 gap-1.5 md:hidden">
           {(
             [
@@ -296,34 +341,6 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
               className={`px-2 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1 text-center ${
                 activeSubTab === tab
                   ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
-                  : 'text-slate-400 hover:text-slate-200 bg-slate-900/40'
-              }`}
-            >
-              <span>{icon}</span>
-              <span>{label}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Row 2 for Mobile (Grid 2: Tyres & Drama) */}
-        <div className="grid grid-cols-2 gap-1.5 md:hidden">
-          {(
-            [
-              ['tyres', '🛞', 'タイヤ大百科'],
-              ['drama', '🎬', '人間ドラマ'],
-            ] as [SubTab, string, string][]
-          ).map(([tab, icon, label]) => (
-            <button
-              key={tab}
-              onClick={() => {
-                setActiveSubTab(tab);
-                setSearchQuery('');
-              }}
-              className={`px-2 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1 text-center ${
-                activeSubTab === tab
-                  ? tab === 'drama'
-                    ? 'bg-rose-600 text-white shadow-md shadow-rose-500/30'
-                    : 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
                   : 'text-slate-400 hover:text-slate-200 bg-slate-900/40'
               }`}
             >
@@ -363,11 +380,12 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
         <div className="hidden md:flex flex-wrap items-center gap-1.5 w-full">
           {(
             [
+              ['tyres', '🛞', 'タイヤ大百科'],
+              ['drama', '🎬', '人間ドラマ・因縁録'],
+              ['glossary', '🧠', 'F1用語辞典'],
               ['teams', '🏎️', 'チーム'],
               ['drivers', '👤', 'ドライバー名鑑'],
               ['circuits', '🏁', 'サーキット解説'],
-              ['tyres', '🛞', 'タイヤ大百科'],
-              ['drama', '🎬', '人間ドラマ・因縁録'],
               ['strategy', '📐', '戦略 & 規則'],
               ['history', '🏛️', '歴史アーカイブ'],
             ] as [SubTab, string, string][]
@@ -382,6 +400,8 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
                 activeSubTab === tab
                   ? tab === 'drama'
                     ? 'bg-rose-600 text-white shadow-md shadow-rose-500/30'
+                    : tab === 'glossary'
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/30'
                     : 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/80'
               }`}
@@ -398,6 +418,9 @@ export default function KnowledgeHistoryHub({ onNavigateToTelemetry }: Knowledge
 
       {/* ── Sub-Tab: F1 DRAMA & STORYLINES ── */}
       {activeSubTab === 'drama' && <F1DramaHub />}
+
+      {/* ── Sub-Tab: F1 GLOSSARY ── */}
+      {activeSubTab === 'glossary' && <F1GlossaryHub />}
 
       {/* ── Sub-Tab 1: TEAMS (Compact Grid + Detail Modal) ── */}
       {activeSubTab === 'teams' && (

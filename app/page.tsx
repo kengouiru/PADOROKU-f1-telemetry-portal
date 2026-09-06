@@ -43,8 +43,10 @@ import SectorAnalysis from '@/components/SectorAnalysis';
 import PitStrategySimulator from '@/components/PitStrategySimulator';
 
 import NewsPaddockHub from '@/components/hubs/NewsPaddockHub';
-import KnowledgeHistoryHub from '@/components/hubs/KnowledgeHistoryHub';
+import KnowledgeHistoryHub, { type SubTab } from '@/components/hubs/KnowledgeHistoryHub';
 import RaceNotesReportHub from '@/components/hubs/RaceNotesReportHub';
+import SeasonHub from '@/components/hubs/SeasonHub';
+import QuickGlossaryModal from '@/components/glossary/QuickGlossaryModal';
 import type { TelemetryTarget } from '@/data/f1KnowledgeData';
 
 import AuthButton from '@/components/auth/AuthButton';
@@ -53,7 +55,8 @@ import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 // ── App State ─────────────────────────────────────────────────────────────────
 
-export type ActiveHub = 'telemetry' | 'news' | 'knowledge' | 'notes';
+export type AppMode = 'season' | 'library';
+export type ActiveHub = 'season' | 'telemetry' | 'news' | 'knowledge' | 'notes';
 
 interface AppState {
   selectedYear: string;
@@ -142,7 +145,10 @@ function buildInitialState(): AppState {
 
 export default function DashboardPage() {
   const [state, setState] = useState<AppState>(buildInitialState);
-  const [activeHub, setActiveHub] = useState<ActiveHub>('telemetry');
+  const [appMode, setAppMode] = useState<AppMode>('season');
+  const [activeHub, setActiveHub] = useState<ActiveHub>('season');
+  const [librarySubTab, setLibrarySubTab] = useState<SubTab>('tyres');
+  const [quickGlossaryOpen, setQuickGlossaryOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>('telemetry');
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>('ai');
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile sidebar drawer
@@ -528,6 +534,60 @@ export default function DashboardPage() {
     </div>
   );
 
+  const mainHubContent = (
+    <>
+      {activeHub === 'season' && (
+        <ErrorBoundary sectionName="2025 シーズン">
+          <SeasonHub
+            onNavigateToTelemetry={() => {
+              setActiveHub('telemetry');
+            }}
+            onNavigateToTyres={() => {
+              setAppMode('library');
+              setLibrarySubTab('tyres');
+              setActiveHub('knowledge');
+            }}
+            onNavigateToDrama={() => {
+              setAppMode('library');
+              setLibrarySubTab('drama');
+              setActiveHub('knowledge');
+            }}
+            onNavigateToGlossary={() => setQuickGlossaryOpen(true)}
+          />
+        </ErrorBoundary>
+      )}
+      {activeHub === 'telemetry' && <ErrorBoundary sectionName="テレメトリー分析">{analysisContent}</ErrorBoundary>}
+      {activeHub === 'news' && <ErrorBoundary sectionName="ニュースパドック"><NewsPaddockHub geminiApiKey={state.geminiApiKey} /></ErrorBoundary>}
+      {activeHub === 'knowledge' && (
+        <ErrorBoundary sectionName="ナレッジ＆ヒストリー">
+          <KnowledgeHistoryHub
+            activeSubTab={librarySubTab}
+            onSubTabChange={setLibrarySubTab}
+            onNavigateToTelemetry={(target) => {
+              setAppMode('season');
+              setActiveHub('telemetry');
+              handleNavigateToTelemetry(target);
+            }}
+          />
+        </ErrorBoundary>
+      )}
+      {activeHub === 'notes' && (
+        <ErrorBoundary sectionName="レースノート">
+          <RaceNotesReportHub
+            selectedDrivers={state.selectedDrivers}
+            drivers={state.drivers}
+            lapsCache={state.lapsCache}
+            stints={state.stints}
+            pitStopsCache={state.pitStopsCache}
+            safetyCarPeriods={state.safetyCarPeriods}
+            sessionName={state.currentSession?.session_name ?? '2024 Bahrain GP Race'}
+            geminiApiKey={state.geminiApiKey}
+          />
+        </ErrorBoundary>
+      )}
+    </>
+  );
+
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
@@ -535,7 +595,7 @@ export default function DashboardPage() {
 
       {/* ── Header (sticky) ── */}
       <header className="flex-shrink-0 sticky top-0 z-30 border-b border-white/10 px-4 py-2.5 flex items-center justify-between gap-3 bg-slate-950/90 backdrop-blur-md">
-        {/* Left: Logo + Session badge */}
+        {/* Left: Logo + Title + Mobile Mode Switcher */}
         <div className="flex items-center gap-3 flex-shrink-0">
           {/* Mobile menu toggle */}
           <button
@@ -558,35 +618,143 @@ export default function DashboardPage() {
               ADVANCED MOTORSPORT INTELLIGENCE
             </p>
           </div>
-        </div>
 
-        {/* Center: Global Multi-Hub Navigation Pills (Desktop & Tablet) */}
-        <nav className="hidden md:flex items-center bg-slate-900/90 rounded-2xl p-1 border border-white/10 shadow-inner">
-          {(
-            [
-              ['telemetry', '🏎️ Telemetry & Live'],
-              ['news', '📰 News & Paddock'],
-              ['knowledge', '📚 Knowledge & History'],
-              ['notes', '📝 Race Notes & Report'],
-            ] as [ActiveHub, string][]
-          ).map(([hub, label]) => (
+          {/* Mobile Mode Switcher (< md) */}
+          <div className="md:hidden flex items-center bg-slate-900 p-0.5 rounded-xl border border-white/10 ml-1">
             <button
-              key={hub}
-              onClick={() => setActiveHub(hub)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-racing font-bold transition-all ${
-                activeHub === hub
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+              onClick={() => {
+                setAppMode('season');
+                if (activeHub === 'knowledge') setActiveHub('season');
+              }}
+              className={`px-2 py-1 rounded-lg text-[10px] font-racing font-bold transition-all ${
+                appMode === 'season' ? 'bg-red-600 text-white' : 'text-slate-400'
               }`}
             >
-              {label}
+              🏁 観戦
             </button>
-          ))}
-        </nav>
+            <button
+              onClick={() => {
+                setAppMode('library');
+                setActiveHub('knowledge');
+              }}
+              className={`px-2 py-1 rounded-lg text-[10px] font-racing font-bold transition-all ${
+                appMode === 'library' ? 'bg-blue-600 text-white' : 'text-slate-400'
+              }`}
+            >
+              📚 百科
+            </button>
+          </div>
+        </div>
 
-        {/* Right: Driver Pills + AI Strategist Toggle */}
+        {/* Center: Dual-Mode Switcher & Context Navigation (Desktop & Tablet) */}
+        <div className="hidden md:flex items-center gap-2">
+          {/* Top-Level Mode Switcher */}
+          <div className="flex items-center bg-slate-950 p-1 rounded-2xl border border-white/15 shadow-inner">
+            <button
+              onClick={() => {
+                setAppMode('season');
+                if (activeHub === 'knowledge') setActiveHub('season');
+              }}
+              className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
+                appMode === 'season'
+                  ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <span>🏁</span>
+              <span className="hidden lg:inline">観戦・シーズン</span>
+              <span className="lg:hidden">観戦</span>
+            </button>
+            <button
+              onClick={() => {
+                setAppMode('library');
+                setActiveHub('knowledge');
+              }}
+              className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
+                appMode === 'library'
+                  ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <span>📚</span>
+              <span className="hidden lg:inline">F1大百科</span>
+              <span className="lg:hidden">大百科</span>
+            </button>
+          </div>
+
+          {/* Context Hub Pills */}
+          {appMode === 'season' ? (
+            <nav className="flex items-center bg-slate-900/90 rounded-2xl p-1 border border-white/10 shadow-inner">
+              {(
+                [
+                  ['season', '🏁 2025 シーズン'],
+                  ['telemetry', '🏎️ テレメトリー＆Live'],
+                  ['news', '📰 ニュース＆パドック'],
+                  ['notes', '📝 レースノート＆AI'],
+                ] as [ActiveHub, string][]
+              ).map(([hub, label]) => (
+                <button
+                  key={hub}
+                  onClick={() => setActiveHub(hub)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all ${
+                    activeHub === hub
+                      ? 'bg-red-600 text-white shadow-md shadow-red-500/30'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </nav>
+          ) : (
+            <nav className="flex items-center bg-slate-900/90 rounded-2xl p-1 border border-white/10 shadow-inner overflow-x-auto max-w-xl">
+              {(
+                [
+                  ['tyres', '🛞 タイヤ大百科'],
+                  ['drama', '🎬 ドラマ・因縁録'],
+                  ['glossary', '🧠 F1用語辞典'],
+                  ['drivers', '👤 選手名鑑'],
+                  ['circuits', '🏁 コース'],
+                  ['teams', '🏎️ チーム'],
+                  ['history', '🏛️ 歴史'],
+                ] as [SubTab, string][]
+              ).map(([subTab, label]) => (
+                <button
+                  key={subTab}
+                  onClick={() => {
+                    setActiveHub('knowledge');
+                    setLibrarySubTab(subTab);
+                  }}
+                  className={`px-2.5 py-1.5 rounded-xl text-xs font-racing font-bold transition-all whitespace-nowrap ${
+                    activeHub === 'knowledge' && librarySubTab === subTab
+                      ? subTab === 'drama'
+                        ? 'bg-rose-600 text-white shadow-md shadow-rose-500/30'
+                        : subTab === 'glossary'
+                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/30'
+                        : 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </nav>
+          )}
+        </div>
+
+        {/* Right: Quick Glossary + Driver Pills + AI Strategist Toggle + Auth */}
         <div className="flex items-center gap-2">
-          {/* Selected driver pills (desktop) */}
+          {/* Quick Glossary Search Button (Global Action) */}
+          <button
+            onClick={() => setQuickGlossaryOpen(true)}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-racing font-bold bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-500/40 hover:border-emerald-400 shadow-sm transition-all flex-shrink-0"
+            title="レース観戦中の用語クイック検索"
+          >
+            <span>🔍</span>
+            <span className="hidden sm:inline">用語検索</span>
+          </button>
+
+          {/* Selected driver pills (desktop, in telemetry hub) */}
           {activeHub === 'telemetry' && (
             <div className="hidden xl:flex items-center gap-1.5 mr-1">
               {state.selectedDrivers.map((num) => {
@@ -640,27 +808,7 @@ export default function DashboardPage() {
 
         {/* Main Hub Area */}
         <main className="flex-1 min-w-0 p-5 overflow-y-auto">
-          {activeHub === 'telemetry' && <ErrorBoundary sectionName="テレメトリー分析">{analysisContent}</ErrorBoundary>}
-          {activeHub === 'news' && <ErrorBoundary sectionName="ニュースパドック"><NewsPaddockHub geminiApiKey={state.geminiApiKey} /></ErrorBoundary>}
-          {activeHub === 'knowledge' && (
-            <ErrorBoundary sectionName="ナレッジ＆ヒストリー">
-              <KnowledgeHistoryHub onNavigateToTelemetry={handleNavigateToTelemetry} />
-            </ErrorBoundary>
-          )}
-          {activeHub === 'notes' && (
-            <ErrorBoundary sectionName="レースノート">
-              <RaceNotesReportHub
-                selectedDrivers={state.selectedDrivers}
-                drivers={state.drivers}
-                lapsCache={state.lapsCache}
-                stints={state.stints}
-                pitStopsCache={state.pitStopsCache}
-                safetyCarPeriods={state.safetyCarPeriods}
-                sessionName={state.currentSession?.session_name ?? '2024 Bahrain GP Race'}
-                geminiApiKey={state.geminiApiKey}
-              />
-            </ErrorBoundary>
-          )}
+          {mainHubContent}
         </main>
       </div>
 
@@ -685,69 +833,85 @@ export default function DashboardPage() {
 
         {/* Tab content (with bottom padding pb-20 so fixed navigation doesn't hide content) */}
         <div className="flex-1 min-h-0 overflow-y-auto p-4 pb-20 md:pb-6">
-          {activeHub === 'telemetry' && <ErrorBoundary sectionName="テレメトリー分析">{analysisContent}</ErrorBoundary>}
-          {activeHub === 'news' && <ErrorBoundary sectionName="ニュースパドック"><NewsPaddockHub geminiApiKey={state.geminiApiKey} /></ErrorBoundary>}
-          {activeHub === 'knowledge' && (
-            <ErrorBoundary sectionName="ナレッジ＆ヒストリー">
-              <KnowledgeHistoryHub onNavigateToTelemetry={handleNavigateToTelemetry} />
-            </ErrorBoundary>
-          )}
-          {activeHub === 'notes' && (
-            <ErrorBoundary sectionName="レースノート">
-              <RaceNotesReportHub
-                selectedDrivers={state.selectedDrivers}
-                drivers={state.drivers}
-                lapsCache={state.lapsCache}
-                stints={state.stints}
-                pitStopsCache={state.pitStopsCache}
-                safetyCarPeriods={state.safetyCarPeriods}
-                sessionName={state.currentSession?.session_name ?? '2024 Bahrain GP Race'}
-                geminiApiKey={state.geminiApiKey}
-              />
-            </ErrorBoundary>
-          )}
+          {mainHubContent}
         </div>
 
         {/* ── Fixed Mobile Bottom Navigation Bar (< md) ── */}
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-black/90 backdrop-blur-md border-t border-white/10 flex items-center justify-around safe-bottom shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
-          {(
-            [
-              ['telemetry', '🏎️', '分析'],
-              ['news',      '📰', 'ニュース'],
-              ['knowledge', '📚', 'ナレッジ'],
-              ['notes',     '📝', 'ノート'],
-              ['ai',        '🤖', 'AI'],
-            ] as [string, string, string][]
-          ).map(([tab, icon, label]) => {
-            const isAiTab = tab === 'ai';
-            const isActive = isAiTab ? aiDrawerOpen : activeHub === tab && !aiDrawerOpen;
+          {appMode === 'season' ? (
+            (
+              [
+                ['season',    '🏁', 'シーズン'],
+                ['telemetry', '🏎️', '分析'],
+                ['news',      '📰', 'ニュース'],
+                ['notes',     '📝', 'ノート'],
+                ['ai',        '🤖', 'AI'],
+              ] as [string, string, string][]
+            ).map(([tab, icon, label]) => {
+              const isAiTab = tab === 'ai';
+              const isActive = isAiTab ? aiDrawerOpen : activeHub === tab && !aiDrawerOpen;
 
-            return (
-              <button
-                key={tab}
-                onClick={() => {
-                  if (isAiTab) {
-                    setAiDrawerOpen((prev) => !prev);
-                  } else {
-                    setActiveHub(tab as ActiveHub);
-                    setMobileTab(tab as MobileTab);
+              return (
+                <button
+                  key={tab}
+                  onClick={() => {
+                    if (isAiTab) {
+                      setAiDrawerOpen((prev) => !prev);
+                    } else {
+                      setActiveHub(tab as ActiveHub);
+                      setMobileTab(tab as MobileTab);
+                      if (aiDrawerOpen) setAiDrawerOpen(false);
+                    }
+                  }}
+                  className={`flex-1 flex flex-col items-center py-2.5 px-1 gap-0.5 text-xs transition-all relative ${
+                    isActive
+                      ? 'text-red-400 font-bold'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <span className={`text-base transition-transform ${isActive ? 'scale-110' : ''}`}>{icon}</span>
+                  <span className="text-[10px] tracking-tight">{label}</span>
+                  {isActive && (
+                    <span className="absolute bottom-1 w-6 h-0.5 bg-red-500 rounded-full shadow-[0_0_8px_#ef4444]" />
+                  )}
+                </button>
+              );
+            })
+          ) : (
+            (
+              [
+                ['tyres',    '🛞', 'タイヤ'],
+                ['drama',    '🎬', 'ドラマ'],
+                ['glossary', '🧠', '用語'],
+                ['drivers',  '👤', '名鑑'],
+                ['circuits', '🏁', 'コース'],
+              ] as [SubTab, string, string][]
+            ).map(([subTab, icon, label]) => {
+              const isActive = activeHub === 'knowledge' && librarySubTab === subTab && !aiDrawerOpen;
+
+              return (
+                <button
+                  key={subTab}
+                  onClick={() => {
+                    setActiveHub('knowledge');
+                    setLibrarySubTab(subTab);
                     if (aiDrawerOpen) setAiDrawerOpen(false);
-                  }
-                }}
-                className={`flex-1 flex flex-col items-center py-2.5 px-1 gap-0.5 text-xs transition-all relative ${
-                  isActive
-                    ? 'text-sky-400 font-bold'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <span className={`text-base transition-transform ${isActive ? 'scale-110' : ''}`}>{icon}</span>
-                <span className="text-[10px] tracking-tight">{label}</span>
-                {isActive && (
-                  <span className="absolute bottom-1 w-6 h-0.5 bg-f1-red rounded-full shadow-[0_0_8px_#ef4444]" />
-                )}
-              </button>
-            );
-          })}
+                  }}
+                  className={`flex-1 flex flex-col items-center py-2.5 px-1 gap-0.5 text-xs transition-all relative ${
+                    isActive
+                      ? 'text-sky-400 font-bold'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <span className={`text-base transition-transform ${isActive ? 'scale-110' : ''}`}>{icon}</span>
+                  <span className="text-[10px] tracking-tight">{label}</span>
+                  {isActive && (
+                    <span className="absolute bottom-1 w-6 h-0.5 bg-sky-500 rounded-full shadow-[0_0_8px_#38bdf8]" />
+                  )}
+                </button>
+              );
+            })
+          )}
         </nav>
       </div>
 
@@ -817,6 +981,12 @@ export default function DashboardPage() {
         onClose={() => setAuthModalOpen(false)}
         title={authModalConfig.title}
         description={authModalConfig.description}
+      />
+
+      {/* ── Quick Glossary Modal (Fast lookup anywhere) ── */}
+      <QuickGlossaryModal
+        isOpen={quickGlossaryOpen}
+        onClose={() => setQuickGlossaryOpen(false)}
       />
     </div>
   );
