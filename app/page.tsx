@@ -147,7 +147,7 @@ export default function DashboardPage() {
   const [state, setState] = useState<AppState>(buildInitialState);
   const [appMode, setAppMode] = useState<AppMode>('season');
   const [activeHub, setActiveHub] = useState<ActiveHub>('season');
-  const [librarySubTab, setLibrarySubTab] = useState<SubTab>('tyres');
+  const [librarySubTab, setLibrarySubTab] = useState<SubTab>('drivers');
   const [quickGlossaryOpen, setQuickGlossaryOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>('telemetry');
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>('ai');
@@ -772,18 +772,16 @@ export default function DashboardPage() {
         {appMode === 'library' && (
           <div className="border-t border-white/10 bg-slate-900/95 px-4 py-2 shadow-inner">
             <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
-              {/* Desktop: All 8 Categories in 1 clean row (No scrollbar needed) */}
+              {/* Desktop: All 6 Categories in 1 clean row */}
               <div className="hidden lg:flex items-center justify-between gap-1.5 w-full bg-slate-900/90 p-1.5 rounded-2xl border border-white/10 shadow-inner">
                 {(
                   [
-                    ['tyres', '🛞', 'タイヤ大百科'],
-                    ['drama', '🎬', '人間ドラマ・因縁録'],
-                    ['glossary', '🧠', 'F1用語辞典'],
-                    ['teams', '🏎️', 'チーム名鑑'],
                     ['drivers', '👤', '選手名鑑'],
+                    ['teams', '🏎️', 'チーム名鑑'],
                     ['circuits', '🏁', 'コース解説'],
-                    ['strategy', '📐', '戦略＆規則'],
-                    ['history', '🏛️', '歴史アーカイブ'],
+                    ['tyres', '🛞', 'タイヤ大百科'],
+                    ['glossary', '🧠', 'F1用語辞典'],
+                    ['drama', '🎬', 'ドラマ・歴史'],
                   ] as [SubTab, string, string][]
                 ).map(([tab, icon, label]) => {
                   const isActive = librarySubTab === tab;
@@ -801,6 +799,8 @@ export default function DashboardPage() {
                             ? 'bg-rose-600 text-white shadow-md shadow-rose-500/30 ring-1 ring-rose-400/40'
                             : tab === 'glossary'
                             ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/30 ring-1 ring-emerald-400/40'
+                            : tab === 'tyres'
+                            ? 'bg-amber-600 text-white shadow-md shadow-amber-500/30 ring-1 ring-amber-400/40'
                             : 'bg-blue-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-400/40'
                           : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
                       }`}
@@ -816,14 +816,12 @@ export default function DashboardPage() {
               <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto w-full py-0.5 no-scrollbar">
                 {(
                   [
-                    ['tyres', '🛞', 'タイヤ大百科'],
-                    ['drama', '🎬', 'ドラマ・因縁録'],
-                    ['glossary', '🧠', '用語辞典'],
-                    ['teams', '🏎️', 'チーム'],
                     ['drivers', '👤', '選手名鑑'],
-                    ['circuits', '🏁', 'コース'],
-                    ['strategy', '📐', '戦略＆規則'],
-                    ['history', '🏛️', '歴史'],
+                    ['teams', '🏎️', 'チーム名鑑'],
+                    ['circuits', '🏁', 'コース解説'],
+                    ['tyres', '🛞', 'タイヤ大百科'],
+                    ['glossary', '🧠', '用語辞典'],
+                    ['drama', '🎬', 'ドラマ・歴史'],
                   ] as [SubTab, string, string][]
                 ).map(([tab, icon, label]) => {
                   const isActive = librarySubTab === tab;
@@ -841,6 +839,8 @@ export default function DashboardPage() {
                             ? 'bg-rose-600 text-white shadow-md'
                             : tab === 'glossary'
                             ? 'bg-emerald-600 text-white shadow-md'
+                            : tab === 'tyres'
+                            ? 'bg-amber-600 text-white shadow-md'
                             : 'bg-blue-600 text-white shadow-md'
                           : 'text-slate-400 hover:text-slate-200 bg-slate-900/60 border border-white/5'
                       }`}
@@ -939,11 +939,12 @@ export default function DashboardPage() {
           ) : (
             (
               [
-                ['tyres',    '🛞', 'タイヤ'],
-                ['drama',    '🎬', 'ドラマ'],
-                ['glossary', '🧠', '用語'],
-                ['drivers',  '👤', '名鑑'],
+                ['drivers',  '👤', '選手'],
+                ['teams',    '🏎️', 'チーム'],
                 ['circuits', '🏁', 'コース'],
+                ['tyres',    '🛞', 'タイヤ'],
+                ['glossary', '🧠', '用語'],
+                ['drama',    '🎬', 'ドラマ'],
               ] as [SubTab, string, string][]
             ).map(([subTab, icon, label]) => {
               const isActive = activeHub === 'knowledge' && librarySubTab === subTab && !aiDrawerOpen;

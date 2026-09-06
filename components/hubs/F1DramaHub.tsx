@@ -51,10 +51,10 @@ export default function F1DramaHub() {
           <span className="text-[10px] text-slate-400">NETFLIX &amp; PADDOCK NARRATIVES</span>
         </div>
         <h3 className="text-xl font-racing font-black tracking-wide text-white flex items-center gap-2">
-          <span>🎬</span> F1ドラマ・因縁＆感動の物語録
+          <span>🎬</span> F1ドラマ・歴史＆感動の物語録
         </h3>
         <p className="text-xs text-slate-400 mt-1 max-w-2xl">
-          「F1はマシンの競技ではなく、人間の葛藤と情熱が織りなす連続ドラマである」。シーズン通史、感動の名場面、宿命のライバル、そしてパドック相関図を完全網羅。
+          「F1はマシンの競技ではなく、人間の葛藤と情熱が織りなす連続ドラマである」。シーズン通史、歴史的名勝負、宿命のライバル、そしてパドック相関図を完全網羅。
         </p>
       </div>
 
@@ -62,9 +62,9 @@ export default function F1DramaHub() {
       <div className="sticky top-0 z-20 bg-slate-950/95 border border-white/15 rounded-2xl p-2.5 md:p-3 backdrop-blur-md shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         <div className="flex items-center gap-2">
           <span className="text-base">🎬</span>
-          <span className="text-xs font-racing font-bold text-slate-200">ドラマカテゴリ:</span>
+          <span className="text-xs font-racing font-bold text-slate-200">ドラマ・歴史:</span>
           <span className="text-[11px] text-rose-400 font-mono font-bold">
-            {activeTab === 'storylines' ? '【連載】シーズン通史' : activeTab === 'moments' ? '【名場面】感動の瞬間' : activeTab === 'rivalries' ? '【対決】因縁のライバル' : '【相関図】パドック関係性'}
+            {activeTab === 'storylines' ? '【連載】シーズン通史' : activeTab === 'moments' ? '【名場面】感動と歴史' : activeTab === 'rivalries' ? '【対決】因縁のライバル' : '【相関図】パドック関係性'}
           </span>
         </div>
 
@@ -98,7 +98,7 @@ export default function F1DramaHub() {
             }`}
           >
             <span>😭</span>
-            <span>感動の名場面</span>
+            <span>感動の名場面・歴史</span>
           </button>
           <button
             onClick={() => {

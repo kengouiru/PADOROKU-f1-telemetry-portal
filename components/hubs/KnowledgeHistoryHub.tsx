@@ -26,7 +26,7 @@ import TyreEncyclopediaHub from './TyreEncyclopediaHub';
 import F1DramaHub from './F1DramaHub';
 import F1GlossaryHub from './F1GlossaryHub';
 
-export type SubTab = 'teams' | 'drivers' | 'circuits' | 'tyres' | 'drama' | 'glossary' | 'strategy' | 'history';
+export type SubTab = 'drivers' | 'teams' | 'circuits' | 'tyres' | 'glossary' | 'drama' | 'strategy' | 'history';
 
 export interface KnowledgeHistoryHubProps {
   onNavigateToTelemetry?: (target?: TelemetryTarget) => void;
@@ -154,7 +154,7 @@ function EmbeddedRadioCard({ radio }: { radio: EmbeddedRadio }) {
 
 export default function KnowledgeHistoryHub({
   onNavigateToTelemetry,
-  initialSubTab = 'tyres',
+  initialSubTab = 'drivers',
   activeSubTab: controlledSubTab,
   onSubTabChange,
 }: KnowledgeHistoryHubProps) {
