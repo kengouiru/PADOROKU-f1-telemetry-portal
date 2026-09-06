@@ -72,61 +72,80 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
   const marginAfterPit = Number((netOneLapGain - gapBeforePit).toFixed(2));
 
   return (
-    <div className="flex flex-col gap-6 animate-fade-in text-white">
-      {/* ── Sub Header / 3-Layer Segmented Nav ── */}
+    <div className="flex flex-col gap-5 text-white">
+      {/* ── Header Introduction Banner ── */}
       <div className="bg-slate-900/60 border border-white/10 rounded-2xl p-4 md:p-5 backdrop-blur-md">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-racing font-bold px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30">
-                PIRELLI FORMULA 1 TECHNICAL MASTERCLASS
-              </span>
-              <span className="text-[10px] text-slate-400">2025 REGULATIONS</span>
-            </div>
-            <h3 className="text-xl font-racing font-black tracking-wide text-white flex items-center gap-2">
-              <span>🛞</span> F1タイヤ大百科 (3レイヤー完全体系)
-            </h3>
-            <p className="text-xs text-slate-400 mt-1 max-w-2xl">
-              「初心者向け基礎」「中級者向け戦略」「玄人向けデータ＆歴史」の3段階で、F1の勝敗の8割を支配するタイヤのすべてを体感。
-            </p>
-          </div>
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-[10px] font-racing font-bold px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30">
+            PIRELLI FORMULA 1 TECHNICAL MASTERCLASS
+          </span>
+          <span className="text-[10px] text-slate-400">2025 REGULATIONS</span>
+        </div>
+        <h3 className="text-xl font-racing font-black tracking-wide text-white flex items-center gap-2">
+          <span>🛞</span> F1タイヤ大百科 (3レイヤー完全体系)
+        </h3>
+        <p className="text-xs text-slate-400 mt-1 max-w-2xl">
+          「初心者向け基礎」「中級者向け戦略」「玄人向けデータ＆歴史」の3段階で、F1の勝敗の8割を支配するタイヤのすべてを体感。
+        </p>
+      </div>
 
-          {/* 3 Layer Navigation Buttons */}
-          <div className="flex flex-wrap gap-1.5 bg-slate-950/80 p-1.5 rounded-2xl border border-white/10 self-start lg:self-auto shadow-inner">
-            <button
-              onClick={() => setActiveLayer('beginner')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
-                activeLayer === 'beginner'
-                  ? 'bg-gradient-to-r from-blue-600 to-sky-600 text-white shadow-lg shadow-blue-500/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-              }`}
-            >
-              <span>🔰</span>
-              <span>初級：タイヤの基本</span>
-            </button>
-            <button
-              onClick={() => setActiveLayer('intermediate')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
-                activeLayer === 'intermediate'
-                  ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg shadow-amber-500/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-              }`}
-            >
-              <span>🧭</span>
-              <span>中級：戦略を読む</span>
-            </button>
-            <button
-              onClick={() => setActiveLayer('expert')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
-                activeLayer === 'expert'
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-              }`}
-            >
-              <span>🔬</span>
-              <span>玄人：データで読む</span>
-            </button>
-          </div>
+      {/* ── Sticky 3-Layer Navigation Bar (Pinned on scroll!) ── */}
+      <div className="sticky top-0 z-20 bg-slate-950/95 border border-white/15 rounded-2xl p-2.5 md:p-3 backdrop-blur-md shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2">
+          <span className="text-base">🛞</span>
+          <span className="text-xs font-racing font-bold text-slate-200">タイヤ階層:</span>
+          <span className="text-[11px] text-pink-400 font-mono font-bold">
+            {activeLayer === 'beginner' ? '【初級】タイヤの基本' : activeLayer === 'intermediate' ? '【中級】戦略を読む' : '【玄人】データで読む'}
+          </span>
+        </div>
+
+        {/* 3 Layer Navigation Buttons */}
+        <div className="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-white/10 shadow-inner overflow-x-auto">
+          <button
+            onClick={() => {
+              setActiveLayer('beginner');
+              const mainEl = document.querySelector('main');
+              if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+              activeLayer === 'beginner'
+                ? 'bg-gradient-to-r from-blue-600 to-sky-600 text-white shadow-md shadow-blue-500/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <span>🔰</span>
+            <span>初級：基本</span>
+          </button>
+          <button
+            onClick={() => {
+              setActiveLayer('intermediate');
+              const mainEl = document.querySelector('main');
+              if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+              activeLayer === 'intermediate'
+                ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md shadow-amber-500/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <span>🧭</span>
+            <span>中級：戦略</span>
+          </button>
+          <button
+            onClick={() => {
+              setActiveLayer('expert');
+              const mainEl = document.querySelector('main');
+              if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+              activeLayer === 'expert'
+                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md shadow-purple-500/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <span>🔬</span>
+            <span>玄人：データ</span>
+          </button>
         </div>
       </div>
 

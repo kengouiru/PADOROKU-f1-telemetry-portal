@@ -261,157 +261,45 @@ export default function KnowledgeHistoryHub({
   };
 
   return (
-    <div className="flex flex-col gap-5 max-w-6xl mx-auto animate-fade-in">
-      {/* Header Banner */}
-      <div className="glass-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
-        <div className="flex flex-col gap-1 z-10">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-racing font-bold text-sky-400 uppercase tracking-widest">
-              ACADEMIC CITATIONS & DEEP TELEMETRY LINKING
-            </span>
+    <div className="flex flex-col gap-5 max-w-6xl mx-auto">
+
+      {/* Header Banner (Shown specifically for Teams, Strategy & History search) */}
+      {(activeSubTab === 'teams' || activeSubTab === 'strategy' || activeSubTab === 'history') && (
+        <div className="glass-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
+          <div className="flex flex-col gap-1 z-10">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-racing font-bold text-sky-400 uppercase tracking-widest">
+                ACADEMIC CITATIONS & DEEP TELEMETRY LINKING
+              </span>
+            </div>
+            <h2 className="text-xl font-racing font-black text-white tracking-wider">
+              {activeSubTab === 'teams'
+                ? 'F1 CONSTRUCTOR TEAMS & PHILOSOPHIES'
+                : activeSubTab === 'strategy'
+                ? 'STRATEGY & TECHNICAL REGULATIONS'
+                : 'HISTORICAL ARCHIVES & LEGENDARY BATTLES'}
+            </h2>
+            <p className="text-xs text-slate-400 max-w-xl">
+              {activeSubTab === 'teams'
+                ? 'FIA公式規則に基づく全10チームの工学哲学、歴代マシン、PU仕様およびファクトリー詳細を体系化。'
+                : activeSubTab === 'strategy'
+                ? '空力グラウンドエフェクト、タイヤ劣化理論、セーフティカー規則などを公式文献付きで詳解。'
+                : 'F1史を揺るがした名勝負を当時の生チーム無線ログ（🎙️）と実テレメトリー連携付きで追体験。'}
+            </p>
           </div>
-          <h2 className="text-xl font-racing font-black text-white tracking-wider">
-            F1 KNOWLEDGE & HISTORICAL ARCHIVES
-          </h2>
-          <p className="text-xs text-slate-400 max-w-xl">
-            FIA公式規則、全10チーム工学哲学、ドライバー詳細名鑑、サーキットデータ、伝説の名勝負を生無線ログ（🎙️）と実テレメトリー連携付きで体系化。
-          </p>
-        </div>
 
-        {/* Search Bar */}
-        <div className="z-10 w-full md:w-64">
-          <input
-            type="text"
-            placeholder="ナレッジ内を検索..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-900/80 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
-          />
+          {/* Search Bar */}
+          <div className="z-10 w-full md:w-64">
+            <input
+              type="text"
+              placeholder={`${activeSubTab === 'teams' ? 'チーム' : activeSubTab === 'strategy' ? '戦略・規則' : '歴史アーカイブ'}内を検索...`}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-slate-900/80 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
+            />
+          </div>
         </div>
-      </div>
-
-      {/* 8 Main Sub-Tabs Navigation (Mobile Segmented Grid & Desktop Responsive Row) */}
-      <div className="flex flex-col gap-1.5 bg-slate-950/70 p-1.5 rounded-2xl border border-white/10 shadow-inner">
-        {/* Row 1 for Mobile (Grid 3: Core Library) */}
-        <div className="grid grid-cols-3 gap-1.5 md:hidden">
-          {(
-            [
-              ['tyres', '🛞', 'タイヤ大百科'],
-              ['drama', '🎬', '人間ドラマ'],
-              ['glossary', '🧠', '用語辞典'],
-            ] as [SubTab, string, string][]
-          ).map(([tab, icon, label]) => (
-            <button
-              key={tab}
-              onClick={() => {
-                setActiveSubTab(tab);
-                setSearchQuery('');
-              }}
-              className={`px-2 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1 text-center ${
-                activeSubTab === tab
-                  ? tab === 'drama'
-                    ? 'bg-rose-600 text-white shadow-md shadow-rose-500/30'
-                    : tab === 'glossary'
-                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/30'
-                    : 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
-                  : 'text-slate-400 hover:text-slate-200 bg-slate-900/40'
-              }`}
-            >
-              <span>{icon}</span>
-              <span>{label}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Row 2 for Mobile (Grid 3: Grids & Tracks) */}
-        <div className="grid grid-cols-3 gap-1.5 md:hidden">
-          {(
-            [
-              ['teams', '🏎️', 'チーム'],
-              ['drivers', '👤', '選手名鑑'],
-              ['circuits', '🏁', 'コース'],
-            ] as [SubTab, string, string][]
-          ).map(([tab, icon, label]) => (
-            <button
-              key={tab}
-              onClick={() => {
-                setActiveSubTab(tab);
-                setSearchQuery('');
-              }}
-              className={`px-2 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1 text-center ${
-                activeSubTab === tab
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
-                  : 'text-slate-400 hover:text-slate-200 bg-slate-900/40'
-              }`}
-            >
-              <span>{icon}</span>
-              <span>{label}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Row 3 for Mobile (Grid 2: Strategy & History) */}
-        <div className="grid grid-cols-2 gap-1.5 md:hidden">
-          {(
-            [
-              ['strategy', '📐', '戦略＆規則'],
-              ['history', '🏛️', '歴史アーカイブ'],
-            ] as [SubTab, string, string][]
-          ).map(([tab, icon, label]) => (
-            <button
-              key={tab}
-              onClick={() => {
-                setActiveSubTab(tab);
-                setSearchQuery('');
-              }}
-              className={`px-2 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1 text-center ${
-                activeSubTab === tab
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
-                  : 'text-slate-400 hover:text-slate-200 bg-slate-900/40'
-              }`}
-            >
-              <span>{icon}</span>
-              <span>{label}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* Desktop Single Row (hidden on mobile, flex on md+) */}
-        <div className="hidden md:flex flex-wrap items-center gap-1.5 w-full">
-          {(
-            [
-              ['tyres', '🛞', 'タイヤ大百科'],
-              ['drama', '🎬', '人間ドラマ・因縁録'],
-              ['glossary', '🧠', 'F1用語辞典'],
-              ['teams', '🏎️', 'チーム'],
-              ['drivers', '👤', 'ドライバー名鑑'],
-              ['circuits', '🏁', 'サーキット解説'],
-              ['strategy', '📐', '戦略 & 規則'],
-              ['history', '🏛️', '歴史アーカイブ'],
-            ] as [SubTab, string, string][]
-          ).map(([tab, icon, fullLabel]) => (
-            <button
-              key={tab}
-              onClick={() => {
-                setActiveSubTab(tab);
-                setSearchQuery('');
-              }}
-              className={`px-3 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1.5 flex-1 whitespace-nowrap ${
-                activeSubTab === tab
-                  ? tab === 'drama'
-                    ? 'bg-rose-600 text-white shadow-md shadow-rose-500/30'
-                    : tab === 'glossary'
-                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/30'
-                    : 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/80'
-              }`}
-            >
-              <span className="text-xs">{icon}</span>
-              <span>{fullLabel}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* ── Sub-Tab: TYRES ENCYCLOPEDIA ── */}
       {activeSubTab === 'tyres' && <TyreEncyclopediaHub onNavigateToTelemetry={onNavigateToTelemetry} />}

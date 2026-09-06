@@ -167,6 +167,8 @@ export default function DashboardPage() {
 
   const timelineRef = useRef<TeamRadioTimelineHandle>(null);
   const notebookRef = useRef<RaceNotebookHandle>(null);
+  const desktopScrollRef = useRef<HTMLElement>(null);
+  const mobileScrollRef = useRef<HTMLDivElement>(null);
 
   const handleRequireAuth = useCallback((title?: string, description?: string) => {
     setAuthModalConfig({
@@ -591,10 +593,12 @@ export default function DashboardPage() {
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen flex flex-col bg-f1-gradient">
+    <div className="h-screen h-[100dvh] flex flex-col bg-f1-gradient overflow-hidden">
 
-      {/* ── Header (sticky) ── */}
-      <header className="flex-shrink-0 sticky top-0 z-30 border-b border-white/10 px-4 py-2.5 flex items-center justify-between gap-3 bg-slate-950/90 backdrop-blur-md">
+      {/* ── Header (sticky flex flex-col) ── */}
+      <header className="flex-shrink-0 sticky top-0 z-30 border-b border-white/10 bg-slate-950/95 backdrop-blur-md shadow-xl flex flex-col">
+        {/* Top Global Row */}
+        <div className="px-4 py-2.5 flex items-center justify-between gap-3">
         {/* Left: Logo + Title + Mobile Mode Switcher */}
         <div className="flex items-center gap-3 flex-shrink-0">
           {/* Mobile menu toggle */}
@@ -682,8 +686,8 @@ export default function DashboardPage() {
             </button>
           </div>
 
-          {/* Context Hub Pills */}
-          {appMode === 'season' ? (
+          {/* Context Hub Pills (Shown in Season Mode) */}
+          {appMode === 'season' && (
             <nav className="flex items-center bg-slate-900/90 rounded-2xl p-1 border border-white/10 shadow-inner">
               {(
                 [
@@ -699,39 +703,6 @@ export default function DashboardPage() {
                   className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all ${
                     activeHub === hub
                       ? 'bg-red-600 text-white shadow-md shadow-red-500/30'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </nav>
-          ) : (
-            <nav className="flex items-center bg-slate-900/90 rounded-2xl p-1 border border-white/10 shadow-inner overflow-x-auto max-w-xl">
-              {(
-                [
-                  ['tyres', '🛞 タイヤ大百科'],
-                  ['drama', '🎬 ドラマ・因縁録'],
-                  ['glossary', '🧠 F1用語辞典'],
-                  ['drivers', '👤 選手名鑑'],
-                  ['circuits', '🏁 コース'],
-                  ['teams', '🏎️ チーム'],
-                  ['history', '🏛️ 歴史'],
-                ] as [SubTab, string][]
-              ).map(([subTab, label]) => (
-                <button
-                  key={subTab}
-                  onClick={() => {
-                    setActiveHub('knowledge');
-                    setLibrarySubTab(subTab);
-                  }}
-                  className={`px-2.5 py-1.5 rounded-xl text-xs font-racing font-bold transition-all whitespace-nowrap ${
-                    activeHub === 'knowledge' && librarySubTab === subTab
-                      ? subTab === 'drama'
-                        ? 'bg-rose-600 text-white shadow-md shadow-rose-500/30'
-                        : subTab === 'glossary'
-                        ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/30'
-                        : 'bg-blue-600 text-white shadow-md shadow-blue-500/30'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
                   }`}
                 >
@@ -795,6 +766,94 @@ export default function DashboardPage() {
           {/* Auth Button (Login / User Profile Dropdown) */}
           <AuthButton onOpenAuthModal={() => handleRequireAuth()} />
         </div>
+      </div>
+
+      {/* ── Level 2: Persistent Library Sub-Header (Integrated inside Header, permanently fixed!) ── */}
+        {appMode === 'library' && (
+          <div className="border-t border-white/10 bg-slate-900/95 px-4 py-2 shadow-inner">
+            <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
+              {/* Desktop: All 8 Categories in 1 clean row (No scrollbar needed) */}
+              <div className="hidden lg:flex items-center justify-between gap-1.5 w-full bg-slate-900/90 p-1.5 rounded-2xl border border-white/10 shadow-inner">
+                {(
+                  [
+                    ['tyres', '🛞', 'タイヤ大百科'],
+                    ['drama', '🎬', '人間ドラマ・因縁録'],
+                    ['glossary', '🧠', 'F1用語辞典'],
+                    ['teams', '🏎️', 'チーム名鑑'],
+                    ['drivers', '👤', '選手名鑑'],
+                    ['circuits', '🏁', 'コース解説'],
+                    ['strategy', '📐', '戦略＆規則'],
+                    ['history', '🏛️', '歴史アーカイブ'],
+                  ] as [SubTab, string, string][]
+                ).map(([tab, icon, label]) => {
+                  const isActive = librarySubTab === tab;
+                  return (
+                    <button
+                      key={tab}
+                      onClick={() => {
+                        setLibrarySubTab(tab);
+                        desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                        mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1.5 flex-1 whitespace-nowrap ${
+                        isActive
+                          ? tab === 'drama'
+                            ? 'bg-rose-600 text-white shadow-md shadow-rose-500/30 ring-1 ring-rose-400/40'
+                            : tab === 'glossary'
+                            ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/30 ring-1 ring-emerald-400/40'
+                            : 'bg-blue-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-400/40'
+                          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <span className="text-sm">{icon}</span>
+                      <span>{label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Mobile / Tablet Horizontal Scrollable Pills */}
+              <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto w-full py-0.5 no-scrollbar">
+                {(
+                  [
+                    ['tyres', '🛞', 'タイヤ大百科'],
+                    ['drama', '🎬', 'ドラマ・因縁録'],
+                    ['glossary', '🧠', '用語辞典'],
+                    ['teams', '🏎️', 'チーム'],
+                    ['drivers', '👤', '選手名鑑'],
+                    ['circuits', '🏁', 'コース'],
+                    ['strategy', '📐', '戦略＆規則'],
+                    ['history', '🏛️', '歴史'],
+                  ] as [SubTab, string, string][]
+                ).map(([tab, icon, label]) => {
+                  const isActive = librarySubTab === tab;
+                  return (
+                    <button
+                      key={tab}
+                      onClick={() => {
+                        setLibrarySubTab(tab);
+                        desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                        mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1 shrink-0 whitespace-nowrap ${
+                        isActive
+                          ? tab === 'drama'
+                            ? 'bg-rose-600 text-white shadow-md'
+                            : tab === 'glossary'
+                            ? 'bg-emerald-600 text-white shadow-md'
+                            : 'bg-blue-600 text-white shadow-md'
+                          : 'text-slate-400 hover:text-slate-200 bg-slate-900/60 border border-white/5'
+                      }`}
+                    >
+                      <span>{icon}</span>
+                      <span>{label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* ── DESKTOP Layout (lg+) ── */}
@@ -807,7 +866,7 @@ export default function DashboardPage() {
         )}
 
         {/* Main Hub Area */}
-        <main className="flex-1 min-w-0 p-5 overflow-y-auto">
+        <main ref={desktopScrollRef} className="flex-1 min-w-0 p-5 overflow-y-auto">
           {mainHubContent}
         </main>
       </div>
@@ -832,7 +891,7 @@ export default function DashboardPage() {
         )}
 
         {/* Tab content (with bottom padding pb-20 so fixed navigation doesn't hide content) */}
-        <div className="flex-1 min-h-0 overflow-y-auto p-4 pb-20 md:pb-6">
+        <div ref={mobileScrollRef} className="flex-1 min-h-0 overflow-y-auto p-4 pb-20 md:pb-6">
           {mainHubContent}
         </div>
 

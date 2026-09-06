@@ -37,11 +37,18 @@
   padding: 0;
 }
 
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   background: radial-gradient(circle at top right, #1f2833 0%, var(--bg-dark) 100%);
   color: var(--text-primary);
   font-family: 'Inter', sans-serif;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   line-height: 1.5;
 }
 

@@ -41,72 +41,95 @@ export default function F1DramaHub() {
     RIVALRIES.find((r) => r.id === selectedRivalryId) || RIVALRIES[0];
 
   return (
-    <div className="flex flex-col gap-6 animate-fade-in text-white">
-      {/* ── Sub Header / Navigation ── */}
+    <div className="flex flex-col gap-5 text-white">
+      {/* ── Sub Header Introduction ── */}
       <div className="bg-slate-900/60 border border-white/10 rounded-2xl p-4 md:p-5 backdrop-blur-md">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-racing font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30">
-                F1 HUMAN DRAMA &amp; SAGAS
-              </span>
-              <span className="text-[10px] text-slate-400">NETFLIX &amp; PADDOCK NARRATIVES</span>
-            </div>
-            <h3 className="text-xl font-racing font-black tracking-wide text-white flex items-center gap-2">
-              <span>🎬</span> F1ドラマ・因縁＆感動の物語録
-            </h3>
-            <p className="text-xs text-slate-400 mt-1 max-w-2xl">
-              「F1はマシンの競技ではなく、人間の葛藤と情熱が織りなす連続ドラマである」。シーズン通史、感動の名場面、宿命のライバル、そしてパドック相関図を完全網羅。
-            </p>
-          </div>
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-[10px] font-racing font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30">
+            F1 HUMAN DRAMA &amp; SAGAS
+          </span>
+          <span className="text-[10px] text-slate-400">NETFLIX &amp; PADDOCK NARRATIVES</span>
+        </div>
+        <h3 className="text-xl font-racing font-black tracking-wide text-white flex items-center gap-2">
+          <span>🎬</span> F1ドラマ・因縁＆感動の物語録
+        </h3>
+        <p className="text-xs text-slate-400 mt-1 max-w-2xl">
+          「F1はマシンの競技ではなく、人間の葛藤と情熱が織りなす連続ドラマである」。シーズン通史、感動の名場面、宿命のライバル、そしてパドック相関図を完全網羅。
+        </p>
+      </div>
 
-          {/* 4 Pillars Segmented Navigation */}
-          <div className="flex flex-wrap gap-1.5 bg-slate-950/80 p-1.5 rounded-2xl border border-white/10 self-start lg:self-auto shadow-inner">
-            <button
-              onClick={() => setActiveTab('storylines')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
-                activeTab === 'storylines'
-                  ? 'bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-lg shadow-rose-500/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-              }`}
-            >
-              <span>🎬</span>
-              <span>連続ドラマ本編 (2024王座崩壊)</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('moments')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
-                activeTab === 'moments'
-                  ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg shadow-amber-500/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-              }`}
-            >
-              <span>😭</span>
-              <span>感動の名シーン集 (IS THAT GLOCK?!)</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('rivalries')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
-                activeTab === 'rivalries'
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-500/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-              }`}
-            >
-              <span>🔥</span>
-              <span>宿命のライバル対決 (VER vs NOR)</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('paddock')}
-              className={`px-3.5 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
-                activeTab === 'paddock'
-                  ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/30'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-              }`}
-            >
-              <span>📊</span>
-              <span>パドック相関図</span>
-            </button>
-          </div>
+      {/* ── Sticky 4-Pillars Navigation Bar (Pinned on scroll!) ── */}
+      <div className="sticky top-0 z-20 bg-slate-950/95 border border-white/15 rounded-2xl p-2.5 md:p-3 backdrop-blur-md shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2">
+          <span className="text-base">🎬</span>
+          <span className="text-xs font-racing font-bold text-slate-200">ドラマカテゴリ:</span>
+          <span className="text-[11px] text-rose-400 font-mono font-bold">
+            {activeTab === 'storylines' ? '【連載】シーズン通史' : activeTab === 'moments' ? '【名場面】感動の瞬間' : activeTab === 'rivalries' ? '【対決】因縁のライバル' : '【相関図】パドック関係性'}
+          </span>
+        </div>
+
+        {/* 4 Pillars Segmented Navigation */}
+        <div className="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-white/10 shadow-inner overflow-x-auto">
+          <button
+            onClick={() => {
+              setActiveTab('storylines');
+              const mainEl = document.querySelector('main');
+              if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+              activeTab === 'storylines'
+                ? 'bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-md shadow-rose-500/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <span>🎬</span>
+            <span>連続ドラマ本編</span>
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab('moments');
+              const mainEl = document.querySelector('main');
+              if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+              activeTab === 'moments'
+                ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md shadow-amber-500/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <span>😭</span>
+            <span>感動の名場面</span>
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab('rivalries');
+              const mainEl = document.querySelector('main');
+              if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+              activeTab === 'rivalries'
+                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md shadow-purple-500/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <span>🔥</span>
+            <span>宿命のライバル</span>
+          </button>
+          <button
+            onClick={() => {
+              setActiveTab('paddock');
+              const mainEl = document.querySelector('main');
+              if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+              activeTab === 'paddock'
+                ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-md shadow-blue-500/30'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+            }`}
+          >
+            <span>📊</span>
+            <span>パドック相関図</span>
+          </button>
         </div>
       </div>
 

@@ -52,7 +52,7 @@ export default function F1GlossaryHub({ onSelectTerm }: F1GlossaryHubProps) {
   }, [searchQuery, selectedCategory, selectedLevel]);
 
   return (
-    <div className="flex flex-col gap-6 animate-fade-in text-white">
+    <div className="flex flex-col gap-5 text-white">
       {/* ── Sub Header ── */}
       <div className="bg-slate-900/60 border border-white/10 rounded-2xl p-4 md:p-5 backdrop-blur-md">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -95,8 +95,8 @@ export default function F1GlossaryHub({ onSelectTerm }: F1GlossaryHubProps) {
         </div>
       </div>
 
-      {/* ── Filter Bar: Categories & Difficulty ── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 bg-slate-950/70 p-3 rounded-2xl border border-white/10">
+      {/* ── Sticky Filter Bar: Categories & Difficulty (Pinned on scroll!) ── */}
+      <div className="sticky top-0 z-20 bg-slate-950/95 p-3 rounded-2xl border border-white/15 backdrop-blur-md shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-3">
         {/* Category Pills */}
         <div className="flex flex-wrap gap-1.5 flex-1">
           {categories.map((cat) => (
