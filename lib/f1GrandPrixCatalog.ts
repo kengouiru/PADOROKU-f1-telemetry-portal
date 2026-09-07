@@ -2929,51 +2929,60 @@ export function getDriversForYear(year: number): Driver[] {
 }
 
 /** Generate realistic stints for all drivers in a race session */
-export function generateCatalogStints(drivers: Driver[]): Stint[] {
+export function generateCatalogStints(
+  drivers: Driver[],
+  totalLaps: number = 57,
+  pit1Lap?: number,
+  pit2Lap?: number
+): Stint[] {
   const stints: Stint[] = [];
+  const defaultP1 = pit1Lap ?? Math.round(totalLaps * 0.32);
+  const defaultP2 = pit2Lap ?? Math.round(totalLaps * 0.65);
+
   drivers.forEach((d, idx) => {
     const isOneStop = idx % 3 === 0;
     if (isOneStop) {
+      const p1 = Math.round(totalLaps * 0.44) + (idx % 3) - 1;
       stints.push({
         driver_number: d.driver_number,
         stint_number: 1,
         lap_start: 1,
-        lap_end: 26,
+        lap_end: p1,
         compound: 'MEDIUM',
         tyre_age_at_start: 0,
       });
       stints.push({
         driver_number: d.driver_number,
         stint_number: 2,
-        lap_start: 27,
-        lap_end: 57,
+        lap_start: p1 + 1,
+        lap_end: totalLaps,
         compound: 'HARD',
         tyre_age_at_start: 0,
       });
     } else {
-      const pit1 = 14 + (idx % 4);
-      const pit2 = 34 + (idx % 4);
+      const p1 = Math.max(8, defaultP1 + (idx % 4) - 2);
+      const p2 = Math.min(totalLaps - 5, defaultP2 + (idx % 4) - 2);
       stints.push({
         driver_number: d.driver_number,
         stint_number: 1,
         lap_start: 1,
-        lap_end: pit1,
+        lap_end: p1,
         compound: 'SOFT',
         tyre_age_at_start: 0,
       });
       stints.push({
         driver_number: d.driver_number,
         stint_number: 2,
-        lap_start: pit1 + 1,
-        lap_end: pit2,
+        lap_start: p1 + 1,
+        lap_end: p2,
         compound: 'HARD',
         tyre_age_at_start: 0,
       });
       stints.push({
         driver_number: d.driver_number,
         stint_number: 3,
-        lap_start: pit2 + 1,
-        lap_end: 57,
+        lap_start: p2 + 1,
+        lap_end: totalLaps,
         compound: idx % 2 === 0 ? 'SOFT' : 'HARD',
         tyre_age_at_start: 0,
       });

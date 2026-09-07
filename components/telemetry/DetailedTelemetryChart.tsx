@@ -68,6 +68,23 @@ export default function DetailedTelemetryChart({
     setIsMounted(true);
   }, []);
 
+  // Synchronize when parent updates selected circuit or drivers
+  useEffect(() => {
+    if (initialCircuitId) {
+      setSelectedCircuit(initialCircuitId);
+      setZoomRange(null);
+      setSelectedCornerName(null);
+    }
+  }, [initialCircuitId]);
+
+  useEffect(() => {
+    if (initialDriver1Code) setDriver1Code(initialDriver1Code);
+  }, [initialDriver1Code]);
+
+  useEffect(() => {
+    if (initialDriver2Code) setDriver2Code(initialDriver2Code);
+  }, [initialDriver2Code]);
+
   // Driver definitions
   const d1 = useMemo(() => {
     const found = KNOWLEDGE_DRIVERS.find((d) => d.code === driver1Code);

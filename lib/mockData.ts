@@ -24,6 +24,8 @@ import {
   generateCatalogRaceControl,
 } from './f1GrandPrixCatalog';
 
+import { resolveCircuitForSession, type CircuitBenchmark } from './circuitResolver';
+
 export {
   getCatalogSessionsForYear,
   getDriversForYear,
@@ -398,12 +400,13 @@ const LAP_PROFILES: Record<number, DriverLapProfile> = {
 };
 
 /**
- * Generates deterministic-style mock lap data for a driver in session 9161.
- * Uses a seeded variance simulation to avoid randomness across renders.
+ * Generates deterministic-style mock lap data for a driver in a session.
+ * Automatically synchronizes with circuit benchmarks (lap times, sector ratios, total laps, pit laps).
  */
 export function generateMockLaps(
   driverNumber: number,
-  sessionKey: number = 9161
+  sessionKey: number = 9161,
+  benchmark?: CircuitBenchmark
 ): Lap[] {
   const profile = LAP_PROFILES[driverNumber] ?? {
     baseTime: 98.0,
@@ -414,47 +417,60 @@ export function generateMockLaps(
     postPit2Boost: 1.2,
   };
 
-  const totalLaps = 57;
-  const baseTimestamp = new Date('2024-03-02T15:03:00.000Z').getTime();
-  let timeAccumulator = baseTimestamp;
-  let baseTime = profile.baseTime;
-  const laps: Lap[] = [];
+  const catalogSession = F1_CATALOG_ALL_SESSIONS.find((s) => s.session_key === sessionKey);
+  const activeBenchmark = benchmark ?? resolveCircuitForSession(catalogSession);
 
-  // Seed-based pseudo-variance (deterministic for SSR consistency)
-  const seed = (n: number) => Math.sin(n * 9301 + driverNumber * 49297) * 0.5;
+  const totalLaps = activeBenchmark ? activeBenchmark.totalLaps : 57;
+  const baseTimestamp = new Date(catalogSession?.date_start ?? '2024-03-02T15:03:00.000Z').getTime();
+  let timeAccumulator = baseTimestamp;
+
+  // Driver skill offset relative to benchmark (e.g. Verstappen is slightly faster, rookie slightly slower)
+  const driverOffset = (driverNumber === 1 ? -0.4 : driverNumber === 4 ? -0.3 : driverNumber === 16 ? -0.25 : driverNumber === 44 ? -0.2 : (driverNumber % 5) * 0.15);
+  const baseBenchmarkTime = activeBenchmark ? activeBenchmark.baseLapTimeSec : profile.baseTime;
+  let baseTime = baseBenchmarkTime + driverOffset;
+  const degradation = profile.degradation * (baseBenchmarkTime / 98.0);
+  const pit1Lap = activeBenchmark ? activeBenchmark.pit1Lap : profile.pit1Lap;
+  const pit2Lap = activeBenchmark ? activeBenchmark.pit2Lap : profile.pit2Lap;
+  const topSpeed = activeBenchmark ? activeBenchmark.topSpeedKmh : 330;
+
+  const laps: Lap[] = [];
+  const seed = (n: number) => Math.sin(n * 9301 + driverNumber * 49297 + sessionKey * 31) * 0.5;
 
   for (let i = 1; i <= totalLaps; i++) {
-    let lapTime = baseTime - i * profile.degradation;
+    let lapTime = baseTime - i * degradation;
     const variance = seed(i) * 0.5;
     lapTime += variance;
 
     // Pit stop laps: inflate lap time
-    if (i === profile.pit1Lap) {
-      lapTime = profile.baseTime + 5.0;
-    } else if (i === profile.pit1Lap + 1) {
-      lapTime = profile.baseTime + 22.0;
+    if (i === pit1Lap) {
+      lapTime = baseTime + 5.0;
+    } else if (i === pit1Lap + 1) {
+      lapTime = baseTime + 22.0;
       baseTime -= profile.postPit1Boost;
-    } else if (i === profile.pit2Lap) {
-      lapTime = profile.baseTime + 4.5;
-    } else if (i === profile.pit2Lap + 1) {
-      lapTime = profile.baseTime + 21.5;
+    } else if (i === pit2Lap) {
+      lapTime = baseTime + 4.5;
+    } else if (i === pit2Lap + 1) {
+      lapTime = baseTime + 21.5;
       baseTime -= profile.postPit2Boost;
     }
 
-    // Calculate speed traps based on driver profile and fuel load (lap number)
-    const baseSpeedST = driverNumber === 1 ? 326.5 : driverNumber === 16 ? 324.0 : 322.0;
-    const baseSpeedI1 = driverNumber === 1 ? 298.0 : driverNumber === 16 ? 296.0 : 294.5;
-    const baseSpeedI2 = driverNumber === 1 ? 258.0 : driverNumber === 16 ? 256.0 : 254.0;
-    const baseSpeedFL = driverNumber === 1 ? 295.0 : driverNumber === 16 ? 293.0 : 291.5;
-    const fuelSpeedBonus = i * 0.12; // lighter car reaches slightly higher top speed
+    const baseSpeedST = topSpeed + (driverNumber === 1 ? 2.5 : driverNumber === 16 ? 1.0 : -1.0);
+    const baseSpeedI1 = topSpeed * 0.90;
+    const baseSpeedI2 = topSpeed * 0.78;
+    const baseSpeedFL = topSpeed * 0.89;
+    const fuelSpeedBonus = i * 0.12;
+
+    const s1Base = baseTime * 0.31;
+    const s2Base = baseTime * 0.42;
+    const s3Base = baseTime * 0.27;
 
     laps.push({
       lap_number: i,
       lap_duration: Number(lapTime.toFixed(3)),
       date_start: new Date(timeAccumulator).toISOString(),
-      duration_sector_1: Number((30.2 - i * 0.02 + seed(i + 100) * 0.3).toFixed(3)),
-      duration_sector_2: Number((41.5 - i * 0.04 + seed(i + 200) * 0.5).toFixed(3)),
-      duration_sector_3: Number((24.8 - i * 0.02 + seed(i + 300) * 0.2).toFixed(3)),
+      duration_sector_1: Number((s1Base - i * 0.015 + seed(i + 100) * 0.25).toFixed(3)),
+      duration_sector_2: Number((s2Base - i * 0.025 + seed(i + 200) * 0.35).toFixed(3)),
+      duration_sector_3: Number((s3Base - i * 0.015 + seed(i + 300) * 0.20).toFixed(3)),
       speed_i1: Number((baseSpeedI1 + fuelSpeedBonus + seed(i + 400) * 3.0).toFixed(1)),
       speed_i2: Number((baseSpeedI2 + fuelSpeedBonus * 0.6 + seed(i + 500) * 3.5).toFixed(1)),
       speed_fl: Number((baseSpeedFL + fuelSpeedBonus + seed(i + 600) * 2.5).toFixed(1)),

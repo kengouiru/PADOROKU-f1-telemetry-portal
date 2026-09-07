@@ -13,7 +13,7 @@
  */
 
 import React, {
-  useState, useEffect, useCallback, useRef, Suspense,
+  useState, useEffect, useCallback, useRef, useMemo, Suspense,
 } from 'react';
 
 import type {
@@ -28,6 +28,7 @@ import {
   generateCatalogStints, generateCatalogRaceControl,
 } from '@/lib/mockData';
 import { detectSafetyCarPeriods, enrichLapsWithStints } from '@/lib/telemetryUtils';
+import { resolveCircuitForSession, type CircuitBenchmark } from '@/lib/circuitResolver';
 import {
   fetchSessions, fetchDrivers, fetchStints, fetchRaceControl,
   fetchLaps, fetchTeamRadio, fetchPitStops, OpenF1Error,
@@ -89,6 +90,35 @@ type MobileTab = 'telemetry' | 'news' | 'knowledge' | 'notes' | 'ai';
 // Desktop right-panel tab
 type RightPanelTab = 'ai' | 'notebook';
 
+
+const GLOBAL_DRIVER_NUM_TO_CODE: Record<string, string> = {
+  '1': 'VER',
+  '44': 'HAM',
+  '4': 'NOR',
+  '16': 'LEC',
+  '81': 'PIA',
+  '55': 'SAI',
+  '63': 'RUS',
+  '11': 'PER',
+  '14': 'ALO',
+  '22': 'TSU',
+  '10': 'GAS',
+  '31': 'OCO',
+  '23': 'ALB',
+  '43': 'COL',
+  '18': 'STR',
+  '27': 'HUL',
+  '20': 'MAG',
+  '77': 'BOT',
+  '24': 'ZHO',
+  '3': 'RIC',
+  '30': 'LAW',
+  '12': 'ANT',
+  '87': 'BEA',
+  '5': 'BOR',
+  '7': 'DOO',
+  '6': 'HAD',
+};
 const DEFAULT_SESSION_KEY = 9161;
 const DEFAULT_MEETING_KEY = 1234;
 const DEFAULT_YEAR = '2024';
@@ -276,18 +306,39 @@ export default function DashboardPage() {
         raceControlMessages = (sessionKey && MOCK_RACE_CONTROL[sessionKey]) ? MOCK_RACE_CONTROL[sessionKey] : generateCatalogRaceControl(sessionKey ?? 0);
       }
 
+      const benchmark = resolveCircuitForSession(targetSession);
+
+      if (!stints || stints.length === 0) {
+        stints = (sessionKey && MOCK_STINTS[sessionKey])
+          ? MOCK_STINTS[sessionKey]
+          : generateCatalogStints(drivers, benchmark.totalLaps, benchmark.pit1Lap, benchmark.pit2Lap);
+      }
+
       const top2Nums = drivers.slice(0, 2).map(d => d.driver_number.toString());
       const selectedDrivers = top2Nums.length > 0 ? top2Nums : ['1', '44'];
 
       const lapsCache: Record<string, Lap[]> = {};
       for (const num of selectedDrivers) {
         const mk = `${sessionKey}_${num}`;
-        const rawLaps = MOCK_LAPS[mk] ?? generateMockLaps(parseInt(num), sessionKey ?? 9161);
+        const rawLaps = MOCK_LAPS[mk] ?? generateMockLaps(parseInt(num), sessionKey ?? 9161, benchmark);
         lapsCache[num] = enrichLapsWithStints(rawLaps, stints, num);
       }
 
       const allLaps = Object.values(lapsCache).flat();
       const safetyCarPeriods = detectSafetyCarPeriods(raceControlMessages, allLaps);
+
+      const d1Code = drivers.find(d => d.driver_number.toString() === selectedDrivers[0])?.name_acronym
+        ?? GLOBAL_DRIVER_NUM_TO_CODE[selectedDrivers[0]]
+        ?? 'VER';
+      const d2Code = drivers.find(d => d.driver_number.toString() === selectedDrivers[1])?.name_acronym
+        ?? GLOBAL_DRIVER_NUM_TO_CODE[selectedDrivers[1]]
+        ?? 'NOR';
+
+      setDetailedTelemetryParams({
+        circuitId: benchmark.circuitId,
+        driver1: d1Code,
+        driver2: d2Code,
+      });
 
       setState(prev => ({
         ...prev,
@@ -351,18 +402,39 @@ export default function DashboardPage() {
       raceControlMessages = (sessionKey && MOCK_RACE_CONTROL[sessionKey]) ? MOCK_RACE_CONTROL[sessionKey] : generateCatalogRaceControl(sessionKey ?? 0);
     }
 
+    const benchmark = resolveCircuitForSession(targetSession);
+
+    if (!stints || stints.length === 0) {
+      stints = (sessionKey && MOCK_STINTS[sessionKey])
+        ? MOCK_STINTS[sessionKey]
+        : generateCatalogStints(drivers, benchmark.totalLaps, benchmark.pit1Lap, benchmark.pit2Lap);
+    }
+
     const validSelected = state.selectedDrivers.filter(num => drivers.some(d => d.driver_number.toString() === num));
     const selectedDrivers = validSelected.length > 0 ? validSelected : drivers.slice(0, 2).map(d => d.driver_number.toString());
 
     const lapsCache: Record<string, Lap[]> = {};
     for (const num of selectedDrivers) {
       const mk = `${sessionKey}_${num}`;
-      const rawLaps = MOCK_LAPS[mk] ?? generateMockLaps(parseInt(num), sessionKey ?? 9161);
+      const rawLaps = MOCK_LAPS[mk] ?? generateMockLaps(parseInt(num), sessionKey ?? 9161, benchmark);
       lapsCache[num] = enrichLapsWithStints(rawLaps, stints, num);
     }
 
     const allLaps = Object.values(lapsCache).flat();
     const safetyCarPeriods = detectSafetyCarPeriods(raceControlMessages, allLaps);
+
+    const d1Code = drivers.find(d => d.driver_number.toString() === selectedDrivers[0])?.name_acronym
+      ?? GLOBAL_DRIVER_NUM_TO_CODE[selectedDrivers[0]]
+      ?? 'VER';
+    const d2Code = drivers.find(d => d.driver_number.toString() === selectedDrivers[1])?.name_acronym
+      ?? GLOBAL_DRIVER_NUM_TO_CODE[selectedDrivers[1]]
+      ?? 'NOR';
+
+    setDetailedTelemetryParams({
+      circuitId: benchmark.circuitId,
+      driver1: d1Code,
+      driver2: d2Code,
+    });
 
     setState(prev => ({
       ...prev,
@@ -412,18 +484,39 @@ export default function DashboardPage() {
       raceControlMessages = (sessionKey && MOCK_RACE_CONTROL[sessionKey]) ? MOCK_RACE_CONTROL[sessionKey] : generateCatalogRaceControl(sessionKey);
     }
 
+    const benchmark = resolveCircuitForSession(targetSession);
+
+    if (!stints || stints.length === 0) {
+      stints = (sessionKey && MOCK_STINTS[sessionKey])
+        ? MOCK_STINTS[sessionKey]
+        : generateCatalogStints(drivers, benchmark.totalLaps, benchmark.pit1Lap, benchmark.pit2Lap);
+    }
+
     const validSelected = state.selectedDrivers.filter(num => drivers.some(d => d.driver_number.toString() === num));
     const selectedDrivers = validSelected.length > 0 ? validSelected : drivers.slice(0, 2).map(d => d.driver_number.toString());
 
     const lapsCache: Record<string, Lap[]> = {};
     for (const num of selectedDrivers) {
       const mk = `${sessionKey}_${num}`;
-      const rawLaps = MOCK_LAPS[mk] ?? generateMockLaps(parseInt(num), sessionKey);
+      const rawLaps = MOCK_LAPS[mk] ?? generateMockLaps(parseInt(num), sessionKey, benchmark);
       lapsCache[num] = enrichLapsWithStints(rawLaps, stints, num);
     }
 
     const allLaps = Object.values(lapsCache).flat();
     const safetyCarPeriods = detectSafetyCarPeriods(raceControlMessages, allLaps);
+
+    const d1Code = drivers.find(d => d.driver_number.toString() === selectedDrivers[0])?.name_acronym
+      ?? GLOBAL_DRIVER_NUM_TO_CODE[selectedDrivers[0]]
+      ?? 'VER';
+    const d2Code = drivers.find(d => d.driver_number.toString() === selectedDrivers[1])?.name_acronym
+      ?? GLOBAL_DRIVER_NUM_TO_CODE[selectedDrivers[1]]
+      ?? 'NOR';
+
+    setDetailedTelemetryParams({
+      circuitId: benchmark.circuitId,
+      driver1: d1Code,
+      driver2: d2Code,
+    });
 
     setState(prev => ({
       ...prev,
@@ -593,6 +686,10 @@ export default function DashboardPage() {
     />
   );
 
+  const currentBenchmark = useMemo(() => {
+    return resolveCircuitForSession(state.currentSession);
+  }, [state.currentSession]);
+
   const analysisContent = (
     <div className="flex flex-col gap-5">
       <TelemetryChart
@@ -614,7 +711,7 @@ export default function DashboardPage() {
         drivers={state.drivers}
         stints={state.stints}
         safetyCarPeriods={state.safetyCarPeriods}
-        totalLaps={57}
+        totalLaps={currentBenchmark.totalLaps}
         selectedDrivers={state.selectedDrivers}
         onDriverSelect={(driverNum) =>
           handleDriverToggle(driverNum, !state.selectedDrivers.includes(driverNum))
@@ -635,7 +732,7 @@ export default function DashboardPage() {
         drivers={state.drivers}
         stints={state.stints}
         pitStopsCache={state.pitStopsCache}
-        totalLaps={57}
+        totalLaps={currentBenchmark.totalLaps}
         isLive={!state.isDemoMode}
         isLoading={state.isLoading}
         selectedDrivers={state.selectedDrivers}
@@ -723,7 +820,7 @@ export default function DashboardPage() {
   const mainHubContent = (
     <>
       {activeHub === 'season' && (
-        <ErrorBoundary sectionName="2025 シーズン">
+        <ErrorBoundary sectionName="F1 シーズン観戦＆カレンダー">
           <SeasonHub
             onNavigateToTelemetry={() => {
               setActiveHub('telemetry');

@@ -168,6 +168,212 @@ const CIRCUIT_CORNER_MAPS: Record<string, { length: number; corners: CornerZone[
       { pctStart: 95, pctApex: 98, pctExit: 100, name: 'Rascasse (T17-T18)', gear: 1, speed: 52, brakingHardness: 0.95 },
     ],
   },
+  'circuit-de-monaco': {
+    length: 3337,
+    corners: [
+      { pctStart: 11, pctApex: 14, pctExit: 17, name: 'Sainte-Dévote (T1)', gear: 2, speed: 85, brakingHardness: 0.9 },
+      { pctStart: 25, pctApex: 28, pctExit: 31, name: 'Casino Square (T3-T4)', gear: 3, speed: 125, brakingHardness: 0.6 },
+      { pctStart: 37, pctApex: 40, pctExit: 43, name: 'Mirabeau (T5)', gear: 2, speed: 80, brakingHardness: 0.8 },
+      { pctStart: 45, pctApex: 48, pctExit: 51, name: 'Grand Hotel Hairpin (T6)', gear: 1, speed: 45, brakingHardness: 0.95 },
+      { pctStart: 54, pctApex: 57, pctExit: 60, name: 'Portier (T8)', gear: 2, speed: 72, brakingHardness: 0.75 },
+      { pctStart: 68, pctApex: 72, pctExit: 75, name: 'Nouvelle Chicane (T10)', gear: 2, speed: 60, brakingHardness: 1.0 },
+      { pctStart: 79, pctApex: 82, pctExit: 85, name: 'Tabac (T12)', gear: 4, speed: 160, brakingHardness: 0.4 },
+      { pctStart: 87, pctApex: 90, pctExit: 93, name: 'Swimming Pool (T13-T16)', gear: 4, speed: 140, brakingHardness: 0.65 },
+      { pctStart: 95, pctApex: 98, pctExit: 100, name: 'Rascasse (T17-T18)', gear: 1, speed: 52, brakingHardness: 0.95 },
+    ],
+  },
+  'albert-park': {
+    length: 5278,
+    corners: [
+      { pctStart: 11, pctApex: 14, pctExit: 17, name: 'T1-T2 (Jones)', gear: 4, speed: 152, brakingHardness: 0.85 },
+      { pctStart: 21, pctApex: 24, pctExit: 27, name: 'T3 (Sports Center)', gear: 3, speed: 96, brakingHardness: 0.9 },
+      { pctStart: 34, pctApex: 37, pctExit: 40, name: 'T6', gear: 5, speed: 168, brakingHardness: 0.6 },
+      { pctStart: 53, pctApex: 56, pctExit: 59, name: 'T9-T10 (Lakeside)', gear: 6, speed: 228, brakingHardness: 0.4 },
+      { pctStart: 70, pctApex: 73, pctExit: 76, name: 'T11-T12 (Clark)', gear: 6, speed: 236, brakingHardness: 0.45 },
+      { pctStart: 88, pctApex: 91, pctExit: 94, name: 'T13-T14 (Ascari/Prost)', gear: 3, speed: 116, brakingHardness: 0.85 },
+    ],
+  },
+  'shanghai': {
+    length: 5451,
+    corners: [
+      { pctStart: 12, pctApex: 16, pctExit: 20, name: 'T1-T3 (Snail Corner)', gear: 2, speed: 82, brakingHardness: 0.85 },
+      { pctStart: 33, pctApex: 36, pctExit: 39, name: 'T6 (Hairpin)', gear: 2, speed: 88, brakingHardness: 0.95 },
+      { pctStart: 46, pctApex: 49, pctExit: 53, name: 'T7-T8 (High Speed)', gear: 6, speed: 215, brakingHardness: 0.3 },
+      { pctStart: 58, pctApex: 61, pctExit: 64, name: 'T9-T10', gear: 3, speed: 122, brakingHardness: 0.8 },
+      { pctStart: 70, pctApex: 73, pctExit: 76, name: 'T11-T13', gear: 4, speed: 158, brakingHardness: 0.6 },
+      { pctStart: 88, pctApex: 91, pctExit: 94, name: 'T14 (End of Straight)', gear: 2, speed: 68, brakingHardness: 1.0 },
+    ],
+  },
+  'jeddah': {
+    length: 6174,
+    corners: [
+      { pctStart: 9, pctApex: 12, pctExit: 15, name: 'T1-T2 Chicane', gear: 3, speed: 112, brakingHardness: 0.95 },
+      { pctStart: 26, pctApex: 30, pctExit: 34, name: 'T4-T10 High-Speed Esses', gear: 6, speed: 242, brakingHardness: 0.3 },
+      { pctStart: 40, pctApex: 43, pctExit: 46, name: 'T13 Banked Hairpin', gear: 4, speed: 138, brakingHardness: 0.7 },
+      { pctStart: 73, pctApex: 76, pctExit: 79, name: 'T22-T24 Blind Sweep', gear: 6, speed: 218, brakingHardness: 0.4 },
+      { pctStart: 93, pctApex: 96, pctExit: 98, name: 'T27 Final Hairpin', gear: 3, speed: 106, brakingHardness: 0.9 },
+    ],
+  },
+  'miami': {
+    length: 5412,
+    corners: [
+      { pctStart: 11, pctApex: 14, pctExit: 17, name: 'T1', gear: 3, speed: 112, brakingHardness: 0.9 },
+      { pctStart: 23, pctApex: 26, pctExit: 29, name: 'T4-T6 S-Curves', gear: 5, speed: 192, brakingHardness: 0.4 },
+      { pctStart: 36, pctApex: 39, pctExit: 42, name: 'T7-T8', gear: 4, speed: 132, brakingHardness: 0.7 },
+      { pctStart: 60, pctApex: 63, pctExit: 66, name: 'T11-T16 Marina Complex', gear: 2, speed: 74, brakingHardness: 1.0 },
+      { pctStart: 86, pctApex: 89, pctExit: 92, name: 'T17 Hairpin', gear: 2, speed: 78, brakingHardness: 0.95 },
+    ],
+  },
+  'imola': {
+    length: 4909,
+    corners: [
+      { pctStart: 16, pctApex: 19, pctExit: 22, name: 'Tamburello (T2-T4)', gear: 4, speed: 152, brakingHardness: 0.85 },
+      { pctStart: 28, pctApex: 31, pctExit: 34, name: 'Villeneuve (T5-T6)', gear: 5, speed: 188, brakingHardness: 0.65 },
+      { pctStart: 40, pctApex: 43, pctExit: 46, name: 'Tosa (T7)', gear: 3, speed: 96, brakingHardness: 0.95 },
+      { pctStart: 54, pctApex: 57, pctExit: 60, name: 'Piratella (T9)', gear: 5, speed: 198, brakingHardness: 0.5 },
+      { pctStart: 66, pctApex: 69, pctExit: 72, name: 'Acque Minerali (T11-T13)', gear: 4, speed: 142, brakingHardness: 0.8 },
+      { pctStart: 78, pctApex: 81, pctExit: 84, name: 'Variante Alta (T14-T15)', gear: 3, speed: 126, brakingHardness: 0.85 },
+      { pctStart: 91, pctApex: 94, pctExit: 97, name: 'Rivazza (T17-T18)', gear: 3, speed: 118, brakingHardness: 0.9 },
+    ],
+  },
+  'villeneuve': {
+    length: 4361,
+    corners: [
+      { pctStart: 12, pctApex: 15, pctExit: 18, name: 'Virage Senna (T1-T2)', gear: 2, speed: 92, brakingHardness: 0.95 },
+      { pctStart: 24, pctApex: 27, pctExit: 30, name: 'T3-T4 Chicane', gear: 4, speed: 132, brakingHardness: 0.8 },
+      { pctStart: 40, pctApex: 43, pctExit: 46, name: 'T6-T7 Chicane', gear: 4, speed: 136, brakingHardness: 0.8 },
+      { pctStart: 56, pctApex: 59, pctExit: 62, name: 'T8-T9 Chicane', gear: 4, speed: 146, brakingHardness: 0.75 },
+      { pctStart: 73, pctApex: 76, pctExit: 79, name: "L'Épingle Hairpin (T10)", gear: 2, speed: 68, brakingHardness: 1.0 },
+      { pctStart: 92, pctApex: 95, pctExit: 98, name: 'Wall of Champions (T13-T14)', gear: 4, speed: 142, brakingHardness: 0.9 },
+    ],
+  },
+  'catalunya': {
+    length: 4657,
+    corners: [
+      { pctStart: 13, pctApex: 16, pctExit: 19, name: 'Elf (T1-T2)', gear: 4, speed: 136, brakingHardness: 0.9 },
+      { pctStart: 24, pctApex: 27, pctExit: 30, name: 'Renault (T3)', gear: 6, speed: 226, brakingHardness: 0.2 },
+      { pctStart: 33, pctApex: 36, pctExit: 39, name: 'Repsol (T4)', gear: 3, speed: 132, brakingHardness: 0.75 },
+      { pctStart: 41, pctApex: 44, pctExit: 47, name: 'Seat (T5)', gear: 2, speed: 86, brakingHardness: 0.95 },
+      { pctStart: 63, pctApex: 66, pctExit: 69, name: 'Campsa (T9)', gear: 6, speed: 218, brakingHardness: 0.35 },
+      { pctStart: 74, pctApex: 77, pctExit: 80, name: 'La Caixa (T10)', gear: 3, speed: 106, brakingHardness: 0.9 },
+      { pctStart: 92, pctApex: 95, pctExit: 98, name: 'New Final Turn (T14)', gear: 6, speed: 222, brakingHardness: 0.2 },
+    ],
+  },
+  'redbull-ring': {
+    length: 4318,
+    corners: [
+      { pctStart: 13, pctApex: 16, pctExit: 19, name: 'Niki Lauda (T1)', gear: 4, speed: 142, brakingHardness: 0.9 },
+      { pctStart: 36, pctApex: 39, pctExit: 42, name: 'Remus (T3)', gear: 2, speed: 68, brakingHardness: 1.0 },
+      { pctStart: 50, pctApex: 53, pctExit: 56, name: 'Schlossgold (T4)', gear: 3, speed: 122, brakingHardness: 0.85 },
+      { pctStart: 68, pctApex: 71, pctExit: 74, name: 'Gerhard Berger (T6-T7)', gear: 5, speed: 182, brakingHardness: 0.5 },
+      { pctStart: 88, pctApex: 91, pctExit: 94, name: 'Jochen Rindt (T9-T10)', gear: 6, speed: 208, brakingHardness: 0.4 },
+    ],
+  },
+  'hungaroring': {
+    length: 4381,
+    corners: [
+      { pctStart: 14, pctApex: 17, pctExit: 20, name: 'T1 Hairpin', gear: 2, speed: 96, brakingHardness: 0.95 },
+      { pctStart: 26, pctApex: 29, pctExit: 32, name: 'T2', gear: 3, speed: 132, brakingHardness: 0.75 },
+      { pctStart: 38, pctApex: 41, pctExit: 44, name: 'Mansell (T4)', gear: 5, speed: 206, brakingHardness: 0.4 },
+      { pctStart: 48, pctApex: 51, pctExit: 54, name: 'T5', gear: 4, speed: 146, brakingHardness: 0.7 },
+      { pctStart: 58, pctApex: 61, pctExit: 64, name: 'Chicane (T6-T7)', gear: 2, speed: 96, brakingHardness: 0.95 },
+      { pctStart: 73, pctApex: 76, pctExit: 79, name: 'T8-T11 Mid-Speed', gear: 5, speed: 176, brakingHardness: 0.55 },
+      { pctStart: 92, pctApex: 95, pctExit: 98, name: 'T14 Final Hairpin', gear: 3, speed: 122, brakingHardness: 0.8 },
+    ],
+  },
+  'zandvoort': {
+    length: 4259,
+    corners: [
+      { pctStart: 12, pctApex: 15, pctExit: 18, name: 'Tarzan (T1)', gear: 3, speed: 106, brakingHardness: 0.95 },
+      { pctStart: 20, pctApex: 23, pctExit: 26, name: 'Gerlach (T2)', gear: 4, speed: 146, brakingHardness: 0.65 },
+      { pctStart: 30, pctApex: 33, pctExit: 36, name: 'Hugenholtz Banked (T3)', gear: 3, speed: 96, brakingHardness: 0.85 },
+      { pctStart: 50, pctApex: 53, pctExit: 56, name: 'Scheivlak (T7)', gear: 6, speed: 232, brakingHardness: 0.35 },
+      { pctStart: 76, pctApex: 79, pctExit: 82, name: 'Hans Ernst Chicane (T11-T12)', gear: 2, speed: 92, brakingHardness: 0.95 },
+      { pctStart: 91, pctApex: 94, pctExit: 97, name: 'Arie Luyendyk Banked (T14)', gear: 7, speed: 248, brakingHardness: 0.1 },
+    ],
+  },
+  'baku': {
+    length: 6003,
+    corners: [
+      { pctStart: 12, pctApex: 15, pctExit: 18, name: 'T1 90-Degree Left', gear: 3, speed: 106, brakingHardness: 1.0 },
+      { pctStart: 21, pctApex: 24, pctExit: 27, name: 'T2 90-Degree Right', gear: 3, speed: 98, brakingHardness: 0.9 },
+      { pctStart: 30, pctApex: 33, pctExit: 36, name: 'T3', gear: 3, speed: 112, brakingHardness: 0.9 },
+      { pctStart: 50, pctApex: 53, pctExit: 56, name: 'Old Town Castle (T7-T11)', gear: 2, speed: 76, brakingHardness: 0.9 },
+      { pctStart: 70, pctApex: 73, pctExit: 76, name: 'T15', gear: 3, speed: 116, brakingHardness: 0.85 },
+      { pctStart: 78, pctApex: 81, pctExit: 84, name: 'T16', gear: 3, speed: 122, brakingHardness: 0.85 },
+    ],
+  },
+  'singapore': {
+    length: 4940,
+    corners: [
+      { pctStart: 13, pctApex: 16, pctExit: 19, name: 'Sheares (T1-T3)', gear: 3, speed: 96, brakingHardness: 0.95 },
+      { pctStart: 26, pctApex: 29, pctExit: 32, name: 'T5', gear: 4, speed: 146, brakingHardness: 0.7 },
+      { pctStart: 40, pctApex: 43, pctExit: 46, name: 'Memorial (T7)', gear: 3, speed: 112, brakingHardness: 0.85 },
+      { pctStart: 52, pctApex: 55, pctExit: 58, name: 'Stamford (T9)', gear: 3, speed: 106, brakingHardness: 0.85 },
+      { pctStart: 70, pctApex: 73, pctExit: 76, name: 'Padang (T14)', gear: 2, speed: 92, brakingHardness: 0.95 },
+      { pctStart: 86, pctApex: 89, pctExit: 92, name: 'Bay (T16-T19)', gear: 3, speed: 126, brakingHardness: 0.8 },
+    ],
+  },
+  'cota': {
+    length: 5513,
+    corners: [
+      { pctStart: 12, pctApex: 15, pctExit: 18, name: 'Big Red (T1 Uphill)', gear: 2, speed: 86, brakingHardness: 1.0 },
+      { pctStart: 28, pctApex: 31, pctExit: 35, name: 'Esses (T3-T6)', gear: 6, speed: 222, brakingHardness: 0.4 },
+      { pctStart: 50, pctApex: 53, pctExit: 56, name: 'T11 Hairpin', gear: 2, speed: 76, brakingHardness: 0.95 },
+      { pctStart: 68, pctApex: 71, pctExit: 74, name: 'T12 End of Backstraight', gear: 3, speed: 96, brakingHardness: 1.0 },
+      { pctStart: 83, pctApex: 86, pctExit: 89, name: 'Carousel (T16-T18)', gear: 5, speed: 192, brakingHardness: 0.5 },
+    ],
+  },
+  'mexico': {
+    length: 4304,
+    corners: [
+      { pctStart: 16, pctApex: 19, pctExit: 22, name: 'Moisés Solana (T1-T3)', gear: 3, speed: 102, brakingHardness: 1.0 },
+      { pctStart: 33, pctApex: 36, pctExit: 39, name: 'T4-T6 Chicane', gear: 3, speed: 116, brakingHardness: 0.85 },
+      { pctStart: 53, pctApex: 56, pctExit: 59, name: 'Esses (T7-T11)', gear: 6, speed: 216, brakingHardness: 0.45 },
+      { pctStart: 80, pctApex: 83, pctExit: 86, name: 'Foro Sol Stadium (T12-T15)', gear: 2, speed: 66, brakingHardness: 0.95 },
+    ],
+  },
+  'interlagos': {
+    length: 4309,
+    corners: [
+      { pctStart: 12, pctApex: 15, pctExit: 18, name: 'Senna S (T1-T2)', gear: 3, speed: 112, brakingHardness: 0.95 },
+      { pctStart: 24, pctApex: 27, pctExit: 30, name: 'Curva do Sol (T3)', gear: 6, speed: 216, brakingHardness: 0.2 },
+      { pctStart: 38, pctApex: 41, pctExit: 44, name: 'Descida do Lago (T4)', gear: 4, speed: 146, brakingHardness: 0.85 },
+      { pctStart: 53, pctApex: 56, pctExit: 59, name: 'Ferradura (T6-T7)', gear: 5, speed: 192, brakingHardness: 0.5 },
+      { pctStart: 68, pctApex: 71, pctExit: 74, name: 'Pinheirinho / Bico de Pato', gear: 2, speed: 78, brakingHardness: 0.95 },
+      { pctStart: 83, pctApex: 86, pctExit: 89, name: 'Junção (T12)', gear: 3, speed: 122, brakingHardness: 0.8 },
+    ],
+  },
+  'las-vegas': {
+    length: 6201,
+    corners: [
+      { pctStart: 10, pctApex: 13, pctExit: 16, name: 'T1-T3 Chicane', gear: 3, speed: 96, brakingHardness: 0.95 },
+      { pctStart: 22, pctApex: 25, pctExit: 28, name: 'The Sphere (T4)', gear: 4, speed: 146, brakingHardness: 0.65 },
+      { pctStart: 40, pctApex: 43, pctExit: 46, name: 'T5-T9 Mid Sector', gear: 3, speed: 126, brakingHardness: 0.8 },
+      { pctStart: 58, pctApex: 61, pctExit: 64, name: 'T12 Strip Entry', gear: 5, speed: 168, brakingHardness: 0.5 },
+      { pctStart: 83, pctApex: 86, pctExit: 89, name: 'T14 End of Strip Straight', gear: 3, speed: 96, brakingHardness: 1.0 },
+    ],
+  },
+  'losail': {
+    length: 5419,
+    corners: [
+      { pctStart: 12, pctApex: 15, pctExit: 18, name: 'T1', gear: 3, speed: 106, brakingHardness: 0.95 },
+      { pctStart: 30, pctApex: 33, pctExit: 36, name: 'T2-T5 Flowing Curves', gear: 5, speed: 178, brakingHardness: 0.5 },
+      { pctStart: 42, pctApex: 45, pctExit: 48, name: 'T6 Hairpin', gear: 3, speed: 116, brakingHardness: 0.85 },
+      { pctStart: 72, pctApex: 75, pctExit: 78, name: 'Triple Apex (T12-T14)', gear: 6, speed: 228, brakingHardness: 0.35 },
+      { pctStart: 90, pctApex: 93, pctExit: 96, name: 'T16 Final Turn', gear: 4, speed: 136, brakingHardness: 0.75 },
+    ],
+  },
+  'yas-marina': {
+    length: 5281,
+    corners: [
+      { pctStart: 12, pctApex: 15, pctExit: 18, name: 'T1', gear: 4, speed: 132, brakingHardness: 0.85 },
+      { pctStart: 30, pctApex: 33, pctExit: 36, name: 'T5 Hairpin', gear: 2, speed: 76, brakingHardness: 1.0 },
+      { pctStart: 56, pctApex: 59, pctExit: 62, name: 'T6-T7 Chicane', gear: 3, speed: 96, brakingHardness: 0.95 },
+      { pctStart: 70, pctApex: 73, pctExit: 76, name: 'T9 Banked Sweeper', gear: 5, speed: 192, brakingHardness: 0.4 },
+      { pctStart: 84, pctApex: 87, pctExit: 90, name: 'T12-T14 Hotel Section', gear: 3, speed: 126, brakingHardness: 0.8 },
+    ],
+  },
 };
 
 // ─────────────────────────────────────────────────────────────

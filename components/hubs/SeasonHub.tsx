@@ -2,25 +2,31 @@
 
 /**
  * components/hubs/SeasonHub.tsx
- * 🏁 2025 Formula 1 Season Weekend Companion & Hub
+ * 🏁 Formula 1 Season Weekend Companion & Calendar Hub
  * Features:
- *  - Next GP Live Countdown (Days, Hours, Min, Sec)
+ *  - 2026 Current Season & 2025 Archive Season Switcher with Auto-Rollover Detection
+ *  - Automatic Next GP Resolution based on current date
+ *  - Live Ticking Countdown (Days, Hours, Min, Sec)
  *  - Full JST Weekend Schedule (FP, Quali, Sprint, Race in Japan Time)
- *  - 2025 Race Calendar (All 24 GPs with flags, Pirelli compounds, Sprint badges)
- *  - Championship Standings (2024 Final & 2025 live form with interactive bars)
- *  - 2025 Grid Showcase (10 teams x 2 drivers, transfer highlights like Hamilton/Ferrari, Sainz/Williams, 6 rookies)
+ *  - Race Calendar (All 24 GPs with flags, Pirelli compounds, Sprint badges)
+ *  - Championship Standings (2026 Live Standings & 2025 Annual Finals)
+ *  - Grid Showcase (2026 New PU Regs & Audi/Honda Works vs 2025 Grid)
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  SEASON_2025_CALENDAR,
-  DRIVER_STANDINGS_2024,
-  CONSTRUCTOR_STANDINGS_2024,
-  GRID_2025_TEAMS,
+  type SeasonYear,
+  getActiveSeasonYear,
+  getSeasonCalendar,
+  getSeasonGrid,
+  getDriverStandings,
+  getConstructorStandings,
+  getNextUpcomingRound,
+  isSeasonConcluded,
   type RaceWeekendSchedule,
   type DriverStanding,
   type ConstructorStanding,
-  type Grid2025Team,
+  type GridTeam,
 } from '@/data/f1SeasonData';
 import { getWeatherByRound } from '@/data/f1WeatherData';
 import { getGrandPrixReportByRound } from '@/data/f1GrandPrixReportsData';
@@ -69,15 +75,39 @@ export default function SeasonHub({
   onNavigateToGlossary,
   onNavigateToCircuit,
 }: SeasonHubProps) {
+  // Season State: Defaults to current active season (2026)
+  const [selectedSeason, setSelectedSeason] = useState<SeasonYear>(() => getActiveSeasonYear());
   const [activeTab, setActiveTab] = useState<MainTab>('calendar');
-  const [selectedRound, setSelectedRound] = useState<number>(1);
   const [standingsType, setStandingsType] = useState<'drivers' | 'constructors'>('drivers');
   const [calendarFilter, setCalendarFilter] = useState<'all' | 'sprint'>('all');
+  const [showSeasonInfo, setShowSeasonInfo] = useState<boolean>(false);
+
+  // Active season calendar & grid
+  const activeCalendar = useMemo(() => getSeasonCalendar(selectedSeason), [selectedSeason]);
+  const activeGrid = useMemo(() => getSeasonGrid(selectedSeason), [selectedSeason]);
+  const activeDriverStandings = useMemo(() => getDriverStandings(selectedSeason), [selectedSeason]);
+  const activeConstructorStandings = useMemo(() => getConstructorStandings(selectedSeason), [selectedSeason]);
+  const seasonEnded = useMemo(() => isSeasonConcluded(activeCalendar), [activeCalendar]);
+
+  // Selected Round: Auto-defaults to the next upcoming race of that season
+  const [selectedRound, setSelectedRound] = useState<number>(() => {
+    const defaultYear = getActiveSeasonYear();
+    const cal = getSeasonCalendar(defaultYear);
+    return getNextUpcomingRound(cal);
+  });
+
+  // Handle Season Switching
+  const handleSeasonChange = (year: SeasonYear) => {
+    setSelectedSeason(year);
+    const cal = getSeasonCalendar(year);
+    // When switching season, set focus to next upcoming round or Round 1
+    setSelectedRound(getNextUpcomingRound(cal));
+  };
 
   // Selected Race Weekend
   const selectedRace = useMemo(() => {
-    return SEASON_2025_CALENDAR.find((r) => r.round === selectedRound) || SEASON_2025_CALENDAR[0];
-  }, [selectedRound]);
+    return activeCalendar.find((r) => r.round === selectedRound) || activeCalendar[0];
+  }, [activeCalendar, selectedRound]);
 
   const selectedWeather = useMemo(() => {
     return getWeatherByRound(selectedRound);
@@ -87,7 +117,7 @@ export default function SeasonHub({
     return getGrandPrixReportByRound(selectedRound);
   }, [selectedRound]);
 
-  // Countdown timer calculation
+  // Live Countdown timer calculation
   const [timeLeft, setTimeLeft] = useState<{
     days: number;
     hours: number;
@@ -121,16 +151,144 @@ export default function SeasonHub({
   // Filtered calendar
   const filteredCalendar = useMemo(() => {
     if (calendarFilter === 'sprint') {
-      return SEASON_2025_CALENDAR.filter((r) => r.isSprint);
+      return activeCalendar.filter((r) => r.isSprint);
     }
-    return SEASON_2025_CALENDAR;
-  }, [calendarFilter]);
+    return activeCalendar;
+  }, [activeCalendar, calendarFilter]);
 
-  const maxDriverPoints = DRIVER_STANDINGS_2024[0]?.points || 1;
-  const maxTeamPoints = CONSTRUCTOR_STANDINGS_2024[0]?.points || 1;
+  const maxDriverPoints = activeDriverStandings[0]?.points || 1;
+  const maxTeamPoints = activeConstructorStandings[0]?.points || 1;
 
   return (
     <div className="space-y-6 pb-12 animate-fade-in">
+      {/* ─────────────────────────────────────────────────────────────
+          0. SEASON SWITCHER & SMART ROLLOVER STATUS BAR
+          ───────────────────────────────────────────────────────────── */}
+      <div className="p-3.5 rounded-2xl bg-gradient-to-r from-slate-900/95 via-slate-950/90 to-slate-900/95 border border-white/10 shadow-xl backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+              <span>📅</span>
+              <span>シーズン選択:</span>
+            </span>
+            <div className="inline-flex items-center p-1 bg-black/50 rounded-xl border border-white/10">
+              <button
+                type="button"
+                onClick={() => handleSeasonChange('2026')}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-2 ${
+                  selectedSeason === '2026'
+                    ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                </span>
+                <span>2026年 (現行シーズン)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSeasonChange('2025')}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
+                  selectedSeason === '2025'
+                    ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <span>🏛️</span>
+                <span>2025年 (アーカイブ)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic Status & Info Trigger */}
+        <div className="flex items-center gap-2 justify-between md:justify-end">
+          {selectedSeason === '2026' ? (
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 font-mono text-[11px] shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              <span className="truncate">
+                {seasonEnded
+                  ? '2026シーズン全24戦終了 / 王者決定'
+                  : `第${selectedRace.round}戦 ${selectedRace.gpName} (${selectedRace.circuitName})`}
+              </span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 border border-white/10 text-slate-300 font-mono text-[11px]">
+              <span>🏆</span>
+              <span>2025シーズン全24戦終了 / マクラーレン WCC制覇</span>
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setShowSeasonInfo(!showSeasonInfo)}
+            className={`px-2.5 py-1.5 rounded-xl border text-xs font-racing font-bold transition-all flex items-center gap-1 shrink-0 ${
+              showSeasonInfo
+                ? 'bg-sky-600/30 border-sky-400/50 text-sky-200'
+                : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-400 hover:text-white'
+            }`}
+            title="シーズン自動移行の設計と仕組み"
+          >
+            <span>ℹ️</span>
+            <span className="hidden sm:inline">自動切替の仕組み</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Season Rollover Architecture Explanation Card */}
+      {showSeasonInfo && (
+        <div className="p-4 rounded-2xl bg-sky-950/40 border border-sky-500/30 shadow-xl space-y-3 animate-fadeIn">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-lg">🤖</span>
+              <h4 className="font-racing font-bold text-sm text-sky-200">
+                PADOROKU シーズン自動判定＆移行アーキテクチャ
+              </h4>
+            </div>
+            <button
+              onClick={() => setShowSeasonInfo(false)}
+              className="text-slate-400 hover:text-white text-xs font-mono"
+            >
+              ✕ 閉じる
+            </button>
+          </div>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            本アプリは端末の現在日時（<span className="font-mono text-amber-300">new Date()</span>）とFIA公式グランプリ日程（targetDateUtc）をリアルタイムに照合し、以下のインテリジェントな自動化を行っています。
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 text-xs">
+            <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
+              <div className="font-racing font-bold text-emerald-400 flex items-center gap-1">
+                <span>⚡</span>
+                <span>1. 次戦自動フォーカス</span>
+              </div>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                現行シーズン中（3月〜11月）は、未完了の最初のレース（次回開催GP）を自動検出してトップ画面に表示し、秒刻みのカウントダウンを作動させます。
+              </p>
+            </div>
+            <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
+              <div className="font-racing font-bold text-amber-400 flex items-center gap-1">
+                <span>🏁</span>
+                <span>2. シーズン終了＆オフシーズン</span>
+              </div>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                第24戦アブダビGPが終了すると、自動的に「年間リザルト確定」モードへシフト。冬季オフシーズン中も年間王者や獲得ポイントを明瞭に表示します。
+              </p>
+            </div>
+            <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
+              <div className="font-racing font-bold text-sky-400 flex items-center gap-1">
+                <span>🔄</span>
+                <span>3. 年越し・新シーズン自動移行</span>
+              </div>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                新年の到来や新シーズン日程の登録に伴い、デフォルト画面が次年度へ自動移行。過去シーズンはワンタップでアーカイブとして常時アクセス可能です。
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ─────────────────────────────────────────────────────────────
           1. NEXT RACE HERO & JST SCHEDULE BANNER
           ───────────────────────────────────────────────────────────── */}
@@ -144,7 +302,7 @@ export default function SeasonHub({
           <div className="space-y-3 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-3 py-1 rounded-full text-xs font-racing font-bold tracking-wider uppercase bg-red-500/20 text-red-400 border border-red-500/30">
-                🏁 第{selectedRace.round}戦 / 全24戦
+                🏁 {selectedSeason}年 第{selectedRace.round}戦 / 全24戦
               </span>
               {selectedRace.isSprint && (
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-racing font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse">
@@ -256,13 +414,14 @@ export default function SeasonHub({
                     公式決勝レース終了・アーカイブ保管済み
                   </div>
                   <div className="text-[10px] text-slate-400 font-mono">
-                    開催期間: {selectedRace.dates}
+                    開催日程: {selectedRace.dates}
                   </div>
                 </div>
               ) : (
                 <>
-                  <div className="text-[10px] font-racing font-bold text-slate-400 uppercase tracking-widest mb-1.5">
-                    決勝スタートまで
+                  <div className="text-[10px] font-racing font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center justify-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                    <span>決勝スタートまで</span>
                   </div>
                   <div className="grid grid-cols-4 gap-1.5 font-mono text-center">
                     <div className="p-2 rounded-lg bg-white/5 border border-white/5">
@@ -327,7 +486,7 @@ export default function SeasonHub({
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          1.5 DEEP RACE REPORT & 2024 RESULTS PANEL (FOR SELECTED ROUND)
+          1.5 DEEP RACE REPORT & PROFILE (FOR SELECTED ROUND)
           ───────────────────────────────────────────────────────────── */}
       {selectedReport && (
         <div className="bg-slate-900/80 rounded-2xl border border-white/10 p-5 md:p-6 space-y-5 shadow-xl animate-fadeIn">
@@ -336,10 +495,10 @@ export default function SeasonHub({
               <span className="text-xl">🏆</span>
               <div>
                 <h3 className="text-base md:text-lg font-racing font-bold text-white tracking-wide">
-                  {selectedRace.gpName} : レース実績 ＆ 戦術エンジニアリングプロファイル
+                  {selectedRace.gpName} : 戦術エンジニアリングプロファイル ＆ コースレコード
                 </h3>
                 <p className="text-xs text-slate-400">
-                  前年決勝の勝敗を分けた決定的瞬間、ピット戦略、公式コースレコード、および今季の戦術指標
+                  勝敗を分けるピット戦略、公式コースレコード、および今季のタイヤ・セーフティカー戦術指標
                 </p>
               </div>
             </div>
@@ -349,11 +508,11 @@ export default function SeasonHub({
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            {/* 1. 2024 Podium & Key Records */}
+            {/* 1. Track Record Podium Profile */}
             <div className="space-y-3 bg-slate-950/60 p-4 rounded-xl border border-white/5">
               <div className="text-xs font-mono font-bold text-amber-400 flex items-center gap-1.5">
                 <span>🥇</span>
-                <span>2024年 決勝表彰台リザルト</span>
+                <span>直近表彰台データ &amp; 実績</span>
               </div>
               <div className="space-y-2">
                 {selectedReport.result2024.podium.map((p, idx) => (
@@ -474,7 +633,7 @@ export default function SeasonHub({
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          2. NAVIGATION TABS (CALENDAR / STANDINGS / 2025 GRID)
+          2. NAVIGATION TABS (CALENDAR / STANDINGS / GRID)
           ───────────────────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
         <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/80 border border-white/10">
@@ -487,7 +646,7 @@ export default function SeasonHub({
             }`}
           >
             <span>📅</span>
-            <span>レースカレンダー (全24戦)</span>
+            <span>{selectedSeason}年 カレンダー (全24戦)</span>
           </button>
           <button
             onClick={() => setActiveTab('standings')}
@@ -498,7 +657,7 @@ export default function SeasonHub({
             }`}
           >
             <span>🏆</span>
-            <span>順位表・ランキング</span>
+            <span>{selectedSeason}年 順位表・ランキング</span>
           </button>
           <button
             onClick={() => setActiveTab('grid')}
@@ -509,7 +668,7 @@ export default function SeasonHub({
             }`}
           >
             <span>👥</span>
-            <span>参戦グリッド・チーム体制</span>
+            <span>{selectedSeason}年 参戦グリッド・PU体制</span>
           </button>
         </div>
 
@@ -530,7 +689,7 @@ export default function SeasonHub({
               className="px-3 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-racing font-bold transition-all flex items-center gap-1"
             >
               <span>🎬</span>
-              <span>今季の因縁・ドラマ録</span>
+              <span>因縁・ドラマ録</span>
             </button>
           )}
         </div>
@@ -574,6 +733,8 @@ export default function SeasonHub({
             {filteredCalendar.map((gp) => {
               const isSelected = gp.round === selectedRound;
               const gpWeather = getWeatherByRound(gp.round);
+              const isGpPast = new Date(gp.targetDateUtc).getTime() <= new Date().getTime();
+
               return (
                 <div
                   key={gp.round}
@@ -586,9 +747,20 @@ export default function SeasonHub({
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-racing font-bold text-slate-400 uppercase">
-                        Round {gp.round}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[11px] font-racing font-bold text-slate-400 uppercase">
+                          Round {gp.round}
+                        </span>
+                        {isGpPast ? (
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-800 text-slate-400 border border-white/10">
+                            終了
+                          </span>
+                        ) : (
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            予定
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center gap-1">
                         {gp.isSprint && (
                           <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
@@ -626,7 +798,7 @@ export default function SeasonHub({
                   </div>
 
                   <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-[11px]">
-                    <span className="font-mono text-slate-300">{gp.dates.replace('2025年 ', '')}</span>
+                    <span className="font-mono text-slate-300">{gp.dates.replace(/^202[0-9]年\s*/, '')}</span>
                     {onNavigateToCircuit ? (
                       <button
                         onClick={(e) => {
@@ -655,11 +827,23 @@ export default function SeasonHub({
           ───────────────────────────────────────────────────────────── */}
       {activeTab === 'standings' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="text-xs text-slate-400">
-              年間確定ランキング ＆ チーム戦力データ
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <div className="text-xs font-bold text-white flex items-center gap-2">
+                <span>🏆</span>
+                <span>
+                  {selectedSeason === '2026'
+                    ? '2026シーズン 暫定選手権ランキング (第16戦 モンツァ終了時点)'
+                    : '2025シーズン 年間確定選手権ランキング (全24戦終了 / マクラーレンWCC)'}
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                {selectedSeason === '2026'
+                  ? '新PU規定元年。マクラーレンとレッドブル・フェラーリによる三つ巴の激戦'
+                  : 'ノリスが悲願の初戴冠、マクラーレンが1998年以来となるコンストラクターズタイトルを奪還'}
+              </p>
             </div>
-            <div className="flex items-center gap-1 p-1 bg-slate-900 rounded-lg border border-white/10 text-xs">
+            <div className="flex items-center gap-1 p-1 bg-slate-900 rounded-lg border border-white/10 text-xs self-start sm:self-auto">
               <button
                 onClick={() => setStandingsType('drivers')}
                 className={`px-3 py-1 rounded font-racing font-bold ${
@@ -698,7 +882,7 @@ export default function SeasonHub({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {DRIVER_STANDINGS_2024.map((d) => {
+                    {activeDriverStandings.map((d) => {
                       const percentage = (d.points / maxDriverPoints) * 100;
                       return (
                         <tr
@@ -776,7 +960,7 @@ export default function SeasonHub({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
-                    {CONSTRUCTOR_STANDINGS_2024.map((team) => {
+                    {activeConstructorStandings.map((team) => {
                       const percentage = (team.points / maxTeamPoints) * 100;
                       return (
                         <tr
@@ -833,16 +1017,24 @@ export default function SeasonHub({
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          TAB CONTENT: 3. 2025 GRID SHOWCASE
+          TAB CONTENT: 3. GRID SHOWCASE
           ───────────────────────────────────────────────────────────── */}
       {activeTab === 'grid' && (
         <div className="space-y-4">
-          <div className="text-xs text-slate-400">
-            全10チーム・20名の公式ドライバー布陣。ハミルトンの跳ね馬移籍、サインツのウィリアムズ加入、そして前代未聞の大型ルーキー陣に注目！
+          <div className="text-xs text-slate-400 leading-relaxed">
+            {selectedSeason === '2026' ? (
+              <span>
+                <strong className="text-white">2026年 新レギュレーション参戦布陣:</strong> ドイツの名門<strong className="text-red-400">アウディ</strong>のF1正式参戦、<strong className="text-emerald-400">アストンマーティン×ホンダ完全ワークス</strong>体制始動、そして<strong className="text-blue-400">レッドブル×フォード新PU</strong>の夜明け！100%持続可能燃料とアクティブエアロが生み出す新時代。
+              </span>
+            ) : (
+              <span>
+                <strong className="text-white">2025年 参戦体制アーカイブ:</strong> ルイス・ハミルトンの跳ね馬電撃移籍、カルロス・サインツのウィリアムズ加入、そしてアントネッリやベアマンら大型ルーキーの鮮烈な挑戦。
+              </span>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {GRID_2025_TEAMS.map((team, idx) => (
+            {activeGrid.map((team, idx) => (
               <div
                 key={idx}
                 className="p-4 rounded-xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between"
