@@ -139,13 +139,12 @@ export default function PhotoGalleryCarousel({
             return (
               <div
                 key={idx}
-                className={`w-[85%] sm:w-[75%] md:w-[72%] flex-shrink-0 snap-center rounded-2xl overflow-hidden bg-slate-950 border transition-all duration-300 relative shadow-lg ${
+                className={`w-[85%] sm:w-[75%] md:w-[72%] h-44 sm:h-56 flex-shrink-0 snap-center rounded-2xl overflow-hidden bg-slate-950 border transition-all duration-300 relative shadow-lg ${
                   isCurrent
                     ? 'ring-1'
                     : 'border-white/10 opacity-75 hover:opacity-95'
                 }`}
                 style={{
-                  height: '230px',
                   borderColor: isCurrent ? activeColor : 'rgba(255, 255, 255, 0.1)',
                   boxShadow: isCurrent ? `0 0 15px ${activeColor}30` : undefined,
                 }}

@@ -269,7 +269,7 @@ export default function KnowledgeHistoryHub({
   };
 
   return (
-    <div className="flex flex-col gap-5 max-w-6xl mx-auto">
+    <div className="flex flex-col gap-5 max-w-6xl mx-auto pb-8 sm:pb-2">
 
       {/* Header Banner (Shown specifically for Teams, Strategy & History search) */}
       {(activeSubTab === 'teams' || activeSubTab === 'strategy' || activeSubTab === 'history') && (

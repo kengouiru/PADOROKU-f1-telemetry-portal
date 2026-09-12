@@ -198,76 +198,78 @@ export default function CircuitDetailModal({
           </div>
         </div>
 
-        {/* Modal Header: Circuit Name, Country, Specs Badge Bar */}
-        <div className="p-5 sm:px-6 pb-3 border-b border-white/10 bg-slate-900/60 flex flex-col md:flex-row md:items-center justify-between gap-4 flex-shrink-0">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-mono text-slate-400 uppercase tracking-widest flex items-center gap-1">
-                <span>📍</span>
-                <span>{circuit.country}</span>
-              </span>
-              <span className="text-xs font-mono font-bold bg-sky-950/80 text-sky-300 border border-sky-500/40 px-2 py-0.5 rounded">
-                FIA Grade 1
-              </span>
+        {/* Scrollable Modal Container: Wraps Header, Sticky Sub-Tabs & Content */}
+        <div className="overflow-y-auto flex-1 flex flex-col min-h-0">
+          {/* Modal Header: Circuit Name, Country, Specs Badge Bar */}
+          <div className="p-3.5 sm:px-6 pb-3 border-b border-white/10 bg-slate-900/60 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 flex-shrink-0">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                  <span>📍</span>
+                  <span>{circuit.country}</span>
+                </span>
+                <span className="text-xs font-mono font-bold bg-sky-950/80 text-sky-300 border border-sky-500/40 px-2 py-0.5 rounded">
+                  FIA Grade 1
+                </span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-racing font-black text-white tracking-wide">
+                {circuit.name}
+              </h2>
+              <p className="text-xs text-slate-400 font-mono">{circuit.officialName}</p>
             </div>
-            <h2 className="text-xl sm:text-2xl font-racing font-black text-white tracking-wide">
-              {circuit.name}
-            </h2>
-            <p className="text-xs text-slate-400 font-mono">{circuit.officialName}</p>
+
+            {/* Quick Stats Badges */}
+            <div className="grid grid-cols-4 gap-1.5 sm:flex sm:flex-wrap sm:items-center sm:gap-2 text-xs font-mono">
+              <div className="bg-slate-800/80 p-2 sm:px-3 sm:py-1.5 rounded-xl border border-white/10 flex flex-col items-center text-center">
+                <span className="text-[8px] sm:text-[9px] text-slate-400">全長</span>
+                <strong className="text-sky-300 font-bold text-[11px] sm:text-xs">{circuit.lengthKm} km</strong>
+              </div>
+
+              <div className="bg-slate-800/80 p-2 sm:px-3 sm:py-1.5 rounded-xl border border-white/10 flex flex-col items-center text-center">
+                <span className="text-[8px] sm:text-[9px] text-slate-400">コーナー</span>
+                <strong className="text-emerald-300 font-bold text-[11px] sm:text-xs">{circuit.turns} ターン</strong>
+              </div>
+
+              <div className="bg-slate-800/80 p-2 sm:px-3 sm:py-1.5 rounded-xl border border-white/10 flex flex-col items-center text-center">
+                <span className="text-[8px] sm:text-[9px] text-slate-400">DRS</span>
+                <strong className="text-purple-300 font-bold text-[11px] sm:text-xs">{circuit.drsZones} 区間</strong>
+              </div>
+
+              <div className="bg-slate-800/80 p-2 sm:px-3 sm:py-1.5 rounded-xl border border-white/10 flex flex-col items-center text-center">
+                <span className="text-[8px] sm:text-[9px] text-slate-400">レコード</span>
+                <strong className="text-amber-300 font-bold text-[10px] sm:text-xs leading-tight">{circuit.lapRecord.time}</strong>
+                <span className="text-[7px] sm:text-[8px] text-slate-400 truncate max-w-[70px] sm:max-w-[120px] hidden sm:inline">
+                  {circuit.lapRecord.driver}
+                </span>
+              </div>
+            </div>
           </div>
 
-          {/* Quick Stats Badges */}
-          <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
-            <div className="bg-slate-800/80 px-3 py-1.5 rounded-xl border border-white/10 flex flex-col items-center">
-              <span className="text-[9px] text-slate-400">コース全長</span>
-              <strong className="text-sky-300 font-bold">{circuit.lengthKm} km</strong>
-            </div>
-
-            <div className="bg-slate-800/80 px-3 py-1.5 rounded-xl border border-white/10 flex flex-col items-center">
-              <span className="text-[9px] text-slate-400">総コーナー数</span>
-              <strong className="text-emerald-300 font-bold">{circuit.turns} ターン</strong>
-            </div>
-
-            <div className="bg-slate-800/80 px-3 py-1.5 rounded-xl border border-white/10 flex flex-col items-center">
-              <span className="text-[9px] text-slate-400">DRSゾーン</span>
-              <strong className="text-purple-300 font-bold">{circuit.drsZones} 区間</strong>
-            </div>
-
-            <div className="bg-slate-800/80 px-3 py-1.5 rounded-xl border border-white/10 flex flex-col items-center">
-              <span className="text-[9px] text-slate-400">コースレコード</span>
-              <strong className="text-amber-300 font-bold">{circuit.lapRecord.time}</strong>
-              <span className="text-[8px] text-slate-400 truncate max-w-[120px]">
-                {circuit.lapRecord.driver} ({circuit.lapRecord.year})
-              </span>
-            </div>
+          {/* 3 Main Sub-Tabs (Sticky when scrolling) */}
+          <div className="sticky top-0 z-20 flex items-center gap-2 px-3.5 sm:px-6 pt-2 sm:pt-2.5 border-b border-white/10 bg-slate-950/95 backdrop-blur-md overflow-x-auto flex-shrink-0 shadow-sm">
+            {(
+              [
+                ['map', '🏁 コース解剖 & ビジュアル'],
+                ['engineering', '🔧 工学・セットアップ & 戦略'],
+                ['history', `🏛️ 歴史的ドラマ & 名勝負 (${circuit.historicalMoments?.length || 0})`],
+              ] as [CircuitTab, string][]
+            ).map(([tab, label]) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`pb-2 px-3 sm:px-4 text-xs font-racing font-bold transition-all border-b-2 flex-shrink-0 cursor-pointer ${
+                  activeTab === tab
+                    ? 'text-sky-400 border-sky-400 font-black'
+                    : 'text-slate-400 border-transparent hover:text-slate-200'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
           </div>
-        </div>
 
-        {/* 3 Main Sub-Tabs */}
-        <div className="flex items-center gap-2 px-5 sm:px-6 pt-3 border-b border-white/10 bg-slate-900/40 overflow-x-auto flex-shrink-0">
-          {(
-            [
-              ['map', '🏁 コース解剖 & ビジュアル'],
-              ['engineering', '🔧 工学・セットアップ & 戦略'],
-              ['history', `🏛️ 歴史的ドラマ & 名勝負 (${circuit.historicalMoments?.length || 0})`],
-            ] as [CircuitTab, string][]
-          ).map(([tab, label]) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-2.5 px-4 text-xs font-racing font-bold transition-all border-b-2 flex-shrink-0 ${
-                activeTab === tab
-                  ? 'text-sky-400 border-sky-400 font-black'
-                  : 'text-slate-400 border-transparent hover:text-slate-200'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* Scrollable Modal Body */}
-        <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-5">
+          {/* Tab Content Body */}
+          <div className="p-3.5 sm:p-6 flex-1 space-y-4 sm:space-y-5">
           {/* ════════════════════════════════════════════════════════════
               TAB 1: TRACK MAP, ATMOSPHERE PHOTO & COMPLETE CORNER GUIDE
           ════════════════════════════════════════════════════════════ */}
@@ -922,6 +924,7 @@ export default function CircuitDetailModal({
               )}
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>,

@@ -509,7 +509,7 @@ export default function DriverComparisonTool({
       )}
 
       {/* ── 6. Action Links: Drama Hub & Telemetry ── */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 glass-card border border-white/10 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 glass-card border border-white/10 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 mb-8 sm:mb-2">
         <div>
           <h4 className="text-xs font-racing font-bold text-white">
             さらなる深掘り分析・ドラマ体験

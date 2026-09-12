@@ -189,207 +189,211 @@ export default function DriverDetailModal({
           </div>
         </div>
 
-        {/* Driver Hero Header */}
-        <div
-          className={`p-5 sm:p-6 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
-            isLegend
-              ? 'bg-gradient-to-r from-amber-950/40 via-yellow-950/20 to-slate-900/40'
-              : 'bg-gradient-to-b from-slate-900/60 to-transparent'
-          }`}
-        >
-          <div className="flex items-center gap-4 sm:gap-5">
-            {/* Driver Portrait Image Area */}
-            <div className="flex flex-col items-center flex-shrink-0">
-              <div
-                className="w-20 h-24 sm:w-24 sm:h-28 rounded-2xl overflow-hidden border shadow-xl bg-slate-900 relative flex items-center justify-center"
-                style={{ borderColor: `${themeColor}80` }}
-              >
-                {/* Fallback Badge (rendered under image or if error) */}
+        {/* Scrollable Modal Container: Wraps Hero Header, Sticky Sub-Tabs & Content */}
+        <div className="overflow-y-auto flex-1 flex flex-col min-h-0">
+          {/* Driver Hero Header */}
+          <div
+            className={`p-3.5 sm:p-6 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 flex-shrink-0 ${
+              isLegend
+                ? 'bg-gradient-to-r from-amber-950/40 via-yellow-950/20 to-slate-900/40'
+                : 'bg-gradient-to-b from-slate-900/60 to-transparent'
+            }`}
+          >
+            <div className="flex items-center gap-3 sm:gap-5">
+              {/* Driver Portrait Image Area */}
+              <div className="flex flex-col items-center flex-shrink-0">
                 <div
-                  className="absolute inset-0 flex flex-col items-center justify-center font-racing font-black"
-                  style={{
-                    color: themeColor,
-                    backgroundColor: `${themeColor}18`,
-                  }}
+                  className="w-16 h-20 sm:w-24 sm:h-28 rounded-xl sm:rounded-2xl overflow-hidden border shadow-xl bg-slate-900 relative flex items-center justify-center"
+                  style={{ borderColor: `${themeColor}80` }}
                 >
-                  <span className="text-2xl sm:text-3xl leading-none">#{driver.number}</span>
-                  <span className="text-xs tracking-wider mt-1">{driver.code}</span>
+                  {/* Fallback Badge (rendered under image or if error) */}
+                  <div
+                    className="absolute inset-0 flex flex-col items-center justify-center font-racing font-black"
+                    style={{
+                      color: themeColor,
+                      backgroundColor: `${themeColor}18`,
+                    }}
+                  >
+                    <span className="text-xl sm:text-3xl leading-none">#{driver.number}</span>
+                    <span className="text-[10px] sm:text-xs tracking-wider mt-1">{driver.code}</span>
+                  </div>
+
+                  {/* Actual Portrait Image via safe Proxy */}
+                  {proxiedImageUrl && !imgError && (
+                    <img
+                      src={proxiedImageUrl}
+                      alt={driver.fullName}
+                      loading="lazy"
+                      decoding="async"
+                      referrerPolicy="no-referrer"
+                      onLoad={() => setImgLoaded(true)}
+                      onError={() => setImgError(true)}
+                      className={`absolute inset-0 w-full h-full object-cover object-top filter brightness-95 transition-opacity duration-300 ${
+                        imgLoaded ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    />
+                  )}
+
+                  {/* Floating Number Badge */}
+                  {imgLoaded && !imgError && (
+                    <div
+                      className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-md text-[9px] sm:text-[10px] font-racing font-black bg-black/85 backdrop-blur-sm border shadow-sm"
+                      style={{ color: themeColor, borderColor: `${themeColor}60` }}
+                    >
+                      #{driver.number}
+                    </div>
+                  )}
                 </div>
 
-                {/* Actual Portrait Image via safe Proxy */}
-                {proxiedImageUrl && !imgError && (
-                  <img
-                    src={proxiedImageUrl}
-                    alt={driver.fullName}
-                    loading="lazy"
-                    decoding="async"
-                    referrerPolicy="no-referrer"
-                    onLoad={() => setImgLoaded(true)}
-                    onError={() => setImgError(true)}
-                    className={`absolute inset-0 w-full h-full object-cover object-top filter brightness-95 transition-opacity duration-300 ${
-                      imgLoaded ? 'opacity-100' : 'opacity-0'
-                    }`}
-                  />
-                )}
-
-                {/* Floating Number Badge */}
-                {imgLoaded && !imgError && (
-                  <div
-                    className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded-md text-[10px] font-racing font-black bg-black/85 backdrop-blur-sm border shadow-sm"
-                    style={{ color: themeColor, borderColor: `${themeColor}60` }}
+                {/* CC Attribution Link */}
+                {driver.visualAsset && (
+                  <a
+                    href={driver.visualAsset.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-0.5 text-[8px] sm:text-[9px] text-slate-400 hover:text-sky-300 font-mono flex items-center gap-0.5 transition-colors max-w-[80px] sm:max-w-[100px] truncate"
+                    title={`撮影: ${driver.visualAsset.credit} (${driver.visualAsset.license})`}
                   >
-                    #{driver.number}
+                    <span>Photo: {driver.visualAsset.credit}</span>
+                    <span className="text-[8px]">↗</span>
+                  </a>
+                )}
+              </div>
+
+              {/* Driver Title & Identity */}
+              <div className="space-y-1 min-w-0">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  <span className="text-[11px] sm:text-xs text-slate-400 font-mono">{driver.country}</span>
+                  <span
+                    className={`px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold font-mono border ${
+                      isLegend
+                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
+                        : 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+                    }`}
+                  >
+                    {isLegend ? '👑 殿堂入り F1 LEGEND' : '🏁 現役ドライバー'}
+                  </span>
+                  <span className="bg-slate-800/90 text-slate-300 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-medium border border-white/10 truncate">
+                    {driver.driverType}
+                  </span>
+                </div>
+
+                <h2 className="text-lg sm:text-2xl font-black text-white leading-tight flex items-center gap-2 truncate">
+                  <span className="truncate">{driver.fullName}</span>
+                  {isLegend && <span className="text-amber-400 text-sm sm:text-lg">👑</span>}
+                </h2>
+                <p className="text-xs text-slate-400 truncate">
+                  <strong className="text-slate-200">{driver.team}</strong>
+                  {driver.nickname && <span className="ml-1.5 text-slate-400">({driver.nickname})</span>}
+                </p>
+
+                {/* Official Social Links (Instagram / X / Web) */}
+                {driver.socialLinks && (
+                  <div className="flex items-center gap-1.5 pt-0.5 flex-wrap">
+                    {driver.socialLinks.instagram && (
+                      <a
+                        href={driver.socialLinks.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-medium text-slate-200 bg-slate-800/80 border border-white/10 hover:border-pink-500/50 hover:bg-gradient-to-r hover:from-[#f09433]/20 hover:via-[#dc2743]/20 hover:to-[#bc1888]/20 hover:text-white transition-all shadow-sm group"
+                        title={`${driver.fullName} 公式Instagramを開く`}
+                      >
+                        <svg className="w-3 h-3 text-pink-400 group-hover:scale-110 transition-transform flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                        <span className="font-mono text-[10px] sm:text-xs">{getInstagramHandle(driver.socialLinks.instagram)}</span>
+                        <span className="text-[9px] text-slate-400 group-hover:text-pink-300">↗</span>
+                      </a>
+                    )}
+
+                    {driver.socialLinks.xTwitter && (
+                      <a
+                        href={driver.socialLinks.xTwitter}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-medium text-slate-400 bg-slate-800/80 border border-white/10 hover:border-white/30 hover:bg-slate-700/80 hover:text-white transition-all shadow-sm"
+                        title={`${driver.fullName} 公式X (Twitter) を開く`}
+                      >
+                        <span className="text-slate-300 font-bold">𝕏</span>
+                        <span className="text-[9px] text-slate-400">↗</span>
+                      </a>
+                    )}
+
+                    {driver.socialLinks.website && (
+                      <a
+                        href={driver.socialLinks.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[11px] sm:text-xs font-medium text-slate-400 bg-slate-800/80 border border-white/10 hover:border-sky-400/40 hover:bg-sky-950/40 hover:text-sky-200 transition-all shadow-sm"
+                        title={`${driver.fullName} 公式Webサイトを開く`}
+                      >
+                        <span>🌐</span>
+                        <span className="text-[9px] text-slate-400">↗</span>
+                      </a>
+                    )}
                   </div>
                 )}
               </div>
-
-              {/* CC Attribution Link */}
-              {driver.visualAsset && (
-                <a
-                  href={driver.visualAsset.sourceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-1 text-[9px] text-slate-400 hover:text-sky-300 font-mono flex items-center gap-0.5 transition-colors max-w-[100px] truncate"
-                  title={`撮影: ${driver.visualAsset.credit} (${driver.visualAsset.license})`}
-                >
-                  <span>Photo: {driver.visualAsset.credit}</span>
-                  <span className="text-[8px]">↗</span>
-                </a>
-              )}
             </div>
 
-            {/* Driver Title & Identity */}
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs text-slate-400 font-mono">{driver.country}</span>
-                <span
-                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono border ${
-                    isLegend
-                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm'
-                      : 'bg-sky-500/20 text-sky-300 border-sky-500/40'
-                  }`}
-                >
-                  {isLegend ? '👑 殿堂入り F1 LEGEND' : '🏁 現役ドライバー'}
-                </span>
-                <span className="bg-slate-800/90 text-slate-300 px-2 py-0.5 rounded-full text-[10px] font-medium border border-white/10">
-                  {driver.driverType}
-                </span>
-              </div>
-
-              <h2 className="text-xl sm:text-2xl font-black text-white leading-tight flex items-center gap-2">
-                <span>{driver.fullName}</span>
-                {isLegend && <span className="text-amber-400 text-lg">👑</span>}
-              </h2>
-              <p className="text-xs text-slate-400">
-                <strong className="text-slate-200">{driver.team}</strong>
-                {driver.nickname && <span className="ml-2 text-slate-400">({driver.nickname})</span>}
-              </p>
-
-              {/* Official Social Links (Instagram / X / Web) */}
-              {driver.socialLinks && (
-                <div className="flex items-center gap-2 pt-1 flex-wrap">
-                  {driver.socialLinks.instagram && (
-                    <a
-                      href={driver.socialLinks.instagram}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-slate-200 bg-slate-800/80 border border-white/10 hover:border-pink-500/50 hover:bg-gradient-to-r hover:from-[#f09433]/20 hover:via-[#dc2743]/20 hover:to-[#bc1888]/20 hover:text-white transition-all shadow-sm group"
-                      title={`${driver.fullName} 公式Instagramを開く`}
+            {/* Championship Trophy Banner */}
+            {driver.championships > 0 && (
+              <div
+                className="rounded-xl sm:rounded-2xl p-2 sm:p-3 px-3 sm:px-4 flex items-center gap-2.5 sm:gap-3 self-start sm:self-auto flex-shrink-0 border shadow-md"
+                style={{
+                  backgroundColor: isLegend ? 'rgba(212, 175, 55, 0.15)' : 'rgba(245, 158, 11, 0.12)',
+                  borderColor: `${themeColor}60`,
+                }}
+              >
+                <span className="text-xl sm:text-3xl">🏆</span>
+                <div>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span
+                      className="text-[10px] sm:text-xs font-racing font-bold uppercase tracking-widest block"
+                      style={{ color: themeColor }}
                     >
-                      <svg className="w-3.5 h-3.5 text-pink-400 group-hover:scale-110 transition-transform flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                      </svg>
-                      <span className="font-mono">{getInstagramHandle(driver.socialLinks.instagram)}</span>
-                      <span className="text-[10px] text-slate-400 group-hover:text-pink-300">↗</span>
-                    </a>
-                  )}
-
-                  {driver.socialLinks.xTwitter && (
-                    <a
-                      href={driver.socialLinks.xTwitter}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-slate-400 bg-slate-800/80 border border-white/10 hover:border-white/30 hover:bg-slate-700/80 hover:text-white transition-all shadow-sm"
-                      title={`${driver.fullName} 公式X (Twitter) を開く`}
-                    >
-                      <span className="text-slate-300 font-bold">𝕏</span>
-                      <span className="text-[10px] text-slate-400">↗</span>
-                    </a>
-                  )}
-
-                  {driver.socialLinks.website && (
-                    <a
-                      href={driver.socialLinks.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium text-slate-400 bg-slate-800/80 border border-white/10 hover:border-sky-400/40 hover:bg-sky-950/40 hover:text-sky-200 transition-all shadow-sm"
-                      title={`${driver.fullName} 公式Webサイトを開く`}
-                    >
-                      <span>🌐</span>
-                      <span className="text-[10px] text-slate-400">↗</span>
-                    </a>
+                      {isLegend ? 'LEGEND' : 'WORLD CHAMPION'}
+                    </span>
+                    <span className="text-xs sm:text-base font-black text-white font-mono">
+                      {driver.championships}回 王座
+                    </span>
+                  </div>
+                  {driver.championshipYears && (
+                    <span className="block text-[9px] sm:text-[10px] text-amber-200/90 font-mono">
+                      ({driver.championshipYears.join(', ')})
+                    </span>
                   )}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
-          {/* Championship Trophy Banner */}
-          {driver.championships > 0 && (
-            <div
-              className="rounded-2xl p-3 px-4 flex items-center gap-3 self-start sm:self-auto flex-shrink-0 border shadow-lg"
-              style={{
-                backgroundColor: isLegend ? 'rgba(212, 175, 55, 0.15)' : 'rgba(245, 158, 11, 0.12)',
-                borderColor: `${themeColor}60`,
-              }}
-            >
-              <span className="text-3xl">🏆</span>
-              <div>
-                <span
-                  className="text-xs font-racing font-bold uppercase tracking-widest block"
-                  style={{ color: themeColor }}
-                >
-                  {isLegend ? 'LEGENDARY WORLD CHAMPION' : 'WORLD CHAMPION'}
-                </span>
-                <span className="text-base sm:text-lg font-black text-white font-mono">
-                  {driver.championships}回 王座
-                </span>
-                {driver.championshipYears && (
-                  <span className="block text-[10px] text-amber-200/90 font-mono">
-                    ({driver.championshipYears.join(', ')})
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+          {/* Modal Sub-Tabs (Sticky at top when scrolling) */}
+          <div className="sticky top-0 z-20 flex items-center gap-2 px-3.5 sm:px-6 pt-2 sm:pt-2.5 border-b border-white/10 bg-slate-950/95 backdrop-blur-md overflow-x-auto flex-shrink-0 shadow-sm">
+            {(
+              [
+                ['overview', '📊 プロフィール & 実績'],
+                ['style', '🏎️ 走行スタイル & 技術'],
+                ['bio', '📖 人物像 & エピソード'],
+                ['references', `📚 参考文献 (${driver.references.length})`],
+              ] as [DetailTab, string][]
+            ).map(([tab, label]) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`pb-2 px-2.5 sm:px-3 text-xs font-racing font-bold transition-all border-b-2 flex-shrink-0 cursor-pointer ${
+                  activeTab === tab
+                    ? 'text-sky-400 border-sky-400 font-black'
+                    : 'text-slate-400 border-transparent hover:text-slate-200'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
 
-        {/* Modal Sub-Tabs */}
-        <div className="flex items-center gap-2 px-5 sm:px-6 pt-3 border-b border-white/10 bg-slate-900/40 overflow-x-auto flex-shrink-0">
-          {(
-            [
-              ['overview', '📊 プロフィール & 実績'],
-              ['style', '🏎️ 走行スタイル & 技術'],
-              ['bio', '📖 人物像 & エピソード'],
-              ['references', `📚 参考文献 (${driver.references.length})`],
-            ] as [DetailTab, string][]
-          ).map(([tab, label]) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-2.5 px-3 text-xs font-racing font-bold transition-all border-b-2 flex-shrink-0 ${
-                activeTab === tab
-                  ? 'text-sky-400 border-sky-400 font-black'
-                  : 'text-slate-400 border-transparent hover:text-slate-200'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* Scrollable Modal Body */}
-        <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-5">
+          {/* Active Tab Body Content */}
+          <div className="p-3.5 sm:p-6 flex-1 space-y-4 sm:space-y-5">
           {/* TAB 1: OVERVIEW & CAREER STATS */}
           {activeTab === 'overview' && (
             <div className="space-y-5 animate-fade-in">
@@ -428,48 +432,48 @@ export default function DriverDetailModal({
                 </p>
               </div>
 
-              {/* Stats 4-Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="bg-slate-900/80 border border-white/10 p-3.5 rounded-2xl text-center">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+              {/* Stats 4-Grid: Compact 4-col on mobile, spacious cards on desktop */}
+              <div className="grid grid-cols-4 gap-1.5 sm:gap-3">
+                <div className="bg-slate-900/80 border border-white/10 p-2 sm:p-3 rounded-xl sm:rounded-2xl text-center flex flex-col justify-center">
+                  <span className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase tracking-wider block truncate">
                     🏁 参戦数
                   </span>
-                  <span className="text-xl font-bold font-mono text-white mt-1 block">
+                  <span className="text-base sm:text-xl font-bold font-mono text-white mt-0.5 block leading-tight">
                     {driver.entries}
                   </span>
-                  <span className="text-[9px] text-slate-500">グランプリ</span>
+                  <span className="text-[8px] sm:text-[9px] text-slate-500 block truncate">グランプリ</span>
                 </div>
-                <div className="bg-slate-900/80 border border-white/10 p-3.5 rounded-2xl text-center">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+                <div className="bg-slate-900/80 border border-white/10 p-2 sm:p-3 rounded-xl sm:rounded-2xl text-center flex flex-col justify-center">
+                  <span className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase tracking-wider block truncate">
                     🥇 優勝数
                   </span>
                   <span
-                    className="text-xl font-bold font-mono mt-1 block"
+                    className="text-base sm:text-xl font-bold font-mono mt-0.5 block leading-tight"
                     style={{ color: themeColor }}
                   >
                     {driver.wins}
                   </span>
-                  <span className="text-[9px] text-slate-500">
+                  <span className="text-[8px] sm:text-[9px] text-slate-500 block truncate">
                     勝率 {((driver.wins / driver.entries) * 100).toFixed(1)}%
                   </span>
                 </div>
-                <div className="bg-slate-900/80 border border-white/10 p-3.5 rounded-2xl text-center">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
+                <div className="bg-slate-900/80 border border-white/10 p-2 sm:p-3 rounded-xl sm:rounded-2xl text-center flex flex-col justify-center">
+                  <span className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase tracking-wider block truncate">
                     🍾 表彰台
                   </span>
-                  <span className="text-xl font-bold font-mono text-sky-400 mt-1 block">
+                  <span className="text-base sm:text-xl font-bold font-mono text-sky-400 mt-0.5 block leading-tight">
                     {driver.podiums}
                   </span>
-                  <span className="text-[9px] text-slate-500">回獲得</span>
+                  <span className="text-[8px] sm:text-[9px] text-slate-500 block truncate">回獲得</span>
                 </div>
-                <div className="bg-slate-900/80 border border-white/10 p-3.5 rounded-2xl text-center">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
-                    ⏱️ ポールポジション
+                <div className="bg-slate-900/80 border border-white/10 p-2 sm:p-3 rounded-xl sm:rounded-2xl text-center flex flex-col justify-center">
+                  <span className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase tracking-wider block truncate">
+                    ⏱️ PP
                   </span>
-                  <span className="text-xl font-bold font-mono text-purple-400 mt-1 block">
+                  <span className="text-base sm:text-xl font-bold font-mono text-purple-400 mt-0.5 block leading-tight">
                     {driver.polePositions}
                   </span>
-                  <span className="text-[9px] text-slate-500">回獲得</span>
+                  <span className="text-[8px] sm:text-[9px] text-slate-500 block truncate">回獲得</span>
                 </div>
               </div>
 
@@ -872,6 +876,7 @@ export default function DriverDetailModal({
               </div>
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>,

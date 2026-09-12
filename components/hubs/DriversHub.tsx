@@ -259,7 +259,7 @@ export default function DriversHub({
   };
 
   return (
-    <div className="flex flex-col gap-4 animate-fade-in">
+    <div className="flex flex-col gap-4 animate-fade-in pb-8 sm:pb-2">
       {/* ── Top Bar: View Mode Switcher, Free-Word Search, Summary & Reset ── */}
       <div className="bg-slate-950/70 border border-white/10 rounded-2xl p-4 shadow-lg flex flex-col gap-3.5">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">

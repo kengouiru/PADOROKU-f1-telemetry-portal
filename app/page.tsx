@@ -1247,8 +1247,8 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Tab content (with bottom padding pb-20 so fixed navigation doesn't hide content) */}
-        <div ref={mobileScrollRef} className="flex-1 min-h-0 overflow-y-auto p-4 pb-20 md:pb-6">
+        {/* Tab content (with generous bottom padding so fixed navigation doesn't hide content) */}
+        <div ref={mobileScrollRef} className="flex-1 min-h-0 overflow-y-auto p-4 pb-[calc(7.5rem+env(safe-area-inset-bottom))] md:pb-6">
           {mainHubContent}
         </div>
 

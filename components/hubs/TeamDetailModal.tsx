@@ -150,103 +150,105 @@ export default function TeamDetailModal({
           </div>
         </div>
 
-        {/* Team Hero Header */}
-        <div className="p-5 sm:p-6 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gradient-to-b from-slate-900/60 to-transparent">
-          <div className="flex items-start sm:items-center gap-4">
-            <div
-              className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex flex-col items-center justify-center font-racing font-black border shadow-xl flex-shrink-0"
-              style={{
-                color: themeColor,
-                borderColor: `${themeColor}80`,
-                backgroundColor: `${themeColor}15`,
-              }}
-            >
-              <span className="text-2xl sm:text-3xl font-black">{team.name.slice(0, 3).toUpperCase()}</span>
-            </div>
-
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs text-slate-400 font-mono">{team.base}</span>
-                <span className="bg-slate-800/90 text-slate-300 px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono border border-white/10">
-                  ⚡ {team.powerUnit}
-                </span>
-                <span className="bg-blue-950/60 text-sky-300 px-2 py-0.5 rounded-full text-[10px] font-mono border border-sky-500/30">
-                  代表: {team.teamPrincipal}
-                </span>
+        {/* Scrollable Modal Container: Wraps Hero Header, Sticky Sub-Tabs & Content */}
+        <div className="overflow-y-auto flex-1 flex flex-col min-h-0">
+          {/* Team Hero Header */}
+          <div className="p-3.5 sm:p-6 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-gradient-to-b from-slate-900/60 to-transparent flex-shrink-0">
+            <div className="flex items-start sm:items-center gap-3 sm:gap-4">
+              <div
+                className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl flex flex-col items-center justify-center font-racing font-black border shadow-xl flex-shrink-0"
+                style={{
+                  color: themeColor,
+                  borderColor: `${themeColor}80`,
+                  backgroundColor: `${themeColor}15`,
+                }}
+              >
+                <span className="text-xl sm:text-3xl font-black">{team.name.slice(0, 3).toUpperCase()}</span>
               </div>
 
-              <h2 className="text-xl sm:text-2xl font-black text-white leading-tight">
-                {team.fullName}
-              </h2>
-
-              <div className="flex items-center gap-1.5 pt-0.5">
-                <span className="text-[11px] text-slate-400 font-mono">DRIVERS:</span>
-                {team.drivers.map((d) => (
-                  <span
-                    key={d}
-                    className="px-2 py-0.5 rounded-md text-[11px] font-mono font-bold border"
-                    style={{
-                      color: themeColor,
-                      borderColor: `${themeColor}50`,
-                      backgroundColor: `${themeColor}12`,
-                    }}
-                  >
-                    {d}
+              <div className="space-y-1 min-w-0">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  <span className="text-[11px] sm:text-xs text-slate-400 font-mono">{team.base}</span>
+                  <span className="bg-slate-800/90 text-slate-300 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold font-mono border border-white/10">
+                    ⚡ {team.powerUnit}
                   </span>
-                ))}
+                  <span className="bg-blue-950/60 text-sky-300 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono border border-sky-500/30">
+                    代表: {team.teamPrincipal}
+                  </span>
+                </div>
+
+                <h2 className="text-lg sm:text-2xl font-black text-white leading-tight truncate">
+                  {team.fullName}
+                </h2>
+
+                <div className="flex items-center gap-1.5 pt-0.5 flex-wrap">
+                  <span className="text-[10px] sm:text-[11px] text-slate-400 font-mono">DRIVERS:</span>
+                  {team.drivers.map((d) => (
+                    <span
+                      key={d}
+                      className="px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-mono font-bold border"
+                      style={{
+                        color: themeColor,
+                        borderColor: `${themeColor}50`,
+                        backgroundColor: `${themeColor}12`,
+                      }}
+                    >
+                      {d}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
+
+            {/* Constructor Titles Banner */}
+            {team.constructorTitles > 0 ? (
+              <div
+                className="rounded-xl sm:rounded-2xl p-2 sm:p-3 px-3 sm:px-4 flex items-center gap-2.5 sm:gap-3 self-start sm:self-auto flex-shrink-0 border shadow-md bg-amber-500/10 border-amber-500/30"
+              >
+                <span className="text-xl sm:text-3xl">🏆</span>
+                <div>
+                  <span className="text-[10px] sm:text-xs font-racing font-bold uppercase tracking-widest text-amber-400 block">
+                    CONSTRUCTOR CHAMPION
+                  </span>
+                  <span className="text-xs sm:text-base font-black text-white font-mono">
+                    {team.constructorTitles}回 制覇
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-xl sm:rounded-2xl p-2 sm:p-3 px-3 sm:px-4 flex items-center gap-2 self-start sm:self-auto flex-shrink-0 bg-slate-900/60 border border-white/10 text-[11px] sm:text-xs text-slate-400 font-mono">
+                <span>🏁</span>
+                <span>コンストラクターズ参戦中</span>
+              </div>
+            )}
           </div>
 
-          {/* Constructor Titles Banner */}
-          {team.constructorTitles > 0 ? (
-            <div
-              className="rounded-2xl p-3 px-4 flex items-center gap-3 self-start sm:self-auto flex-shrink-0 border shadow-lg bg-amber-500/10 border-amber-500/30"
-            >
-              <span className="text-3xl">🏆</span>
-              <div>
-                <span className="text-xs font-racing font-bold uppercase tracking-widest text-amber-400 block">
-                  CONSTRUCTOR CHAMPION
-                </span>
-                <span className="text-base sm:text-lg font-black text-white font-mono">
-                  {team.constructorTitles}回 制覇
-                </span>
-              </div>
-            </div>
-          ) : (
-            <div className="rounded-2xl p-3 px-4 flex items-center gap-2 self-start sm:self-auto flex-shrink-0 bg-slate-900/60 border border-white/10 text-xs text-slate-400 font-mono">
-              <span>🏁</span>
-              <span>コンストラクターズ参戦中</span>
-            </div>
-          )}
-        </div>
+          {/* Modal Sub-Tabs (Sticky when scrolling) */}
+          <div className="sticky top-0 z-20 flex items-center gap-2 px-3.5 sm:px-6 pt-2 sm:pt-2.5 border-b border-white/10 bg-slate-950/95 backdrop-blur-md overflow-x-auto flex-shrink-0 shadow-sm">
+            {(
+              [
+                ['factory', '🏭 ファクトリー & 組織体系'],
+                ['engineering', '📐 空力 & シャシー工学哲学'],
+                ['history', '🏆 歴史 & 歴代マシン'],
+                ['references', `📚 参考文献 (${team.references.length})`],
+              ] as [TeamTab, string][]
+            ).map(([tab, label]) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`pb-2 px-2.5 sm:px-3 text-xs font-racing font-bold transition-all border-b-2 flex-shrink-0 cursor-pointer ${
+                  activeTab === tab
+                    ? 'text-sky-400 border-sky-400 font-black'
+                    : 'text-slate-400 border-transparent hover:text-slate-200'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
 
-        {/* Modal Sub-Tabs */}
-        <div className="flex items-center gap-2 px-5 sm:px-6 pt-3 border-b border-white/10 bg-slate-900/40 overflow-x-auto flex-shrink-0">
-          {(
-            [
-              ['factory', '🏭 ファクトリー & 組織体系'],
-              ['engineering', '📐 空力 & シャシー工学哲学'],
-              ['history', '🏆 歴史 & 歴代マシン'],
-              ['references', `📚 参考文献 (${team.references.length})`],
-            ] as [TeamTab, string][]
-          ).map(([tab, label]) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-2.5 px-3 text-xs font-racing font-bold transition-all border-b-2 flex-shrink-0 ${
-                activeTab === tab
-                  ? 'text-sky-400 border-sky-400 font-black'
-                  : 'text-slate-400 border-transparent hover:text-slate-200'
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {/* Scrollable Modal Body */}
-        <div className="p-5 sm:p-6 overflow-y-auto flex-1 space-y-5">
+          {/* Tab Content Body */}
+          <div className="p-3.5 sm:p-6 flex-1 space-y-4 sm:space-y-5">
           {/* TAB 1: FACTORY & STRUCTURE */}
           {activeTab === 'factory' && (
             <div className="space-y-4 animate-fade-in">
@@ -478,6 +480,7 @@ export default function TeamDetailModal({
               </div>
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>,
