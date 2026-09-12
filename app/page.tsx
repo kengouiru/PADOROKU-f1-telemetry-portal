@@ -919,205 +919,213 @@ export default function DashboardPage() {
       {/* ── Header (sticky flex flex-col) ── */}
       <header className="flex-shrink-0 sticky top-0 z-30 border-b border-white/10 bg-slate-950/95 backdrop-blur-md shadow-xl flex flex-col">
         {/* Top Global Row */}
-        <div className="px-4 py-2.5 flex items-center justify-between gap-3">
-        {/* Left: Logo + Title + Mobile Mode Switcher */}
-        <div className="flex items-center gap-3 flex-shrink-0">
-          {/* Mobile menu toggle */}
-          <button
-            className="lg:hidden text-slate-400 hover:text-white text-lg"
-            onClick={() => setSidebarOpen((v) => !v)}
-            aria-label="Toggle sidebar"
-          >
-            ☰
-          </button>
+        <div className="px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-3">
+          {/* Left: Logo + Title */}
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            {/* Mobile menu toggle */}
+            <button
+              className="lg:hidden text-slate-400 hover:text-white text-lg p-1 -ml-1 cursor-pointer"
+              onClick={() => setSidebarOpen((v) => !v)}
+              aria-label="Toggle sidebar"
+            >
+              ☰
+            </button>
 
-          {/* Logo & Brand Title */}
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-gradient-to-br from-red-600 via-red-500 to-rose-700 rounded flex items-center justify-center flex-shrink-0 shadow-md shadow-red-950/40 border border-red-400/30">
-              <span className="font-racing text-white text-xs font-black tracking-tight">P1</span>
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="font-racing text-sm sm:text-base font-bold text-white tracking-widest leading-tight">
-                  PADOROKU
-                </h1>
-                <span className="hidden xl:inline-block px-1.5 py-0.5 rounded bg-red-950/70 border border-red-500/30 text-[9px] font-mono text-red-300 font-semibold">
-                  F1 PORTAL
-                </span>
+            {/* Logo & Brand Title */}
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 bg-gradient-to-br from-red-600 via-red-500 to-rose-700 rounded flex items-center justify-center flex-shrink-0 shadow-md shadow-red-950/40 border border-red-400/30">
+                <span className="font-racing text-white text-xs font-black tracking-tight">P1</span>
               </div>
-              <p className="text-slate-400 text-[10px] font-mono tracking-wider hidden md:block">
-                ADVANCED MOTORSPORT INTELLIGENCE
-              </p>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h1 className="font-racing text-xs sm:text-base font-bold text-white tracking-widest leading-tight">
+                    PADOROKU
+                  </h1>
+                  <span className="hidden xl:inline-block px-1.5 py-0.5 rounded bg-red-950/70 border border-red-500/30 text-[9px] font-mono text-red-300 font-semibold">
+                    F1 PORTAL
+                  </span>
+                </div>
+                <p className="text-slate-400 text-[10px] font-mono tracking-wider hidden md:block">
+                  ADVANCED MOTORSPORT INTELLIGENCE
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Mobile Mode Switcher (< md) */}
-          <div className="md:hidden flex items-center bg-slate-900 p-0.5 rounded-xl border border-white/10 ml-1">
+          {/* Center: Dual-Mode Switcher & Context Navigation (Desktop & Tablet) */}
+          <div className="hidden md:flex items-center gap-2">
+            {/* Top-Level Mode Switcher */}
+            <div className="flex items-center bg-slate-950 p-1 rounded-2xl border border-white/15 shadow-inner">
+              <button
+                onClick={() => {
+                  setAppMode('season');
+                  if (activeHub === 'knowledge') setActiveHub('season');
+                }}
+                className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  appMode === 'season'
+                    ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <span>🏁</span>
+                <span className="hidden lg:inline">レース観戦</span>
+                <span className="lg:hidden">観戦</span>
+              </button>
+              <button
+                onClick={() => {
+                  setAppMode('library');
+                  setActiveHub('knowledge');
+                }}
+                className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  appMode === 'library'
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <span>📚</span>
+                <span className="hidden lg:inline">F1大百科</span>
+                <span className="lg:hidden">大百科</span>
+              </button>
+            </div>
+
+            {/* Context Hub Pills (Shown in Season Mode) */}
+            {appMode === 'season' && (
+              <nav className="flex items-center bg-slate-900/90 rounded-2xl p-1 border border-white/10 shadow-inner">
+                {(
+                  [
+                    ['season', '🏁 レース観戦＆カレンダー'],
+                    ['telemetry', '🏎️ テレメトリー＆Live'],
+                    ['news', '📰 ニュース＆パドック'],
+                    ['notes', '📝 レースノート＆AI'],
+                  ] as [ActiveHub, string][]
+                ).map(([hub, label]) => (
+                  <button
+                    key={hub}
+                    onClick={() => setActiveHub(hub)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all ${
+                      activeHub === hub
+                        ? 'bg-red-600 text-white shadow-md shadow-red-500/30'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </nav>
+            )}
+          </div>
+
+          {/* Right: Quick Actions + Driver Pills + AI Strategist Toggle + Auth */}
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+            {/* F1 Quiz & Trivia Button (Prominent & Easy to Tap on Mobile!) */}
             <button
-              onClick={() => {
-                setAppMode('season');
-                if (activeHub === 'knowledge') setActiveHub('season');
-              }}
-              className={`px-2 py-1 rounded-lg text-[10px] font-racing font-bold transition-all ${
-                appMode === 'season' ? 'bg-red-600 text-white' : 'text-slate-400'
+              onClick={() => setQuizModalOpen(true)}
+              className="flex items-center gap-1 sm:gap-1.5 px-2 py-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-xs font-racing font-bold bg-purple-950/60 hover:bg-purple-900/80 text-purple-300 border border-purple-500/50 hover:border-purple-400 shadow-sm transition-all flex-shrink-0 cursor-pointer"
+              title="対話型F1クイズ＆トリビア検定"
+            >
+              <span className="text-sm">🏆</span>
+              <span className="inline font-bold">クイズ</span>
+            </button>
+
+            {/* Global Command Palette / Search Button (Ctrl+K) */}
+            <button
+              onClick={() => setGlobalSearchOpen(true)}
+              className="flex items-center gap-1.5 px-2 py-1.5 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl text-xs font-racing font-bold bg-slate-800/90 hover:bg-slate-700 text-sky-300 hover:text-white border border-sky-500/30 hover:border-sky-400 shadow-sm transition-all flex-shrink-0 cursor-pointer"
+              title="選手・チーム・コース・タイヤ・用語の横断検索 (Ctrl+K)"
+            >
+              <span>🔍</span>
+              <span className="hidden md:inline">総合検索</span>
+              <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 rounded bg-black/50 text-[9px] text-slate-400 font-mono border border-white/10 ml-0.5">
+                Ctrl K
+              </kbd>
+            </button>
+
+            {/* Quick Glossary Search Button (Global Action) */}
+            <button
+              onClick={() => setQuickGlossaryOpen(true)}
+              className="flex items-center gap-1.5 px-2 py-1.5 sm:px-2.5 sm:py-1.5 rounded-lg sm:rounded-xl text-xs font-racing font-bold bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-500/40 hover:border-emerald-400 shadow-sm transition-all flex-shrink-0 cursor-pointer"
+              title="レース観戦中の用語クイック検索"
+            >
+              <span>📖</span>
+              <span className="hidden md:inline">用語</span>
+            </button>
+
+            {/* Selected driver pills (desktop, in telemetry hub) */}
+            {activeHub === 'telemetry' && (
+              <div className="hidden xl:flex items-center gap-1.5 mr-1">
+                {state.selectedDrivers.map((num) => {
+                  const drv = state.drivers.find((d) => d.driver_number.toString() === num);
+                  const color = drv ? `#${drv.team_colour}` : '#38bdf8';
+                  return (
+                    <span
+                      key={num}
+                      className="px-2 py-0.5 rounded-full text-xs font-racing font-bold border"
+                      style={{ borderColor: `${color}60`, color, backgroundColor: `${color}15` }}
+                    >
+                      {drv?.name_acronym ?? `#${num}`}
+                    </span>
+                  );
+                })}
+                {state.isLoading && (
+                  <span className="text-xs text-slate-500 flex items-center gap-1">
+                    <span className="w-3 h-3 border border-slate-500 border-t-transparent rounded-full animate-spin" />
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* AI Strategist Toggle Button (Header: Desktop & Tablet only) */}
+            <button
+              onClick={() => setAiDrawerOpen((v) => !v)}
+              className={`hidden md:flex px-3 py-1.5 rounded-xl text-xs font-racing font-bold items-center gap-1.5 transition-all shadow-md flex-shrink-0 ${
+                aiDrawerOpen
+                  ? 'bg-blue-600 text-white border border-blue-400 shadow-[0_0_12px_rgba(37,99,235,0.4)]'
+                  : 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-white/10 hover:border-white/25'
               }`}
             >
-              🏁 観戦
+              <span>🤖</span>
+              <span>AI STRATEGIST</span>
+              {aiDrawerOpen && <span className="text-[10px] ml-0.5">✕</span>}
             </button>
-            <button
-              onClick={() => {
-                setAppMode('library');
-                setActiveHub('knowledge');
-              }}
-              className={`px-2 py-1 rounded-lg text-[10px] font-racing font-bold transition-all ${
-                appMode === 'library' ? 'bg-blue-600 text-white' : 'text-slate-400'
-              }`}
-            >
-              📚 百科
-            </button>
+
+            {/* Auth Button (Login / User Profile Dropdown) */}
+            <AuthButton onOpenAuthModal={() => handleRequireAuth()} />
           </div>
         </div>
 
-        {/* Center: Dual-Mode Switcher & Context Navigation (Desktop & Tablet) */}
-        <div className="hidden md:flex items-center gap-2">
-          {/* Top-Level Mode Switcher */}
-          <div className="flex items-center bg-slate-950 p-1 rounded-2xl border border-white/15 shadow-inner">
+        {/* ── Mobile Row 2: Clean Mode Switcher Bar (< md) ── */}
+        <div className="md:hidden px-3 py-1.5 border-t border-white/5 bg-slate-900/80 flex items-center justify-center">
+          <div className="grid grid-cols-2 w-full max-w-xs bg-slate-950 p-1 rounded-xl border border-white/10 gap-1 shadow-inner">
             <button
               onClick={() => {
                 setAppMode('season');
                 if (activeHub === 'knowledge') setActiveHub('season');
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
+              className={`py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 appMode === 'season'
                   ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <span>🏁</span>
-              <span className="hidden lg:inline">レース観戦</span>
-              <span className="lg:hidden">観戦</span>
+              <span>レース観戦</span>
             </button>
             <button
               onClick={() => {
                 setAppMode('library');
                 setActiveHub('knowledge');
               }}
-              className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
+              className={`py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                 appMode === 'library'
                   ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <span>📚</span>
-              <span className="hidden lg:inline">F1大百科</span>
-              <span className="lg:hidden">大百科</span>
+              <span>F1大百科</span>
             </button>
           </div>
-
-          {/* Context Hub Pills (Shown in Season Mode) */}
-          {appMode === 'season' && (
-            <nav className="flex items-center bg-slate-900/90 rounded-2xl p-1 border border-white/10 shadow-inner">
-              {(
-                [
-                  ['season', '🏁 レース観戦＆カレンダー'],
-                  ['telemetry', '🏎️ テレメトリー＆Live'],
-                  ['news', '📰 ニュース＆パドック'],
-                  ['notes', '📝 レースノート＆AI'],
-                ] as [ActiveHub, string][]
-              ).map(([hub, label]) => (
-                <button
-                  key={hub}
-                  onClick={() => setActiveHub(hub)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all ${
-                    activeHub === hub
-                      ? 'bg-red-600 text-white shadow-md shadow-red-500/30'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-                  }`}
-                >
-                  {label}
-                </button>
-              ))}
-            </nav>
-          )}
         </div>
-
-        {/* Right: Quick Glossary + Driver Pills + AI Strategist Toggle + Auth */}
-        <div className="flex items-center gap-2">
-          {/* Global Command Palette / Search Button (Ctrl+K) */}
-          <button
-            onClick={() => setGlobalSearchOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-racing font-bold bg-slate-800/90 hover:bg-slate-700 text-sky-300 hover:text-white border border-sky-500/30 hover:border-sky-400 shadow-sm transition-all flex-shrink-0 cursor-pointer"
-            title="選手・チーム・コース・タイヤ・用語の横断検索 (Ctrl+K)"
-          >
-            <span>🔍</span>
-            <span className="hidden sm:inline">総合検索</span>
-            <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 rounded bg-black/50 text-[9px] text-slate-400 font-mono border border-white/10 ml-0.5">
-              Ctrl K
-            </kbd>
-          </button>
-
-          {/* Quick Glossary Search Button (Global Action) */}
-          <button
-            onClick={() => setQuickGlossaryOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-racing font-bold bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-500/40 hover:border-emerald-400 shadow-sm transition-all flex-shrink-0 cursor-pointer"
-            title="レース観戦中の用語クイック検索"
-          >
-            <span>📖</span>
-            <span className="hidden sm:inline">用語</span>
-          </button>
-
-          {/* F1 Quiz & Trivia Button */}
-          <button
-            onClick={() => setQuizModalOpen(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-racing font-bold bg-purple-950/40 hover:bg-purple-900/60 text-purple-300 border border-purple-500/40 hover:border-purple-400 shadow-sm transition-all flex-shrink-0 cursor-pointer"
-            title="対話型F1クイズ＆トリビア検定"
-          >
-            <span>🏆</span>
-            <span className="hidden sm:inline">クイズ</span>
-          </button>
-
-          {/* Selected driver pills (desktop, in telemetry hub) */}
-          {activeHub === 'telemetry' && (
-            <div className="hidden xl:flex items-center gap-1.5 mr-1">
-              {state.selectedDrivers.map((num) => {
-                const drv = state.drivers.find((d) => d.driver_number.toString() === num);
-                const color = drv ? `#${drv.team_colour}` : '#38bdf8';
-                return (
-                  <span
-                    key={num}
-                    className="px-2 py-0.5 rounded-full text-xs font-racing font-bold border"
-                    style={{ borderColor: `${color}60`, color, backgroundColor: `${color}15` }}
-                  >
-                    {drv?.name_acronym ?? `#${num}`}
-                  </span>
-                );
-              })}
-              {state.isLoading && (
-                <span className="text-xs text-slate-500 flex items-center gap-1">
-                  <span className="w-3 h-3 border border-slate-500 border-t-transparent rounded-full animate-spin" />
-                </span>
-              )}
-            </div>
-          )}
-
-          {/* AI Strategist Toggle Button (Header: Desktop & Tablet only) */}
-          <button
-            onClick={() => setAiDrawerOpen((v) => !v)}
-            className={`hidden md:flex px-3 py-1.5 rounded-xl text-xs font-racing font-bold items-center gap-1.5 transition-all shadow-md flex-shrink-0 ${
-              aiDrawerOpen
-                ? 'bg-blue-600 text-white border border-blue-400 shadow-[0_0_12px_rgba(37,99,235,0.4)]'
-                : 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-white/10 hover:border-white/25'
-            }`}
-          >
-            <span>🤖</span>
-            <span>AI STRATEGIST</span>
-            {aiDrawerOpen && <span className="text-[10px] ml-0.5">✕</span>}
-          </button>
-
-          {/* Auth Button (Login / User Profile Dropdown) */}
-          <AuthButton onOpenAuthModal={() => handleRequireAuth()} />
-        </div>
-      </div>
 
       {/* ── Level 2: Persistent Library Sub-Header (Integrated inside Header, permanently fixed!) ── */}
         {appMode === 'library' && (
@@ -1207,6 +1215,15 @@ export default function DashboardPage() {
                     </button>
                   );
                 })}
+
+                {/* Quick shortcut to F1 Quiz */}
+                <button
+                  onClick={() => setQuizModalOpen(true)}
+                  className="px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1 shrink-0 whitespace-nowrap bg-purple-950/60 text-purple-300 border border-purple-500/40 hover:bg-purple-900/60 cursor-pointer"
+                >
+                  <span>🏆</span>
+                  <span>F1クイズ検定</span>
+                </button>
               </div>
             </div>
           </div>
@@ -1237,12 +1254,86 @@ export default function DashboardPage() {
               className="absolute inset-0 bg-black/60 backdrop-blur-xs"
               onClick={() => setSidebarOpen(false)}
             />
-            <aside className="relative z-50 w-72 bg-slate-900 border-r border-white/10 p-4 overflow-y-auto h-full">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-racing text-white tracking-widest">RACE SETTINGS</span>
-                <button onClick={() => setSidebarOpen(false)} className="text-slate-400 text-lg">✕</button>
+            <aside className="relative z-50 w-72 bg-slate-900 border-r border-white/10 p-4 overflow-y-auto h-full flex flex-col">
+              <div className="flex items-center justify-between mb-3 pb-3 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 bg-red-600 rounded flex items-center justify-center font-racing text-white text-xs font-black">
+                    P1
+                  </div>
+                  <span className="text-xs font-racing text-white tracking-widest font-bold">PADOROKU MENU</span>
+                </div>
+                <button onClick={() => setSidebarOpen(false)} className="text-slate-400 hover:text-white text-lg p-1 cursor-pointer">✕</button>
               </div>
-              {sidebarContent}
+
+              {/* Quick Tools Navigation */}
+              <div className="mb-4 space-y-1.5">
+                <span className="text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider px-1">各種機能・ツール</span>
+                <div className="grid grid-cols-1 gap-1.5">
+                  <button
+                    onClick={() => {
+                      setSidebarOpen(false);
+                      setQuizModalOpen(true);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/30 text-purple-200 text-xs font-racing font-bold text-left transition-all cursor-pointer"
+                  >
+                    <span className="text-base">🏆</span>
+                    <div>
+                      <div>F1 クイズ＆トリビア検定</div>
+                      <div className="text-[10px] text-purple-400 font-normal">全4難易度・対話型クイズ</div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setSidebarOpen(false);
+                      setGlobalSearchOpen(true);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-sky-500/30 text-sky-200 text-xs font-racing font-bold text-left transition-all cursor-pointer"
+                  >
+                    <span className="text-base">🔍</span>
+                    <div>
+                      <div>総合検索 (Ctrl+K)</div>
+                      <div className="text-[10px] text-slate-400 font-normal">選手・チーム・コース・用語</div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setSidebarOpen(false);
+                      setQuickGlossaryOpen(true);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/30 text-emerald-200 text-xs font-racing font-bold text-left transition-all cursor-pointer"
+                  >
+                    <span className="text-base">📖</span>
+                    <div>
+                      <div>レース観戦用語辞典</div>
+                      <div className="text-[10px] text-emerald-400 font-normal">アンダーカット、DRSなど</div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setSidebarOpen(false);
+                      setAiDrawerOpen(true);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-blue-950/40 hover:bg-blue-900/60 border border-blue-500/30 text-blue-200 text-xs font-racing font-bold text-left transition-all cursor-pointer"
+                  >
+                    <span className="text-base">🤖</span>
+                    <div>
+                      <div>AI 戦略アナリスト</div>
+                      <div className="text-[10px] text-blue-400 font-normal">AIレース分析・ピット戦略</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Race Settings divider & content */}
+              <div className="pt-2 border-t border-white/10">
+                <div className="mb-2">
+                  <span className="text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider px-1">RACE & TELEMETRY SETTINGS</span>
+                </div>
+                {sidebarContent}
+              </div>
             </aside>
           </div>
         )}

@@ -51,7 +51,7 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
       <>
         <button
           onClick={onOpenAuthModal}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/10 hover:border-white/20 text-slate-200 text-xs font-racing font-bold transition-all shadow-md cursor-pointer flex-shrink-0"
+          className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/10 hover:border-white/20 text-slate-200 text-xs font-racing font-bold transition-all shadow-md cursor-pointer flex-shrink-0"
         >
           <span>🔑</span>
           <span>ログイン</span>
@@ -96,7 +96,7 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
 
           {/* User Name & Pro Badge */}
           <div className="flex items-center gap-1">
-            <span className="text-[11px] sm:text-xs font-racing font-bold max-w-[70px] sm:max-w-[120px] truncate hidden xs:inline">
+            <span className="text-[11px] sm:text-xs font-racing font-bold max-w-[70px] sm:max-w-[120px] truncate hidden sm:inline">
               {activeDisplayName}
             </span>
             <span className="px-1.5 py-0.2 rounded text-[9px] font-racing font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm">
