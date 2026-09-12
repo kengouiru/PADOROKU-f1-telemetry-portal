@@ -12,14 +12,14 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL('https://padoroku.app'),
   title: 'PADOROKU - F1テレメトリー & 総合大百科ポータル',
-  description: 'リアルタイムF1テレメトリー比較、2025年レースカレンダー、24サーキット完全攻略、伝説のチーム無線アーカイブ、対話型F1クイズを統合した最高峰のF1エンタメ・データプラットフォーム。',
+  description: 'リアルタイムF1テレメトリー比較、2026年レースカレンダー、24サーキット完全攻略、伝説のチーム無線アーカイブ、対話型F1クイズを統合した最高峰のF1エンタメ・データプラットフォーム。',
   keywords: [
     'Formula 1',
     'F1',
     'テレメトリー',
     'テレメトリー分析',
     'F1カレンダー',
-    'F1 2025',
+    'F1 2026',
     '角田裕毅',
     'フェルスタッペン',
     'チーム無線',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   openGraph: {
     title: 'PADOROKU - F1テレメトリー & 総合大百科ポータル',
-    description: 'リアルタイムF1テレメトリー比較、2025年全24戦レースカレンダー、サーキット完全攻略、チーム無線アーカイブ、対話型F1クイズ。',
+    description: 'リアルタイムF1テレメトリー比較、2026年全24戦レースカレンダー、サーキット完全攻略、チーム無線アーカイブ、対話型F1クイズ。',
     url: 'https://padoroku.app',
     siteName: 'PADOROKU',
     locale: 'ja_JP',
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'PADOROKU - F1テレメトリー & 総合大百科ポータル',
-    description: 'リアルタイムF1テレメトリー比較、2025年全24戦レースカレンダー、サーキット完全攻略、チーム無線アーカイブ、対話型F1クイズ。',
+    description: 'リアルタイムF1テレメトリー比較、2026年全24戦レースカレンダー、サーキット完全攻略、チーム無線アーカイブ、対話型F1クイズ。',
   },
 };
 

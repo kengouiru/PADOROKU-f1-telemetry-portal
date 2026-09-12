@@ -11,10 +11,7 @@
  *
  * Initial state: 2024 Bahrain GP Race, VER (#1) vs HAM (#44) instant display.
  */
-
-import React, {
-  useState, useEffect, useCallback, useRef, useMemo, Suspense,
-} from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 import type {
   Session, Driver, Lap, Stint, TeamRadio, PitStop,
@@ -31,7 +28,7 @@ import { detectSafetyCarPeriods, enrichLapsWithStints } from '@/lib/telemetryUti
 import { resolveCircuitForSession, type CircuitBenchmark } from '@/lib/circuitResolver';
 import {
   fetchSessions, fetchDrivers, fetchStints, fetchRaceControl,
-  fetchLaps, fetchTeamRadio, fetchPitStops, OpenF1Error,
+  fetchLaps, fetchTeamRadio, fetchPitStops,
 } from '@/lib/openf1Api';
 
 import Sidebar from '@/components/Sidebar';
@@ -119,22 +116,24 @@ const GLOBAL_DRIVER_NUM_TO_CODE: Record<string, string> = {
   '7': 'DOO',
   '6': 'HAD',
 };
-const DEFAULT_SESSION_KEY = 9161;
-const DEFAULT_MEETING_KEY = 1234;
-const DEFAULT_YEAR = '2024';
+const DEFAULT_SESSION_KEY = 2026011;
+const DEFAULT_MEETING_KEY = 202601;
+const DEFAULT_YEAR = '2026';
 
 function buildInitialState(): AppState {
-  const stints = MOCK_STINTS[DEFAULT_SESSION_KEY] ?? [];
+  const currentSession = MOCK_SESSIONS.find(s => s.session_key === DEFAULT_SESSION_KEY) ?? null;
+  const drivers = getDriversForYear(2026);
+  const benchmark = resolveCircuitForSession(currentSession);
+  const stints = generateCatalogStints(drivers, benchmark.totalLaps, benchmark.pit1Lap, benchmark.pit2Lap);
+  const raceControlMessages = generateCatalogRaceControl(DEFAULT_SESSION_KEY);
+  const selectedDrivers = ['1', '12']; // Max Verstappen (#1, Red Bull Ford) & Andrea Kimi Antonelli (#12, Mercedes)
+
   const lapsCache: Record<string, Lap[]> = {};
-  for (const [key, laps] of Object.entries(MOCK_LAPS)) {
-    if (key.startsWith(`${DEFAULT_SESSION_KEY}_`)) {
-      const driverNum = key.split('_')[1];
-      lapsCache[driverNum] = enrichLapsWithStints(laps, stints, driverNum);
-    }
+  for (const num of selectedDrivers) {
+    const rawLaps = generateMockLaps(parseInt(num), DEFAULT_SESSION_KEY, benchmark);
+    lapsCache[num] = enrichLapsWithStints(rawLaps, stints, num);
   }
 
-  const drivers = MOCK_DRIVERS[DEFAULT_SESSION_KEY] ?? [];
-  const raceControlMessages = MOCK_RACE_CONTROL[DEFAULT_SESSION_KEY] ?? [];
   const allLaps = Object.values(lapsCache).flat();
   const safetyCarPeriods = detectSafetyCarPeriods(raceControlMessages, allLaps);
 
@@ -154,8 +153,6 @@ function buildInitialState(): AppState {
   const storedTranscripts = typeof window !== 'undefined'
     ? JSON.parse(localStorage.getItem('f1_transcripts_cache') ?? '{}') : {};
 
-  const currentSession = MOCK_SESSIONS.find(s => s.session_key === DEFAULT_SESSION_KEY) ?? null;
-
   return {
     selectedYear: DEFAULT_YEAR,
     selectedMeetingKey: DEFAULT_MEETING_KEY,
@@ -164,7 +161,7 @@ function buildInitialState(): AppState {
     currentSession,
     drivers,
     stints,
-    selectedDrivers: ['1', '44'],
+    selectedDrivers,
     lapsCache,
     teamRadioCache,
     pitStopsCache,
@@ -199,9 +196,9 @@ export default function DashboardPage() {
     driver1: string;
     driver2: string;
   }>({
-    circuitId: 'bahrain-international',
+    circuitId: 'albert-park',
     driver1: 'VER',
-    driver2: 'NOR',
+    driver2: 'ANT',
   });
   const [targetCircuitId, setTargetCircuitId] = useState<string | undefined>(undefined);
 
@@ -822,8 +819,43 @@ export default function DashboardPage() {
       {activeHub === 'season' && (
         <ErrorBoundary sectionName="F1 シーズン観戦＆カレンダー">
           <SeasonHub
-            onNavigateToTelemetry={() => {
+            onNavigateToTelemetry={(gpName) => {
               setActiveHub('telemetry');
+              setMobileTab('telemetry');
+              if (gpName) {
+                let circId = 'bahrain-international';
+                if (gpName.includes('日本') || gpName.includes('鈴鹿')) circId = 'suzuka';
+                else if (gpName.includes('ベルギー') || gpName.includes('スパ')) circId = 'spa-francorchamps';
+                else if (gpName.includes('イタリア') || gpName.includes('モンツァ')) circId = 'monza';
+                else if (gpName.includes('イギリス') || gpName.includes('シルバーストン')) circId = 'silverstone';
+                else if (gpName.includes('モナコ')) circId = 'circuit-de-monaco';
+                else if (gpName.includes('オーストラリア') || gpName.includes('メルボルン')) circId = 'albert-park';
+                else if (gpName.includes('中国') || gpName.includes('上海')) circId = 'shanghai';
+                else if (gpName.includes('サウジ') || gpName.includes('ジェッダ')) circId = 'jeddah';
+                else if (gpName.includes('マイアミ')) circId = 'miami';
+                else if (gpName.includes('カナダ') || gpName.includes('モントリオール')) circId = 'villeneuve';
+                else if (gpName.includes('スペイン') || gpName.includes('カタロニア')) circId = 'catalunya';
+                else if (gpName.includes('マドリード') || gpName.includes('マドリング')) circId = 'madrid';
+                else if (gpName.includes('オーストリア') || gpName.includes('レッドブル')) circId = 'redbull-ring';
+                else if (gpName.includes('ハンガリー') || gpName.includes('ハンガロリンク')) circId = 'hungaroring';
+                else if (gpName.includes('オランダ') || gpName.includes('ザントフォールト')) circId = 'zandvoort';
+                else if (gpName.includes('アゼルバイジャン') || gpName.includes('バクー')) circId = 'baku';
+                else if (gpName.includes('シンガポール')) circId = 'singapore';
+                else if (gpName.includes('アメリカ') || gpName.includes('オースティン')) circId = 'cota';
+                else if (gpName.includes('メキシコ')) circId = 'mexico';
+                else if (gpName.includes('ブラジル') || gpName.includes('サンパウロ') || gpName.includes('インテルラゴス')) circId = 'interlagos';
+                else if (gpName.includes('ラスベガス')) circId = 'las-vegas';
+                else if (gpName.includes('カタール') || gpName.includes('ルサイル')) circId = 'losail';
+                else if (gpName.includes('アブダビ') || gpName.includes('ヤス')) circId = 'yas-marina';
+
+                setDetailedTelemetryParams(prev => ({
+                  ...prev,
+                  circuitId: circId,
+                }));
+              }
+              setTimeout(() => {
+                document.getElementById('detailed-telemetry-section')?.scrollIntoView({ behavior: 'smooth' });
+              }, 150);
             }}
             onNavigateToTyres={() => {
               setAppMode('library');

@@ -11,6 +11,602 @@
 import type { Session, Driver, Stint, RaceControlMessage } from './types';
 
 export const F1_CATALOG_SESSIONS_BY_YEAR: Record<number, Session[]> = {
+  "2026": [
+    {
+        "session_key": 2026011,
+        "meeting_key": 202601,
+        "meeting_name": "Australian Grand Prix",
+        "meeting_official_name": "Formula 1 Australian Grand Prix 2026",
+        "location": "メルボルン",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-03-08T04:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026012,
+        "meeting_key": 202601,
+        "meeting_name": "Australian Grand Prix",
+        "meeting_official_name": "Formula 1 Australian Grand Prix 2026",
+        "location": "メルボルン",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-03-07T04:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026021,
+        "meeting_key": 202602,
+        "meeting_name": "Chinese Grand Prix",
+        "meeting_official_name": "Formula 1 Chinese Grand Prix 2026",
+        "location": "上海",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-03-15T07:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026022,
+        "meeting_key": 202602,
+        "meeting_name": "Chinese Grand Prix",
+        "meeting_official_name": "Formula 1 Chinese Grand Prix 2026",
+        "location": "上海",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-03-14T07:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026023,
+        "meeting_key": 202602,
+        "meeting_name": "Chinese Grand Prix",
+        "meeting_official_name": "Formula 1 Chinese Grand Prix 2026",
+        "location": "上海",
+        "session_name": "Sprint",
+        "session_type": "Sprint",
+        "date_start": "2026-03-14T03:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026031,
+        "meeting_key": 202603,
+        "meeting_name": "Japanese Grand Prix",
+        "meeting_official_name": "Formula 1 Japanese Grand Prix 2026",
+        "location": "三重県鈴鹿市",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-03-29T05:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026032,
+        "meeting_key": 202603,
+        "meeting_name": "Japanese Grand Prix",
+        "meeting_official_name": "Formula 1 Japanese Grand Prix 2026",
+        "location": "三重県鈴鹿市",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-03-28T05:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026041,
+        "meeting_key": 202604,
+        "meeting_name": "Bahrain Grand Prix",
+        "meeting_official_name": "Formula 1 Bahrain Grand Prix 2026",
+        "location": "サヒール",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-04-12T15:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026042,
+        "meeting_key": 202604,
+        "meeting_name": "Bahrain Grand Prix",
+        "meeting_official_name": "Formula 1 Bahrain Grand Prix 2026",
+        "location": "サヒール",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-04-11T15:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026051,
+        "meeting_key": 202605,
+        "meeting_name": "Saudi Arabian Grand Prix",
+        "meeting_official_name": "Formula 1 Saudi Arabian Grand Prix 2026",
+        "location": "ジェッダ",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-04-19T17:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026052,
+        "meeting_key": 202605,
+        "meeting_name": "Saudi Arabian Grand Prix",
+        "meeting_official_name": "Formula 1 Saudi Arabian Grand Prix 2026",
+        "location": "ジェッダ",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-04-18T17:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026061,
+        "meeting_key": 202606,
+        "meeting_name": "Miami Grand Prix",
+        "meeting_official_name": "Formula 1 Miami Grand Prix 2026",
+        "location": "マイアミ",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-05-03T20:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026062,
+        "meeting_key": 202606,
+        "meeting_name": "Miami Grand Prix",
+        "meeting_official_name": "Formula 1 Miami Grand Prix 2026",
+        "location": "マイアミ",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-05-02T20:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026063,
+        "meeting_key": 202606,
+        "meeting_name": "Miami Grand Prix",
+        "meeting_official_name": "Formula 1 Miami Grand Prix 2026",
+        "location": "マイアミ",
+        "session_name": "Sprint",
+        "session_type": "Sprint",
+        "date_start": "2026-05-02T16:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026071,
+        "meeting_key": 202607,
+        "meeting_name": "Canadian Grand Prix",
+        "meeting_official_name": "Formula 1 Canadian Grand Prix 2026",
+        "location": "モントリオール",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-05-24T18:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026072,
+        "meeting_key": 202607,
+        "meeting_name": "Canadian Grand Prix",
+        "meeting_official_name": "Formula 1 Canadian Grand Prix 2026",
+        "location": "モントリオール",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-05-23T18:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026073,
+        "meeting_key": 202607,
+        "meeting_name": "Canadian Grand Prix",
+        "meeting_official_name": "Formula 1 Canadian Grand Prix 2026",
+        "location": "モントリオール",
+        "session_name": "Sprint",
+        "session_type": "Sprint",
+        "date_start": "2026-05-23T14:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026081,
+        "meeting_key": 202608,
+        "meeting_name": "Monaco Grand Prix",
+        "meeting_official_name": "Formula 1 Monaco Grand Prix 2026",
+        "location": "モンテカルロ",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-06-07T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026082,
+        "meeting_key": 202608,
+        "meeting_name": "Monaco Grand Prix",
+        "meeting_official_name": "Formula 1 Monaco Grand Prix 2026",
+        "location": "モンテカルロ",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-06-06T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026091,
+        "meeting_key": 202609,
+        "meeting_name": "Spanish Grand Prix",
+        "meeting_official_name": "Formula 1 Spanish Grand Prix 2026",
+        "location": "バルセロナ",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-06-14T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026092,
+        "meeting_key": 202609,
+        "meeting_name": "Spanish Grand Prix",
+        "meeting_official_name": "Formula 1 Spanish Grand Prix 2026",
+        "location": "バルセロナ",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-06-13T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026101,
+        "meeting_key": 202610,
+        "meeting_name": "Austrian Grand Prix",
+        "meeting_official_name": "Formula 1 Austrian Grand Prix 2026",
+        "location": "シュピールベルク",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-06-28T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026102,
+        "meeting_key": 202610,
+        "meeting_name": "Austrian Grand Prix",
+        "meeting_official_name": "Formula 1 Austrian Grand Prix 2026",
+        "location": "シュピールベルク",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-06-27T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026111,
+        "meeting_key": 202611,
+        "meeting_name": "British Grand Prix",
+        "meeting_official_name": "Formula 1 British Grand Prix 2026",
+        "location": "シルバーストン",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-07-05T14:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026112,
+        "meeting_key": 202611,
+        "meeting_name": "British Grand Prix",
+        "meeting_official_name": "Formula 1 British Grand Prix 2026",
+        "location": "シルバーストン",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-07-04T14:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026113,
+        "meeting_key": 202611,
+        "meeting_name": "British Grand Prix",
+        "meeting_official_name": "Formula 1 British Grand Prix 2026",
+        "location": "シルバーストン",
+        "session_name": "Sprint",
+        "session_type": "Sprint",
+        "date_start": "2026-07-04T10:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026121,
+        "meeting_key": 202612,
+        "meeting_name": "Belgian Grand Prix",
+        "meeting_official_name": "Formula 1 Belgian Grand Prix 2026",
+        "location": "スパ / スタヴロ",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-07-19T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026122,
+        "meeting_key": 202612,
+        "meeting_name": "Belgian Grand Prix",
+        "meeting_official_name": "Formula 1 Belgian Grand Prix 2026",
+        "location": "スパ / スタヴロ",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-07-18T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026131,
+        "meeting_key": 202613,
+        "meeting_name": "Hungarian Grand Prix",
+        "meeting_official_name": "Formula 1 Hungarian Grand Prix 2026",
+        "location": "ブダペスト",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-07-26T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026132,
+        "meeting_key": 202613,
+        "meeting_name": "Hungarian Grand Prix",
+        "meeting_official_name": "Formula 1 Hungarian Grand Prix 2026",
+        "location": "ブダペスト",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-07-25T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026141,
+        "meeting_key": 202614,
+        "meeting_name": "Dutch Grand Prix",
+        "meeting_official_name": "Formula 1 Dutch Grand Prix 2026",
+        "location": "ザントフォールト",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-08-23T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026142,
+        "meeting_key": 202614,
+        "meeting_name": "Dutch Grand Prix",
+        "meeting_official_name": "Formula 1 Dutch Grand Prix 2026",
+        "location": "ザントフォールト",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-08-22T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026143,
+        "meeting_key": 202614,
+        "meeting_name": "Dutch Grand Prix",
+        "meeting_official_name": "Formula 1 Dutch Grand Prix 2026",
+        "location": "ザントフォールト",
+        "session_name": "Sprint",
+        "session_type": "Sprint",
+        "date_start": "2026-08-22T09:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026151,
+        "meeting_key": 202615,
+        "meeting_name": "Italian Grand Prix",
+        "meeting_official_name": "Formula 1 Italian Grand Prix 2026",
+        "location": "モンツァ",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-09-06T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026152,
+        "meeting_key": 202615,
+        "meeting_name": "Italian Grand Prix",
+        "meeting_official_name": "Formula 1 Italian Grand Prix 2026",
+        "location": "モンツァ",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-09-05T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026161,
+        "meeting_key": 202616,
+        "meeting_name": "Madrid Grand Prix",
+        "meeting_official_name": "Formula 1 Madrid Grand Prix 2026",
+        "location": "マドリード",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-09-13T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026162,
+        "meeting_key": 202616,
+        "meeting_name": "Madrid Grand Prix",
+        "meeting_official_name": "Formula 1 Madrid Grand Prix 2026",
+        "location": "マドリード",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-09-12T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026171,
+        "meeting_key": 202617,
+        "meeting_name": "Azerbaijan Grand Prix",
+        "meeting_official_name": "Formula 1 Azerbaijan Grand Prix 2026",
+        "location": "バクー",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-09-26T11:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026172,
+        "meeting_key": 202617,
+        "meeting_name": "Azerbaijan Grand Prix",
+        "meeting_official_name": "Formula 1 Azerbaijan Grand Prix 2026",
+        "location": "バクー",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-09-25T11:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026181,
+        "meeting_key": 202618,
+        "meeting_name": "Singapore Grand Prix",
+        "meeting_official_name": "Formula 1 Singapore Grand Prix 2026",
+        "location": "シンガポール",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-10-11T12:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026182,
+        "meeting_key": 202618,
+        "meeting_name": "Singapore Grand Prix",
+        "meeting_official_name": "Formula 1 Singapore Grand Prix 2026",
+        "location": "シンガポール",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-10-10T12:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026183,
+        "meeting_key": 202618,
+        "meeting_name": "Singapore Grand Prix",
+        "meeting_official_name": "Formula 1 Singapore Grand Prix 2026",
+        "location": "シンガポール",
+        "session_name": "Sprint",
+        "session_type": "Sprint",
+        "date_start": "2026-10-10T08:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026191,
+        "meeting_key": 202619,
+        "meeting_name": "United States Grand Prix",
+        "meeting_official_name": "Formula 1 United States Grand Prix 2026",
+        "location": "オースティン",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-10-25T19:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026192,
+        "meeting_key": 202619,
+        "meeting_name": "United States Grand Prix",
+        "meeting_official_name": "Formula 1 United States Grand Prix 2026",
+        "location": "オースティン",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-10-24T19:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026201,
+        "meeting_key": 202620,
+        "meeting_name": "メキシコ Grand Prix",
+        "meeting_official_name": "Formula 1 メキシコ Grand Prix 2026",
+        "location": "メキシコシティ",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-11-01T20:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026202,
+        "meeting_key": 202620,
+        "meeting_name": "メキシコ Grand Prix",
+        "meeting_official_name": "Formula 1 メキシコ Grand Prix 2026",
+        "location": "メキシコシティ",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-10-31T20:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026211,
+        "meeting_key": 202621,
+        "meeting_name": "Sao Paulo Grand Prix",
+        "meeting_official_name": "Formula 1 Sao Paulo Grand Prix 2026",
+        "location": "サンパウロ",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-11-08T17:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026212,
+        "meeting_key": 202621,
+        "meeting_name": "Sao Paulo Grand Prix",
+        "meeting_official_name": "Formula 1 Sao Paulo Grand Prix 2026",
+        "location": "サンパウロ",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-11-07T17:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026221,
+        "meeting_key": 202622,
+        "meeting_name": "Las Vegas Grand Prix",
+        "meeting_official_name": "Formula 1 Las Vegas Grand Prix 2026",
+        "location": "ラスベガス",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-11-22T06:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026222,
+        "meeting_key": 202622,
+        "meeting_name": "Las Vegas Grand Prix",
+        "meeting_official_name": "Formula 1 Las Vegas Grand Prix 2026",
+        "location": "ラスベガス",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-11-21T06:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026231,
+        "meeting_key": 202623,
+        "meeting_name": "Qatar Grand Prix",
+        "meeting_official_name": "Formula 1 Qatar Grand Prix 2026",
+        "location": "ルサイル",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-11-29T17:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026232,
+        "meeting_key": 202623,
+        "meeting_name": "Qatar Grand Prix",
+        "meeting_official_name": "Formula 1 Qatar Grand Prix 2026",
+        "location": "ルサイル",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-11-28T17:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026241,
+        "meeting_key": 202624,
+        "meeting_name": "Abu Dhabi Grand Prix",
+        "meeting_official_name": "Formula 1 Abu Dhabi Grand Prix 2026",
+        "location": "アブダビ",
+        "session_name": "Race",
+        "session_type": "Race",
+        "date_start": "2026-12-06T13:00:00.000Z",
+        "year": 2026
+    },
+    {
+        "session_key": 2026242,
+        "meeting_key": 202624,
+        "meeting_name": "Abu Dhabi Grand Prix",
+        "meeting_official_name": "Formula 1 Abu Dhabi Grand Prix 2026",
+        "location": "アブダビ",
+        "session_name": "Qualifying",
+        "session_type": "Qualifying",
+        "date_start": "2026-12-05T13:00:00.000Z",
+        "year": 2026
+    }
+],
   "2025": [
     {
         "session_key": 2025011,
@@ -2807,11 +3403,37 @@ export const F1_CATALOG_SESSIONS_BY_YEAR: Record<number, Session[]> = {
 };
 
 export const F1_CATALOG_ALL_SESSIONS: Session[] = [
+  ...(F1_CATALOG_SESSIONS_BY_YEAR[2026] ?? []),
   ...(F1_CATALOG_SESSIONS_BY_YEAR[2025] ?? []),
   ...(F1_CATALOG_SESSIONS_BY_YEAR[2024] ?? []),
   ...(F1_CATALOG_SESSIONS_BY_YEAR[2023] ?? []),
   ...(F1_CATALOG_SESSIONS_BY_YEAR[2022] ?? []),
   ...(F1_CATALOG_SESSIONS_BY_YEAR[2021] ?? []),
+];
+
+export const DRIVERS_2026: Driver[] = [
+  { driver_number: 1, name_acronym: 'VER', first_name: 'Max', last_name: 'Verstappen', full_name: 'Max Verstappen', team_name: 'Oracle Red Bull Racing', team_colour: '3671C6' },
+  { driver_number: 6, name_acronym: 'HAD', first_name: 'Isack', last_name: 'Hadjar', full_name: 'Isack Hadjar', team_name: 'Oracle Red Bull Racing', team_colour: '3671C6' },
+  { driver_number: 4, name_acronym: 'NOR', first_name: 'Lando', last_name: 'Norris', full_name: 'Lando Norris', team_name: 'McLaren', team_colour: 'FF8000' },
+  { driver_number: 81, name_acronym: 'PIA', first_name: 'Oscar', last_name: 'Piastri', full_name: 'Oscar Piastri', team_name: 'McLaren', team_colour: 'FF8000' },
+  { driver_number: 16, name_acronym: 'LEC', first_name: 'Charles', last_name: 'Leclerc', full_name: 'Charles Leclerc', team_name: 'Scuderia Ferrari', team_colour: 'E80020' },
+  { driver_number: 44, name_acronym: 'HAM', first_name: 'Lewis', last_name: 'Hamilton', full_name: 'Lewis Hamilton', team_name: 'Scuderia Ferrari', team_colour: 'E80020' },
+  { driver_number: 63, name_acronym: 'RUS', first_name: 'George', last_name: 'Russell', full_name: 'George Russell', team_name: 'Mercedes-AMG', team_colour: '27F4D2' },
+  { driver_number: 12, name_acronym: 'ANT', first_name: 'Andrea Kimi', last_name: 'Antonelli', full_name: 'Andrea Kimi Antonelli', team_name: 'Mercedes-AMG', team_colour: '27F4D2' },
+  { driver_number: 14, name_acronym: 'ALO', first_name: 'Fernando', last_name: 'Alonso', full_name: 'Fernando Alonso', team_name: 'Aston Martin Aramco', team_colour: '229971' },
+  { driver_number: 18, name_acronym: 'STR', first_name: 'Lance', last_name: 'Stroll', full_name: 'Lance Stroll', team_name: 'Aston Martin Aramco', team_colour: '229971' },
+  { driver_number: 10, name_acronym: 'GAS', first_name: 'Pierre', last_name: 'Gasly', full_name: 'Pierre Gasly', team_name: 'BWT Alpine F1 Team', team_colour: '0093CC' },
+  { driver_number: 43, name_acronym: 'COL', first_name: 'Franco', last_name: 'Colapinto', full_name: 'Franco Colapinto', team_name: 'BWT Alpine F1 Team', team_colour: '0093CC' },
+  { driver_number: 23, name_acronym: 'ALB', first_name: 'Alexander', last_name: 'Albon', full_name: 'Alexander Albon', team_name: 'Williams Racing', team_colour: '00A0DE' },
+  { driver_number: 55, name_acronym: 'SAI', first_name: 'Carlos', last_name: 'Sainz', full_name: 'Carlos Sainz', team_name: 'Williams Racing', team_colour: '00A0DE' },
+  { driver_number: 22, name_acronym: 'TSU', first_name: 'Yuki', last_name: 'Tsunoda', full_name: 'Yuki Tsunoda', team_name: 'Visa Cash App RB', team_colour: '6692FF' },
+  { driver_number: 30, name_acronym: 'LAW', first_name: 'Liam', last_name: 'Lawson', full_name: 'Liam Lawson', team_name: 'Visa Cash App RB', team_colour: '6692FF' },
+  { driver_number: 27, name_acronym: 'HUL', first_name: 'Nico', last_name: 'Hulkenberg', full_name: 'Nico Hulkenberg', team_name: 'Audi Revolut F1 Team', team_colour: 'E0001A' },
+  { driver_number: 5, name_acronym: 'BOR', first_name: 'Gabriel', last_name: 'Bortoleto', full_name: 'Gabriel Bortoleto', team_name: 'Audi Revolut F1 Team', team_colour: 'E0001A' },
+  { driver_number: 31, name_acronym: 'OCO', first_name: 'Esteban', last_name: 'Ocon', full_name: 'Esteban Ocon', team_name: 'MoneyGram Haas F1 Team', team_colour: 'B6BABD' },
+  { driver_number: 87, name_acronym: 'BEA', first_name: 'Oliver', last_name: 'Bearman', full_name: 'Oliver Bearman', team_name: 'MoneyGram Haas F1 Team', team_colour: 'B6BABD' },
+  { driver_number: 11, name_acronym: 'PER', first_name: 'Sergio', last_name: 'Perez', full_name: 'Sergio Perez', team_name: 'Cadillac Formula 1 Team', team_colour: 'D4AF37' },
+  { driver_number: 77, name_acronym: 'BOT', first_name: 'Valtteri', last_name: 'Bottas', full_name: 'Valtteri Bottas', team_name: 'Cadillac Formula 1 Team', team_colour: 'D4AF37' },
 ];
 
 export const DRIVERS_2025: Driver[] = [
@@ -2916,15 +3538,16 @@ export const DRIVERS_2021: Driver[] = [
 
 /** Retrieve all catalog sessions for a given year */
 export function getCatalogSessionsForYear(year: number): Session[] {
-  return F1_CATALOG_SESSIONS_BY_YEAR[year] ?? F1_CATALOG_SESSIONS_BY_YEAR[2025] ?? F1_CATALOG_SESSIONS_BY_YEAR[2024] ?? [];
+  return F1_CATALOG_SESSIONS_BY_YEAR[year] ?? F1_CATALOG_SESSIONS_BY_YEAR[2026] ?? F1_CATALOG_SESSIONS_BY_YEAR[2025] ?? F1_CATALOG_SESSIONS_BY_YEAR[2024] ?? [];
 }
 
 /** Retrieve starting drivers for a given season */
 export function getDriversForYear(year: number): Driver[] {
+  if (year === 2026) return DRIVERS_2026;
+  if (year === 2025) return DRIVERS_2025;
   if (year === 2021) return DRIVERS_2021;
   if (year === 2022) return DRIVERS_2022;
   if (year === 2023) return DRIVERS_2023;
-  if (year === 2025) return DRIVERS_2025;
   return DRIVERS_2024;
 }
 

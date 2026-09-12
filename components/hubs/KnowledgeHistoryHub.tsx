@@ -289,7 +289,7 @@ export default function KnowledgeHistoryHub({
             </h2>
             <p className="text-xs text-slate-400 max-w-xl">
               {activeSubTab === 'teams'
-                ? 'FIA公式規則に基づく全10チームの工学哲学、歴代マシン、PU仕様およびファクトリー詳細を体系化。'
+                ? 'FIA公式規則に基づく全11チームの工学哲学、歴代マシン、PU仕様およびファクトリー詳細を体系化。'
                 : activeSubTab === 'strategy'
                 ? '空力グラウンドエフェクト、タイヤ劣化理論、セーフティカー規則などを公式文献付きで詳解。'
                 : 'F1史を揺るがした名勝負を当時の生チーム無線ログ（🎙️）と実テレメトリー連携付きで追体験。'}
@@ -328,7 +328,7 @@ export default function KnowledgeHistoryHub({
           <div className="flex items-center justify-between gap-3 bg-slate-950/70 border border-white/10 rounded-2xl p-3 px-4 shadow-sm">
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono font-bold text-slate-300">
-                F1 2025 全10コンストラクター
+                F1 2026 全11コンストラクター
               </span>
             </div>
             <button

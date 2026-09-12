@@ -3,7 +3,7 @@ import path from 'path';
 import https from 'https';
 import http from 'http';
 
-const rootDir = 'C:\\CreationKengo\\F1analyisis-app\\f1-telemetry-next';
+const rootDir = process.cwd();
 
 const driversDir = path.join(rootDir, 'public', 'images', 'drivers');
 const circuitsDir = path.join(rootDir, 'public', 'images', 'circuits');

@@ -20,9 +20,9 @@ import {
 import DriverDetailModal from './DriverDetailModal';
 import DriverComparisonTool from './DriverComparisonTool';
 import { useUserPreferences } from '@/lib/userPreferences';
-import { GRID_2025_TEAMS } from '@/data/f1SeasonData';
+import { GRID_2026_TEAMS, GRID_2025_TEAMS } from '@/data/f1SeasonData';
 
-export type DriverViewMode = 'grouped' | 'grid2025' | 'flat' | 'legends' | 'compare';
+export type DriverViewMode = 'grouped' | 'grid2026' | 'grid2025' | 'flat' | 'legends' | 'compare';
 export type DriverStatusFilter = 'ALL' | 'Current' | 'Legend' | 'Favorites';
 
 export interface DriversHubProps {
@@ -281,17 +281,17 @@ export default function DriversHub({
             </button>
 
             <button
-              onClick={() => setViewMode('grid2025')}
+              onClick={() => setViewMode('grid2026')}
               className={`px-3.5 py-2 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                viewMode === 'grid2025'
+                viewMode === 'grid2026'
                   ? 'bg-red-600 text-white shadow-md shadow-red-500/30 ring-1 ring-red-400/50'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
               }`}
             >
               <span>🏎️</span>
-              <span>2025年最新グリッド</span>
+              <span>2026年最新グリッド</span>
               <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-400/20 text-red-200 border border-red-400/30 ml-0.5">
-                新体制
+                11チーム新時代
               </span>
             </button>
 
@@ -338,7 +338,7 @@ export default function DriversHub({
               {viewMode === 'grouped' && (
                 <>
                   表示中:{' '}
-                  <strong className="text-white text-sm">全10チーム</strong> (現役20名 + レジェンド4名)
+                  <strong className="text-white text-sm">全11チーム</strong> (現役22名 + レジェンド5名)
                 </>
               )}
               {viewMode === 'flat' && (
@@ -459,8 +459,9 @@ export default function DriversHub({
               'Alpine',
               'Williams',
               'RB',
-              'Sauber',
+              'Audi',
               'Haas',
+              'Cadillac',
             ].map((t) => (
               <button
                 key={t}
@@ -599,37 +600,37 @@ export default function DriversHub({
         </div>
       )}
 
-      {/* ── View Mode: 2025 OFFICIAL GRID (10 TEAMS x 2 DRIVERS) ── */}
-      {viewMode === 'grid2025' && (
+      {/* ── View Mode: 2026 OFFICIAL GRID (11 TEAMS x 2 DRIVERS = 22 DRIVERS) ── */}
+      {viewMode === 'grid2026' && (
         <div className="flex flex-col gap-5 animate-fade-in">
-          {/* 2025 Grid Header Banner */}
+          {/* 2026 Grid Header Banner */}
           <div className="bg-gradient-to-r from-red-950/40 via-slate-950 to-red-950/40 border border-red-500/30 rounded-2xl p-5 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1.5">
                 <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-mono font-bold uppercase tracking-wider">
-                  2025 NEW ERA
+                  2026 NEW ERA (11 TEAMS)
                 </span>
                 <span className="text-xs text-slate-400 font-mono">
-                  全10チーム 20名 正式確定ロスター
+                  全11チーム 22名 正式確定ロスター
                 </span>
               </div>
               <h2 className="text-xl md:text-2xl font-racing font-bold text-white tracking-wide">
-                2025年 F1世界選手権 公式グリッド体制
+                2026年 F1世界選手権 公式グリッド体制
               </h2>
               <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-                ルイス・ハミルトンの歴史的フェラーリ移籍、カルロス・サインツのウィリアムズ加入、18歳の超新星キミ・アントネッリ、角田裕毅のF1参戦5年目エース体制など、大激変を迎えた2025年の全容。
+                新PU規定＆アクティブエアロの幕開け、キャデラックF1チームの第11番目新規参戦、アウディ本格ワークス参入、ホンダ×アストンマーティン、レッドブル・フォード、メルセデス2年目キミ・アントネッリの快進撃など、歴史的変革を迎えた2026年全11チームの陣容。
               </p>
             </div>
             <div className="flex items-center gap-2 flex-shrink-0">
               <span className="px-3 py-1.5 rounded-xl bg-slate-900 border border-white/10 text-xs font-mono text-slate-300">
-                移籍: <strong className="text-amber-400">5名</strong> / 新人: <strong className="text-sky-400">5名</strong>
+                新規参入: <strong className="text-amber-400">Cadillac</strong> / ワークス: <strong className="text-sky-400">Audi</strong>
               </span>
             </div>
           </div>
 
-          {/* 10 Teams Grid */}
+          {/* 11 Teams Grid */}
           <div className="grid grid-cols-1 gap-4">
-            {GRID_2025_TEAMS.map((team) => (
+            {GRID_2026_TEAMS.map((team) => (
               <div
                 key={team.teamName}
                 className="glass-card rounded-2xl p-4 sm:p-5 border shadow-lg space-y-3.5 transition-all"
@@ -700,7 +701,7 @@ export default function DriversHub({
                           <div className="flex items-center gap-1">
                             {drv.isTransfer && (
                               <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold font-mono">
-                                ⚡ 2025移籍
+                                ⚡ 2026移籍
                               </span>
                             )}
                             {drv.isRookie && (

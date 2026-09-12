@@ -22,6 +22,7 @@ import {
   getDriversForYear,
   generateCatalogStints,
   generateCatalogRaceControl,
+  DRIVERS_2026,
 } from './f1GrandPrixCatalog';
 
 import { resolveCircuitForSession, type CircuitBenchmark } from './circuitResolver';
@@ -31,6 +32,7 @@ export {
   getDriversForYear,
   generateCatalogStints,
   generateCatalogRaceControl,
+  DRIVERS_2026,
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -43,7 +45,9 @@ export const MOCK_SESSIONS: Session[] = F1_CATALOG_ALL_SESSIONS;
 // Drivers (keyed by session_key)
 // ─────────────────────────────────────────────────────────────
 
-export const MOCK_DRIVERS: Record<number, Driver[]> = {
+const BASE_MOCK_DRIVERS: Record<number, Driver[]> = {
+  2026011: DRIVERS_2026,
+  2026012: DRIVERS_2026,
   9161: [
     { driver_number: 1,  name_acronym: 'VER', first_name: 'Max',       last_name: 'Verstappen', full_name: 'Max Verstappen',   team_name: 'Red Bull Racing', team_colour: '3671C2' },
     { driver_number: 11, name_acronym: 'PER', first_name: 'Sergio',    last_name: 'Perez',      full_name: 'Sergio Perez',     team_name: 'Red Bull Racing', team_colour: '3671C2' },
@@ -80,6 +84,21 @@ export const MOCK_DRIVERS: Record<number, Driver[]> = {
     { driver_number: 4,  name_acronym: 'NOR', first_name: 'Lando',  last_name: 'Norris',     full_name: 'Lando Norris',   team_name: 'McLaren',         team_colour: 'FF8000' },
   ],
 };
+
+export const MOCK_DRIVERS: Record<number, Driver[]> = new Proxy(BASE_MOCK_DRIVERS, {
+  get(target, prop) {
+    if (typeof prop === 'string' && (prop.startsWith('2026') || prop.startsWith('2025'))) {
+      const num = Number(prop);
+      if (!isNaN(num) && num >= 2026000 && num < 2027000) return DRIVERS_2026;
+      return getDriversForYear(Number(prop.slice(0, 4)));
+    }
+    const num = Number(prop);
+    if (!isNaN(num) && num >= 2026000 && num < 2027000) {
+      return DRIVERS_2026;
+    }
+    return (target as any)[prop];
+  },
+});
 
 // ─────────────────────────────────────────────────────────────
 // Stints (keyed by session_key)
@@ -437,7 +456,7 @@ export function generateMockLaps(
   const seed = (n: number) => Math.sin(n * 9301 + driverNumber * 49297 + sessionKey * 31) * 0.5;
 
   for (let i = 1; i <= totalLaps; i++) {
-    let lapTime = baseTime - i * degradation;
+    let lapTime = baseTime + i * degradation;
     const variance = seed(i) * 0.5;
     lapTime += variance;
 
@@ -460,17 +479,37 @@ export function generateMockLaps(
     const baseSpeedFL = topSpeed * 0.89;
     const fuelSpeedBonus = i * 0.12;
 
-    const s1Base = baseTime * 0.31;
-    const s2Base = baseTime * 0.42;
-    const s3Base = baseTime * 0.27;
+    const isPitLap = (i === pit1Lap + 1 || i === pit2Lap + 1);
+    const isPitInLap = (i === pit1Lap || i === pit2Lap);
+
+    let s1: number;
+    let s2: number;
+    let s3: number;
+
+    if (isPitLap) {
+      // Pit stop lap: pit lane transit and tyre change primarily inflate S2 (box) and S3/S1 (pit lane)
+      const nonPitTime = lapTime - 22.0;
+      s1 = nonPitTime * 0.31 + 4.0 + seed(i + 100) * 0.25;
+      s2 = nonPitTime * 0.42 + 14.0 + seed(i + 200) * 0.35;
+      s3 = nonPitTime * 0.27 + 4.0 + seed(i + 300) * 0.20;
+    } else if (isPitInLap) {
+      const nonPitTime = lapTime - 5.0;
+      s1 = nonPitTime * 0.31 + seed(i + 100) * 0.25;
+      s2 = nonPitTime * 0.42 + seed(i + 200) * 0.35;
+      s3 = nonPitTime * 0.27 + 5.0 + seed(i + 300) * 0.20;
+    } else {
+      s1 = lapTime * 0.31 + seed(i + 100) * 0.25;
+      s2 = lapTime * 0.42 + seed(i + 200) * 0.35;
+      s3 = lapTime - s1 - s2;
+    }
 
     laps.push({
       lap_number: i,
       lap_duration: Number(lapTime.toFixed(3)),
       date_start: new Date(timeAccumulator).toISOString(),
-      duration_sector_1: Number((s1Base - i * 0.015 + seed(i + 100) * 0.25).toFixed(3)),
-      duration_sector_2: Number((s2Base - i * 0.025 + seed(i + 200) * 0.35).toFixed(3)),
-      duration_sector_3: Number((s3Base - i * 0.015 + seed(i + 300) * 0.20).toFixed(3)),
+      duration_sector_1: Number(s1.toFixed(3)),
+      duration_sector_2: Number(s2.toFixed(3)),
+      duration_sector_3: Number(s3.toFixed(3)),
       speed_i1: Number((baseSpeedI1 + fuelSpeedBonus + seed(i + 400) * 3.0).toFixed(1)),
       speed_i2: Number((baseSpeedI2 + fuelSpeedBonus * 0.6 + seed(i + 500) * 3.5).toFixed(1)),
       speed_fl: Number((baseSpeedFL + fuelSpeedBonus + seed(i + 600) * 2.5).toFixed(1)),

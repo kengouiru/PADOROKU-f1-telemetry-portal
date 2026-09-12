@@ -48,6 +48,7 @@ export async function GET(req: NextRequest) {
 
     // Fetch remote audio stream with proper User-Agent & Accept headers
     const response = await fetch(audioUrl, {
+      signal: AbortSignal.timeout(8000),
       headers: {
         'User-Agent':
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',

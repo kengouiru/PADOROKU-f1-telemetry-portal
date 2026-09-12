@@ -24,14 +24,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const password = credentials?.password;
 
         // Test demo credentials
-        if (email === 'demo@f1telemetry.pro' && password === 'f1pro2024') {
-          return {
-            id: 'demo-pro-user-1',
-            name: 'Demo Pro User',
-            email: 'demo@f1telemetry.pro',
-            image: '/images/drivers/portraits/max-verstappen.jpg',
-            role: 'pro',
-          };
+        if (process.env.NODE_ENV !== 'production') {
+          if (email === 'demo@f1telemetry.pro' && password === 'f1pro2024') {
+            return {
+              id: 'demo-pro-user-1',
+              name: 'Demo Pro User',
+              email: 'demo@f1telemetry.pro',
+              image: '/images/drivers/portraits/max-verstappen.jpg',
+              role: 'pro',
+            };
+          }
         }
         return null;
       },
@@ -54,6 +56,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
   },
-  secret: process.env.AUTH_SECRET || 'f1-telemetry-nextauth-secret-key-2024-v1-dev',
+  secret: process.env.AUTH_SECRET,
   trustHost: true,
 });

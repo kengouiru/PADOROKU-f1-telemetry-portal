@@ -315,14 +315,44 @@ export default function DetailedTelemetryChart({
             VER vs HAM
           </button>
           <button
-            onClick={() => applyPreset('TSU', 'ALO')}
+            onClick={() => applyPreset('RUS', 'ANT')}
             className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all ${
-              driver1Code === 'TSU' && driver2Code === 'ALO'
-                ? 'bg-amber-600 text-white shadow-md'
+              driver1Code === 'RUS' && driver2Code === 'ANT'
+                ? 'bg-teal-600 text-white shadow-md'
                 : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
             }`}
           >
-            TSU vs ALO
+            RUS vs ANT
+          </button>
+          <button
+            onClick={() => applyPreset('HUL', 'BOR')}
+            className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all ${
+              driver1Code === 'HUL' && driver2Code === 'BOR'
+                ? 'bg-red-700 text-white shadow-md'
+                : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
+            }`}
+          >
+            Audi (HUL vs BOR)
+          </button>
+          <button
+            onClick={() => applyPreset('PER', 'BOT')}
+            className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all ${
+              driver1Code === 'PER' && driver2Code === 'BOT'
+                ? 'bg-amber-500 text-slate-950 font-black shadow-md'
+                : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
+            }`}
+          >
+            Cadillac (PER vs BOT)
+          </button>
+          <button
+            onClick={() => applyPreset('TSU', 'LAW')}
+            className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all ${
+              driver1Code === 'TSU' && driver2Code === 'LAW'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
+            }`}
+          >
+            TSU vs LAW
           </button>
         </div>
       </div>

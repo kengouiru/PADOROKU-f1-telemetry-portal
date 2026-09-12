@@ -43,11 +43,13 @@ interface DriverComparisonToolProps {
 
 const PRESET_MATCHUPS: { d1: string; d2: string; label: string; desc: string }[] = [
   { d1: 'VER', d2: 'NOR', label: 'VER vs NOR', desc: '新世代の頂上決戦' },
-  { d1: 'HAM', d2: 'LEC', label: 'HAM vs LEC', desc: '2025年フェラーリ同門' },
-  { d1: 'HAM', d2: 'RUS', label: 'HAM vs RUS', desc: 'メルセデス英国対決' },
+  { d1: 'HAM', d2: 'LEC', label: 'HAM vs LEC', desc: '跳ね馬同門頂上決戦' },
+  { d1: 'RUS', d2: 'ANT', label: 'RUS vs ANT', desc: 'メルセデス新時代タッグ' },
+  { d1: 'PER', d2: 'BOT', label: 'PER vs BOT', desc: 'キャデラック新チーム初代激突' },
+  { d1: 'HUL', d2: 'BOR', label: 'HUL vs BOR', desc: 'アウディワークス初年度対決' },
   { d1: 'NOR', d2: 'PIA', label: 'NOR vs PIA', desc: 'マクラーレン内戦' },
-  { d1: 'LEC', d2: 'SAI', label: 'LEC vs SAI', desc: '4年間の跳ね馬タッグ' },
-  { d1: 'TSU', d2: 'RIC', label: 'TSU vs RIC', desc: 'レッドブル昇格争覇' },
+  { d1: 'LEC', d2: 'SAI', label: 'LEC vs SAI', desc: '元フェラーリ盟友対決' },
+  { d1: 'TSU', d2: 'LAW', label: 'TSU vs LAW', desc: 'RB同門・昇格争覇' },
   { d1: 'SEN', d2: 'PRO', label: 'SEN vs PRO', desc: '史上最大の伝説因縁' },
 ];
 
@@ -162,7 +164,7 @@ export default function DriverComparisonTool({
               onChange={(e) => setDriver1Code(e.target.value)}
               className="bg-slate-900 text-white text-xs rounded-lg px-2.5 py-1.5 border border-white/20 focus:outline-none focus:border-sky-400"
             >
-              <optgroup label="現役ドライバー (2025)">
+              <optgroup label="現役ドライバー (2026)">
                 {KNOWLEDGE_DRIVERS.filter((d) => d.status === 'Current').map((d) => (
                   <option key={d.code} value={d.code} disabled={d.code === driver2Code}>
                     #{d.number} {d.fullName} ({d.team})
@@ -230,7 +232,7 @@ export default function DriverComparisonTool({
               onChange={(e) => setDriver2Code(e.target.value)}
               className="bg-slate-900 text-white text-xs rounded-lg px-2.5 py-1.5 border border-white/20 focus:outline-none focus:border-sky-400"
             >
-              <optgroup label="現役ドライバー (2025)">
+              <optgroup label="現役ドライバー (2026)">
                 {KNOWLEDGE_DRIVERS.filter((d) => d.status === 'Current').map((d) => (
                   <option key={d.code} value={d.code} disabled={d.code === driver1Code}>
                     #{d.number} {d.fullName} ({d.team})

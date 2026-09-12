@@ -865,8 +865,47 @@ export const GRAND_PRIX_REPORTS: Record<number, GrandPrixReportData> = {
       projectedStrategy: 'トワイライトレース。日没とともに路面温度が急激に下がるため、第1スティントと第2スティントでタイヤの挙動が激変する。',
     },
   },
+  // Madrid GP (2026 Debut)
+  99: {
+    round: 16,
+    gpName: 'マドリードGP',
+    circuitId: 'madrid',
+    circuitName: 'マドリング (IFEMAマドリード市街地コース)',
+    country: 'スペイン',
+    flag: '🇪🇸',
+    result2024: {
+      podium: [
+        { code: 'ANT', name: 'キミ・アントネッリ', team: 'Mercedes', teamColor: '#27F4D2', grid: 1, pitStops: 1 },
+        { code: 'RUS', name: 'ジョージ・ラッセル', team: 'Mercedes', teamColor: '#27F4D2', grid: 2, pitStops: 1 },
+        { code: 'HAM', name: 'ルイス・ハミルトン', team: 'Ferrari', teamColor: '#E80020', grid: 3, pitStops: 2 },
+      ],
+      polePosition: { code: 'RUS', name: 'G. ラッセル', time: '1:18.210' },
+      fastestLap: { code: 'ANT', name: 'K. アントネッリ', time: '1:21.050', lap: 48 },
+      winningStrategy: '2026年初開催。高速ストレートとテクニカルなIFEMA展示場周辺セクションの融合。新舗装での熱管理が勝敗を分ける。',
+      strategicTurningPoint: 'マドリード初開催での歴史的バトル。新世代PUのエネルギー回生配分が長い全開区間で決定的な差を生む。',
+      safetyCarDeployments: '初開催想定 SC 1〜2回',
+    },
+    circuitRecords: {
+      qualifyingRecord: { time: '1:18.210 (初開催基準)', driver: 'G. ラッセル', year: 2026, car: 'Mercedes W17' },
+      raceLapRecord: { time: '1:21.050 (初開催基準)', driver: 'K. アントネッリ', year: 2026, car: 'Mercedes W17' },
+      mostWinsDriver: '2026年初開催',
+      mostWinsTeam: '2026年初開催',
+    },
+    tacticalProfile: {
+      tyreDegradationIndex: 4,
+      overtakeDifficultyIndex: 3,
+      safetyCarProbabilityPercent: 65,
+      pitLossSeconds: 22.5,
+      undercutStrengthSeconds: '+1.3秒 / 周',
+      projectedStrategy: '新設サーキット特有のグリーン路面からのエボリューション。1ストップ対2ストップの戦略分かれ目。',
+    },
+  },
 };
 
 export function getGrandPrixReportByRound(round: number): GrandPrixReportData | undefined {
   return GRAND_PRIX_REPORTS[round];
+}
+
+export function getGrandPrixReportByCircuitId(circuitId: string): GrandPrixReportData | undefined {
+  return Object.values(GRAND_PRIX_REPORTS).find((r) => r.circuitId === circuitId);
 }

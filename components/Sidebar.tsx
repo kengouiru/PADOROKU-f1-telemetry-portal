@@ -29,15 +29,12 @@ interface SidebarProps {
   drivers: Driver[];
   selectedDrivers: string[];
   onDriverToggle: (num: string, checked: boolean) => void;
-  // Optional legacy props (deprecated, handled via backend/env)
-  geminiApiKey?: string;
-  onGeminiKeyChange?: (key: string) => void;
   // Status
   isDemoMode: boolean;
   isLoading: boolean;
 }
 
-const AVAILABLE_YEARS = ['2025', '2024', '2023', '2022', '2021'];
+const AVAILABLE_YEARS = ['2026', '2025', '2024', '2023', '2022', '2021'];
 
 function buildUniqueMeetings(sessions: Session[]): UniqueMeeting[] {
   const seen = new Set<number>();
@@ -115,8 +112,10 @@ export default function Sidebar({
               className={selectClass}
               disabled={isLoading && meetings.length === 0}
             >
-              {meetings.length === 0 && (
-                <option value="">{isLoading ? '読み込み中...' : 'GPがありません'}</option>
+              {(!selectedMeetingKey || meetings.length === 0) && (
+                <option value="" disabled>
+                  {isLoading ? '読み込み中...' : meetings.length === 0 ? 'GPがありません' : 'GPを選択してください'}
+                </option>
               )}
               {meetings.map(m => (
                 <option key={m.meeting_key} value={m.meeting_key}>
@@ -135,8 +134,10 @@ export default function Sidebar({
               className={selectClass}
               disabled={isLoading && filteredSessions.length === 0}
             >
-              {filteredSessions.length === 0 && (
-                <option value="">{isLoading ? '読み込み中...' : 'GPを選択してください'}</option>
+              {(!selectedSessionKey || filteredSessions.length === 0) && (
+                <option value="" disabled>
+                  {isLoading ? '読み込み中...' : filteredSessions.length === 0 ? 'セッションがありません' : 'セッションを選択してください'}
+                </option>
               )}
               {filteredSessions.map(s => (
                 <option key={s.session_key} value={s.session_key}>

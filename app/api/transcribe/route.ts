@@ -56,14 +56,34 @@ function classifyCategory(text: string): TranscribeResponse['category'] {
   return 'PACE';
 }
 
+const ALLOWED_AUDIO_HOSTS = ['livetiming.formula1.com', 'api.openf1.org', 'openf1.org'];
+
 async function fetchAudioAsBase64(url: string): Promise<{ data: string; mimeType: string }> {
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    throw new Error('Invalid audio URL');
+  }
+  if (!ALLOWED_AUDIO_HOSTS.includes(parsedUrl.hostname)) {
+    throw new Error('Audio URL is not from an allowed host');
+  }
+
   const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
   if (!res.ok) throw new Error(`Audio fetch failed: ${res.status}`);
+
+  const contentLength = res.headers.get('content-length');
+  if (contentLength && parseInt(contentLength, 10) > 10 * 1024 * 1024) {
+    throw new Error('Audio file is too large (max 10MB)');
+  }
 
   const contentType = res.headers.get('content-type') ?? 'audio/mpeg';
   const mimeType = contentType.split(';')[0].trim();
 
   const buffer = await res.arrayBuffer();
+  if (buffer.byteLength > 10 * 1024 * 1024) {
+    throw new Error('Audio file is too large (max 10MB)');
+  }
   const data = Buffer.from(buffer).toString('base64');
   return { data, mimeType };
 }

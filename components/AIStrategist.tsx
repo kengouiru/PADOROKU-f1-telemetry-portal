@@ -179,7 +179,7 @@ export default function AIStrategist({
       const msg = err instanceof Error ? err.message : 'Unknown error';
       setMessages(prev =>
         prev.map(m => m.id === aiMsgId
-          ? { ...m, isStreaming: false, content: `⚠️ エラー: ${msg}\n\nGemini API キーをサイドバーの「AI SETTINGS」に設定してください。` }
+          ? { ...m, isStreaming: false, content: `⚠️ エラー: ${msg}\n\nGemini API接続に問題が発生しました。しばらく時間を置いてお試しください。` }
           : m
         )
       );

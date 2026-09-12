@@ -363,6 +363,10 @@ interface TimelineCardProps {
   cardRef: (el: HTMLDivElement | null) => void;
 }
 
+// Shared single-playback controller for radio audio
+let activeAudioElement: HTMLAudioElement | null = null;
+let stopActivePlayback: (() => void) | null = null;
+
 function TimelineCard({ event, driverColor, transcript, isLoadingTranscript, onFetchTranscript, cardRef }: TimelineCardProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -377,7 +381,7 @@ function TimelineCard({ event, driverColor, transcript, isLoadingTranscript, onF
 
   const badgeClass = CATEGORY_BADGE_COLORS[finalCategory] ?? CATEGORY_BADGE_COLORS.DEFAULT;
 
-  // Audio setup
+  // TimelineCard Audio setup
   useEffect(() => {
     if (!event.recording_url) return;
     setAudioError(false);
@@ -393,10 +397,22 @@ function TimelineCard({ event, driverColor, transcript, isLoadingTranscript, onF
     audio.onended = () => {
       setIsPlaying(false);
       setCurrentTime(0);
+      if (activeAudioElement === audio) {
+        activeAudioElement = null;
+        stopActivePlayback = null;
+      }
     };
 
     return () => {
       audio.pause();
+      audio.onloadedmetadata = null;
+      audio.ontimeupdate = null;
+      audio.onerror = null;
+      audio.onended = null;
+      if (activeAudioElement === audio) {
+        activeAudioElement = null;
+        stopActivePlayback = null;
+      }
       audioRef.current = null;
     };
   }, [event.recording_url]);
@@ -406,7 +422,19 @@ function TimelineCard({ event, driverColor, transcript, isLoadingTranscript, onF
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
+      if (activeAudioElement === audioRef.current) {
+        activeAudioElement = null;
+        stopActivePlayback = null;
+      }
     } else {
+      // Stop any other currently playing radio clip
+      if (activeAudioElement && activeAudioElement !== audioRef.current) {
+        activeAudioElement.pause();
+        stopActivePlayback?.();
+      }
+      activeAudioElement = audioRef.current;
+      stopActivePlayback = () => setIsPlaying(false);
+
       audioRef.current
         .play()
         .then(() => {

@@ -28,8 +28,8 @@ import {
   type ConstructorStanding,
   type GridTeam,
 } from '@/data/f1SeasonData';
-import { getWeatherByRound } from '@/data/f1WeatherData';
-import { getGrandPrixReportByRound } from '@/data/f1GrandPrixReportsData';
+import { getWeatherByRound, getCircuitWeather } from '@/data/f1WeatherData';
+import { getGrandPrixReportByRound, getGrandPrixReportByCircuitId } from '@/data/f1GrandPrixReportsData';
 
 interface SeasonHubProps {
   onNavigateToTelemetry?: (gpName?: string) => void;
@@ -39,32 +39,36 @@ interface SeasonHubProps {
   onNavigateToCircuit?: (circuitId: string) => void;
 }
 
-const ROUND_TO_CIRCUIT_ID: Record<number, string> = {
-  1: 'albert-park',
-  2: 'shanghai',
-  3: 'suzuka',
-  4: 'bahrain-international',
-  5: 'jeddah',
-  6: 'miami',
-  7: 'imola',
-  8: 'circuit-de-monaco',
-  9: 'catalunya',
-  10: 'villeneuve',
-  11: 'redbull-ring',
-  12: 'silverstone',
-  13: 'hungaroring',
-  14: 'spa-francorchamps',
-  15: 'zandvoort',
-  16: 'monza',
-  17: 'baku',
-  18: 'singapore',
-  19: 'cota',
-  20: 'mexico',
-  21: 'interlagos',
-  22: 'las-vegas',
-  23: 'losail',
-  24: 'yas-marina',
-};
+export function getCircuitIdForRace(race: RaceWeekendSchedule): string {
+  const name = (race.gpName + ' ' + race.circuitName).toLowerCase();
+  if (name.includes('アルバート') || name.includes('albert') || name.includes('オーストラリア')) return 'albert-park';
+  if (name.includes('上海') || name.includes('shanghai') || name.includes('中国')) return 'shanghai';
+  if (name.includes('鈴鹿') || name.includes('suzuka') || name.includes('日本')) return 'suzuka';
+  if (name.includes('サヒール') || name.includes('bahrain') || name.includes('バーレーン')) return 'bahrain-international';
+  if (name.includes('ジェッダ') || name.includes('jeddah') || name.includes('サウジ')) return 'jeddah';
+  if (name.includes('マイアミ') || name.includes('miami')) return 'miami';
+  if (name.includes('イモラ') || name.includes('imola')) return 'imola';
+  if (name.includes('モナコ') || name.includes('monaco') || name.includes('モンテカルロ')) return 'circuit-de-monaco';
+  if (name.includes('マドリード') || name.includes('madrid') || name.includes('マドリング')) return 'madrid';
+  if (name.includes('カタロニア') || name.includes('catalunya') || name.includes('バルセロナ') || name.includes('スペイン')) return 'catalunya';
+  if (name.includes('カナダ') || name.includes('モントリオール') || name.includes('ジル') || name.includes('villeneuve')) return 'villeneuve';
+  if (name.includes('オーストリア') || name.includes('レッドブル・リンク') || name.includes('redbull')) return 'redbull-ring';
+  if (name.includes('シルバーストン') || name.includes('silverstone') || name.includes('イギリス')) return 'silverstone';
+  if (name.includes('スパ') || name.includes('spa') || name.includes('ベルギー')) return 'spa-francorchamps';
+  if (name.includes('ハンガロリンク') || name.includes('hungaroring') || name.includes('ハンガリー') || name.includes('ブダペスト')) return 'hungaroring';
+  if (name.includes('ザントフォールト') || name.includes('zandvoort') || name.includes('オランダ')) return 'zandvoort';
+  if (name.includes('モンツァ') || name.includes('monza') || name.includes('イタリア')) return 'monza';
+  if (name.includes('バクー') || name.includes('baku') || name.includes('アゼルバイジャン')) return 'baku';
+  if (name.includes('シンガポール') || name.includes('singapore') || name.includes('マリーナベイ')) return 'singapore';
+  if (name.includes('アメリカ') || name.includes('オースティン') || name.includes('cota')) return 'cota';
+  if (name.includes('メキシコ') || name.includes('mexico')) return 'mexico';
+  if (name.includes('サンパウロ') || name.includes('ブラジル') || name.includes('インテルラゴス') || name.includes('interlagos')) return 'interlagos';
+  if (name.includes('ラスベガス') || name.includes('vegas')) return 'las-vegas';
+  if (name.includes('カタール') || name.includes('ルサイル') || name.includes('losail')) return 'losail';
+  if (name.includes('アブダビ') || name.includes('ヤス') || name.includes('yas')) return 'yas-marina';
+  return 'suzuka';
+}
+
 
 type MainTab = 'calendar' | 'standings' | 'grid';
 
@@ -109,13 +113,17 @@ export default function SeasonHub({
     return activeCalendar.find((r) => r.round === selectedRound) || activeCalendar[0];
   }, [activeCalendar, selectedRound]);
 
+  const selectedCircuitId = useMemo(() => {
+    return getCircuitIdForRace(selectedRace);
+  }, [selectedRace]);
+
   const selectedWeather = useMemo(() => {
-    return getWeatherByRound(selectedRound);
-  }, [selectedRound]);
+    return getCircuitWeather(selectedCircuitId) || getWeatherByRound(selectedRound);
+  }, [selectedCircuitId, selectedRound]);
 
   const selectedReport = useMemo(() => {
-    return getGrandPrixReportByRound(selectedRound);
-  }, [selectedRound]);
+    return getGrandPrixReportByCircuitId(selectedCircuitId) || getGrandPrixReportByRound(selectedRound);
+  }, [selectedCircuitId, selectedRound]);
 
   // Live Countdown timer calculation
   const [timeLeft, setTimeLeft] = useState<{
@@ -340,9 +348,9 @@ export default function SeasonHub({
                 <span className="text-[10px] text-slate-500 font-normal">※生中継観戦用</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                {selectedRace.scheduleJst.map((s, idx) => (
+                {selectedRace.scheduleJst.map((s) => (
                   <div
-                    key={idx}
+                    key={s.session}
                     className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] border border-white/5 text-xs"
                   >
                     <span className="text-slate-300 font-medium">{s.session}</span>
@@ -472,7 +480,7 @@ export default function SeasonHub({
               )}
               {onNavigateToCircuit && (
                 <button
-                  onClick={() => onNavigateToCircuit(ROUND_TO_CIRCUIT_ID[selectedRace.round] || 'suzuka')}
+                  onClick={() => onNavigateToCircuit(selectedCircuitId)}
                   className="py-2.5 px-3 rounded-xl bg-sky-600/20 hover:bg-sky-600/30 border border-sky-500/30 text-sky-300 hover:text-white font-racing font-bold text-xs transition-all flex items-center justify-center gap-1 shadow-sm"
                   title="サーキット諸元・コース解説を見る"
                 >
@@ -803,7 +811,7 @@ export default function SeasonHub({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          onNavigateToCircuit(ROUND_TO_CIRCUIT_ID[gp.round] || 'suzuka');
+                          onNavigateToCircuit(getCircuitIdForRace(gp));
                         }}
                         className="text-[10px] text-sky-400 hover:text-sky-300 flex items-center gap-1 font-mono font-medium hover:underline bg-sky-950/40 px-2 py-0.5 rounded border border-sky-500/20"
                         title="サーキット詳細を見る"
@@ -833,13 +841,13 @@ export default function SeasonHub({
                 <span>🏆</span>
                 <span>
                   {selectedSeason === '2026'
-                    ? '2026シーズン 暫定選手権ランキング (第16戦 モンツァ終了時点)'
+                    ? '2026シーズン 暫定選手権ランキング (第15戦 モンツァ終了時点)'
                     : '2025シーズン 年間確定選手権ランキング (全24戦終了 / マクラーレンWCC)'}
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 mt-0.5">
                 {selectedSeason === '2026'
-                  ? '新PU規定元年。マクラーレンとレッドブル・フェラーリによる三つ巴の激戦'
+                  ? '新PU規定元年。メルセデスの超新星アントネッリが首位を快走、第11チーム・キャデラック参戦で白熱する22台の選手権'
                   : 'ノリスが悲願の初戴冠、マクラーレンが1998年以来となるコンストラクターズタイトルを奪還'}
               </p>
             </div>
@@ -1024,7 +1032,7 @@ export default function SeasonHub({
           <div className="text-xs text-slate-400 leading-relaxed">
             {selectedSeason === '2026' ? (
               <span>
-                <strong className="text-white">2026年 新レギュレーション参戦布陣:</strong> ドイツの名門<strong className="text-red-400">アウディ</strong>のF1正式参戦、<strong className="text-emerald-400">アストンマーティン×ホンダ完全ワークス</strong>体制始動、そして<strong className="text-blue-400">レッドブル×フォード新PU</strong>の夜明け！100%持続可能燃料とアクティブエアロが生み出す新時代。
+                <strong className="text-white">2026年 新レギュレーション参戦布陣:</strong> ドイツの名門<strong className="text-red-400">アウディ</strong>とアメリカの巨頭<strong className="text-amber-400">キャデラック（第11チーム）</strong>のF1正式参戦、<strong className="text-emerald-400">アストンマーティン×ホンダ完全ワークス</strong>体制始動、そして<strong className="text-blue-400">レッドブル×フォード新PU</strong>の夜明け！全11チーム・22台が織りなす新時代。
               </span>
             ) : (
               <span>
@@ -1034,13 +1042,13 @@ export default function SeasonHub({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {activeGrid.map((team, idx) => (
+            {activeGrid.map((team) => (
               <div
-                key={idx}
+                key={team.teamName}
                 className="p-4 rounded-xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-2.5">
+                  <div className="flex items-center justify-between mb-2 border-b border-white/10 pb-2">
                     <div className="flex items-center gap-2">
                       <span
                         className="w-3.5 h-3.5 rounded-full shadow-sm"
@@ -1048,8 +1056,18 @@ export default function SeasonHub({
                       />
                       <h3 className="font-racing font-bold text-base text-white">{team.teamName}</h3>
                     </div>
-                    <span className="text-[10px] font-mono text-slate-400 px-2 py-0.5 rounded bg-white/5 border border-white/5">
-                      PU: {team.powerUnit}
+                    <span className="text-[10px] font-mono text-slate-400 px-2 py-0.5 rounded bg-white/5 border border-white/5 truncate max-w-[140px]">
+                      {team.fullName}
+                    </span>
+                  </div>
+
+                  {/* Team Principal & PU specs pill */}
+                  <div className="flex flex-wrap items-center gap-1.5 mb-3 text-[10px] font-mono">
+                    <span className="bg-slate-950/80 border border-white/10 px-2 py-0.5 rounded text-slate-300">
+                      👔 代表: <strong className="text-slate-100">{team.teamPrincipal}</strong>
+                    </span>
+                    <span className="bg-slate-950/80 border border-white/10 px-2 py-0.5 rounded text-slate-300">
+                      ⚡ PU: <strong className="text-sky-300">{team.powerUnit}</strong>
                     </span>
                   </div>
 

@@ -258,7 +258,20 @@ export const CIRCUIT_BENCHMARKS: Record<string, CircuitBenchmark> = {
     pit2Lap: 38,
     topSpeedKmh: 335,
   },
+  'madrid': {
+    circuitId: 'madrid',
+    name: 'Madring (IFEMA Madrid Hybrid Circuit)',
+    location: 'Madrid',
+    totalLaps: 55,
+    baseLapTimeSec: 81.5, // ~1:21.500
+    pit1Lap: 18,
+    pit2Lap: 38,
+    topSpeedKmh: 340,
+  },
 };
+
+// Monaco alias for backwards compatibility
+CIRCUIT_BENCHMARKS['monaco'] = CIRCUIT_BENCHMARKS['circuit-de-monaco'];
 
 /**
  * Resolves a circuit identifier and its telemetry benchmark for any given session.
@@ -293,6 +306,9 @@ export function resolveCircuitForSession(session: Session | null | undefined): C
   }
   if (query.includes('monaco') || query.includes('monte carlo')) {
     return CIRCUIT_BENCHMARKS['circuit-de-monaco'];
+  }
+  if (query.includes('madrid') || query.includes('madring') || query.includes('ifema')) {
+    return CIRCUIT_BENCHMARKS['madrid'];
   }
   if (query.includes('catalunya') || query.includes('barcelona') || query.includes('spani') || query.includes('españa')) {
     return CIRCUIT_BENCHMARKS['catalunya'];

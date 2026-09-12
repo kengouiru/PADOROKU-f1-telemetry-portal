@@ -47,7 +47,8 @@ export async function GET(req: NextRequest) {
         'Accept': 'application/json',
         'User-Agent': 'F1TelemetryPortal/1.0',
       },
-      signal: AbortSignal.timeout(4000),
+      signal: AbortSignal.timeout(6000),
+      next: { revalidate: 30 },
     });
 
     if (response.status === 404 || response.status === 401) {
@@ -64,7 +65,11 @@ export async function GET(req: NextRequest) {
     }
 
     const data = await response.json();
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=120',
+      },
+    });
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Unknown error';
     return NextResponse.json(
