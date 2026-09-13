@@ -21,10 +21,13 @@ import {
   QUIZ_QUESTIONS,
   QUIZ_DIFFICULTY_CONFIG,
   QUIZ_CATEGORY_CONFIG,
+  QUIZ_FORMAT_CONFIG,
   type QuizDifficulty,
   type QuizCategory,
+  type QuestionFormat,
   type QuizQuestion,
 } from '@/data/f1QuizData';
+// Real FOM Broadcast Audio: using HTML5 Audio element directly
 
 interface F1QuizModalProps {
   isOpen: boolean;
@@ -36,6 +39,7 @@ export type QuizGameMode = 'standard' | 'sprint';
 type QuizPhase = 'intro' | 'question' | 'result';
 type FilterDifficulty = 'all' | QuizDifficulty;
 type FilterCategory = 'all' | QuizCategory;
+type FilterFormat = 'all' | 'audio_radio' | 'circuit_shape' | 'driver_visual' | 'rule_dilemma' | 'standard';
 
 export default function F1QuizModal({
   isOpen,
@@ -45,6 +49,7 @@ export default function F1QuizModal({
   const [mounted, setMounted] = useState(false);
   const [phase, setPhase] = useState<QuizPhase>('intro');
   const [gameMode, setGameMode] = useState<QuizGameMode>('standard');
+  const [selectedFormat, setSelectedFormat] = useState<FilterFormat>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<FilterDifficulty>('all');
   const [selectedCategory, setSelectedCategory] = useState<FilterCategory>('all');
   const [questionCount, setQuestionCount] = useState<number>(10);
@@ -59,6 +64,19 @@ export default function F1QuizModal({
   const [streak, setStreak] = useState(0);
   const [maxStreak, setMaxStreak] = useState(0);
 
+  // Audio Radio playback state & ref (100% Genuine FOM Archive Recordings)
+  const radioAudioRef = React.useRef<HTMLAudioElement | null>(null);
+  const [isPlayingRadio, setIsPlayingRadio] = useState(false);
+
+  const stopRadioAudio = React.useCallback(() => {
+    if (radioAudioRef.current) {
+      radioAudioRef.current.pause();
+      radioAudioRef.current.currentTime = 0;
+      radioAudioRef.current = null;
+    }
+    setIsPlayingRadio(false);
+  }, []);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -66,23 +84,44 @@ export default function F1QuizModal({
   // Keyboard escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) onClose();
+      if (e.key === 'Escape' && isOpen) {
+        stopRadioAudio();
+        setIsPlayingRadio(false);
+        onClose();
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
+
+  // Stop radio on unmount
+  useEffect(() => {
+    return () => {
+      stopRadioAudio();
+      setIsPlayingRadio(false);
+    };
+  }, []);
 
   // Compute matching questions count for current filters
   const matchingPool = useMemo(() => {
     return QUIZ_QUESTIONS.filter((q) => {
       const matchDiff = selectedDifficulty === 'all' || q.difficulty === selectedDifficulty;
       const matchCat = selectedCategory === 'all' || q.category === selectedCategory;
-      return matchDiff && matchCat;
+      const matchFormat =
+        selectedFormat === 'all'
+          ? true
+          : selectedFormat === 'standard'
+          ? ['standard', 'scenario', 'track_corner', 'telemetry_tactics'].includes(q.format)
+          : q.format === selectedFormat;
+      return matchDiff && matchCat && matchFormat;
     });
-  }, [selectedDifficulty, selectedCategory]);
+  }, [selectedDifficulty, selectedCategory, selectedFormat]);
 
   // Start a new quiz session
   const startQuiz = () => {
+    stopRadioAudio();
+    setIsPlayingRadio(false);
+
     const pool = [...matchingPool];
     const count = Math.min(questionCount, pool.length);
     const shuffled = pool.sort(() => 0.5 - Math.random()).slice(0, count);
@@ -101,6 +140,12 @@ export default function F1QuizModal({
 
   const currentQ = activeQuestions[currentIndex];
 
+  // Stop audio on question change
+  useEffect(() => {
+    stopRadioAudio();
+    setIsPlayingRadio(false);
+  }, [currentIndex, phase]);
+
   // 10s Countdown timer for Sprint mode
   useEffect(() => {
     if (phase !== 'question' || isAnswered || gameMode !== 'sprint') return;
@@ -117,6 +162,8 @@ export default function F1QuizModal({
 
       if (elapsed >= durationMs) {
         clearInterval(timer);
+        stopRadioAudio();
+        setIsPlayingRadio(false);
         setIsTimeout(true);
         setIsAnswered(true);
         setSelectedOption(-1);
@@ -146,6 +193,9 @@ export default function F1QuizModal({
   };
 
   const handleNextQuestion = () => {
+    stopRadioAudio();
+    setIsPlayingRadio(false);
+
     if (currentIndex < activeQuestions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
       setSelectedOption(null);
@@ -155,6 +205,40 @@ export default function F1QuizModal({
     } else {
       setPhase('result');
     }
+  };
+
+  // Toggle Genuine Radio Audio Playback (FOM official recording)
+  const handleToggleRadio = () => {
+    if (isPlayingRadio) {
+      stopRadioAudio();
+      return;
+    }
+
+    if (!currentQ?.audioSnippet?.audioUrl) return;
+
+    if (radioAudioRef.current) {
+      radioAudioRef.current.pause();
+      radioAudioRef.current.currentTime = 0;
+    }
+
+    const audio = new Audio(currentQ.audioSnippet.audioUrl);
+    radioAudioRef.current = audio;
+
+    audio.onplay = () => setIsPlayingRadio(true);
+    audio.onended = () => {
+      setIsPlayingRadio(false);
+      radioAudioRef.current = null;
+    };
+    audio.onerror = (e) => {
+      console.warn('Official Radio audio playback error:', e);
+      setIsPlayingRadio(false);
+      radioAudioRef.current = null;
+    };
+
+    audio.play().catch((err) => {
+      console.warn('Audio play prevented by browser policy:', err);
+      setIsPlayingRadio(false);
+    });
   };
 
   // Rank title computation
@@ -234,6 +318,8 @@ export default function F1QuizModal({
     const total = activeQuestions.length || 1;
     const pct = Math.round((score / total) * 100);
 
+    const fmtText = QUIZ_FORMAT_CONFIG[selectedFormat]?.label || '全形式';
+
     const diffText =
       selectedDifficulty === 'all'
         ? '全難易度ミックス'
@@ -244,17 +330,19 @@ export default function F1QuizModal({
         ? '全ジャンル総合'
         : QUIZ_CATEGORY_CONFIG[selectedCategory].label.split(' ')[1];
 
-    const modeText = gameMode === 'sprint' ? '⚡10秒スプリントモード' : '🎯通常検定モード';
+    const modeText = gameMode === 'sprint' ? '⚡10秒スプリント' : '🎯通常検定';
 
-    const text = encodeURIComponent(
-      `【F1クイズ＆トリビア検定 (${modeText})】\n` +
-      `ジャンル: ${catText} | 難易度: ${diffText}\n` +
-      `成績: ${score} / ${total}問 正解 (${pct}点) 🔥最大${maxStreak}連問正解\n` +
-      `私のF1認定称号は「${rankInfo.title.split(' (')[0]}」でした！🏎️💨\n\n` +
-      `#PADOROKU #F1 #F1JP #F1クイズ #F1スプリント`
-    );
+    const tweetBody =
+      '【F1クイズ＆トリビア検定 (' + modeText + ')】\\n' +
+      '出題形式: ' + fmtText + ' | 難易度: ' + diffText + '\\n' +
+      'ジャンル: ' + catText + '\\n' +
+      '成績: ' + score + ' / ' + total + '問 正解 (' + pct + '点) 🔥最大' + maxStreak + '連問正解\\n' +
+      '私のF1認定称号は「' + rankInfo.title.split(' (')[0] + '」でした！🏎️💨\\n\\n' +
+      '#PADOROKU #F1 #F1JP #F1クイズ #F1スプリント';
+
+    const text = encodeURIComponent(tweetBody);
     const url = encodeURIComponent(window.location.origin);
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+    window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
   };
 
   if (!isOpen || !mounted) return null;
@@ -271,20 +359,24 @@ export default function F1QuizModal({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-racing font-bold text-white leading-tight">
-                  F1クイズ ＆ トリビア検定 (QUIZ 2.0)
+                  F1クイズ ＆ トリビア検定 (QUIZ 3.0)
                 </h2>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold">
-                  全120問収録
+                  多形式 {QUIZ_QUESTIONS.length}問収録
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 font-mono mt-0.5">
-                ルール・歴史・コース攻略・戦術テレメトリーの本格対話型検定
+                音声無線・コース形状・ドライバー肖像・FIA公式裁定事件の対話型検定
               </p>
             </div>
           </div>
 
           <button
-            onClick={onClose}
+            onClick={() => {
+              stopRadioAudio();
+              setIsPlayingRadio(false);
+              onClose();
+            }}
             className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
             title="閉じる (Esc)"
           >
@@ -319,7 +411,7 @@ export default function F1QuizModal({
                       </span>
                     </div>
                     <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                      制限時間なし。じっくり思考し、問題ごとの詳細解説やF1大百科リンクを深く読み込めます。
+                      制限時間なし。音声や図解をじっくり吟味し、問題ごとの公式出典や詳細解説を深く学べます。
                     </p>
                   </div>
                 </button>
@@ -343,18 +435,61 @@ export default function F1QuizModal({
                       </span>
                     </div>
                     <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-                      1問わずか10秒の制限時間！F1ドライバー並みの反射神経と瞬時の決断力を試す電光石火モード。
+                      1問わずか10秒の制限時間！F1ドライバー並みの瞬発力と瞬時の決断力を試す電光石火モード。
                     </p>
                   </div>
                 </button>
               </div>
             </div>
 
-            {/* Step 1: Category Filter */}
+            {/* Step 1: Format Selector (NEW in Quiz 3.0) */}
+            <div className="space-y-2">
+              <label className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <span>🎨</span>
+                  <span>1. 出題形式 (フォーマット) を選択</span>
+                </span>
+                <span className="text-[10px] text-amber-400 font-mono">音声・形状・顔写真・裁定事件</span>
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {(Object.keys(QUIZ_FORMAT_CONFIG) as FilterFormat[]).map((fmtKey) => {
+                  const cfg = QUIZ_FORMAT_CONFIG[fmtKey];
+                  const count =
+                    fmtKey === 'all'
+                      ? QUIZ_QUESTIONS.length
+                      : QUIZ_QUESTIONS.filter((q) =>
+                          fmtKey === 'standard'
+                            ? ['standard', 'scenario', 'track_corner', 'telemetry_tactics'].includes(q.format)
+                            : q.format === fmtKey
+                        ).length;
+                  const isSel = selectedFormat === fmtKey;
+
+                  return (
+                    <button
+                      key={fmtKey}
+                      onClick={() => setSelectedFormat(fmtKey)}
+                      className={`p-2.5 rounded-xl border text-xs font-racing font-bold text-left transition-all cursor-pointer ${
+                        isSel
+                          ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-md ring-1 ring-amber-400/40'
+                          : 'bg-slate-900/60 hover:bg-slate-800 border-white/5 text-slate-400'
+                      }`}
+                    >
+                      <div className="text-xs flex items-center gap-1.5 truncate">
+                        <span>{cfg.icon}</span>
+                        <span>{cfg.label}</span>
+                      </div>
+                      <div className="text-[10px] font-mono text-slate-400 mt-0.5">{count}問収録</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Step 2: Category Filter */}
             <div className="space-y-2">
               <label className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                 <span>📚</span>
-                <span>1. 出題ジャンルを選択</span>
+                <span>2. 出題ジャンルを選択</span>
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 <button
@@ -391,11 +526,11 @@ export default function F1QuizModal({
               </div>
             </div>
 
-            {/* Step 2: Difficulty Level */}
+            {/* Step 3: Difficulty Level */}
             <div className="space-y-2">
               <label className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                 <span>🎯</span>
-                <span>2. 難易度を選択</span>
+                <span>3. 難易度を選択</span>
               </label>
               <div className="space-y-2">
                 {/* All difficulty button */}
@@ -459,11 +594,11 @@ export default function F1QuizModal({
               </div>
             </div>
 
-            {/* Step 3: Question Count Selector */}
+            {/* Step 4: Question Count Selector */}
             <div className="space-y-2">
               <label className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                 <span>🔢</span>
-                <span>3. 出題数を選択</span>
+                <span>4. 出題数を選択</span>
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {[5, 10, 20].map((num) => (
@@ -584,6 +719,196 @@ export default function F1QuizModal({
                 </div>
               )}
 
+              {/* ── MULTI-FORMAT MEDIA RENDERING ── */}
+
+              {/* Format 1: 🎙️ Team Radio Blind Test (100% Genuine FOM Audio) */}
+              {currentQ.format === 'audio_radio' && currentQ.audioSnippet && (
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-slate-900 to-teal-950/80 border border-emerald-500/40 shadow-xl space-y-3.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">🎙️</span>
+                      <div>
+                        <span className="text-xs font-racing font-bold text-emerald-400 uppercase tracking-wider block">
+                          公式FOM コックピット無線実音源アーカイブ
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          F1 Official Team Radio Archive Recording
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5 shadow-sm">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="font-bold">100% 公式実音源</span>
+                    </span>
+                  </div>
+
+                  {/* Audio Play Button & Real Sound Equalizer */}
+                  <div className="flex flex-col sm:flex-row items-center gap-3 bg-slate-950/90 p-3.5 rounded-xl border border-white/10 shadow-inner">
+                    <button
+                      type="button"
+                      onClick={handleToggleRadio}
+                      className={`w-full sm:w-auto px-5 py-3 rounded-xl font-racing font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg ${
+                        isPlayingRadio
+                          ? 'bg-rose-600 hover:bg-rose-500 text-white animate-pulse ring-2 ring-rose-400/50'
+                          : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white ring-1 ring-emerald-400/40 shadow-emerald-500/20'
+                      }`}
+                    >
+                      <span className="text-sm">{isPlayingRadio ? '⏹' : '▶'}</span>
+                      <span>{isPlayingRadio ? '音声を停止' : '公式実音源を再生 (実況録音)'}</span>
+                    </button>
+
+                    {/* Live Equalizer Wave Animation */}
+                    <div className="flex items-center gap-1 h-6 px-3 bg-slate-900/80 rounded-lg py-1 border border-white/5">
+                      {[35, 80, 50, 95, 70, 100, 60, 85, 45, 90, 65, 85].map((h, i) => (
+                        <div
+                          key={i}
+                          className={`w-1 rounded-full transition-all duration-150 ${
+                            isPlayingRadio ? 'bg-emerald-400 animate-pulse' : 'bg-slate-700 h-1.5'
+                          }`}
+                          style={{ height: isPlayingRadio ? `${h}%` : '20%' }}
+                        />
+                      ))}
+                    </div>
+
+                    <div className="text-[11px] font-mono text-center sm:text-left flex-1">
+                      {isPlayingRadio ? (
+                        <span className="text-emerald-300 font-bold flex items-center justify-center sm:justify-start gap-1.5 animate-pulse">
+                          <span>🔊</span>
+                          <span>公式中継アーカイブ実音声を再生中...</span>
+                        </span>
+                      ) : (
+                        <span className="text-slate-400">
+                          再生ボタンを押して、ピット交信の実音源をお聞きください
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Transcript quote & translation */}
+                  <div className="p-3.5 rounded-xl bg-black/60 border border-white/10 font-mono text-xs space-y-2">
+                    <div className="flex items-center justify-between text-slate-400 text-[10px] uppercase tracking-wider">
+                      <span className="flex items-center gap-1">
+                        <span>📻</span>
+                        <span>交信テキスト (RADIO TRANSCRIPT):</span>
+                      </span>
+                      {currentQ.audioSnippet.gpName && (
+                        <span className="text-[10px] text-amber-400/90 font-sans">
+                          📍 {currentQ.audioSnippet.gpName} ({currentQ.audioSnippet.year}年)
+                        </span>
+                      )}
+                    </div>
+                    {!isAnswered ? (
+                      <div className="bg-slate-900/60 p-3 rounded-lg border border-dashed border-white/15 text-center sm:text-left space-y-1">
+                        <p className="text-slate-400 italic tracking-widest text-xs font-sans">
+                          「 ？？？？？？？？？？？？？？？？？？？？ 」
+                        </p>
+                        <p className="text-[11px] text-emerald-400/90 font-sans not-italic font-medium">
+                          💡 まずは音声を聴いて選択肢から回答してください。回答後に英語テキストと日本語対訳がアンロックされます！
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2 bg-emerald-950/40 p-3.5 rounded-xl border border-emerald-500/30">
+                        <p className="text-emerald-300 font-semibold leading-relaxed text-sm">
+                          “{currentQ.audioSnippet.radioQuote}”
+                        </p>
+                        {currentQ.audioSnippet.transcriptJa && (
+                          <div className="text-slate-200 text-xs font-sans leading-relaxed border-t border-white/10 pt-2">
+                            <span className="text-amber-400 font-bold mr-1.5">🇯🇵 日本語対訳:</span>
+                            <span>{currentQ.audioSnippet.transcriptJa}</span>
+                          </div>
+                        )}
+                        {currentQ.audioSnippet.speakerName && (
+                          <div className="text-slate-400 text-[11px] font-sans flex flex-wrap items-center justify-between pt-1.5 border-t border-white/10 gap-2">
+                            <span>発言者: <strong className="text-white font-medium">{currentQ.audioSnippet.speakerName}</strong></span>
+                            <span className="text-[10px] text-slate-400 bg-slate-900/80 px-2 py-0.5 rounded border border-white/10">
+                              出典: FOD / フジテレビNEXT 中継 & FOM公式アーカイブ
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Format 2: 🏁 Circuit Shape Silhouette */}
+              {currentQ.format === 'circuit_shape' && currentQ.circuitVisual && (
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-black to-slate-900 border border-red-500/30 shadow-lg flex flex-col items-center justify-center relative overflow-hidden">
+                  <div className="w-full flex items-center justify-between pb-2 mb-2 border-b border-white/10">
+                    <span className="text-xs font-racing font-bold text-red-400 flex items-center gap-1.5">
+                      <span>🏁</span>
+                      <span>コース・レイアウトシルエット</span>
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30">
+                      CIRCUIT MAP
+                    </span>
+                  </div>
+
+                  <div className="relative p-2 flex items-center justify-center w-full min-h-[160px]">
+                    <img
+                      src={currentQ.circuitVisual.svgMapUrl}
+                      alt="Circuit Layout Map"
+                      className="max-h-44 w-auto object-contain filter drop-shadow-[0_0_15px_rgba(239,68,68,0.5)] transition-all transform hover:scale-105"
+                    />
+                  </div>
+
+                  {isAnswered && currentQ.circuitVisual.circuitNameJa && (
+                    <div className="mt-2 text-center animate-fade-in">
+                      <span className="text-xs font-racing font-bold text-amber-300 bg-black/60 px-3 py-1 rounded-full border border-amber-500/30">
+                        正解コース: {currentQ.circuitVisual.circuitNameJa}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Format 3: 👤 Driver Visual Portrait */}
+              {currentQ.format === 'driver_visual' && currentQ.driverVisual && (
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-950/60 via-slate-900 to-indigo-950/60 border border-blue-500/30 shadow-lg flex flex-col sm:flex-row items-center gap-4">
+                  <img
+                    src={currentQ.driverVisual.imagePath}
+                    alt="Driver Portrait"
+                    className="w-28 h-28 sm:w-32 sm:h-32 object-cover rounded-2xl border-2 border-amber-400/40 shadow-xl flex-shrink-0"
+                  />
+                  <div className="space-y-1 text-center sm:text-left flex-1">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 font-bold">
+                      👤 ドライバー肖像クイズ
+                    </span>
+                    <h4 className="text-sm font-racing font-bold text-white mt-1">
+                      {isAnswered ? currentQ.driverVisual.driverNameJa : 'このドライバーは誰？'}
+                    </h4>
+                    {currentQ.driverVisual.teamName && isAnswered && (
+                      <p className="text-xs text-slate-300 font-mono">
+                        所属: {currentQ.driverVisual.teamName}
+                      </p>
+                    )}
+                    <p className="text-xs text-slate-400">
+                      写真の人物に該当するドライバーを選択肢から選んでください
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Format 4: ⚖️ FIA Rule Dilemma Incident */}
+              {currentQ.format === 'rule_dilemma' && (
+                <div className="p-3.5 rounded-2xl bg-gradient-to-r from-purple-950/50 via-slate-900 to-indigo-950/50 border border-purple-500/30 flex items-center gap-3">
+                  <span className="text-2xl">⚖️</span>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-racing font-bold text-purple-300">
+                        FIA公式審議・インシデント判定
+                      </span>
+                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold">
+                        FIA REGULATION
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-300 mt-0.5">
+                      実際の歴史的事件とFIA国際競技規則条項に基づく正確な裁定判断が問われます。
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Question Box */}
               <div className="bg-slate-900/70 p-4 rounded-2xl border border-white/10 shadow-inner">
                 <h3 className="text-sm sm:text-base font-bold text-white leading-relaxed">
@@ -645,7 +970,7 @@ export default function F1QuizModal({
 
               {/* Explanation Box (Revealed upon answer or timeout) */}
               {isAnswered && (
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-black border border-white/10 space-y-2 animate-fade-in shadow-inner">
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-black border border-white/10 space-y-2.5 animate-fade-in shadow-inner">
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <span className="text-lg">
@@ -663,6 +988,8 @@ export default function F1QuizModal({
                     {currentQ.linkSubTab && onNavigateToTab && (
                       <button
                         onClick={() => {
+                          stopRadioAudio();
+                          setIsPlayingRadio(false);
                           onClose();
                           onNavigateToTab(currentQ.linkSubTab!);
                         }}
@@ -677,6 +1004,24 @@ export default function F1QuizModal({
                   <p className="text-xs text-slate-300 leading-relaxed font-medium">
                     {currentQ.explanation}
                   </p>
+
+                  {/* 📚 Source Attribution Banner */}
+                  {currentQ.sourceAttribution && (
+                    <div className="p-2.5 rounded-xl bg-slate-950/90 border border-amber-500/30 flex items-start gap-2.5 text-left">
+                      <span className="text-base shrink-0 mt-0.5">📚</span>
+                      <div className="text-[11px] leading-relaxed">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="font-racing font-bold text-amber-300">公式根拠・出典:</span>
+                          <span className="font-mono text-slate-200">{currentQ.sourceAttribution.title}</span>
+                        </div>
+                        {currentQ.sourceAttribution.archiveNote && (
+                          <div className="text-[10px] text-slate-400 font-mono mt-0.5">
+                            記録アーカイブ: {currentQ.sourceAttribution.archiveNote}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   {currentQ.funFact && (
                     <p className="text-[11px] text-amber-300/90 font-mono bg-amber-500/10 p-2 rounded-lg border border-amber-500/20">

@@ -1,0 +1,367 @@
+{
+  "version": "news-snapshot-2026-09-12-1789227942843",
+  "timestamp": "2026-09-12T15:45:42.843Z",
+  "createdAt": "2026/9/13 0:45:42",
+  "articlesCount": 14,
+  "articles": [
+    {
+      "id": "rss-0-1789227942692",
+      "title": "Max Verstappen reveals laid-back approach to 100-driver Silverstone challenge",
+      "summary": "Four-time Formula 1 champion Max Verstappen has admitted that he has done zero preparation ahead of a 30-lap challenge against 100 go-karters at Silverstone next week.The Dutchman will be given the challenge of starti...",
+      "link": "https://www.motorsport.com/f1/news/max-verstappen-reveals-laid-back-approach-to-100-driver-silverstone-challenge/10854765/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-11T22:26:37.000Z",
+      "category": "PADDOCK",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [
+        {
+          "name": "Red Bull",
+          "color": "#38bdf8",
+          "bgColor": "rgba(56, 189, 248, 0.15)",
+          "borderColor": "rgba(56, 189, 248, 0.4)"
+        }
+      ],
+      "drivers": [
+        "VER"
+      ]
+    },
+    {
+      "id": "rss-1-1789227942692",
+      "title": "George Russell shares childhood Silverstone connection and why he rejected bigger grandstand",
+      "summary": "George Russell has opened up about launching his own dedicated grandstand for his supporters at Silverstone.It was announced this week that the British driver would have the George Russell Grandstand at his home grand...",
+      "link": "https://www.motorsport.com/f1/news/george-russell-shares-childhood-silverstone-connection-and-why-he-rejected-bigger-grandstand/10854755/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-11T21:55:17.000Z",
+      "category": "PADDOCK",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [
+        {
+          "name": "Mercedes",
+          "color": "#2dd4bf",
+          "bgColor": "rgba(45, 212, 191, 0.15)",
+          "borderColor": "rgba(45, 212, 191, 0.4)"
+        }
+      ],
+      "drivers": [
+        "RUS"
+      ]
+    },
+    {
+      "id": "rss-2-1789227942692",
+      "title": "David Coulthard says Kimi Antonelli proved he is an F1 \"phenomenon\" at Monza",
+      "summary": "Former Formula 1 driver David Coulthard says Kimi Antonelli's charge from 19th on the grid to win the Italian Grand Prix was a career-defining performance that sits alongside drives from the greatest drivers in the hi...",
+      "link": "https://www.motorsport.com/f1/news/david-coulthard-says-kimi-antonelli-proved-he-is-an-f1-phenomenon-at-monza/10854748/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-11T21:24:20.000Z",
+      "category": "PADDOCK",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [
+        {
+          "name": "Mercedes",
+          "color": "#2dd4bf",
+          "bgColor": "rgba(45, 212, 191, 0.15)",
+          "borderColor": "rgba(45, 212, 191, 0.4)"
+        }
+      ],
+      "drivers": [
+        "ANT"
+      ]
+    },
+    {
+      "id": "rss-3-1789227942692",
+      "title": "Mercedes clearly ahead: How long-run pace compared in F1 Spanish GP practice",
+      "summary": "George Russell was the fastest long-run driver with a lot of fuel on board. His closest challenger was Red Bull’s Max Verstappen over Friday’s practice sessions ahead of the Formula 1 Spanish Grand Prix. The Dutchman ...",
+      "link": "https://www.motorsport.com/f1/news/mercedes-clearly-ahead-how-long-run-pace-compared-in-f1-spanish-gp-practice-/10854723/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-11T19:06:43.000Z",
+      "category": "PADDOCK",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [
+        {
+          "name": "Red Bull",
+          "color": "#38bdf8",
+          "bgColor": "rgba(56, 189, 248, 0.15)",
+          "borderColor": "rgba(56, 189, 248, 0.4)"
+        },
+        {
+          "name": "Mercedes",
+          "color": "#2dd4bf",
+          "bgColor": "rgba(45, 212, 191, 0.15)",
+          "borderColor": "rgba(45, 212, 191, 0.4)"
+        }
+      ],
+      "drivers": [
+        "VER",
+        "RUS"
+      ]
+    },
+    {
+      "id": "rss-4-1789227942692",
+      "title": "“High risk” and a chance of “chaos” - drivers open up on F1’s new Madring circuit",
+      "summary": "The Spanish Grand Prix's Madring circuit has received a thumbs-up from several leading Formula 1 drivers as they praised its high-commitment layout, although not everyone is as impressed.Having sampled the 5.4km circu...",
+      "link": "https://www.motorsport.com/f1/news/very-high-risk-and-the-best-race-in-europe-f1-drivers-share-first-madring-impressions/10854690/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-11T18:12:35.000Z",
+      "category": "PADDOCK",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [],
+      "drivers": []
+    },
+    {
+      "id": "rss-5-1789227942693",
+      "title": "Max Verstappen’s short but telling reaction to F1’s new Madrid circuit",
+      "summary": "Formula 1’s first encounter with the circuit around the IFEMA complex in Madrid has produced less chaos than some in the paddock may have feared. While the F3 and F2 sessions have seen several crashes and even a car g...",
+      "link": "https://www.motorsport.com/f1/news/max-verstappens-short-but-telling-reaction-to-f1s-new-madrid-circuit/10854695/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-11T18:00:32.000Z",
+      "category": "PADDOCK",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [
+        {
+          "name": "Red Bull",
+          "color": "#38bdf8",
+          "bgColor": "rgba(56, 189, 248, 0.15)",
+          "borderColor": "rgba(56, 189, 248, 0.4)"
+        }
+      ],
+      "drivers": [
+        "VER"
+      ]
+    },
+    {
+      "id": "rss-6-1789227942693",
+      "title": "David Croft hails Kimi Antonelli's maturity as F1 title charge gathers pace",
+      "summary": "Sky Sports Formula 1 lead commentator David Croft has backed Mercedes driver Kimi Antonelli to become a younger world champion than Max Verstappen.Antonelli delivered an incredible performance at last weekend's Italia...",
+      "link": "https://www.motorsport.com/f1/news/david-croft-hails-kimi-antonellis-maturity-as-f1-title-charge-gathers-pace/10854687/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-11T17:58:32.000Z",
+      "category": "PADDOCK",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [
+        {
+          "name": "Red Bull",
+          "color": "#38bdf8",
+          "bgColor": "rgba(56, 189, 248, 0.15)",
+          "borderColor": "rgba(56, 189, 248, 0.4)"
+        },
+        {
+          "name": "Mercedes",
+          "color": "#2dd4bf",
+          "bgColor": "rgba(45, 212, 191, 0.15)",
+          "borderColor": "rgba(45, 212, 191, 0.4)"
+        }
+      ],
+      "drivers": [
+        "VER",
+        "ANT"
+      ]
+    },
+    {
+      "id": "rss-7-1789227942693",
+      "title": "F1 Spanish GP at Madring: Saturday schedule, weather forecast and how to watch",
+      "summary": "Formula 1 heads into Saturday at Madring with Kimi Antonelli fastest after a tricky second practice session for the Spanish Grand Prix.The Mercedes championship leader pipped Ferrari’s Charles Leclerc in FP2, with Lew...",
+      "link": "https://www.motorsport.com/f1/news/f1-spanish-gp-at-madring-saturday-schedule-weather-forecast-and-how-to-watch/10854656/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-11T17:22:55.000Z",
+      "category": "RACE",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [
+        {
+          "name": "Ferrari",
+          "color": "#f87171",
+          "bgColor": "rgba(248, 113, 113, 0.15)",
+          "borderColor": "rgba(248, 113, 113, 0.4)"
+        },
+        {
+          "name": "Mercedes",
+          "color": "#2dd4bf",
+          "bgColor": "rgba(45, 212, 191, 0.15)",
+          "borderColor": "rgba(45, 212, 191, 0.4)"
+        }
+      ],
+      "drivers": [
+        "LEC",
+        "ANT"
+      ]
+    },
+    {
+      "id": "rss-8-1789227942693",
+      "title": "F1 Spanish GP: Kimi Antonelli leads tricky second practice as Arvid Lindblad crashes",
+      "summary": "Mercedes driver Kimi Antonelli topped second practice at Formula 1's Spanish Grand Prix, pipping Ferrari's Charles Leclerc on Friday afternoon at a hot and challenging Madring circuit.Antonelli set the fastest lap aro...",
+      "link": "https://www.motorsport.com/f1/news/f1-spanish-gp-fp2-report/10854600/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-11T16:11:52.000Z",
+      "category": "PADDOCK",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [
+        {
+          "name": "Ferrari",
+          "color": "#f87171",
+          "bgColor": "rgba(248, 113, 113, 0.15)",
+          "borderColor": "rgba(248, 113, 113, 0.4)"
+        },
+        {
+          "name": "Mercedes",
+          "color": "#2dd4bf",
+          "bgColor": "rgba(45, 212, 191, 0.15)",
+          "borderColor": "rgba(45, 212, 191, 0.4)"
+        }
+      ],
+      "drivers": [
+        "LEC",
+        "ANT"
+      ]
+    },
+    {
+      "id": "rss-9-1789227942694",
+      "title": "Juan Pablo Montoya says Madring is first 2026 F1 track he wants to drive",
+      "summary": "Former Formula 1 driver Juan Pablo Montoya has praised the brand-new Madring circuit, revealing that it is the first track of the 2026 season that has made him want to get back behind the wheel.After the Italian Grand...",
+      "link": "https://www.motorsport.com/f1/news/juan-pablo-montoya-says-madring-is-first-2026-f1-track-he-wants-to-drive/10854613/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-11T15:58:58.000Z",
+      "category": "PADDOCK",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [],
+      "drivers": []
+    },
+    {
+      "id": "fb-3",
+      "title": "マクラーレン、ノリスとピアストリのタイトル争いを支える新型Hウィングを公開",
+      "summary": "高速サーキットでの直線スピードとDRS効率を両立させる新型リヤウィングを投入。低ドラッグ特性によりトップスピード向上を狙う。",
+      "link": "https://www.motorsport.com/f1/news/mclaren-rear-wing-update/",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-12T10:45:42.671Z",
+      "category": "TECHNICAL",
+      "authorityLevel": "CONSTRUCTOR_OFFICIAL",
+      "badgeColor": "bg-orange-500/20 text-orange-300 border-orange-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [
+        {
+          "name": "McLaren",
+          "color": "#fb923c",
+          "bgColor": "rgba(251, 146, 60, 0.15)",
+          "borderColor": "rgba(251, 146, 60, 0.4)"
+        }
+      ],
+      "drivers": [
+        "NOR",
+        "PIA"
+      ]
+    },
+    {
+      "id": "fb-4",
+      "title": "パドック速報：アウディワークス参戦準備と2026年PU開発ベンチマークの最新情報",
+      "summary": "ヒュルケンベルグとボルトレートを擁するザウバー/アウディ陣営が、ノイブルク開発拠点での新規定50:50ハイブリッドPU単体テストで高効率回生数値を記録。",
+      "link": "https://www.formula1.com/en/latest/article.audi-2026-update.html",
+      "source": "Paddock Insider",
+      "pubDate": "2026-09-12T08:45:42.671Z",
+      "category": "PADDOCK",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+      "topics": [
+        "Contract",
+        "PU"
+      ],
+      "teams": [
+        {
+          "name": "Audi",
+          "color": "#e0001a",
+          "bgColor": "rgba(224, 0, 26, 0.15)",
+          "borderColor": "rgba(224, 0, 26, 0.4)"
+        },
+        {
+          "name": "Aston Martin",
+          "color": "#34d399",
+          "bgColor": "rgba(52, 211, 153, 0.15)",
+          "borderColor": "rgba(52, 211, 153, 0.4)"
+        }
+      ],
+      "drivers": [
+        "HUL",
+        "BOR",
+        "ALO"
+      ]
+    },
+    {
+      "id": "fb-5",
+      "title": "FIA世界モータースポーツ評議会：2026年アクティブ空力詳細規則を正式承認。X/Zモード規定が確定",
+      "summary": "フロントおよびリアの連動フラップ機構、MGU-K 350kW出力特性、およびMOMオーバーテイク規定の詳細付則が批准。",
+      "link": "https://www.fia.com/news/fia-formula-1-regulations-2026",
+      "source": "FIA World Motor Sport Council",
+      "pubDate": "2026-09-12T05:45:42.671Z",
+      "category": "FIA",
+      "authorityLevel": "FIA_OFFICIAL",
+      "badgeColor": "bg-amber-500/20 text-amber-300 border-amber-500/30",
+      "topics": [
+        "FIA",
+        "Aero",
+        "PU"
+      ],
+      "teams": [],
+      "drivers": []
+    },
+    {
+      "id": "fb-6",
+      "title": "決勝レース戦略展望：路面温度の低下とアンダーカット威力が鍵を握る2ストップ戦",
+      "summary": "ナイトセッションでのトラックエボリューション（路面グリップ向上）を考慮し、ピレリ推奨のソフトからハードへの乗り換えタイミングが勝敗の分岐点に。国内公式中継FODにて完全生解説。",
+      "link": "https://www.formula1.com/en/latest/article.strategy-guide.html",
+      "source": "FOD / フジテレビNEXT 中継解説デスク",
+      "pubDate": "2026-09-11T23:45:42.671Z",
+      "category": "RACE",
+      "authorityLevel": "BROADCAST_PRIMARY",
+      "badgeColor": "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+      "topics": [
+        "Strategy",
+        "Tyre"
+      ],
+      "teams": [],
+      "drivers": [
+        "VER",
+        "NOR",
+        "LEC"
+      ]
+    }
+  ]
+}

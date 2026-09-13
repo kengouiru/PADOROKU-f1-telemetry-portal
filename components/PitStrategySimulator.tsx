@@ -10,9 +10,10 @@
  *  - Integrated Gemini AI Strategy Advisor trigger
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import type { Driver, Lap, Stint, TyreCompound, PitSimulationResult } from '@/lib/types';
 import { simulatePitStrategy, getTyreColor } from '@/lib/telemetryUtils';
+import VirtualPitwallWarRoom from '@/components/strategy/VirtualPitwallWarRoom';
 
 interface PitStrategySimulatorProps {
   selectedDrivers: string[];
@@ -20,6 +21,7 @@ interface PitStrategySimulatorProps {
   lapsCache: Record<string, Lap[]>;
   stints: Stint[];
   geminiApiKey?: string;
+  initialViewMode?: 'basic' | 'war_room';
 }
 
 export default function PitStrategySimulator({
@@ -28,10 +30,18 @@ export default function PitStrategySimulator({
   lapsCache,
   stints,
   geminiApiKey = '',
+  initialViewMode,
 }: PitStrategySimulatorProps) {
   const [pitLoss, setPitLoss] = useState<number>(22.5);
   const [freshGain, setFreshGain] = useState<number>(1.4);
   const [targetCompound, setTargetCompound] = useState<TyreCompound>('HARD');
+  const [viewMode, setViewMode] = useState<'basic' | 'war_room'>(initialViewMode || 'basic');
+
+  useEffect(() => {
+    if (initialViewMode) {
+      setViewMode(initialViewMode);
+    }
+  }, [initialViewMode]);
 
   // AI Strategy advice state per driver
   const [aiAdvice, setAiAdvice] = useState<Record<string, string>>({});
@@ -115,6 +125,46 @@ export default function PitStrategySimulator({
 
   return (
     <div className="glass-card p-4 flex flex-col gap-4">
+      {/* ── Mode Switcher Bar ── */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-2 bg-slate-950/80 rounded-2xl border border-white/10 shadow-lg">
+        <div className="flex items-center gap-2">
+          <span className="text-lg">🧠</span>
+          <div className="text-xs font-racing font-bold text-white uppercase tracking-wider">
+            RACE STRATEGY INTELLIGENCE
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5 p-1 bg-slate-900 rounded-xl border border-white/10">
+          <button
+            type="button"
+            onClick={() => setViewMode('basic')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
+              viewMode === 'basic'
+                ? 'bg-blue-600 text-white shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <span>⏱️ 基本ピット窓口 ＆ 復帰位置</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('war_room')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
+              viewMode === 'war_room'
+                ? 'bg-gradient-to-r from-amber-500 to-red-600 text-white shadow-md shadow-amber-500/30'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <span>🚨 戦術司令室 (War Room: 天候/SC/タイヤ崖)</span>
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+          </button>
+        </div>
+      </div>
+
+      {viewMode === 'war_room' ? (
+        <VirtualPitwallWarRoom />
+      ) : (
+        <>
       {/* Title & Interactive Sliders */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-3">
         <div>
@@ -349,6 +399,8 @@ export default function PitStrategySimulator({
           );
         })}
       </div>
+        </>
+      )}
     </div>
   );
 }

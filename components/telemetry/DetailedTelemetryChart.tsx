@@ -38,11 +38,13 @@ import {
 } from '@/lib/carTelemetryService';
 import { KNOWLEDGE_CIRCUITS, KNOWLEDGE_DRIVERS } from '@/data/f1KnowledgeData';
 import TelemetryTrackMap, { CIRCUIT_TRACK_MAPS } from './TelemetryTrackMap';
+import TelemetryDeltaAnalyzer from './TelemetryDeltaAnalyzer';
 
 export interface DetailedTelemetryChartProps {
   initialCircuitId?: string;
   initialDriver1Code?: string;
   initialDriver2Code?: string;
+  initialTab?: 'charts' | 'delta_matrix';
   className?: string;
 }
 
@@ -50,6 +52,7 @@ export default function DetailedTelemetryChart({
   initialCircuitId = 'bahrain-international',
   initialDriver1Code = 'VER',
   initialDriver2Code = 'NOR',
+  initialTab,
   className = '',
 }: DetailedTelemetryChartProps) {
   const [selectedCircuit, setSelectedCircuit] = useState(initialCircuitId);
@@ -62,11 +65,18 @@ export default function DetailedTelemetryChart({
   // Corner Zoom State: { start: number; end: number } or null for full circuit
   const [zoomRange, setZoomRange] = useState<{ start: number; end: number } | null>(null);
   const [selectedCornerName, setSelectedCornerName] = useState<string | null>(null);
+  const [activeTelemetryTab, setActiveTelemetryTab] = useState<'charts' | 'delta_matrix'>(initialTab || 'charts');
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTelemetryTab(initialTab);
+    }
+  }, [initialTab]);
 
   // Synchronize when parent updates selected circuit or drivers
   useEffect(() => {
@@ -281,6 +291,33 @@ export default function DetailedTelemetryChart({
           </h3>
         </div>
 
+        {/* ── View Switcher: Charts vs Delta Analyzer ── */}
+        <div className="flex items-center gap-1.5 p-1 bg-slate-950/90 rounded-xl border border-white/10 self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={() => setActiveTelemetryTab('charts')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
+              activeTelemetryTab === 'charts'
+                ? 'bg-sky-600 text-white shadow-md'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <span>📈 3段同期波形</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTelemetryTab('delta_matrix')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
+              activeTelemetryTab === 'delta_matrix'
+                ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-md shadow-sky-500/30 ring-1 ring-sky-300'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <span>🏁 タイムデルタ(Δt) ＆ コーナー詳細解析</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-sky-300 animate-pulse" />
+          </button>
+        </div>
+
         {/* Quick Matchup Presets */}
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className="text-[11px] font-mono text-slate-500 mr-1 hidden sm:inline">人気対決:</span>
@@ -357,6 +394,14 @@ export default function DetailedTelemetryChart({
         </div>
       </div>
 
+      {activeTelemetryTab === 'delta_matrix' ? (
+        <TelemetryDeltaAnalyzer
+          initialCircuitId={selectedCircuit}
+          initialDriver1Code={driver1Code}
+          initialDriver2Code={driver2Code}
+        />
+      ) : (
+        <>
       {/* ── Selectors Bar: Driver 1 vs Driver 2 & Circuit ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-900/60 p-3 rounded-2xl border border-white/5">
         {/* Driver 1 Selector */}
@@ -1046,6 +1091,8 @@ export default function DetailedTelemetryChart({
           </div>
         )}
       </div>
+        </>
+      )}
     </div>
   );
 }

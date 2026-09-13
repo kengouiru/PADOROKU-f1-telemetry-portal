@@ -12,7 +12,7 @@
  * when the parent flex chain is misconfigured.
  */
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import type { Driver, Lap, Stint, PitStop, Session } from '@/lib/types';
 import { buildTelemetryContext } from '@/lib/telemetryContext';
@@ -25,6 +25,125 @@ interface ChatMessage {
   role: 'user' | 'model';
   content: string;
   isStreaming?: boolean;
+}
+
+// ── Navigation Action Types ───────────────────────────────────────────────────
+
+export interface NavAction {
+  type:
+    | 'telemetry'
+    | 'stints'
+    | 'pit_sim'
+    | 'radio'
+    | 'library_tyres'
+    | 'library_circuits'
+    | 'library_regulations'
+    | 'library_glossary'
+    | 'library_drama'
+    | 'quiz';
+  label: string;
+  icon: string;
+  circuitId?: string;
+  driver1?: string;
+  driver2?: string;
+  lapNumber?: number;
+  termId?: string;
+}
+
+export function parseNavActions(content: string): { cleanContent: string; actions: NavAction[] } {
+  const actions: NavAction[] = [];
+  const navRegex = /\[NAV:([^\]]+)\]/g;
+
+  let match;
+  while ((match = navRegex.exec(content)) !== null) {
+    const rawTag = match[1].trim();
+    const parts = rawTag.split(':');
+    const category = parts[0];
+
+    if (category === 'telemetry') {
+      const circuitId = parts[1] || 'bahrain-international';
+      const d1 = parts[2] || 'VER';
+      const d2 = parts[3] || 'NOR';
+      const lap = parts[4] ? parseInt(parts[4]) : undefined;
+      const lapLabel = lap ? `Lap ${lap}: ` : '';
+      actions.push({
+        type: 'telemetry',
+        icon: '🏎️',
+        label: `${lapLabel}${d1} vs ${d2} テレメトリーを開く`,
+        circuitId,
+        driver1: d1,
+        driver2: d2,
+        lapNumber: lap,
+      });
+    } else if (category === 'stints') {
+      actions.push({
+        type: 'stints',
+        icon: '🛞',
+        label: 'タイヤ・スティント推移を見る',
+      });
+    } else if (category === 'pit_sim') {
+      actions.push({
+        type: 'pit_sim',
+        icon: '⛽',
+        label: 'ピット戦略シミュレーターを試す',
+      });
+    } else if (category === 'radio') {
+      const lap = parts[1] ? parseInt(parts[1]) : undefined;
+      const lapLabel = lap ? `(Lap ${lap})` : '';
+      actions.push({
+        type: 'radio',
+        icon: '📻',
+        label: `チーム無線タイムライン ${lapLabel}`.trim(),
+        lapNumber: lap,
+      });
+    } else if (category === 'library') {
+      const sub = parts[1];
+      if (sub === 'tyres') {
+        actions.push({
+          type: 'library_tyres',
+          icon: '🛞',
+          label: 'F1大百科：タイヤ解説を開く',
+        });
+      } else if (sub === 'circuits') {
+        const circ = parts[2];
+        actions.push({
+          type: 'library_circuits',
+          icon: '🏁',
+          label: 'F1大百科：コース解説を見る',
+          circuitId: circ,
+        });
+      } else if (sub === 'regulations') {
+        actions.push({
+          type: 'library_regulations',
+          icon: '📜',
+          label: 'F1大百科：規定・ルールを読む',
+        });
+      } else if (sub === 'glossary') {
+        const termId = parts[2];
+        actions.push({
+          type: 'library_glossary',
+          icon: '🧠',
+          label: termId ? `F1用語辞典：「${termId}」を開く` : 'F1大百科：用語辞典で調べる',
+          termId,
+        });
+      } else if (sub === 'drama') {
+        actions.push({
+          type: 'library_drama',
+          icon: '🎬',
+          label: 'F1大百科：因縁ドラマを読む',
+        });
+      }
+    } else if (category === 'quiz') {
+      actions.push({
+        type: 'quiz',
+        icon: '🏆',
+        label: 'F1クイズ検定に挑戦する',
+      });
+    }
+  }
+
+  const cleanContent = content.replace(/\[NAV:[^\]]+\]/g, '').trimEnd();
+  return { cleanContent, actions };
 }
 
 interface StrategistMessage {
@@ -42,6 +161,7 @@ interface AIStrategistProps {
   session?: Session | null;
   onAddToNotebook: (content: string, source: 'ai') => void;
   onRequireAuth?: () => void;
+  onNavigate?: (action: NavAction) => void;
 }
 
 // ── Quick prompts ──────────────────────────────────────────────────────────────
@@ -76,13 +196,74 @@ export default function AIStrategist({
   session,
   onAddToNotebook,
   onRequireAuth,
+  onNavigate,
 }: AIStrategistProps) {
   const { data: authSession } = useSession();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const saved = localStorage.getItem('f1_ai_chat_messages_v1');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed.map((m: any) => ({ ...m, isStreaming: false }));
+        }
+      }
+    } catch (_) {}
+    return [];
+  });
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [modelChoice, setModelChoice] = useState<'flash' | 'pro'>('flash');
   const [speakingMsgId, setSpeakingMsgId] = useState<string | null>(null);
+
+  // Gemini API Key management (localStorage with fallback to prop)
+  const [apiKey, setApiKey] = useState<string>('');
+  const [tempApiKey, setTempApiKey] = useState<string>('');
+  const [showKeyModal, setShowKeyModal] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('f1_gemini_api_key') || geminiApiKey || '';
+      setApiKey(stored);
+      setTempApiKey(stored);
+    } catch (_) {
+      setApiKey(geminiApiKey || '');
+      setTempApiKey(geminiApiKey || '');
+    }
+  }, [geminiApiKey]);
+
+  // Persist chat messages across unmount, tab switches, and page reloads
+  useEffect(() => {
+    if (isStreaming) return;
+    try {
+      if (messages.length > 0) {
+        localStorage.setItem('f1_ai_chat_messages_v1', JSON.stringify(messages));
+      }
+    } catch (_) {}
+  }, [messages, isStreaming]);
+
+  const handleSaveApiKey = () => {
+    const trimmed = tempApiKey.trim();
+    setApiKey(trimmed);
+    try {
+      if (trimmed) {
+        localStorage.setItem('f1_gemini_api_key', trimmed);
+      } else {
+        localStorage.removeItem('f1_gemini_api_key');
+      }
+    } catch (_) {}
+    setShowKeyModal(false);
+  };
+
+  const handleClearApiKey = () => {
+    setApiKey('');
+    setTempApiKey('');
+    try {
+      localStorage.removeItem('f1_gemini_api_key');
+    } catch (_) {}
+    setShowKeyModal(false);
+  };
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -137,7 +318,8 @@ export default function AIStrategist({
 
     try {
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (geminiApiKey) headers['x-gemini-key'] = geminiApiKey;
+      const effectiveKey = apiKey || geminiApiKey;
+      if (effectiveKey) headers['x-gemini-key'] = effectiveKey;
 
       const res = await fetch('/api/strategist', {
         method: 'POST',
@@ -187,7 +369,7 @@ export default function AIStrategist({
       setIsStreaming(false);
       inputRef.current?.focus();
     }
-  }, [isStreaming, messages, geminiApiKey, getContext, modelChoice, authSession, onRequireAuth]);
+  }, [isStreaming, messages, geminiApiKey, apiKey, getContext, modelChoice, authSession, onRequireAuth]);
 
   const handleStop = () => {
     abortRef.current?.abort();
@@ -200,6 +382,9 @@ export default function AIStrategist({
     setMessages([]);
     setIsStreaming(false);
     setInput('');
+    try {
+      localStorage.removeItem('f1_ai_chat_messages_v1');
+    } catch (_) {}
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -222,7 +407,22 @@ export default function AIStrategist({
           <h3 className="text-xs font-racing font-bold text-white tracking-widest border-l-2 border-f1-red pl-2 uppercase">
             AI STRATEGIST
           </h3>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setTempApiKey(apiKey);
+                setShowKeyModal(true);
+              }}
+              title={apiKey ? 'Gemini APIキー設定済み（クリックで変更）' : 'APIキー設定（現在デモAIモード稼働中・クリックで設定）'}
+              className={`text-[11px] px-2 py-1 rounded border flex items-center gap-1 transition-all cursor-pointer ${
+                apiKey
+                  ? 'border-emerald-500/50 bg-emerald-950/40 text-emerald-300 hover:bg-emerald-950/70'
+                  : 'border-white/10 bg-slate-800/80 text-slate-400 hover:text-slate-200 hover:border-white/20'
+              }`}
+            >
+              <span>{apiKey ? '🟢 🔑 設定済' : '🔑 キー設定'}</span>
+            </button>
             <select
               value={modelChoice}
               onChange={e => setModelChoice(e.target.value as 'flash' | 'pro')}
@@ -316,6 +516,7 @@ export default function AIStrategist({
                 }
               }}
               onAddToNotebook={content => onAddToNotebook(content, 'ai')}
+              onNavigate={onNavigate}
             />
           ))
         )}
@@ -355,6 +556,103 @@ export default function AIStrategist({
         </div>
         <p className="text-xs text-slate-700 mt-1">Enter: 送信 ／ Shift+Enter: 改行</p>
       </div>
+
+      {/* ── API Key Settings Modal ── */}
+      {showKeyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
+          <div className="bg-slate-900 border border-white/15 rounded-2xl p-5 max-w-md w-full shadow-2xl space-y-4 text-slate-200">
+            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+              <h3 className="font-racing font-bold text-sm text-white flex items-center gap-2">
+                <span>🔑</span>
+                <span>Gemini API キー設定</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowKeyModal(false)}
+                className="text-slate-400 hover:text-white text-lg px-1.5 py-0.5 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-2 text-xs text-slate-300">
+              <p>
+                Google Gemini APIキーを設定すると、Google AI StudioのGemini 2.5 / 3.5モデルと直接通信して、より高度で自由なレース戦略推論が可能になります。
+              </p>
+              <div className="p-2.5 rounded-xl bg-slate-800/80 border border-white/10 text-[11px] space-y-1">
+                <div className="flex items-center gap-1.5 font-bold">
+                  {apiKey ? (
+                    <span className="text-emerald-400">🟢 APIキー設定済み（Gemini実機通信）</span>
+                  ) : (
+                    <span className="text-amber-400">🟡 デモAIモード稼働中（APIキー不要）</span>
+                  )}
+                </div>
+                <p className="text-slate-400 leading-relaxed">
+                  ※APIキーが未設定でも、内蔵の「F1デモストラテジストAI」がシミュレーション回答と画面連動アクション（テレメトリー分析インスペクター等）を完全提供します。
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="block text-[11px] font-medium text-slate-300">
+                Gemini API Key (AIzaSy...)
+              </label>
+              <input
+                type="password"
+                value={tempApiKey}
+                onChange={e => setTempApiKey(e.target.value)}
+                placeholder="AIzaSy..."
+                className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-sky-500 transition-colors font-mono"
+              />
+              <p className="text-[10px] text-slate-500">
+                キーはお使いのブラウザのlocalStorageにのみ安全に保存され、第三者サーバーには保存されません。
+              </p>
+            </div>
+
+            <div className="pt-1 text-right">
+              <a
+                href="https://aistudio.google.com/app/apikey"
+                target="_blank"
+                rel="noreferrer"
+                className="text-[11px] text-sky-400 hover:text-sky-300 underline inline-flex items-center gap-1"
+              >
+                <span>Google AI Studioで無料のAPIキーを取得 (Google公式)</span>
+                <span>↗</span>
+              </a>
+            </div>
+
+            <div className="flex items-center justify-between pt-2 border-t border-white/10">
+              {apiKey ? (
+                <button
+                  type="button"
+                  onClick={handleClearApiKey}
+                  className="px-3 py-1.5 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs transition-colors cursor-pointer"
+                >
+                  キーを削除（デモに戻す）
+                </button>
+              ) : (
+                <div />
+              )}
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowKeyModal(false)}
+                  className="px-3 py-1.5 rounded-xl border border-white/10 hover:bg-white/5 text-slate-400 hover:text-slate-200 text-xs transition-colors cursor-pointer"
+                >
+                  キャンセル
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveApiKey}
+                  className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+                >
+                  保存する
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -366,33 +664,60 @@ function MessageBubble({
   isSpeaking = false,
   onToggleRadio,
   onAddToNotebook,
+  onNavigate,
 }: {
   message: ChatMessage;
   isSpeaking?: boolean;
   onToggleRadio?: () => void;
   onAddToNotebook: (content: string) => void;
+  onNavigate?: (action: NavAction) => void;
 }) {
   const isUser = message.role === 'user';
 
+  const { cleanContent, actions } = useMemo(() => {
+    if (isUser || !message.content) {
+      return { cleanContent: message.content, actions: [] };
+    }
+    return parseNavActions(message.content);
+  }, [isUser, message.content]);
+
   return (
-    <div className={`flex flex-col gap-1 ${isUser ? 'items-end' : 'items-start'}`}>
+    <div className={`flex flex-col gap-1.5 ${isUser ? 'items-end' : 'items-start'}`}>
       <div
-        className={`max-w-[90%] text-xs leading-relaxed whitespace-pre-wrap rounded-2xl px-3 py-2 ${
+        className={`max-w-[92%] text-xs leading-relaxed whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 shadow-sm ${
           isUser
-            ? 'bg-blue-600/85 text-white rounded-br-sm'
-            : 'bg-slate-700/70 text-slate-200 rounded-bl-sm border border-white/8'
+            ? 'bg-blue-600/90 text-white rounded-br-sm'
+            : 'bg-slate-800/85 text-slate-200 rounded-bl-sm border border-white/10'
         }`}
       >
-        {message.isStreaming && !message.content
+        {message.isStreaming && !cleanContent
           ? <ThinkingDots />
-          : message.content}
-        {message.isStreaming && message.content && (
+          : cleanContent}
+        {message.isStreaming && cleanContent && (
           <span className="inline-block w-1.5 h-3.5 bg-blue-400 ml-0.5 animate-pulse rounded-sm align-text-bottom" />
         )}
       </div>
 
+      {/* Interactive Navigation Action Chips (Direct App Jumps) */}
+      {!isUser && !message.isStreaming && actions.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 max-w-[92%] px-1 mt-0.5">
+          {actions.map((act: NavAction, idx: number) => (
+            <button
+              key={idx}
+              type="button"
+              onClick={() => onNavigate?.(act)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-950/90 via-indigo-950/80 to-blue-900/70 hover:from-blue-900 hover:to-indigo-850 border border-blue-400/40 hover:border-blue-300 text-blue-200 hover:text-white text-xs font-racing font-bold shadow-md transition-all cursor-pointer group active:scale-95"
+            >
+              <span className="text-sm group-hover:scale-110 transition-transform">{act.icon}</span>
+              <span>{act.label}</span>
+              <span className="text-[11px] text-blue-400 group-hover:translate-x-0.5 transition-transform">➔</span>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* AI message actions */}
-      {!isUser && !message.isStreaming && message.content && (
+      {!isUser && !message.isStreaming && cleanContent && (
         <div className="flex items-center gap-2 px-1 mt-0.5">
           {onToggleRadio && (
             <button
@@ -410,14 +735,14 @@ function MessageBubble({
             </button>
           )}
           <button
-            onClick={() => onAddToNotebook(message.content)}
-            className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+            onClick={() => onAddToNotebook(cleanContent)}
+            className="text-xs text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
           >
             📝 ノートに追加
           </button>
           <button
-            onClick={() => navigator.clipboard.writeText(message.content)}
-            className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+            onClick={() => navigator.clipboard.writeText(cleanContent)}
+            className="text-xs text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
           >
             コピー
           </button>

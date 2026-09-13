@@ -1,0 +1,371 @@
+{
+  "version": "news-snapshot-2026-09-12-1789229551902",
+  "timestamp": "2026-09-12T16:12:31.902Z",
+  "createdAt": "2026/9/13 1:12:31",
+  "articlesCount": 14,
+  "articles": [
+    {
+      "id": "rss-0-1789229551820",
+      "title": "F1 2026 qualifying head-to-head: Spanish GP",
+      "summary": "After every Formula 1 qualifying session, Motorsport.com publishes each team's qualifying record in terms of team-mate battles.This record is based exclusively on qualifying results so that grid penalties don't alter ...",
+      "link": "https://www.motorsport.com/f1/news/f1-2026-qualifying-head-to-head-spanish-gp/10855013/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-12T15:24:21.000Z",
+      "category": "RACE",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+      "topics": [
+        "PU"
+      ],
+      "teams": [],
+      "drivers": []
+    },
+    {
+      "id": "rss-1-1789229551820",
+      "title": "F1 Spanish GP: Lando Norris takes stunning pole at Madring",
+      "summary": "Reigning world champion Lando Norris claimed his third pole of the season at Formula 1's Spanish Grand Prix, beating series leader Kimi Antonelli on F1's first-ever visit to the Madring circuit.With a last-ditch effor...",
+      "link": "https://www.motorsport.com/f1/news/f1-spanish-gp-10854999/10854999/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-12T15:04:40.000Z",
+      "category": "RACE",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [
+        {
+          "name": "McLaren",
+          "color": "#fb923c",
+          "bgColor": "rgba(251, 146, 60, 0.15)",
+          "borderColor": "rgba(251, 146, 60, 0.4)"
+        },
+        {
+          "name": "Mercedes",
+          "color": "#2dd4bf",
+          "bgColor": "rgba(45, 212, 191, 0.15)",
+          "borderColor": "rgba(45, 212, 191, 0.4)"
+        }
+      ],
+      "drivers": [
+        "NOR",
+        "ANT"
+      ]
+    },
+    {
+      "id": "rss-2-1789229551821",
+      "title": "Kimi Antonelli \"should be in a Ferrari\" after Monza win, says Guenther Steiner",
+      "summary": "Former Haas Formula 1 team principal Guenther Steiner believes Mercedes driver and current championship leader Kimi Antonelli \"should be in a Ferrari\" following his impressive win at the Italian Grand Prix.Antonelli s...",
+      "link": "https://www.motorsport.com/f1/news/kimi-antonelli-should-be-in-a-ferrari-after-monza-win-says-guenther-steiner/10854948/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-12T12:35:27.000Z",
+      "category": "TECHNICAL",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-blue-500/20 text-blue-300 border-blue-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [
+        {
+          "name": "Ferrari",
+          "color": "#f87171",
+          "bgColor": "rgba(248, 113, 113, 0.15)",
+          "borderColor": "rgba(248, 113, 113, 0.4)"
+        },
+        {
+          "name": "Mercedes",
+          "color": "#2dd4bf",
+          "bgColor": "rgba(45, 212, 191, 0.15)",
+          "borderColor": "rgba(45, 212, 191, 0.4)"
+        },
+        {
+          "name": "Haas",
+          "color": "#e2e8f0",
+          "bgColor": "rgba(226, 232, 240, 0.15)",
+          "borderColor": "rgba(226, 232, 240, 0.4)"
+        }
+      ],
+      "drivers": [
+        "ANT"
+      ]
+    },
+    {
+      "id": "rss-3-1789229551821",
+      "title": "Anthony Davidson warns young drivers not to follow Lewis Hamilton's Madrid FP3 example",
+      "summary": "Former Formula 1 driver and Sky Sports analyst Anthony Davidson has argued that Lewis Hamilton set a bad example for junior drivers during the third practice session in Madrid.Hamilton crashed at the final corner duri...",
+      "link": "https://www.motorsport.com/f1/news/anthony-davidson-warns-lewis-hamilton-set-poor-example-for-young-drivers-in-madrid-fp3-incident/10854936/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-12T12:09:29.000Z",
+      "category": "PADDOCK",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [
+        {
+          "name": "Ferrari",
+          "color": "#f87171",
+          "bgColor": "rgba(248, 113, 113, 0.15)",
+          "borderColor": "rgba(248, 113, 113, 0.4)"
+        }
+      ],
+      "drivers": [
+        "HAM"
+      ]
+    },
+    {
+      "id": "rss-4-1789229551821",
+      "title": "F1 Spanish GP: Kimi Antonelli tops red-flagged FP3 following Lewis Hamilton, Oliver Bearman crashes",
+      "summary": "Championship leader Kimi Antonelli heads into qualifying at the Spanish Grand Prix's challenging Madring circuit with the fastest time, following a final Formula 1 practice session marred by two crashes.Antonelli fend...",
+      "link": "https://www.motorsport.com/f1/news/f1-spanish-gp-fp3-report/10854919/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-12T12:02:07.000Z",
+      "category": "TECHNICAL",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-blue-500/20 text-blue-300 border-blue-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [
+        {
+          "name": "Ferrari",
+          "color": "#f87171",
+          "bgColor": "rgba(248, 113, 113, 0.15)",
+          "borderColor": "rgba(248, 113, 113, 0.4)"
+        },
+        {
+          "name": "Mercedes",
+          "color": "#2dd4bf",
+          "bgColor": "rgba(45, 212, 191, 0.15)",
+          "borderColor": "rgba(45, 212, 191, 0.4)"
+        },
+        {
+          "name": "Haas",
+          "color": "#e2e8f0",
+          "bgColor": "rgba(226, 232, 240, 0.15)",
+          "borderColor": "rgba(226, 232, 240, 0.4)"
+        }
+      ],
+      "drivers": [
+        "HAM",
+        "BEA",
+        "ANT"
+      ]
+    },
+    {
+      "id": "rss-5-1789229551821",
+      "title": "Lewis Hamilton under fire after ignoring Ferrari calls to stop damaged car in Madrid FP3",
+      "summary": "Seven-time Formula 1 champion Lewis Hamilton has come under fire from fans after ignoring orders to stop his damaged Ferrari during the third free practice session in Madrid.The Ferrari driver's session ended abruptly...",
+      "link": "https://www.motorsport.com/f1/news/lewis-hamilton-under-fire-after-ignoring-ferrari-calls-to-stop-damaged-car-in-madrid-fp3/10854917/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-12T11:46:20.000Z",
+      "category": "PADDOCK",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [
+        {
+          "name": "Ferrari",
+          "color": "#f87171",
+          "bgColor": "rgba(248, 113, 113, 0.15)",
+          "borderColor": "rgba(248, 113, 113, 0.4)"
+        }
+      ],
+      "drivers": [
+        "HAM"
+      ]
+    },
+    {
+      "id": "rss-6-1789229551821",
+      "title": "Charles Leclerc: Madrid qualifying to be \"one of the most challenging\" in F1 2026",
+      "summary": "Charles Leclerc reckons qualifying at this weekend’s Spanish Grand Prix will be “one of the most challenging” of the 2026 Formula 1 season as drivers adapt to the new Madrid circuit.The Madring has replaced Barcelona ...",
+      "link": "https://www.motorsport.com/f1/news/charles-leclerc-madrid-qualifying-to-be-one-of-the-most-challenging-in-f1-2026/10854841/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-12T09:30:07.000Z",
+      "category": "PADDOCK",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [
+        {
+          "name": "Ferrari",
+          "color": "#f87171",
+          "bgColor": "rgba(248, 113, 113, 0.15)",
+          "borderColor": "rgba(248, 113, 113, 0.4)"
+        }
+      ],
+      "drivers": [
+        "LEC"
+      ]
+    },
+    {
+      "id": "rss-7-1789229551821",
+      "title": "Full throttle or not? Some F1 teams got the simulations for Madrid's toughest corner wrong",
+      "summary": "The latest addition to the Formula 1 calendar had already sparked plenty of discussion in the paddock before the weekend. Most of the conversations centred on safety and whether the track around the IFEMA complex woul...",
+      "link": "https://www.motorsport.com/f1/news/full-throttle-or-not-why-pirelli-calls-madrids-la-monumental-f1s-toughest-corner/10854838/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-12T09:28:23.000Z",
+      "category": "PADDOCK",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [],
+      "drivers": []
+    },
+    {
+      "id": "rss-8-1789229551822",
+      "title": "Pain in Spain goes mainly down the drain, explains Permane",
+      "summary": "Racing Bulls boss Alan Permane hailed his team's Friday efforts at the Spanish Grand Prix as an \"excellent day\", despite Arvid Lindblad's Turn 13 crash in FP2 bringing an early end to his running.The VCARB 03 has alre...",
+      "link": "https://www.motorsport.com/f1/news/pain-in-spain-goes-mainly-down-the-drain-explains-permane/10854817/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-12T08:41:40.000Z",
+      "category": "PADDOCK",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+      "topics": [
+        "Strategy"
+      ],
+      "teams": [
+        {
+          "name": "RB",
+          "color": "#60a5fa",
+          "bgColor": "rgba(96, 165, 250, 0.15)",
+          "borderColor": "rgba(96, 165, 250, 0.4)"
+        }
+      ],
+      "drivers": []
+    },
+    {
+      "id": "rss-9-1789229551822",
+      "title": "How Monza revealed the true picture – Max Verstappen responds to FIA's surprising ADUO verdict",
+      "summary": "After the race weekend in Zandvoort, the FIA finally publicly confirmed what had already been known in the paddock since the Monaco weekend: every manufacturer has been awarded a token under Formula 1’s Additional Dev...",
+      "link": "https://www.motorsport.com/f1/news/how-monza-revealed-the-true-picture-max-verstappen-responds-to-fias-surprising-aduo-verdict/10854603/?utm_source=RSS&amp;utm_medium=referral&amp;utm_campaign=RSS-F1&amp;utm_term=News&amp;utm_content=www",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-12T07:17:36.000Z",
+      "category": "FIA",
+      "authorityLevel": "FIA_OFFICIAL",
+      "badgeColor": "bg-amber-500/20 text-amber-300 border-amber-500/30",
+      "topics": [
+        "PU",
+        "FIA"
+      ],
+      "teams": [
+        {
+          "name": "Red Bull",
+          "color": "#38bdf8",
+          "bgColor": "rgba(56, 189, 248, 0.15)",
+          "borderColor": "rgba(56, 189, 248, 0.4)"
+        }
+      ],
+      "drivers": [
+        "VER"
+      ]
+    },
+    {
+      "id": "fb-3",
+      "title": "マクラーレン、ノリスとピアストリのタイトル争いを支える新型Hウィングを公開",
+      "summary": "高速サーキットでの直線スピードとDRS効率を両立させる新型リヤウィングを投入。低ドラッグ特性によりトップスピード向上を狙う。",
+      "link": "https://www.motorsport.com/f1/news/mclaren-rear-wing-update/",
+      "source": "Motorsport.com Live",
+      "pubDate": "2026-09-12T11:12:31.812Z",
+      "category": "TECHNICAL",
+      "authorityLevel": "CONSTRUCTOR_OFFICIAL",
+      "badgeColor": "bg-orange-500/20 text-orange-300 border-orange-500/30",
+      "topics": [
+        "Aero"
+      ],
+      "teams": [
+        {
+          "name": "McLaren",
+          "color": "#fb923c",
+          "bgColor": "rgba(251, 146, 60, 0.15)",
+          "borderColor": "rgba(251, 146, 60, 0.4)"
+        }
+      ],
+      "drivers": [
+        "NOR",
+        "PIA"
+      ]
+    },
+    {
+      "id": "fb-4",
+      "title": "パドック速報：アウディワークス参戦準備と2026年PU開発ベンチマークの最新情報",
+      "summary": "ヒュルケンベルグとボルトレートを擁するザウバー/アウディ陣営が、ノイブルク開発拠点での新規定50:50ハイブリッドPU単体テストで高効率回生数値を記録。",
+      "link": "https://www.formula1.com/en/latest/article.audi-2026-update.html",
+      "source": "Paddock Insider",
+      "pubDate": "2026-09-12T09:12:31.812Z",
+      "category": "PADDOCK",
+      "authorityLevel": "PADDOCK_INTEL",
+      "badgeColor": "bg-purple-500/20 text-purple-300 border-purple-500/30",
+      "topics": [
+        "Contract",
+        "PU"
+      ],
+      "teams": [
+        {
+          "name": "Audi",
+          "color": "#e0001a",
+          "bgColor": "rgba(224, 0, 26, 0.15)",
+          "borderColor": "rgba(224, 0, 26, 0.4)"
+        },
+        {
+          "name": "Aston Martin",
+          "color": "#34d399",
+          "bgColor": "rgba(52, 211, 153, 0.15)",
+          "borderColor": "rgba(52, 211, 153, 0.4)"
+        }
+      ],
+      "drivers": [
+        "HUL",
+        "BOR",
+        "ALO"
+      ]
+    },
+    {
+      "id": "fb-5",
+      "title": "FIA世界モータースポーツ評議会：2026年アクティブ空力詳細規則を正式承認。X/Zモード規定が確定",
+      "summary": "フロントおよびリアの連動フラップ機構、MGU-K 350kW出力特性、およびMOMオーバーテイク規定の詳細付則が批准。",
+      "link": "https://www.fia.com/news/fia-formula-1-regulations-2026",
+      "source": "FIA World Motor Sport Council",
+      "pubDate": "2026-09-12T06:12:31.812Z",
+      "category": "FIA",
+      "authorityLevel": "FIA_OFFICIAL",
+      "badgeColor": "bg-amber-500/20 text-amber-300 border-amber-500/30",
+      "topics": [
+        "FIA",
+        "Aero",
+        "PU"
+      ],
+      "teams": [],
+      "drivers": []
+    },
+    {
+      "id": "fb-6",
+      "title": "決勝レース戦略展望：路面温度の低下とアンダーカット威力が鍵を握る2ストップ戦",
+      "summary": "ナイトセッションでのトラックエボリューション（路面グリップ向上）を考慮し、ピレリ推奨のソフトからハードへの乗り換えタイミングが勝敗の分岐点に。国内公式中継FODにて完全生解説。",
+      "link": "https://www.formula1.com/en/latest/article.strategy-guide.html",
+      "source": "FOD / フジテレビNEXT 中継解説デスク",
+      "pubDate": "2026-09-12T00:12:31.812Z",
+      "category": "RACE",
+      "authorityLevel": "BROADCAST_PRIMARY",
+      "badgeColor": "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+      "topics": [
+        "Strategy",
+        "Tyre"
+      ],
+      "teams": [],
+      "drivers": [
+        "VER",
+        "NOR",
+        "LEC"
+      ]
+    }
+  ]
+}

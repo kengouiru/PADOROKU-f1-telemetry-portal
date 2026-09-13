@@ -9,6 +9,31 @@
 
 export type GlossaryCategory = 'car' | 'tyre' | 'strategy' | 'race' | 'rule' | 'engineering';
 
+export type GlossaryVisualType =
+  | 'undercut'
+  | 'overcut'
+  | 'drs'
+  | 'slipstream'
+  | 'dirty-air'
+  | 'porpoising'
+  | 'degradation'
+  | 'parc-ferme'
+  | 'telemetry'
+  | 'apex'
+  | 'default';
+
+export interface InAppLink {
+  label: string;
+  icon: string;
+  action: {
+    appMode?: 'season' | 'library';
+    hub?: 'season' | 'telemetry' | 'news' | 'knowledge' | 'notes';
+    subTab?: 'drivers' | 'teams' | 'circuits' | 'tyres' | 'glossary' | 'drama' | 'regulations';
+    section?: string;
+    circuitId?: string;
+  };
+}
+
 export interface GlossaryTerm {
   id: string;
   term: string;
@@ -20,6 +45,8 @@ export interface GlossaryTerm {
   description: string;
   realExample: string;
   relatedTerms?: string[];
+  visualType?: GlossaryVisualType;
+  inAppLinks?: InAppLink[];
 }
 
 export const GLOSSARY_TERMS: GlossaryTerm[] = [
@@ -35,6 +62,19 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     description: 'DRS検知ポイントで前走車と1秒未満の差にいる場合、指定されたDRSゾーン内でステアリングのボタンを押してフラップを開放できます。空気抵抗（ドラッグ）が急減し、ストレートでのオーバーテイクを強力に支援します。',
     realExample: '「フェルスタッペンがDRSゾーンに入りました！リアウィングが開いて一気に真横に並びかける！」',
     relatedTerms: ['オーバーテイク', 'スリップストリーム', 'ダウンフォース'],
+    visualType: 'drs',
+    inAppLinks: [
+      {
+        label: 'F1大百科：コース解説で各サーキットのDRSゾーンを見る',
+        icon: '🏁',
+        action: { appMode: 'library', hub: 'knowledge', subTab: 'circuits' },
+      },
+      {
+        label: 'テレメトリーで最高速とストレートの伸びを比較する',
+        icon: '🏎️',
+        action: { appMode: 'season', hub: 'telemetry' },
+      },
+    ],
   },
   {
     id: 'ground-effect',
@@ -61,6 +101,46 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     relatedTerms: ['モノコック', 'コックピット'],
   },
   {
+    id: 'slipstream',
+    term: 'スリップストリーム (トゥ / 牽引効果)',
+    englishTerm: 'Slipstream / Tow',
+    category: 'car',
+    categoryLabel: '🏎️ マシン',
+    level: 1,
+    summary: '高速走行する前走車の真後ろにできる低気圧の空気の穴に入り、空気抵抗を減らして急加速する走法。',
+    description: '前を走るマシンが空気を切り裂くことで、真後ろに気圧の低い空間（スリップストリーム）が発生します。ここに飛び込むと空気抵抗が激減し、同じエンジン出力でも最高速が時速10〜15km/h伸びてオーバーテイクが容易になります。予選でチームメイト同士が引っ張り合う「トウ」の駆け引きも有名です。',
+    realExample: '「モンツァのストレートで完璧なスリップストリームに入った！一気にスリップから抜け出してオーバーテイク！」',
+    relatedTerms: ['DRS', 'ダーティエア', 'オーバーテイク'],
+    visualType: 'slipstream',
+    inAppLinks: [
+      {
+        label: 'テレメトリーで最高速とストレート加速差を確認する',
+        icon: '🏎️',
+        action: { appMode: 'season', hub: 'telemetry' },
+      },
+    ],
+  },
+  {
+    id: 'dirty-air',
+    term: 'ダーティエア (乱気流)',
+    englishTerm: 'Dirty Air (Turbulence)',
+    category: 'car',
+    categoryLabel: '🏎️ マシン',
+    level: 1,
+    summary: '前を走るマシンが後方にまき散らす激しい乱気流。後続車のダウンフォースを最大30%奪い、タイヤを痛める。',
+    description: 'F1マシンは強力なダウンフォースを生む代償として、後方に激しくかき乱された空気の渦（ダーティエア）を吐き出します。真後ろを走るマシンはフロントウイングに綺麗な空気が当たらずダウンフォースを喪失。コーナリングで滑るためタイヤが異常加熱し、接近走行が困難になります。',
+    realExample: '「無線: ダーティエアが酷くてフロントタイヤの温度が上がりすぎている。少し車間を空ける。」',
+    relatedTerms: ['スリップストリーム', 'グラウンド・エフェクト', 'ダウンフォース'],
+    visualType: 'dirty-air',
+    inAppLinks: [
+      {
+        label: 'F1大百科：空力レギュレーション（接近戦改善ルール）を読む',
+        icon: '📜',
+        action: { appMode: 'library', hub: 'knowledge', subTab: 'regulations' },
+      },
+    ],
+  },
+  {
     id: 'porpoising',
     term: 'ポーパシング / バウンシング',
     englishTerm: 'Porpoising / Bouncing',
@@ -71,6 +151,14 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     description: '高速走行時に床下の負圧で車高が下がりすぎると、フロアと地面の隙間が塞がれて突如気流が剥離（失速）します。ダウンフォースが消えて車高が浮き、再び気流が通って下がる...という上下運動が時速300km/hで連続して発生します。イルカ（Porpoise）の泳ぐ姿に似ていることから命名されました。',
     realExample: '「2022年アゼルバイジャンGPでハミルトンが激しい腰痛を訴えた最大の原因。」',
     relatedTerms: ['グラウンド・エフェクト', 'ダウンフォース'],
+    visualType: 'porpoising',
+    inAppLinks: [
+      {
+        label: 'F1大百科：空力レギュレーション解説を読む',
+        icon: '📜',
+        action: { appMode: 'library', hub: 'knowledge', subTab: 'regulations' },
+      },
+    ],
   },
 
   // ── タイヤ関連 (TYRE) ──
@@ -85,6 +173,19 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     description: '単にゴムが薄くなる物理的摩耗だけでなく、連続高負荷による熱ダレ（サーマル・デグラデーション）も含みます。デグラデーションが大きいサーキットでは、ピットストップ回数（2ストップ作戦）が増える傾向にあります。',
     realExample: '「マクラーレンはデグラデーションが極めて小さく、終盤までハイペースを維持しています。」',
     relatedTerms: ['ザ・クリフ', 'グレイニング', 'ブリスタリング'],
+    visualType: 'degradation',
+    inAppLinks: [
+      {
+        label: '全ドライバーのタイヤ履歴・スティント推移を見る',
+        icon: '📊',
+        action: { appMode: 'season', hub: 'telemetry', section: 'stints' },
+      },
+      {
+        label: 'F1大百科：タイヤ解説（熱劣化メカニズム）を開く',
+        icon: '🛞',
+        action: { appMode: 'library', hub: 'knowledge', subTab: 'tyres' },
+      },
+    ],
   },
   {
     id: 'the-cliff',
@@ -97,6 +198,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     description: 'トレッドゴムが極端に薄くなると熱を保持できず、急激にオーバーヒートしてゴムが死にます。崖に落ちる前にピットインするのがレース戦略の絶対鉄則です。',
     realExample: '「無線: タイヤが完全にクリフを迎えた！今すぐピットに入れてくれ！」',
     relatedTerms: ['デグラデーション', 'アンダーカット'],
+    visualType: 'degradation',
   },
   {
     id: 'graining',
@@ -109,6 +211,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     description: 'ゴムの内部骨格が温まる前に激しくプッシュすると、ゴムが路面追従できずにちぎれます。一時的にグリップが落ちますが、数周ステアリング操作を優しくして走るとカスが剥がれ落ちて回復する（クリーンアップ）特徴があります。',
     realExample: '「フロントに軽いグレイニングが出ていますが、数周我慢すればペースは戻る見込みです。」',
     relatedTerms: ['ブリスタリング', 'デグラデーション'],
+    visualType: 'degradation',
   },
   {
     id: 'blistering',
@@ -121,6 +224,7 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     description: '猛暑の路面や過度のホイールスピンが原因。ゴム内部の揮発成分が気化して内部から爆発するため、一度発生すると二度と自己修復せず、放置するとバーストにつながるため即時ピット交換が必要です。',
     realExample: '「リアタイヤに巨大なブリスターが発生！緊急ピットインです！」',
     relatedTerms: ['グレイニング', 'バースト'],
+    visualType: 'degradation',
   },
 
   // ── 戦略関連 (STRATEGY) ──
@@ -135,6 +239,29 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     description: '相手が摩耗した古タイヤで走っている間に、こちらは新品タイヤの圧倒的グリップで全開走行。相手が翌周ピットに入った際、ピット出口で鼻先を押さえて順位を奪い取ります。',
     realExample: '「フェルスタッペンが先にピットイン！アンダーカットを狙って猛烈にプッシュしています！」',
     relatedTerms: ['オーバーカット', 'アウトラップ', 'ピットウィンドウ'],
+    visualType: 'undercut',
+    inAppLinks: [
+      {
+        label: 'ピット戦略＆アンダーカットシミュレーターで試す',
+        icon: '⛽',
+        action: { appMode: 'season', hub: 'telemetry', section: 'pit-sim' },
+      },
+      {
+        label: '全ドライバーのタイヤ履歴・スティント推移を見る',
+        icon: '🛞',
+        action: { appMode: 'season', hub: 'telemetry', section: 'stints' },
+      },
+      {
+        label: 'F1大百科：タイヤ解説（C1〜C5コンパウンド特性）を開く',
+        icon: '📖',
+        action: { appMode: 'library', hub: 'knowledge', subTab: 'tyres' },
+      },
+      {
+        label: 'テレメトリー画面でアウトラップのペース差を確認する',
+        icon: '🏎️',
+        action: { appMode: 'season', hub: 'telemetry' },
+      },
+    ],
   },
   {
     id: 'overcut',
@@ -147,6 +274,19 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     description: '新品タイヤが温まるのに時間がかかるサーキットや、タイヤがタレないコース（モナコなど）で有効。相手がアウトラップで冷えたタイヤに苦戦している隙に、クリアエアで全開アタックしてタイム差を築きます。',
     realExample: '「ペレスがモナコでステイアウトを選択。前が空いたモナコでオーバーカットを成功させました！」',
     relatedTerms: ['アンダーカット', 'クリアエア'],
+    visualType: 'overcut',
+    inAppLinks: [
+      {
+        label: 'ピット戦略シミュレーターで試す',
+        icon: '⛽',
+        action: { appMode: 'season', hub: 'telemetry', section: 'pit-sim' },
+      },
+      {
+        label: 'F1大百科：コース解説（モナコ市街地コース）を見る',
+        icon: '🏁',
+        action: { appMode: 'library', hub: 'knowledge', subTab: 'circuits', circuitId: 'circuit-de-monaco' },
+      },
+    ],
   },
   {
     id: 'cheap-pit',
@@ -223,6 +363,14 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     description: 'フランス語で「閉ざされた公園」。予選専用の過激なセッティングでタイムを出し、決勝前にまるごとレース用に戻すような不正を防ぐため、サスペンションや空力ウィングの変更が封印されます。違反するとピットレーンスタートのペナルティが科されます。',
     realExample: '「パルクフェルメ解除後にセットアップを変更したため、ラッセルはピットレーンスタートとなります。」',
     relatedTerms: ['スクルティニアリング', 'ペナルティ'],
+    visualType: 'parc-ferme',
+    inAppLinks: [
+      {
+        label: 'F1大百科：FIA公式規定・ペナルティ基準を読む',
+        icon: '📜',
+        action: { appMode: 'library', hub: 'knowledge', subTab: 'regulations' },
+      },
+    ],
   },
   {
     id: 'track-limits',
@@ -235,6 +383,13 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     description: '白線から4輪全てが完全にはみ出た瞬間、その周のラップタイムは抹消されます。決勝レース中に4回違反すると「5秒タイムペナルティ」が科されます。オーストリアGPなどでは毎戦多数の違反が発生します。',
     realExample: '「ターン10でトラックリミット違反！ノリスの予選アタックタイムが抹消されました！」',
     relatedTerms: ['ペナルティ', '縁石'],
+    inAppLinks: [
+      {
+        label: 'F1大百科：規定・ペナルティガイドを読む',
+        icon: '📜',
+        action: { appMode: 'library', hub: 'knowledge', subTab: 'regulations' },
+      },
+    ],
   },
   {
     id: 'safety-car',
@@ -247,6 +402,13 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     description: '実車のセーフティカー（AMG GTやアストンマーティン）が入ると全車が隊列を組んで追い越し禁止になります。VSC（バーチャル・セーフティカー）は先導車を出さず、ステアリング上のデルタタイムに従って全車が一律に約40%減速する電子規制です。',
     realExample: '「コース上にデブリが散乱したため、バーチャル・セーフティカーが発動されました。」',
     relatedTerms: ['チープ・ピットストップ', '黄旗'],
+    inAppLinks: [
+      {
+        label: 'ピット戦略シミュレーターでSC時の逆転を試す',
+        icon: '⛽',
+        action: { appMode: 'season', hub: 'telemetry', section: 'pit-sim' },
+      },
+    ],
   },
   {
     id: 'blue-flag',
@@ -297,5 +459,106 @@ export const GLOSSARY_TERMS: GlossaryTerm[] = [
     description: 'F1マシンには300個以上のセンサーが埋め込まれており、1秒あたり数万件のデータがピットウォールおよび英国・イタリア等の本拠地ファクトリーへ送られます。ドライバーのドライビングスタイルの違いやマシントラブルの予兆が一瞬で判明します。',
     realExample: '「テレメトリーデータを見ると、ハミルトンの方がターン3で10メートル奥までブレーキを我慢しています。」',
     relatedTerms: ['スロットル開度', 'ブレーキ圧', 'タイヤ温度'],
+    visualType: 'telemetry',
+    inAppLinks: [
+      {
+        label: 'テレメトリー分析画面を開く',
+        icon: '🏎️',
+        action: { appMode: 'season', hub: 'telemetry' },
+      },
+    ],
+  },
+  {
+    id: 'apex',
+    term: 'エイペックス (クリッピングポイント)',
+    englishTerm: 'Apex / Clipping Point',
+    category: 'engineering',
+    categoryLabel: '🔧 工学',
+    level: 1,
+    summary: 'コーナー旋回中、マシンのラインが最もイン側（縁石）に最接近する頂点地点。',
+    description: 'エイペックスは幾何学的中心だけでなく、脱出速度を最大化するために意図的に奥に取る「レイト・エイペックス」走法などがあります。エイペックスでの車速（ボトムスピード）とステアリングの舵角がテレメトリー比較の核心となります。',
+    realExample: '「ターン4のエイペックスを完璧に捉えた！素早くステアリングを戻してフルスロットルへ移ります！」',
+    relatedTerms: ['ボトムスピード', 'トレイルブレーキング', 'テレメトリー'],
+    visualType: 'apex',
+    inAppLinks: [
+      {
+        label: 'テレメトリーでエイペックス付近の速度差を確認する',
+        icon: '🏎️',
+        action: { appMode: 'season', hub: 'telemetry' },
+      },
+    ],
+  },
+  {
+    id: 'bottom-speed',
+    term: 'ボトムスピード (最低コーナリング車速)',
+    englishTerm: 'Minimum Cornering Speed',
+    category: 'engineering',
+    categoryLabel: '🔧 工学',
+    level: 2,
+    summary: 'コーナー旋回中に最も車速が落ちた瞬間の数値。マシンのメカニカルグリップと回頭性の指標。',
+    description: '減速を終えて加速に移る転換点のスピード。ボトムスピードが高すぎるとアンダーステアで立ち上がりが遅れ、低すぎると純粋にタイムを失います。フェルスタッペンやハミルトンはボトムスピードの高さと立ち上がり加速の両立が世界屈指です。',
+    realExample: '「テレメトリーを見ると、マクラーレンは中速コーナーのボトムスピードがレッドブルより時速4km高い状態です。」',
+    relatedTerms: ['エイペックス', 'トレイルブレーキング', 'テレメトリー'],
+    visualType: 'apex',
+    inAppLinks: [
+      {
+        label: 'テレメトリーグラフでボトムスピードの谷を比較する',
+        icon: '📈',
+        action: { appMode: 'season', hub: 'telemetry' },
+      },
+    ],
+  },
+  {
+    id: 'trail-braking',
+    term: 'トレイルブレーキング (荷重移動走法)',
+    englishTerm: 'Trail Braking',
+    category: 'engineering',
+    categoryLabel: '🔧 工学',
+    level: 3,
+    summary: '直線で100%フルブレーキングした後、コーナー進入時にステアリングを切りながら徐々にブレーキを緩める高等走法。',
+    description: 'ステアリングを切り込む際にあえてフロントタイヤに荷重を残すことで、フロントのグリップを限界まで引き出し回頭性を高めます。テレメトリーのブレーキグラフが綺麗な滑り台のような下降カーブを描くのが特徴です。',
+    realExample: '「ノリスはターン1へのトレイルブレーキングが非常に深く、ノーズの入りがシャープです。」',
+    relatedTerms: ['ボトムスピード', 'エイペックス', 'テレメトリー'],
+    visualType: 'telemetry',
+    inAppLinks: [
+      {
+        label: 'テレメトリーでブレーキ踏み込み＆リリース波形を比較する',
+        icon: '📈',
+        action: { appMode: 'season', hub: 'telemetry' },
+      },
+    ],
+  },
+  {
+    id: 'delta-time',
+    term: 'デルタタイム (タイム差 / タイム差波形)',
+    englishTerm: 'Delta Time (Time Delta)',
+    category: 'engineering',
+    categoryLabel: '🔧 工学',
+    level: 1,
+    summary: 'ライバル車や自己ベストラップとの区間ごとの時間差（+0.15秒など）をミリ秒単位で追跡した波形データ。',
+    description: 'テレメトリーチャートの最下段に表示される累積時間差。波形が上に向かうと相手がタイムを稼いでおり、下に向かうと自分が引き離していることを示します。どのコーナー進入、旋回、直線で勝敗が分かれたかが一目で分かります。',
+    realExample: '「セクター2の出口でデルタがマイナス0.2秒まで縮まりました！激しいタイム削り合いです！」',
+    relatedTerms: ['テレメトリー', 'ボトムスピード'],
+    visualType: 'telemetry',
+    inAppLinks: [
+      {
+        label: '詳細テレメトリー画面でデルタタイム波形を確認する',
+        icon: '📈',
+        action: { appMode: 'season', hub: 'telemetry' },
+      },
+    ],
+  },
+  {
+    id: 'downforce',
+    term: 'ダウンフォース (下向きの空気力)',
+    englishTerm: 'Aerodynamic Downforce',
+    category: 'car',
+    categoryLabel: '🏎️ マシン',
+    level: 1,
+    summary: '車体を地面に強烈に押し付け、時速250km超での驚異的なコーナリンググリップを生み出す空気の力。',
+    description: '前後ウイングやフロア（床下）の気流差によって発生。車重を重くすることなくタイヤへの荷重を増やせるため、コーナリング限界が跳ね上がります。時速200km以上ではマシンの重量以上のダウンフォースが発生し、理論上はトンネルの天井を逆さまに走行可能です。',
+    realExample: '「ハイダウンフォース仕様のモナコでは、最高速を犠牲にしてでもコーナーのグリップを最優先します。」',
+    relatedTerms: ['グラウンド・エフェクト', 'DRS', 'ダーティエア'],
+    visualType: 'porpoising',
   },
 ];

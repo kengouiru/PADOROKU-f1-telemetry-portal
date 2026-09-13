@@ -26,9 +26,12 @@ import TyreEncyclopediaHub from './TyreEncyclopediaHub';
 import F1DramaHub from './F1DramaHub';
 import F1GlossaryHub from './F1GlossaryHub';
 import F1RegulationsHub from './F1RegulationsHub';
+import RulesGlossaryHub from './RulesGlossaryHub';
+import DataSourceVerificationModal from './DataSourceVerificationModal';
 import { useUserPreferences } from '@/lib/userPreferences';
+import { type InAppLink } from '@/data/f1GlossaryData';
 
-export type SubTab = 'drivers' | 'teams' | 'circuits' | 'tyres' | 'glossary' | 'drama' | 'regulations' | 'strategy' | 'history';
+export type SubTab = 'drivers' | 'teams' | 'circuits' | 'tyres' | 'rules' | 'glossary' | 'drama' | 'regulations' | 'strategy' | 'history';
 
 export interface KnowledgeHistoryHubProps {
   onNavigateToTelemetry?: (target?: TelemetryTarget) => void;
@@ -37,6 +40,8 @@ export interface KnowledgeHistoryHubProps {
   onSubTabChange?: (tab: SubTab) => void;
   targetCircuitId?: string;
   initialDramaTab?: 'storylines' | 'moments' | 'rivalries' | 'paddock' | 'radios';
+  initialGlossaryTermId?: string | null;
+  onNavigateToApp?: (action: InAppLink['action']) => void;
 }
 
 /** Individual Team Radio Audio Player with Play/Pause and Seek Bar */
@@ -163,6 +168,8 @@ export default function KnowledgeHistoryHub({
   onSubTabChange,
   targetCircuitId,
   initialDramaTab,
+  initialGlossaryTermId,
+  onNavigateToApp,
 }: KnowledgeHistoryHubProps) {
   const [internalSubTab, setInternalSubTab] = useState<SubTab>(initialSubTab);
   const activeSubTab = controlledSubTab ?? internalSubTab;
@@ -175,6 +182,7 @@ export default function KnowledgeHistoryHub({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedTeamDetail, setSelectedTeamDetail] = useState<TeamProfile | null>(null);
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
 
   // Jump to Reference list & highlight target reference
   const handleCitationClick = (cardId: string, refId: number) => {
@@ -270,6 +278,28 @@ export default function KnowledgeHistoryHub({
 
   return (
     <div className="flex flex-col gap-5 max-w-6xl mx-auto pb-8 sm:pb-2">
+      {/* Official Data Source & Generation Backup Header Strip */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-slate-900 to-sky-950/40 border border-emerald-500/20 text-xs">
+        <div className="flex items-center gap-2">
+          <span className="text-base">🛡️</span>
+          <span className="text-[11px] text-slate-300 font-medium">
+            国内公式中継: <strong className="text-sky-300 font-normal">FOD / フジテレビNEXT</strong> ＆ FIA・FOM公式規則・実音源に100%準拠
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsVerificationModalOpen(true)}
+          className="px-3 py-1 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[11px] font-racing font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm hover:scale-[1.02]"
+        >
+          <span>出典明示 ＆ 世代バックアップ管理</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+        </button>
+      </div>
+
+      <DataSourceVerificationModal
+        isOpen={isVerificationModalOpen}
+        onClose={() => setIsVerificationModalOpen(false)}
+      />
 
       {/* Header Banner (Shown specifically for Teams, Strategy & History search) */}
       {(activeSubTab === 'teams' || activeSubTab === 'strategy' || activeSubTab === 'history') && (
@@ -315,11 +345,22 @@ export default function KnowledgeHistoryHub({
       {/* ── Sub-Tab: F1 DRAMA & STORYLINES ── */}
       {activeSubTab === 'drama' && <F1DramaHub initialTab={initialDramaTab} />}
 
-      {/* ── Sub-Tab: F1 GLOSSARY ── */}
-      {activeSubTab === 'glossary' && <F1GlossaryHub />}
-
-      {/* ── Sub-Tab: FIA REGULATIONS & RULES ── */}
-      {activeSubTab === 'regulations' && <F1RegulationsHub onNavigateToTab={(tab) => setActiveSubTab(tab as SubTab)} />}
+      {/* ── Sub-Tab: RULES & GLOSSARY (規定・用語集 統合ハブ) ── */}
+      {(activeSubTab === 'rules' || activeSubTab === 'glossary' || activeSubTab === 'regulations') && (
+        <RulesGlossaryHub
+          initialMode={activeSubTab === 'regulations' ? 'regulations' : 'glossary'}
+          initialGlossaryTermId={initialGlossaryTermId}
+          onNavigateToApp={onNavigateToApp}
+          onNavigateToTab={(tab) => {
+            if (tab === 'glossary' || tab === 'regulations' || tab === 'rules') {
+              setActiveSubTab('rules');
+            } else {
+              setActiveSubTab(tab as SubTab);
+            }
+          }}
+          onNavigateToTelemetry={onNavigateToTelemetry}
+        />
+      )}
 
       {/* ── Sub-Tab 1: TEAMS (Compact Grid + Detail Modal) ── */}
       {activeSubTab === 'teams' && (

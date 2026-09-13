@@ -1,0 +1,83 @@
+{
+  "radio_tsunoda_suzuka.mp3": {
+    "speaker": "Charles Leclerc",
+    "speakerCode": "LEC",
+    "year": 2023,
+    "gpName": "Monaco Grand Prix",
+    "transcriptEn": "As you can see, it's actually a lot more slidey than um, previous days.",
+    "transcriptJa": "見ての通り、実際、以前よりもずっと滑りやすいですね。",
+    "contextJa": "F1モナコGPのチームラジオで、フェラーリのシャルル・ルクレールが走行中の路面状況について報告している。彼は路面がこれまでの日よりも滑りやすいと述べており、特にモナコのようなストリートサーキットでは路面コンディションの変化がラップタイムや車の挙動に大きく影響するため、重要なフィードバックとなる。"
+  },
+  "radio_alonso_suzuka.mp3": {
+    "speaker": "Unknown",
+    "speakerCode": "XXX",
+    "year": 0,
+    "gpName": "",
+    "transcriptEn": "Can make a bit of space in 11. Just do some leaning on the tyre through 12.",
+    "transcriptJa": "",
+    "contextJa": ""
+  },
+  "radio_verstappen_suzuka.mp3": {
+    "speaker": "Race Engineer",
+    "speakerCode": "ENG",
+    "year": null,
+    "gpName": "Unknown",
+    "transcriptEn": "Okay, that's fine. Stay out.",
+    "transcriptJa": "大丈夫だ。このまま行け。",
+    "contextJa": "レースエンジニアがドライバーに、ピットインせずそのまま走行を続けるように指示している。"
+  },
+  "radio_norris_suzuka.mp3": {
+    "speaker": "Commentator",
+    "speakerCode": "COM",
+    "year": null,
+    "gpName": null,
+    "transcriptEn": "And Lando suggests consistent use of red button into turn 15 for tires.",
+    "transcriptJa": "そして、ランドはターン15でのタイヤのために、赤ボタンの一貫した使用を提案しています。",
+    "contextJa": "F1のステアリングホイールにある「赤ボタン」は、ERS（エネルギー回生システム）の展開（いわゆるオーバーテイクボタン）や、エンジンモードの切り替えなど、様々な機能に割り当てられることがあります。この音声では、ランド・ノリスが特定のコーナー（ターン15）でのタイヤマネジメントのために、この「赤ボタン」で操作する機能の一貫した使用を提案している状況を示しています。"
+  },
+  "radio_piastri_suzuka.mp3": {
+    "speaker": "Oscar Piastri",
+    "speakerCode": "PIA",
+    "year": 2023,
+    "gpName": "Unknown Grand Prix",
+    "transcriptEn": "Race Engineer: Oscar, what do you think about down two?\nOscar Piastri: Yeah. Happy with that.\nRace Engineer: Copy. Will box. We'll bring you back in the garage.",
+    "transcriptJa": "レースエンジニア: オスカー、ダウンツーについてどう思いますか？\nオスカー・ピアストリ: ええ、それで満足です。\nレースエンジニア: 了解。ピットインします。ガレージに戻します。",
+    "contextJa": "レースエンジニアがオスカー・ピアストリに、特定の設定（例: ダウンフォースの「ダウンツー」）またはコースの特定のセクション（例: ターン2に向かうセクション）についてのフィードバックを求めています。ピアストリはそれに満足していると伝え、エンジニアはピットインしてガレージに戻るよう指示しています。これは通常、セッションの終わりや予定された停車を示します。"
+  },
+  "radio_leclerc_suzuka.mp3": {
+    "speaker": "",
+    "speakerCode": "",
+    "year": 0,
+    "gpName": "",
+    "transcriptEn": "And box opposite McLaren, box opposite McLaren.",
+    "transcriptJa": "",
+    "contextJa": ""
+  },
+  "radio_hamilton_suzuka.mp3": {
+    "speaker": "Christian Horner",
+    "speakerCode": "RBR",
+    "year": 2023,
+    "gpName": "Unknown GP",
+    "transcriptEn": "I didn't hear by Perez.",
+    "transcriptJa": "ペレスからの情報が聞き取れなかった。",
+    "contextJa": "F1のレッドブル・レーシングのチーム代表であるクリスチャン・ホーナーによる無線音声です。ドライバーのセルジオ・ペレスからの無線連絡、または彼に関する情報が聞き取れなかったと述べています。「by Perez」は「ペレスからの」または「ペレスに関する」というニュアンスで解釈されます。"
+  },
+  "radio_sainz_singapore.mp3": {
+    "speaker": "Race Engineer",
+    "speakerCode": "ENG",
+    "year": 2023,
+    "gpName": "Italian Grand Prix",
+    "transcriptEn": "Russell, one second behind. If you keep the pack bunched up, he cannot do two stops. Russell cannot do two stops.",
+    "transcriptJa": "ラッセル、1秒差だ。もしパックを固めておけば、彼は2ストップはできない。ラッセルは2ストップはできないぞ。",
+    "contextJa": "レースエンジニアがジョージ・ラッセルに対し、後続のライバルとのギャップを管理し、集団をまとめることでライバルが2ストップ戦略を採るのを防ぐよう指示しています。同時に、ラッセル自身の戦略も2ストップではないことを伝えています。"
+  },
+  "radio_russell_suzuka.mp3": {
+    "speaker": "Race Engineer",
+    "speakerCode": "ENG",
+    "year": null,
+    "gpName": null,
+    "transcriptEn": "Please check fast gear and Sergeant. Still aggressive.",
+    "transcriptJa": "ファーストギアとサージェントを確認してください。まだアグレッシブです。",
+    "contextJa": "エンジニアがファーストギアの状態と、ドライバーのサージェントがまだアグレッシブな状態にあることを確認するよう指示しています。"
+  }
+}

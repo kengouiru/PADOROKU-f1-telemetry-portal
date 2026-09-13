@@ -56,6 +56,24 @@ export interface TelemetryInsight {
   }>;
 }
 
+
+export interface CornerTelemetryAnalysis {
+  cornerName: string;
+  distanceMeters: number;
+  distPercent: number;
+  gear: number;
+  d1BrakeStartM: number;
+  d1ApexSpeed: number;
+  d1ThrottlePickUpPct: number;
+  d2BrakeStartM: number;
+  d2ApexSpeed: number;
+  d2ThrottlePickUpPct: number;
+  apexSpeedDelta: number; // km/h (positive = D1 faster)
+  timeDeltaSeconds: number; // s (positive = D1 faster)
+  advantageDriver: string; // driver code
+  keyTacticalNote: string;
+}
+
 export interface TelemetryComparisonData {
   circuitName: string;
   circuitLengthM: number;
@@ -75,6 +93,7 @@ export interface TelemetryComparisonData {
   };
   points: NormalizedTelemetryPoint[];
   insights: TelemetryInsight;
+  cornerAnalyses: CornerTelemetryAnalysis[];
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -551,6 +570,38 @@ export function generateNormalizedTelemetry(
   const circuitProfile = KNOWLEDGE_CIRCUITS.find(c => c.id === circuitId);
   const circName = circuitProfile ? circuitProfile.name : 'バーレーン・インターナショナル・サーキット';
 
+
+  // Generate corner-by-corner apex and braking point telemetry matrix
+  const cornerAnalyses: CornerTelemetryAnalysis[] = corners.map((c) => {
+    const apexPoint = points.find((p) => Math.abs(p.distPercent - c.pctApex) < 1.2) || points[Math.min(points.length - 1, Math.round((c.pctApex / 100) * points.length))];
+    const exitPoint = points.find((p) => Math.abs(p.distPercent - c.pctExit) < 1.5) || points[Math.min(points.length - 1, Math.round((c.pctExit / 100) * points.length))];
+
+    const speed1 = apexPoint ? apexPoint.speed1 : c.speed;
+    const speed2 = apexPoint ? apexPoint.speed2 : c.speed - 2;
+    const apexDelta = speed1 - speed2;
+    const isD1Adv = apexDelta >= 0;
+    const timeDelta = Number((apexDelta * 0.014).toFixed(3));
+
+    return {
+      cornerName: c.name,
+      distanceMeters: Math.round((c.pctApex / 100) * trackLength),
+      distPercent: c.pctApex,
+      gear: c.gear,
+      d1BrakeStartM: Math.round((c.pctStart / 100) * trackLength),
+      d1ApexSpeed: speed1,
+      d1ThrottlePickUpPct: exitPoint ? exitPoint.throttle1 : 85,
+      d2BrakeStartM: Math.round((c.pctStart / 100) * trackLength) + (t1.brakingPointBias < t2.brakingPointBias ? 5 : -4),
+      d2ApexSpeed: speed2,
+      d2ThrottlePickUpPct: exitPoint ? exitPoint.throttle2 : 80,
+      apexSpeedDelta: apexDelta,
+      timeDeltaSeconds: timeDelta,
+      advantageDriver: isD1Adv ? driver1.code : driver2.code,
+      keyTacticalNote: isD1Adv
+        ? `${driver1.code} が深いトレイルブレーキングでボトム車速を +${Math.abs(apexDelta)}km/h 維持`
+        : `${driver2.code} がエイペックス手前で鋭く回頭させ、立ち上がりのフルスロットルを優先`,
+    };
+  });
+
   return {
     circuitName: circName,
     circuitLengthM: trackLength,
@@ -564,6 +615,7 @@ export function generateNormalizedTelemetry(
     },
     points,
     insights,
+    cornerAnalyses,
   };
 }
 

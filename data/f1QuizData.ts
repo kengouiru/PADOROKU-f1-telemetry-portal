@@ -9,7 +9,44 @@
 
 export type QuizDifficulty = 'beginner' | 'intermediate' | 'expert' | 'master';
 export type QuizCategory = 'rules' | 'history' | 'circuits' | 'racecraft';
-export type QuestionFormat = 'standard' | 'scenario' | 'rule_dilemma' | 'track_corner' | 'telemetry_tactics';
+export type QuestionFormat =
+  | 'standard'
+  | 'scenario'
+  | 'rule_dilemma'
+  | 'track_corner'
+  | 'telemetry_tactics'
+  | 'audio_radio'
+  | 'circuit_shape'
+  | 'driver_visual';
+
+export interface AudioSnippetInfo {
+  radioQuote: string;
+  speakerName?: string;
+  speakerCode?: string;
+  year?: number;
+  gpName?: string;
+  audioUrl?: string;
+  transcriptJa?: string;
+}
+
+export interface CircuitVisualInfo {
+  circuitId: string;
+  svgMapUrl: string;
+  circuitNameJa: string;
+  cornerName?: string;
+}
+
+export interface DriverVisualInfo {
+  imagePath: string;
+  driverNameJa: string;
+  teamName?: string;
+}
+
+export interface SourceAttributionInfo {
+  title: string;
+  archiveNote?: string;
+  url?: string;
+}
 
 export interface QuizQuestion {
   id: string;
@@ -24,7 +61,23 @@ export interface QuizQuestion {
   explanation: string;
   funFact?: string;
   linkSubTab?: string;
+  audioSnippet?: AudioSnippetInfo;
+  circuitVisual?: CircuitVisualInfo;
+  driverVisual?: DriverVisualInfo;
+  sourceAttribution?: SourceAttributionInfo;
 }
+
+export const QUIZ_FORMAT_CONFIG: Record<
+  'all' | 'audio_radio' | 'circuit_shape' | 'driver_visual' | 'rule_dilemma' | 'standard',
+  { label: string; icon: string; description: string }
+> = {
+  all: { label: 'すべて', icon: '🌐', description: '全フォーマットからバランスよく出題' },
+  audio_radio: { label: '🎙️ 音声無線', icon: '🎙️', description: '無線通信音を聞いて当てるブラインドテスト' },
+  circuit_shape: { label: '🏁 コース形状', icon: '🏁', description: 'SVGシルエットやコーナーから当てる視覚クイズ' },
+  driver_visual: { label: '👤 顔写真', icon: '👤', description: '顔写真・ポートレートから当てるビジュアルクイズ' },
+  rule_dilemma: { label: '⚖️ 規則・事件', icon: '⚖️', description: '歴史的審議事件とFIA国際競技規則条項' },
+  standard: { label: '🏎️ 戦術・知識', icon: '🏎️', description: 'テレメトリー・タイヤ戦略・F1基本知識' },
+};
 
 export const QUIZ_DIFFICULTY_CONFIG: Record<
   QuizDifficulty,
@@ -2371,4 +2424,987 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     "funFact": "これを利用してライバルがステイアウトしている間にVSC下でピットインを成功させることを「VSCチープストップ（Cheap Stop）」と呼び、レース展開を一瞬でひっくり返します。",
     "linkSubTab": "tyres"
   }
+,
+{
+  "id": "radio-b-1",
+  "difficulty": "beginner",
+  "category": "racecraft",
+  "format": "audio_radio",
+  "categoryLabel": "🎙️ 公式実音源クイズ",
+  "formatLabel": "📻 実況無線アーカイブ",
+  "question": "【公式FOM実況実音源・無線戦略クイズ】流れる本物のチーム無線をお聞きください。「Russell, one second behind. If you keep the pack bunched up, he cannot do two stops...（ラッセルは1秒後方。集団を団子状態にしておけば、彼は2ストップ作戦を採れない）」と指示を受け、後続のノリスに意図的にDRSを与え続けてラッセルの猛追を封じ込め、フェラーリに劇的勝利をもたらしたドライバーは誰？",
+  "options": [
+    "カルロス・サインツ (スクーデリア・フェラーリ)",
+    "シャルル・ルクレール (スクーデリア・フェラーリ)",
+    "ランド・ノリス (マクラーレン)",
+    "ジョージ・ラッセル (メルセデスAMG)"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「カルロス・サインツ (2023年 シンガポールGP)」です！レース終盤、タイヤ交換で猛烈に追い上げるメルセデス勢（ラッセル＆ハミルトン）に対し、首位サインツはペースを敢えて落として2位ノリスを1秒以内のDRS圏内にキープ。「DRSトレイン」を形成してノリスを守りつつ自身の防壁とする天才的チェス戦略で見事ポール・トゥ・ウィンを飾りました。",
+  "funFact": "サインツ自身がレース後に「意図的にペースをコントロールし、ランドにDRSを供給し続けた」と明かした、現代F1の戦術史に残るマスターピースです。",
+  "linkSubTab": "drama",
+  "audioSnippet": {
+    "audioUrl": "/audio/radio/radio_sainz_singapore.mp3",
+    "radioQuote": "Russell, one second behind. If you keep the pack bunched up, he cannot do two stops. Russell cannot do two stops.",
+    "transcriptJa": "ラッセルは1秒後方だ。集団を団子状態に詰まらせておけば、彼は2ストップ作戦を採ることはできない。ラッセルは2ストップできないぞ。",
+    "speakerName": "リカルド・アダミ (サインツ担当エンジニア)",
+    "speakerCode": "SAI",
+    "year": 2023,
+    "gpName": "シンガポールGP"
+  },
+  "sourceAttribution": {
+    "title": "2023 F1シンガポールGP 公式チーム無線実音源アーカイブ",
+    "archiveNote": "FOD / フジテレビNEXT 中継アーカイブ & FOM公式ライブタイミング記録"
+  }
+},
+{
+  "id": "radio-b-2",
+  "difficulty": "beginner",
+  "category": "racecraft",
+  "format": "audio_radio",
+  "categoryLabel": "🎙️ 公式実音源クイズ",
+  "formatLabel": "📻 実況無線アーカイブ",
+  "question": "【公式FOM実況実音源・戦術用語クイズ】流れる本物のピット無線をお聞きください。エンジニアから「And box opposite McLaren, box opposite McLaren」と指示が入りました。F1のピット戦略における定番指示「Box opposite [ライバルチーム名]」が意味する戦術行動として正しいものはどれ？",
+  "options": [
+    "指定チーム（マクラーレン）と「逆の行動」をとれ（相手がピットに入ればステイアウト、相手がコースに残ればピットイン）",
+    "マクラーレンの直後について同時にピットインせよ",
+    "マクラーレンのガレージの反対側（ファストレーン側）に停車せよ",
+    "マクラーレンとは異なるタイヤコンパウンドを装着せよ"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「指定チームと逆の行動をとれ」です！ピットレーン入口直前でライバルの動きを見て、相手が入ればコースに留まり（オーバーカット狙い）、相手が入らなければ自車がピットに飛び込む（アンダーカット狙い）という、ピットストップタイミングを敢えてずらすためのF1の王道タクティクス指示です。",
+  "funFact": "この指示はピット入口の直前（最終コーナー付近）でコールされることが多く、ドライバーはコンマ数秒の判断でピットレーンに飛び込むかステイアウトするかを決断します。",
+  "linkSubTab": "pitstops",
+  "audioSnippet": {
+    "audioUrl": "/audio/radio/radio_leclerc_suzuka.mp3",
+    "radioQuote": "And box opposite McLaren, box opposite McLaren.",
+    "transcriptJa": "そしてマクラーレンと逆の行動をとれ。マクラーレンと逆だ。",
+    "speakerName": "レースエンジニア",
+    "speakerCode": "ENG",
+    "year": 2024,
+    "gpName": "日本GP (鈴鹿)"
+  },
+  "sourceAttribution": {
+    "title": "2024 F1日本GP 公式ピットウォール通信記録",
+    "archiveNote": "FOD / フジテレビNEXT 中継アーカイブ & FOM公式ライブタイミング記録"
+  }
+},
+{
+  "id": "radio-b-3",
+  "difficulty": "beginner",
+  "category": "racecraft",
+  "format": "audio_radio",
+  "categoryLabel": "🎙️ 公式実音源クイズ",
+  "formatLabel": "📻 実況無線アーカイブ",
+  "question": "【公式FOM実況実音源・ピット無線クイズ】流れる本物のチーム無線をお聞きください。冷静沈着なトーンで「Okay, that's fine. Stay out.（了解、問題ない。そのままステイアウトしろ）」とドライバーに指示を出している、マックス・フェルスタッペンとの絶妙な掛け合いと信頼関係で知られるレッドブル・レーシングの名物チーフ・レースエンジニアは誰？",
+  "options": [
+    "ジャンピエロ・ランビアーゼ (通称GP)",
+    "ピーター・ボニントン (通称ボノ)",
+    "リカルド・アダミ",
+    "ヒュー・バード"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解はレッドブルの「ジャンピエロ・ランビアーゼ（Gianpiero Lambiase、通称GP）」です！フェルスタッペンが2016年にレッドブルに昇格して以来一貫して担当し、過酷なレース展開でも決して動じず冷静な指示を飛ばす姿は、まさに現代F1最強のドライバー＆エンジニアコンビの象徴です。",
+  "funFact": "フェルスタッペンは「もしGPが引退したり辞めたりするなら、僕もF1を辞める」と公言するほど、GPに対して絶対的な信頼を寄せています。",
+  "linkSubTab": "drama",
+  "audioSnippet": {
+    "audioUrl": "/audio/radio/radio_verstappen_suzuka.mp3",
+    "radioQuote": "Okay, that's fine. Stay out.",
+    "transcriptJa": "了解、問題ない。そのままコースにステイアウトしろ。",
+    "speakerName": "ジャンピエロ・ランビアーゼ (GP)",
+    "speakerCode": "VER",
+    "year": 2024,
+    "gpName": "日本GP (鈴鹿)"
+  },
+  "sourceAttribution": {
+    "title": "2024 F1日本GP レッドブル・レーシング公式チーム無線",
+    "archiveNote": "FOD / フジテレビNEXT 中継アーカイブ & FOM公式ライブタイミング記録"
+  }
+},
+{
+  "id": "radio-i-1",
+  "difficulty": "intermediate",
+  "category": "racecraft",
+  "format": "audio_radio",
+  "categoryLabel": "🎙️ 公式実音源クイズ",
+  "formatLabel": "📻 実況無線アーカイブ",
+  "question": "【公式FOM実況実音源・ピットセッティング無線】流れるMcLarenの本物ピット無線をお聞きください。エンジニアから「Oscar, what do you think about down two?（オスカー、ダウン2はどうだ？）」と聞かれ、ピアストリが「Yeah. Happy with that.」と答えています。この「down two（ダウン2）」が意味するピット作業時のメカニカル調整はどれ？",
+  "options": [
+    "フロントウイングのフラップ角度を2クリック（2段階）寝かせる（フロント荷重を抜いてアンダー気味に振る）",
+    "エンジン出力をモード2まで下げて燃料をセーブする",
+    "タイヤ空気圧（内圧）を前後ともに2psi下げる",
+    "ブレーキバイアスをフロントからリアへ2%移行する"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「フロントウイングのフラップ角度を2段階寝かせる（ダウンフォース減）」です！F1のピット作業では専用のトルクレンチでフロントウイングのネジを回し、左右のフラップ角度を「Down two / Up two」などと微調整します。ドライバーのフィードバックに合わせて前後のグリップバランス（オーバーステア/アンダーステア）を即座に補正する重要なピット作業です。",
+  "funFact": "鈴鹿のような高速S字区間があるサーキットでは、ウイング角度がわずか1クリック違うだけでマシンの回頭性とリアの安定性が劇的に変化します。",
+  "linkSubTab": "aero",
+  "audioSnippet": {
+    "audioUrl": "/audio/radio/radio_piastri_suzuka.mp3",
+    "radioQuote": "Engineer: Oscar, what do you think about down two?\nOscar Piastri: Yeah. Happy with that.\nEngineer: Copy. Will box. We'll bring you back in the garage.",
+    "transcriptJa": "エンジニア: オスカー、フロントウイングをダウン2（2クリック下げ）にするのはどうだ？\nピアストリ: ええ、それでいいです。満足です。\nエンジニア: 了解。ピットインしろ。ガレージに戻す。",
+    "speakerName": "オスカー・ピアストリ ＆ エンジニア",
+    "speakerCode": "PIA",
+    "year": 2024,
+    "gpName": "日本GP (鈴鹿)"
+  },
+  "sourceAttribution": {
+    "title": "2024 F1日本GP マクラーレン公式チーム無線",
+    "archiveNote": "FOD / フジテレビNEXT 中継アーカイブ & FOM公式ライブタイミング記録"
+  }
+},
+{
+  "id": "radio-i-2",
+  "difficulty": "intermediate",
+  "category": "racecraft",
+  "format": "audio_radio",
+  "categoryLabel": "🎙️ 公式実音源クイズ",
+  "formatLabel": "📻 実況無線アーカイブ",
+  "question": "【公式FOM実況実音源・ステアリング操作無線】流れるピット無線音声をお聞きください。「Lando suggests consistent use of red button into turn 15 for tires（ランドはタイヤのためにターン15で赤ボタンを一貫して使うことを提案している）」と言及されています。現代F1のステアリング上に配置される「赤ボタン（Red Button / OTボタン）」が持つ最も代表的な機能は何？",
+  "options": [
+    "オーバーテイクボタン（ERSバッテリーの最大120kW出力を瞬時に解放するデプロイメント）",
+    "ピットリミッター（ピットレーン走行時の80km/h速度制限）",
+    "無線ミュートボタン（ピットとの音声通信を完全に遮断する）",
+    "ドリンクポンプボタン（ヘルメット内の給水チューブを作動させる）"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「オーバーテイクボタン（ERS最大出力展開）」です！ステアリング背面や側面に備わる目立つ赤色のボタンは、通常プッシュ・トゥ・パス（オーバーテイクモード）に設定されており、押している間バッテリーの最大出力をフル放出し、コーナー立ち上がりやストレートでの加速を最大化します。",
+  "funFact": "鈴鹿のターン15（130R）の立ち上がりでERSパワーを効率的に使うことで、タイヤのトラクション負荷を低減しつつメインストレートへの車速を伸ばすことができます。",
+  "linkSubTab": "energy",
+  "audioSnippet": {
+    "audioUrl": "/audio/radio/radio_norris_suzuka.mp3",
+    "radioQuote": "And Lando suggests consistent use of red button into turn 15 for tires.",
+    "transcriptJa": "ランドはタイヤマネジメントのために、ターン15で赤ボタン（オーバーテイク/エネルギー展開）を一貫して使用することを提案しています。",
+    "speakerName": "マクラーレン・ピットウォール通信",
+    "speakerCode": "NOR",
+    "year": 2024,
+    "gpName": "日本GP (鈴鹿 130R)"
+  },
+  "sourceAttribution": {
+    "title": "2024 F1日本GP マクラーレン公式チーム無線",
+    "archiveNote": "FOD / フジテレビNEXT 中継アーカイブ & FOM公式ライブタイミング記録"
+  }
+},
+{
+  "id": "radio-i-3",
+  "difficulty": "intermediate",
+  "category": "racecraft",
+  "format": "audio_radio",
+  "categoryLabel": "🎙️ 公式実音源クイズ",
+  "formatLabel": "📻 実況無線アーカイブ",
+  "question": "【公式FOM実況実音源・ドライバー無線テスト】流れる本物のドライバー交信音声をお聞きください。「As you can see, it's actually a lot more slidey than previous days.（見ての通り、前の日よりもずっと滑りやすいよ）」と独特の落ち着いたアクセントで路面のグリップ低下をエンジニアへ詳細に報告している、フェラーリのエースドライバーは誰？",
+  "options": [
+    "シャルル・ルクレール (スクーデリア・フェラーリ)",
+    "カルロス・サインツ (スクーデリア・フェラーリ)",
+    "ピエール・ガスリー (アルピーヌ)",
+    "角田裕毅 (レーシング・ブルズ)"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「シャルル・ルクレール」です！コースの路面コンディション（ラバーの乗り具合や路面温度によるグリップ変化）を的確に言語化し、セットアップや走行ラインの変更に活かすフィードバック能力の高さが伺える本物の無線通信です。",
+  "funFact": "F1ドライバーは走行中、ステアリングを通じて手のひらに伝わる微細な振動やスリップアングルから路面の摩擦係数を感知し、即座にピットへ報告します。",
+  "linkSubTab": "tyres",
+  "audioSnippet": {
+    "audioUrl": "/audio/radio/radio_tsunoda_suzuka.mp3",
+    "radioQuote": "As you can see, it's actually a lot more slidey than um, previous days.",
+    "transcriptJa": "見ての通り、実際、前日よりもずっとマシンがスライドして滑りやすい状態だね。",
+    "speakerName": "シャルル・ルクレール",
+    "speakerCode": "LEC",
+    "year": 2024,
+    "gpName": "日本GP (鈴鹿)"
+  },
+  "sourceAttribution": {
+    "title": "2024 F1日本GP フェラーリ公式チーム無線",
+    "archiveNote": "FOD / フジテレビNEXT 中継アーカイブ & FOM公式ライブタイミング記録"
+  }
+},
+{
+  "id": "radio-e-1",
+  "difficulty": "expert",
+  "category": "racecraft",
+  "format": "audio_radio",
+  "categoryLabel": "🎙️ 公式実音源クイズ",
+  "formatLabel": "📻 実況無線アーカイブ",
+  "question": "【公式FOM実況実音源・タイヤ内圧＆熱入れ指示】流れる本物のエンジニア無線をお聞きください。「Can make a bit of space in 11. Just do some leaning on the tyre through 12.（ターン11で少しスペースを空けろ。ターン12でタイヤに荷重をしっかりかけていけ）」と指示が入っています。「leaning on the tyre（タイヤに荷重をかける）」という指示がセッション中に行われる主目的は何？",
+  "options": [
+    "高速コーナリングでタイヤのショルダー部に横G荷重をかけ、タイヤ表面とコア（深部）の温度を均一に作動温度領域（ワーキングレンジ）まで引き上げるため",
+    "トレッド表面の左右偏摩耗を削り落としてフラットスポットを消すため",
+    "タイヤ内圧を意図的に下げて空気漏れセンサーの校正を行うため",
+    "縁石に勢いよく乗り上げてサスペンションのストローク限界を計測するため"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「横G荷重をかけてタイヤ表面とコア温度を作動温度域まで均一に引き上げるため」です！ピラニアのように激しいF1のタイヤ管理では、単なる蛇行（ウィービング）では表面温度しか上がらず、高速コーナーでマシンを「もたれかけさせる（leaning）」ことでタイヤの深部（カーカス/コア）まで熱を入れ、アタックラップの1コーナーから最大のメカニカルグリップを引き出します。",
+  "funFact": "鈴鹿のターン12（200R・スプーンカーブの手前）は強烈な横Gがかかるため、アタック前のタイヤ内圧・温度コントロールに最適なセクターとされています。",
+  "linkSubTab": "tyres",
+  "audioSnippet": {
+    "audioUrl": "/audio/radio/radio_alonso_suzuka.mp3",
+    "radioQuote": "Can make a bit of space in 11. Just do some leaning on the tyre through 12.",
+    "transcriptJa": "ターン11で前とのスペースを少し空けていい。ターン12でタイヤにしっかり横荷重をかけて熱を入れていけ。",
+    "speakerName": "アストンマーティン・レースエンジニア",
+    "speakerCode": "ENG",
+    "year": 2024,
+    "gpName": "日本GP (鈴鹿 200R)"
+  },
+  "sourceAttribution": {
+    "title": "2024 F1日本GP アストンマーティン公式チーム無線",
+    "archiveNote": "FOD / フジテレビNEXT 中継アーカイブ & FOM公式ライブタイミング記録"
+  }
+},
+{
+  "id": "radio-e-2",
+  "difficulty": "expert",
+  "category": "history",
+  "format": "audio_radio",
+  "categoryLabel": "🎙️ 公式実音源クイズ",
+  "formatLabel": "📻 実況無線アーカイブ",
+  "question": "【公式FOM実況実音源・チーム代表無線】流れる本物のピットウォール通信音声をお聞きください。ピットウォールのインターコムから「I didn't hear by Perez」と明瞭なイギリス英語で指示・確認を行っている、レッドブル・レーシングのチーム代表（Team Principal）は誰？",
+  "options": [
+    "クリスチャン・ホーナー (レッドブル・レーシング)",
+    "トト・ヴォルフ (メルセデスAMG F1)",
+    "フレデリック・バスール (スクーデリア・フェラーリ)",
+    "アンドレア・ステラ (マクラーレン)"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解はレッドブル・レーシングの「クリスチャン・ホーナー（Christian Horner）」代表です！2005年のチーム創設以来、長年にわたりピットウォールの司令塔として君臨し、数々のコンストラクターズ王座とドライバーズ王座を獲得した百戦錬磨のチーム代表です。",
+  "funFact": "ホーナー代表のチーム無線コールは、ピットウォール中央のコンソールからダイレクトにレースエンジニアやFIAレースディレクターへ通達されます。",
+  "linkSubTab": "drama",
+  "audioSnippet": {
+    "audioUrl": "/audio/radio/radio_hamilton_suzuka.mp3",
+    "radioQuote": "I didn't hear by Perez.",
+    "transcriptJa": "ペレス側からの無線が聞き取れなかった。",
+    "speakerName": "クリスチャン・ホーナー (レッドブル代表)",
+    "speakerCode": "HOR",
+    "year": 2024,
+    "gpName": "日本GP (鈴鹿)"
+  },
+  "sourceAttribution": {
+    "title": "2024 F1日本GP レッドブル・レーシング公式チーム代表無線",
+    "archiveNote": "FOD / フジテレビNEXT 中継アーカイブ & FOM公式ライブタイミング記録"
+  }
+},
+{
+  "id": "radio-m-1",
+  "difficulty": "master",
+  "category": "rules",
+  "format": "audio_radio",
+  "categoryLabel": "🎙️ 公式実音源クイズ",
+  "formatLabel": "📻 実況無線アーカイブ",
+  "question": "【公式FOM実況実音源・FIAデータ通信システム】流れる本物のピット無線をお聞きください。「Please check fast gear and Sargeant. Still aggressive.」とエンジニアが指示を出しています。F1レース中にピットウォールがドライバーへ「他車のアグレッシブ度やシフトギア・挙動」を瞬時にリアルタイム警告できるのは、FIAのレギュレーションによって全チーム・全車に搭載が義務付けられている何のシステムがあるから？",
+  "options": [
+    "FIA公式リアルタイム・テレメトリー＆GPSトラッキングシステム（全車の位置・車速・ギア・加速度データがレースコントロールおよび全チームにミリ秒単位で共有される）",
+    "各ドライバーのヘルメットに取り付けられた脳波・脈拍センサー",
+    "ピットレーンに配置された各チームの専任望遠スパイカメラ",
+    "サーキット上空を旋回する偵察用小型ドローン中継"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「FIA公式リアルタイム・テレメトリー＆GPSトラッキングシステム」です！現代F1ではFIA指定の標準ECU（TAG 320）およびGPSトランスポンダーにより、全20台の車速、スロットル、ギア、コース上の絶対座標、タイヤ状態がリアルタイムで暗号化通信され、各チームの戦略エンジニアがライバルのペースやセクタータイム、ピットウインドウをミリ秒単位で解析しています。",
+  "funFact": "このデータ共有システムはOpenF1や公式F1 TV Proのテレメトリーデータソースの根幹でもあり、現代F1のデータ革命を支える基盤技術です。",
+  "linkSubTab": "telemetry",
+  "audioSnippet": {
+    "audioUrl": "/audio/radio/radio_russell_suzuka.mp3",
+    "radioQuote": "Please check fast gear and Sargeant. Still aggressive.",
+    "transcriptJa": "高速ギアとサージェントの動向を確認してくれ。彼はまだ非常にアグレッシブだ。",
+    "speakerName": "メルセデス・レースエンジニア",
+    "speakerCode": "ENG",
+    "year": 2024,
+    "gpName": "日本GP (鈴鹿)"
+  },
+  "sourceAttribution": {
+    "title": "2024 F1日本GP メルセデスAMG公式チーム無線",
+    "archiveNote": "FOD / フジテレビNEXT 中継アーカイブ & FOM公式ライブタイミング記録"
+  }
+},
+{
+  "id": "track-shape-suzuka",
+  "difficulty": "beginner",
+  "category": "circuits",
+  "format": "circuit_shape",
+  "categoryLabel": "🏁 コース形状クイズ",
+  "formatLabel": "🗺️ サーキット形状",
+  "question": "【コース形状クイズ】表示されたコースレイアウト（SVGシルエット）をご覧ください。このサーキットはどこでしょう？",
+  "options": [
+    "鈴鹿サーキット",
+    "富士スピードウェイ",
+    "上海インターナショナル・サーキット",
+    "セパン・インターナショナル・サーキット"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「鈴鹿サーキット（日本・三重県）」です！全長5.807km、18のコーナーで構成される世界屈指のテクニカルコース。立体交差（8の字形状）によって右回りと左回りが組み合わされており、連続S字、デグナー、スプーンカーブ、超高速の130Rなど、ドライバーの腕とマシンの空力バランスが極限まで問われます。",
+  "funFact": "1962年に本田宗一郎の号令で建設され、オランダの建築家ジョン・フーゲンホルツが設計を担当しました。",
+  "linkSubTab": "circuits",
+  "circuitVisual": {
+    "circuitId": "suzuka",
+    "svgMapUrl": "/images/circuits/maps/suzuka.svg",
+    "circuitNameJa": "鈴鹿サーキット (Suzuka Circuit)"
+  },
+  "sourceAttribution": {
+    "title": "FIA Grade 1 Circuit Documentation: Suzuka Circuit",
+    "archiveNote": "FIA公式サーキット公認台帳 & FOD/フジテレビNEXT日本GP中継"
+  }
+},
+{
+  "id": "track-shape-monaco",
+  "difficulty": "beginner",
+  "category": "circuits",
+  "format": "circuit_shape",
+  "categoryLabel": "🏁 コース形状クイズ",
+  "formatLabel": "🗺️ サーキット形状",
+  "question": "【コース形状クイズ】表示されたコースレイアウト（SVGシルエット）をご覧ください。このサーキットはどこでしょう？",
+  "options": [
+    "モンテカルロ市街地コース",
+    "マリーナベイ市街地サーキット",
+    "バクー市街地サーキット",
+    "アルバート・パーク・サーキット"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「モンテカルロ市街地コース（モナコGP）」です！全長3.337kmとF1カレンダー中最も短く、最低平均速度の伝統公道サーキット。サン・デボーテ、世界一低速なフェアモント（ロウズ）ヘアピン、トンネル、プールサイドシケイン、ラスカスなどをガードレールギリギリで駆け抜けます。",
+  "funFact": "モナコ公国の公道をレース専用に閉鎖して開催され、インディ500・ル・マン24時間と並ぶ「世界三大レース」の一冠に位置付けられます。",
+  "linkSubTab": "circuits",
+  "circuitVisual": {
+    "circuitId": "monaco",
+    "svgMapUrl": "/images/circuits/maps/circuit-de-monaco.svg",
+    "circuitNameJa": "モンテカルロ市街地コース (Circuit de Monaco)"
+  },
+  "sourceAttribution": {
+    "title": "FIA Circuit Classification Grade 1: Monaco",
+    "archiveNote": "FIA公式サーキットガイド & FOD/フジテレビNEXT中継アーカイブ"
+  }
+},
+{
+  "id": "track-shape-spa",
+  "difficulty": "intermediate",
+  "category": "circuits",
+  "format": "circuit_shape",
+  "categoryLabel": "🏁 コース形状クイズ",
+  "formatLabel": "🗺️ サーキット形状",
+  "question": "【コース形状クイズ】表示されたコースレイアウト（SVGシルエット）をご覧ください。このサーキットはどこでしょう？",
+  "options": [
+    "スパ・フランコルシャン",
+    "ニュルブルクリンク",
+    "ホッケンハイムリンク",
+    "カタロニア・サーキット"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「スパ・フランコルシャン（ベルギーGP）」です！全長7.004kmとF1カレンダー最長。アルデンヌの深い森に作られ、高低差は100m以上。急激な下り坂から一気に駆け上がる「オールージュ〜ラディオン」、ケメルストレート、超高速左の「ブランシモン」など伝説のコーナーが連続します。",
+  "funFact": "コースの一角では大雨が降り、別のセクションは完全ドライという「スパ・ウェザー（局地的な天候急変）」が幾多の名勝負と波乱を生み出してきました。",
+  "linkSubTab": "circuits",
+  "circuitVisual": {
+    "circuitId": "spa",
+    "svgMapUrl": "/images/circuits/maps/spa-francorchamps.svg",
+    "circuitNameJa": "スパ・フランコルシャン (Circuit de Spa-Francorchamps)"
+  },
+  "sourceAttribution": {
+    "title": "FIA Circuit Certification Grade 1: Spa-Francorchamps",
+    "archiveNote": "FIA公式サーキットガイド & FOD/フジテレビNEXT中継"
+  }
+},
+{
+  "id": "track-shape-monza",
+  "difficulty": "intermediate",
+  "category": "circuits",
+  "format": "circuit_shape",
+  "categoryLabel": "🏁 コース形状クイズ",
+  "formatLabel": "🗺️ サーキット形状",
+  "question": "【コース形状クイズ】表示されたコースレイアウト（SVGシルエット）をご覧ください。このサーキットはどこでしょう？",
+  "options": [
+    "モンツァ・サーキット",
+    "イモラ・サーキット",
+    "ムジェロ・サーキット",
+    "ポール・リカール・サーキット"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「モンツァ・サーキット（イタリアGP）」です！全長5.793km。コースの約80%がアクセル全開区間というF1最速の「スピードの殿堂（Temple of Speed）」。最高速は時速350kmを超え、直線を3つのタイトなシケインと高速コーナー（レズモ、アスカリ、パラボリカ）で繋ぐ超高速レイアウトです。",
+  "funFact": "1922年に建設された世界で3番目に古い常設サーキットであり、イタリアの熱狂的フェラーリファン「ティフォシ」の聖地です。",
+  "linkSubTab": "circuits",
+  "circuitVisual": {
+    "circuitId": "monza",
+    "svgMapUrl": "/images/circuits/maps/monza.svg",
+    "circuitNameJa": "モンツァ・サーキット (Autodromo Nazionale Monza)"
+  },
+  "sourceAttribution": {
+    "title": "FIA Grade 1 Circuit Registry: Monza",
+    "archiveNote": "FIA公式サーキットガイド & FOD/フジテレビNEXT中継"
+  }
+},
+{
+  "id": "track-shape-silverstone",
+  "difficulty": "intermediate",
+  "category": "circuits",
+  "format": "circuit_shape",
+  "categoryLabel": "🏁 コース形状クイズ",
+  "formatLabel": "🗺️ サーキット形状",
+  "question": "【コース形状クイズ】表示されたコースレイアウト（SVGシルエット）をご覧ください。このサーキットはどこでしょう？",
+  "options": [
+    "シルバーストン・サーキット",
+    "ブランズ・ハッチ",
+    "ドニントン・パーク",
+    "ヘレス・サーキット"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「シルバーストン・サーキット（イギリスGP）」です！全長5.891km。第二次世界大戦中の英空軍（RAF）飛行場跡地に建設され、1950年にF1世界選手権の「史上最初のレース」が開催された発祥の地。コプス、時速280km/h超で駆け抜けるマゴッツ・ベケッツ・チャペルの連続高速S字、ストウなど中高速コーナーが連続します。",
+  "funFact": "ほぼ全F1チームのファクトリーがシルバーストン周辺（モータースポーツ・バレー）に本拠地を置いています。",
+  "linkSubTab": "circuits",
+  "circuitVisual": {
+    "circuitId": "silverstone",
+    "svgMapUrl": "/images/circuits/maps/silverstone.svg",
+    "circuitNameJa": "シルバーストン・サーキット (Silverstone Circuit)"
+  },
+  "sourceAttribution": {
+    "title": "FIA Circuit Registry: Silverstone Circuit",
+    "archiveNote": "FIA公式サーキットガイド & FOD/フジテレビNEXT中継"
+  }
+},
+{
+  "id": "track-shape-interlagos",
+  "difficulty": "expert",
+  "category": "circuits",
+  "format": "circuit_shape",
+  "categoryLabel": "🏁 コース形状クイズ",
+  "formatLabel": "🗺️ サーキット形状",
+  "question": "【コース形状クイズ】表示されたコースレイアウト（SVGシルエット）をご覧ください。このサーキットはどこでしょう？",
+  "options": [
+    "インテルラゴス・サーキット",
+    "エルマノス・ロドリゲス・サーキット",
+    "アルバート・パーク・サーキット",
+    "カタロニア・サーキット"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「インテルラゴス・サーキット（正式名：アウトドローモ・ホセ・カルロス・パーチェ）」です！全長4.309km。2つの湖に挟まれたすり鉢状の天然地形を活かした反時計回りコース。スタート直後の「エス・ド・セナ」、インフィールドのタイトセクション、そして全開で駆け上がるジュンカオの登り坂など、数々のドラマチックなタイトル決定劇を生み出してきました。",
+  "funFact": "反時計回りコースのためドライバーの首の左側に強烈なG負荷がかかる過酷なコースとして有名です。",
+  "linkSubTab": "circuits",
+  "circuitVisual": {
+    "circuitId": "interlagos",
+    "svgMapUrl": "/images/circuits/maps/interlagos.svg",
+    "circuitNameJa": "インテルラゴス・サーキット (Autódromo José Carlos Pace)"
+  },
+  "sourceAttribution": {
+    "title": "FIA Sporting Regulations Appendix O (Interlagos)",
+    "archiveNote": "FIA公式サーキットガイド & FOD/フジテレビNEXT中継アーカイブ"
+  }
+},
+{
+  "id": "track-shape-redbull-ring",
+  "difficulty": "expert",
+  "category": "circuits",
+  "format": "circuit_shape",
+  "categoryLabel": "🏁 コース形状クイズ",
+  "formatLabel": "🗺️ サーキット形状",
+  "question": "【コース形状クイズ】表示されたコースレイアウト（SVGシルエット）をご覧ください。このサーキットはどこでしょう？",
+  "options": [
+    "レッドブル・リンク",
+    "ハンガロリンク",
+    "ザントフォールト・サーキット",
+    "イモラ・サーキット"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「レッドブル・リンク（オーストリアGP）」です！全長4.318km、わずか10個のコーナーで構成されるコンパクトな山岳サーキット。シュピールベルクの丘陵地帯に位置し、急勾配のターン1、続く登り直線の先のターン3、そして下りながら曲がるターン4と、3つのDRSゾーンを繋ぐストップ＆ゴーのオーバーテイク激戦地です。",
+  "funFact": "1周の予選ラップタイムが約63〜64秒台と、全F1カレンダー中で最も短時間で周回されるサーキットです。",
+  "linkSubTab": "circuits",
+  "circuitVisual": {
+    "circuitId": "redbull-ring",
+    "svgMapUrl": "/images/circuits/maps/redbull-ring.svg",
+    "circuitNameJa": "レッドブル・リンク (Red Bull Ring)"
+  },
+  "sourceAttribution": {
+    "title": "FIA Grade 1 Circuit Registry: Red Bull Ring",
+    "archiveNote": "FIA公式サーキットガイド & FOD/フジテレビNEXT中継"
+  }
+},
+{
+  "id": "track-shape-villeneuve",
+  "difficulty": "expert",
+  "category": "circuits",
+  "format": "circuit_shape",
+  "categoryLabel": "🏁 コース形状クイズ",
+  "formatLabel": "🗺️ サーキット形状",
+  "question": "【コース形状クイズ】表示されたコースレイアウト（SVGシルエット）をご覧ください。このサーキットはどこでしょう？",
+  "options": [
+    "ジル・ヴィルヌーヴ・サーキット",
+    "アルバート・パーク・サーキット",
+    "ソチ・オートドローム",
+    "マイアミ・インターナショナル・オートドローム"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「ジル・ヴィルヌーヴ・サーキット（カナダGP）」です！全長4.361km。セント・ローレンス川に浮かぶ人工島（ノートルダム島）の公園道路を利用した半常設サーキット。ロングストレートとシケインが交互に現れる過酷なブレーキングサーキットで、最終シケイン立ち上がりには数々の王者を飲み込んだ「チャンピオンの壁（Wall of Champions）」が待ち受けます。",
+  "funFact": "1978年に初開催され、地元カナダの英雄ジル・ヴィルヌーヴが初優勝を飾ったことを讃えて1982年に現在の名称に改名されました。",
+  "linkSubTab": "circuits",
+  "circuitVisual": {
+    "circuitId": "villeneuve",
+    "svgMapUrl": "/images/circuits/maps/villeneuve.svg",
+    "circuitNameJa": "ジル・ヴィルヌーヴ・サーキット (Circuit Gilles-Villeneuve)"
+  },
+  "sourceAttribution": {
+    "title": "FIA Grade 1 Circuit Documentation: Montreal",
+    "archiveNote": "FIA公式サーキットガイド & FOD/フジテレビNEXT中継"
+  }
+},
+{
+  "id": "track-shape-singapore",
+  "difficulty": "master",
+  "category": "circuits",
+  "format": "circuit_shape",
+  "categoryLabel": "🏁 コース形状クイズ",
+  "formatLabel": "🗺️ サーキット形状",
+  "question": "【コース形状クイズ】表示されたコースレイアウト（SVGシルエット）をご覧ください。このサーキットはどこでしょう？",
+  "options": [
+    "マリーナベイ市街地サーキット",
+    "バクー市街地サーキット",
+    "ジェッダ市街地サーキット",
+    "ラスベガス・ストリップ・サーキット"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「マリーナベイ市街地サーキット（シンガポールGP）」です！全長4.940km（2023年改修後）。2008年にF1史上初の「フルナイトレース」として誕生。強烈な熱帯の湿気と気温の中、投光器で照らされた高層ビル群の間を縫うように走る過酷なストリートコース。セーフティカー出動率が100%に近いことでも知られます。",
+  "funFact": "2時間制限ルール（最大レース時間）に最も到達しやすい肉体的・精神的にF1最もしんどいグランプリと評されます。",
+  "linkSubTab": "circuits",
+  "circuitVisual": {
+    "circuitId": "singapore",
+    "svgMapUrl": "/images/circuits/maps/singapore.svg",
+    "circuitNameJa": "マリーナベイ市街地サーキット (Marina Bay Street Circuit)"
+  },
+  "sourceAttribution": {
+    "title": "FIA Circuit Homologation Grade 1: Marina Bay",
+    "archiveNote": "FIA公式サーキットガイド & FOD/フジテレビNEXT中継"
+  }
+},
+{
+  "id": "track-shape-cota",
+  "difficulty": "master",
+  "category": "circuits",
+  "format": "circuit_shape",
+  "categoryLabel": "🏁 コース形状クイズ",
+  "formatLabel": "🗺️ サーキット形状",
+  "question": "【コース形状クイズ】表示されたコースレイアウト（SVGシルエット）をご覧ください。このサーキットはどこでしょう？",
+  "options": [
+    "サーキット・オブ・ジ・アメリカズ (COTA)",
+    "上海インターナショナル・サーキット",
+    "ヤス・マリーナ・サーキット",
+    "ロサイル・インターナショナル・サーキット"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「サーキット・オブ・ジ・アメリカズ（COTA / アメリカ・オースティン）」です！全長5.513km、20個のコーナーを持つ反時計回りサーキット。スタート直後に一気に駆け上がる標高差41mの急勾配ブラインド左コーナー（ターン1）、シルバーストンのマゴッツ・ベケッツをオマージュした連続高速S字、ホッケンハイムを模したスタジアムセクションなど、世界の有名コーナーの要素を融合させた近代的超テクニカルコースです。",
+  "funFact": "反時計回りで激しいバンプ（路面の凹凸）があり、2023年にはプランク摩耗による車検失格が相次ぐなどマシンの車高セッティングが極めてシビアなコースです。",
+  "linkSubTab": "circuits",
+  "circuitVisual": {
+    "circuitId": "cota",
+    "svgMapUrl": "/images/circuits/maps/cota.svg",
+    "circuitNameJa": "サーキット・オブ・ジ・アメリカズ (Circuit of the Americas)"
+  },
+  "sourceAttribution": {
+    "title": "FIA Grade 1 Circuit Registry: COTA",
+    "archiveNote": "FIA公式サーキットガイド & FOD/フジテレビNEXT中継"
+  }
+},
+{
+  "id": "driver-v-1-tsunoda",
+  "difficulty": "beginner",
+  "category": "history",
+  "format": "driver_visual",
+  "categoryLabel": "👤 ドライバー顔写真クイズ",
+  "formatLabel": "📷 顔写真クイズ",
+  "question": "【ドライバー顔写真クイズ】写真のドライバーをご覧ください。日本人F1最長参戦記録を更新し、鋭いブレーキングと卓越した予選スピードで世界のトップチーム首脳陣から高い評価を受けるこの現役ドライバーは誰？",
+  "options": [
+    "角田裕毅",
+    "小林可夢偉",
+    "佐藤琢磨",
+    "中嶋一貴"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「角田裕毅」です！ホンダ・レッドブル育成として2021年にアルファタウリからF1デビュー。ルーキーイヤー最終戦アブダビGPで4位入賞。粘り強いレース巧者へと進化し、日本モータースポーツ界を背負うトップドライバーです。",
+  "funFact": "デビュー戦の2021年バーレーンGPでフェルナンド・アロンソをオーバーテイクして9位入賞し、日本人初のデビュー戦ポイント獲得を達成しました。",
+  "linkSubTab": "drivers",
+  "driverVisual": {
+    "imagePath": "/images/drivers/driver_tsunoda.jpg",
+    "driverNameJa": "角田裕毅",
+    "teamName": "VCARB / レッドブル・レーシング"
+  },
+  "sourceAttribution": {
+    "title": "Formula 1 Official Driver Registry: Yuki Tsunoda",
+    "archiveNote": "F1公式ドライバーズプロフィール"
+  }
+},
+{
+  "id": "driver-v-2-verstappen",
+  "difficulty": "beginner",
+  "category": "history",
+  "format": "driver_visual",
+  "categoryLabel": "👤 ドライバー顔写真クイズ",
+  "formatLabel": "📷 顔写真クイズ",
+  "question": "【ドライバー顔写真クイズ】写真のドライバーをご覧ください。史上最年少の17歳でF1デビューを果たし、シーズン年間19勝（勝率86.4%）という前人未到の大記録を樹立したオランダの若き皇帝は誰？",
+  "options": [
+    "マックス・フェルスタッペン",
+    "ルイス・ハミルトン",
+    "シャルル・ルクレール",
+    "ランド・ノリス"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「マックス・フェルスタッペン」です！2016年スペインGPで18歳7ヶ月での史上最年少優勝を記録。2021年に劇的な初戴冠を果たし、以降シーズン10連勝や年間最多勝などF1の歴史的記録を次々と塗り替えています。",
+  "funFact": "彼の父親ヨス・フェルスタッペンも元F1ドライバーで、ミハエル・シューマッハのチームメイトを務めました。",
+  "linkSubTab": "drivers",
+  "driverVisual": {
+    "imagePath": "/images/drivers/driver_verstappen.jpg",
+    "driverNameJa": "マックス・フェルスタッペン",
+    "teamName": "レッドブル・レーシング"
+  },
+  "sourceAttribution": {
+    "title": "FIA Formula 1 World Championship Hall of Fame: Max Verstappen",
+    "archiveNote": "レッドブル・レーシング公式ドライバーアーカイブ"
+  }
+},
+{
+  "id": "driver-v-3-norris",
+  "difficulty": "beginner",
+  "category": "history",
+  "format": "driver_visual",
+  "categoryLabel": "👤 ドライバー顔写真クイズ",
+  "formatLabel": "📷 顔写真クイズ",
+  "question": "【ドライバー顔写真クイズ】写真のドライバーをご覧ください。マクラーレンのエースとして2024年マイアミGPで待望の初優勝を飾り、卓越したコーナリングスピードで王座争いを演じるイギリス出身ドライバーは誰？",
+  "options": [
+    "ランド・ノリス",
+    "ジョージ・ラッセル",
+    "オスカー・ピアストリ",
+    "アレクサンダー・アルボン"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「ランド・ノリス」です！2019年に19歳でマクラーレンからデビュー。表彰台常連となりながら惜しくも優勝を逃し続ける苦闘を乗り越え、2024年マイアミで見事初戴冠を果たしました。",
+  "funFact": "シムレース（eスポーツ）の世界でもプロ級の腕前を持ち、ゲーム配信者としても世界中に数百万人のファンを持っています。",
+  "linkSubTab": "drivers",
+  "driverVisual": {
+    "imagePath": "/images/drivers/driver_norris.jpg",
+    "driverNameJa": "ランド・ノリス",
+    "teamName": "マクラーレン・フォーミュラ1チーム"
+  },
+  "sourceAttribution": {
+    "title": "McLaren Racing Official Archives: Lando Norris",
+    "archiveNote": "FOD / フジテレビNEXT F1中継選手名鑑"
+  }
+},
+{
+  "id": "driver-v-4-senna",
+  "difficulty": "intermediate",
+  "category": "history",
+  "format": "driver_visual",
+  "categoryLabel": "👤 ドライバー顔写真クイズ",
+  "formatLabel": "📷 顔写真クイズ",
+  "question": "【ドライバー顔写真クイズ】写真のドライバーをご覧ください。「音速の貴公子」と称され、マクラーレン・ホンダの黄金期を牽引して3度の世界王者に輝いたブラジルの不世出の英雄は誰？",
+  "options": [
+    "アイルトン・セナ",
+    "アラン・プロスト",
+    "ネルソン・ピケ",
+    "エマーソン・フィッティパルディ"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「アイルトン・セナ」です！神憑り的な予選一発のアタック力、雨のレースでの圧倒的なドライビング、そしてプロストとの歴史的ライバル関係など、日本をはじめ世界中で社会現象を巻き起こしました。",
+  "funFact": "1988年日本GP（鈴鹿）ではスタートでエンジンストール寸前の最後尾近くまで落ちながら、驚異の猛追撃で大逆転優勝を飾り、自身初のワールドチャンピオンを決定づけました。",
+  "linkSubTab": "drivers",
+  "driverVisual": {
+    "imagePath": "/images/drivers/driver_senna.jpg",
+    "driverNameJa": "アイルトン・セナ",
+    "teamName": "マクラーレン・ホンダ / ロータス / ウィリアムズ"
+  },
+  "sourceAttribution": {
+    "title": "Formula 1 Heritage Hall of Fame: Ayrton Senna da Silva",
+    "archiveNote": "F1歴史遺産アーカイブ記録"
+  }
+},
+{
+  "id": "driver-v-5-schumacher",
+  "difficulty": "intermediate",
+  "category": "history",
+  "format": "driver_visual",
+  "categoryLabel": "👤 ドライバー顔写真クイズ",
+  "formatLabel": "📷 顔写真クイズ",
+  "question": "【ドライバー顔写真クイズ】写真のドライバーをご覧ください。ベネトンとスクーデリア・フェラーリで通算7度の世界王座（歴代最多タイ）と通算91勝を誇り、『皇帝』と称されたドイツの偉大なレジェンドは誰？",
+  "options": [
+    "ミハエル・シューマッハ",
+    "セバスチャン・ベッテル",
+    "ニコ・ロズベルグ",
+    "ミカ・ハッキネン"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「ミハエル・シューマッハ」です！1994-1995年にベネトンで連覇し、フェラーリへ移籍して2000年から前人未到のドライバーズ5連覇を達成。驚異的なフィジカルトレーニングと徹底したチームビルディングで現代F1のプロ意識の基準を打ち立てました。",
+  "funFact": "弟のラルフ・シューマッハ、息子のミック・シューマッハもF1ドライバーとして活躍したF1一族です。",
+  "linkSubTab": "drivers",
+  "driverVisual": {
+    "imagePath": "/images/drivers/driver_schumacher.jpg",
+    "driverNameJa": "ミハエル・シューマッハ",
+    "teamName": "スクーデリア・フェラーリ / ベネトン / メルセデス"
+  },
+  "sourceAttribution": {
+    "title": "Scuderia Ferrari Official Hall of Fame: Michael Schumacher",
+    "archiveNote": "FIA殿堂入りドライバー記録"
+  }
+},
+{
+  "id": "incident-e-abu-dhabi",
+  "difficulty": "expert",
+  "category": "rules",
+  "format": "rule_dilemma",
+  "categoryLabel": "📜 ルール・規定",
+  "formatLabel": "⚖️ FIA裁定事件",
+  "question": "【FIA公式裁定事件】2021年アブダビGP最終周直前のSC解除プロセスにおいて、首位ハミルトンと2位フェルスタッペンの間の周回遅れ車両数台のみがアンラップを許可されたことが歴史的論争となりました。FIAはこの曖昧さを排除するため、競技規則条項の「ANY（任意の）」をどの単語へと公式改定した？",
+  "options": [
+    "ALL (すべての)",
+    "EACH (それぞれの)",
+    "SOME (いくつかの)",
+    "REMAINING (残りの)"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「ALL（すべての）」です！当時の第48条12項には『any cars that have been lapped...』と書かれており、レースディレクターは『任意の一部の車両』と解釈して運用しました。激しい抗議と検証報告書を経て、FIAは条文を明確に『all cars that have been lapped』へと改定し、一部だけのアンラップを厳格に禁止しました。",
+  "funFact": "この改定に伴い、セーフティカー解除手順の文言やレースコントロールの権限範囲が根本から見直されました。",
+  "linkSubTab": "rules",
+  "sourceAttribution": {
+    "title": "FIA Sporting Regulations 第55条13項 (旧第48条12項 改定条項)",
+    "archiveNote": "FIAアブダビGP公式調査最終報告書 (2022年3月発行) & FOD/フジテレビNEXT中継"
+  }
+},
+{
+  "id": "incident-e-cota-plank",
+  "difficulty": "expert",
+  "category": "rules",
+  "format": "rule_dilemma",
+  "categoryLabel": "📜 ルール・規定",
+  "formatLabel": "⚖️ FIA裁定事件",
+  "question": "【FIA公式裁定事件】2023年アメリカGP（COTA）スプリント週末の決勝レース後、2位チェッカーのルイス・ハミルトン（メルセデス）と6位のシャルル・ルクレール（フェラーリ）が車検失格となった技術規則違反の原因は？",
+  "options": [
+    "マシン底部のスキッドブロック（プランク）の厚みが規定の最低9.0mmを下回って摩耗していたため",
+    "最低乾燥重量（798kg）を1.5kg下回っていたため",
+    "燃料サンプルの残量が規定の1.0リットルに満たなかったため",
+    "DRSリアウイング開口部の隙間が規定値（85mm）を超過していたため"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「底部のスキッドブロック（プランク）の過剰摩耗」です！FIA技術規則第3条5項9号により、10mmの新品プランクはレース後に最低9.0mm（摩耗許容1.0mm以内）残っていなければなりません。COTAの激しいバンプと、スプリント週末で金曜1回しかフリー走行がなく車高セッティングを突き詰められなかったことが原因でした。",
+  "funFact": "この失格により、角田裕毅は8位へと繰り上がり、自身初のファステストラップボーナスポイント（1点）と合わせて計5ポイントを獲得しました。",
+  "linkSubTab": "rules",
+  "sourceAttribution": {
+    "title": "FIA Formula 1 Technical Regulations Article 3.5.9 (Plank Assembly)",
+    "archiveNote": "FIA公式車検レポート (2023 US GP Doc 66 & 67)"
+  }
+},
+{
+  "id": "incident-m-spa-russell",
+  "difficulty": "master",
+  "category": "rules",
+  "format": "rule_dilemma",
+  "categoryLabel": "📜 ルール・規定",
+  "formatLabel": "⚖️ FIA裁定事件",
+  "question": "【FIA公式裁定事件】2024年ベルギーGP（スパ）において、ジョージ・ラッセルが見事な1ストップ作戦でトップチェッカーを受けたものの、レース後の車検計量で無念の失格処分となりました。車検で測定された重量と最低規定重量の差は？",
+  "options": [
+    "燃料全量抜き取り後の測定値が796.5kg（最低規定798.0kgより1.5kgアンダー）だった",
+    "測定値が794.0kg（4.0kgアンダー）だった",
+    "ドライバー体重が78kg（最低80kgより2kgアンダー）だった",
+    "冷却水が蒸発して0.8kgアンダーだった"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「車両重量796.5kg（規定798kgより1.5kgアンダー）」です！FIA技術規則第4条1項に違反しました。予定外の1ストップを敢行したため、タイヤのトレッドゴムが想定以上に摩耗して削ぎ落とされ、さらにスパ特有の「レース後のインラップなし（ピットロード直行）」によりタイヤカス（マーブル）を拾って重量を稼ぐことができなかった複合的要因でした。",
+  "funFact": "ラッセルの失格により、チームメイトのルイス・ハミルトンが繰り上がりでキャリア105勝目を飾りました。",
+  "linkSubTab": "rules",
+  "sourceAttribution": {
+    "title": "FIA Technical Regulations Article 4.1 & Technical Delegate Report",
+    "archiveNote": "2024 Belgian Grand Prix Doc 45 (Car 63 Infringement) & FOD/フジテレビNEXT中継"
+  }
+},
+{
+  "id": "incident-m-suzuka-points",
+  "difficulty": "master",
+  "category": "rules",
+  "format": "rule_dilemma",
+  "categoryLabel": "📜 ルール・規定",
+  "formatLabel": "⚖️ FIA裁定事件",
+  "question": "【FIA公式裁定事件】2022年日本GP（鈴鹿）において、悪天候でレース予定距離の約53%（28周）しか消化できなかったにもかかわらず、フェルスタッペンにハーフポイントではなくフルポイント（25点）が付与されて王座決定が確定した競技規則条文上の理由は？",
+  "options": [
+    "短縮レースの減点制を定めた規則条項が「レースが中断のまま再開されず終了した場合」にのみ適用される文言になっており、鈴鹿では赤旗中断後に再開されてチェッカーが振られたため",
+    "鈴鹿サーキットはクラシックコース特例としてスチュワードに裁量権があったため",
+    "ファステストラップを記録していたため自動的にフルポイントが適用された",
+    "全チーム代表がレース終了後にピットウォールで満場一致の特例承認を出したため"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「規則文言が『中断のまま再開されず終了した場合』にのみ減点制が適用される規定になっており、再開されてチェッカーが振られた鈴鹿は除外されたため」です！2021年スパの雨中2周中止を受けて作られた新条項の文言の盲点であり、当のフェルスタッペンやレッドブル首脳陣もレース直後はハーフポイントだと思い込んでいました。",
+  "funFact": "クールダウンルームで公式インタビュー中に「マックス、君がワールドチャンピオンだ！」と告げられ、フェルスタッペン本人が「本当に？確かなの？」と困惑する珍場面が全世界に放映されました。",
+  "linkSubTab": "rules",
+  "sourceAttribution": {
+    "title": "FIA Formula 1 Sporting Regulations Article 6.5 (Points Allocations)",
+    "archiveNote": "2022 F1日本GP FOD/フジテレビNEXT中継アーカイブ & FIA公式声明"
+  }
+}
+,
+{
+  "id": "driver-v-hamilton",
+  "difficulty": "beginner",
+  "category": "history",
+  "format": "driver_visual",
+  "categoryLabel": "👤 ドライバー顔写真クイズ",
+  "formatLabel": "📷 顔写真クイズ",
+  "question": "【ドライバー顔写真クイズ】写真のドライバーをご覧ください。通算104回以上のポールポジションと105勝以上を誇り、ミハエル・シューマッハと並ぶ史上最多タイの「7度のワールドチャンピオン」を獲得した生ける伝説は誰？",
+  "options": [
+    "ルイス・ハミルトン",
+    "フェルナンド・アロンソ",
+    "セバスチャン・ベッテル",
+    "キミ・ライコネン"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「ルイス・ハミルトン」です！2007年の鮮烈なデビュー以来、マクラーレンとメルセデスで通算7度の世界王座、100勝・100ポールポジションを史上初めて達成。2025年からはフェラーリへ移籍し、8度目の戴冠を目指して戦い続ける現代F1の生ける伝説です。",
+  "funFact": "2008年ブラジルGP最終周の最終コーナーでティモ・グロックをかわして史上最年少（当時）で劇的な初王座を獲得しました。",
+  "linkSubTab": "drivers",
+  "driverVisual": {
+    "imagePath": "/images/drivers/driver_hamilton.jpg",
+    "driverNameJa": "ルイス・ハミルトン",
+    "teamName": "メルセデスAMG / スクーデリア・フェラーリ"
+  },
+  "sourceAttribution": {
+    "title": "FIA Formula 1 World Championship Hall of Fame: Lewis Hamilton",
+    "archiveNote": "FOD / フジテレビNEXT F1中継アーカイブ選手名鑑"
+  }
+},
+{
+  "id": "driver-v-alonso",
+  "difficulty": "intermediate",
+  "category": "history",
+  "format": "driver_visual",
+  "categoryLabel": "👤 ドライバー顔写真クイズ",
+  "formatLabel": "📷 顔写真クイズ",
+  "question": "【ドライバー顔写真クイズ】写真のドライバーをご覧ください。2005年・2006年にルノーでシューマッハの連覇を止めて2年連続王座に輝き、F1史上最多の400戦以上のグランプリ出走記録を持つスペインの闘将は誰？",
+  "options": [
+    "フェルナンド・アロンソ",
+    "カルロス・サインツ",
+    "ペドロ・デ・ラ・ロサ",
+    "マーク・ウェバー"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「フェルナンド・アロンソ」です！アグレッシブなステアリング操作と比類なきレースクラフトで知られ、ルノー、マクラーレン、フェラーリ、アルピーヌ、アストンマーティンと第一線で走り続け、40歳を超えても表彰台争いを繰り広げる鉄人です。",
+  "funFact": "ル・マン24時間レースでも総合優勝を2度飾り、世界三大レースの二冠（F1モナコGP＆ル・マン24時間）を達成しています。",
+  "linkSubTab": "drivers",
+  "driverVisual": {
+    "imagePath": "/images/drivers/driver_alonso.jpg",
+    "driverNameJa": "フェルナンド・アロンソ",
+    "teamName": "アストンマーティンF1チーム"
+  },
+  "sourceAttribution": {
+    "title": "Formula 1 Official Driver Registry: Fernando Alonso",
+    "archiveNote": "FOD / フジテレビNEXT F1中継アーカイブ"
+  }
+},
+{
+  "id": "driver-v-senna",
+  "difficulty": "expert",
+  "category": "history",
+  "format": "driver_visual",
+  "categoryLabel": "👤 レジェンド肖像クイズ",
+  "formatLabel": "📷 顔写真クイズ",
+  "question": "【レジェンド肖像クイズ】写真のドライバーをご覧ください。1988年、1990年、1991年にホンダV10/V12エンジンを駆るマクラーレンで3度の世界王座を獲得し、「音速の貴公子」として日本でも社会現象を巻き起こしたブラジルのカリスマは誰？",
+  "options": [
+    "アイルトン・セナ",
+    "アラン・プロスト",
+    "ナイジェル・マンセル",
+    "ネルソン・ピケ"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「アイルトン・セナ」です！神憑り的な予選一発アタック（通算65ポール）と雨中の驚異的なマシンコントロールで全世界のファンを熱狂させました。ホンダ技術陣との深い絆でも知られ、鈴鹿サーキットで数々の名勝負を刻みました。",
+  "funFact": "1993年ヨーロッパGP（ドニントンパーク）のオープニングラップで、雨の路面をものともせず1周で5台をごぼう抜きした走りは「F1史上最高のオープニングラップ」と讃えられています。",
+  "linkSubTab": "history",
+  "driverVisual": {
+    "imagePath": "/images/drivers/driver_senna.jpg",
+    "driverNameJa": "アイルトン・セナ",
+    "teamName": "マクラーレン・ホンダ"
+  },
+  "sourceAttribution": {
+    "title": "FIA Hall of Fame: Ayrton Senna",
+    "archiveNote": "FOD / フジテレビNEXT F1歴史アーカイブ記録"
+  }
+},
+{
+  "id": "driver-v-piastri",
+  "difficulty": "intermediate",
+  "category": "history",
+  "format": "driver_visual",
+  "categoryLabel": "👤 ドライバー顔写真クイズ",
+  "formatLabel": "📷 顔写真クイズ",
+  "question": "【ドライバー顔写真クイズ】写真のドライバーをご覧ください。F3・F2をルーキーイヤーで連覇し、2024年ハンガリーGPで初優勝、アゼルバイジャンGPでは果敢な飛び込みで首位を奪取して勝利したマクラーレンのオーストラリア人新星は誰？",
+  "options": [
+    "オスカー・ピアストリ",
+    "ダニエル・リカルド",
+    "ジャック・ドゥーハン",
+    "リアム・ローソン"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「オスカー・ピアストリ」です！極めて冷静沈着な無線応答（通称アイスマンJr.）と一切のプレッシャーを感じさせない正確無比なドライビングで、参戦2年目にしてトップドライバーへと飛躍しました。",
+  "funFact": "元F1ドライバーのマーク・ウェバーがマネージャーを務めており、巧みなキャリアマネジメントでも知られます。",
+  "linkSubTab": "drivers",
+  "driverVisual": {
+    "imagePath": "/images/drivers/driver_piastri.jpg",
+    "driverNameJa": "オスカー・ピアストリ",
+    "teamName": "マクラーレンF1チーム"
+  },
+  "sourceAttribution": {
+    "title": "Formula 1 Official Profile: Oscar Piastri",
+    "archiveNote": "FOD / フジテレビNEXT F1中継アーカイブ"
+  }
+},
+{
+  "id": "drama-h-1-senna-prost-1989",
+  "difficulty": "expert",
+  "category": "history",
+  "format": "rule_dilemma",
+  "categoryLabel": "📜 歴史的事件・審議",
+  "formatLabel": "⚖️ FIA裁定事件",
+  "question": "【F1歴史的事件簿】1989年日本GP（鈴鹿）の47周目、シケイン進入でトップ争い中のセナとプロストが接触。コースに復帰してトップチェッカーを受けたセナがレース後に失格処分となった、FIA（バレストル会長）が下した裁定の公式名目は？",
+  "options": [
+    "「マーシャルにマシンを押してもらい押し掛け再スタートしたこと」および「シケイン不通過（エスケープ直進によるコース短縮）」",
+    "「ピットレーンでの制限速度超過」",
+    "「危険な幅寄せ走行に対する黒旗判定」",
+    "「最低車両重量違反（1.5kgアンダー）」"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「マーシャルによる押し掛け再スタートおよびシケイン不通過（エスケープ直進）」です！接触停止後、セナはオフィシャルの押し掛けで脱出路を抜けてコース復帰し、ノーズ交換を経て猛追・優勝しました。しかしFIAはシケインを正規に通過していないとして失格を下し、プロストの1989年王座が決定。翌1990年の鈴鹿1コーナー同士討ちへと因縁が続きました。",
+  "funFact": "この裁定に対しセナは「政治的な不公正だ」と激しく反論し、一時はスーパーライセンスの剥奪危機にまで発展しました。",
+  "linkSubTab": "history",
+  "sourceAttribution": {
+    "title": "1989 FIA F1 World Championship Official Report (Suzuka)",
+    "archiveNote": "FOD / フジテレビNEXT F1歴史アーカイブ & FIA公式審議録"
+  }
+},
+{
+  "id": "drama-h-2-crashgate-2008",
+  "difficulty": "master",
+  "category": "history",
+  "format": "rule_dilemma",
+  "categoryLabel": "📜 歴史的スキャンダル",
+  "formatLabel": "⚖️ FIA重大処分事件",
+  "question": "【F1歴史的スキャンダル】2008年第15戦シンガポールGPにおいて、ルノーのチーム代表フラビオ・ブリアトーレらがネルソン・ピケJr.に指示し、14周目のターン17で故意にスピン・クラッシュさせてセーフティカーを導入させ、早期ピットインしていたアロンソを優勝に導いた前代未聞の不正事件の通称は？",
+  "options": [
+    "クラッシュゲート (Crashgate)",
+    "スパイゲート (Spygate)",
+    "タイヤゲート (Tyregate)",
+    "パドックゲート (Paddockgate)"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「クラッシュゲート」です！翌2009年、チームを解雇されたピケJr.がFIAに真実を告発して発覚。FIA世界モータースポーツ評議会（WMSC）により、首謀者のブリアトーレ代表にはF1からの無期限追放処分（後に減刑）、エンジニアリングディレクターのパット・シモンズには5年間の資格停止処分が下されました。",
+  "funFact": "このSC導入時のピット混乱で給油ホースが抜けないまま発進してしまったフェリペ・マッサは大量得点を失い、結果として1点差で2008年王座を逃す引き金となりました。",
+  "linkSubTab": "history",
+  "sourceAttribution": {
+    "title": "FIA World Motor Sport Council Decision: Renault F1 Team (Sept 2009)",
+    "archiveNote": "FIA公式調査最終報告書 & FOD/フジテレビNEXT中継アーカイブ"
+  }
+},
+{
+  "id": "drama-h-3-canada-2011-button",
+  "difficulty": "intermediate",
+  "category": "history",
+  "format": "standard",
+  "categoryLabel": "📜 伝説の名勝負",
+  "formatLabel": "🏁 歴史的激闘",
+  "question": "【伝説の名勝負】豪雨で2時間以上の中断を挟み、総レース時間「4時間4分39秒」（F1史上最長）となった2011年カナダGPにおいて、接触・ドライブスルーペナルティ・パンク等で計6回もピットに入り、一時は最後尾21位まで転落しながら、最終周に首位ベッテルを劇的にオーバーテイクして優勝を飾ったドライバーは？",
+  "options": [
+    "ジェンソン・バトン (マクラーレン)",
+    "ルイス・ハミルトン (マクラーレン)",
+    "マーク・ウェバー (レッドブル)",
+    "ミハエル・シューマッハ (メルセデス)"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「ジェンソン・バトン」です！タイヤ交換、接触によるウイング交換、ドライブスルーペナルティなどで合計6回もピットロードを通過し、一時は最後尾まで落ちながらも、乾いていく路面で異次元のラップタイムを連発。最終周のターン6で首位ベッテルが痛恨のハーフスピンを喫した瞬間に抜き去り、F1史上最も劇的な大逆転勝利を達成しました。",
+  "funFact": "このレースは赤旗中断を含めた総所要時間が長すぎたため、後のレギュレーション改正で「赤旗中断を含めたレースの最大時間制限は3時間（後に2021年ベルギーGPを受けて見直し）」と規定される契機となりました。",
+  "linkSubTab": "history",
+  "sourceAttribution": {
+    "title": "2011 Canadian Grand Prix Official Race Report",
+    "archiveNote": "FOD / フジテレビNEXT 2011年カナダGP中継アーカイブ"
+  }
+}
 ];

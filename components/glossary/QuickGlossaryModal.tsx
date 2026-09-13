@@ -9,6 +9,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { GLOSSARY_TERMS, type GlossaryTerm } from '@/data/f1GlossaryData';
+import GlossaryVisualDiagram from './GlossaryVisualDiagram';
 
 interface QuickGlossaryModalProps {
   isOpen: boolean;
@@ -135,6 +136,12 @@ export default function QuickGlossaryModal({
                 <strong className="text-slate-400 text-[10px] block mb-1">詳しい解説:</strong>
                 {selectedTerm.description}
               </div>
+
+              {selectedTerm.visualType && (
+                <div className="pt-1">
+                  <GlossaryVisualDiagram visualType={selectedTerm.visualType} />
+                </div>
+              )}
 
               <div className="text-xs text-sky-200 leading-relaxed bg-sky-950/20 p-3 rounded-xl border border-sky-500/30 italic">
                 <strong className="text-sky-400 text-[10px] block mb-1">中継での実例場面:</strong>

@@ -51,7 +51,12 @@ import SeasonHub from '@/components/hubs/SeasonHub';
 import QuickGlossaryModal from '@/components/glossary/QuickGlossaryModal';
 import GlobalSearchModal from '@/components/search/GlobalSearchModal';
 import F1QuizModal from '@/components/quiz/F1QuizModal';
+import FeatureDirectoryModal from '@/components/navigation/FeatureDirectoryModal';
+import AppNavigationDrawer from '@/components/navigation/AppNavigationDrawer';
 import type { TelemetryTarget } from '@/data/f1KnowledgeData';
+import { GLOSSARY_TERMS } from '@/data/f1GlossaryData';
+import type { NavAction } from '@/components/AIStrategist';
+import AITelemetryInspectorModal from '@/components/telemetry/AITelemetryInspectorModal';
 
 import AuthButton from '@/components/auth/AuthButton';
 import AuthModal from '@/components/auth/AuthModal';
@@ -83,7 +88,7 @@ interface AppState {
 }
 
 // Mobile tab type
-type MobileTab = 'telemetry' | 'news' | 'knowledge' | 'notes' | 'ai';
+type MobileTab = 'season' | 'telemetry' | 'news' | 'knowledge' | 'notes' | 'ai';
 // Desktop right-panel tab
 type RightPanelTab = 'ai' | 'notebook';
 
@@ -182,9 +187,14 @@ export default function DashboardPage() {
   const [activeHub, setActiveHub] = useState<ActiveHub>('season');
   const [librarySubTab, setLibrarySubTab] = useState<SubTab>('drivers');
   const [quickGlossaryOpen, setQuickGlossaryOpen] = useState(false);
+  const [quickGlossaryQuery, setQuickGlossaryQuery] = useState('');
   const [globalSearchOpen, setGlobalSearchOpen] = useState(false);
   const [targetDramaTab, setTargetDramaTab] = useState<'storylines' | 'moments' | 'rivalries' | 'paddock' | 'radios' | undefined>(undefined);
   const [quizModalOpen, setQuizModalOpen] = useState(false);
+  const [featureDirectoryOpen, setFeatureDirectoryOpen] = useState(false);
+  const [navigationDrawerOpen, setNavigationDrawerOpen] = useState(false);
+  const [detailedTelemetryTab, setDetailedTelemetryTab] = useState<'charts' | 'delta_matrix'>('charts');
+  const [pitStrategyViewMode, setPitStrategyViewMode] = useState<'basic' | 'war_room'>('basic');
   const [mobileTab, setMobileTab] = useState<MobileTab>('telemetry');
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>('ai');
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile sidebar drawer
@@ -201,6 +211,25 @@ export default function DashboardPage() {
     driver2: 'ANT',
   });
   const [targetCircuitId, setTargetCircuitId] = useState<string | undefined>(undefined);
+  const [targetGlossaryTermId, setTargetGlossaryTermId] = useState<string | null>(null);
+  const [activeAiGuidance, setActiveAiGuidance] = useState<{
+    title: string;
+    content: string;
+    sourceAction?: string;
+  } | null>(null);
+  const [aiInspectorState, setAiInspectorState] = useState<{
+    isOpen: boolean;
+    circuitId: string;
+    driver1Code: string;
+    driver2Code: string;
+    lapNumber?: number;
+    insightNotes?: string;
+  }>({
+    isOpen: false,
+    circuitId: 'bahrain-international',
+    driver1Code: 'VER',
+    driver2Code: 'NOR',
+  });
 
   const timelineRef = useRef<TeamRadioTimelineHandle>(null);
   const notebookRef = useRef<RaceNotebookHandle>(null);
@@ -225,6 +254,129 @@ export default function DashboardPage() {
       description: description ?? 'AI戦略アナリストおよびチーム無線AI解析は認証メンバー専用機能です。',
     });
     setAuthModalOpen(true);
+  }, []);
+
+  const handleGoHome = useCallback(() => {
+    setNavigationDrawerOpen(false);
+    setFeatureDirectoryOpen(false);
+    setSidebarOpen(false);
+    setAiDrawerOpen(false);
+    setQuizModalOpen(false);
+    setGlobalSearchOpen(false);
+    setQuickGlossaryOpen(false);
+    setAuthModalOpen(false);
+    setAppMode('season');
+    setActiveHub('season');
+    setMobileTab('season');
+    desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, []);
+
+  const handleFeatureJump = useCallback((featureId: string) => {
+    setFeatureDirectoryOpen(false);
+    setNavigationDrawerOpen(false);
+    if (featureId === '2026_regulations') {
+      setAppMode('library');
+      setLibrarySubTab('regulations');
+      setActiveHub('knowledge');
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (featureId === 'season_calendar') {
+      setAppMode('season');
+      setActiveHub('season');
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (featureId === 'telemetry_delta') {
+      setAppMode('season');
+      setActiveHub('telemetry');
+      setMobileTab('telemetry');
+      setDetailedTelemetryTab('delta_matrix');
+      setTimeout(() => {
+        document.getElementById('detailed-telemetry-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+    } else if (featureId === 'war_room') {
+      setAppMode('season');
+      setActiveHub('telemetry');
+      setMobileTab('telemetry');
+      setPitStrategyViewMode('war_room');
+      setTimeout(() => {
+        document.getElementById('pit-strategy-simulator-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+    } else if (featureId === 'fod_news') {
+      setAppMode('season');
+      setActiveHub('news');
+      setMobileTab('news');
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (featureId === 'quiz') {
+      setQuizModalOpen(true);
+    } else if (featureId === 'telemetry_laps') {
+      setAppMode('season');
+      setActiveHub('telemetry');
+      setMobileTab('telemetry');
+      setDetailedTelemetryTab('charts');
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (featureId === 'stint_visualizer') {
+      setAppMode('season');
+      setActiveHub('telemetry');
+      setMobileTab('telemetry');
+      setTimeout(() => {
+        document.getElementById('stint-visualizer-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+    } else if (featureId === 'position_changes') {
+      setAppMode('season');
+      setActiveHub('telemetry');
+      setMobileTab('telemetry');
+      setTimeout(() => {
+        document.getElementById('position-change-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+    } else if (featureId === 'sector_analysis') {
+      setAppMode('season');
+      setActiveHub('telemetry');
+      setMobileTab('telemetry');
+      setTimeout(() => {
+        document.getElementById('sector-analysis-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+    } else if (featureId === 'team_radios') {
+      setAppMode('season');
+      setActiveHub('telemetry');
+      setMobileTab('telemetry');
+      setTimeout(() => {
+        document.getElementById('team-radio-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+    } else if (featureId === 'fia_rules') {
+      setAppMode('library');
+      setLibrarySubTab('rules');
+      setActiveHub('knowledge');
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (featureId === 'race_notes') {
+      setActiveHub('notes');
+      setMobileTab('notes');
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (
+      featureId === 'drivers' ||
+      featureId === 'teams' ||
+      featureId === 'circuits' ||
+      featureId === 'tyres' ||
+      featureId === 'drama' ||
+      featureId === 'glossary' ||
+      featureId === 'rules'
+    ) {
+      setAppMode('library');
+      setLibrarySubTab(featureId as SubTab);
+      setActiveHub('knowledge');
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (featureId === 'ai_strategist') {
+      setAiDrawerOpen(true);
+      setRightPanelTab('ai');
+    }
   }, []);
 
   // Clean up any legacy localStorage Gemini key (now handled server-side)
@@ -658,6 +810,114 @@ export default function DashboardPage() {
     }
   }, [state.selectedDrivers]);
 
+  // AI-driven navigation handler:
+  // - PC (width >= 1024): Opens independent AITelemetryInspectorModal (main screen state completely preserved!)
+  // - Mobile (< 1024): Closes drawer and applies circuit/drivers/laps directly to main telemetry screen
+  const handleAiNavigate = useCallback((action: NavAction) => {
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
+
+    if (action.type === 'telemetry') {
+      const circuitId = action.circuitId || detailedTelemetryParams.circuitId || 'bahrain-international';
+      const d1 = action.driver1 || detailedTelemetryParams.driver1 || 'VER';
+      const d2 = action.driver2 || detailedTelemetryParams.driver2 || 'NOR';
+
+      const guidanceText = `【${d1} vs ${d2} ${action.lapNumber ? `(Lap ${action.lapNumber})` : ''} テレメトリー分析ガイド】
+1. ストレート区間での最高速とDRS作動効果の差をチェック
+2. ターン進入時のブレーキング開始位置と減速Gの立ち上がり比較
+3. エイペックスでの最小速度（ボトムスピード）とステアリング回頭性
+4. コーナー脱出時のスロットル全開（100%）到達タイミングとトラクション
+※グラフ下部のコーナー番号ボタンをクリックして各セクションをズームできます。`;
+
+      setActiveAiGuidance({
+        title: `🤖 AI分析ガイド: ${d1} vs ${d2} ${action.lapNumber ? `(Lap ${action.lapNumber})` : ''}`,
+        content: guidanceText,
+        sourceAction: 'telemetry',
+      });
+
+      if (isDesktop) {
+        // PC: Open independent inspector modal (main screen state untouched!)
+        setAiInspectorState({
+          isOpen: true,
+          circuitId,
+          driver1Code: d1,
+          driver2Code: d2,
+          lapNumber: action.lapNumber,
+          insightNotes: guidanceText,
+        });
+      } else {
+        // Mobile: Close drawer and apply directly to main telemetry screen
+        setAiDrawerOpen(false);
+        setAppMode('season');
+        setActiveHub('telemetry');
+        setMobileTab('telemetry');
+        setDetailedTelemetryParams({
+          circuitId,
+          driver1: d1,
+          driver2: d2,
+        });
+        setTimeout(() => {
+          document.getElementById('detailed-telemetry-section')?.scrollIntoView({ behavior: 'smooth' });
+        }, 150);
+      }
+      return;
+    }
+
+    // Other tools (PC & Mobile): close AI drawer and jump directly
+    setAiDrawerOpen(false);
+
+    if (action.type === 'stints') {
+      setAppMode('season');
+      setActiveHub('telemetry');
+      setMobileTab('telemetry');
+      setTimeout(() => {
+        document.getElementById('stint-visualizer-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+    } else if (action.type === 'pit_sim') {
+      setAppMode('season');
+      setActiveHub('telemetry');
+      setMobileTab('telemetry');
+      setTimeout(() => {
+        document.getElementById('pit-strategy-simulator-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+    } else if (action.type === 'radio') {
+      setAppMode('season');
+      setActiveHub('telemetry');
+      setMobileTab('telemetry');
+      if (action.lapNumber) {
+        const drv = state.selectedDrivers[0] ?? '1';
+        setTimeout(() => {
+          timelineRef.current?.scrollToLap(drv, action.lapNumber!);
+        }, 300);
+      }
+    } else if (action.type === 'library_tyres') {
+      setAppMode('library');
+      setLibrarySubTab('tyres');
+      setActiveHub('knowledge');
+    } else if (action.type === 'library_circuits') {
+      if (action.circuitId) setTargetCircuitId(action.circuitId);
+      setAppMode('library');
+      setLibrarySubTab('circuits');
+      setActiveHub('knowledge');
+    } else if (action.type === 'library_regulations') {
+      setAppMode('library');
+      setLibrarySubTab('regulations');
+      setActiveHub('knowledge');
+    } else if (action.type === 'library_glossary') {
+      if (action.termId) {
+        setTargetGlossaryTermId(action.termId);
+      }
+      setAppMode('library');
+      setLibrarySubTab('glossary');
+      setActiveHub('knowledge');
+    } else if (action.type === 'library_drama') {
+      setAppMode('library');
+      setLibrarySubTab('drama');
+      setActiveHub('knowledge');
+    } else if (action.type === 'quiz') {
+      setQuizModalOpen(true);
+    }
+  }, [detailedTelemetryParams, state.selectedDrivers]);
+
 
   // Session tag for notebook entries
   const sessionTag = state.currentSession
@@ -689,6 +949,122 @@ export default function DashboardPage() {
 
   const analysisContent = (
     <div className="flex flex-col gap-5">
+      {/* Persistent AI Guidance Companion Bar if active */}
+      {activeAiGuidance && (() => {
+        const lower = activeAiGuidance.content.toLowerCase();
+        const relevantTerms = GLOSSARY_TERMS.filter((term) => {
+          if (lower.includes(term.id.toLowerCase())) return true;
+          const cleanTerm = term.term.replace(/\(.*?\)/g, '').trim().toLowerCase();
+          if (cleanTerm.length >= 2 && lower.includes(cleanTerm)) return true;
+          const cleanEn = term.englishTerm.toLowerCase();
+          if (cleanEn.length >= 3 && lower.includes(cleanEn)) return true;
+          return false;
+        }).slice(0, 6);
+
+        return (
+          <div className="rounded-2xl bg-gradient-to-r from-blue-950/90 via-slate-900/90 to-indigo-950/90 border border-blue-500/40 p-4 shadow-xl space-y-2.5 animate-fade-in">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🤖</span>
+                <h4 className="font-racing font-bold text-xs sm:text-sm text-white flex items-center gap-2">
+                  <span>{activeAiGuidance.title}</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                    AIアドバイス保持中
+                  </span>
+                </h4>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuickGlossaryQuery('');
+                    setQuickGlossaryOpen(true);
+                  }}
+                  className="text-[11px] font-racing font-bold px-2.5 py-1 rounded-lg bg-emerald-700/80 hover:bg-emerald-600 text-white transition-colors cursor-pointer shadow-sm flex items-center gap-1"
+                  title="F1用語クイック検索を開く"
+                >
+                  <span>📖</span>
+                  <span>用語検索</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (typeof window === 'undefined') return;
+                    const params = new URLSearchParams();
+                    if (detailedTelemetryParams.circuitId) params.set('circuit', detailedTelemetryParams.circuitId);
+                    if (detailedTelemetryParams.driver1) params.set('d1', detailedTelemetryParams.driver1);
+                    if (detailedTelemetryParams.driver2) params.set('d2', detailedTelemetryParams.driver2);
+                    if (activeAiGuidance.content) params.set('notes', activeAiGuidance.content);
+
+                    const url = `/popout/telemetry?${params.toString()}`;
+                    const width = 1280;
+                    const height = 850;
+                    const left = Math.max(0, Math.round((window.screen.width - width) / 2));
+                    const top = Math.max(0, Math.round((window.screen.height - height) / 2));
+
+                    window.open(
+                      url,
+                      'F1TelemetryInspectorPopout',
+                      `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes`
+                    );
+                  }}
+                  className="text-[11px] font-racing font-bold px-2.5 py-1 rounded-lg bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 hover:border-purple-300 text-purple-200 hover:text-white transition-colors cursor-pointer shadow-sm flex items-center gap-1"
+                  title="テレメトリーを別ウィンドウで分離して開く"
+                >
+                  <span>↗</span>
+                  <span className="hidden sm:inline">別ウィンドウ</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAiDrawerOpen(true);
+                    setRightPanelTab('ai');
+                  }}
+                  className="text-[11px] font-racing font-bold px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors cursor-pointer shadow-sm"
+                >
+                  AIチャットを開く
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveAiGuidance(null)}
+                  className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                  title="閉じる"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+            <div className="text-xs text-slate-200 whitespace-pre-wrap leading-relaxed pl-6 border-l-2 border-blue-400/50">
+              {activeAiGuidance.content}
+            </div>
+
+            {/* Clickable Relevant Term Chips */}
+            {relevantTerms.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-white/10 mt-1">
+                <span className="text-[10px] font-racing font-bold text-sky-400 flex items-center gap-1 flex-shrink-0">
+                  <span>💡</span>
+                  <span>解説内の重要用語（クリックで図解確認）:</span>
+                </span>
+                {relevantTerms.map((term) => (
+                  <button
+                    key={term.id}
+                    type="button"
+                    onClick={() => {
+                      setQuickGlossaryQuery(term.term.split(' ')[0]);
+                      setQuickGlossaryOpen(true);
+                    }}
+                    className="px-2 py-0.5 rounded-lg text-[11px] font-mono font-bold bg-slate-800/90 hover:bg-emerald-950/90 text-slate-300 hover:text-emerald-300 border border-white/10 hover:border-emerald-500/40 transition-all flex items-center gap-1 cursor-pointer shadow-sm active:scale-95"
+                  >
+                    <span>🧠</span>
+                    <span>{term.term.split(' ')[0]}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
       <TelemetryChart
         selectedDrivers={state.selectedDrivers}
         lapsCache={state.lapsCache}
@@ -704,16 +1080,18 @@ export default function DashboardPage() {
       />
 
       {/* ── Lap-by-Lap Position Change Chart ── */}
-      <PositionChangeChart
-        drivers={state.drivers}
-        stints={state.stints}
-        safetyCarPeriods={state.safetyCarPeriods}
-        totalLaps={currentBenchmark.totalLaps}
-        selectedDrivers={state.selectedDrivers}
-        onDriverSelect={(driverNum) =>
-          handleDriverToggle(driverNum, !state.selectedDrivers.includes(driverNum))
-        }
-      />
+      <section id="position-change-section">
+        <PositionChangeChart
+          drivers={state.drivers}
+          stints={state.stints}
+          safetyCarPeriods={state.safetyCarPeriods}
+          totalLaps={currentBenchmark.totalLaps}
+          selectedDrivers={state.selectedDrivers}
+          onDriverSelect={(driverNum) =>
+            handleDriverToggle(driverNum, !state.selectedDrivers.includes(driverNum))
+          }
+        />
+      </section>
 
       {/* 3-Tier Synchronized Detailed Telemetry (Car Data Comparison) */}
       <section id="detailed-telemetry-section">
@@ -721,44 +1099,52 @@ export default function DashboardPage() {
           initialCircuitId={detailedTelemetryParams.circuitId}
           initialDriver1Code={detailedTelemetryParams.driver1}
           initialDriver2Code={detailedTelemetryParams.driver2}
+          initialTab={detailedTelemetryTab}
         />
       </section>
 
       {/* ── Full-Grid Tyre Stints & Strategy Timeline (Stint Visualizer) ── */}
-      <StintVisualizer
-        drivers={state.drivers}
-        stints={state.stints}
-        pitStopsCache={state.pitStopsCache}
-        totalLaps={currentBenchmark.totalLaps}
-        isLive={!state.isDemoMode}
-        isLoading={state.isLoading}
-        selectedDrivers={state.selectedDrivers}
-        onDriverSelect={(driverNum) =>
-          handleDriverToggle(driverNum, !state.selectedDrivers.includes(driverNum))
-        }
-        onRefresh={() => {
-          if (state.selectedSessionKey) {
-            handleSessionChange(state.selectedSessionKey);
+      <section id="stint-visualizer-section">
+        <StintVisualizer
+          drivers={state.drivers}
+          stints={state.stints}
+          pitStopsCache={state.pitStopsCache}
+          totalLaps={currentBenchmark.totalLaps}
+          isLive={!state.isDemoMode}
+          isLoading={state.isLoading}
+          selectedDrivers={state.selectedDrivers}
+          onDriverSelect={(driverNum) =>
+            handleDriverToggle(driverNum, !state.selectedDrivers.includes(driverNum))
           }
-        }}
-      />
+          onRefresh={() => {
+            if (state.selectedSessionKey) {
+              handleSessionChange(state.selectedSessionKey);
+            }
+          }}
+        />
+      </section>
 
       {state.selectedDrivers.length > 0 && (
-        <SectorAnalysis
-          selectedDrivers={state.selectedDrivers}
-          drivers={state.drivers}
-          lapsCache={state.lapsCache}
-        />
+        <section id="sector-analysis-section">
+          <SectorAnalysis
+            selectedDrivers={state.selectedDrivers}
+            drivers={state.drivers}
+            lapsCache={state.lapsCache}
+          />
+        </section>
       )}
 
       {state.selectedDrivers.length > 0 && (
-        <PitStrategySimulator
-          selectedDrivers={state.selectedDrivers}
-          drivers={state.drivers}
-          lapsCache={state.lapsCache}
-          stints={state.stints}
-          geminiApiKey={state.geminiApiKey}
-        />
+        <section id="pit-strategy-simulator-section">
+          <PitStrategySimulator
+            selectedDrivers={state.selectedDrivers}
+            drivers={state.drivers}
+            lapsCache={state.lapsCache}
+            stints={state.stints}
+            geminiApiKey={state.geminiApiKey}
+            initialViewMode={pitStrategyViewMode}
+          />
+        </section>
       )}
 
       {state.selectedDrivers.length > 0 && (
@@ -773,7 +1159,7 @@ export default function DashboardPage() {
         </section>
       )}
 
-      <section>
+      <section id="team-radio-section">
         <TeamRadioTimeline
           ref={timelineRef}
           selectedDrivers={state.selectedDrivers}
@@ -804,6 +1190,7 @@ export default function DashboardPage() {
         session={state.currentSession}
         onAddToNotebook={handleAddToNotebook}
         onRequireAuth={() => handleRequireAuth('AI 戦略アナリスト', 'AI戦略アナリストによるレース分析・戦略提案は認証メンバー専用機能です。')}
+        onNavigate={handleAiNavigate}
       />
     </div>
   );
@@ -816,6 +1203,49 @@ export default function DashboardPage() {
 
   const mainHubContent = (
     <>
+      {/* ── Minimalist Location Breadcrumb (Slim & unobtrusive) ── */}
+      <nav aria-label="Breadcrumb" className="mb-3 flex items-center gap-1.5 text-xs text-slate-400 font-mono">
+        <button
+          type="button"
+          onClick={handleGoHome}
+          className="text-slate-400 hover:text-white transition-colors cursor-pointer flex items-center gap-1"
+          title="ホーム画面に戻る"
+        >
+          <span>🏠</span>
+          <span>ホーム</span>
+        </button>
+        <span className="text-slate-600">/</span>
+        <span className="text-slate-300">
+          {appMode === 'season' ? 'レース観戦' : 'F1大百科'}
+        </span>
+        <span className="text-slate-600">/</span>
+        <span className="text-slate-200 font-semibold font-sans">
+          {appMode === 'season'
+            ? activeHub === 'season'
+              ? '2026年レースカレンダー'
+              : activeHub === 'telemetry'
+              ? detailedTelemetryTab === 'delta_matrix'
+                ? 'タイムデルタ(Δt)解析'
+                : 'テレメトリー＆Live'
+              : activeHub === 'news'
+              ? 'ニュース＆パドック (FOD公式中継)'
+              : 'レースノート＆AI'
+            : librarySubTab === 'drivers'
+            ? '選手名鑑'
+            : librarySubTab === 'teams'
+            ? 'チーム名鑑'
+            : librarySubTab === 'circuits'
+            ? 'コース解説'
+            : librarySubTab === 'tyres'
+            ? 'タイヤ大百科'
+            : librarySubTab === 'regulations'
+            ? '2026次世代規定'
+            : librarySubTab === 'rules'
+            ? '規定・用語集'
+            : 'ドラマ・歴史'}
+        </span>
+      </nav>
+
       {activeHub === 'season' && (
         <ErrorBoundary sectionName="F1 シーズン観戦＆カレンダー">
           <SeasonHub
@@ -886,6 +1316,25 @@ export default function DashboardPage() {
             onSubTabChange={setLibrarySubTab}
             targetCircuitId={targetCircuitId}
             initialDramaTab={targetDramaTab}
+            initialGlossaryTermId={targetGlossaryTermId}
+            onNavigateToApp={(action) => {
+              if (action.appMode) setAppMode(action.appMode);
+              if (action.hub) {
+                setActiveHub(action.hub);
+                if (action.hub === 'telemetry') setMobileTab('telemetry');
+              }
+              if (action.subTab) {
+                setLibrarySubTab(action.subTab);
+              }
+              if (action.circuitId) {
+                setDetailedTelemetryParams(prev => ({ ...prev, circuitId: action.circuitId! }));
+              }
+              if (action.section) {
+                setTimeout(() => {
+                  document.getElementById(action.section!)?.scrollIntoView({ behavior: 'smooth' });
+                }, 150);
+              }
+            }}
             onNavigateToTelemetry={(target) => {
               setAppMode('season');
               setActiveHub('telemetry');
@@ -916,315 +1365,200 @@ export default function DashboardPage() {
   return (
     <div className="h-screen h-[100dvh] flex flex-col bg-f1-gradient overflow-hidden">
 
-      {/* ── Header (sticky flex flex-col) ── */}
-      <header className="flex-shrink-0 sticky top-0 z-30 border-b border-white/10 bg-slate-950/95 backdrop-blur-md shadow-xl flex flex-col">
-        {/* Top Global Row */}
-        <div className="px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-3">
-          {/* Left: Logo + Title */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-            {/* Mobile menu toggle */}
+      {/* ── Header: Ultra-Slim Modern Single Bar (h-14 / 56px fixed) ── */}
+      <header className="flex-shrink-0 sticky top-0 z-30 border-b border-white/10 bg-slate-950/95 backdrop-blur-md shadow-md">
+        {/* Top Row: Exactly 56px, single line, no vertical bloating */}
+        <div className="h-14 px-3 sm:px-4 flex items-center justify-between gap-2 sm:gap-4">
+          {/* Left: Hamburger (☰) + Clickable Logo */}
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Standard App Hamburger Menu Button (☰) */}
             <button
-              className="lg:hidden text-slate-400 hover:text-white text-lg p-1 -ml-1 cursor-pointer"
-              onClick={() => setSidebarOpen((v) => !v)}
-              aria-label="Toggle sidebar"
+              type="button"
+              onClick={() => setNavigationDrawerOpen(true)}
+              className="flex items-center justify-center w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 hover:border-white/20 transition-all cursor-pointer shadow-sm active:scale-95 group"
+              aria-label="全機能メニューを開く"
+              title="全機能メニュー (☰)"
             >
-              ☰
+              <div className="w-4 h-3.5 flex flex-col justify-between items-center py-0.5">
+                <span className="w-4 h-0.5 bg-current rounded-full transition-all group-hover:bg-red-400" />
+                <span className="w-4 h-0.5 bg-current rounded-full transition-all group-hover:bg-red-400" />
+                <span className="w-4 h-0.5 bg-current rounded-full transition-all group-hover:bg-red-400" />
+              </div>
             </button>
 
-            {/* Logo & Brand Title */}
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 bg-gradient-to-br from-red-600 via-red-500 to-rose-700 rounded flex items-center justify-center flex-shrink-0 shadow-md shadow-red-950/40 border border-red-400/30">
-                <span className="font-racing text-white text-xs font-black tracking-tight">P1</span>
+            {/* Logo & Brand Title (Clickable Home Link — アプリ名・ロゴクリックでホーム画面へ即時復帰) */}
+            <button
+              type="button"
+              onClick={handleGoHome}
+              className="flex items-center gap-2 p-1 rounded-xl text-left cursor-pointer group select-none hover:bg-white/5 active:bg-white/10 transition-all active:scale-98"
+              title="ホーム画面（2026年シーズン観戦カレンダー）に戻る"
+              aria-label="ホーム画面に戻る"
+            >
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-red-600 via-red-500 to-rose-700 rounded-lg flex items-center justify-center shrink-0 shadow-md shadow-red-950/40 border border-red-400/30 group-hover:border-red-300 group-hover:scale-105 transition-all">
+                <span className="font-racing text-white text-xs sm:text-sm font-black tracking-tight">P1</span>
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="font-racing text-xs sm:text-base font-bold text-white tracking-widest leading-tight">
-                    PADOROKU
-                  </h1>
-                  <span className="hidden xl:inline-block px-1.5 py-0.5 rounded bg-red-950/70 border border-red-500/30 text-[9px] font-mono text-red-300 font-semibold">
-                    F1 PORTAL
-                  </span>
-                </div>
-                <p className="text-slate-400 text-[10px] font-mono tracking-wider hidden md:block">
-                  ADVANCED MOTORSPORT INTELLIGENCE
-                </p>
+              <div className="flex items-center gap-1.5">
+                <span className="font-racing text-sm sm:text-base font-bold text-white tracking-widest leading-none group-hover:text-red-400 transition-colors">
+                  PADOROKU
+                </span>
+                <span className="hidden xl:inline-block px-1.5 py-0.2 rounded bg-red-950/70 border border-red-500/30 text-[9px] font-mono text-red-300 font-semibold">
+                  F1 PORTAL
+                </span>
               </div>
-            </div>
+            </button>
           </div>
 
-          {/* Center: Dual-Mode Switcher & Context Navigation (Desktop & Tablet) */}
-          <div className="hidden md:flex items-center gap-2">
-            {/* Top-Level Mode Switcher */}
-            <div className="flex items-center bg-slate-950 p-1 rounded-2xl border border-white/15 shadow-inner">
-              <button
-                onClick={() => {
-                  setAppMode('season');
-                  if (activeHub === 'knowledge') setActiveHub('season');
-                }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                  appMode === 'season'
-                    ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <span>🏁</span>
-                <span className="hidden lg:inline">レース観戦</span>
-                <span className="lg:hidden">観戦</span>
-              </button>
-              <button
-                onClick={() => {
-                  setAppMode('library');
-                  setActiveHub('knowledge');
-                }}
-                className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                  appMode === 'library'
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <span>📚</span>
-                <span className="hidden lg:inline">F1大百科</span>
-                <span className="lg:hidden">大百科</span>
-              </button>
-            </div>
-
-            {/* Context Hub Pills (Shown in Season Mode) */}
-            {appMode === 'season' && (
-              <nav className="flex items-center bg-slate-900/90 rounded-2xl p-1 border border-white/10 shadow-inner">
-                {(
-                  [
-                    ['season', '🏁 レース観戦＆カレンダー'],
-                    ['telemetry', '🏎️ テレメトリー＆Live'],
-                    ['news', '📰 ニュース＆パドック'],
-                    ['notes', '📝 レースノート＆AI'],
-                  ] as [ActiveHub, string][]
-                ).map(([hub, label]) => (
-                  <button
-                    key={hub}
-                    onClick={() => setActiveHub(hub)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all ${
-                      activeHub === hub
-                        ? 'bg-red-600 text-white shadow-md shadow-red-500/30'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </nav>
-            )}
-          </div>
-
-          {/* Right: Quick Actions + Driver Pills + AI Strategist Toggle + Auth */}
-          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-            {/* F1 Quiz & Trivia Button (Prominent & Easy to Tap on Mobile!) */}
+          {/* Center: Primary Navigation Tabs (Single clean row, never wraps) */}
+          <nav className="hidden md:flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-white/10 shadow-inner shrink-0">
             <button
-              onClick={() => setQuizModalOpen(true)}
-              className="flex items-center gap-1 sm:gap-1.5 px-2 py-1.5 sm:px-2.5 sm:py-1.5 rounded-xl text-xs font-racing font-bold bg-purple-950/60 hover:bg-purple-900/80 text-purple-300 border border-purple-500/50 hover:border-purple-400 shadow-sm transition-all flex-shrink-0 cursor-pointer"
-              title="対話型F1クイズ＆トリビア検定"
-            >
-              <span className="text-sm">🏆</span>
-              <span className="inline font-bold">クイズ</span>
-            </button>
-
-            {/* Global Command Palette / Search Button (Ctrl+K) */}
-            <button
-              onClick={() => setGlobalSearchOpen(true)}
-              className="flex items-center gap-1.5 px-2 py-1.5 sm:px-3 sm:py-1.5 rounded-lg sm:rounded-xl text-xs font-racing font-bold bg-slate-800/90 hover:bg-slate-700 text-sky-300 hover:text-white border border-sky-500/30 hover:border-sky-400 shadow-sm transition-all flex-shrink-0 cursor-pointer"
-              title="選手・チーム・コース・タイヤ・用語の横断検索 (Ctrl+K)"
-            >
-              <span>🔍</span>
-              <span className="hidden md:inline">総合検索</span>
-              <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.5 rounded bg-black/50 text-[9px] text-slate-400 font-mono border border-white/10 ml-0.5">
-                Ctrl K
-              </kbd>
-            </button>
-
-            {/* Quick Glossary Search Button (Global Action) */}
-            <button
-              onClick={() => setQuickGlossaryOpen(true)}
-              className="flex items-center gap-1.5 px-2 py-1.5 sm:px-2.5 sm:py-1.5 rounded-lg sm:rounded-xl text-xs font-racing font-bold bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-500/40 hover:border-emerald-400 shadow-sm transition-all flex-shrink-0 cursor-pointer"
-              title="レース観戦中の用語クイック検索"
-            >
-              <span>📖</span>
-              <span className="hidden md:inline">用語</span>
-            </button>
-
-            {/* Selected driver pills (desktop, in telemetry hub) */}
-            {activeHub === 'telemetry' && (
-              <div className="hidden xl:flex items-center gap-1.5 mr-1">
-                {state.selectedDrivers.map((num) => {
-                  const drv = state.drivers.find((d) => d.driver_number.toString() === num);
-                  const color = drv ? `#${drv.team_colour}` : '#38bdf8';
-                  return (
-                    <span
-                      key={num}
-                      className="px-2 py-0.5 rounded-full text-xs font-racing font-bold border"
-                      style={{ borderColor: `${color}60`, color, backgroundColor: `${color}15` }}
-                    >
-                      {drv?.name_acronym ?? `#${num}`}
-                    </span>
-                  );
-                })}
-                {state.isLoading && (
-                  <span className="text-xs text-slate-500 flex items-center gap-1">
-                    <span className="w-3 h-3 border border-slate-500 border-t-transparent rounded-full animate-spin" />
-                  </span>
-                )}
-              </div>
-            )}
-
-            {/* AI Strategist Toggle Button (Header: Desktop & Tablet only) */}
-            <button
-              onClick={() => setAiDrawerOpen((v) => !v)}
-              className={`hidden md:flex px-3 py-1.5 rounded-xl text-xs font-racing font-bold items-center gap-1.5 transition-all shadow-md flex-shrink-0 ${
-                aiDrawerOpen
-                  ? 'bg-blue-600 text-white border border-blue-400 shadow-[0_0_12px_rgba(37,99,235,0.4)]'
-                  : 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-white/10 hover:border-white/25'
-              }`}
-            >
-              <span>🤖</span>
-              <span>AI STRATEGIST</span>
-              {aiDrawerOpen && <span className="text-[10px] ml-0.5">✕</span>}
-            </button>
-
-            {/* Auth Button (Login / User Profile Dropdown) */}
-            <AuthButton onOpenAuthModal={() => handleRequireAuth()} />
-          </div>
-        </div>
-
-        {/* ── Mobile Row 2: Clean Mode Switcher Bar (< md) ── */}
-        <div className="md:hidden px-3 py-1.5 border-t border-white/5 bg-slate-900/80 flex items-center justify-center">
-          <div className="grid grid-cols-2 w-full max-w-xs bg-slate-950 p-1 rounded-xl border border-white/10 gap-1 shadow-inner">
-            <button
+              type="button"
               onClick={() => {
                 setAppMode('season');
-                if (activeHub === 'knowledge') setActiveHub('season');
+                setActiveHub('season');
               }}
-              className={`py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                appMode === 'season'
-                  ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
-                  : 'text-slate-400 hover:text-slate-200'
+              className={`px-3 py-1 rounded-lg text-xs font-racing font-bold transition-all whitespace-nowrap cursor-pointer ${
+                appMode === 'season' && activeHub === 'season'
+                  ? 'bg-red-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
             >
-              <span>🏁</span>
-              <span>レース観戦</span>
+              🏁 レース観戦
             </button>
+
             <button
+              type="button"
+              onClick={() => {
+                setAppMode('season');
+                setActiveHub('telemetry');
+              }}
+              className={`px-3 py-1 rounded-lg text-xs font-racing font-bold transition-all whitespace-nowrap cursor-pointer ${
+                appMode === 'season' && activeHub === 'telemetry'
+                  ? 'bg-red-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              🏎️ テレメトリー
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setAppMode('season');
+                setActiveHub('news');
+              }}
+              className={`px-3 py-1 rounded-lg text-xs font-racing font-bold transition-all whitespace-nowrap cursor-pointer ${
+                appMode === 'season' && activeHub === 'news'
+                  ? 'bg-red-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              📺 FOD中継＆ニュース
+            </button>
+
+            <button
+              type="button"
               onClick={() => {
                 setAppMode('library');
                 setActiveHub('knowledge');
               }}
-              className={`py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`px-3 py-1 rounded-lg text-xs font-racing font-bold transition-all whitespace-nowrap cursor-pointer ${
                 appMode === 'library'
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
             >
-              <span>📚</span>
-              <span>F1大百科</span>
+              📚 F1大百科
             </button>
+          </nav>
+
+          {/* Right: Quick Tools (Search, Quiz, AI, Auth) */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Global Command Palette / Search Button (Ctrl+K) */}
+            <button
+              type="button"
+              onClick={() => setGlobalSearchOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 hover:border-white/20 transition-all cursor-pointer"
+              title="選手・チーム・コース・タイヤ・用語の横断検索 (Ctrl+K)"
+            >
+              <span className="text-xs">🔍</span>
+              <span className="hidden sm:inline">検索</span>
+              <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.2 rounded bg-black/50 text-[9px] text-slate-400 font-mono border border-white/10 ml-0.5">
+                Ctrl K
+              </kbd>
+            </button>
+
+            {/* F1 Quiz Button */}
+            <button
+              type="button"
+              onClick={() => setQuizModalOpen(true)}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold bg-purple-950/60 hover:bg-purple-900/80 text-purple-300 border border-purple-500/40 hover:border-purple-400 transition-all cursor-pointer"
+              title="対話型F1クイズ＆トリビア検定"
+            >
+              <span>🏆</span>
+              <span className="hidden sm:inline">クイズ</span>
+            </button>
+
+            {/* AI Strategist Toggle Button (Desktop & Tablet) */}
+            <button
+              type="button"
+              onClick={() => setAiDrawerOpen((v) => !v)}
+              className={`hidden md:flex px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold items-center gap-1.5 transition-all cursor-pointer shrink-0 ${
+                aiDrawerOpen
+                  ? 'bg-blue-600 text-white border border-blue-400 shadow-[0_0_12px_rgba(37,99,235,0.4)]'
+                  : 'bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10'
+              }`}
+              title="AIチーフレースストラテジスト"
+            >
+              <span>🤖</span>
+              <span className="hidden lg:inline">AI</span>
+            </button>
+
+            {/* Auth Button */}
+            <AuthButton onOpenAuthModal={() => handleRequireAuth()} />
           </div>
         </div>
 
-      {/* ── Level 2: Persistent Library Sub-Header (Integrated inside Header, permanently fixed!) ── */}
+        {/* ── Sub-Header: ONLY shown in Library Mode (Clean horizontal pills) ── */}
         {appMode === 'library' && (
-          <div className="border-t border-white/10 bg-slate-900/95 px-4 py-2 shadow-inner">
-            <div className="max-w-6xl mx-auto flex items-center justify-between gap-2">
-              {/* Desktop: All 6 Categories in 1 clean row */}
-              <div className="hidden lg:flex items-center justify-between gap-1 w-full bg-slate-900/90 p-1.5 rounded-2xl border border-white/10 shadow-inner">
-                {(
-                  [
-                    ['drivers', '👤', '選手名鑑'],
-                    ['teams', '🏎️', 'チーム名鑑'],
-                    ['circuits', '🏁', 'コース解説'],
-                    ['tyres', '🛞', 'タイヤ大百科'],
-                    ['regulations', '📜', '規定・ルール'],
-                    ['glossary', '🧠', '用語辞典'],
-                    ['drama', '🎬', 'ドラマ・歴史'],
-                  ] as [SubTab, string, string][]
-                ).map(([tab, icon, label]) => {
-                  const isActive = librarySubTab === tab;
-                  return (
-                    <button
-                      key={tab}
-                      onClick={() => {
-                        setLibrarySubTab(tab);
-                        desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-                        mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className={`px-2.5 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center justify-center gap-1.5 flex-1 whitespace-nowrap ${
-                        isActive
-                          ? tab === 'drama'
-                            ? 'bg-rose-600 text-white shadow-md shadow-rose-500/30 ring-1 ring-rose-400/40'
-                          : tab === 'regulations'
-                            ? 'bg-purple-600 text-white shadow-md shadow-purple-500/30 ring-1 ring-purple-400/40'
-                          : tab === 'glossary'
-                            ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/30 ring-1 ring-emerald-400/40'
-                          : tab === 'tyres'
-                            ? 'bg-amber-600 text-white shadow-md shadow-amber-500/30 ring-1 ring-amber-400/40'
-                          : 'bg-blue-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-400/40'
-                          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-                      }`}
-                    >
-                      <span className="text-sm">{icon}</span>
-                      <span>{label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Mobile / Tablet Horizontal Scrollable Pills */}
-              <div className="lg:hidden flex items-center gap-1.5 overflow-x-auto w-full py-0.5 no-scrollbar">
-                {(
-                  [
-                    ['drivers', '👤', '選手名鑑'],
-                    ['teams', '🏎️', 'チーム名鑑'],
-                    ['circuits', '🏁', 'コース解説'],
-                    ['tyres', '🛞', 'タイヤ大百科'],
-                    ['regulations', '📜', '規定・ルール'],
-                    ['glossary', '🧠', '用語辞典'],
-                    ['drama', '🎬', 'ドラマ・歴史'],
-                  ] as [SubTab, string, string][]
-                ).map(([tab, icon, label]) => {
-                  const isActive = librarySubTab === tab;
-                  return (
-                    <button
-                      key={tab}
-                      onClick={() => {
-                        setLibrarySubTab(tab);
-                        desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-                        mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1 shrink-0 whitespace-nowrap ${
-                        isActive
-                          ? tab === 'drama'
-                            ? 'bg-rose-600 text-white shadow-md'
-                          : tab === 'regulations'
-                            ? 'bg-purple-600 text-white shadow-md'
-                          : tab === 'glossary'
-                            ? 'bg-emerald-600 text-white shadow-md'
-                          : tab === 'tyres'
-                            ? 'bg-amber-600 text-white shadow-md'
-                          : 'bg-blue-600 text-white shadow-md'
-                          : 'text-slate-400 hover:text-slate-200 bg-slate-900/60 border border-white/5'
-                      }`}
-                    >
-                      <span>{icon}</span>
-                      <span>{label}</span>
-                    </button>
-                  );
-                })}
-
-                {/* Quick shortcut to F1 Quiz */}
-                <button
-                  onClick={() => setQuizModalOpen(true)}
-                  className="px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1 shrink-0 whitespace-nowrap bg-purple-950/60 text-purple-300 border border-purple-500/40 hover:bg-purple-900/60 cursor-pointer"
-                >
-                  <span>🏆</span>
-                  <span>F1クイズ検定</span>
-                </button>
-              </div>
+          <div className="h-10 border-t border-white/10 bg-slate-900/90 px-3 sm:px-4 flex items-center justify-between overflow-x-auto no-scrollbar">
+            <div className="flex items-center gap-1 w-full max-w-5xl mx-auto py-0.5">
+              {(
+                [
+                  ['drivers', '👤', '選手名鑑'],
+                  ['teams', '🏎️', 'チーム名鑑'],
+                  ['circuits', '🏁', 'コース解説'],
+                  ['tyres', '🛞', 'タイヤ大百科'],
+                  ['rules', '⚖️', '規定・用語集'],
+                  ['drama', '🎬', 'ドラマ・歴史'],
+                ] as [SubTab, string, string][]
+              ).map(([tab, icon, label]) => {
+                const isActive = librarySubTab === tab || (tab === 'rules' && (librarySubTab === 'rules' || librarySubTab === 'glossary' || librarySubTab === 'regulations'));
+                return (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => {
+                      setLibrarySubTab(tab);
+                      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className={`px-3 py-1 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1 shrink-0 whitespace-nowrap cursor-pointer ${
+                      isActive
+                        ? tab === 'drama'
+                          ? 'bg-rose-600 text-white shadow-sm'
+                        : tab === 'rules'
+                          ? 'bg-emerald-600 text-white shadow-sm'
+                        : tab === 'tyres'
+                          ? 'bg-amber-600 text-white shadow-sm'
+                        : 'bg-blue-600 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                    }`}
+                  >
+                    <span>{icon}</span>
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -1269,6 +1603,20 @@ export default function DashboardPage() {
               <div className="mb-4 space-y-1.5">
                 <span className="text-[10px] font-mono text-slate-400 font-bold uppercase tracking-wider px-1">各種機能・ツール</span>
                 <div className="grid grid-cols-1 gap-1.5">
+                  <button
+                    onClick={() => {
+                      setSidebarOpen(false);
+                      setFeatureDirectoryOpen(true);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl bg-red-950/40 hover:bg-red-900/60 border border-red-500/30 text-red-200 text-xs font-racing font-bold text-left transition-all cursor-pointer"
+                  >
+                    <span className="text-base">🧭</span>
+                    <div>
+                      <div>全機能マップ ＆ レビューガイド</div>
+                      <div className="text-[10px] text-red-400 font-normal">全機能への直通ジャンプと解説</div>
+                    </div>
+                  </button>
+
                   <button
                     onClick={() => {
                       setSidebarOpen(false);
@@ -1391,11 +1739,11 @@ export default function DashboardPage() {
                 ['teams',    '🏎️', 'チーム'],
                 ['circuits', '🏁', 'コース'],
                 ['tyres',    '🛞', 'タイヤ'],
-                ['glossary', '🧠', '用語'],
+                ['rules',    '⚖️', '規定・用語'],
                 ['drama',    '🎬', 'ドラマ'],
               ] as [SubTab, string, string][]
             ).map(([subTab, icon, label]) => {
-              const isActive = activeHub === 'knowledge' && librarySubTab === subTab && !aiDrawerOpen;
+              const isActive = activeHub === 'knowledge' && (librarySubTab === subTab || (subTab === 'rules' && (librarySubTab === 'rules' || librarySubTab === 'glossary' || librarySubTab === 'regulations'))) && !aiDrawerOpen;
 
               return (
                 <button
@@ -1495,6 +1843,7 @@ export default function DashboardPage() {
       <QuickGlossaryModal
         isOpen={quickGlossaryOpen}
         onClose={() => setQuickGlossaryOpen(false)}
+        initialQuery={quickGlossaryQuery}
       />
 
       {/* ── Global Search Command Palette (Ctrl+K) ── */}
@@ -1524,6 +1873,62 @@ export default function DashboardPage() {
       <F1QuizModal
         isOpen={quizModalOpen}
         onClose={() => setQuizModalOpen(false)}
+      />
+
+      {/* ── Feature Directory & Review Guide Modal ── */}
+      <FeatureDirectoryModal
+        isOpen={featureDirectoryOpen}
+        onClose={() => setFeatureDirectoryOpen(false)}
+        onSelectFeature={handleFeatureJump}
+      />
+
+      {/* ── Standard App Global Navigation Drawer (☰ 横棒三本メニュー) ── */}
+      <AppNavigationDrawer
+        isOpen={navigationDrawerOpen}
+        onClose={() => setNavigationDrawerOpen(false)}
+        activeHub={activeHub}
+        appMode={appMode}
+        librarySubTab={librarySubTab}
+        detailedTelemetryTab={detailedTelemetryTab}
+        pitStrategyViewMode={pitStrategyViewMode}
+        onSelectFeature={handleFeatureJump}
+        sessionProps={{
+          selectedYear: state.selectedYear,
+          onYearChange: handleYearChange,
+          selectedMeetingKey: state.selectedMeetingKey,
+          onMeetingChange: handleMeetingChange,
+          selectedSessionKey: state.selectedSessionKey,
+          onSessionChange: handleSessionChange,
+          sessions: state.sessions,
+          drivers: state.drivers,
+          selectedDrivers: state.selectedDrivers,
+          onDriverToggle: handleDriverToggle,
+          isDemoMode: state.isDemoMode,
+          isLoading: state.isLoading,
+        }}
+      />
+
+      {/* ── PC AI Telemetry Inspector Modal (Independent Sandbox) ── */}
+      <AITelemetryInspectorModal
+        isOpen={aiInspectorState.isOpen}
+        onClose={() => setAiInspectorState(prev => ({ ...prev, isOpen: false }))}
+        circuitId={aiInspectorState.circuitId}
+        driver1Code={aiInspectorState.driver1Code}
+        driver2Code={aiInspectorState.driver2Code}
+        lapNumber={aiInspectorState.lapNumber}
+        insightNotes={aiInspectorState.insightNotes}
+        onApplyToMain={({ circuitId, driver1Code, driver2Code }) => {
+          setAppMode('season');
+          setActiveHub('telemetry');
+          setDetailedTelemetryParams({
+            circuitId,
+            driver1: driver1Code,
+            driver2: driver2Code,
+          });
+          setTimeout(() => {
+            document.getElementById('detailed-telemetry-section')?.scrollIntoView({ behavior: 'smooth' });
+          }, 150);
+        }}
       />
     </div>
   );

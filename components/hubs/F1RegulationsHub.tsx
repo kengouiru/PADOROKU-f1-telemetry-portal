@@ -13,6 +13,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
+import Regulations2026SimulatorSuite from '@/components/regulations/Regulations2026SimulatorSuite';
 import {
   REGULATION_CATEGORIES,
   REGULATION_ARTICLES,
@@ -28,6 +29,7 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
   const [selectedCategory, setSelectedCategory] = useState<RegulationCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedArticleId, setExpandedArticleId] = useState<string | null>(REGULATION_ARTICLES[0].id);
+  const [show2026Simulator, setShow2026Simulator] = useState<boolean>(true);
 
   // Filtered Articles
   const filteredArticles = useMemo(() => {
@@ -169,6 +171,38 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
           ))}
         </div>
       )}
+
+            {/* ── 2026 Next-Gen Simulator Lab Toggle & Showcase ── */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => setShow2026Simulator(!show2026Simulator)}
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600/30 to-purple-600/30 hover:from-red-600/40 hover:to-purple-600/40 border border-red-500/40 text-xs font-racing font-bold text-white flex items-center gap-2 shadow-lg transition-all"
+          >
+            <span>🚀 2026年 次世代規定 インタラクティブ・シミュレーター群</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 font-mono">
+              {show2026Simulator ? '▲ 格納する' : '▼ 展開して体験する'}
+            </span>
+          </button>
+          {selectedCategory !== 'future2026' && (
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedCategory('future2026');
+                setShow2026Simulator(true);
+              }}
+              className="text-xs text-red-400 hover:text-red-300 font-mono hidden sm:inline-block"
+            >
+              2026規定カテゴリーを開く ↗
+            </button>
+          )}
+        </div>
+
+        {(show2026Simulator || selectedCategory === 'future2026') && (
+          <Regulations2026SimulatorSuite />
+        )}
+      </div>
 
       {/* ── Articles List ── */}
       <div className="space-y-4">
