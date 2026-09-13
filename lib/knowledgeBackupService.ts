@@ -8,10 +8,19 @@
 import fs from 'fs';
 import path from 'path';
 
+export interface RollbackLogEntry {
+  timestamp: string;
+  target: 'knowledge' | 'news' | 'all';
+  restoredVersion: string;
+  message: string;
+}
+
 export interface BackupManifest {
   version: string;
   timestamp: string;
   createdAt: string;
+  lastRollback?: RollbackLogEntry;
+  rollbackHistory?: RollbackLogEntry[];
   stats: {
     teamsCount: number;
     circuitsCount: number;
@@ -298,5 +307,183 @@ export function runIntegrityAudit(): IntegrityCheckResult {
     passed,
     timestamp: new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }),
     checks,
+  };
+}
+
+/**
+ * Execute rollback to previous generation snapshot
+ */
+export function executeRollback(target: 'knowledge' | 'news' | 'all' = 'all'): {
+  success: boolean;
+  message: string;
+  restoredTargets: string[];
+  restoredVersions: Record<string, string>;
+  stats?: any;
+} {
+  ensureBackupDir();
+  const manifestPath = path.join(BACKUP_DIR, 'backup_manifest.json');
+  let manifest = getBackupManifest();
+  const now = new Date();
+  const nowStr = now.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+  const restoredTargets: string[] = [];
+  const restoredVersions: Record<string, string> = {};
+
+  // 1. Rollback Knowledge Data
+  if (target === 'knowledge' || target === 'all') {
+    const latestPath = path.join(BACKUP_DIR, 'knowledge_snapshot_latest.json');
+    const previousPath = path.join(BACKUP_DIR, 'knowledge_snapshot_previous.json');
+    const tempSafetyPath = path.join(BACKUP_DIR, 'knowledge_snapshot_safety_temp.json');
+
+    if (fs.existsSync(previousPath)) {
+      try {
+        // Read previous
+        const prevRaw = fs.readFileSync(previousPath, 'utf8');
+        const prevJson = JSON.parse(prevRaw);
+
+        // Safety backup of current latest
+        if (fs.existsSync(latestPath)) {
+          fs.copyFileSync(latestPath, tempSafetyPath);
+        }
+
+        // Overwrite latest with previous
+        fs.writeFileSync(latestPath, prevRaw, 'utf8');
+
+        // Delete temp on success
+        if (fs.existsSync(tempSafetyPath)) {
+          fs.unlinkSync(tempSafetyPath);
+        }
+
+        restoredTargets.push('knowledge');
+        restoredVersions.knowledge = prevJson.version || 'previous-version';
+      } catch (err) {
+        console.error('Failed to rollback knowledge snapshot:', err);
+        return {
+          success: false,
+          message: `知識データのロールバック処理中にエラーが発生しました: ${String(err)}`,
+          restoredTargets,
+          restoredVersions,
+        };
+      }
+    } else if (target === 'knowledge') {
+      return {
+        success: false,
+        message: '知識データの直前世代バックアップ（previous）が存在しないため復元できません。',
+        restoredTargets,
+        restoredVersions,
+      };
+    }
+  }
+
+  // 2. Rollback News Data
+  if (target === 'news' || target === 'all') {
+    const latestNewsPath = path.join(BACKUP_DIR, 'news_snapshot_latest.json');
+    const previousNewsPath = path.join(BACKUP_DIR, 'news_snapshot_previous.json');
+    const tempSafetyPath = path.join(BACKUP_DIR, 'news_snapshot_safety_temp.json');
+
+    if (fs.existsSync(previousNewsPath)) {
+      try {
+        const prevRaw = fs.readFileSync(previousNewsPath, 'utf8');
+        const prevJson = JSON.parse(prevRaw);
+
+        if (fs.existsSync(latestNewsPath)) {
+          fs.copyFileSync(latestNewsPath, tempSafetyPath);
+        }
+
+        fs.writeFileSync(latestNewsPath, prevRaw, 'utf8');
+
+        if (fs.existsSync(tempSafetyPath)) {
+          fs.unlinkSync(tempSafetyPath);
+        }
+
+        restoredTargets.push('news');
+        restoredVersions.news = prevJson.version || 'previous-news-version';
+      } catch (err) {
+        console.error('Failed to rollback news snapshot:', err);
+        return {
+          success: false,
+          message: `ニュースデータのロールバック処理中にエラーが発生しました: ${String(err)}`,
+          restoredTargets,
+          restoredVersions,
+        };
+      }
+    } else if (target === 'news') {
+      return {
+        success: false,
+        message: 'ニュースデータの直前世代バックアップ（previous）が存在しないため復元できません。',
+        restoredTargets,
+        restoredVersions,
+      };
+    }
+  }
+
+  if (restoredTargets.length === 0) {
+    return {
+      success: false,
+      message: '復元対象となる直前世代バックアップが見つかりませんでした。',
+      restoredTargets,
+      restoredVersions,
+    };
+  }
+
+  // 3. Record Rollback Log in Manifest
+  const rollbackEntry: RollbackLogEntry = {
+    timestamp: nowStr,
+    target,
+    restoredVersion: Object.values(restoredVersions).join(', '),
+    message: `直前世代へのロールバックが正常に完了しました (${restoredTargets.join(', ')})`,
+  };
+
+  if (manifest) {
+    manifest.lastRollback = rollbackEntry;
+    manifest.rollbackHistory = manifest.rollbackHistory || [];
+    manifest.rollbackHistory.unshift(rollbackEntry);
+    if (manifest.rollbackHistory.length > 10) manifest.rollbackHistory.pop();
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
+  }
+
+  return {
+    success: true,
+    message: `${restoredTargets.join('・')} の直前世代へのロールバックが完了しました。`,
+    restoredTargets,
+    restoredVersions,
+    stats: manifest?.stats,
+  };
+}
+
+/**
+ * Check if previous generation rollback is available
+ */
+export function getRollbackStatus(): {
+  knowledgeAvailable: boolean;
+  knowledgePreviousDate?: string;
+  newsAvailable: boolean;
+  newsPreviousDate?: string;
+  manifest: BackupManifest | null;
+} {
+  ensureBackupDir();
+  const previousPath = path.join(BACKUP_DIR, 'knowledge_snapshot_previous.json');
+  const previousNewsPath = path.join(BACKUP_DIR, 'news_snapshot_previous.json');
+  const manifest = getBackupManifest();
+
+  let knowledgeAvailable = false;
+  let knowledgePreviousDate: string | undefined = undefined;
+  if (fs.existsSync(previousPath)) {
+    knowledgeAvailable = true;
+    knowledgePreviousDate = fs.statSync(previousPath).mtime.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+  }
+
+  let newsAvailable = false;
+  let newsPreviousDate: string | undefined = undefined;
+  if (fs.existsSync(previousNewsPath)) {
+    newsAvailable = true;
+    newsPreviousDate = fs.statSync(previousNewsPath).mtime.toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+  }
+
+  return {
+    knowledgeAvailable,
+    knowledgePreviousDate,
+    newsAvailable,
+    newsPreviousDate,
+    manifest,
   };
 }

@@ -99,3 +99,92 @@ export function getPipelineHealth(): PipelineHealthStatus {
     lastAuditTimestamp: new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' }),
   };
 }
+
+export interface DeduplicationResult {
+  isDuplicate: boolean;
+  similarityScore: number;
+  matchedQuestionId?: string;
+  matchedQuestionText?: string;
+  reason: string;
+}
+
+/**
+ * Tokenize and normalize Japanese and F1 terms for deduplication
+ */
+function extractQuestionKeywords(text: string): Set<string> {
+  // Normalize
+  const normalized = text
+    .toLowerCase()
+    .replace(/[、。！？\s\(\)「」『』・]/g, ' ');
+
+  // Common Japanese particles and stopwords to ignore
+  const STOPWORDS = new Set([
+    'の', 'に', 'は', 'を', 'た', 'が', 'で', 'て', 'と', 'し', 'れ', 'さ',
+    'ある', 'いる', 'も', 'する', 'から', 'な', 'こと', 'として', 'い', 'や',
+    'れる', 'など', 'なっ', 'ない', 'この', 'ため', 'その', 'あっ', 'よう',
+    'また', 'もの', 'という', 'あり', 'まで', 'られ', 'なる', 'へ', 'か',
+    'だ', 'これ', 'によって', 'により', 'について', 'どの', '何', 'どれ',
+    '正しい', '誤り', '説明', '選択肢', '最も', '適切', 'ドライバー', 'f1', 'グランプリ',
+  ]);
+
+  const words = normalized.split(' ').filter((w) => w.length > 1 && !STOPWORDS.has(w));
+  return new Set(words);
+}
+
+/**
+ * Compute Jaccard keyword similarity between candidate and existing question
+ */
+function computeKeywordSimilarity(setA: Set<string>, setB: Set<string>): number {
+  if (setA.size === 0 || setB.size === 0) return 0;
+  let intersectionCount = 0;
+  for (const item of setA) {
+    if (setB.has(item)) intersectionCount++;
+  }
+  const unionCount = setA.size + setB.size - intersectionCount;
+  return unionCount === 0 ? 0 : intersectionCount / unionCount;
+}
+
+/**
+ * Check if candidate question is a duplicate of any existing question in data bank
+ */
+export function checkQuestionDeduplication(
+  candidate: Partial<QuizQuestion>,
+  existingQuestions: QuizQuestion[]
+): DeduplicationResult {
+  const candidateText = `${candidate.question || ''} ${candidate.options?.join(' ') || ''}`;
+  const candidateKeywords = extractQuestionKeywords(candidateText);
+
+  let highestScore = 0;
+  let bestMatch: QuizQuestion | null = null;
+
+  for (const q of existingQuestions) {
+    const existingText = `${q.question} ${q.options.join(' ')}`;
+    const existingKeywords = extractQuestionKeywords(existingText);
+
+    const score = computeKeywordSimilarity(candidateKeywords, existingKeywords);
+    if (score > highestScore) {
+      highestScore = score;
+      bestMatch = q;
+    }
+  }
+
+  // Threshold: >= 0.55 similarity is rejected as duplicate
+  const THRESHOLD = 0.55;
+  const isDuplicate = highestScore >= THRESHOLD;
+
+  if (isDuplicate && bestMatch) {
+    return {
+      isDuplicate: true,
+      similarityScore: Math.round(highestScore * 100) / 100,
+      matchedQuestionId: bestMatch.id,
+      matchedQuestionText: bestMatch.question,
+      reason: `既存問題 [${bestMatch.id}] と類似度 ${(highestScore * 100).toFixed(0)}% で重複を検知しました。同一または酷似した論点です。`,
+    };
+  }
+
+  return {
+    isDuplicate: false,
+    similarityScore: Math.round(highestScore * 100) / 100,
+    reason: `既存148問との類似度は最大 ${(highestScore * 100).toFixed(0)}% であり、新規固有の出題として承認されました。`,
+  };
+}

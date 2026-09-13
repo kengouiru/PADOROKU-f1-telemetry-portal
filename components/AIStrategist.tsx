@@ -18,6 +18,8 @@ import type { Driver, Lap, Stint, PitStop, Session } from '@/lib/types';
 import { buildTelemetryContext } from '@/lib/telemetryContext';
 import { playRadioSpeech, stopRadioSpeech } from '@/lib/radioAudioEffect';
 
+import { usePlanTier } from '@/lib/tierService';
+
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 interface ChatMessage {
@@ -99,46 +101,20 @@ export function parseNavActions(content: string): { cleanContent: string; action
     } else if (category === 'library') {
       const sub = parts[1];
       if (sub === 'tyres') {
-        actions.push({
-          type: 'library_tyres',
-          icon: '🛞',
-          label: 'F1大百科：タイヤ解説を開く',
-        });
+        actions.push({ type: 'library_tyres', icon: '🛞', label: 'タイヤ大百科（C1〜C5性能解説）を開く' });
       } else if (sub === 'circuits') {
-        const circ = parts[2];
-        actions.push({
-          type: 'library_circuits',
-          icon: '🏁',
-          label: 'F1大百科：コース解説を見る',
-          circuitId: circ,
-        });
+        const cId = parts[2];
+        actions.push({ type: 'library_circuits', icon: '🗺️', label: `サーキット詳細ガイドを開く`, circuitId: cId });
       } else if (sub === 'regulations') {
-        actions.push({
-          type: 'library_regulations',
-          icon: '📜',
-          label: 'F1大百科：規定・ルールを読む',
-        });
+        actions.push({ type: 'library_regulations', icon: '⚖️', label: 'FIA公式競技規則・ペナルティ基準を開く' });
       } else if (sub === 'glossary') {
         const termId = parts[2];
-        actions.push({
-          type: 'library_glossary',
-          icon: '🧠',
-          label: termId ? `F1用語辞典：「${termId}」を開く` : 'F1大百科：用語辞典で調べる',
-          termId,
-        });
+        actions.push({ type: 'library_glossary', icon: '📖', label: `用語図解・解説を開く`, termId });
       } else if (sub === 'drama') {
-        actions.push({
-          type: 'library_drama',
-          icon: '🎬',
-          label: 'F1大百科：因縁ドラマを読む',
-        });
+        actions.push({ type: 'library_drama', icon: '🎬', label: 'F1歴史的ドラマ・ライバル列伝を開く' });
       }
     } else if (category === 'quiz') {
-      actions.push({
-        type: 'quiz',
-        icon: '🏆',
-        label: 'F1クイズ検定に挑戦する',
-      });
+      actions.push({ type: 'quiz', icon: '🏆', label: '関連F1クイズに挑戦する' });
     }
   }
 
@@ -151,6 +127,8 @@ interface StrategistMessage {
   content: string;
 }
 
+// ── Props ──────────────────────────────────────────────────────────────────────
+
 interface AIStrategistProps {
   selectedDrivers: string[];
   drivers: Driver[];
@@ -162,6 +140,7 @@ interface AIStrategistProps {
   onAddToNotebook: (content: string, source: 'ai') => void;
   onRequireAuth?: () => void;
   onNavigate?: (action: NavAction) => void;
+  onOpenUpgradeModal?: () => void;
 }
 
 // ── Quick prompts ──────────────────────────────────────────────────────────────
@@ -197,8 +176,10 @@ export default function AIStrategist({
   onAddToNotebook,
   onRequireAuth,
   onNavigate,
+  onOpenUpgradeModal,
 }: AIStrategistProps) {
   const { data: authSession } = useSession();
+  const { isPro, aiUsage, consumeAi } = usePlanTier();
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     if (typeof window === 'undefined') return [];
     try {
@@ -298,6 +279,24 @@ export default function AIStrategist({
       return;
     }
 
+    if (!isPro && aiUsage.remaining <= 0) {
+      onOpenUpgradeModal?.();
+      const userMsgId = `user_${Date.now()}`;
+      const aiMsgId = `ai_${Date.now()}`;
+      setMessages(prev => [
+        ...prev,
+        { id: userMsgId, role: 'user', content: trimmed },
+        {
+          id: aiMsgId,
+          role: 'model',
+          content: '💎 **本日の無料AI戦略相談枠（3回）の上限に達しました**\n\nAIストラテジストを回数無制限で活用するには、**「Pitwall Pro」**へアップグレードしてください。',
+          isStreaming: false,
+        },
+      ]);
+      setInput('');
+      return;
+    }
+
     const userMsgId = `user_${Date.now()}`;
     const aiMsgId = `ai_${Date.now()}`;
 
@@ -339,6 +338,8 @@ export default function AIStrategist({
       }
       if (!res.body) throw new Error('No response body from server');
 
+      consumeAi();
+
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let acc = '';
@@ -369,7 +370,7 @@ export default function AIStrategist({
       setIsStreaming(false);
       inputRef.current?.focus();
     }
-  }, [isStreaming, messages, geminiApiKey, apiKey, getContext, modelChoice, authSession, onRequireAuth]);
+  }, [isStreaming, messages, geminiApiKey, apiKey, getContext, modelChoice, authSession, onRequireAuth, isPro, aiUsage, consumeAi, onOpenUpgradeModal]);
 
   const handleStop = () => {
     abortRef.current?.abort();
@@ -408,6 +409,24 @@ export default function AIStrategist({
             AI STRATEGIST
           </h3>
           <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Tier Quota Badge */}
+            {isPro ? (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-bold flex items-center gap-1 shadow-sm">
+                <span>💎</span>
+                <span>PRO</span>
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={onOpenUpgradeModal}
+                className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 font-mono flex items-center gap-1 cursor-pointer transition-colors"
+                title="無料プランの本日残り利用回数（クリックでPro詳細）"
+              >
+                <span>⚡ {aiUsage.remaining}/3回</span>
+                <span className="text-amber-400 font-bold">UPGRADE</span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={() => {

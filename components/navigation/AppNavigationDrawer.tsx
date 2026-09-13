@@ -2,6 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import type { Session, Driver } from '@/lib/types';
+import { useSession, signOut } from 'next-auth/react';
+import { useUserPreferences } from '@/lib/userPreferences';
+import { KNOWLEDGE_TEAMS, KNOWLEDGE_DRIVERS } from '@/data/f1KnowledgeData';
+import ProfileSettingsModal from '@/components/auth/ProfileSettingsModal';
+import { usePlanTier } from '@/lib/tierService';
 
 export interface AppNavigationDrawerProps {
   isOpen: boolean;
@@ -12,6 +17,8 @@ export interface AppNavigationDrawerProps {
   detailedTelemetryTab?: string;
   pitStrategyViewMode?: string;
   onSelectFeature: (featureId: string) => void;
+  onOpenAuthModal?: () => void;
+  onOpenUpgradeModal?: () => void;
   // Session & Driver selectors (Optional inside drawer)
   sessionProps?: {
     selectedYear: string;
@@ -64,12 +71,12 @@ const NAV_GROUPS: NavGroup[] = [
     groupIcon: '🔥',
     items: [
       {
-        id: '2026_regulations',
-        label: '2026年次世代規定シミュレーター',
-        icon: '🚀',
-        badge: 'NEW',
-        badgeColor: 'bg-red-600 text-white',
-        description: 'アクティブ空力(Z/X)・50:50 PU・MOM・車体小型化',
+        id: 'virtual_gp',
+        label: '模擬レースシミュレーター Pro',
+        icon: '🏎️',
+        badge: 'PRO',
+        badgeColor: 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black',
+        description: 'パラメータ変更・複数台レース・降雨/SC逆転劇・AI総括',
       },
       {
         id: 'telemetry_delta',
@@ -183,9 +190,9 @@ const NAV_GROUPS: NavGroup[] = [
       },
       {
         id: 'fia_rules',
-        label: 'FIA公式規則 ＆ ペナルティ基準',
+        label: 'FIA公式規則 ＆ 2026年新規定解説',
         icon: '⚖️',
-        description: '競技規則・技術規則・スチュワード判定基準・事故事例',
+        description: '競技・技術規則・2026年新規定図解(アクティブ空力/PU)・スチュワード判定基準',
       },
       {
         id: 'drama',
@@ -215,6 +222,28 @@ const NAV_GROUPS: NavGroup[] = [
       },
     ],
   },
+  {
+    groupTitle: '個人設定 ＆ カスタマイズ',
+    groupIcon: '⚙️',
+    items: [
+      {
+        id: 'pitwall_pro',
+        label: 'Pitwall Pro メンバーシップ管理',
+        icon: '💎',
+        badge: 'UPGRADE',
+        badgeColor: 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black',
+        description: '月額/年額プラン比較・AI無制限・シミュレーター完全開放',
+      },
+      {
+        id: 'profile_settings',
+        label: '推しチーム ＆ プロフィール設定',
+        icon: '⚙️',
+        badge: 'カスタム',
+        badgeColor: 'bg-amber-600 text-white',
+        description: '応援チームカラー・推しドライバー・アバター・表示名設定',
+      },
+    ],
+  },
 ];
 
 export default function AppNavigationDrawer({
@@ -226,10 +255,26 @@ export default function AppNavigationDrawer({
   detailedTelemetryTab,
   pitStrategyViewMode,
   onSelectFeature,
+  onOpenAuthModal,
+  onOpenUpgradeModal,
   sessionProps,
 }: AppNavigationDrawerProps) {
+  const { data: session } = useSession();
+  const { isPro } = usePlanTier();
+  const { prefs } = useUserPreferences();
   const [sessionPickerOpen, setSessionPickerOpen] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
+
+  const user = session?.user;
+  const activeAvatar = prefs.customAvatarUrl || user?.image || '';
+  const activeDisplayName = prefs.displayName || user?.name || (user ? 'Pro User' : 'ゲスト');
+
+  const selectedTeam = KNOWLEDGE_TEAMS.find((t) => t.id === prefs.favoriteTeamId);
+  const selectedDriver = KNOWLEDGE_DRIVERS.find((d) => d.code === prefs.favoriteDriverCode);
+  const teamColor = selectedTeam?.color || '#38bdf8';
+  const initial = (activeDisplayName || 'U').charAt(0).toUpperCase();
 
   // Close on Escape key press
   useEffect(() => {
@@ -258,8 +303,8 @@ export default function AppNavigationDrawer({
 
   // Determine active item ID
   const getIsActive = (id: string): boolean => {
-    if (id === '2026_regulations') {
-      return appMode === 'library' && (librarySubTab === 'regulations' || librarySubTab === 'rules');
+    if (id === 'virtual_gp') {
+      return activeHub === 'telemetry' && pitStrategyViewMode === 'virtual_gp';
     }
     if (id === 'telemetry_delta') {
       return activeHub === 'telemetry' && detailedTelemetryTab === 'delta_matrix';
@@ -274,13 +319,13 @@ export default function AppNavigationDrawer({
       return appMode === 'season' && activeHub === 'season';
     }
     if (id === 'telemetry_laps') {
-      return activeHub === 'telemetry' && detailedTelemetryTab !== 'delta_matrix' && pitStrategyViewMode !== 'war_room';
+      return activeHub === 'telemetry' && detailedTelemetryTab !== 'delta_matrix' && pitStrategyViewMode !== 'war_room' && pitStrategyViewMode !== 'virtual_gp';
     }
     if (id === 'drivers' || id === 'teams' || id === 'circuits' || id === 'tyres' || id === 'drama' || id === 'glossary') {
       return appMode === 'library' && librarySubTab === id;
     }
-    if (id === 'fia_rules') {
-      return appMode === 'library' && librarySubTab === 'rules';
+    if (id === 'fia_rules' || id === '2026_regulations') {
+      return appMode === 'library' && (librarySubTab === 'rules' || librarySubTab === 'regulations');
     }
     if (id === 'race_notes') {
       return activeHub === 'notes';
@@ -393,6 +438,15 @@ export default function AppNavigationDrawer({
                       key={item.id}
                       type="button"
                       onClick={() => {
+                        if (item.id === 'profile_settings') {
+                          setProfileModalOpen(true);
+                          return;
+                        }
+                        if (item.id === 'pitwall_pro') {
+                          onOpenUpgradeModal?.();
+                          onClose();
+                          return;
+                        }
                         onSelectFeature(item.id);
                         onClose();
                       }}
@@ -506,15 +560,141 @@ export default function AppNavigationDrawer({
           )}
         </div>
 
-        {/* Drawer Footer */}
-        <div className="p-3 border-t border-white/10 bg-slate-950 flex items-center justify-between text-[11px] text-slate-400">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="font-mono">2026 Live Platform</span>
-          </div>
-          <span className="text-[10px] font-mono text-slate-500">Escで閉じる</span>
+        {/* ── Drawer User Profile & Settings Footer (Discord/Slack/Notion Style) ── */}
+        <div className="p-3 border-t border-white/10 bg-slate-950/95 backdrop-blur-md shrink-0">
+          {session?.user ? (
+            <div className="space-y-2.5">
+              {/* User Identity Row */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  {/* User Avatar */}
+                  {activeAvatar && !avatarError ? (
+                    <div
+                      className="w-8 h-8 rounded-lg overflow-hidden border shadow-sm shrink-0"
+                      style={{ borderColor: teamColor }}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={activeAvatar}
+                        alt={activeDisplayName}
+                        className="w-full h-full object-cover object-top"
+                        onError={() => setAvatarError(true)}
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 font-racing font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                      {initial}
+                    </div>
+                  )}
+
+                  {/* User Names & Badges */}
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <p className="font-racing font-bold text-xs text-white truncate">
+                        {activeDisplayName}
+                      </p>
+                      <span className={`px-1.5 py-0.2 rounded text-[8px] font-racing font-black ${
+                        isPro
+                          ? 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm'
+                          : 'bg-slate-800 text-slate-400 border border-white/10'
+                      }`}>
+                        {isPro ? 'PRO' : 'FREE'}
+                      </span>
+                    </div>
+                    {selectedTeam && (
+                      <p className="text-[10px] font-mono truncate" style={{ color: selectedTeam.color }}>
+                        🏁 {selectedTeam.name}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Quick Icon Actions */}
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setProfileModalOpen(true)}
+                    className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 hover:border-amber-500/40 transition-all cursor-pointer shadow-sm"
+                    title="プロフィール・推しチーム設定 (⚙️)"
+                    aria-label="設定"
+                  >
+                    <span className="text-sm">⚙️</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => signOut()}
+                    className="p-1.5 rounded-lg bg-slate-900 hover:bg-rose-950/60 text-slate-400 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 transition-all cursor-pointer shadow-sm"
+                    title="ログアウト"
+                    aria-label="ログアウト"
+                  >
+                    <span className="text-sm">🚪</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Push button to open Settings */}
+              <button
+                type="button"
+                onClick={() => setProfileModalOpen(true)}
+                className="w-full py-1.5 px-3 rounded-xl bg-slate-900/90 hover:bg-slate-850 text-slate-200 hover:text-white border border-white/10 hover:border-amber-500/30 text-xs font-racing font-bold transition-all flex items-center justify-between cursor-pointer group shadow-sm"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-amber-400">⚙️</span>
+                  <span>推しチーム・プロフィール設定</span>
+                </div>
+                <span className="text-[10px] text-slate-400 group-hover:text-amber-300 font-mono">
+                  編集 ➔
+                </span>
+              </button>
+
+              {!isPro && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenUpgradeModal?.();
+                    onClose();
+                  }}
+                  className="w-full mt-2 py-1.5 px-3 rounded-xl bg-gradient-to-r from-amber-500/20 via-yellow-400/20 to-red-500/20 border border-amber-500/40 text-amber-300 text-xs font-racing font-bold flex items-center justify-between cursor-pointer hover:brightness-125 transition-all shadow-sm"
+                >
+                  <div className="flex items-center gap-1.5">
+                    <span>💎</span>
+                    <span>Pitwall Pro へアップグレード</span>
+                  </div>
+                  <span className="text-[10px] font-mono text-amber-400">➔</span>
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-slate-400 font-mono text-[11px] flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-slate-500" />
+                  <span>ゲスト利用中</span>
+                </span>
+                <span className="text-[10px] font-mono text-slate-500">Escで閉じる</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (onOpenAuthModal) {
+                    onOpenAuthModal();
+                  }
+                  onClose();
+                }}
+                className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 text-white font-racing font-bold text-xs transition-all shadow-md shadow-red-950/40 border border-red-400/30 flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>🔑</span>
+                <span>ログイン / メンバー登録</span>
+              </button>
+            </div>
+          )}
         </div>
       </aside>
+
+      {/* Settings Modal Portal inside Drawer */}
+      {profileModalOpen && (
+        <ProfileSettingsModal onClose={() => setProfileModalOpen(false)} />
+      )}
     </div>
   );
 }

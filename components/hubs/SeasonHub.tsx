@@ -30,6 +30,7 @@ import {
 } from '@/data/f1SeasonData';
 import { getWeatherByRound, getCircuitWeather } from '@/data/f1WeatherData';
 import { getGrandPrixReportByRound, getGrandPrixReportByCircuitId } from '@/data/f1GrandPrixReportsData';
+import F1BroadcastTrackGuide from '@/components/circuits/F1BroadcastTrackGuide';
 
 interface SeasonHubProps {
   onNavigateToTelemetry?: (gpName?: string) => void;
@@ -492,6 +493,15 @@ export default function SeasonHub({
           </div>
         </div>
       </div>
+
+      {/* ─────────────────────────────────────────────────────────────
+          1.25 OFFICIAL BROADCAST TRACK GUIDE & 3D ELEVATION VIEWER
+          ───────────────────────────────────────────────────────────── */}
+      <F1BroadcastTrackGuide
+        circuitId={selectedCircuitId}
+        gpName={selectedRace.gpName}
+        round={selectedRace.round}
+      />
 
       {/* ─────────────────────────────────────────────────────────────
           1.5 DEEP RACE REPORT & PROFILE (FOR SELECTED ROUND)

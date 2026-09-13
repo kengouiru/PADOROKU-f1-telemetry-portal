@@ -14,6 +14,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import type { Driver, Lap, Stint, TyreCompound, PitSimulationResult } from '@/lib/types';
 import { simulatePitStrategy, getTyreColor } from '@/lib/telemetryUtils';
 import VirtualPitwallWarRoom from '@/components/strategy/VirtualPitwallWarRoom';
+import VirtualGrandPrixSimulator from '@/components/strategy/VirtualGrandPrixSimulator';
 
 interface PitStrategySimulatorProps {
   selectedDrivers: string[];
@@ -21,7 +22,8 @@ interface PitStrategySimulatorProps {
   lapsCache: Record<string, Lap[]>;
   stints: Stint[];
   geminiApiKey?: string;
-  initialViewMode?: 'basic' | 'war_room';
+  initialViewMode?: 'basic' | 'war_room' | 'virtual_gp';
+  onOpenUpgradeModal?: () => void;
 }
 
 export default function PitStrategySimulator({
@@ -31,11 +33,12 @@ export default function PitStrategySimulator({
   stints,
   geminiApiKey = '',
   initialViewMode,
+  onOpenUpgradeModal,
 }: PitStrategySimulatorProps) {
   const [pitLoss, setPitLoss] = useState<number>(22.5);
   const [freshGain, setFreshGain] = useState<number>(1.4);
   const [targetCompound, setTargetCompound] = useState<TyreCompound>('HARD');
-  const [viewMode, setViewMode] = useState<'basic' | 'war_room'>(initialViewMode || 'basic');
+  const [viewMode, setViewMode] = useState<'basic' | 'war_room' | 'virtual_gp'>(initialViewMode || 'basic');
 
   useEffect(() => {
     if (initialViewMode) {
@@ -134,34 +137,51 @@ export default function PitStrategySimulator({
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 p-1 bg-slate-900 rounded-xl border border-white/10">
+        <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-900 rounded-xl border border-white/10">
           <button
             type="button"
             onClick={() => setViewMode('basic')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
               viewMode === 'basic'
                 ? 'bg-blue-600 text-white shadow-md'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            <span>⏱️ 基本ピット窓口 ＆ 復帰位置</span>
+            <span>⏱️ 基本ピット窓口</span>
           </button>
           <button
             type="button"
             onClick={() => setViewMode('war_room')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
               viewMode === 'war_room'
                 ? 'bg-gradient-to-r from-amber-500 to-red-600 text-white shadow-md shadow-amber-500/30'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            <span>🚨 戦術司令室 (War Room: 天候/SC/タイヤ崖)</span>
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <span>🚨 戦術司令室</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('virtual_gp')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
+              viewMode === 'virtual_gp'
+                ? 'bg-gradient-to-r from-amber-500 via-yellow-400 to-red-500 text-slate-950 font-black shadow-md shadow-amber-500/30'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <span>🏎️ 模擬レース Pro</span>
+            <span className="text-[9px] bg-amber-400/20 text-amber-300 border border-amber-400/30 px-1 rounded font-mono">PRO</span>
           </button>
         </div>
       </div>
 
-      {viewMode === 'war_room' ? (
+      {viewMode === 'virtual_gp' ? (
+        <VirtualGrandPrixSimulator
+          onOpenUpgradeModal={onOpenUpgradeModal}
+          geminiApiKey={geminiApiKey}
+        />
+      ) : viewMode === 'war_room' ? (
         <VirtualPitwallWarRoom />
       ) : (
         <>

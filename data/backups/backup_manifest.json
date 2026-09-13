@@ -1,41 +1,24 @@
 {
-  "version": "snapshot-2026-09-12-initial",
-  "timestamp": "2026-09-12T15:29:52.910Z",
-  "createdAt": "2026/9/13 0:29:52",
-  "primarySources": [
-    {
-      "name": "FOD / フジテレビNEXT",
-      "category": "国内公式放映・実況アーカイブ"
-    },
-    {
-      "name": "FIA (国際自動車連盟)",
-      "category": "公式技術・競技規則"
-    },
-    {
-      "name": "FOM / Formula 1",
-      "category": "公式ライブタイミング＆無線実音源"
-    },
-    {
-      "name": "OpenF1 API",
-      "category": "リアルタイム・テレメトリーストリーム"
-    }
-  ],
+  "version": "snapshot-2026-09-13-1789272772802",
+  "timestamp": "2026-09-13T04:12:52.802Z",
+  "createdAt": "2026/9/13 13:12:52",
   "stats": {
-    "teamsCount": 10,
+    "teamsCount": 11,
     "circuitsCount": 24,
-    "quizQuestionsCount": 120,
+    "quizQuestionsCount": 155,
     "audioClipsCount": 16,
-    "regulationsCount": 15,
+    "regulationsCount": 12,
     "newsArticlesCount": 14
   },
   "auditSummary": {
     "status": "VERIFIED",
-    "broadcasterCompliant": true,
-    "broadcasterName": "FOD (フジテレビオンデマンド) / フジテレビNEXT",
+    "sourcesChecked": 6,
+    "sourcesPassed": 6,
     "audioFilesVerified": 16,
-    "discrepanciesCount": 0
+    "broadcasterCompliant": true
   },
-  "previousSnapshotAvailable": false,
+  "previousSnapshotAvailable": true,
+  "previousSnapshotDate": "2026-09-13T04:12:52.800Z",
   "newsSnapshot": {
     "latestVersion": "news-snapshot-2026-09-12-1789229551902",
     "timestamp": "2026-09-12T16:12:31.902Z",

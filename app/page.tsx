@@ -60,6 +60,8 @@ import AITelemetryInspectorModal from '@/components/telemetry/AITelemetryInspect
 
 import AuthButton from '@/components/auth/AuthButton';
 import AuthModal from '@/components/auth/AuthModal';
+import PitwallProModal from '@/components/subscription/PitwallProModal';
+import { usePlanTier } from '@/lib/tierService';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 // ── App State ─────────────────────────────────────────────────────────────────
@@ -194,7 +196,9 @@ export default function DashboardPage() {
   const [featureDirectoryOpen, setFeatureDirectoryOpen] = useState(false);
   const [navigationDrawerOpen, setNavigationDrawerOpen] = useState(false);
   const [detailedTelemetryTab, setDetailedTelemetryTab] = useState<'charts' | 'delta_matrix'>('charts');
-  const [pitStrategyViewMode, setPitStrategyViewMode] = useState<'basic' | 'war_room'>('basic');
+  const [pitStrategyViewMode, setPitStrategyViewMode] = useState<'basic' | 'war_room' | 'virtual_gp'>('basic');
+  const [proModalOpen, setProModalOpen] = useState(false);
+  const { isPro } = usePlanTier();
   const [mobileTab, setMobileTab] = useState<MobileTab>('telemetry');
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>('ai');
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile sidebar drawer
@@ -305,6 +309,16 @@ export default function DashboardPage() {
       setTimeout(() => {
         document.getElementById('pit-strategy-simulator-section')?.scrollIntoView({ behavior: 'smooth' });
       }, 150);
+    } else if (featureId === 'virtual_gp') {
+      setAppMode('season');
+      setActiveHub('telemetry');
+      setMobileTab('telemetry');
+      setPitStrategyViewMode('virtual_gp');
+      setTimeout(() => {
+        document.getElementById('pit-strategy-simulator-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 150);
+    } else if (featureId === 'pitwall_pro') {
+      setProModalOpen(true);
     } else if (featureId === 'fod_news') {
       setAppMode('season');
       setActiveHub('news');
@@ -1009,7 +1023,7 @@ export default function DashboardPage() {
                     );
                   }}
                   className="text-[11px] font-racing font-bold px-2.5 py-1 rounded-lg bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 hover:border-purple-300 text-purple-200 hover:text-white transition-colors cursor-pointer shadow-sm flex items-center gap-1"
-                  title="テレメトリーを別ウィンドウで分離して開く"
+                  title="テレメトリーを別ウィンドウで分離して開く（マルチモニター・デュアルディスプレイ対応）"
                 >
                   <span>↗</span>
                   <span className="hidden sm:inline">別ウィンドウ</span>
@@ -1143,6 +1157,7 @@ export default function DashboardPage() {
             stints={state.stints}
             geminiApiKey={state.geminiApiKey}
             initialViewMode={pitStrategyViewMode}
+            onOpenUpgradeModal={() => setProModalOpen(true)}
           />
         </section>
       )}
@@ -1191,6 +1206,7 @@ export default function DashboardPage() {
         onAddToNotebook={handleAddToNotebook}
         onRequireAuth={() => handleRequireAuth('AI 戦略アナリスト', 'AI戦略アナリストによるレース分析・戦略提案は認証メンバー専用機能です。')}
         onNavigate={handleAiNavigate}
+        onOpenUpgradeModal={() => setProModalOpen(true)}
       />
     </div>
   );
@@ -1513,6 +1529,21 @@ export default function DashboardPage() {
               <span className="hidden lg:inline">AI</span>
             </button>
 
+            {/* Pitwall Pro Membership Button */}
+            <button
+              type="button"
+              onClick={() => setProModalOpen(true)}
+              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all cursor-pointer shrink-0 border ${
+                isPro
+                  ? 'bg-gradient-to-r from-amber-500/20 to-yellow-400/20 border-amber-500/50 text-amber-300 hover:brightness-125 shadow-sm'
+                  : 'bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 border-amber-400 hover:brightness-110 shadow-md shadow-amber-500/20 font-black'
+              }`}
+              title="Pitwall Pro メンバーシップ管理・アップグレード"
+            >
+              <span>💎</span>
+              <span className="hidden sm:inline">{isPro ? 'PRO' : 'Upgrade'}</span>
+            </button>
+
             {/* Auth Button */}
             <AuthButton onOpenAuthModal={() => handleRequireAuth()} />
           </div>
@@ -1689,6 +1720,44 @@ export default function DashboardPage() {
         {/* Tab content (with generous bottom padding so fixed navigation doesn't hide content) */}
         <div ref={mobileScrollRef} className="flex-1 min-h-0 overflow-y-auto p-4 pb-[calc(7.5rem+env(safe-area-inset-bottom))] md:pb-6">
           {mainHubContent}
+
+          {/* Global App Footer with Legal Disclaimer & Quick Links */}
+          <footer className="mt-12 pt-8 pb-4 border-t border-white/10 text-center text-xs font-mono text-slate-500 space-y-2.5">
+            <div className="flex flex-wrap items-center justify-center gap-3 text-slate-400 font-racing text-xs">
+              <span className="text-slate-300">🏎️ F1 PADOROKU TELEMETRY PORTAL</span>
+              <span className="text-slate-600">•</span>
+              <button
+                type="button"
+                onClick={() => setProModalOpen(true)}
+                className="text-amber-400 hover:underline cursor-pointer"
+              >
+                Pitwall Pro (¥300/月)
+              </button>
+              <span className="text-slate-600">•</span>
+              <button
+                type="button"
+                onClick={() => setQuizModalOpen(true)}
+                className="hover:text-white transition-colors cursor-pointer"
+              >
+                F1クイズ検定
+              </button>
+              <span className="text-slate-600">•</span>
+              <button
+                type="button"
+                onClick={() => setFeatureDirectoryOpen(true)}
+                className="hover:text-white transition-colors cursor-pointer"
+              >
+                全機能目次
+              </button>
+            </div>
+            <p className="text-[11px] max-w-2xl mx-auto leading-relaxed text-slate-400">
+              ※ 当サイトは非公式ファン分析ポータルであり、FIA（国際自動車連盟）またはFormula Oneグループ各社（Formula One Licensing B.V.等）とは提携・公認関係にありません。
+              Formula 1, F1, GRAND PRIX および関連するマークは、Formula One Licensing B.V. の登録商標です。
+            </p>
+            <p className="text-[10px] text-slate-400">
+              © 2026 F1 Padoroku Telemetry Portal. All rights reserved.
+            </p>
+          </footer>
         </div>
 
         {/* ── Fixed Mobile Bottom Navigation Bar (< md) ── */}
@@ -1892,6 +1961,8 @@ export default function DashboardPage() {
         detailedTelemetryTab={detailedTelemetryTab}
         pitStrategyViewMode={pitStrategyViewMode}
         onSelectFeature={handleFeatureJump}
+        onOpenAuthModal={() => handleRequireAuth()}
+        onOpenUpgradeModal={() => setProModalOpen(true)}
         sessionProps={{
           selectedYear: state.selectedYear,
           onYearChange: handleYearChange,
@@ -1929,6 +2000,12 @@ export default function DashboardPage() {
             document.getElementById('detailed-telemetry-section')?.scrollIntoView({ behavior: 'smooth' });
           }, 150);
         }}
+      />
+
+      {/* ── Pitwall Pro Membership & Upgrade Modal ── */}
+      <PitwallProModal
+        isOpen={proModalOpen}
+        onClose={() => setProModalOpen(false)}
       />
     </div>
   );

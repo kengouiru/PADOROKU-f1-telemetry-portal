@@ -1,5 +1,3 @@
-'use client';
-
 /**
  * data/f1QuizData.ts
  * Interactive Formula 1 Quiz & Trivia Question Bank (Quiz 2.0).
