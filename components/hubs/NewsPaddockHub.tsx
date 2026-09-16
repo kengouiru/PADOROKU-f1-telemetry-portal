@@ -9,7 +9,8 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { F1NewsArticle, TeamTag, TopicTag, NewsAuthorityLevel } from '@/app/api/f1-news/route';
-import { SEASON_2026_CALENDAR, getNextUpcomingRound } from '@/data/f1SeasonData';
+import { SEASON_2026_CALENDAR, getNextUpcomingRound, type RaceWeekendSchedule } from '@/data/f1SeasonData';
+import { getGeminiAuthHeaders } from '@/lib/apiKeyService';
 
 interface NewsPaddockHubProps {
   geminiApiKey?: string;
@@ -74,11 +75,36 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
   const [isSavingBackup, setIsSavingBackup] = useState<boolean>(false);
   const [lastBackupTime, setLastBackupTime] = useState<string | null>(null);
 
+  // Active Calendar (starts with fallback, upgraded via /api/f1-calendar)
+  const [calendar, setCalendar] = useState<RaceWeekendSchedule[]>(SEASON_2026_CALENDAR);
+
+  // Fetch official calendar from API to ensure exact synchronization with SeasonHub
+  useEffect(() => {
+    let cancelled = false;
+    async function loadOfficialCalendar() {
+      try {
+        const res = await fetch('/api/f1-calendar?year=2026', {
+          signal: AbortSignal.timeout(8000),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (!cancelled && data.races && data.races.length > 0) {
+            setCalendar(data.races);
+          }
+        }
+      } catch (e) {
+        // Fallback to static SEASON_2026_CALENDAR
+      }
+    }
+    loadOfficialCalendar();
+    return () => { cancelled = true; };
+  }, []);
+
   // Upcoming Grand Prix for Broadcaster Timetable
   const upcomingRound = useMemo(() => {
-    const roundNum = getNextUpcomingRound(SEASON_2026_CALENDAR);
-    return SEASON_2026_CALENDAR.find((r) => r.round === roundNum) || SEASON_2026_CALENDAR[0];
-  }, []);
+    const roundNum = getNextUpcomingRound(calendar);
+    return calendar.find((r) => r.round === roundNum) || calendar[0];
+  }, [calendar]);
 
   // Fetch News from BFF API
   const fetchNews = useCallback(async () => {
@@ -163,8 +189,10 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
 ・【戦術/技術的影響】（マシンパフォーマンス、タイヤ、戦略への影響を1文で）
 ・【今後の注目点】（週末のセッションや中継での着目点を1文で）`;
 
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (geminiApiKey) headers['x-gemini-key'] = geminiApiKey;
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...getGeminiAuthHeaders(),
+      };
 
       const res = await fetch('/api/strategist', {
         method: 'POST',
@@ -292,7 +320,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
             </h2>
 
             <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-              全24戦のフリー走行・予選・スプリント・決勝を完全生中継。
+              全{calendar.length}戦のフリー走行・予選・スプリント・決勝を完全生中継。
               解説陣（川井一仁、森脇基恭、米家峰起、中野信治、松田次生）によるピットレーン深層分析と一次情報をリアルタイムでお届けします。
             </p>
           </div>

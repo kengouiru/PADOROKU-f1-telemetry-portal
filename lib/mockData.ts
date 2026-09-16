@@ -455,22 +455,30 @@ export function generateMockLaps(
   const laps: Lap[] = [];
   const seed = (n: number) => Math.sin(n * 9301 + driverNumber * 49297 + sessionKey * 31) * 0.5;
 
+  let stintLap = 1;
+
   for (let i = 1; i <= totalLaps; i++) {
-    let lapTime = baseTime + i * degradation;
+    let lapTime = baseTime + stintLap * degradation;
     const variance = seed(i) * 0.5;
     lapTime += variance;
 
     // Pit stop laps: inflate lap time
     if (i === pit1Lap) {
-      lapTime = baseTime + 5.0;
+      lapTime = baseTime + stintLap * degradation + 5.0;
+      stintLap++;
     } else if (i === pit1Lap + 1) {
       lapTime = baseTime + 22.0;
       baseTime -= profile.postPit1Boost;
+      stintLap = 1;
     } else if (i === pit2Lap) {
-      lapTime = baseTime + 4.5;
+      lapTime = baseTime + stintLap * degradation + 4.5;
+      stintLap++;
     } else if (i === pit2Lap + 1) {
       lapTime = baseTime + 21.5;
       baseTime -= profile.postPit2Boost;
+      stintLap = 1;
+    } else {
+      stintLap++;
     }
 
     const baseSpeedST = topSpeed + (driverNumber === 1 ? 2.5 : driverNumber === 16 ? 1.0 : -1.0);
@@ -491,12 +499,12 @@ export function generateMockLaps(
       const nonPitTime = lapTime - 22.0;
       s1 = nonPitTime * 0.31 + 4.0 + seed(i + 100) * 0.25;
       s2 = nonPitTime * 0.42 + 14.0 + seed(i + 200) * 0.35;
-      s3 = nonPitTime * 0.27 + 4.0 + seed(i + 300) * 0.20;
+      s3 = lapTime - s1 - s2;
     } else if (isPitInLap) {
       const nonPitTime = lapTime - 5.0;
       s1 = nonPitTime * 0.31 + seed(i + 100) * 0.25;
       s2 = nonPitTime * 0.42 + seed(i + 200) * 0.35;
-      s3 = nonPitTime * 0.27 + 5.0 + seed(i + 300) * 0.20;
+      s3 = lapTime - s1 - s2;
     } else {
       s1 = lapTime * 0.31 + seed(i + 100) * 0.25;
       s2 = lapTime * 0.42 + seed(i + 200) * 0.35;

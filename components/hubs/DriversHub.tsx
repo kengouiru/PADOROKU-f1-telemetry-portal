@@ -142,7 +142,7 @@ export default function DriversHub({
       <div
         key={driver.id}
         onClick={() => setSelectedDriverDetail(driver)}
-        className="glass-card p-4 flex flex-col justify-between gap-3 border-l-4 cursor-pointer hover:border-sky-400 hover:bg-slate-900/90 transition-all hover:scale-[1.02] shadow-md group relative overflow-hidden"
+        className="glass-card-premium p-4.5 flex flex-col justify-between gap-3 border-l-4 cursor-pointer hover:border-sky-400 hover:shadow-2xl transition-all duration-200 hover:-translate-y-0.5 shadow-md group relative overflow-hidden rounded-2xl"
         style={{ borderLeftColor: driver.teamColor }}
       >
         <div className="space-y-2">
@@ -150,7 +150,7 @@ export default function DriversHub({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span
-                className="text-xs font-racing font-black px-2 py-0.5 rounded-lg border"
+                className="text-xs font-racing font-black px-2.5 py-0.5 rounded-md border f1-badge-chamfer shadow-sm"
                 style={{
                   color: driver.teamColor,
                   borderColor: `${driver.teamColor}60`,

@@ -4108,7 +4108,8 @@ export default function TelemetryTrackMap({
   }, [apexInsight, trackData.waypoints]);
 
   return (
-    <div className={`relative bg-slate-950/90 rounded-2xl border border-white/10 p-3 sm:p-4 flex flex-col items-center justify-between gap-2.5 ${className}`}>
+    <div className={`relative glass-card-premium rounded-2xl border border-white/10 p-3 sm:p-4 flex flex-col items-center justify-between gap-2.5 shadow-xl overflow-hidden ${className}`}>
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-sky-500 via-teal-400 to-amber-500 opacity-80" />
       {/* Header bar */}
       <div className="w-full flex items-center justify-between gap-2 pb-2 border-b border-white/10 text-xs">
         <div className="flex items-center gap-2">

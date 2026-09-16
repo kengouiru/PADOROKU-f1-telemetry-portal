@@ -19,6 +19,7 @@ import { buildTelemetryContext } from '@/lib/telemetryContext';
 import { playRadioSpeech, stopRadioSpeech } from '@/lib/radioAudioEffect';
 
 import { usePlanTier } from '@/lib/tierService';
+import { useGeminiApiKey } from '@/lib/apiKeyService';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -135,7 +136,6 @@ interface AIStrategistProps {
   lapsCache: Record<string, Lap[]>;
   stints: Stint[];
   pitStopsCache: Record<string, PitStop[]>;
-  geminiApiKey: string;
   session?: Session | null;
   onAddToNotebook: (content: string, source: 'ai') => void;
   onRequireAuth?: () => void;
@@ -171,7 +171,6 @@ export default function AIStrategist({
   lapsCache,
   stints,
   pitStopsCache,
-  geminiApiKey,
   session,
   onAddToNotebook,
   onRequireAuth,
@@ -180,13 +179,14 @@ export default function AIStrategist({
 }: AIStrategistProps) {
   const { data: authSession } = useSession();
   const { isPro, aiUsage, consumeAi } = usePlanTier();
+
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
     if (typeof window === 'undefined') return [];
     try {
       const saved = localStorage.getItem('f1_ai_chat_messages_v1');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
+        if (Array.isArray(parsed) && parsed.length > 0) {
           return parsed.map((m: any) => ({ ...m, isStreaming: false }));
         }
       }
@@ -196,23 +196,20 @@ export default function AIStrategist({
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [modelChoice, setModelChoice] = useState<'flash' | 'pro'>('flash');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [savedId, setSavedId] = useState<string | null>(null);
   const [speakingMsgId, setSpeakingMsgId] = useState<string | null>(null);
 
-  // Gemini API Key management (localStorage with fallback to prop)
-  const [apiKey, setApiKey] = useState<string>('');
+  // Gemini API Key management via centralized service
+  const [storedApiKey, setStoredApiKey] = useGeminiApiKey();
   const [tempApiKey, setTempApiKey] = useState<string>('');
   const [showKeyModal, setShowKeyModal] = useState(false);
 
+  const apiKey = storedApiKey;
+
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('f1_gemini_api_key') || geminiApiKey || '';
-      setApiKey(stored);
-      setTempApiKey(stored);
-    } catch (_) {
-      setApiKey(geminiApiKey || '');
-      setTempApiKey(geminiApiKey || '');
-    }
-  }, [geminiApiKey]);
+    setTempApiKey(apiKey);
+  }, [apiKey]);
 
   // Persist chat messages across unmount, tab switches, and page reloads
   useEffect(() => {
@@ -226,23 +223,13 @@ export default function AIStrategist({
 
   const handleSaveApiKey = () => {
     const trimmed = tempApiKey.trim();
-    setApiKey(trimmed);
-    try {
-      if (trimmed) {
-        localStorage.setItem('f1_gemini_api_key', trimmed);
-      } else {
-        localStorage.removeItem('f1_gemini_api_key');
-      }
-    } catch (_) {}
+    setStoredApiKey(trimmed);
     setShowKeyModal(false);
   };
 
   const handleClearApiKey = () => {
-    setApiKey('');
+    setStoredApiKey('');
     setTempApiKey('');
-    try {
-      localStorage.removeItem('f1_gemini_api_key');
-    } catch (_) {}
     setShowKeyModal(false);
   };
 
@@ -317,7 +304,7 @@ export default function AIStrategist({
 
     try {
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      const effectiveKey = apiKey || geminiApiKey;
+      const effectiveKey = apiKey;
       if (effectiveKey) headers['x-gemini-key'] = effectiveKey;
 
       const res = await fetch('/api/strategist', {
@@ -370,7 +357,7 @@ export default function AIStrategist({
       setIsStreaming(false);
       inputRef.current?.focus();
     }
-  }, [isStreaming, messages, geminiApiKey, apiKey, getContext, modelChoice, authSession, onRequireAuth, isPro, aiUsage, consumeAi, onOpenUpgradeModal]);
+  }, [isStreaming, messages, apiKey, getContext, modelChoice, authSession, onRequireAuth, isPro, aiUsage, consumeAi, onOpenUpgradeModal]);
 
   const handleStop = () => {
     abortRef.current?.abort();

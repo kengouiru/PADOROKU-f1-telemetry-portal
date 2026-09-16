@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap');
+
 
 @tailwind base;
 @tailwind components;
@@ -46,7 +46,7 @@ body {
 body {
   background: radial-gradient(circle at top right, #1f2833 0%, var(--bg-dark) 100%);
   color: var(--text-primary);
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), 'Inter', sans-serif;
   height: 100vh;
   height: 100dvh;
   line-height: 1.5;
@@ -61,16 +61,16 @@ body {
   background: var(--bg-dark);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(56, 189, 248, 0.25);
+  background: rgba(225, 6, 0, 0.25);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(56, 189, 248, 0.5);
+  background: rgba(225, 6, 0, 0.5);
 }
 
 /* Racing font utility */
 .font-racing {
-  font-family: 'Orbitron', sans-serif;
+  font-family: var(--font-orbitron), sans-serif;
   letter-spacing: 0.05em;
 }
 
@@ -112,6 +112,40 @@ body {
 /* Safe area insets for mobile devices */
 .safe-bottom {
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0.5rem));
+}
+
+/* Carbon weave subtle pattern for F1 composite feel */
+.carbon-pattern {
+  background-color: #0b0c10;
+  background-image:
+    linear-gradient(45deg, #11141a 25%, transparent 25%),
+    linear-gradient(-45deg, #11141a 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #11141a 75%),
+    linear-gradient(-45deg, transparent 75%, #11141a 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+}
+
+/* F1 Badge Chamfer Cut */
+.f1-badge-chamfer {
+  clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+}
+
+/* Premium Glass Card with gradient border glow */
+.glass-card-premium {
+  background: linear-gradient(135deg, rgba(22, 27, 39, 0.75) 0%, rgba(11, 15, 23, 0.9) 100%);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+}
+
+/* F1 Red Accent Glow */
+.glow-f1-red {
+  box-shadow: 0 0 15px rgba(225, 6, 0, 0.35);
+}
+
+.glow-f1-cyan {
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.35);
 }
 
 

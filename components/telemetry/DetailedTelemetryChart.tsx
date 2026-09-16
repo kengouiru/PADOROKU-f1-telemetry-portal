@@ -403,11 +403,12 @@ export default function DetailedTelemetryChart({
       ) : (
         <>
       {/* ── Selectors Bar: Driver 1 vs Driver 2 & Circuit ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-900/60 p-3 rounded-2xl border border-white/5">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 glass-card-premium p-3.5 rounded-2xl border border-white/10 shadow-lg relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-red-600 via-sky-500 to-amber-500 opacity-60" />
         {/* Driver 1 Selector */}
         <div className="flex items-center gap-2">
           <div
-            className="w-3 h-8 rounded-full flex-shrink-0"
+            className="w-2.5 h-8 f1-badge-chamfer flex-shrink-0 shadow-sm"
             style={{ backgroundColor: d1.color }}
           />
           <div className="flex-1">
@@ -429,7 +430,7 @@ export default function DetailedTelemetryChart({
         {/* Driver 2 Selector */}
         <div className="flex items-center gap-2">
           <div
-            className="w-3 h-8 rounded-full flex-shrink-0"
+            className="w-2.5 h-8 f1-badge-chamfer flex-shrink-0 shadow-sm"
             style={{ backgroundColor: d2.color }}
           />
           <div className="flex-1">
@@ -616,7 +617,8 @@ export default function DetailedTelemetryChart({
         </div>
 
         {/* Right Column: 3-Tier Synchronized Charts (8 cols on xl) */}
-        <div className="xl:col-span-8 space-y-2 bg-slate-950/90 rounded-2xl p-3 sm:p-4 border border-white/10">
+        <div className="xl:col-span-8 space-y-2 glass-card-premium rounded-2xl p-3 sm:p-4 border border-white/10 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-sky-500 via-teal-400 to-amber-500 opacity-70" />
           {/* ── Quick Corner Zoom Bar & Navigation Controls ── */}
           <div className="bg-slate-900/90 rounded-xl p-2.5 border border-white/10 space-y-2 mb-2 shadow-lg">
             <div className="flex items-center justify-between flex-wrap gap-2">

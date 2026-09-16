@@ -13,7 +13,7 @@
  *  - Grid Showcase (2026 New PU Regs & Audi/Honda Works vs 2025 Grid)
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   type SeasonYear,
   getActiveSeasonYear,
@@ -31,6 +31,7 @@ import {
 import { getWeatherByRound, getCircuitWeather } from '@/data/f1WeatherData';
 import { getGrandPrixReportByRound, getGrandPrixReportByCircuitId } from '@/data/f1GrandPrixReportsData';
 import F1BroadcastTrackGuide from '@/components/circuits/F1BroadcastTrackGuide';
+import { useCountdown } from '@/lib/useCountdown';
 
 interface SeasonHubProps {
   onNavigateToTelemetry?: (gpName?: string) => void;
@@ -67,9 +68,104 @@ export function getCircuitIdForRace(race: RaceWeekendSchedule): string {
   if (name.includes('ラスベガス') || name.includes('vegas')) return 'las-vegas';
   if (name.includes('カタール') || name.includes('ルサイル') || name.includes('losail')) return 'losail';
   if (name.includes('アブダビ') || name.includes('ヤス') || name.includes('yas')) return 'yas-marina';
+  if (name.includes('セパン') || name.includes('sepang') || name.includes('マレーシア')) return 'sepang';
   return 'suzuka';
 }
 
+
+interface RaceCountdownCardProps {
+  targetDateUtc: string;
+  dates: string;
+}
+
+const RaceCountdownCard = React.memo(function RaceCountdownCard({
+  targetDateUtc,
+  dates,
+}: RaceCountdownCardProps) {
+  const timeLeft = useCountdown(targetDateUtc);
+
+  // Before mounted on client, render consistent placeholder to eliminate SSR hydration mismatch
+  if (!timeLeft.mounted) {
+    return (
+      <div className="w-full bg-black/40 p-4 rounded-2xl border border-white/10 text-center shadow-inner">
+        <div className="text-[10px] font-racing font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center justify-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+          <span>決勝スタートまで</span>
+        </div>
+        <div className="grid grid-cols-4 gap-1.5 font-mono text-center">
+          <div className="p-2 rounded-lg bg-white/5 border border-white/5">
+            <div className="text-xl md:text-2xl font-black text-white/50">--</div>
+            <div className="text-[9px] text-slate-400 uppercase">DAYS</div>
+          </div>
+          <div className="p-2 rounded-lg bg-white/5 border border-white/5">
+            <div className="text-xl md:text-2xl font-black text-amber-400/50">--</div>
+            <div className="text-[9px] text-slate-400 uppercase">HOURS</div>
+          </div>
+          <div className="p-2 rounded-lg bg-white/5 border border-white/5">
+            <div className="text-xl md:text-2xl font-black text-white/50">--</div>
+            <div className="text-[9px] text-slate-400 uppercase">MIN</div>
+          </div>
+          <div className="p-2 rounded-lg bg-white/5 border border-white/5">
+            <div className="text-xl md:text-2xl font-black text-red-400/50">--</div>
+            <div className="text-[9px] text-slate-400 uppercase">SEC</div>
+          </div>
+        </div>
+        <div className="mt-2 text-[10px] text-slate-400 flex items-center justify-center gap-1">
+          <span>🎯</span>
+          <span>ターゲット: {dates.split('-')[1]?.trim() || dates}</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full bg-black/40 p-4 rounded-2xl border border-white/10 text-center shadow-inner">
+      {timeLeft.isPast ? (
+        <div className="space-y-2 py-1">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-racing font-bold">
+            <span>🏁</span>
+            <span>レース完走 / リザルト確定</span>
+          </div>
+          <div className="text-xs text-slate-300 font-medium">
+            公式決勝レース終了・アーカイブ保管済み
+          </div>
+          <div className="text-[10px] text-slate-400 font-mono">
+            開催日程: {dates}
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="text-[10px] font-racing font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center justify-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <span>決勝スタートまで</span>
+          </div>
+          <div className="grid grid-cols-4 gap-1.5 font-mono text-center">
+            <div className="p-2 rounded-lg bg-white/5 border border-white/5">
+              <div className="text-xl md:text-2xl font-black text-white" suppressHydrationWarning>{timeLeft.days}</div>
+              <div className="text-[9px] text-slate-400 uppercase">DAYS</div>
+            </div>
+            <div className="p-2 rounded-lg bg-white/5 border border-white/5">
+              <div className="text-xl md:text-2xl font-black text-amber-400" suppressHydrationWarning>{timeLeft.hours}</div>
+              <div className="text-[9px] text-slate-400 uppercase">HOURS</div>
+            </div>
+            <div className="p-2 rounded-lg bg-white/5 border border-white/5">
+              <div className="text-xl md:text-2xl font-black text-white" suppressHydrationWarning>{timeLeft.minutes}</div>
+              <div className="text-[9px] text-slate-400 uppercase">MIN</div>
+            </div>
+            <div className="p-2 rounded-lg bg-white/5 border border-white/5">
+              <div className="text-xl md:text-2xl font-black text-red-400 animate-pulse" suppressHydrationWarning>{timeLeft.seconds}</div>
+              <div className="text-[9px] text-slate-400 uppercase">SEC</div>
+            </div>
+          </div>
+          <div className="mt-2 text-[10px] text-slate-400 flex items-center justify-center gap-1">
+            <span>🎯</span>
+            <span>ターゲット: {dates.split('-')[1]?.trim() || dates}</span>
+          </div>
+        </>
+      )}
+    </div>
+  );
+});
 
 type MainTab = 'calendar' | 'standings' | 'grid';
 
@@ -87,12 +183,67 @@ export default function SeasonHub({
   const [calendarFilter, setCalendarFilter] = useState<'all' | 'sprint'>('all');
   const [showSeasonInfo, setShowSeasonInfo] = useState<boolean>(false);
 
-  // Active season calendar & grid
-  const activeCalendar = useMemo(() => getSeasonCalendar(selectedSeason), [selectedSeason]);
+  // Active season calendar & grid — starts with local data, upgradeable via API
+  const localCalendar = useMemo(() => getSeasonCalendar(selectedSeason), [selectedSeason]);
+  const [liveCalendar, setLiveCalendar] = useState<RaceWeekendSchedule[] | null>(null);
+  const [calendarSource, setCalendarSource] = useState<'local' | 'api'>('local');
+
+  // Fetch official calendar from API
+  useEffect(() => {
+    if (selectedSeason !== '2026') {
+      setLiveCalendar(null);
+      setCalendarSource('local');
+      return;
+    }
+
+    let cancelled = false;
+
+    async function fetchCalendar() {
+      try {
+        const res = await fetch(`/api/f1-calendar?year=2026`, {
+          signal: AbortSignal.timeout(12000),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (cancelled) return;
+
+        const apiRaces: RaceWeekendSchedule[] = data.races;
+
+        // Merge: API provides scheduleJst, dates, isCancelled; local provides laps, lengthKm, pirelliCompounds
+        const merged = apiRaces.map((apiRace) => {
+          const localMatch = localCalendar.find((l) => l.round === apiRace.round);
+          return {
+            ...apiRace,
+            // Supplement with local data where API doesn't provide
+            lengthKm: apiRace.lengthKm || localMatch?.lengthKm || 0,
+            laps: apiRace.laps || localMatch?.laps || 0,
+            pirelliCompounds: apiRace.pirelliCompounds || localMatch?.pirelliCompounds || '',
+          };
+        });
+
+        setLiveCalendar(merged);
+        setCalendarSource('api');
+        if (!userHasSelectedRoundRef.current) {
+          setSelectedRound(getNextUpcomingRound(merged));
+        }
+      } catch (err) {
+        console.warn('[SeasonHub] API calendar fetch failed, using local data:', err);
+        setLiveCalendar(null);
+        setCalendarSource('local');
+      }
+    }
+
+    fetchCalendar();
+    return () => { cancelled = true; };
+  }, [selectedSeason, localCalendar]);
+
+  const activeCalendar = liveCalendar || localCalendar;
   const activeGrid = useMemo(() => getSeasonGrid(selectedSeason), [selectedSeason]);
   const activeDriverStandings = useMemo(() => getDriverStandings(selectedSeason), [selectedSeason]);
   const activeConstructorStandings = useMemo(() => getConstructorStandings(selectedSeason), [selectedSeason]);
   const seasonEnded = useMemo(() => isSeasonConcluded(activeCalendar), [activeCalendar]);
+
+  const userHasSelectedRoundRef = React.useRef(false);
 
   // Selected Round: Auto-defaults to the next upcoming race of that season
   const [selectedRound, setSelectedRound] = useState<number>(() => {
@@ -104,6 +255,7 @@ export default function SeasonHub({
   // Handle Season Switching
   const handleSeasonChange = (year: SeasonYear) => {
     setSelectedSeason(year);
+    userHasSelectedRoundRef.current = false;
     const cal = getSeasonCalendar(year);
     // When switching season, set focus to next upcoming round or Round 1
     setSelectedRound(getNextUpcomingRound(cal));
@@ -125,37 +277,6 @@ export default function SeasonHub({
   const selectedReport = useMemo(() => {
     return getGrandPrixReportByCircuitId(selectedCircuitId) || getGrandPrixReportByRound(selectedRound);
   }, [selectedCircuitId, selectedRound]);
-
-  // Live Countdown timer calculation
-  const [timeLeft, setTimeLeft] = useState<{
-    days: number;
-    hours: number;
-    minutes: number;
-    seconds: number;
-    isPast: boolean;
-  }>({ days: 0, hours: 0, minutes: 0, seconds: 0, isPast: false });
-
-  useEffect(() => {
-    const calculateTime = () => {
-      const targetTime = new Date(selectedRace.targetDateUtc).getTime();
-      const now = new Date().getTime();
-      const difference = targetTime - now;
-
-      if (difference <= 0) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, isPast: true });
-      } else {
-        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((difference / 1000 / 60) % 60);
-        const seconds = Math.floor((difference / 1000) % 60);
-        setTimeLeft({ days, hours, minutes, seconds, isPast: false });
-      }
-    };
-
-    calculateTime();
-    const interval = setInterval(calculateTime, 1000);
-    return () => clearInterval(interval);
-  }, [selectedRace]);
 
   // Filtered calendar
   const filteredCalendar = useMemo(() => {
@@ -311,7 +432,7 @@ export default function SeasonHub({
           <div className="space-y-3 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-3 py-1 rounded-full text-xs font-racing font-bold tracking-wider uppercase bg-red-500/20 text-red-400 border border-red-500/30">
-                🏁 {selectedSeason}年 第{selectedRace.round}戦 / 全24戦
+                🏁 {selectedSeason}年 第{selectedRace.round}戦 / 全{activeCalendar.length}戦
               </span>
               {selectedRace.isSprint && (
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-racing font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse">
@@ -412,51 +533,10 @@ export default function SeasonHub({
 
           {/* Right: Countdown Clock & Quick Actions */}
           <div className="flex flex-col items-center lg:items-end gap-4 min-w-[260px]">
-            <div className="w-full bg-black/40 p-4 rounded-2xl border border-white/10 text-center shadow-inner">
-              {timeLeft.isPast ? (
-                <div className="space-y-2 py-1">
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-racing font-bold">
-                    <span>🏁</span>
-                    <span>レース完走 / リザルト確定</span>
-                  </div>
-                  <div className="text-xs text-slate-300 font-medium">
-                    公式決勝レース終了・アーカイブ保管済み
-                  </div>
-                  <div className="text-[10px] text-slate-400 font-mono">
-                    開催日程: {selectedRace.dates}
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div className="text-[10px] font-racing font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center justify-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                    <span>決勝スタートまで</span>
-                  </div>
-                  <div className="grid grid-cols-4 gap-1.5 font-mono text-center">
-                    <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-                      <div className="text-xl md:text-2xl font-black text-white">{timeLeft.days}</div>
-                      <div className="text-[9px] text-slate-400 uppercase">DAYS</div>
-                    </div>
-                    <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-                      <div className="text-xl md:text-2xl font-black text-amber-400">{timeLeft.hours}</div>
-                      <div className="text-[9px] text-slate-400 uppercase">HOURS</div>
-                    </div>
-                    <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-                      <div className="text-xl md:text-2xl font-black text-white">{timeLeft.minutes}</div>
-                      <div className="text-[9px] text-slate-400 uppercase">MIN</div>
-                    </div>
-                    <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-                      <div className="text-xl md:text-2xl font-black text-red-400 animate-pulse">{timeLeft.seconds}</div>
-                      <div className="text-[9px] text-slate-400 uppercase">SEC</div>
-                    </div>
-                  </div>
-                  <div className="mt-2 text-[10px] text-slate-400 flex items-center justify-center gap-1">
-                    <span>🎯</span>
-                    <span>ターゲット: {selectedRace.dates.split('-')[1]?.trim() || selectedRace.dates}</span>
-                  </div>
-                </>
-              )}
-            </div>
+            <RaceCountdownCard
+              targetDateUtc={selectedRace.targetDateUtc}
+              dates={selectedRace.dates}
+            />
 
             {/* Quick Actions for Race Viewers */}
             <div className="flex items-center gap-2 w-full">
@@ -718,9 +798,14 @@ export default function SeasonHub({
           ───────────────────────────────────────────────────────────── */}
       {activeTab === 'calendar' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between text-xs">
-            <div className="text-slate-400">
-              各グランプリをクリックすると、上部のカウントダウン＆日本時間予定表が切り替わります。
+          <div className="flex items-center justify-between text-xs flex-wrap gap-2">
+            <div className="flex items-center gap-2 text-slate-400">
+              <span>各グランプリをクリックすると、上部のカウントダウン＆日本時間予定表が切り替わります。</span>
+              {calendarSource === 'api' && (
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  📡 LIVE DATA
+                </span>
+              )}
             </div>
             <div className="flex items-center gap-1">
               <button
@@ -731,7 +816,7 @@ export default function SeasonHub({
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                全24戦
+                全{activeCalendar.length}戦
               </button>
               <button
                 onClick={() => setCalendarFilter('sprint')}
@@ -742,7 +827,7 @@ export default function SeasonHub({
                 }`}
               >
                 <span>⚡</span>
-                <span>スプリント戦のみ (6)</span>
+                <span>スプリント戦のみ ({activeCalendar.filter(r => r.isSprint).length})</span>
               </button>
             </div>
           </div>
@@ -756,20 +841,27 @@ export default function SeasonHub({
               return (
                 <div
                   key={gp.round}
-                  onClick={() => setSelectedRound(gp.round)}
+                  onClick={() => {
+                    userHasSelectedRoundRef.current = true;
+                    setSelectedRound(gp.round);
+                  }}
                   className={`cursor-pointer p-4 rounded-xl border transition-all text-left flex flex-col justify-between ${
                     isSelected
                       ? 'bg-red-950/40 border-red-500/60 ring-1 ring-red-500/40 shadow-lg shadow-red-950/50 scale-[1.01]'
                       : 'bg-slate-900/60 hover:bg-slate-800/70 border-white/5 hover:border-white/20'
                   }`}
                 >
-                  <div className="space-y-2">
+                  <div className={`space-y-2 ${gp.isCancelled ? 'opacity-50' : ''}`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <span className="text-[11px] font-racing font-bold text-slate-400 uppercase">
                           Round {gp.round}
                         </span>
-                        {isGpPast ? (
+                        {gp.isCancelled ? (
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-red-500/20 text-red-300 border border-red-500/30">
+                            中止
+                          </span>
+                        ) : isGpPast ? (
                           <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-800 text-slate-400 border border-white/10">
                             終了
                           </span>
@@ -792,12 +884,16 @@ export default function SeasonHub({
                     <div>
                       <h3
                         className={`font-racing font-bold text-sm leading-tight ${
+                          gp.isCancelled ? 'line-through text-slate-500' :
                           isSelected ? 'text-red-300' : 'text-white'
                         }`}
                       >
                         {gp.gpName}
                       </h3>
                       <p className="text-[11px] text-slate-400 truncate mt-0.5">{gp.circuitName}</p>
+                      {gp.replacementNote && (
+                        <p className="text-[10px] text-amber-400 mt-0.5">{gp.replacementNote}</p>
+                      )}
                     </div>
 
                     {/* Weather Pill */}

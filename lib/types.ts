@@ -202,7 +202,7 @@ export interface AppState {
   raceControlMessages: RaceControlMessage[];
   safetyCarPeriods: SafetyCarPeriod[];
   isDemoMode: boolean;
-  geminiApiKey: string;
+  geminiApiKey?: string;
   activeTimelineFilter: RadioCategory | 'ALL' | 'FIA_EVENT';
   transcriptsCache: Record<string, { transcript: string; translation: string; category: RadioCategory }>;
 }

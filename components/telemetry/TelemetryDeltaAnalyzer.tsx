@@ -28,6 +28,7 @@ import {
   type CornerTelemetryAnalysis,
 } from '@/lib/carTelemetryService';
 import { KNOWLEDGE_CIRCUITS, KNOWLEDGE_DRIVERS } from '@/data/f1KnowledgeData';
+import { getGeminiAuthHeaders } from '@/lib/apiKeyService';
 
 interface TelemetryDeltaAnalyzerProps {
   initialCircuitId?: string;
@@ -126,8 +127,10 @@ ${cornerSummaryText}
 3. ⚡ 【${d2.code}の走法解剖】：マシンの向きの変え方、エイペックス速度、脱出トラクションの比較
 4. 🛠️ 【次セッションへのセットアップ提言】：車高・フロントウイング角・デフ設定への具体的推奨`;
 
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (geminiApiKey) headers['x-gemini-key'] = geminiApiKey;
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...getGeminiAuthHeaders(),
+      };
 
       const res = await fetch('/api/strategist', {
         method: 'POST',

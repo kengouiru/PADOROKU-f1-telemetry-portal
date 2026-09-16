@@ -16,8 +16,8 @@ export default function AuthModal({
   title = 'F1 Intelligence メンバー認証',
   description = 'AI戦略アナリストおよびチーム無線AI解析は認証メンバー専用機能です。',
 }: AuthModalProps) {
-  const [email, setEmail] = useState('demo@f1telemetry.pro');
-  const [password, setPassword] = useState('f1pro2024');
+  const [email, setEmail] = useState('demo-pro@f1telemetry.pro');
+  const [password, setPassword] = useState('f1pro2026');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -47,18 +47,21 @@ export default function AuthModal({
     }
   };
 
-  const handleQuickDemoLogin = async () => {
+  const handleDemoLogin = async (type: 'pro' | 'free') => {
     setIsLoading(true);
     setErrorMessage(null);
+    const targetEmail = type === 'pro' ? 'demo-pro@f1telemetry.pro' : 'demo-free@f1telemetry.pro';
+    const targetPass = type === 'pro' ? 'f1pro2026' : 'f1free2026';
+
     try {
       const res = await signIn('credentials', {
-        email: 'demo@f1telemetry.pro',
-        password: 'f1pro2024',
+        email: targetEmail,
+        password: targetPass,
         redirect: false,
       });
 
       if (res?.error) {
-        setErrorMessage('デモログインに失敗しました。');
+        setErrorMessage(`${type.toUpperCase()} デモログインに失敗しました。`);
       } else {
         onClose();
       }
@@ -115,32 +118,75 @@ export default function AuthModal({
           </div>
         )}
 
-        {/* Quick Demo Login (Recommended for Reviewers & Testing) */}
-        <div className="bg-gradient-to-r from-blue-950/50 to-sky-950/50 p-3.5 rounded-2xl border border-sky-500/30 space-y-2">
+        {/* Quick Demo Login Cards (PRO and FREE) */}
+        <div className="space-y-2.5">
           <div className="flex items-center justify-between text-[11px] font-mono">
-            <span className="text-sky-300 font-bold flex items-center gap-1">
+            <span className="text-amber-300 font-bold flex items-center gap-1">
               <span>⚡</span>
-              <span>評価・即時テスト用</span>
+              <span>評価・即時テスト用デモアカウント</span>
             </span>
-            <span className="text-slate-400">1-Click Pro Access</span>
+            <span className="text-slate-400">1-Click Access</span>
           </div>
-          <button
-            onClick={handleQuickDemoLogin}
-            disabled={isLoading}
-            className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white text-xs font-racing font-bold shadow-lg shadow-sky-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-          >
-            {isLoading ? (
-              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>
-                <span>🚀</span>
-                <span>デモアカウントで今すぐログイン (Pro権限)</span>
-              </>
-            )}
-          </button>
-          <p className="text-[10px] text-slate-400 text-center font-mono">
-            demo@f1telemetry.pro / f1pro2024 (入力不要でワンクリック)
-          </p>
+
+          {/* PRO Demo Button */}
+          <div className="bg-gradient-to-r from-amber-950/40 via-yellow-950/30 to-amber-950/40 p-3 rounded-2xl border border-amber-500/30 space-y-1.5">
+            <div className="flex items-center justify-between text-[10px]">
+              <span className="font-racing font-bold text-amber-300 flex items-center gap-1">
+                <span>👑</span>
+                <span>PRO デモ (全機能開放・無制限)</span>
+              </span>
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-racing font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950">
+                PRO
+              </span>
+            </div>
+            <button
+              onClick={() => handleDemoLogin('pro')}
+              disabled={isLoading}
+              className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-racing font-black shadow-md shadow-amber-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              {isLoading ? (
+                <span className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <span>🚀</span>
+                  <span>PRO アカウントで1クリック ログイン</span>
+                </>
+              )}
+            </button>
+            <p className="text-[10px] text-slate-400 text-center font-mono">
+              demo-pro@f1telemetry.pro / f1pro2026 (AI無制限・フルGP)
+            </p>
+          </div>
+
+          {/* FREE Demo Button */}
+          <div className="bg-slate-950/60 p-3 rounded-2xl border border-white/10 space-y-1.5">
+            <div className="flex items-center justify-between text-[10px]">
+              <span className="font-racing font-bold text-slate-300 flex items-center gap-1">
+                <span>🆓</span>
+                <span>FREE デモ (無料プラン制限テスト)</span>
+              </span>
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-racing font-bold bg-slate-800 text-slate-400 border border-white/10">
+                FREE
+              </span>
+            </div>
+            <button
+              onClick={() => handleDemoLogin('free')}
+              disabled={isLoading}
+              className="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-750 text-white text-xs font-racing font-bold border border-white/15 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              {isLoading ? (
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <span>👤</span>
+                  <span>FREE アカウントで1クリック ログイン</span>
+                </>
+              )}
+            </button>
+            <p className="text-[10px] text-slate-400 text-center font-mono">
+              demo-free@f1telemetry.pro / f1free2026 (AI1日3回・制限テスト)
+            </p>
+          </div>
         </div>
 
         {/* Divider */}

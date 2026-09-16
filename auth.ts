@@ -23,15 +23,36 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const email = credentials?.email;
         const password = credentials?.password;
 
-        // Test demo credentials
+        // Test demo credentials (PRO & FREE)
         if (process.env.NODE_ENV !== 'production') {
-          if (email === 'demo@f1telemetry.pro' && password === 'f1pro2024') {
+          // PRO Demo Account
+          if (
+            (email === 'demo-pro@f1telemetry.pro' ||
+              email === 'demo@f1telemetry.pro' ||
+              email === 'pro@f1telemetry.pro') &&
+            (password === 'f1pro2026' || password === 'f1pro2024')
+          ) {
             return {
               id: 'demo-pro-user-1',
               name: 'Demo Pro User',
-              email: 'demo@f1telemetry.pro',
+              email: 'demo-pro@f1telemetry.pro',
               image: '/images/drivers/portraits/max-verstappen.jpg',
               role: 'pro',
+            };
+          }
+
+          // FREE Demo Account
+          if (
+            (email === 'demo-free@f1telemetry.pro' ||
+              email === 'free@f1telemetry.pro') &&
+            (password === 'f1free2026' || password === 'f1free2024')
+          ) {
+            return {
+              id: 'demo-free-user-1',
+              name: 'Demo Free User',
+              email: 'demo-free@f1telemetry.pro',
+              image: '/images/drivers/portraits/yuki-tsunoda.jpg',
+              role: 'free',
             };
           }
         }
@@ -43,7 +64,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as { role?: string }).role || 'pro';
+        token.role = (user as { role?: string }).role || 'free';
       }
       return token;
     },
@@ -51,11 +72,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (session.user && token) {
         session.user.id = token.id as string;
         // Attach role to session user
-        (session.user as unknown as { role: string }).role = (token.role as string) || 'pro';
+        (session.user as unknown as { role: string }).role = (token.role as string) || 'free';
       }
       return session;
     },
   },
-  secret: process.env.AUTH_SECRET || 'f1-telemetry-nextauth-secret-key-2026-padoroku-dev',
+  secret: process.env.AUTH_SECRET || (process.env.NODE_ENV === 'production' ? undefined : 'f1-telemetry-nextauth-secret-key-2026-padoroku-dev'),
   trustHost: true,
 });

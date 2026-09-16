@@ -2,32 +2,32 @@
 
 /**
  * components/TelemetryChart.tsx
- * Multi-mode F1 Telemetry Chart:
+ * Multi-mode F1 Telemetry Chart powered by Recharts:
  *  1. Lap Times (Laps vs Lap Duration)
  *  2. Gap / Delta (Laps vs Gap relative to reference driver)
  *  3. Stint Pace (Tyre Age vs Lap Duration & Degradation)
  *
- * Integrated with:
- *  - Safety Car / VSC shaded bands
- *  - Pit stop "P" markers & bottom Radio timeline pins
- *  - Inline Audio Player & AI Tactical Summary
+ * Unified with Recharts (bundle reduction ~250KB):
+ *  - Safety Car / VSC shaded bands (ReferenceArea)
+ *  - Pit stop markers & interactive points
+ *  - Rich F1 Cyberpunk-styled Tooltip with tyre compounds & sector splits
+ *  - Inline Team Radio Player & Gemini AI Tactical Summary
  *  - Quick radio lap jump pills
  */
 
-import React, { useMemo, useRef, useState, useCallback, useEffect } from 'react';
+import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react';
 import {
-  Chart as ChartJS,
-  LinearScale,
-  PointElement,
-  LineElement,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
   Tooltip,
   Legend,
-  Filler,
-  type ChartOptions,
-  type Plugin,
-  type ChartDataset,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
+  ReferenceArea,
+  ReferenceLine,
+  CartesianGrid,
+} from 'recharts';
 
 import type { Driver, Lap, Stint, PitStop, SafetyCarPeriod, TeamRadio, TyreCompound } from '@/lib/types';
 import {
@@ -41,31 +41,9 @@ import {
   calculateStintDegradation,
   getProxiedAudioUrl,
 } from '@/lib/telemetryUtils';
-
-// ── Register Chart.js modules globally (idempotent) ───────────────────────────
-ChartJS.register(LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
-
-// ── Types ─────────────────────────────────────────────────────────────────────
+import { getGeminiAuthHeaders } from '@/lib/apiKeyService';
 
 export type ChartMode = 'laps' | 'gap' | 'stint';
-
-interface ChartPoint {
-  x: number;
-  y: number;
-  compound?: string;
-  tyreAge?: number;
-  s1?: number | null;
-  s2?: number | null;
-  s3?: number | null;
-  lapNumber?: number;
-  driverNum: string;
-  extraLabel?: string;
-}
-
-type F1Dataset = ChartDataset<'line', ChartPoint[]> & {
-  originalColor: string;
-  driverNum: string;
-};
 
 interface TelemetryChartProps {
   selectedDrivers: string[];
@@ -106,7 +84,6 @@ export default function TelemetryChart({
   transcriptsCache = {},
   onTranscriptFetched,
 }: TelemetryChartProps) {
-  const chartRef = useRef<ChartJS<'line', ChartPoint[]>>(null);
   const [chartMode, setChartMode] = useState<ChartMode>('laps');
   const [activeRadioContext, setActiveRadioContext] = useState<ActiveRadioContext | null>(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -141,57 +118,104 @@ export default function TelemetryChart({
     return list.sort((a, b) => (a.radio.lap_number ?? 0) - (b.radio.lap_number ?? 0));
   }, [selectedDrivers, mappedRadios, drivers]);
 
-  // ── 1. Datasets for "Lap Times" mode ───────────────────────────────────────
-  const lapTimesDatasets: F1Dataset[] = useMemo(() => {
+  // Select a radio context to open inline player
+  const selectRadioContext = useCallback(
+    (driverNum: string, lapNumber: number) => {
+      const driver = drivers.find((d) => d.driver_number.toString() === driverNum);
+      const dRadios = (mappedRadios[driverNum] ?? []).filter((r) => r.lap_number === lapNumber);
+      const lap = (lapsCache[driverNum] ?? []).find((l) => l.lap_number === lapNumber);
+
+      let compound: string = lap?.compound ?? 'UNKNOWN';
+      let tyreAge: number = lap?.tyreAge ?? 0;
+      if (!lap?.compound) {
+        const driverStints = stints.filter((s) => s.driver_number?.toString() === driverNum);
+        for (const st of driverStints) {
+          if (lapNumber >= st.lap_start && (st.lap_end == null || lapNumber <= st.lap_end)) {
+            compound = st.compound ?? 'UNKNOWN';
+            tyreAge = lapNumber - st.lap_start + 1;
+            break;
+          }
+        }
+      }
+
+      setActiveRadioContext({
+        driverNum,
+        driverName: driver?.full_name ?? `#${driverNum}`,
+        driverAcronym: driver?.name_acronym ?? `#${driverNum}`,
+        teamColour: driver ? formatColor(driver.team_colour) : '#38bdf8',
+        lapNumber,
+        lapDuration: lap?.lap_duration ?? lap?.lap_time ?? null,
+        compound,
+        tyreAge,
+        radios: dRadios.length > 0 ? dRadios : [
+          {
+            session_key: 0,
+            date: new Date().toISOString(),
+            driver_number: Number(driverNum),
+            recording_url: '',
+            transcript: '（この周回の音声データはありません）',
+            translation: '',
+            category: 'PACE',
+            lap_number: lapNumber,
+          },
+        ],
+      });
+
+      onLapClick?.(driverNum, lapNumber);
+    },
+    [drivers, mappedRadios, lapsCache, stints, onLapClick]
+  );
+
+  // ── 1. Recharts Data for "Lap Times" mode ──────────────────────────────────
+  const { lapTimesData, lapDriversConfig } = useMemo(() => {
+    const lapMap = new Map<number, Record<string, any>>();
+    const configs: { code: string; num: string; color: string; dash: string }[] = [];
     const teamColorCount: Record<string, number> = {};
 
-    return selectedDrivers.map((driverNum) => {
+    selectedDrivers.forEach((driverNum) => {
       const raw = lapsCache[driverNum] ?? [];
       const enriched = enrichLapsWithStints(raw, stints, driverNum);
-      const points: ChartPoint[] = lapsToChartData(enriched).map((p) => ({
-        x: p.x,
-        y: p.y,
-        compound: p.compound,
-        tyreAge: p.tyreAge,
-        s1: p.s1,
-        s2: p.s2,
-        s3: p.s3,
-        lapNumber: p.x,
-        driverNum,
-      }));
-
+      const pts = lapsToChartData(enriched);
       const info = drivers.find((d) => d.driver_number.toString() === driverNum);
       const color = info ? formatColor(info.team_colour) : '#38bdf8';
       const code = info?.name_acronym ?? `#${driverNum}`;
 
       teamColorCount[color] = (teamColorCount[color] ?? 0) + 1;
       const idx = teamColorCount[color] - 1;
-      const dashes: number[][] = [[], [6, 4], [2, 4]];
+      const dashes = ['', '5 5', '2 2'];
 
-      return {
-        label: `${code}  #${driverNum}`,
-        data: points,
-        borderColor: color,
-        backgroundColor: color + '22',
-        borderDash: dashes[idx] ?? [8, 4],
-        borderWidth: 2.5,
-        fill: false,
-        tension: 0.2,
-        pointBackgroundColor: points.map((p) => getTyreColor(p.compound)),
-        pointBorderColor: points.map((p) => getTyreColor(p.compound)),
-        pointRadius: 4,
-        pointHoverRadius: 7,
-        pointHoverBorderColor: '#fff',
-        pointHoverBorderWidth: 2,
-        originalColor: color,
-        driverNum,
-        parsing: false as never,
-      } as F1Dataset;
+      configs.push({
+        code,
+        num: driverNum,
+        color,
+        dash: dashes[idx] || '4 4',
+      });
+
+      pts.forEach((p) => {
+        if (!lapMap.has(p.x)) {
+          lapMap.set(p.x, { lap: p.x });
+        }
+        const row = lapMap.get(p.x)!;
+        row[code] = p.y;
+        row[`${code}_meta`] = {
+          compound: p.compound,
+          tyreAge: p.tyreAge,
+          s1: p.s1,
+          s2: p.s2,
+          s3: p.s3,
+          driverNum,
+          hasRadio: (mappedRadios[driverNum] ?? []).some((r) => r.lap_number === p.x),
+          isPit: (pitStopsCache[driverNum] ?? []).some((pit) => pit.lap_number === p.x),
+        };
+      });
     });
-  }, [selectedDrivers, lapsCache, stints, drivers]);
 
-  // ── 2. Datasets for "Gap / Delta" mode ──────────────────────────────────────
-  const { gapDatasets, refDriverCode } = useMemo(() => {
+    const data = Array.from(lapMap.values()).sort((a, b) => a.lap - b.lap);
+    return { lapTimesData: data, lapDriversConfig: configs };
+  }, [selectedDrivers, lapsCache, stints, drivers, mappedRadios, pitStopsCache]);
+
+  // ── 2. Recharts Data for "Gap / Delta" mode ────────────────────────────────
+  const { gapData, gapDriversConfig, refDriverCode } = useMemo(() => {
     const { series, referenceDriverNum } = calculateCumulativeGaps(
       selectedDrivers,
       drivers,
@@ -202,42 +226,41 @@ export default function TelemetryChart({
     const refInfo = drivers.find((d) => d.driver_number.toString() === referenceDriverNum);
     const refCode = refInfo?.name_acronym ?? `#${referenceDriverNum}`;
 
-    const dsList: F1Dataset[] = series.map((s) => {
-      const points: ChartPoint[] = s.points.map((p) => ({
-        x: p.x,
-        y: p.y,
-        compound: p.compound,
-        tyreAge: p.tyreAge,
-        lapNumber: p.x,
-        driverNum: s.driverNum,
-        extraLabel: p.gapDelta !== 0 ? `(${p.gapDelta > 0 ? '+' : ''}${p.gapDelta.toFixed(3)}s/L)` : '',
-      }));
+    const lapMap = new Map<number, Record<string, any>>();
+    const configs: { code: string; num: string; color: string; isRef: boolean; label: string }[] = [];
 
+    series.forEach((s) => {
       const isRef = s.isReference;
-      return {
+      configs.push({
+        code: s.driverAcronym,
+        num: s.driverNum,
+        color: s.teamColour,
+        isRef,
         label: isRef ? `${s.driverAcronym} (基準: 0.0s)` : `${s.driverAcronym} vs ${refCode}`,
-        data: points,
-        borderColor: s.teamColour,
-        backgroundColor: s.teamColour + '22',
-        borderDash: isRef ? [3, 3] : [],
-        borderWidth: isRef ? 2 : 2.5,
-        fill: false,
-        tension: 0.2,
-        pointBackgroundColor: points.map((p) => getTyreColor(p.compound)),
-        pointBorderColor: s.teamColour,
-        pointRadius: isRef ? 2 : 4,
-        pointHoverRadius: 7,
-        originalColor: s.teamColour,
-        driverNum: s.driverNum,
-        parsing: false as never,
-      } as F1Dataset;
+      });
+
+      s.points.forEach((p) => {
+        if (!lapMap.has(p.x)) {
+          lapMap.set(p.x, { lap: p.x });
+        }
+        const row = lapMap.get(p.x)!;
+        row[s.driverAcronym] = p.y;
+        row[`${s.driverAcronym}_meta`] = {
+          compound: p.compound,
+          tyreAge: p.tyreAge,
+          driverNum: s.driverNum,
+          gapDelta: p.gapDelta,
+          hasRadio: (mappedRadios[s.driverNum] ?? []).some((r) => r.lap_number === p.x),
+        };
+      });
     });
 
-    return { gapDatasets: dsList, refDriverCode: refCode };
-  }, [selectedDrivers, drivers, lapsCache, stints]);
+    const data = Array.from(lapMap.values()).sort((a, b) => a.lap - b.lap);
+    return { gapData: data, gapDriversConfig: configs, refDriverCode: refCode };
+  }, [selectedDrivers, drivers, lapsCache, stints, mappedRadios]);
 
-  // ── 3. Datasets for "Stint Pace" mode ───────────────────────────────────────
-  const stintDatasets: F1Dataset[] = useMemo(() => {
+  // ── 3. Recharts Data for "Stint Pace" mode ─────────────────────────────────
+  const { stintData, stintConfigs } = useMemo(() => {
     const stintSeries = calculateStintDegradation(
       selectedDrivers,
       drivers,
@@ -245,342 +268,41 @@ export default function TelemetryChart({
       stints
     );
 
-    return stintSeries.map((st, idx) => {
-      const tyreColor = getTyreColor(st.compound);
-      const points: ChartPoint[] = st.points.map((p) => ({
-        x: p.x, // Tyre age
-        y: p.y, // Lap time
-        compound: st.compound,
-        tyreAge: p.x,
-        lapNumber: p.lapNumber,
-        driverNum: st.driverNum,
-        extraLabel: `+${p.deltaFromStintStart.toFixed(2)}s deg`,
-      }));
+    const ageMap = new Map<number, Record<string, any>>();
+    const configs: { key: string; label: string; color: string; dash: string; driverNum: string }[] = [];
 
-      const isOddStint = st.stintNumber % 2 === 1;
+    stintSeries.forEach((st) => {
+      const key = `${st.driverAcronym}_S${st.stintNumber}`;
+      const isOdd = st.stintNumber % 2 === 1;
 
-      return {
-        label: `${st.driverAcronym} S${st.stintNumber} (${st.compound} avg ${formatLapTime(st.avgPace)})`,
-        data: points,
-        borderColor: st.teamColour,
-        backgroundColor: tyreColor + '33',
-        borderDash: isOddStint ? [] : [6, 4],
-        borderWidth: 2.5,
-        fill: false,
-        tension: 0.25,
-        pointBackgroundColor: tyreColor,
-        pointBorderColor: st.teamColour,
-        pointRadius: 4,
-        pointHoverRadius: 7,
-        originalColor: st.teamColour,
+      configs.push({
+        key,
+        label: `${st.driverAcronym} S${st.stintNumber} (${st.compound})`,
+        color: st.teamColour,
+        dash: isOdd ? '' : '6 4',
         driverNum: st.driverNum,
-        parsing: false as never,
-      } as F1Dataset;
+      });
+
+      st.points.forEach((p) => {
+        if (!ageMap.has(p.x)) {
+          ageMap.set(p.x, { tyreAge: p.x });
+        }
+        const row = ageMap.get(p.x)!;
+        row[key] = p.y;
+        row[`${key}_meta`] = {
+          compound: st.compound,
+          lapNumber: p.lapNumber,
+          driverNum: st.driverNum,
+          degDelta: p.deltaFromStintStart,
+        };
+      });
     });
+
+    const data = Array.from(ageMap.values()).sort((a, b) => a.tyreAge - b.tyreAge);
+    return { stintData: data, stintConfigs: configs };
   }, [selectedDrivers, drivers, lapsCache, stints]);
 
-  // Active datasets based on mode
-  const currentDatasets =
-    chartMode === 'gap' ? gapDatasets : chartMode === 'stint' ? stintDatasets : lapTimesDatasets;
-
-  // ── Safety-car band plugin (active on Laps & Gap modes) ─────────────────────
-
-  const scPlugin: Plugin<'line'> = useMemo(
-    () => ({
-      id: 'f1_sc_bands',
-      beforeDraw(chart) {
-        if (chartMode === 'stint' || !safetyCarPeriods.length) return;
-        const { ctx, chartArea, scales } = chart;
-        if (!chartArea || !scales.x) return;
-        ctx.save();
-        for (const p of safetyCarPeriods) {
-          const x1 = scales.x.getPixelForValue(p.startLap);
-          const x2 = scales.x.getPixelForValue(p.endLap ?? scales.x.max);
-          ctx.fillStyle =
-            p.type === 'RED'
-              ? 'rgba(239,68,68,0.14)'
-              : p.type === 'SC'
-              ? 'rgba(251,146,60,0.12)'
-              : 'rgba(250,204,21,0.10)';
-          ctx.fillRect(x1, chartArea.top, x2 - x1, chartArea.height);
-        }
-        ctx.restore();
-      },
-    }),
-    [safetyCarPeriods, chartMode]
-  );
-
-  // ── Pit & Radio Timeline Markers Plugin ────────────────────────────────────
-
-  const markersPlugin: Plugin<'line'> = useMemo(
-    () => ({
-      id: 'f1_markers',
-      afterDatasetsDraw(chart) {
-        const { ctx, chartArea, scales } = chart;
-        if (!chartArea || !scales.x) return;
-
-        // Pit markers (Laps mode)
-        if (chartMode === 'laps') {
-          chart.data.datasets.forEach((ds, dsIdx) => {
-            const f1ds = ds as F1Dataset;
-            if (!f1ds.driverNum) return;
-            const driverNum = f1ds.driverNum;
-            const pits = pitStopsCache[driverNum] ?? [];
-            const meta = chart.getDatasetMeta(dsIdx);
-
-            pits.forEach((pit) => {
-              const dataIdx = f1ds.data.findIndex(
-                (d) => (d as ChartPoint).x === pit.lap_number
-              );
-              if (dataIdx === -1) return;
-              const el = meta.data[dataIdx] as { x: number; y: number } | undefined;
-              if (!el) return;
-              ctx.save();
-              ctx.fillStyle = '#ef4444';
-              ctx.beginPath();
-              ctx.arc(el.x, el.y - 13, 6.5, 0, 2 * Math.PI);
-              ctx.fill();
-              ctx.fillStyle = '#fff';
-              ctx.font = 'bold 8.5px Inter,sans-serif';
-              ctx.textAlign = 'center';
-              ctx.textBaseline = 'middle';
-              ctx.fillText('P', el.x, el.y - 13);
-              ctx.restore();
-            });
-          });
-        }
-
-        // Radio Bottom Timeline Pins (Laps & Gap mode)
-        if (chartMode === 'laps' || chartMode === 'gap') {
-          const radioLapsMap: Record<number, { driverNum: string; count: number }[]> = {};
-
-          selectedDrivers.forEach((dNum) => {
-            const radios = mappedRadios[dNum] ?? [];
-            radios.forEach((r) => {
-              if (r.lap_number) {
-                if (!radioLapsMap[r.lap_number]) radioLapsMap[r.lap_number] = [];
-                const existing = radioLapsMap[r.lap_number].find((x) => x.driverNum === dNum);
-                if (existing) {
-                  existing.count++;
-                } else {
-                  radioLapsMap[r.lap_number].push({ driverNum: dNum, count: 1 });
-                }
-              }
-            });
-          });
-
-          const bottomY = chartArea.bottom - 12;
-
-          Object.entries(radioLapsMap).forEach(([lapStr, driverEntries]) => {
-            const lapNum = Number(lapStr);
-            const xPos = scales.x.getPixelForValue(lapNum);
-            if (xPos < chartArea.left || xPos > chartArea.right) return;
-
-            ctx.save();
-            ctx.strokeStyle = 'rgba(56, 189, 248, 0.18)';
-            ctx.lineWidth = 1;
-            ctx.setLineDash([2, 3]);
-            ctx.beginPath();
-            ctx.moveTo(xPos, chartArea.top);
-            ctx.lineTo(xPos, bottomY - 8);
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            driverEntries.forEach((entry, i) => {
-              const driverInfo = drivers.find((d) => d.driver_number.toString() === entry.driverNum);
-              const color = driverInfo ? formatColor(driverInfo.team_colour) : '#38bdf8';
-              const offset = (i - (driverEntries.length - 1) / 2) * 14;
-
-              ctx.fillStyle = '#0f172a';
-              ctx.beginPath();
-              ctx.arc(xPos + offset, bottomY, 7, 0, 2 * Math.PI);
-              ctx.fill();
-
-              ctx.lineWidth = 1.5;
-              ctx.strokeStyle = color;
-              ctx.beginPath();
-              ctx.arc(xPos + offset, bottomY, 7, 0, 2 * Math.PI);
-              ctx.stroke();
-
-              ctx.fillStyle = color;
-              ctx.font = 'bold 8px sans-serif';
-              ctx.textAlign = 'center';
-              ctx.textBaseline = 'middle';
-              ctx.fillText('🎙', xPos + offset, bottomY + 0.5);
-            });
-
-            ctx.restore();
-          });
-        }
-      },
-    }),
-    [pitStopsCache, mappedRadios, selectedDrivers, drivers, chartMode]
-  );
-
-  // ── Open Radio Context in Inline Panel ────────────────────────────────────
-
-  const selectRadioContext = useCallback((driverNum: string, lapNumber: number) => {
-    onLapClick?.(driverNum, lapNumber);
-
-    const radiosOnLap = (mappedRadios[driverNum] ?? []).filter(
-      (r) => r.lap_number === lapNumber
-    );
-
-    if (radiosOnLap.length > 0) {
-      const driverInfo = drivers.find((d) => d.driver_number.toString() === driverNum);
-      const rawLaps = lapsCache[driverNum] ?? [];
-      const lapObj = rawLaps.find((l) => l.lap_number === lapNumber);
-      const enriched = enrichLapsWithStints(rawLaps, stints, driverNum);
-      const enrichedLap = enriched.find((l) => l.lap_number === lapNumber);
-
-      setActiveRadioContext({
-        driverNum,
-        driverName: driverInfo?.full_name ?? `Driver #${driverNum}`,
-        driverAcronym: driverInfo?.name_acronym ?? `#${driverNum}`,
-        teamColour: driverInfo ? formatColor(driverInfo.team_colour) : '#38bdf8',
-        lapNumber,
-        lapDuration: lapObj?.lap_duration ?? lapObj?.lap_time ?? null,
-        compound: (enrichedLap?.compound ?? 'UNKNOWN') as string,
-        tyreAge: enrichedLap?.tyreAge ?? 0,
-        radios: radiosOnLap,
-      });
-    }
-  }, [drivers, lapsCache, mappedRadios, onLapClick, stints]);
-
-  // ── Dynamic Chart Options based on Mode ───────────────────────────────────
-
-  const options: ChartOptions<'line'> = useMemo(() => {
-    const isGap = chartMode === 'gap';
-    const isStint = chartMode === 'stint';
-
-    return {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: { duration: 250 },
-      parsing: false,
-      interaction: { mode: 'index', intersect: false },
-      onClick(_, active) {
-        if (!active.length) return;
-        const { datasetIndex, index } = active[0];
-        const ds = currentDatasets[datasetIndex];
-        const pt = ds?.data[index] as ChartPoint | undefined;
-        if (ds && pt) {
-          const targetLap = pt.lapNumber ?? pt.x;
-          selectRadioContext(ds.driverNum, targetLap);
-        }
-      },
-      scales: {
-        x: {
-          type: 'linear',
-          title: {
-            display: true,
-            text: isStint ? 'TYRE AGE (周回数 / STINT LAPS)' : 'LAP (周回)',
-            color: 'rgba(255,255,255,0.5)',
-            font: { size: 10, weight: 'bold' },
-          },
-          ticks: { color: 'rgba(255,255,255,0.45)', maxTicksLimit: 16 },
-          grid: { color: 'rgba(255,255,255,0.06)' },
-        },
-        y: {
-          type: 'linear',
-          suggestedMin: isGap ? -5 : 88,
-          suggestedMax: isGap ? 25 : 130,
-          title: {
-            display: true,
-            text: isGap ? 'GAP TO REFERENCE (秒)' : 'LAP TIME (タイム)',
-            color: 'rgba(255,255,255,0.5)',
-            font: { size: 10, weight: 'bold' },
-          },
-          ticks: {
-            color: 'rgba(255,255,255,0.45)',
-            callback: (v) => {
-              if (typeof v !== 'number') return String(v);
-              if (isGap) return `${v > 0 ? '+' : ''}${v.toFixed(1)}s`;
-              return formatLapTime(v);
-            },
-          },
-          grid: {
-            color: (ctx) =>
-              isGap && ctx.tick.value === 0
-                ? 'rgba(255,255,255,0.3)'
-                : 'rgba(255,255,255,0.06)',
-          },
-        },
-      },
-      plugins: {
-        legend: {
-          display: true,
-          position: 'top',
-          labels: {
-            color: 'rgba(255,255,255,0.85)',
-            font: { size: 11 },
-            boxWidth: 16,
-            padding: 12,
-            usePointStyle: true,
-          },
-        },
-        tooltip: {
-          backgroundColor: 'rgba(8,12,30,0.96)',
-          borderColor: 'rgba(255,255,255,0.15)',
-          borderWidth: 1,
-          titleColor: '#fff',
-          bodyColor: 'rgba(255,255,255,0.7)',
-          padding: 10,
-          callbacks: {
-            title: (items) => {
-              const pt = items[0]?.raw as ChartPoint | undefined;
-              if (isStint) return `Tyre Age: ${pt?.x ?? '?'}周目 (Lap ${pt?.lapNumber ?? '?'})`;
-              return `Lap ${items[0]?.parsed?.x ?? '?'}`;
-            },
-            label(ctx) {
-              const raw = ctx.raw as ChartPoint;
-              const targetLap = raw.lapNumber ?? raw.x;
-              const dRadios = (mappedRadios[raw.driverNum] ?? []).filter(
-                (r) => r.lap_number === targetLap
-              );
-
-              if (isGap) {
-                return [
-                  `  ${ctx.dataset.label}: ${raw.y > 0 ? '+' : ''}${raw.y.toFixed(3)}s ${raw.extraLabel ?? ''}`,
-                  `  Tyre: ${raw.compound ?? ''} (${raw.tyreAge}L old)`,
-                  ...(dRadios.length > 0 ? ['  🎙️ チーム無線あり (クリックで再生)'] : []),
-                ];
-              }
-
-              if (isStint) {
-                return [
-                  `  ${ctx.dataset.label}: ${formatLapTime(raw.y)}`,
-                  `  デグラデーション: ${raw.extraLabel ?? ''}`,
-                  ...(dRadios.length > 0 ? ['  🎙️ チーム無線あり (クリックで再生)'] : []),
-                ];
-              }
-
-              // Default: Lap Times
-              const lines = [
-                `  ${ctx.dataset.label}: ${formatLapTime(raw.y)}`,
-                `  Tyre: ${raw.compound} (${raw.tyreAge}L old)`,
-              ];
-              if (raw.s1 != null) {
-                lines.push(
-                  `  S1 ${raw.s1.toFixed(3)}  S2 ${(raw.s2 ?? 0).toFixed(3)}  S3 ${(raw.s3 ?? 0).toFixed(3)}`
-                );
-              }
-              if (dRadios.length > 0) {
-                const preview = dRadios[0].transcript
-                  ? dRadios[0].transcript.slice(0, 35) + '...'
-                  : '無線あり';
-                lines.push(`  🎙️ 無線: "${preview}" (クリックで下部に再生展開)`);
-              }
-              return lines;
-            },
-          },
-        },
-      },
-    };
-  }, [chartMode, currentDatasets, mappedRadios, selectRadioContext]);
-
   // ── Empty state ───────────────────────────────────────────────────────────
-
   if (selectedDrivers.length === 0) {
     return (
       <div
@@ -594,18 +316,21 @@ export default function TelemetryChart({
   }
 
   return (
-    <div className="glass-card p-4 flex flex-col gap-3 relative">
+    <div className="glass-card-premium p-4 sm:p-5 flex flex-col gap-3.5 relative overflow-hidden rounded-2xl shadow-2xl">
+      {/* F1 Red gradient accent line */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-red-600 via-rose-500 to-amber-500" />
+
       {/* Title & Mode Switcher Tabs */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-white/10 pb-3">
         <div>
-          <h3 className="text-xs font-racing font-bold text-white tracking-widest border-l-2 border-f1-red pl-2 uppercase">
-            {chartMode === 'laps'
+          <h3 className="text-xs font-racing font-bold text-white tracking-widest border-l-2 border-f1-red pl-2 uppercase flex items-center gap-2">
+            <span>{chartMode === 'laps'
               ? 'LAP TIME COMPARISON'
               : chartMode === 'gap'
               ? 'GAP / DELTA TO REFERENCE'
-              : 'STINT & TYRE DEGRADATION'}
+              : 'STINT & TYRE DEGRADATION'}</span>
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-400 mt-0.5 font-mono">
             {chartMode === 'laps' && '周回ごとのラップタイム推移とセーフティカー・無線連動'}
             {chartMode === 'gap' && `基準ドライバー (${refDriverCode}) に対するタイム差（秒）の推移・アンダーカット分析`}
             {chartMode === 'stint' && 'タイヤ周回数（Tyre Age）に応じたデグラデーション（劣化傾向）の比較'}
@@ -613,7 +338,7 @@ export default function TelemetryChart({
         </div>
 
         {/* Mode Switcher Pills */}
-        <div className="flex bg-slate-900/90 rounded-xl p-1 border border-white/10 self-start sm:self-auto">
+        <div className="flex bg-slate-950/90 rounded-xl p-1 border border-white/10 self-start sm:self-auto shadow-inner">
           {(
             [
               ['laps', '📈 Lap Times'],
@@ -624,10 +349,10 @@ export default function TelemetryChart({
             <button
               key={mode}
               onClick={() => setChartMode(mode)}
-              className={`px-3 py-1 rounded-lg text-xs font-medium transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all cursor-pointer ${
                 chartMode === mode
-                  ? 'bg-blue-600 text-white font-bold shadow-md'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white font-bold shadow-md shadow-red-600/30 ring-1 ring-red-400/40'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               {label}
@@ -636,15 +361,283 @@ export default function TelemetryChart({
         </div>
       </div>
 
-      {/* Chart Canvas Area */}
-      <div style={{ position: 'relative', width: '100%', height: 285 }}>
+      {/* Recharts Chart Area */}
+      <div style={{ position: 'relative', width: '100%', height: 300 }}>
         {isMounted ? (
-          <Line
-            ref={chartRef}
-            data={{ datasets: currentDatasets as ChartDataset<'line', ChartPoint[]>[] }}
-            options={options}
-            plugins={[scPlugin, markersPlugin]}
-          />
+          <ResponsiveContainer width="100%" height="100%">
+            {chartMode === 'laps' ? (
+              <LineChart data={lapTimesData} margin={{ top: 12, right: 20, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.4} />
+                <XAxis
+                  dataKey="lap"
+                  stroke="#94a3b8"
+                  fontSize={11}
+                  tickFormatter={(v) => `L${v}`}
+                  dy={4}
+                />
+                <YAxis
+                  stroke="#94a3b8"
+                  fontSize={11}
+                  domain={['auto', 'auto']}
+                  tickFormatter={(v) => formatLapTime(v)}
+                />
+                <Tooltip
+                  content={({ active, payload, label }) => {
+                    if (!active || !payload?.length) return null;
+                    return (
+                      <div className="bg-slate-950/95 border border-white/15 rounded-xl p-3 shadow-2xl backdrop-blur-md text-xs font-mono min-w-[220px]">
+                        <div className="border-b border-white/10 pb-1.5 mb-2 flex items-center justify-between">
+                          <span className="font-racing font-bold text-white tracking-wider">
+                            LAP {label}
+                          </span>
+                          <span className="text-[10px] text-slate-400">TELEMETRY</span>
+                        </div>
+                        <div className="space-y-2">
+                          {payload.map((entry: any) => {
+                            const code = entry.dataKey;
+                            const meta = entry.payload ? entry.payload[`${code}_meta`] : null;
+                            if (!meta || entry.value == null) return null;
+                            const tyreCol = getTyreColor(meta.compound);
+                            return (
+                              <div key={code} className="flex flex-col gap-0.5">
+                                <div className="flex items-center justify-between gap-3">
+                                  <span className="font-bold" style={{ color: entry.color }}>
+                                    {code}
+                                  </span>
+                                  <span className="text-white font-bold">
+                                    {formatLapTime(entry.value)}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
+                                  <span
+                                    className="px-1 py-0.2 rounded text-[9px] font-bold border"
+                                    style={{
+                                      borderColor: `${tyreCol}66`,
+                                      color: tyreCol,
+                                      backgroundColor: `${tyreCol}1a`,
+                                    }}
+                                  >
+                                    {meta.compound} ({meta.tyreAge}L)
+                                  </span>
+                                  {meta.s1 != null && (
+                                    <span>
+                                      S1: {meta.s1.toFixed(1)} S2: {(meta.s2 ?? 0).toFixed(1)} S3: {(meta.s3 ?? 0).toFixed(1)}
+                                    </span>
+                                  )}
+                                  {meta.hasRadio && (
+                                    <span className="text-amber-400 font-bold">🎙️ RADIO</span>
+                                  )}
+                                  {meta.isPit && (
+                                    <span className="text-red-400 font-bold">🅿️ PIT</span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  }}
+                />
+                <Legend
+                  wrapperStyle={{ paddingTop: 8, fontSize: 11 }}
+                  formatter={(value) => <span className="text-slate-300 font-bold text-xs">{value}</span>}
+                />
+
+                {/* Safety Car / VSC shaded zones */}
+                {safetyCarPeriods.map((p, idx) => (
+                  <ReferenceArea
+                    key={idx}
+                    x1={p.startLap}
+                    x2={p.endLap ?? undefined}
+                    fill={p.type === 'RED' ? '#ef4444' : p.type === 'SC' ? '#f97316' : '#eab308'}
+                    fillOpacity={0.12}
+                    strokeOpacity={0.3}
+                  />
+                ))}
+
+                {/* Driver Lines */}
+                {lapDriversConfig.map((cfg) => (
+                  <Line
+                    key={cfg.code}
+                    type="monotone"
+                    dataKey={cfg.code}
+                    name={cfg.code}
+                    stroke={cfg.color}
+                    strokeDasharray={cfg.dash}
+                    strokeWidth={2.5}
+                    dot={(props: any) => {
+                      const meta = props.payload ? props.payload[`${cfg.code}_meta`] : null;
+                      if (!meta) return <circle key={props.key} cx={props.cx} cy={props.cy} r={2} fill={cfg.color} />;
+                      const tyreCol = getTyreColor(meta.compound);
+                      if (meta.hasRadio || meta.isPit) {
+                        return (
+                          <circle
+                            key={props.key}
+                            cx={props.cx}
+                            cy={props.cy}
+                            r={5}
+                            fill={meta.isPit ? '#ef4444' : '#38bdf8'}
+                            stroke="#fff"
+                            strokeWidth={1.5}
+                            className="cursor-pointer"
+                            onClick={() => selectRadioContext(cfg.num, props.payload.lap)}
+                          />
+                        );
+                      }
+                      return (
+                        <circle
+                          key={props.key}
+                          cx={props.cx}
+                          cy={props.cy}
+                          r={3}
+                          fill={tyreCol}
+                          stroke={cfg.color}
+                          strokeWidth={1}
+                          className="cursor-pointer"
+                          onClick={() => selectRadioContext(cfg.num, props.payload.lap)}
+                        />
+                      );
+                    }}
+                    activeDot={{ r: 6, stroke: '#fff', strokeWidth: 2 }}
+                    connectNulls
+                  />
+                ))}
+              </LineChart>
+            ) : chartMode === 'gap' ? (
+              <LineChart data={gapData} margin={{ top: 12, right: 20, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.4} />
+                <XAxis
+                  dataKey="lap"
+                  stroke="#94a3b8"
+                  fontSize={11}
+                  tickFormatter={(v) => `L${v}`}
+                  dy={4}
+                />
+                <YAxis
+                  stroke="#94a3b8"
+                  fontSize={11}
+                  domain={['auto', 'auto']}
+                  tickFormatter={(v) => `${v > 0 ? '+' : ''}${v.toFixed(1)}s`}
+                />
+                <ReferenceLine y={0} stroke="#94a3b8" strokeDasharray="3 3" />
+                <Tooltip
+                  content={({ active, payload, label }) => {
+                    if (!active || !payload?.length) return null;
+                    return (
+                      <div className="bg-slate-950/95 border border-white/15 rounded-xl p-3 shadow-2xl backdrop-blur-md text-xs font-mono min-w-[200px]">
+                        <div className="border-b border-white/10 pb-1.5 mb-2 flex items-center justify-between">
+                          <span className="font-racing font-bold text-white">LAP {label}</span>
+                          <span className="text-[10px] text-slate-400">GAP TO {refDriverCode}</span>
+                        </div>
+                        <div className="space-y-1.5">
+                          {payload.map((entry: any) => {
+                            const code = entry.dataKey;
+                            const meta = entry.payload ? entry.payload[`${code}_meta`] : null;
+                            if (entry.value == null) return null;
+                            return (
+                              <div key={code} className="flex items-center justify-between gap-3">
+                                <span className="font-bold" style={{ color: entry.color }}>
+                                  {code}
+                                </span>
+                                <span className="text-white font-bold">
+                                  {entry.value === 0 ? '基準 (0.0s)' : `+${entry.value.toFixed(2)}s`}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  }}
+                />
+                <Legend
+                  wrapperStyle={{ paddingTop: 8, fontSize: 11 }}
+                  formatter={(value) => <span className="text-slate-300 font-bold text-xs">{value}</span>}
+                />
+
+                {/* Driver Lines */}
+                {gapDriversConfig.map((cfg) => (
+                  <Line
+                    key={cfg.code}
+                    type="monotone"
+                    dataKey={cfg.code}
+                    name={cfg.label}
+                    stroke={cfg.color}
+                    strokeDasharray={cfg.isRef ? '3 3' : ''}
+                    strokeWidth={cfg.isRef ? 1.5 : 2.5}
+                    dot={{ r: cfg.isRef ? 1 : 3, fill: cfg.color }}
+                    activeDot={{ r: 6, stroke: '#fff', strokeWidth: 2 }}
+                    connectNulls
+                  />
+                ))}
+              </LineChart>
+            ) : (
+              <LineChart data={stintData} margin={{ top: 12, right: 20, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.4} />
+                <XAxis
+                  dataKey="tyreAge"
+                  stroke="#94a3b8"
+                  fontSize={11}
+                  tickFormatter={(v) => `${v}L`}
+                  dy={4}
+                />
+                <YAxis
+                  stroke="#94a3b8"
+                  fontSize={11}
+                  domain={['auto', 'auto']}
+                  tickFormatter={(v) => formatLapTime(v)}
+                />
+                <Tooltip
+                  content={({ active, payload, label }) => {
+                    if (!active || !payload?.length) return null;
+                    return (
+                      <div className="bg-slate-950/95 border border-white/15 rounded-xl p-3 shadow-2xl backdrop-blur-md text-xs font-mono min-w-[210px]">
+                        <div className="border-b border-white/10 pb-1.5 mb-2 flex items-center justify-between">
+                          <span className="font-racing font-bold text-white">TYRE AGE: {label} LAPS</span>
+                        </div>
+                        <div className="space-y-1.5">
+                          {payload.map((entry: any) => {
+                            if (entry.value == null) return null;
+                            return (
+                              <div key={entry.dataKey} className="flex items-center justify-between gap-3">
+                                <span className="font-bold text-[11px]" style={{ color: entry.color }}>
+                                  {entry.name}
+                                </span>
+                                <span className="text-white font-bold">
+                                  {formatLapTime(entry.value)}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  }}
+                />
+                <Legend
+                  wrapperStyle={{ paddingTop: 8, fontSize: 11 }}
+                  formatter={(value) => <span className="text-slate-300 font-bold text-xs">{value}</span>}
+                />
+
+                {/* Stint Lines */}
+                {stintConfigs.map((cfg) => (
+                  <Line
+                    key={cfg.key}
+                    type="monotone"
+                    dataKey={cfg.key}
+                    name={cfg.label}
+                    stroke={cfg.color}
+                    strokeDasharray={cfg.dash}
+                    strokeWidth={2.5}
+                    dot={{ r: 3, fill: cfg.color }}
+                    activeDot={{ r: 6, stroke: '#fff', strokeWidth: 2 }}
+                    connectNulls
+                  />
+                ))}
+              </LineChart>
+            )}
+          </ResponsiveContainer>
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-slate-900/40 rounded-xl border border-white/5 animate-pulse">
             <span className="text-xs font-mono text-slate-500">チャート読み込み中...</span>
@@ -711,7 +704,7 @@ export default function TelemetryChart({
 interface InlineRadioPlayerProps {
   context: ActiveRadioContext;
   onClose: () => void;
-  geminiApiKey: string;
+  geminiApiKey?: string;
   transcriptsCache: Record<string, { transcript: string; translation: string; aiSummary?: string; category: string }>;
   onTranscriptFetched?: (url: string, data: { transcript: string; translation: string; aiSummary?: string; category: string }) => void;
 }
@@ -719,7 +712,7 @@ interface InlineRadioPlayerProps {
 function InlineRadioPlayer({
   context,
   onClose,
-  geminiApiKey,
+  geminiApiKey = '',
   transcriptsCache,
   onTranscriptFetched,
 }: InlineRadioPlayerProps) {
@@ -788,13 +781,13 @@ function InlineRadioPlayer({
 function InlineRadioItem({
   radio,
   context,
-  geminiApiKey,
+  geminiApiKey = '',
   transcriptCache,
   onTranscriptFetched,
 }: {
   radio: TeamRadio;
   context: ActiveRadioContext;
-  geminiApiKey: string;
+  geminiApiKey?: string;
   transcriptCache?: { transcript: string; translation: string; aiSummary?: string; category: string };
   onTranscriptFetched?: (url: string, data: { transcript: string; translation: string; aiSummary?: string; category: string }) => void;
 }) {
@@ -810,7 +803,7 @@ function InlineRadioItem({
   const aiSummary = transcriptCache?.aiSummary ?? radio.aiSummary ?? '';
   const category = (transcriptCache?.category ?? radio.category ?? 'PACE').toUpperCase();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!radio.recording_url) return;
     setAudioError(false);
     const audio = new Audio(getProxiedAudioUrl(radio.recording_url));
@@ -865,8 +858,10 @@ function InlineRadioItem({
     setIsLoadingAi(true);
 
     try {
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (geminiApiKey) headers['x-gemini-key'] = geminiApiKey;
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...getGeminiAuthHeaders(),
+      };
 
       const lapContext = `Lap ${context.lapNumber}, Lap Time: ${formatLapTime(
         context.lapDuration

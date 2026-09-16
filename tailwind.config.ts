@@ -31,8 +31,8 @@ const config: Config = {
         'tyre-wet': '#00aeef',
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        racing: ['Orbitron', 'sans-serif'],
+        sans: ['var(--font-inter)', 'Inter', 'sans-serif'],
+        racing: ['var(--font-orbitron)', 'Orbitron', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       backgroundImage: {

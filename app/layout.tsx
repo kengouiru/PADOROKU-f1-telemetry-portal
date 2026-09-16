@@ -1,6 +1,21 @@
 import type { Metadata, Viewport } from 'next';
+import { Inter, Orbitron } from 'next/font/google';
 import './globals.css';
 import SessionProvider from '@/components/auth/SessionProvider';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+  weight: ['300', '400', '500', '600', '700'],
+});
+
+const orbitron = Orbitron({
+  subsets: ['latin'],
+  variable: '--font-orbitron',
+  display: 'swap',
+  weight: ['500', '700', '900'],
+});
 
 export const viewport: Viewport = {
   themeColor: '#e10600',
@@ -50,7 +65,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body className="antialiased">
+      <body className={`${inter.variable} ${orbitron.variable} antialiased`}>
         <SessionProvider>
           {children}
         </SessionProvider>

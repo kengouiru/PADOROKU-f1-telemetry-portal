@@ -11,6 +11,7 @@ import {
   type TeamProfile,
 } from '@/data/f1KnowledgeData';
 import { useUserPreferences, getUserPreferences, saveUserPreferences, type UserPreferences } from '@/lib/userPreferences';
+import { usePlanTier } from '@/lib/tierService';
 
 interface ProfileSettingsModalProps {
   onClose: () => void;
@@ -26,6 +27,9 @@ const FAN_TYPES = [
 
 export default function ProfileSettingsModal({ onClose }: ProfileSettingsModalProps) {
   const { data: session } = useSession();
+  const { isPro } = usePlanTier();
+  const userRole = (session?.user as { role?: string })?.role || (isPro ? 'pro' : 'free');
+  const isProUser = userRole === 'pro';
   const { prefs, update, toggleDriver, toggleTeam, toggleCircuit } = useUserPreferences();
   const [mounted, setMounted] = useState(false);
 
@@ -169,14 +173,20 @@ export default function ProfileSettingsModal({ onClose }: ProfileSettingsModalPr
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <h3 className="text-base font-racing font-bold text-white truncate">
-                  {displayName || session?.user?.name || 'Pro User'}
+                  {displayName || session?.user?.name || (isProUser ? 'Pro User' : 'Free User')}
                 </h3>
-                <span className="px-2 py-0.5 rounded text-[10px] font-racing font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm flex-shrink-0">
-                  PRO
-                </span>
+                {isProUser ? (
+                  <span className="px-2 py-0.5 rounded text-[10px] font-racing font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm flex-shrink-0">
+                    PRO
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded text-[10px] font-racing font-bold bg-slate-800 text-slate-300 border border-white/15 flex-shrink-0">
+                    FREE
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-400 font-mono truncate">
-                {session?.user?.email || 'demo@f1telemetry.pro'}
+                {session?.user?.email || (isProUser ? 'demo-pro@f1telemetry.pro' : 'demo-free@f1telemetry.pro')}
               </p>
               <div className="flex items-center gap-2 mt-1 flex-wrap">
                 {selectedTeam && (

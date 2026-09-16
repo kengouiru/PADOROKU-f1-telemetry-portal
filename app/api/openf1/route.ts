@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
         'Accept': 'application/json',
         'User-Agent': 'F1TelemetryPortal/1.0',
       },
-      signal: AbortSignal.timeout(6000),
+      signal: AbortSignal.timeout(8000),
       next: { revalidate: 30 },
     });
 

@@ -10,6 +10,7 @@ import React, { useState, useRef, useCallback, useEffect, useMemo, useImperative
 import { useSession } from 'next-auth/react';
 import type { Driver, Lap, TeamRadio, PitStop, RaceControlMessage } from '@/lib/types';
 import { formatColor, mapRadioRecordingsToLaps, formatLapTime, getProxiedAudioUrl } from '@/lib/telemetryUtils';
+import { getGeminiAuthHeaders } from '@/lib/apiKeyService';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -47,7 +48,6 @@ interface TeamRadioTimelineProps {
   raceControlMessages: RaceControlMessage[];
   drivers: Driver[];
   lapsCache: Record<string, Lap[]>;
-  geminiApiKey: string;
   transcriptsCache: Record<string, { transcript: string; translation: string; aiSummary?: string; category: string }>;
   onTranscriptFetched: (url: string, data: { transcript: string; translation: string; aiSummary?: string; category: string }) => void;
   onRequireAuth?: () => void;
@@ -57,10 +57,11 @@ interface TeamRadioTimelineProps {
 
 const FILTER_LABELS: Record<FilterType, string> = {
   ALL: 'すべて', PIT: 'PIT', TYRE: 'TYRE', PACE: 'PACE',
-  SAFETY: 'SAFETY', STRATEGY: 'STRAT', FIA: 'FIA',
+  SAFETY: 'SC/VSC', STRATEGY: '戦略', FIA: 'FIA審理',
 };
 
-const CATEGORY_BADGE_COLORS: Record<string, string> = {
+const FILTER_COLORS: Record<FilterType | 'DEFAULT', string> = {
+  ALL:      'bg-slate-700/60 text-slate-200 border-slate-600',
   PIT:      'bg-red-500/20 text-red-300 border-red-500/30',
   TYRE:     'bg-yellow-500/20 text-yellow-200 border-yellow-500/30',
   PACE:     'bg-blue-500/20 text-blue-200 border-blue-500/30',
@@ -69,6 +70,8 @@ const CATEGORY_BADGE_COLORS: Record<string, string> = {
   FIA:      'bg-slate-500/20 text-slate-300 border-slate-500/30',
   DEFAULT:  'bg-slate-700/40 text-slate-400 border-slate-600/30',
 };
+
+const CATEGORY_BADGE_COLORS: Record<string, string> = FILTER_COLORS;
 
 function flagColor(flag: string | null | undefined): string {
   if (!flag) return '';
@@ -89,7 +92,7 @@ function formatTime(iso: string): string {
 // ── Main Component ────────────────────────────────────────────────────────────
 
 const TeamRadioTimeline = forwardRef<TeamRadioTimelineHandle, TeamRadioTimelineProps>(function TeamRadioTimeline(
-  { selectedDrivers, teamRadioCache, pitStopsCache, raceControlMessages, drivers, lapsCache, geminiApiKey, transcriptsCache, onTranscriptFetched, onRequireAuth },
+  { selectedDrivers, teamRadioCache, pitStopsCache, raceControlMessages, drivers, lapsCache, transcriptsCache, onTranscriptFetched, onRequireAuth },
   ref
 ) {
   const { data: authSession } = useSession();
@@ -174,8 +177,10 @@ const TeamRadioTimeline = forwardRef<TeamRadioTimelineHandle, TeamRadioTimelineP
       setLoadingUrls(prev => new Set(prev).add(url));
       try {
         const endpoint = '/api/transcribe';
-        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-        if (geminiApiKey) headers['x-gemini-key'] = geminiApiKey;
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+          ...getGeminiAuthHeaders(),
+        };
 
         const driverInfo = drivers.find(d => d.driver_number.toString() === driverNum);
         const lap = driverNum && lapNumber ? (lapsCache[driverNum] ?? []).find(l => l.lap_number === lapNumber) : null;
@@ -207,7 +212,7 @@ const TeamRadioTimeline = forwardRef<TeamRadioTimelineHandle, TeamRadioTimelineP
         setLoadingUrls(prev => { const s = new Set(prev); s.delete(url); return s; });
       }
     },
-    [geminiApiKey, transcriptsCache, loadingUrls, onTranscriptFetched, drivers, lapsCache, authSession, onRequireAuth]
+    [transcriptsCache, loadingUrls, onTranscriptFetched, drivers, lapsCache, authSession, onRequireAuth]
   );
 
   if (selectedDrivers.length === 0) {

@@ -57,6 +57,7 @@ import type { TelemetryTarget } from '@/data/f1KnowledgeData';
 import { GLOSSARY_TERMS } from '@/data/f1GlossaryData';
 import type { NavAction } from '@/components/AIStrategist';
 import AITelemetryInspectorModal from '@/components/telemetry/AITelemetryInspectorModal';
+import { Flag, Activity, Newspaper, BookOpen } from 'lucide-react';
 
 import AuthButton from '@/components/auth/AuthButton';
 import AuthModal from '@/components/auth/AuthModal';
@@ -84,7 +85,6 @@ interface AppState {
   raceControlMessages: RaceControlMessage[];
   safetyCarPeriods: SafetyCarPeriod[];
   isDemoMode: boolean;
-  geminiApiKey: string;
   transcriptsCache: Record<string, { transcript: string; translation: string; category: string }>;
   isLoading: boolean;
 }
@@ -175,7 +175,6 @@ function buildInitialState(): AppState {
     raceControlMessages,
     safetyCarPeriods,
     isDemoMode: true,
-    geminiApiKey: '',
     transcriptsCache: storedTranscripts,
     isLoading: false,
   };
@@ -763,30 +762,7 @@ export default function DashboardPage() {
       return;
     }
 
-    const DRIVER_NUM_TO_CODE: Record<string, string> = {
-      '1': 'VER',
-      '44': 'HAM',
-      '4': 'NOR',
-      '16': 'LEC',
-      '81': 'PIA',
-      '55': 'SAI',
-      '63': 'RUS',
-      '11': 'PER',
-      '14': 'ALO',
-      '22': 'TSU',
-      '10': 'GAS',
-      '31': 'OCO',
-      '23': 'ALB',
-      '43': 'COL',
-      '18': 'STR',
-      '27': 'HUL',
-      '20': 'MAG',
-      '77': 'BOT',
-      '24': 'ZHO',
-      '3': 'RIC',
-    };
-
-    const targetCode = target.targetDriver ? (DRIVER_NUM_TO_CODE[target.targetDriver] ?? 'VER') : 'VER';
+    const targetCode = target.targetDriver ? (GLOBAL_DRIVER_NUM_TO_CODE[target.targetDriver] ?? 'VER') : 'VER';
     const otherCode = targetCode === 'VER' ? 'NOR' : 'VER';
 
     let circId = 'bahrain-international';
@@ -1088,7 +1064,6 @@ export default function DashboardPage() {
         teamRadioCache={state.teamRadioCache}
         safetyCarPeriods={state.safetyCarPeriods}
         onLapClick={handleLapClick}
-        geminiApiKey={state.geminiApiKey}
         transcriptsCache={state.transcriptsCache}
         onTranscriptFetched={handleTranscriptFetched}
       />
@@ -1155,7 +1130,6 @@ export default function DashboardPage() {
             drivers={state.drivers}
             lapsCache={state.lapsCache}
             stints={state.stints}
-            geminiApiKey={state.geminiApiKey}
             initialViewMode={pitStrategyViewMode}
             onOpenUpgradeModal={() => setProModalOpen(true)}
           />
@@ -1183,7 +1157,6 @@ export default function DashboardPage() {
           raceControlMessages={state.raceControlMessages}
           drivers={state.drivers}
           lapsCache={state.lapsCache}
-          geminiApiKey={state.geminiApiKey}
           transcriptsCache={state.transcriptsCache}
           onTranscriptFetched={handleTranscriptFetched}
           onRequireAuth={() => handleRequireAuth('チーム無線 AI解析', 'チーム無線のリアルタイム文字起こしおよびAI戦術要約は認証メンバー専用機能です。')}
@@ -1201,7 +1174,6 @@ export default function DashboardPage() {
         lapsCache={state.lapsCache}
         stints={state.stints}
         pitStopsCache={state.pitStopsCache}
-        geminiApiKey={state.geminiApiKey}
         session={state.currentSession}
         onAddToNotebook={handleAddToNotebook}
         onRequireAuth={() => handleRequireAuth('AI 戦略アナリスト', 'AI戦略アナリストによるレース分析・戦略提案は認証メンバー専用機能です。')}
@@ -1324,7 +1296,7 @@ export default function DashboardPage() {
         </ErrorBoundary>
       )}
       {activeHub === 'telemetry' && <ErrorBoundary sectionName="テレメトリー分析">{analysisContent}</ErrorBoundary>}
-      {activeHub === 'news' && <ErrorBoundary sectionName="ニュースパドック"><NewsPaddockHub geminiApiKey={state.geminiApiKey} /></ErrorBoundary>}
+      {activeHub === 'news' && <ErrorBoundary sectionName="ニュースパドック"><NewsPaddockHub /></ErrorBoundary>}
       {activeHub === 'knowledge' && (
         <ErrorBoundary sectionName="ナレッジ＆ヒストリー">
           <KnowledgeHistoryHub
@@ -1369,7 +1341,6 @@ export default function DashboardPage() {
             pitStopsCache={state.pitStopsCache}
             safetyCarPeriods={state.safetyCarPeriods}
             sessionName={state.currentSession?.session_name ?? '2024 Bahrain GP Race'}
-            geminiApiKey={state.geminiApiKey}
           />
         </ErrorBoundary>
       )}
@@ -1432,13 +1403,13 @@ export default function DashboardPage() {
                 setAppMode('season');
                 setActiveHub('season');
               }}
-              className={`px-3 py-1 rounded-lg text-xs font-racing font-bold transition-all whitespace-nowrap cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all whitespace-nowrap cursor-pointer ${
                 appMode === 'season' && activeHub === 'season'
-                  ? 'bg-red-600 text-white shadow-sm'
+                  ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950/60 border border-red-500/40'
                   : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
             >
-              🏁 レース観戦
+              <Flag className="w-3.5 h-3.5" /> SEASON
             </button>
 
             <button
@@ -1447,13 +1418,13 @@ export default function DashboardPage() {
                 setAppMode('season');
                 setActiveHub('telemetry');
               }}
-              className={`px-3 py-1 rounded-lg text-xs font-racing font-bold transition-all whitespace-nowrap cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all whitespace-nowrap cursor-pointer ${
                 appMode === 'season' && activeHub === 'telemetry'
-                  ? 'bg-red-600 text-white shadow-sm'
+                  ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950/60 border border-red-500/40'
                   : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
             >
-              🏎️ テレメトリー
+              <Activity className="w-3.5 h-3.5" /> TELEMETRY
             </button>
 
             <button
@@ -1462,13 +1433,13 @@ export default function DashboardPage() {
                 setAppMode('season');
                 setActiveHub('news');
               }}
-              className={`px-3 py-1 rounded-lg text-xs font-racing font-bold transition-all whitespace-nowrap cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all whitespace-nowrap cursor-pointer ${
                 appMode === 'season' && activeHub === 'news'
-                  ? 'bg-red-600 text-white shadow-sm'
+                  ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950/60 border border-red-500/40'
                   : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
             >
-              📺 FOD中継＆ニュース
+              <Newspaper className="w-3.5 h-3.5" /> NEWS
             </button>
 
             <button
@@ -1477,13 +1448,13 @@ export default function DashboardPage() {
                 setAppMode('library');
                 setActiveHub('knowledge');
               }}
-              className={`px-3 py-1 rounded-lg text-xs font-racing font-bold transition-all whitespace-nowrap cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all whitespace-nowrap cursor-pointer ${
                 appMode === 'library'
-                  ? 'bg-blue-600 text-white shadow-sm'
+                  ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950/60 border border-red-500/40'
                   : 'text-slate-400 hover:text-white hover:bg-white/5'
               }`}
             >
-              📚 F1大百科
+              <BookOpen className="w-3.5 h-3.5" /> LIBRARY
             </button>
           </nav>
 
@@ -1765,12 +1736,12 @@ export default function DashboardPage() {
           {appMode === 'season' ? (
             (
               [
-                ['season',    '🏁', '観戦'],
-                ['telemetry', '🏎️', '分析'],
-                ['news',      '📰', 'ニュース'],
-                ['notes',     '📝', 'ノート'],
-                ['ai',        '🤖', 'AI'],
-              ] as [string, string, string][]
+                ['season',    <Flag key="s" className="w-5 h-5" />, 'SEASON'],
+                ['telemetry', <Activity key="t" className="w-5 h-5" />, 'TELEMETRY'],
+                ['news',      <Newspaper key="n" className="w-5 h-5" />, 'NEWS'],
+                ['notes',     <BookOpen key="b" className="w-5 h-5" />, 'NOTES'],
+                ['ai',        <span key="a" className="text-xl leading-none">🤖</span>, 'AI'],
+              ] as [string, React.ReactNode, string][]
             ).map(([tab, icon, label]) => {
               const isAiTab = tab === 'ai';
               const isActive = isAiTab ? aiDrawerOpen : activeHub === tab && !aiDrawerOpen;

@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useUserPreferences } from '@/lib/userPreferences';
+import { usePlanTier } from '@/lib/tierService';
 import { KNOWLEDGE_TEAMS, KNOWLEDGE_DRIVERS } from '@/data/f1KnowledgeData';
 import ProfileSettingsModal from './ProfileSettingsModal';
 
@@ -13,6 +14,7 @@ interface AuthButtonProps {
 export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
   const { data: session, status } = useSession();
   const { prefs } = useUserPreferences();
+  const { isPro, aiUsage } = usePlanTier();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
@@ -38,8 +40,11 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
 
   // Determine active avatar & name (custom preference takes priority over session defaults)
   const user = session?.user;
+  const userRole = (user as { role?: string })?.role || (isPro ? 'pro' : 'free');
+  const isProUser = userRole === 'pro';
+
   const activeAvatar = prefs.customAvatarUrl || user?.image || '';
-  const activeDisplayName = prefs.displayName || user?.name || (user ? 'Pro User' : 'ゲスト');
+  const activeDisplayName = prefs.displayName || user?.name || (isProUser ? 'Pro User' : 'Free User');
 
   const selectedTeam = KNOWLEDGE_TEAMS.find((t) => t.id === prefs.favoriteTeamId);
   const selectedDriver = KNOWLEDGE_DRIVERS.find((d) => d.code === prefs.favoriteDriverCode);
@@ -71,7 +76,9 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setDropdownOpen((v) => !v)}
-          className="flex items-center gap-1.5 p-1 pl-1.5 pr-2 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-amber-500/30 text-white transition-all shadow-md cursor-pointer group flex-shrink-0"
+          className={`flex items-center gap-1.5 p-1 pl-1.5 pr-2 rounded-xl bg-slate-900/90 hover:bg-slate-850 border text-white transition-all shadow-md cursor-pointer group flex-shrink-0 ${
+            isProUser ? 'border-amber-500/30' : 'border-white/15'
+          }`}
           title="アカウント設定 & 個人設定"
         >
           {/* User Avatar */}
@@ -89,19 +96,27 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
               />
             </div>
           ) : (
-            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg bg-amber-500 text-slate-950 font-racing font-bold text-xs flex items-center justify-center flex-shrink-0">
+            <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-lg font-racing font-bold text-xs flex items-center justify-center flex-shrink-0 ${
+              isProUser ? 'bg-amber-500 text-slate-950' : 'bg-slate-700 text-white'
+            }`}>
               {initial}
             </div>
           )}
 
-          {/* User Name & Pro Badge */}
+          {/* User Name & Role Badge */}
           <div className="flex items-center gap-1">
             <span className="text-[11px] sm:text-xs font-racing font-bold max-w-[70px] sm:max-w-[120px] truncate hidden sm:inline">
               {activeDisplayName}
             </span>
-            <span className="px-1.5 py-0.2 rounded text-[9px] font-racing font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm">
-              PRO
-            </span>
+            {isProUser ? (
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-racing font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm">
+                PRO
+              </span>
+            ) : (
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-racing font-bold bg-slate-800 text-slate-300 border border-white/10">
+                FREE
+              </span>
+            )}
           </div>
 
           <span className="text-[9px] text-slate-400 group-hover:text-white transition-colors">
@@ -118,9 +133,15 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
                 <p className="font-racing font-bold text-white truncate max-w-[140px]">
                   {activeDisplayName}
                 </p>
-                <span className="px-1.5 py-0.2 rounded text-[9px] font-racing font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950">
-                  PRO
-                </span>
+                {isProUser ? (
+                  <span className="px-1.5 py-0.2 rounded text-[9px] font-racing font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950">
+                    PRO
+                  </span>
+                ) : (
+                  <span className="px-1.5 py-0.2 rounded text-[9px] font-racing font-bold bg-slate-800 text-slate-300 border border-white/10">
+                    FREE
+                  </span>
+                )}
               </div>
               <p className="font-mono text-[10px] text-slate-400 truncate">{user?.email}</p>
 
@@ -145,11 +166,25 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
                 )}
               </div>
 
-              <div className="pt-1 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[10px] font-racing text-emerald-300 font-semibold">
-                  AI 戦略アナリスト 有効
-                </span>
+              {/* Tier status indicator */}
+              <div className="pt-1 flex items-center justify-between">
+                {isProUser ? (
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-[10px] font-racing text-emerald-300 font-semibold">
+                      AI 戦略アナリスト 無制限
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between w-full text-[10px] font-mono">
+                    <span className="text-amber-400 font-semibold">
+                      AI相談: 残り {aiUsage.remaining}/{aiUsage.max}回
+                    </span>
+                    <span className="text-slate-400">
+                      無料プラン
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
 

@@ -24,6 +24,8 @@ export interface RaceWeekendSchedule {
     session: string;
     dayTime: string;
   }[];
+  isCancelled?: boolean;       // From OpenF1 API — race was cancelled
+  replacementNote?: string;    // e.g. "マレーシア(セパン)で代替開催"
 }
 
 export interface DriverStanding {
@@ -74,509 +76,833 @@ export type Grid2025Team = GridTeam;
 
 export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
   {
-    round: 1,
-    gpName: 'オーストラリアGP',
-    country: 'オーストラリア',
-    flag: '🇦🇺',
-    circuitName: 'アルバート・パーク・サーキット',
-    city: 'メルボルン',
-    dates: '2026年 3月6日 - 3月8日',
-    targetDateUtc: '2026-03-08T04:00:00Z',
-    isSprint: false,
-    lengthKm: 5.278,
-    laps: 58,
-    pirelliCompounds: 'C3 (ハード) / C4 (ミディアム) / C5 (ソフト)',
-    scheduleJst: [
-      { session: 'FP1 (フリー走行1)', dayTime: '3/6 (金) 10:30 - 11:30' },
-      { session: 'FP2 (フリー走行2)', dayTime: '3/6 (金) 14:00 - 15:00' },
-      { session: 'FP3 (フリー走行3)', dayTime: '3/7 (土) 10:30 - 11:30' },
-      { session: '予選 (Qualifying)', dayTime: '3/7 (土) 14:00 - 15:00' },
-      { session: '決勝 (Grand Prix)', dayTime: '3/8 (日) 13:00 スタート' },
-    ],
+    "round": 1,
+    "gpName": "オーストラリアGP",
+    "country": "オーストラリア",
+    "flag": "🇦🇺",
+    "circuitName": "アルバート・パーク・サーキット",
+    "city": "メルボルン",
+    "dates": "2026年 3月6日 - 3月8日",
+    "targetDateUtc": "2026-03-08T04:00:00Z",
+    "isSprint": false,
+    "lengthKm": 5.278,
+    "laps": 58,
+    "pirelliCompounds": "C3 (ハード) / C4 (ミディアム) / C5 (ソフト)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "3/6 (金) 19:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "3/6 (金) 23:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "3/7 (土) 19:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "3/7 (土) 23:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "3/8 (日) 22:00 スタート"
+      }
+    ]
   },
   {
-    round: 2,
-    gpName: '中国GP',
-    country: '中国',
-    flag: '🇨🇳',
-    circuitName: '上海インターナショナル・サーキット',
-    city: '上海',
-    dates: '2026年 3月13日 - 3月15日',
-    targetDateUtc: '2026-03-15T07:00:00Z',
-    isSprint: true,
-    lengthKm: 5.451,
-    laps: 56,
-    pirelliCompounds: 'C2 (ハード) / C3 (ミディアム) / C4 (ソフト)',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '3/13 (金) 12:30 - 13:30' },
-      { session: 'スプリント予選', dayTime: '3/13 (金) 16:30 - 17:14' },
-      { session: 'スプリント決勝', dayTime: '3/14 (土) 12:00 - 13:00' },
-      { session: '本選予選', dayTime: '3/14 (土) 16:00 - 17:00' },
-      { session: '決勝レース', dayTime: '3/15 (日) 16:00 スタート' },
-    ],
+    "round": 2,
+    "gpName": "中国GP",
+    "country": "中国",
+    "flag": "🇨🇳",
+    "circuitName": "上海インターナショナル・サーキット",
+    "city": "上海",
+    "dates": "2026年 3月13日 - 3月15日",
+    "targetDateUtc": "2026-03-15T07:00:00Z",
+    "isSprint": true,
+    "lengthKm": 5.451,
+    "laps": 56,
+    "pirelliCompounds": "C2 (ハード) / C3 (ミディアム) / C4 (ソフト)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "3/13 (金) 21:30"
+      },
+      {
+        "session": "スプリント予選",
+        "dayTime": "3/14 (土) 01:30"
+      },
+      {
+        "session": "スプリント決勝",
+        "dayTime": "3/14 (土) 21:00"
+      },
+      {
+        "session": "本選予選",
+        "dayTime": "3/15 (日) 01:00"
+      },
+      {
+        "session": "決勝レース",
+        "dayTime": "3/16 (月) 01:00 スタート"
+      }
+    ]
   },
   {
-    round: 3,
-    gpName: '日本GP (鈴鹿)',
-    country: '日本',
-    flag: '🇯🇵',
-    circuitName: '鈴鹿サーキット',
-    city: '三重県鈴鹿市',
-    dates: '2026年 3月27日 - 3月29日',
-    targetDateUtc: '2026-03-29T05:00:00Z',
-    isSprint: false,
-    lengthKm: 5.807,
-    laps: 53,
-    pirelliCompounds: 'C1 (ハード) / C2 (ミディアム) / C3 (ソフト)',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '3/27 (金) 11:30 - 12:30' },
-      { session: 'FP2', dayTime: '3/27 (金) 15:00 - 16:00' },
-      { session: 'FP3', dayTime: '3/28 (土) 11:30 - 12:30' },
-      { session: '予選', dayTime: '3/28 (土) 15:00 - 16:00' },
-      { session: '決勝 (Grand Prix)', dayTime: '3/29 (日) 14:00 スタート' },
-    ],
+    "round": 3,
+    "gpName": "日本GP (鈴鹿)",
+    "country": "日本",
+    "flag": "🇯🇵",
+    "circuitName": "鈴鹿サーキット",
+    "city": "三重県鈴鹿市",
+    "dates": "2026年 3月27日 - 3月29日",
+    "targetDateUtc": "2026-03-29T05:00:00Z",
+    "isSprint": false,
+    "lengthKm": 5.807,
+    "laps": 53,
+    "pirelliCompounds": "C1 (ハード) / C2 (ミディアム) / C3 (ソフト)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "3/27 (金) 20:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "3/28 (土) 00:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "3/28 (土) 20:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "3/29 (日) 00:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "3/29 (日) 23:00 スタート"
+      }
+    ]
   },
   {
-    round: 4,
-    gpName: 'バーレーンGP',
-    country: 'バーレーン',
-    flag: '🇧🇭',
-    circuitName: 'バーレーン・インターナショナル・サーキット',
-    city: 'サヒール',
-    dates: '2026年 4月10日 - 4月12日',
-    targetDateUtc: '2026-04-12T15:00:00Z',
-    isSprint: false,
-    lengthKm: 5.412,
-    laps: 57,
-    pirelliCompounds: 'C1 / C2 / C3 (高温・高トラクション)',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '4/10 (金) 20:30 - 21:30' },
-      { session: 'FP2 (ナイト)', dayTime: '4/11 (土) 00:00 - 01:00' },
-      { session: 'FP3', dayTime: '4/11 (土) 21:30 - 22:30' },
-      { session: '予選', dayTime: '4/12 (日) 01:00 - 02:00' },
-      { session: '決勝 (ナイトレース)', dayTime: '4/13 (月) 00:00 スタート' },
-    ],
+    "round": 4,
+    "gpName": "マイアミGP",
+    "country": "アメリカ",
+    "flag": "🇺🇸",
+    "circuitName": "マイアミ・インターナショナル・オートドローム",
+    "city": "マイアミ",
+    "dates": "2026年 5月1日 - 5月3日",
+    "targetDateUtc": "2026-05-03T20:00:00Z",
+    "isSprint": true,
+    "lengthKm": 5.412,
+    "laps": 57,
+    "pirelliCompounds": "C2 / C3 / C4",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "5/2 (土) 10:00"
+      },
+      {
+        "session": "スプリント予選",
+        "dayTime": "5/2 (土) 14:30"
+      },
+      {
+        "session": "スプリント決勝",
+        "dayTime": "5/3 (日) 10:00"
+      },
+      {
+        "session": "本選予選",
+        "dayTime": "5/3 (日) 14:00"
+      },
+      {
+        "session": "決勝レース",
+        "dayTime": "5/4 (月) 14:00 スタート"
+      }
+    ]
   },
   {
-    round: 5,
-    gpName: 'サウジアラビアGP',
-    country: 'サウジアラビア',
-    flag: '🇸🇦',
-    circuitName: 'ジェッダ・コーニッシュ・サーキット',
-    city: 'ジェッダ',
-    dates: '2026年 4月17日 - 4月19日',
-    targetDateUtc: '2026-04-19T17:00:00Z',
-    isSprint: false,
-    lengthKm: 6.174,
-    laps: 50,
-    pirelliCompounds: 'C2 / C3 / C4 (超高速市街地)',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '4/17 (金) 22:30 - 23:30' },
-      { session: 'FP2', dayTime: '4/18 (土) 02:00 - 03:00' },
-      { session: 'FP3', dayTime: '4/18 (土) 22:30 - 23:30' },
-      { session: '予選', dayTime: '4/19 (日) 02:00 - 03:00' },
-      { session: '決勝 (ナイトレース)', dayTime: '4/20 (月) 02:00 スタート' },
-    ],
+    "round": 5,
+    "gpName": "カナダGP",
+    "country": "カナダ",
+    "flag": "🇨🇦",
+    "circuitName": "ジル・ヴィルヌーヴ・サーキット",
+    "city": "モントリオール",
+    "dates": "2026年 5月22日 - 5月24日",
+    "targetDateUtc": "2026-05-24T20:00:00Z",
+    "isSprint": true,
+    "lengthKm": 4.361,
+    "laps": 70,
+    "pirelliCompounds": "C3 / C4 / C5",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "5/23 (土) 10:30"
+      },
+      {
+        "session": "スプリント予選",
+        "dayTime": "5/23 (土) 14:30"
+      },
+      {
+        "session": "スプリント決勝",
+        "dayTime": "5/24 (日) 10:00"
+      },
+      {
+        "session": "本選予選",
+        "dayTime": "5/24 (日) 14:00"
+      },
+      {
+        "session": "決勝レース",
+        "dayTime": "5/25 (月) 14:00 スタート"
+      }
+    ]
   },
   {
-    round: 6,
-    gpName: 'マイアミGP',
-    country: 'アメリカ',
-    flag: '🇺🇸',
-    circuitName: 'マイアミ・インターナショナル・オートドローム',
-    city: 'マイアミ',
-    dates: '2026年 5月1日 - 5月3日',
-    targetDateUtc: '2026-05-03T20:00:00Z',
-    isSprint: true,
-    lengthKm: 5.412,
-    laps: 57,
-    pirelliCompounds: 'C2 / C3 / C4',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '5/2 (土) 01:30 - 02:30' },
-      { session: 'スプリント予選', dayTime: '5/2 (土) 05:30 - 06:14' },
-      { session: 'スプリント決勝', dayTime: '5/3 (日) 01:00 - 02:00' },
-      { session: '本選予選', dayTime: '5/3 (日) 05:00 - 06:00' },
-      { session: '決勝', dayTime: '5/4 (月) 05:00 スタート' },
-    ],
+    "round": 6,
+    "gpName": "モナコGP",
+    "country": "モナコ",
+    "flag": "🇲🇨",
+    "circuitName": "モンテカルロ市街地コース",
+    "city": "モンテカルロ",
+    "dates": "2026年 6月5日 - 6月7日",
+    "targetDateUtc": "2026-06-07T13:00:00Z",
+    "isSprint": false,
+    "lengthKm": 3.337,
+    "laps": 78,
+    "pirelliCompounds": "C3 / C4 / C5 (最軟コンパウンド)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "6/6 (土) 05:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "6/6 (土) 09:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "6/7 (日) 04:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "6/7 (日) 08:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "6/8 (月) 07:00 スタート"
+      }
+    ]
   },
   {
-    round: 7,
-    gpName: 'カナダGP',
-    country: 'カナダ',
-    flag: '🇨🇦',
-    circuitName: 'ジル・ヴィルヌーヴ・サーキット',
-    city: 'モントリオール',
-    dates: '2026年 5月22日 - 5月24日',
-    targetDateUtc: '2026-05-24T18:00:00Z',
-    isSprint: true,
-    lengthKm: 4.361,
-    laps: 70,
-    pirelliCompounds: 'C3 / C4 / C5',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '5/23 (土) 02:30 - 03:30' },
-      { session: 'スプリント予選', dayTime: '5/23 (土) 06:30 - 07:14' },
-      { session: 'スプリント決勝', dayTime: '5/24 (日) 02:00 - 03:00' },
-      { session: '本選予選', dayTime: '5/24 (日) 05:00 - 06:00' },
-      { session: '決勝', dayTime: '5/25 (月) 03:00 スタート' },
-    ],
+    "round": 7,
+    "gpName": "バルセロナGP",
+    "country": "スペイン",
+    "flag": "🇪🇸",
+    "circuitName": "カタロニア・サーキット",
+    "city": "バルセロナ",
+    "dates": "2026年 6月12日 - 6月14日",
+    "targetDateUtc": "2026-06-14T13:00:00Z",
+    "isSprint": false,
+    "lengthKm": 4.657,
+    "laps": 66,
+    "pirelliCompounds": "C1 / C2 / C3 (高ダウンフォース)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "6/13 (土) 05:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "6/13 (土) 09:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "6/14 (日) 04:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "6/14 (日) 08:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "6/15 (月) 07:00 スタート"
+      }
+    ]
   },
   {
-    round: 8,
-    gpName: 'モナコGP',
-    country: 'モナコ',
-    flag: '🇲🇨',
-    circuitName: 'モンテカルロ市街地コース',
-    city: 'モンテカルロ',
-    dates: '2026年 6月5日 - 6月7日',
-    targetDateUtc: '2026-06-07T13:00:00Z',
-    isSprint: false,
-    lengthKm: 3.337,
-    laps: 78,
-    pirelliCompounds: 'C3 / C4 / C5 (最軟コンパウンド)',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '6/5 (金) 20:30 - 21:30' },
-      { session: 'FP2', dayTime: '6/6 (土) 00:00 - 01:00' },
-      { session: 'FP3', dayTime: '6/6 (土) 19:30 - 20:30' },
-      { session: '予選 (最重要セッション)', dayTime: '6/6 (土) 23:00 - 00:00' },
-      { session: '決勝', dayTime: '6/7 (日) 22:00 スタート' },
-    ],
+    "round": 8,
+    "gpName": "オーストリアGP",
+    "country": "オーストリア",
+    "flag": "🇦🇹",
+    "circuitName": "レッドブル・リンク",
+    "city": "シュピールベルク",
+    "dates": "2026年 6月26日 - 6月28日",
+    "targetDateUtc": "2026-06-28T13:00:00Z",
+    "isSprint": false,
+    "lengthKm": 4.318,
+    "laps": 71,
+    "pirelliCompounds": "C3 / C4 / C5",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "6/27 (土) 05:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "6/27 (土) 09:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "6/28 (日) 04:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "6/28 (日) 08:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "6/29 (月) 07:00 スタート"
+      }
+    ]
   },
   {
-    round: 9,
-    gpName: 'スペインGP (カタロニア)',
-    country: 'スペイン',
-    flag: '🇪🇸',
-    circuitName: 'カタロニア・サーキット',
-    city: 'バルセロナ',
-    dates: '2026年 6月12日 - 6月14日',
-    targetDateUtc: '2026-06-14T13:00:00Z',
-    isSprint: false,
-    lengthKm: 4.657,
-    laps: 66,
-    pirelliCompounds: 'C1 / C2 / C3',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '6/12 (金) 20:30 - 21:30' },
-      { session: 'FP2', dayTime: '6/13 (土) 00:00 - 01:00' },
-      { session: 'FP3', dayTime: '6/13 (土) 19:30 - 20:30' },
-      { session: '予選', dayTime: '6/13 (土) 23:00 - 00:00' },
-      { session: '決勝', dayTime: '6/14 (日) 22:00 スタート' },
-    ],
+    "round": 9,
+    "gpName": "イギリスGP (シルバーストン)",
+    "country": "イギリス",
+    "flag": "🇬🇧",
+    "circuitName": "シルバーストン・サーキット",
+    "city": "シルバーストン",
+    "dates": "2026年 7月3日 - 7月5日",
+    "targetDateUtc": "2026-07-05T14:00:00Z",
+    "isSprint": true,
+    "lengthKm": 5.891,
+    "laps": 52,
+    "pirelliCompounds": "C1 / C2 / C3 (超高速G負荷)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "7/4 (土) 05:30"
+      },
+      {
+        "session": "スプリント予選",
+        "dayTime": "7/4 (土) 09:30"
+      },
+      {
+        "session": "スプリント決勝",
+        "dayTime": "7/5 (日) 05:00"
+      },
+      {
+        "session": "本選予選",
+        "dayTime": "7/5 (日) 09:00"
+      },
+      {
+        "session": "決勝レース",
+        "dayTime": "7/6 (月) 08:00 スタート"
+      }
+    ]
   },
   {
-    round: 10,
-    gpName: 'オーストリアGP',
-    country: 'オーストリア',
-    flag: '🇦🇹',
-    circuitName: 'レッドブル・リンク',
-    city: 'シュピールベルク',
-    dates: '2026年 6月26日 - 6月28日',
-    targetDateUtc: '2026-06-28T13:00:00Z',
-    isSprint: false,
-    lengthKm: 4.318,
-    laps: 71,
-    pirelliCompounds: 'C3 / C4 / C5',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '6/26 (金) 20:30 - 21:30' },
-      { session: 'FP2', dayTime: '6/27 (土) 00:00 - 01:00' },
-      { session: 'FP3', dayTime: '6/27 (土) 19:30 - 20:30' },
-      { session: '予選', dayTime: '6/27 (土) 23:00 - 00:00' },
-      { session: '決勝', dayTime: '6/28 (日) 22:00 スタート' },
-    ],
+    "round": 10,
+    "gpName": "ベルギーGP (スパ)",
+    "country": "ベルギー",
+    "flag": "🇧🇪",
+    "circuitName": "スパ・フランコルシャン",
+    "city": "スパ / スタヴロ",
+    "dates": "2026年 7月17日 - 7月19日",
+    "targetDateUtc": "2026-07-19T13:00:00Z",
+    "isSprint": false,
+    "lengthKm": 7.004,
+    "laps": 44,
+    "pirelliCompounds": "C2 / C3 / C4 (最長サーキット)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "7/18 (土) 05:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "7/18 (土) 09:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "7/19 (日) 04:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "7/19 (日) 08:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "7/20 (月) 07:00 スタート"
+      }
+    ]
   },
   {
-    round: 11,
-    gpName: 'イギリスGP (シルバーストン)',
-    country: 'イギリス',
-    flag: '🇬🇧',
-    circuitName: 'シルバーストン・サーキット',
-    city: 'シルバーストン',
-    dates: '2026年 7月3日 - 7月5日',
-    targetDateUtc: '2026-07-05T14:00:00Z',
-    isSprint: true,
-    lengthKm: 5.891,
-    laps: 52,
-    pirelliCompounds: 'C1 / C2 / C3 (超高速G負荷)',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '7/3 (金) 20:30 - 21:30' },
-      { session: 'スプリント予選', dayTime: '7/4 (土) 00:30 - 01:14' },
-      { session: 'スプリント決勝', dayTime: '7/4 (土) 19:00 - 20:00' },
-      { session: '本選予選', dayTime: '7/4 (土) 23:00 - 00:00' },
-      { session: '決勝', dayTime: '7/5 (日) 23:00 スタート' },
-    ],
+    "round": 11,
+    "gpName": "ハンガリーGP",
+    "country": "ハンガリー",
+    "flag": "🇭🇺",
+    "circuitName": "ハンガロリンク",
+    "city": "ブダペスト",
+    "dates": "2026年 7月24日 - 7月26日",
+    "targetDateUtc": "2026-07-26T13:00:00Z",
+    "isSprint": false,
+    "lengthKm": 4.381,
+    "laps": 70,
+    "pirelliCompounds": "C3 / C4 / C5 (ツイスティ・酷暑)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "7/25 (土) 05:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "7/25 (土) 09:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "7/26 (日) 04:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "7/26 (日) 08:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "7/27 (月) 07:00 スタート"
+      }
+    ]
   },
   {
-    round: 12,
-    gpName: 'ベルギーGP (スパ)',
-    country: 'ベルギー',
-    flag: '🇧🇪',
-    circuitName: 'スパ・フランコルシャン',
-    city: 'スパ / スタヴロ',
-    dates: '2026年 7月17日 - 7月19日',
-    targetDateUtc: '2026-07-19T13:00:00Z',
-    isSprint: false,
-    lengthKm: 7.004,
-    laps: 44,
-    pirelliCompounds: 'C2 / C3 / C4',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '7/17 (金) 20:30 - 21:30' },
-      { session: 'FP2', dayTime: '7/18 (土) 00:00 - 01:00' },
-      { session: 'FP3', dayTime: '7/18 (土) 19:30 - 20:30' },
-      { session: '予選', dayTime: '7/18 (土) 23:00 - 00:00' },
-      { session: '決勝', dayTime: '7/19 (日) 22:00 スタート' },
-    ],
+    "round": 12,
+    "gpName": "オランダGP (ザントフォールト)",
+    "country": "オランダ",
+    "flag": "🇳🇱",
+    "circuitName": "ザントフォールト・サーキット",
+    "city": "ザントフォールト",
+    "dates": "2026年 8月21日 - 8月23日",
+    "targetDateUtc": "2026-08-23T13:00:00Z",
+    "isSprint": true,
+    "lengthKm": 4.259,
+    "laps": 72,
+    "pirelliCompounds": "C1 / C2 / C3 (急バンクコーナー)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "8/22 (土) 04:30"
+      },
+      {
+        "session": "スプリント予選",
+        "dayTime": "8/22 (土) 08:30"
+      },
+      {
+        "session": "スプリント決勝",
+        "dayTime": "8/23 (日) 04:00"
+      },
+      {
+        "session": "本選予選",
+        "dayTime": "8/23 (日) 08:00"
+      },
+      {
+        "session": "決勝レース",
+        "dayTime": "8/24 (月) 07:00 スタート"
+      }
+    ]
   },
   {
-    round: 13,
-    gpName: 'ハンガリーGP',
-    country: 'ハンガリー',
-    flag: '🇭🇺',
-    circuitName: 'ハンガロリンク',
-    city: 'ブダペスト',
-    dates: '2026年 7月24日 - 7月26日',
-    targetDateUtc: '2026-07-26T13:00:00Z',
-    isSprint: false,
-    lengthKm: 4.381,
-    laps: 70,
-    pirelliCompounds: 'C3 / C4 / C5',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '7/24 (金) 20:30 - 21:30' },
-      { session: 'FP2', dayTime: '7/25 (土) 00:00 - 01:00' },
-      { session: 'FP3', dayTime: '7/25 (土) 19:30 - 20:30' },
-      { session: '予選', dayTime: '7/25 (土) 23:00 - 00:00' },
-      { session: '決勝', dayTime: '7/26 (日) 22:00 スタート' },
-    ],
+    "round": 13,
+    "gpName": "イタリアGP (モンツァ)",
+    "country": "イタリア",
+    "flag": "🇮🇹",
+    "circuitName": "モンツァ・サーキット",
+    "city": "モンツァ",
+    "dates": "2026年 9月4日 - 9月6日",
+    "targetDateUtc": "2026-09-06T13:00:00Z",
+    "isSprint": false,
+    "lengthKm": 5.793,
+    "laps": 53,
+    "pirelliCompounds": "C3 / C4 / C5 (超高速の殿堂)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "9/5 (土) 04:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "9/5 (土) 08:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "9/6 (日) 04:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "9/6 (日) 08:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "9/7 (月) 07:00 スタート"
+      }
+    ]
   },
   {
-    round: 14,
-    gpName: 'オランダGP (ザントフォールト)',
-    country: 'オランダ',
-    flag: '🇳🇱',
-    circuitName: 'ザントフォールト・サーキット',
-    city: 'ザントフォールト',
-    dates: '2026年 8月21日 - 8月23日',
-    targetDateUtc: '2026-08-23T13:00:00Z',
-    isSprint: true,
-    lengthKm: 4.259,
-    laps: 72,
-    pirelliCompounds: 'C1 / C2 / C3 (急バンクコーナー)',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '8/21 (金) 19:30 - 20:30' },
-      { session: 'スプリント予選', dayTime: '8/21 (金) 23:30 - 00:14' },
-      { session: 'スプリント決勝', dayTime: '8/22 (土) 19:00 - 20:00' },
-      { session: '本選予選', dayTime: '8/22 (土) 23:00 - 00:00' },
-      { session: '決勝', dayTime: '8/23 (日) 22:00 スタート' },
-    ],
+    "round": 14,
+    "gpName": "スペインGP (マドリード)",
+    "country": "スペイン",
+    "flag": "🇪🇸",
+    "circuitName": "マドリング (IFEMAマドリード市街地コース)",
+    "city": "マドリード",
+    "dates": "2026年 9月11日 - 9月13日",
+    "targetDateUtc": "2026-09-13T13:00:00Z",
+    "isSprint": false,
+    "lengthKm": 5.474,
+    "laps": 55,
+    "pirelliCompounds": "C3 / C4 / C5 (新設ハイブリッド公道)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "9/12 (土) 05:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "9/12 (土) 09:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "9/13 (日) 04:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "9/13 (日) 08:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "9/14 (月) 07:00 スタート"
+      }
+    ]
   },
   {
-    round: 15,
-    gpName: 'イタリアGP (モンツァ)',
-    country: 'イタリア',
-    flag: '🇮🇹',
-    circuitName: 'モンツァ・サーキット',
-    city: 'モンツァ',
-    dates: '2026年 9月4日 - 9月6日',
-    targetDateUtc: '2026-09-06T13:00:00Z',
-    isSprint: false,
-    lengthKm: 5.793,
-    laps: 53,
-    pirelliCompounds: 'C3 / C4 / C5 (超高速の殿堂バトル)',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '9/4 (金) 20:30 - 21:30' },
-      { session: 'FP2', dayTime: '9/5 (土) 00:00 - 01:00' },
-      { session: 'FP3', dayTime: '9/5 (土) 19:30 - 20:30' },
-      { session: '予選', dayTime: '9/5 (土) 23:00 - 00:00' },
-      { session: '決勝 (アントネッリ劇的優勝)', dayTime: '9/6 (日) 22:00 スタート' },
-    ],
+    "round": 15,
+    "gpName": "アゼルバイジャンGP (バクー)",
+    "country": "アゼルバイジャン",
+    "flag": "🇦🇿",
+    "circuitName": "バクー市街地コース",
+    "city": "バクー",
+    "dates": "2026年 9月24日 - 9月26日",
+    "targetDateUtc": "2026-09-26T11:00:00Z",
+    "isSprint": false,
+    "lengthKm": 6.003,
+    "laps": 51,
+    "pirelliCompounds": "C3 / C4 / C5 (最長ストレート & 旧市街地)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "9/25 (金) 02:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "9/25 (金) 06:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "9/26 (土) 02:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "9/26 (土) 06:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "9/27 (日) 05:00 スタート"
+      }
+    ]
   },
   {
-    round: 16,
-    gpName: 'マドリードGP (初開催)',
-    country: 'スペイン',
-    flag: '🇪🇸',
-    circuitName: 'マドリング (IFEMAマドリード市街地コース)',
-    city: 'マドリード',
-    dates: '2026年 9月11日 - 9月13日',
-    targetDateUtc: '2026-09-13T13:00:00Z',
-    isSprint: false,
-    lengthKm: 5.474,
-    laps: 55,
-    pirelliCompounds: 'C3 / C4 / C5 (新設ハイブリッド公道)',
-    scheduleJst: [
-      { session: 'FP1 (歴史的初走行)', dayTime: '9/11 (金) 20:30 - 21:30' },
-      { session: 'FP2', dayTime: '9/12 (土) 00:00 - 01:00' },
-      { session: 'FP3', dayTime: '9/12 (土) 19:30 - 20:30' },
-      { session: '予選 (初ポール争奪)', dayTime: '9/12 (土) 23:00 - 00:00' },
-      { session: '決勝 (グランプリ決勝)', dayTime: '9/13 (日) 22:00 スタート' },
-    ],
+    "round": 16,
+    "gpName": "マレーシアGP (代替開催)",
+    "country": "マレーシア",
+    "flag": "🇲🇾",
+    "circuitName": "セパン・インターナショナル・サーキット",
+    "city": "クアラルンプール",
+    "dates": "2026年 10月2日 - 10月4日",
+    "targetDateUtc": "2026-10-04T07:00:00Z",
+    "isSprint": false,
+    "lengthKm": 5.543,
+    "laps": 56,
+    "pirelliCompounds": "C1 / C2 / C3 (熱帯スコール & 高熱)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "10/2 (金) 22:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "10/3 (土) 02:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "10/3 (土) 22:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "10/4 (日) 02:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "10/5 (月) 01:00 スタート"
+      }
+    ]
   },
   {
-    round: 17,
-    gpName: 'アゼルバイジャンGP (バクー)',
-    country: 'アゼルバイジャン',
-    flag: '🇦🇿',
-    circuitName: 'バクー市街地コース',
-    city: 'バクー',
-    dates: '2026年 9月24日 - 9月26日',
-    targetDateUtc: '2026-09-26T11:00:00Z',
-    isSprint: false,
-    lengthKm: 6.003,
-    laps: 51,
-    pirelliCompounds: 'C3 / C4 / C5 (最長ストレート & 旧市街地)',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '9/24 (木) 18:30 - 19:30' },
-      { session: 'FP2', dayTime: '9/24 (木) 22:00 - 23:00' },
-      { session: 'FP3', dayTime: '9/25 (金) 17:30 - 18:30' },
-      { session: '予選', dayTime: '9/25 (金) 21:00 - 22:00' },
-      { session: '決勝 (トワイライト)', dayTime: '9/26 (土) 20:00 スタート' },
-    ],
+    "round": 17,
+    "gpName": "シンガポールGP (マリーナベイ)",
+    "country": "シンガポール",
+    "flag": "🇸🇬",
+    "circuitName": "マリーナベイ・ストリート・サーキット",
+    "city": "シンガポール",
+    "dates": "2026年 10月9日 - 10月11日",
+    "targetDateUtc": "2026-10-11T12:00:00Z",
+    "isSprint": true,
+    "lengthKm": 4.94,
+    "laps": 62,
+    "pirelliCompounds": "C3 / C4 / C5 (極限ナイトレース)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "10/10 (土) 02:30"
+      },
+      {
+        "session": "スプリント予選",
+        "dayTime": "10/10 (土) 06:30"
+      },
+      {
+        "session": "スプリント決勝",
+        "dayTime": "10/11 (日) 03:00"
+      },
+      {
+        "session": "本選予選",
+        "dayTime": "10/11 (日) 07:00"
+      },
+      {
+        "session": "決勝レース",
+        "dayTime": "10/12 (月) 06:00 スタート"
+      }
+    ]
   },
   {
-    round: 18,
-    gpName: 'シンガポールGP (マリーナベイ)',
-    country: 'シンガポール',
-    flag: '🇸🇬',
-    circuitName: 'マリーナベイ・ストリート・サーキット',
-    city: 'シンガポール',
-    dates: '2026年 10月9日 - 10月11日',
-    targetDateUtc: '2026-10-11T12:00:00Z',
-    isSprint: true,
-    lengthKm: 4.940,
-    laps: 62,
-    pirelliCompounds: 'C3 / C4 / C5 (ナイトスプリント初導入)',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '10/9 (金) 18:30 - 19:30' },
-      { session: 'スプリント予選', dayTime: '10/9 (金) 22:30 - 23:14' },
-      { session: 'スプリント決勝', dayTime: '10/10 (土) 18:30 - 19:30' },
-      { session: '本選予選', dayTime: '10/10 (土) 22:00 - 23:00' },
-      { session: '決勝 (ナイトレース)', dayTime: '10/11 (日) 21:00 スタート' },
-    ],
+    "round": 18,
+    "gpName": "アメリカGP (オースティン)",
+    "country": "アメリカ",
+    "flag": "🇺🇸",
+    "circuitName": "サーキット・オブ・ジ・アメリカズ (COTA)",
+    "city": "オースティン",
+    "dates": "2026年 10月23日 - 10月25日",
+    "targetDateUtc": "2026-10-25T20:00:00Z",
+    "isSprint": false,
+    "lengthKm": 5.513,
+    "laps": 56,
+    "pirelliCompounds": "C2 / C3 / C4 (名物ターン1急坂)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "10/24 (土) 11:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "10/24 (土) 15:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "10/25 (日) 11:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "10/25 (日) 15:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "10/26 (月) 14:00 スタート"
+      }
+    ]
   },
   {
-    round: 19,
-    gpName: 'アメリカGP (オースティン)',
-    country: 'アメリカ',
-    flag: '🇺🇸',
-    circuitName: 'サーキット・オブ・ジ・アメリカズ (COTA)',
-    city: 'オースティン',
-    dates: '2026年 10月23日 - 10月25日',
-    targetDateUtc: '2026-10-25T19:00:00Z',
-    isSprint: false,
-    lengthKm: 5.513,
-    laps: 56,
-    pirelliCompounds: 'C2 / C3 / C4',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '10/24 (土) 02:30 - 03:30' },
-      { session: 'FP2', dayTime: '10/24 (土) 06:00 - 07:00' },
-      { session: 'FP3', dayTime: '10/25 (日) 02:30 - 03:30' },
-      { session: '予選', dayTime: '10/25 (日) 06:00 - 07:00' },
-      { session: '決勝', dayTime: '10/26 (月) 04:00 スタート' },
-    ],
+    "round": 19,
+    "gpName": "メキシコシティGP",
+    "country": "メキシコ",
+    "flag": "🇲🇽",
+    "circuitName": "エルマノス・ロドリゲス・サーキット",
+    "city": "メキシコシティ",
+    "dates": "2026年 10月30日 - 11月1日",
+    "targetDateUtc": "2026-11-01T20:00:00Z",
+    "isSprint": false,
+    "lengthKm": 4.304,
+    "laps": 71,
+    "pirelliCompounds": "C3 / C4 / C5 (標高2,200m希薄空気)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "10/31 (土) 12:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "10/31 (土) 16:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "11/1 (日) 11:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "11/1 (日) 15:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "11/2 (月) 14:00 スタート"
+      }
+    ]
   },
   {
-    round: 20,
-    gpName: 'メキシコシティGP',
-    country: 'メキシコ',
-    flag: '🇲🇽',
-    circuitName: 'エルマノス・ロドリゲス・サーキット',
-    city: 'メキシコシティ',
-    dates: '2026年 10月30日 - 11月1日',
-    targetDateUtc: '2026-11-01T20:00:00Z',
-    isSprint: false,
-    lengthKm: 4.304,
-    laps: 71,
-    pirelliCompounds: 'C3 / C4 / C5 (標高2,200m希薄大気)',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '10/31 (土) 03:30 - 04:30' },
-      { session: 'FP2', dayTime: '10/31 (土) 07:00 - 08:30' },
-      { session: 'FP3', dayTime: '11/1 (日) 02:30 - 03:30' },
-      { session: '予選', dayTime: '11/1 (日) 06:00 - 07:00' },
-      { session: '決勝', dayTime: '11/2 (月) 05:00 スタート' },
-    ],
+    "round": 20,
+    "gpName": "サンパウロGP (インテルラゴス)",
+    "country": "ブラジル",
+    "flag": "🇧🇷",
+    "circuitName": "アウトドローモ・ホセ・カルロス・パーチェ",
+    "city": "サンパウロ",
+    "dates": "2026年 11月6日 - 11月8日",
+    "targetDateUtc": "2026-11-08T17:00:00Z",
+    "isSprint": false,
+    "lengthKm": 4.309,
+    "laps": 71,
+    "pirelliCompounds": "C2 / C3 / C4 (天候急変インテルラゴス)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "11/7 (土) 09:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "11/7 (土) 13:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "11/8 (日) 08:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "11/8 (日) 12:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "11/9 (月) 11:00 スタート"
+      }
+    ]
   },
   {
-    round: 21,
-    gpName: 'サンパウロGP (インテルラゴス)',
-    country: 'ブラジル',
-    flag: '🇧🇷',
-    circuitName: 'アウトドローモ・ホセ・カルロス・パーチェ',
-    city: 'サンパウロ',
-    dates: '2026年 11月6日 - 11月8日',
-    targetDateUtc: '2026-11-08T17:00:00Z',
-    isSprint: false,
-    lengthKm: 4.309,
-    laps: 71,
-    pirelliCompounds: 'C2 / C3 / C4 (天候急変の聖地)',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '11/6 (金) 23:30 - 00:30' },
-      { session: 'FP2', dayTime: '11/7 (土) 03:00 - 04:00' },
-      { session: 'FP3', dayTime: '11/7 (土) 23:30 - 00:30' },
-      { session: '予選', dayTime: '11/8 (日) 03:00 - 04:00' },
-      { session: '決勝', dayTime: '11/9 (月) 02:00 スタート' },
-    ],
+    "round": 21,
+    "gpName": "ラスベガスGP",
+    "country": "アメリカ",
+    "flag": "🇺🇸",
+    "circuitName": "ラスベガス・ストリップ・サーキット",
+    "city": "ラスベガス",
+    "dates": "2026年 11月20日 - 11月22日",
+    "targetDateUtc": "2026-11-22T04:00:00Z",
+    "isSprint": false,
+    "lengthKm": 6.201,
+    "laps": 50,
+    "pirelliCompounds": "C3 / C4 / C5 (極寒ナイトレース)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "11/20 (金) 18:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "11/20 (金) 22:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "11/21 (土) 18:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "11/21 (土) 22:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "11/22 (日) 22:00 スタート"
+      }
+    ]
   },
   {
-    round: 22,
-    gpName: 'ラスベガスGP',
-    country: 'アメリカ',
-    flag: '🇺🇸',
-    circuitName: 'ラスベガス・ストリップ・サーキット',
-    city: 'ラスベガス',
-    dates: '2026年 11月19日 - 11月21日',
-    targetDateUtc: '2026-11-22T06:00:00Z',
-    isSprint: false,
-    lengthKm: 6.201,
-    laps: 50,
-    pirelliCompounds: 'C3 / C4 / C5 (極寒ナイトレース)',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '11/20 (金) 11:30 - 12:30' },
-      { session: 'FP2', dayTime: '11/20 (金) 15:00 - 16:00' },
-      { session: 'FP3', dayTime: '11/21 (土) 11:30 - 12:30' },
-      { session: '予選', dayTime: '11/21 (土) 15:00 - 16:00' },
-      { session: '決勝 (サタデーナイト)', dayTime: '11/22 (日) 15:00 スタート' },
-    ],
+    "round": 22,
+    "gpName": "カタールGP (ルサイル)",
+    "country": "カタール",
+    "flag": "🇶🇦",
+    "circuitName": "ルサイル・インターナショナル・サーキット",
+    "city": "ルサイル",
+    "dates": "2026年 11月27日 - 11月29日",
+    "targetDateUtc": "2026-11-29T16:00:00Z",
+    "isSprint": false,
+    "lengthKm": 5.419,
+    "laps": 57,
+    "pirelliCompounds": "C1 / C2 / C3 (高速連続コーナー)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "11/28 (土) 07:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "11/28 (土) 11:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "11/29 (日) 08:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "11/29 (日) 12:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "11/30 (月) 10:00 スタート"
+      }
+    ]
   },
   {
-    round: 23,
-    gpName: 'カタールGP (ルサイル)',
-    country: 'カタール',
-    flag: '🇶🇦',
-    circuitName: 'ルサイル・インターナショナル・サーキット',
-    city: 'ルサイル',
-    dates: '2026年 11月27日 - 11月29日',
-    targetDateUtc: '2026-11-29T17:00:00Z',
-    isSprint: false,
-    lengthKm: 5.419,
-    laps: 57,
-    pirelliCompounds: 'C1 / C2 / C3 (極限タイヤ負荷)',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '11/27 (金) 22:30 - 23:30' },
-      { session: 'FP2', dayTime: '11/28 (土) 02:00 - 03:00' },
-      { session: 'FP3', dayTime: '11/28 (土) 22:30 - 23:30' },
-      { session: '予選', dayTime: '11/29 (日) 02:00 - 03:00' },
-      { session: '決勝 (ナイトレース)', dayTime: '11/30 (月) 02:00 スタート' },
-    ],
-  },
-  {
-    round: 24,
-    gpName: 'アブダビGP (ヤス・マリーナ)',
-    country: 'アラブ首長国連邦',
-    flag: '🇦🇪',
-    circuitName: 'ヤス・マリーナ・サーキット',
-    city: 'アブダビ',
-    dates: '2026年 12月4日 - 12月6日',
-    targetDateUtc: '2026-12-06T13:00:00Z',
-    isSprint: false,
-    lengthKm: 5.281,
-    laps: 58,
-    pirelliCompounds: 'C3 / C4 / C5 (グランドフィナーレ)',
-    scheduleJst: [
-      { session: 'FP1', dayTime: '12/4 (金) 18:30 - 19:30' },
-      { session: 'FP2 (トワイライト)', dayTime: '12/4 (金) 22:00 - 23:00' },
-      { session: 'FP3', dayTime: '12/5 (土) 19:30 - 20:30' },
-      { session: '予選', dayTime: '12/5 (土) 23:00 - 00:00' },
-      { session: '決勝 (最終戦トワイライト)', dayTime: '12/6 (日) 22:00 スタート' },
-    ],
-  },
+    "round": 23,
+    "gpName": "アブダビGP",
+    "country": "UAE",
+    "flag": "🇦🇪",
+    "circuitName": "ヤス・マリーナ・サーキット",
+    "city": "アブダビ",
+    "dates": "2026年 12月4日 - 12月6日",
+    "targetDateUtc": "2026-12-06T13:00:00Z",
+    "isSprint": false,
+    "lengthKm": 5.281,
+    "laps": 58,
+    "pirelliCompounds": "C3 / C4 / C5 (トワイライト最終決戦)",
+    "scheduleJst": [
+      {
+        "session": "FP1",
+        "dayTime": "12/5 (土) 03:30"
+      },
+      {
+        "session": "FP2",
+        "dayTime": "12/5 (土) 07:00"
+      },
+      {
+        "session": "FP3",
+        "dayTime": "12/6 (日) 04:30"
+      },
+      {
+        "session": "予選",
+        "dayTime": "12/6 (日) 08:00"
+      },
+      {
+        "session": "決勝",
+        "dayTime": "12/7 (月) 07:00 スタート"
+      }
+    ]
+  }
 ];
 
 // ─────────────────────────────────────────────────────────────

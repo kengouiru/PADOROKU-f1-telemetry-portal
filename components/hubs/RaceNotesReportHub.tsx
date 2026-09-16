@@ -8,6 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Driver, Lap, Stint, PitStop, SafetyCarPeriod } from '@/lib/types';
 import { formatLapTime } from '@/lib/telemetryUtils';
+import { getGeminiAuthHeaders } from '@/lib/apiKeyService';
 
 interface RaceNotesReportHubProps {
   selectedDrivers: string[];
@@ -17,7 +18,6 @@ interface RaceNotesReportHubProps {
   pitStopsCache: Record<string, PitStop[]>;
   safetyCarPeriods: SafetyCarPeriod[];
   sessionName?: string;
-  geminiApiKey?: string;
 }
 
 export default function RaceNotesReportHub({
@@ -28,7 +28,6 @@ export default function RaceNotesReportHub({
   pitStopsCache,
   safetyCarPeriods,
   sessionName = '2024 Bahrain GP Race',
-  geminiApiKey = '',
 }: RaceNotesReportHubProps) {
   const storageKey = `f1_race_notes_${sessionName}`;
   const [noteContent, setNoteContent] = useState<string>('');
@@ -95,8 +94,10 @@ ${noteContent}
 3. 🏎️ 各ドライバーのペース比較とセクターパフォーマンス評価
 4. 💡 次戦に向けた総括と技術的課題`;
 
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (geminiApiKey) headers['x-gemini-key'] = geminiApiKey;
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...getGeminiAuthHeaders(),
+      };
 
       const res = await fetch('/api/strategist', {
         method: 'POST',
@@ -147,7 +148,8 @@ ${noteContent}
   return (
     <div className="flex flex-col gap-5 max-w-6xl mx-auto animate-fade-in">
       {/* Header Banner */}
-      <div className="glass-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="glass-card-premium p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden rounded-2xl shadow-xl">
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500 via-sky-500 to-f1-red" />
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-racing font-bold text-sky-400 uppercase tracking-widest">
@@ -167,7 +169,7 @@ ${noteContent}
           <button
             onClick={handleGenerateAiReport}
             disabled={isGeneratingAi}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-900/60 to-blue-900/60 hover:from-purple-900/80 hover:to-blue-900/80 border border-purple-500/40 text-purple-200 text-xs font-bold font-racing flex items-center gap-2 shadow-lg transition-all disabled:opacity-50"
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold font-racing flex items-center gap-2 shadow-lg shadow-purple-600/30 ring-1 ring-purple-400/40 transition-all cursor-pointer disabled:opacity-50"
           >
             {isGeneratingAi ? (
               <>
@@ -183,7 +185,7 @@ ${noteContent}
           </button>
           <button
             onClick={handleExportMarkdown}
-            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium border border-white/10 transition-colors flex items-center gap-1.5 shadow-md"
+            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-racing font-bold border border-white/10 transition-colors flex items-center gap-1.5 shadow-md cursor-pointer"
             title="Markdownとしてエクスポート"
           >
             <span>📥</span>
@@ -195,7 +197,7 @@ ${noteContent}
       {/* 2-Column Layout: Left (Editable Notes), Right (Generated AI Report) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Left: Notes Editor */}
-        <div className="glass-card p-5 flex flex-col gap-3 min-h-[460px]">
+        <div className="glass-card-premium p-5 flex flex-col gap-3 min-h-[460px] rounded-2xl shadow-lg relative overflow-hidden">
           <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
             <h3 className="text-xs font-racing font-bold text-white tracking-wider uppercase flex items-center gap-1.5">
               <span>📝</span>
@@ -215,7 +217,7 @@ ${noteContent}
         </div>
 
         {/* Right: AI Executive Report */}
-        <div className="glass-card p-5 flex flex-col gap-3 min-h-[460px] bg-slate-900/40">
+        <div className="glass-card-premium p-5 flex flex-col gap-3 min-h-[460px] rounded-2xl shadow-lg border-purple-500/20 relative overflow-hidden">
           <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
             <h3 className="text-xs font-racing font-bold text-purple-300 tracking-wider uppercase flex items-center gap-1.5">
               <span>🤖</span>

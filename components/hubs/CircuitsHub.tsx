@@ -377,7 +377,7 @@ export default function CircuitsHub({
             <div
               key={circuit.id}
               onClick={() => setSelectedCircuitDetail(circuit)}
-              className="glass-card p-4 flex flex-col justify-between gap-3 border-l-4 border-l-sky-500 cursor-pointer hover:border-sky-400 hover:bg-slate-900/90 transition-all hover:scale-[1.02] shadow-md group relative overflow-hidden"
+              className="glass-card-premium p-4.5 flex flex-col justify-between gap-3 border-l-4 border-l-sky-500 cursor-pointer hover:border-sky-400 hover:shadow-2xl hover:shadow-sky-500/10 transition-all duration-200 hover:-translate-y-0.5 group relative overflow-hidden rounded-2xl"
             >
               <div className="space-y-2.5">
                 {/* Card Header: Country, Name, Length */}

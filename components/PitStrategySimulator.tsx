@@ -15,6 +15,7 @@ import type { Driver, Lap, Stint, TyreCompound, PitSimulationResult } from '@/li
 import { simulatePitStrategy, getTyreColor } from '@/lib/telemetryUtils';
 import VirtualPitwallWarRoom from '@/components/strategy/VirtualPitwallWarRoom';
 import VirtualGrandPrixSimulator from '@/components/strategy/VirtualGrandPrixSimulator';
+import { getGeminiAuthHeaders } from '@/lib/apiKeyService';
 
 interface PitStrategySimulatorProps {
   selectedDrivers: string[];
@@ -81,8 +82,10 @@ export default function PitStrategySimulator({
 - ピットロスタイム: ${result.pitLossSeconds}秒
 - 新品${result.targetCompound}タイヤの想定ゲイン: +${result.freshTyreDeltaPerLap}秒/周`;
 
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (geminiApiKey) headers['x-gemini-key'] = geminiApiKey;
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...getGeminiAuthHeaders(),
+      };
 
       const res = await fetch('/api/strategist', {
         method: 'POST',
@@ -179,7 +182,6 @@ export default function PitStrategySimulator({
       {viewMode === 'virtual_gp' ? (
         <VirtualGrandPrixSimulator
           onOpenUpgradeModal={onOpenUpgradeModal}
-          geminiApiKey={geminiApiKey}
         />
       ) : viewMode === 'war_room' ? (
         <VirtualPitwallWarRoom />

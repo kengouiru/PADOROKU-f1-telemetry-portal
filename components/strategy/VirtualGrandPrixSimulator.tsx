@@ -26,6 +26,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { usePlanTier } from '@/lib/tierService';
+import { getGeminiAuthHeaders } from '@/lib/apiKeyService';
 
 // ── Circuit Profiles ───────────────────────────────────────────────────────────
 interface CircuitProfile {
@@ -455,8 +456,10 @@ export default function VirtualGrandPrixSimulator({
 - セーフティカー: ${scEnabled ? `Lap ${scLap}〜${scLap + scDuration}にSC出動` : 'SCなし'}
 - 各ドライバーのピット回数: ${simulationSnapshots[simulationSnapshots.length - 1]?.cars.map((c) => `${c.code}(${c.pitCount}回, 最終タイヤ:${c.tyreCompound})`).join(', ')}`;
 
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (geminiApiKey) headers['x-gemini-key'] = geminiApiKey;
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...getGeminiAuthHeaders(),
+      };
 
       const res = await fetch('/api/strategist', {
         method: 'POST',

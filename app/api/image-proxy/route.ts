@@ -49,6 +49,7 @@ export async function GET(req: NextRequest) {
 
     // Fetch remote image with Wikimedia compliant User-Agent
     const response = await fetch(imageUrl, {
+      signal: AbortSignal.timeout(8000),
       headers: {
         'User-Agent':
           'F1TelemetryApp/1.0 (Educational/Analytical Research; contact@f1telemetry.local)',

@@ -262,7 +262,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'spa-francorchamps': {
     circuitId: 'spa-francorchamps',
-    round: 14,
+    round: 12,
     gpName: 'ベルギーGP',
     location: 'スパ (ベルギー)',
     condition: 'rain',
@@ -280,7 +280,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'zandvoort': {
     circuitId: 'zandvoort',
-    round: 15,
+    round: 14,
     gpName: 'オランダGP',
     location: 'ザントフォールト (オランダ)',
     condition: 'windy',
