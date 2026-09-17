@@ -48,6 +48,7 @@ import NewsPaddockHub from '@/components/hubs/NewsPaddockHub';
 import KnowledgeHistoryHub, { type SubTab } from '@/components/hubs/KnowledgeHistoryHub';
 import RaceNotesReportHub from '@/components/hubs/RaceNotesReportHub';
 import SeasonHub from '@/components/hubs/SeasonHub';
+import RaceSimulatorHub from '@/components/hubs/RaceSimulatorHub';
 import QuickGlossaryModal from '@/components/glossary/QuickGlossaryModal';
 import GlobalSearchModal from '@/components/search/GlobalSearchModal';
 import F1QuizModal from '@/components/quiz/F1QuizModal';
@@ -57,7 +58,7 @@ import type { TelemetryTarget } from '@/data/f1KnowledgeData';
 import { GLOSSARY_TERMS } from '@/data/f1GlossaryData';
 import type { NavAction } from '@/components/AIStrategist';
 import AITelemetryInspectorModal from '@/components/telemetry/AITelemetryInspectorModal';
-import { Flag, Activity, Newspaper, BookOpen } from 'lucide-react';
+import { Flag, Activity, Newspaper, BookOpen, Gamepad2 } from 'lucide-react';
 
 import AuthButton from '@/components/auth/AuthButton';
 import AuthModal from '@/components/auth/AuthModal';
@@ -68,7 +69,7 @@ import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 // ── App State ─────────────────────────────────────────────────────────────────
 
 export type AppMode = 'season' | 'library';
-export type ActiveHub = 'season' | 'telemetry' | 'news' | 'knowledge' | 'notes';
+export type ActiveHub = 'season' | 'telemetry' | 'simulator' | 'news' | 'knowledge' | 'notes';
 export type TelemetrySubTab = 'pace' | 'car_data' | 'strategy' | 'radio' | 'laptable';
 
 interface AppState {
@@ -91,7 +92,7 @@ interface AppState {
 }
 
 // Mobile tab type
-type MobileTab = 'season' | 'telemetry' | 'news' | 'knowledge' | 'notes' | 'ai';
+type MobileTab = 'season' | 'telemetry' | 'simulator' | 'news' | 'knowledge' | 'notes' | 'ai';
 // Desktop right-panel tab
 type RightPanelTab = 'ai' | 'notebook';
 
@@ -302,20 +303,10 @@ export default function DashboardPage() {
       setDetailedTelemetryTab('delta_matrix');
       desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
       mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (featureId === 'war_room') {
+    } else if (featureId === 'war_room' || featureId === 'virtual_gp' || featureId === 'race_simulator') {
       setAppMode('season');
-      setActiveHub('telemetry');
-      setMobileTab('telemetry');
-      setTelemetrySubTab('strategy');
-      setPitStrategyViewMode('war_room');
-      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (featureId === 'virtual_gp') {
-      setAppMode('season');
-      setActiveHub('telemetry');
-      setMobileTab('telemetry');
-      setTelemetrySubTab('strategy');
-      setPitStrategyViewMode('virtual_gp');
+      setActiveHub('simulator');
+      setMobileTab('simulator');
       desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
       mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (featureId === 'pitwall_pro') {
@@ -1309,6 +1300,8 @@ export default function DashboardPage() {
                 : telemetrySubTab === 'laptable'
                 ? '周回データシート'
                 : 'ペース・順位推移'
+              : activeHub === 'simulator'
+              ? 'グランプリ模擬レース ＆ 作戦司令室'
               : activeHub === 'news'
               ? 'ニュース＆パドック (FOD公式中継)'
               : 'レースノート＆AI'
@@ -1390,6 +1383,21 @@ export default function DashboardPage() {
         </ErrorBoundary>
       )}
       {activeHub === 'telemetry' && <ErrorBoundary sectionName="テレメトリー分析">{analysisContent}</ErrorBoundary>}
+      {activeHub === 'simulator' && (
+        <ErrorBoundary sectionName="ピットウォール司令塔 (PITWALL)">
+          <RaceSimulatorHub
+            onOpenUpgradeModal={() => setProModalOpen(true)}
+            onNavigateToLibrary={(subTab, termId) => {
+              setAppMode('library');
+              setLibrarySubTab(subTab as any);
+              setActiveHub('knowledge');
+              if (termId) setTargetGlossaryTermId(termId);
+              desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+              mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
+        </ErrorBoundary>
+      )}
       {activeHub === 'news' && <ErrorBoundary sectionName="ニュースパドック"><NewsPaddockHub /></ErrorBoundary>}
       {activeHub === 'knowledge' && (
         <ErrorBoundary sectionName="ナレッジ＆ヒストリー">
@@ -1523,6 +1531,21 @@ export default function DashboardPage() {
               }`}
             >
               <Activity className="w-3.5 h-3.5" /> TELEMETRY
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setAppMode('season');
+                setActiveHub('simulator');
+              }}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all whitespace-nowrap cursor-pointer ${
+                appMode === 'season' && activeHub === 'simulator'
+                  ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950/60 border border-red-500/40'
+                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Gamepad2 className="w-3.5 h-3.5" /> PITWALL
             </button>
 
             <button
@@ -1868,8 +1891,8 @@ export default function DashboardPage() {
               [
                 ['season',    <Flag key="s" className="w-5 h-5" />, 'SEASON'],
                 ['telemetry', <Activity key="t" className="w-5 h-5" />, 'TELEMETRY'],
+                ['simulator', <Gamepad2 key="sim" className="w-5 h-5" />, 'PITWALL'],
                 ['news',      <Newspaper key="n" className="w-5 h-5" />, 'NEWS'],
-                ['notes',     <BookOpen key="b" className="w-5 h-5" />, 'NOTES'],
                 ['ai',        <span key="a" className="text-xl leading-none">🤖</span>, 'AI'],
               ] as [string, React.ReactNode, string][]
             ).map(([tab, icon, label]) => {

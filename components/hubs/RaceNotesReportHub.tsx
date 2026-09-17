@@ -10,6 +10,8 @@ import type { Driver, Lap, Stint, PitStop, SafetyCarPeriod } from '@/lib/types';
 import { formatLapTime } from '@/lib/telemetryUtils';
 import { getGeminiAuthHeaders } from '@/lib/apiKeyService';
 
+import { Sparkles, Download, FileText, Bot, CheckCircle2 } from 'lucide-react';
+
 interface RaceNotesReportHubProps {
   selectedDrivers: string[];
   drivers: Driver[];
@@ -146,49 +148,49 @@ ${noteContent}
   };
 
   return (
-    <div className="flex flex-col gap-5 max-w-6xl mx-auto animate-fade-in">
+    <div className="flex flex-col gap-6 max-w-6xl mx-auto animate-fade-in pb-8">
       {/* Header Banner */}
       <div className="glass-card-premium p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden rounded-2xl shadow-xl">
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-purple-500 via-sky-500 to-f1-red" />
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-red-600 via-red-500/80 to-transparent" />
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-racing font-bold text-sky-400 uppercase tracking-widest">
+            <span className="f1-label text-red-400">
               REPORTING & INTELLIGENCE
             </span>
           </div>
-          <h2 className="text-xl font-racing font-black text-white tracking-wider">
+          <h2 className="f1-section-title text-white">
             RACE NOTES & AI EXECUTIVE REPORT
           </h2>
-          <p className="text-xs text-slate-400 max-w-xl mt-1">
+          <p className="f1-meta text-slate-400 max-w-xl mt-1">
             リアルタイム観戦メモの記録、テレメトリ連動メモ、およびGeminiによるレース総括レポートの自動生成。
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2 self-start md:self-auto">
+        <div className="flex items-center gap-2.5 self-start md:self-auto">
           <button
             onClick={handleGenerateAiReport}
             disabled={isGeneratingAi}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold font-racing flex items-center gap-2 shadow-lg shadow-purple-600/30 ring-1 ring-purple-400/40 transition-all cursor-pointer disabled:opacity-50"
+            className="btn-console-primary flex items-center gap-2 text-xs py-2 px-4 shadow-lg shadow-red-900/30 disabled:opacity-50"
           >
             {isGeneratingAi ? (
               <>
-                <span className="w-3.5 h-3.5 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
+                <span className="w-3.5 h-3.5 border-2 border-white/60 border-t-transparent rounded-full animate-spin" />
                 <span>AIレポート作成中...</span>
               </>
             ) : (
               <>
-                <span>✨</span>
-                <span>AIレース総括レポートを生成</span>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>AIレポート生成</span>
               </>
             )}
           </button>
           <button
             onClick={handleExportMarkdown}
-            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-racing font-bold border border-white/10 transition-colors flex items-center gap-1.5 shadow-md cursor-pointer"
+            className="btn-console flex items-center gap-1.5 text-xs py-2 px-3.5"
             title="Markdownとしてエクスポート"
           >
-            <span>📥</span>
+            <Download className="w-3.5 h-3.5 text-slate-400" />
             <span>.md 保存</span>
           </button>
         </div>
@@ -197,14 +199,14 @@ ${noteContent}
       {/* 2-Column Layout: Left (Editable Notes), Right (Generated AI Report) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Left: Notes Editor */}
-        <div className="glass-card-premium p-5 flex flex-col gap-3 min-h-[460px] rounded-2xl shadow-lg relative overflow-hidden">
-          <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-            <h3 className="text-xs font-racing font-bold text-white tracking-wider uppercase flex items-center gap-1.5">
-              <span>📝</span>
+        <div className="glass-card-premium p-5 flex flex-col gap-3 min-h-[480px] rounded-2xl shadow-lg relative overflow-hidden">
+          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <h3 className="f1-card-title flex items-center gap-2">
+              <FileText className="w-4 h-4 text-red-400" />
               <span>LIVE OBSERVATION NOTES</span>
             </h3>
-            <span className="text-[11px] text-emerald-400 font-mono flex items-center gap-1">
-              <span>●</span>
+            <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>{saveStatus}</span>
             </span>
           </div>
@@ -212,19 +214,20 @@ ${noteContent}
             value={noteContent}
             onChange={(e) => handleContentChange(e.target.value)}
             placeholder="ここにラップごとの気付きや無線内容、タイヤ状況をメモ..."
-            className="w-full flex-1 bg-slate-950/60 border border-white/10 rounded-xl p-3.5 text-xs text-slate-200 font-mono leading-relaxed focus:outline-none focus:border-sky-400 transition-colors resize-none"
+            className="w-full flex-1 bg-slate-950/60 border border-white/10 rounded-xl p-4 text-xs text-slate-200 font-mono leading-relaxed focus:outline-none focus:border-red-500/60 transition-colors resize-none"
           />
         </div>
 
         {/* Right: AI Executive Report */}
-        <div className="glass-card-premium p-5 flex flex-col gap-3 min-h-[460px] rounded-2xl shadow-lg border-purple-500/20 relative overflow-hidden">
-          <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-            <h3 className="text-xs font-racing font-bold text-purple-300 tracking-wider uppercase flex items-center gap-1.5">
-              <span>🤖</span>
+        <div className="glass-card-premium p-5 flex flex-col gap-3 min-h-[480px] rounded-2xl shadow-lg border-red-500/20 relative overflow-hidden">
+          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <h3 className="f1-card-title flex items-center gap-2">
+              <Bot className="w-4 h-4 text-red-400" />
               <span>AI EXECUTIVE SUMMARY REPORT</span>
             </h3>
             {aiReport && (
-              <span className="text-[10px] text-purple-400 bg-purple-950/40 border border-purple-500/30 px-2 py-0.5 rounded-full font-mono">
+              <span className="text-[10px] text-red-300 bg-red-950/40 border border-red-500/30 px-2 py-0.5 rounded-full font-mono flex items-center gap-1">
+                <CheckCircle2 className="w-3 h-3 text-red-400" />
                 Gemini 生成完了
               </span>
             )}
@@ -237,9 +240,9 @@ ${noteContent}
               </div>
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-center text-slate-500 gap-3 py-16">
-                <span className="text-3xl">🤖</span>
-                <p className="text-xs max-w-xs leading-relaxed">
-                  上部の「✨ AIレース総括レポートを生成」をクリックすると、テレメトリと観戦メモを統合した総括分析レポートがここに表示されます。
+                <Bot className="w-10 h-10 text-slate-600 stroke-[1.2]" />
+                <p className="f1-meta text-slate-400 max-w-xs leading-relaxed">
+                  上部の「AIレポート生成」をクリックすると、テレメトリと観戦メモを統合した総括分析レポートがここに表示されます。
                 </p>
               </div>
             )}

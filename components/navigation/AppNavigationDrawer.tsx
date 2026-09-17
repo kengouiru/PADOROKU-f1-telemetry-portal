@@ -72,11 +72,11 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       {
         id: 'virtual_gp',
-        label: '模擬レースシミュレーター Pro',
-        icon: '🏎️',
-        badge: 'PRO',
-        badgeColor: 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black',
-        description: 'パラメータ変更・複数台レース・降雨/SC逆転劇・AI総括',
+        label: 'ピットウォール司令塔 (PITWALL)',
+        icon: '🎮',
+        badge: 'COMMAND',
+        badgeColor: 'bg-gradient-to-r from-red-600 to-rose-600 text-white font-black',
+        description: '全24戦・全11チーム・実戦テレメトリー＆双方向チーム無線・100点採点',
       },
       {
         id: 'telemetry_delta',

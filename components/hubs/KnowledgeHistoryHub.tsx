@@ -28,6 +28,7 @@ import F1GlossaryHub from './F1GlossaryHub';
 import F1RegulationsHub from './F1RegulationsHub';
 import RulesGlossaryHub from './RulesGlossaryHub';
 import DataSourceVerificationModal from './DataSourceVerificationModal';
+import VirtualPitwallWarRoom from '@/components/strategy/VirtualPitwallWarRoom';
 import { useUserPreferences } from '@/lib/userPreferences';
 import { type InAppLink } from '@/data/f1GlossaryData';
 
@@ -278,21 +279,19 @@ export default function KnowledgeHistoryHub({
 
   return (
     <div className="flex flex-col gap-5 max-w-6xl mx-auto pb-8 sm:pb-2">
-      {/* Official Data Source & Generation Backup Header Strip */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-slate-900 to-sky-950/40 border border-emerald-500/20 text-xs">
-        <div className="flex items-center gap-2">
-          <span className="text-base">🛡️</span>
-          <span className="text-[11px] text-slate-300 font-medium">
-            国内公式中継: <strong className="text-sky-300 font-normal">FOD / フジテレビNEXT</strong> ＆ FIA・FOM公式規則・実音源に100%準拠
-          </span>
+      {/* Official Data Source & Verification Header Strip */}
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-1.5 rounded-xl bg-slate-950/60 border border-white/10 text-xs">
+        <div className="flex items-center gap-1.5 text-slate-400 text-[11px] font-mono">
+          <span>🛡️</span>
+          <span>国内公式中継 (FOD / フジテレビNEXT) ＆ FIA・FOM公式規則準拠</span>
         </div>
         <button
           type="button"
           onClick={() => setIsVerificationModalOpen(true)}
-          className="px-3 py-1 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[11px] font-racing font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm hover:scale-[1.02]"
+          className="btn-console text-[10px] py-0.5 px-2 text-emerald-300 border-emerald-500/30 hover:border-emerald-400 cursor-pointer"
         >
-          <span>出典明示 ＆ 世代バックアップ管理</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span>出典明示・検証</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse ml-1" />
         </button>
       </div>
 
@@ -303,37 +302,32 @@ export default function KnowledgeHistoryHub({
 
       {/* Header Banner (Shown specifically for Teams, Strategy & History search) */}
       {(activeSubTab === 'teams' || activeSubTab === 'strategy' || activeSubTab === 'history') && (
-        <div className="glass-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
-          <div className="flex flex-col gap-1 z-10">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-racing font-bold text-sky-400 uppercase tracking-widest">
-                ACADEMIC CITATIONS & DEEP TELEMETRY LINKING
-              </span>
-            </div>
-            <h2 className="text-xl font-racing font-black text-white tracking-wider">
+        <div className="glass-card p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 relative overflow-hidden">
+          <div className="flex flex-col gap-0.5 z-10">
+            <h2 className="f1-card-title text-white tracking-wider">
               {activeSubTab === 'teams'
                 ? 'F1 CONSTRUCTOR TEAMS & PHILOSOPHIES'
                 : activeSubTab === 'strategy'
                 ? 'STRATEGY & TECHNICAL REGULATIONS'
                 : 'HISTORICAL ARCHIVES & LEGENDARY BATTLES'}
             </h2>
-            <p className="text-xs text-slate-400 max-w-xl">
+            <p className="f1-meta text-slate-400 max-w-xl">
               {activeSubTab === 'teams'
-                ? 'FIA公式規則に基づく全11チームの工学哲学、歴代マシン、PU仕様およびファクトリー詳細を体系化。'
+                ? 'FIA公式規則に基づく全11チームの工学哲学、歴代マシン、PU仕様およびファクトリー詳細'
                 : activeSubTab === 'strategy'
-                ? '空力グラウンドエフェクト、タイヤ劣化理論、セーフティカー規則などを公式文献付きで詳解。'
-                : 'F1史を揺るがした名勝負を当時の生チーム無線ログ（🎙️）と実テレメトリー連携付きで追体験。'}
+                ? '空力グラウンドエフェクト、タイヤ劣化理論、セーフティカー規則などを公式文献付きで詳解'
+                : 'F1史を揺るがした名勝負を当時の生チーム無線ログ（🎙️）と実テレメトリー連携付きで追体験'}
             </p>
           </div>
 
           {/* Search Bar */}
-          <div className="z-10 w-full md:w-64">
+          <div className="z-10 w-full md:w-60">
             <input
               type="text"
               placeholder={`${activeSubTab === 'teams' ? 'チーム' : activeSubTab === 'strategy' ? '戦略・規則' : '歴史アーカイブ'}内を検索...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-900/80 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
+              className="w-full bg-slate-900/90 border border-white/10 rounded-xl px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-500 transition-colors font-mono"
             />
           </div>
         </div>
@@ -366,7 +360,7 @@ export default function KnowledgeHistoryHub({
       {activeSubTab === 'teams' && (
         <div className="flex flex-col gap-4 animate-fade-in">
           {/* Teams Filter & Counter Bar */}
-          <div className="flex items-center justify-between gap-3 bg-slate-950/70 border border-white/10 rounded-2xl p-3 px-4 shadow-sm">
+          <div className="flex items-center justify-between gap-3 bg-slate-950/60 border border-white/10 rounded-xl p-2.5 px-3.5 shadow-sm">
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono font-bold text-slate-300">
                 F1 2026 全11コンストラクター
@@ -374,10 +368,10 @@ export default function KnowledgeHistoryHub({
             </div>
             <button
               onClick={() => setTeamsFilterStarred((prev) => !prev)}
-              className={`text-xs font-racing font-bold px-3 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 shadow-sm cursor-pointer ${
+              className={`btn-console text-xs py-1 px-2.5 cursor-pointer ${
                 teamsFilterStarred
-                  ? 'bg-amber-500/25 border-amber-400 text-amber-300 ring-1 ring-amber-400/50'
-                  : 'bg-slate-900 border-white/10 text-slate-400 hover:text-amber-300 hover:border-amber-400/30'
+                  ? 'bg-amber-500/20 border-amber-400 text-amber-300 ring-1 ring-amber-400/50'
+                  : 'text-slate-400 hover:text-amber-300'
               }`}
               title="推しチームのみ絞り込み"
             >
@@ -530,7 +524,29 @@ export default function KnowledgeHistoryHub({
 
       {/* ── Sub-Tab 4: STRATEGY & REGULATIONS ── */}
       {activeSubTab === 'strategy' && (
-        <div className="flex flex-col gap-4 animate-fade-in">
+        <div className="flex flex-col gap-6 animate-fade-in">
+          {/* Interactive Pitwall Strategy Simulator */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between pb-1 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <span className="text-base">⏱️</span>
+                <h3 className="font-racing font-bold text-sm text-white tracking-wider uppercase">
+                  VIRTUAL PITWALL WAR ROOM / インタラクティブ作戦シミュレーター
+                </h3>
+              </div>
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-sky-950 text-sky-300 border border-sky-500/30">
+                理論実践ビジュアル
+              </span>
+            </div>
+            <VirtualPitwallWarRoom />
+          </div>
+
+          <div className="flex items-center gap-2 pt-2 border-b border-white/10 pb-2">
+            <span className="text-base">📚</span>
+            <h3 className="font-racing font-bold text-sm text-white tracking-wider uppercase">
+              STRATEGY CONCEPTS & ARCHIVE / レース戦略公理・重要原則
+            </h3>
+          </div>
           {KNOWLEDGE_STRATEGIES.filter(
             (s) =>
               s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

@@ -167,7 +167,7 @@ const RaceCountdownCard = React.memo(function RaceCountdownCard({
   );
 });
 
-type MainTab = 'calendar' | 'standings' | 'grid';
+type MainTab = 'calendar' | 'track_analysis' | 'standings' | 'grid';
 
 export default function SeasonHub({
   onNavigateToTelemetry,
@@ -539,34 +539,35 @@ export default function SeasonHub({
             />
 
             {/* Quick Actions for Race Viewers */}
-            <div className="flex items-center gap-2 w-full">
+            <div className="flex flex-wrap items-center gap-2 w-full">
               {onNavigateToTelemetry && (
                 <button
+                  type="button"
                   onClick={() => onNavigateToTelemetry(selectedRace.gpName)}
-                  className="flex-1 py-2.5 px-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-racing font-bold text-xs shadow-lg shadow-red-600/20 transition-all flex items-center justify-center gap-1.5"
+                  className="btn-console-primary flex-1 py-2 px-3 text-xs"
                 >
                   <span>🏎️</span>
                   <span>テレメトリー分析へ</span>
                 </button>
               )}
+              <button
+                type="button"
+                onClick={() => setActiveTab('track_analysis')}
+                className="btn-console py-2 px-3 text-xs text-sky-300 border-sky-500/30 hover:border-sky-400"
+                title="3Dコース標高図・戦術プロファイルを見る"
+              >
+                <span>🏁</span>
+                <span>コース・戦術詳細</span>
+              </button>
               {onNavigateToTyres && (
                 <button
+                  type="button"
                   onClick={onNavigateToTyres}
-                  className="py-2.5 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 hover:text-white font-racing font-bold text-xs transition-all flex items-center justify-center gap-1"
+                  className="btn-console py-2 px-3 text-xs"
                   title="タイヤ戦略・コンパウンド解説を見る"
                 >
                   <span>🛞</span>
                   <span className="hidden sm:inline">タイヤ戦略</span>
-                </button>
-              )}
-              {onNavigateToCircuit && (
-                <button
-                  onClick={() => onNavigateToCircuit(selectedCircuitId)}
-                  className="py-2.5 px-3 rounded-xl bg-sky-600/20 hover:bg-sky-600/30 border border-sky-500/30 text-sky-300 hover:text-white font-racing font-bold text-xs transition-all flex items-center justify-center gap-1 shadow-sm"
-                  title="サーキット諸元・コース解説を見る"
-                >
-                  <span>🏁</span>
-                  <span className="hidden sm:inline">コース解説</span>
                 </button>
               )}
             </div>
@@ -575,198 +576,57 @@ export default function SeasonHub({
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          1.25 OFFICIAL BROADCAST TRACK GUIDE & 3D ELEVATION VIEWER
-          ───────────────────────────────────────────────────────────── */}
-      <F1BroadcastTrackGuide
-        circuitId={selectedCircuitId}
-        gpName={selectedRace.gpName}
-        round={selectedRace.round}
-      />
-
-      {/* ─────────────────────────────────────────────────────────────
-          1.5 DEEP RACE REPORT & PROFILE (FOR SELECTED ROUND)
-          ───────────────────────────────────────────────────────────── */}
-      {selectedReport && (
-        <div className="bg-slate-900/80 rounded-2xl border border-white/10 p-5 md:p-6 space-y-5 shadow-xl animate-fadeIn">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">🏆</span>
-              <div>
-                <h3 className="text-base md:text-lg font-racing font-bold text-white tracking-wide">
-                  {selectedRace.gpName} : 戦術エンジニアリングプロファイル ＆ コースレコード
-                </h3>
-                <p className="text-xs text-slate-400">
-                  勝敗を分けるピット戦略、公式コースレコード、および今季のタイヤ・セーフティカー戦術指標
-                </p>
-              </div>
-            </div>
-            <span className="self-start sm:self-auto px-2.5 py-1 rounded-full bg-red-500/20 text-red-300 border border-red-500/30 text-xs font-mono font-bold">
-              ROUND {selectedReport.round} ANALYSIS
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-            {/* 1. Track Record Podium Profile */}
-            <div className="space-y-3 bg-slate-950/60 p-4 rounded-xl border border-white/5">
-              <div className="text-xs font-mono font-bold text-amber-400 flex items-center gap-1.5">
-                <span>🥇</span>
-                <span>直近表彰台データ &amp; 実績</span>
-              </div>
-              <div className="space-y-2">
-                {selectedReport.result2024.podium.map((p, idx) => (
-                  <div
-                    key={p.code}
-                    className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.03] border border-white/5"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
-                        idx === 0 ? 'bg-amber-400 text-slate-950' : idx === 1 ? 'bg-slate-300 text-slate-950' : 'bg-amber-700 text-white'
-                      }`}>
-                        {idx + 1}
-                      </span>
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.teamColor }} />
-                      <span className="font-racing font-bold text-white text-xs">{p.code}</span>
-                      <span className="text-xs text-slate-300">{p.name}</span>
-                    </div>
-                    <div className="text-right text-[10px] font-mono text-slate-400">
-                      <span>{p.team}</span>
-                      <span className="ml-2 text-slate-500">P{p.grid}発 / {p.pitStops}停</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Pole & FL */}
-              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/5 text-xs font-mono">
-                <div className="bg-slate-900/80 p-2 rounded-lg">
-                  <div className="text-[10px] text-slate-400">⏱️ ポールポジション</div>
-                  <div className="font-bold text-white text-xs mt-0.5">{selectedReport.result2024.polePosition.code}</div>
-                  <div className="text-amber-400 text-[11px]">{selectedReport.result2024.polePosition.time}</div>
-                </div>
-                <div className="bg-slate-900/80 p-2 rounded-lg">
-                  <div className="text-[10px] text-slate-400">⚡ 最速ラップ (FL)</div>
-                  <div className="font-bold text-white text-xs mt-0.5">{selectedReport.result2024.fastestLap.code} (L{selectedReport.result2024.fastestLap.lap})</div>
-                  <div className="text-purple-400 text-[11px]">{selectedReport.result2024.fastestLap.time}</div>
-                </div>
-              </div>
-            </div>
-
-            {/* 2. Decisive Winning Tactics & Drama */}
-            <div className="space-y-3 bg-slate-950/60 p-4 rounded-xl border border-white/5 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="text-xs font-mono font-bold text-emerald-400 flex items-center gap-1.5">
-                  <span>🎯</span>
-                  <span>勝敗を分けた決定的戦略 &amp; ターニングポイント</span>
-                </div>
-                <div className="bg-slate-900/80 p-3 rounded-lg border border-emerald-500/20">
-                  <div className="text-[10px] font-bold text-emerald-300 mb-1">勝者のピット戦略:</div>
-                  <p className="text-xs text-slate-200 leading-relaxed">
-                    {selectedReport.result2024.winningStrategy}
-                  </p>
-                </div>
-                <div className="bg-slate-900/80 p-3 rounded-lg border border-red-500/20">
-                  <div className="text-[10px] font-bold text-red-300 mb-1">レースの決定的ドラマ:</div>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    {selectedReport.result2024.strategicTurningPoint}
-                  </p>
-                </div>
-              </div>
-              <div className="text-[11px] font-mono text-slate-400 pt-2 border-t border-white/5 flex items-center justify-between">
-                <span>🚨 セーフティカー出動実績:</span>
-                <span className="text-amber-300 font-bold">{selectedReport.result2024.safetyCarDeployments}</span>
-              </div>
-            </div>
-
-            {/* 3. Tactical Profile & Track Records */}
-            <div className="space-y-3 bg-slate-950/60 p-4 rounded-xl border border-white/5 flex flex-col justify-between">
-              <div>
-                <div className="text-xs font-mono font-bold text-blue-400 flex items-center gap-1.5 mb-2.5">
-                  <span>📊</span>
-                  <span>戦術エンジニアリング指標</span>
-                </div>
-                <div className="space-y-2 text-xs">
-                  <div>
-                    <div className="flex justify-between text-[11px] mb-1">
-                      <span className="text-slate-400">タイヤ摩耗度 (Degradation)</span>
-                      <span className="font-bold text-amber-400 font-mono">Level {selectedReport.tacticalProfile.tyreDegradationIndex} / 5</span>
-                    </div>
-                    <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-amber-500 rounded-full" style={{ width: `${selectedReport.tacticalProfile.tyreDegradationIndex * 20}%` }} />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-[11px] mb-1">
-                      <span className="text-slate-400">オーバーテイク難易度</span>
-                      <span className="font-bold text-sky-400 font-mono">Level {selectedReport.tacticalProfile.overtakeDifficultyIndex} / 5</span>
-                    </div>
-                    <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-sky-500 rounded-full" style={{ width: `${selectedReport.tacticalProfile.overtakeDifficultyIndex * 20}%` }} />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2 pt-2 text-[11px] font-mono">
-                    <div className="bg-slate-900/60 p-2 rounded border border-white/5">
-                      <span className="text-slate-500 block text-[10px]">SC発生確率</span>
-                      <span className="font-bold text-amber-300">{selectedReport.tacticalProfile.safetyCarProbabilityPercent}%</span>
-                    </div>
-                    <div className="bg-slate-900/60 p-2 rounded border border-white/5">
-                      <span className="text-slate-500 block text-[10px]">ピットロス</span>
-                      <span className="font-bold text-white">{selectedReport.tacticalProfile.pitLossSeconds}秒</span>
-                    </div>
-                  </div>
-                  <div className="bg-slate-900/80 p-2.5 rounded-lg border border-blue-500/20 text-xs text-slate-300 mt-2 leading-relaxed">
-                    <span className="font-bold text-blue-300">戦術展望: </span>
-                    {selectedReport.tacticalProfile.projectedStrategy}
-                  </div>
-                </div>
-              </div>
-
-              {/* Records footnote */}
-              <div className="text-[10px] font-mono text-slate-400 pt-2 border-t border-white/5 flex flex-wrap justify-between gap-1">
-                <span>🏆 決勝レコード: {selectedReport.circuitRecords.raceLapRecord.time} ({selectedReport.circuitRecords.raceLapRecord.driver})</span>
-                <span className="text-slate-500">最多勝: {selectedReport.circuitRecords.mostWinsDriver}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          2. NAVIGATION TABS (CALENDAR / STANDINGS / GRID)
+          2. NAVIGATION TABS (CALENDAR / TRACK / STANDINGS / GRID)
           ───────────────────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/80 border border-white/10">
+        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/80 border border-white/10 overflow-x-auto no-scrollbar">
           <button
+            type="button"
             onClick={() => setActiveTab('calendar')}
-            className={`px-4 py-2 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer ${
               activeTab === 'calendar'
-                ? 'bg-red-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950/40 border border-red-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <span>📅</span>
-            <span>{selectedSeason}年 カレンダー (全24戦)</span>
+            <span>カレンダー (全{activeCalendar.length}戦)</span>
           </button>
           <button
+            type="button"
+            onClick={() => setActiveTab('track_analysis')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer ${
+              activeTab === 'track_analysis'
+                ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950/40 border border-red-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <span>🏁</span>
+            <span>コース・戦術解析</span>
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab('standings')}
-            className={`px-4 py-2 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer ${
               activeTab === 'standings'
-                ? 'bg-red-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950/40 border border-red-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <span>🏆</span>
-            <span>{selectedSeason}年 順位表・ランキング</span>
+            <span>選手権ランキング</span>
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab('grid')}
-            className={`px-4 py-2 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer ${
               activeTab === 'grid'
-                ? 'bg-red-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950/40 border border-red-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
             <span>👥</span>
-            <span>{selectedSeason}年 参戦グリッド・PU体制</span>
+            <span>参戦体制・グリッド</span>
           </button>
         </div>
 
@@ -835,7 +695,6 @@ export default function SeasonHub({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {filteredCalendar.map((gp) => {
               const isSelected = gp.round === selectedRound;
-              const gpWeather = getWeatherByRound(gp.round);
               const isGpPast = new Date(gp.targetDateUtc).getTime() <= new Date().getTime();
 
               return (
@@ -845,36 +704,36 @@ export default function SeasonHub({
                     userHasSelectedRoundRef.current = true;
                     setSelectedRound(gp.round);
                   }}
-                  className={`cursor-pointer p-4 rounded-xl border transition-all text-left flex flex-col justify-between ${
+                  className={`cursor-pointer p-3.5 rounded-xl border transition-all text-left flex flex-col justify-between group ${
                     isSelected
-                      ? 'bg-red-950/40 border-red-500/60 ring-1 ring-red-500/40 shadow-lg shadow-red-950/50 scale-[1.01]'
-                      : 'bg-slate-900/60 hover:bg-slate-800/70 border-white/5 hover:border-white/20'
+                      ? 'bg-red-950/40 border-red-500/70 ring-1 ring-red-500/50 shadow-lg shadow-red-950/60 scale-[1.01]'
+                      : 'bg-slate-900/60 hover:bg-slate-800/80 border-white/10 hover:border-white/20'
                   }`}
                 >
-                  <div className={`space-y-2 ${gp.isCancelled ? 'opacity-50' : ''}`}>
+                  <div className={`space-y-1.5 ${gp.isCancelled ? 'opacity-50' : ''}`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] font-racing font-bold text-slate-400 uppercase">
-                          Round {gp.round}
+                        <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
+                          ROUND {gp.round}
                         </span>
                         {gp.isCancelled ? (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-red-500/20 text-red-300 border border-red-500/30">
+                          <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-red-500/20 text-red-300 border border-red-500/30">
                             中止
                           </span>
                         ) : isGpPast ? (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-800 text-slate-400 border border-white/10">
+                          <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-800 text-slate-400 border border-white/10">
                             終了
                           </span>
                         ) : (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                             予定
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1.5">
                         {gp.isSprint && (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                            SPRINT
+                          <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 font-racing">
+                            ⚡ SPRINT
                           </span>
                         )}
                         <span className="text-base">{gp.flag}</span>
@@ -883,9 +742,9 @@ export default function SeasonHub({
 
                     <div>
                       <h3
-                        className={`font-racing font-bold text-sm leading-tight ${
+                        className={`font-racing font-bold text-sm leading-tight transition-colors ${
                           gp.isCancelled ? 'line-through text-slate-500' :
-                          isSelected ? 'text-red-300' : 'text-white'
+                          isSelected ? 'text-red-300' : 'text-white group-hover:text-red-300'
                         }`}
                       >
                         {gp.gpName}
@@ -895,44 +754,205 @@ export default function SeasonHub({
                         <p className="text-[10px] text-amber-400 mt-0.5">{gp.replacementNote}</p>
                       )}
                     </div>
-
-                    {/* Weather Pill */}
-                    {gpWeather && (
-                      <div className="flex items-center justify-between text-[10px] font-mono text-slate-300 bg-white/[0.03] px-2 py-1 rounded-md border border-white/5">
-                        <span className="flex items-center gap-1">
-                          <span>{gpWeather.weatherIcon}</span>
-                          <span>{gpWeather.airTempC}℃</span>
-                          <span className="text-amber-400">/ 路面{gpWeather.trackTempC}℃</span>
-                        </span>
-                        <span className={gpWeather.rainProb > 30 ? 'text-sky-400 font-bold' : 'text-slate-400'}>
-                          ☔ {gpWeather.rainProb}%
-                        </span>
-                      </div>
-                    )}
                   </div>
 
-                  <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-[11px]">
-                    <span className="font-mono text-slate-300">{gp.dates.replace(/^202[0-9]年\s*/, '')}</span>
-                    {onNavigateToCircuit ? (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onNavigateToCircuit(getCircuitIdForRace(gp));
-                        }}
-                        className="text-[10px] text-sky-400 hover:text-sky-300 flex items-center gap-1 font-mono font-medium hover:underline bg-sky-950/40 px-2 py-0.5 rounded border border-sky-500/20"
-                        title="サーキット詳細を見る"
-                      >
-                        <span>🏁 コース解説</span>
-                        <span>➔</span>
-                      </button>
-                    ) : (
-                      <span className="text-[10px] text-amber-400 font-mono">{gp.pirelliCompounds}</span>
-                    )}
+                  <div className="mt-3 pt-2 border-t border-white/5 flex items-center justify-between text-xs font-mono">
+                    <span className="text-slate-400 text-[11px]">{gp.dates.replace(/^202[0-9]年\s*/, '')}</span>
+                    <div className="flex items-center gap-1.5">
+                      {gp.pirelliCompounds && (
+                        <span className="text-[10px] text-amber-400/90 font-semibold">{gp.pirelliCompounds}</span>
+                      )}
+                      <span className={`text-[10px] font-racing ${isSelected ? 'text-red-400 font-bold' : 'text-slate-600 group-hover:text-slate-400'}`}>
+                        {isSelected ? '● 選択中' : '選択 ➔'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               );
             })}
           </div>
+        </div>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          TAB CONTENT: 1.5 TRACK & TACTICAL ANALYSIS
+          ───────────────────────────────────────────────────────────── */}
+      {activeTab === 'track_analysis' && (
+        <div className="space-y-6 animate-fade-in">
+          {/* Header Bar for selected round */}
+          <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-slate-900/90 to-slate-950/90 border border-white/10 shadow-lg">
+            <div className="flex items-center gap-2.5">
+              <span className="text-2xl">{selectedRace.flag}</span>
+              <div>
+                <h3 className="font-racing font-bold text-sm sm:text-base text-white flex items-center gap-2">
+                  <span>第{selectedRace.round}戦 {selectedRace.gpName}</span>
+                  <span className="text-xs font-mono text-slate-400 font-normal">({selectedRace.circuitName})</span>
+                </h3>
+                <p className="text-xs text-slate-400 font-mono mt-0.5">
+                  公式コース諸元・3D標高プロファイル ＆ 戦術エンジニアリング詳細データ
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveTab('calendar')}
+              className="btn-console text-xs"
+            >
+              <span>📅 カレンダーから他のレースを選ぶ</span>
+            </button>
+          </div>
+
+          {/* 3D Elevation & Broadcast Track Guide */}
+          <F1BroadcastTrackGuide
+            circuitId={selectedCircuitId}
+            gpName={selectedRace.gpName}
+            round={selectedRace.round}
+          />
+
+          {/* Deep Race Report & Profile (For Selected Round) */}
+          {selectedReport && (
+            <div className="bg-slate-900/80 rounded-2xl border border-white/10 p-5 md:p-6 space-y-5 shadow-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🏆</span>
+                  <div>
+                    <h3 className="text-base md:text-lg font-racing font-bold text-white tracking-wide">
+                      {selectedRace.gpName} : 戦術エンジニアリングプロファイル ＆ コースレコード
+                    </h3>
+                    <p className="text-xs text-slate-400">
+                      勝敗を分けるピット戦略、公式コースレコード、および今季のタイヤ・セーフティカー戦術指標
+                    </p>
+                  </div>
+                </div>
+                <span className="self-start sm:self-auto px-2.5 py-1 rounded-full bg-red-500/20 text-red-300 border border-red-500/30 text-xs font-mono font-bold">
+                  ROUND {selectedReport.round} ANALYSIS
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                {/* 1. Track Record Podium Profile */}
+                <div className="space-y-3 bg-slate-950/60 p-4 rounded-xl border border-white/5">
+                  <div className="text-xs font-mono font-bold text-amber-400 flex items-center gap-1.5">
+                    <span>🥇</span>
+                    <span>直近表彰台データ &amp; 実績</span>
+                  </div>
+                  <div className="space-y-2">
+                    {selectedReport.result2024.podium.map((p, idx) => (
+                      <div
+                        key={p.code}
+                        className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.03] border border-white/5"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                            idx === 0 ? 'bg-amber-400 text-slate-950' : idx === 1 ? 'bg-slate-300 text-slate-950' : 'bg-amber-700 text-white'
+                          }`}>
+                            {idx + 1}
+                          </span>
+                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.teamColor }} />
+                          <span className="font-racing font-bold text-white text-xs">{p.code}</span>
+                          <span className="text-xs text-slate-300">{p.name}</span>
+                        </div>
+                        <div className="text-right text-[10px] font-mono text-slate-400">
+                          <span>{p.team}</span>
+                          <span className="ml-2 text-slate-500">P{p.grid}発 / {p.pitStops}停</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Pole & FL */}
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/5 text-xs font-mono">
+                    <div className="bg-slate-900/80 p-2 rounded-lg">
+                      <div className="text-[10px] text-slate-400">⏱️ ポールポジション</div>
+                      <div className="font-bold text-white text-xs mt-0.5">{selectedReport.result2024.polePosition.code}</div>
+                      <div className="text-amber-400 text-[11px]">{selectedReport.result2024.polePosition.time}</div>
+                    </div>
+                    <div className="bg-slate-900/80 p-2 rounded-lg">
+                      <div className="text-[10px] text-slate-400">⚡ 最速ラップ (FL)</div>
+                      <div className="font-bold text-white text-xs mt-0.5">{selectedReport.result2024.fastestLap.code} (L{selectedReport.result2024.fastestLap.lap})</div>
+                      <div className="text-purple-400 text-[11px]">{selectedReport.result2024.fastestLap.time}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Decisive Winning Tactics & Drama */}
+                <div className="space-y-3 bg-slate-950/60 p-4 rounded-xl border border-white/5 flex flex-col justify-between">
+                  <div className="space-y-3">
+                    <div className="text-xs font-mono font-bold text-emerald-400 flex items-center gap-1.5">
+                      <span>🎯</span>
+                      <span>勝敗を分けた決定的戦略 &amp; ターニングポイント</span>
+                    </div>
+                    <div className="bg-slate-900/80 p-3 rounded-lg border border-emerald-500/20">
+                      <div className="text-[10px] font-bold text-emerald-300 mb-1">勝者のピット戦略:</div>
+                      <p className="text-xs text-slate-200 leading-relaxed">
+                        {selectedReport.result2024.winningStrategy}
+                      </p>
+                    </div>
+                    <div className="bg-slate-900/80 p-3 rounded-lg border border-red-500/20">
+                      <div className="text-[10px] font-bold text-red-300 mb-1">レースの決定的ドラマ:</div>
+                      <p className="text-xs text-slate-300 leading-relaxed">
+                        {selectedReport.result2024.strategicTurningPoint}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-[11px] font-mono text-slate-400 pt-2 border-t border-white/5 flex items-center justify-between">
+                    <span>🚨 セーフティカー出動実績:</span>
+                    <span className="text-amber-300 font-bold">{selectedReport.result2024.safetyCarDeployments}</span>
+                  </div>
+                </div>
+
+                {/* 3. Tactical Profile & Track Records */}
+                <div className="space-y-3 bg-slate-950/60 p-4 rounded-xl border border-white/5 flex flex-col justify-between">
+                  <div>
+                    <div className="text-xs font-mono font-bold text-blue-400 flex items-center gap-1.5 mb-2.5">
+                      <span>📊</span>
+                      <span>戦術エンジニアリング指標</span>
+                    </div>
+                    <div className="space-y-2 text-xs">
+                      <div>
+                        <div className="flex justify-between text-[11px] mb-1">
+                          <span className="text-slate-400">タイヤ摩耗度 (Degradation)</span>
+                          <span className="font-bold text-amber-400 font-mono">Level {selectedReport.tacticalProfile.tyreDegradationIndex} / 5</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-amber-500 rounded-full" style={{ width: `${selectedReport.tacticalProfile.tyreDegradationIndex * 20}%` }} />
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between text-[11px] mb-1">
+                          <span className="text-slate-400">オーバーテイク難易度</span>
+                          <span className="font-bold text-sky-400 font-mono">Level {selectedReport.tacticalProfile.overtakeDifficultyIndex} / 5</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-sky-500 rounded-full" style={{ width: `${selectedReport.tacticalProfile.overtakeDifficultyIndex * 20}%` }} />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 pt-2 text-[11px] font-mono">
+                        <div className="bg-slate-900/60 p-2 rounded border border-white/5">
+                          <span className="text-slate-500 block text-[10px]">SC発生確率</span>
+                          <span className="font-bold text-amber-300">{selectedReport.tacticalProfile.safetyCarProbabilityPercent}%</span>
+                        </div>
+                        <div className="bg-slate-900/60 p-2 rounded border border-white/5">
+                          <span className="text-slate-500 block text-[10px]">ピットロス</span>
+                          <span className="font-bold text-white">{selectedReport.tacticalProfile.pitLossSeconds}秒</span>
+                        </div>
+                      </div>
+                      <div className="bg-slate-900/80 p-2.5 rounded-lg border border-blue-500/20 text-xs text-slate-300 mt-2 leading-relaxed">
+                        <span className="font-bold text-blue-300">戦術展望: </span>
+                        {selectedReport.tacticalProfile.projectedStrategy}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Records footnote */}
+                  <div className="text-[10px] font-mono text-slate-400 pt-2 border-t border-white/5 flex flex-wrap justify-between gap-1">
+                    <span>🏆 決勝レコード: {selectedReport.circuitRecords.raceLapRecord.time} ({selectedReport.circuitRecords.raceLapRecord.driver})</span>
+                    <span className="text-slate-500">最多勝: {selectedReport.circuitRecords.mostWinsDriver}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
