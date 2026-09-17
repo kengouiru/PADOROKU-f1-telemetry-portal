@@ -297,6 +297,32 @@ export const F1_BADGES_CATALOG: F1Badge[] = [
     unlockConditionText: '中団・下位チーム（RB/ハース/ザウバー等）を担当し、赤旗やSCの混乱を味方につけてP1勝利を掴む。',
     lore: '2020年イタリアGPでピエール・ガスリーがアルファタウリに歴史的勝利をもたらした感動の奇跡。',
   },
+  {
+    id: 'points_finish_grit',
+    name: '🏁 激戦区の1ポイント',
+    englishTitle: 'Points Finish in the Midfield',
+    category: 'masterstroke',
+    categoryLabel: '🏆 神采配',
+    icon: '🏁',
+    rarity: 'RARE',
+    rarityColor: 'text-emerald-300 border-emerald-500/60 bg-emerald-950/40',
+    historicalQuote: '「P10フィニッシュ！チームに貴重な1ポイントを持ち帰った！」',
+    unlockConditionText: '22台中団・下位チーム（RB/ウィリアムズ/ハース/アウディ/キャデラック等）でP10以内入賞を果たす。',
+    lore: 'トップチームが独占する中、全22台の死闘の中で下位チームが命懸けで奪い取る1ポイントの重み。',
+  },
+  {
+    id: 'drs_train_master',
+    name: '🚂 DRSトレイン・マスター',
+    englishTitle: 'DRS Train Conductor',
+    category: 'masterstroke',
+    categoryLabel: '🏆 神采配',
+    icon: '🚂',
+    rarity: 'EPIC',
+    rarityColor: 'text-amber-300 border-amber-500/60 bg-amber-950/40',
+    historicalQuote: '「5台のDRSトレインを先導し、1周も抜かせずに耐え抜いた」',
+    unlockConditionText: 'DRSトレイン（車間1秒以内の密集集団）の中で順位を死守するか、アンダーカットで集団を一気に飛び越える。',
+    lore: '前車のトゲを抜き、後続全員にDRSを与えて膠着状態を作り出すF1屈指の鉄壁戦術。',
+  },
 
   // ── B. 名言・無線・ドラマティック称号 (Iconic Memes & Dramas) ──
   {
@@ -748,6 +774,22 @@ export function diagnoseStrategistProfile(
   }
   if (isP1 && (scenario.playerConfig.team.includes('RB') || scenario.playerConfig.team.includes('Williams') || scenario.playerConfig.team.includes('Haas'))) {
     checkAndAward('pierre_monza');
+  }
+  const isMidfieldTeam = scenario.playerConfig.team.includes('RB') ||
+    scenario.playerConfig.team.includes('Williams') ||
+    scenario.playerConfig.team.includes('Haas') ||
+    scenario.playerConfig.team.includes('Audi') ||
+    scenario.playerConfig.team.includes('Cadillac') ||
+    scenario.playerConfig.team.includes('Alpine');
+  if (finalPos <= 10 && isMidfieldTeam) {
+    checkAndAward('points_finish_grit');
+  }
+  const survivedDrsTrain = snapshots.some(s => {
+    const c = s.cars.find(car => car.code === scenario.playerConfig.code);
+    return c && (c.inDrsTrain || c.inDirtyAir);
+  });
+  if (survivedDrsTrain && reachedTarget) {
+    checkAndAward('drs_train_master');
   }
   const trustedRadio = Object.values(radioChoices).some((val) => val.includes('driver') || val.includes('stay') || val.includes('trust'));
   if (trustedRadio && reachedTarget) {

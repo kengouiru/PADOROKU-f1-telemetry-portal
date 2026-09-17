@@ -602,9 +602,125 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
     pit1Tyre: 'MEDIUM',
     crewStopTime: 2.5,
   },
+  // Alpine
+  {
+    code: 'GAS',
+    name: 'ピエール・ガスリー',
+    number: '10',
+    team: 'Alpine',
+    color: '#0090ff',
+    teammateCode: 'DOO',
+    basePaceOffset: 0.40,
+    machineSetup: { downforce: 'balanced', puMode: 'standard', ersStrategy: 'balanced' },
+    startTyre: 'MEDIUM',
+    pit1Lap: 18,
+    pit1Tyre: 'HARD',
+    crewStopTime: 2.6,
+  },
+  {
+    code: 'DOO',
+    name: 'ジャック・ドゥーハン',
+    number: '7',
+    team: 'Alpine',
+    color: '#0070cc',
+    teammateCode: 'GAS',
+    basePaceOffset: 0.52,
+    machineSetup: { downforce: 'balanced', puMode: 'standard', ersStrategy: 'balanced' },
+    startTyre: 'HARD',
+    pit1Lap: 25,
+    pit1Tyre: 'MEDIUM',
+    crewStopTime: 2.7,
+  },
+  // Haas
+  {
+    code: 'OCO',
+    name: 'エステバン・オコン',
+    number: '31',
+    team: 'Haas',
+    color: '#dc2626',
+    teammateCode: 'BEA',
+    basePaceOffset: 0.42,
+    machineSetup: { downforce: 'low', puMode: 'standard', ersStrategy: 'balanced' },
+    startTyre: 'MEDIUM',
+    pit1Lap: 17,
+    pit1Tyre: 'HARD',
+    crewStopTime: 2.6,
+  },
+  {
+    code: 'BEA',
+    name: 'オリバー・ベアマン',
+    number: '87',
+    team: 'Haas',
+    color: '#b91c1c',
+    teammateCode: 'OCO',
+    basePaceOffset: 0.48,
+    machineSetup: { downforce: 'low', puMode: 'standard', ersStrategy: 'balanced' },
+    startTyre: 'SOFT',
+    pit1Lap: 13,
+    pit1Tyre: 'HARD',
+    crewStopTime: 2.5,
+  },
+  // Audi Revolut
+  {
+    code: 'HUL',
+    name: 'ニコ・ヒュルケンベルグ',
+    number: '27',
+    team: 'Audi Revolut',
+    color: '#10b981',
+    teammateCode: 'BOR',
+    basePaceOffset: 0.44,
+    machineSetup: { downforce: 'balanced', puMode: 'standard', ersStrategy: 'balanced' },
+    startTyre: 'MEDIUM',
+    pit1Lap: 19,
+    pit1Tyre: 'HARD',
+    crewStopTime: 2.6,
+  },
+  {
+    code: 'BOR',
+    name: 'ガブリエル・ボルトレート',
+    number: '5',
+    team: 'Audi Revolut',
+    color: '#059669',
+    teammateCode: 'HUL',
+    basePaceOffset: 0.54,
+    machineSetup: { downforce: 'balanced', puMode: 'standard', ersStrategy: 'balanced' },
+    startTyre: 'HARD',
+    pit1Lap: 27,
+    pit1Tyre: 'MEDIUM',
+    crewStopTime: 2.7,
+  },
+  // Cadillac Formula 1 Team (2026 Works Entry)
+  {
+    code: 'HER',
+    name: 'コルトン・ハータ',
+    number: '26',
+    team: 'Cadillac F1',
+    color: '#f59e0b',
+    teammateCode: 'DRU',
+    basePaceOffset: 0.46,
+    machineSetup: { downforce: 'low', puMode: 'standard', ersStrategy: 'balanced' },
+    startTyre: 'MEDIUM',
+    pit1Lap: 18,
+    pit1Tyre: 'HARD',
+    crewStopTime: 2.6,
+  },
+  {
+    code: 'DRU',
+    name: 'フェリペ・ドルゴヴィッチ',
+    number: '34',
+    team: 'Cadillac F1',
+    color: '#d97706',
+    teammateCode: 'HER',
+    basePaceOffset: 0.50,
+    machineSetup: { downforce: 'low', puMode: 'standard', ersStrategy: 'balanced' },
+    startTyre: 'SOFT',
+    pit1Lap: 14,
+    pit1Tyre: 'HARD',
+    crewStopTime: 2.7,
+  },
 ];
 
-export const DEFAULT_SIM_GRID = GRID_DRIVERS.slice(0, 8);
+export const DEFAULT_SIM_GRID = GRID_DRIVERS;
 
 // ── Commentary & Telemetry Types ──────────────────────────────────────────────
 
@@ -648,6 +764,9 @@ export interface CarLapSimState {
   eventNote?: string;
   teammateGapSeconds?: number;
   doubleStackDelay?: number; // e.g. 4.5s
+  inDrsTrain?: boolean;
+  inDirtyAir?: boolean;
+  pointsAwarded?: number; // 25, 18, 15, 12, 10, 8, 6, 4, 2, 1 for P1-P10
 }
 
 export interface RainRadarStatus {
@@ -1007,8 +1126,8 @@ export function runFullGrandPrixSimulation(params: {
         
         // Evaporation: based on track temperature (higher temp = faster drying)
         const evapRate = Math.max(0.08, (currentTrackTemp - 16.0) * 0.016);
-        // Car displacement: 20 F1 cars at 250km/h clear ~50L of water per second from racing groove
-        const carDisplacement = 0.16;
+        // 22-Car displacement: 22 F1 cars clearing ~60L of water per second from racing line
+        const carDisplacement = (drivers.length / 22) * 0.22;
         dryingRate = Number((evapRate + carDisplacement).toFixed(2));
         currentWaterDepth = Math.max(0, Number((currentWaterDepth - dryingRate).toFixed(2)));
       }
@@ -1343,6 +1462,9 @@ export function runFullGrandPrixSimulation(params: {
       tracker.fuelKg = Math.max(2, tracker.fuelKg - 1.55);
       const fuelPaceBonus = -((totalLaps - currentLap) * 0.035);
 
+      // Track evolution (22 cars laying down rubber every lap improves baseline grip by up to 0.25s)
+      const trackEvolutionBonus = -Math.min(0.25, (currentLap / totalLaps) * 0.22);
+
       // SC pacing
       const scPaceAdd = isSC ? circuit.baseLapTime * 0.42 : 0;
 
@@ -1357,6 +1479,7 @@ export function runFullGrandPrixSimulation(params: {
         tyreWearPacePenalty +
         waterPenalty +
         fuelPaceBonus +
+        trackEvolutionBonus +
         scPaceAdd +
         lapPitLoss +
         jitter;
@@ -1402,13 +1525,35 @@ export function runFullGrandPrixSimulation(params: {
     // Sort by cumulative race time to establish positions
     lapCarStates.sort((a, b) => a.cumulativeTime - b.cumulativeTime);
     const leaderTime = lapCarStates[0].cumulativeTime;
+    const FIA_POINTS_TABLE = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
 
     lapCarStates.forEach((car, idx) => {
       car.position = idx + 1;
       car.gapToLeader = Number((car.cumulativeTime - leaderTime).toFixed(2));
       const aheadTime = idx === 0 ? leaderTime : lapCarStates[idx - 1].cumulativeTime;
       car.gapToAhead = Number((car.cumulativeTime - aheadTime).toFixed(2));
+      car.pointsAwarded = FIA_POINTS_TABLE[idx] || 0;
+
+      // Dirty Air detection: within 1.2s behind ahead car
+      const inDirtyAir = idx > 0 && car.gapToAhead <= 1.2;
+      car.inDirtyAir = inDirtyAir;
+
+      // Following in dirty air heats up front tyre surface by +3°C to +6°C
+      if (inDirtyAir) {
+        car.tyreSurfaceTemp = Math.min(145, car.tyreSurfaceTemp + 4);
+      }
     });
+
+    // Detect DRS Trains: when 3 or more consecutive cars each have gapToAhead <= 1.0s
+    for (let i = 1; i < lapCarStates.length - 1; i++) {
+      if (lapCarStates[i].gapToAhead <= 1.0 && lapCarStates[i + 1].gapToAhead <= 1.0) {
+        lapCarStates[i].inDrsTrain = true;
+        lapCarStates[i + 1].inDrsTrain = true;
+        if (i > 0 && lapCarStates[i - 1].gapToAhead <= 1.0) {
+          lapCarStates[i - 1].inDrsTrain = true;
+        }
+      }
+    }
 
     // Teammate status for player
     let teammateStatus: TeammateStatus | undefined = undefined;
@@ -1720,12 +1865,7 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
       startTyre: 'MEDIUM',
       pit1Lap: 99,
     },
-    rivals: [
-      GRID_DRIVERS[2], // VER
-      GRID_DRIVERS[4], // NOR
-      GRID_DRIVERS[6], // LEC
-      GRID_DRIVERS[8], // RUS
-    ],
+    rivals: GRID_DRIVERS.filter(d => d.code !== 'TSU' && d.code !== 'HAD'),
     startWeather: 'dry',
     weatherForecast: {
       radarDesc: '南西より巨大な雨雲接近中。4〜6周目前後に降雨到達予想（確率85%）。',
@@ -1762,12 +1902,7 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
       startTyre: 'MEDIUM',
       pit1Lap: 99,
     },
-    rivals: [
-      GRID_DRIVERS[2], // VER
-      GRID_DRIVERS[6], // LEC
-      GRID_DRIVERS[8], // RUS
-      GRID_DRIVERS[0], // TSU
-    ],
+    rivals: GRID_DRIVERS.filter(d => d.code !== 'NOR' && d.code !== 'PIA'),
     startWeather: 'dry',
     weatherForecast: {
       radarDesc: '終日快晴。路面温度44℃（高温によるタイヤデグラデーション注意）。',
@@ -1804,12 +1939,7 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
       startTyre: 'HARD',
       pit1Lap: 99,
     },
-    rivals: [
-      GRID_DRIVERS[2], // VER
-      GRID_DRIVERS[4], // NOR
-      GRID_DRIVERS[8], // RUS
-      GRID_DRIVERS[0], // TSU
-    ],
+    rivals: GRID_DRIVERS.filter(d => d.code !== 'LEC' && d.code !== 'HAM'),
     startWeather: 'dry',
     weatherForecast: {
       radarDesc: 'アルデンヌの森に低気圧停滞。SC出動確率極めて高い(90%)。',
@@ -1830,7 +1960,7 @@ export function generateSprintRaceScenario(circuitId: string, playerCode: string
   const circuit = SIM_CIRCUITS.find((c) => c.id === circuitId) || SIM_CIRCUITS[2];
   const playerBase = GRID_DRIVERS.find((d) => d.code === playerCode) || GRID_DRIVERS[0];
   const tmBase = GRID_DRIVERS.find((d) => d.team === playerBase.team && d.code !== playerBase.code) || GRID_DRIVERS[1];
-  const otherDrivers = GRID_DRIVERS.filter((d) => d.code !== playerBase.code && d.code !== tmBase.code).slice(0, 5);
+  const otherDrivers = GRID_DRIVERS.filter((d) => d.code !== playerBase.code && d.code !== tmBase.code);
 
   return {
     id: `sprint_${circuit.id}_${playerBase.code}`,
@@ -1869,9 +1999,9 @@ export function generateSprintRaceScenario(circuitId: string, playerCode: string
 // Procedural random scenario generator
 export function generateProceduralScenario(): ChallengeScenario {
   const randCircuit = SIM_CIRCUITS[Math.floor(Math.random() * SIM_CIRCUITS.length)];
-  const randPlayer = GRID_DRIVERS[Math.floor(Math.random() * 6)];
+  const randPlayer = GRID_DRIVERS[Math.floor(Math.random() * GRID_DRIVERS.length)];
   const randTeammate = GRID_DRIVERS.find((d) => d.team === randPlayer.team && d.code !== randPlayer.code) || GRID_DRIVERS[1];
-  const randRivals = GRID_DRIVERS.filter((d) => d.code !== randPlayer.code && d.code !== randTeammate.code).slice(0, 4);
+  const randRivals = GRID_DRIVERS.filter((d) => d.code !== randPlayer.code && d.code !== randTeammate.code);
 
   const hasRain = Math.random() > 0.45;
   const laps = Math.floor(Math.random() * 4) + 6; // 6 to 9 laps
