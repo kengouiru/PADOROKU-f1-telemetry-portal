@@ -47,7 +47,24 @@ import {
   Compass,
   BookOpen,
   AlertCircle,
+  Award,
+  Medal,
+  Lock,
+  Unlock,
+  ExternalLink,
 } from 'lucide-react';
+import {
+  STRATEGIST_ARCHETYPES,
+  F1_BADGES_CATALOG,
+  FIA_LICENSES,
+  diagnoseStrategistProfile,
+  loadStrategistCareer,
+  saveStrategistCareer,
+  type DiagnosticResult,
+  type SavedCareerData,
+  type F1Badge,
+  type BadgeCategory,
+} from '@/lib/raceDebriefAnalysis';
 import {
   SIM_CIRCUITS,
   GRID_DRIVERS,
@@ -147,6 +164,14 @@ export default function RaceSimulatorHub({
   const [selectedIntelTerm, setSelectedIntelTerm] = useState<GlossaryTerm | null>(null);
   const [geminiDebrief, setGeminiDebrief] = useState<string | null>(null);
   const [loadingGeminiDebrief, setLoadingGeminiDebrief] = useState<boolean>(false);
+
+  // Phase 1 Debrief: Personality Archetype & Badges State
+  const [diagnosticResult, setDiagnosticResult] = useState<DiagnosticResult | null>(null);
+  const [debriefTab, setDebriefTab] = useState<'score' | 'archetype' | 'badges' | 'knowledge'>('score');
+  const [careerData, setCareerData] = useState<SavedCareerData>(() => loadStrategistCareer());
+  const [isCareerModalOpen, setIsCareerModalOpen] = useState<boolean>(false);
+  const [selectedBadgeForDetail, setSelectedBadgeForDetail] = useState<F1Badge | null>(null);
+  const [badgeCategoryFilter, setBadgeCategoryFilter] = useState<'all' | BadgeCategory>('all');
 
   // Compute effective player config based on pre-race strategy selection
   const effectivePlayerConfig = useMemo<DriverSimConfig>(() => {
@@ -354,20 +379,47 @@ export default function RaceSimulatorHub({
     }
   }, [challengePlaying, activeScenario.totalLaps, currentIntervalMs]);
 
-  // Evaluate score when race completes
+  // Evaluate score and diagnose strategist archetype & badges when race completes
   useEffect(() => {
     if (challengeLap >= activeScenario.totalLaps && challengeSnapshots.length > 0) {
-      const score = evaluateTacticalScore(
-        challengeSnapshots,
-        activeScenario,
-        playerTacticalCommands,
-        radioResponses
-      );
-      setTacticalScore(score);
+      if (!tacticalScore) {
+        const score = evaluateTacticalScore(
+          challengeSnapshots,
+          activeScenario,
+          playerTacticalCommands,
+          radioResponses
+        );
+        setTacticalScore(score);
+
+        const currentCareer = loadStrategistCareer();
+        const diagnostic = diagnoseStrategistProfile(
+          challengeSnapshots,
+          activeScenario,
+          playerTacticalCommands,
+          radioResponses,
+          score,
+          currentCareer.unlockedBadgeIds
+        );
+        setDiagnosticResult(diagnostic);
+
+        const playerCar = challengeSnapshots[challengeSnapshots.length - 1]?.cars.find(
+          (c) => c.code === activeScenario.playerConfig.code
+        );
+        const isWin = playerCar?.position === 1;
+        const updatedCareer = saveStrategistCareer(
+          diagnostic.totalCpEarnedThisRace,
+          diagnostic.unlockedBadgesThisRace.map((b) => b.id),
+          score.totalScore,
+          isWin,
+          diagnostic.archetype.id
+        );
+        setCareerData(updatedCareer);
+      }
     } else {
       setTacticalScore(null);
+      setDiagnosticResult(null);
     }
-  }, [challengeLap, activeScenario, challengeSnapshots, playerTacticalCommands, radioResponses]);
+  }, [challengeLap, activeScenario, challengeSnapshots, playerTacticalCommands, radioResponses, tacticalScore]);
 
   // Handle player commands
   const handleToggleBoxNextLap = () => {
@@ -493,6 +545,8 @@ export default function RaceSimulatorHub({
     setErsBoostUsedThisLap(false);
     setActiveTeamOrder('none');
     setTacticalScore(null);
+    setDiagnosticResult(null);
+    setDebriefTab('score');
     setGeminiDebrief(null);
     setAutoPauseAlert(null);
     setCustomStartingTyre(null);
@@ -512,12 +566,14 @@ export default function RaceSimulatorHub({
 プレイヤーが担当した ${activeScenario.title} のレース結果をプロの視点で徹底総括してください。
 - 最終結果: P${playerCar?.position} (目標 P${activeScenario.targetPosition})
 - 総合採点: ${tacticalScore.totalScore}点 / 100点 (Rank: ${tacticalScore.rank})
-- ピット窓口: ${tacticalScore.pitTimingScore}/25点
+- 判定された司令官タイプ: ${diagnosticResult?.archetype.name || 'ロス・ブラウン型'} (${diagnosticResult?.archetype.catchphrase || ''})
+- ピット窓口適正度: ${tacticalScore.pitTimingScore}/25点
 - トラフィック管理: ${tacticalScore.trafficScore}/25点
 - タイヤ熱管理: ${tacticalScore.tyreEnergyScore}/25点
-- チームワーク: ${tacticalScore.chaosTeamScore}/25点
+- チームワーク＆突発対応: ${tacticalScore.chaosTeamScore}/25点
+${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号: ${diagnosticResult.unlockedBadgesThisRace.map(b => b.name).join(', ')}` : ''}
 
-具体的な周回と判断を挙げながら、なぜ勝てたのか／何秒どこで損したのか（アンダーカット、ダーティエア、ダブルスタック、タイヤクリフ等）を熱く分かりやすく論評してください。`;
+司令官タイプの特徴（長所・短所）にも触れつつ、具体的な周回と判断を挙げながら、どこでタイムを得した／損したのか（アンダーカット、ダーティエア、ダブルスタック、タイヤクリフ等）を熱く分かりやすく論評してください。`;
 
       const res = await fetch('/api/strategist', {
         method: 'POST',
@@ -591,6 +647,22 @@ export default function RaceSimulatorHub({
 
         {/* Top Controls: Sound Toggle & SubHub switcher */}
         <div className="flex items-center gap-2">
+          {/* FIA Career & Badges Museum Button */}
+          <button
+            type="button"
+            onClick={() => setIsCareerModalOpen(true)}
+            className="btn-console flex items-center gap-1.5 text-xs px-3 py-1.5 bg-gradient-to-r from-amber-950/50 via-slate-900 to-red-950/40 border-amber-500/40 text-amber-300 hover:text-white hover:border-amber-400 transition-all shadow-sm group"
+            title="FIAライセンス等級・累積CP・全30+称号カタログを開く"
+          >
+            <Award className="w-3.5 h-3.5 text-yellow-400 group-hover:scale-110 transition-transform" />
+            <span className="font-racing text-[11px] font-bold">
+              {careerData.grade === 'S' ? '👑 SUPER S' : `GRADE ${careerData.grade}`}
+            </span>
+            <span className="hidden md:inline px-1 py-0.2 rounded bg-amber-950/80 border border-amber-500/30 text-[9px] font-mono text-amber-200">
+              {careerData.unlockedBadgeIds.length}/{F1_BADGES_CATALOG.length}称号
+            </span>
+          </button>
+
           {/* Auto Pause Toggle Button */}
           <button
             type="button"
@@ -1941,174 +2013,712 @@ export default function RaceSimulatorHub({
             </div>
           </div>
 
-          {/* ── RESULT & 100-POINT TACTICAL SCORECARD MODAL ── */}
+          {/* ── RESULT & FULL F1 DEBRIEF CONSOLE (SCORE + ARCHETYPE + BADGES + LIBRARY) ── */}
           {tacticalScore && (
-            <div className="p-5 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-red-950/40 border-2 border-red-500/60 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-400">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+            <div className="p-5 rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-red-950/50 border-2 border-red-500/60 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-400">
+              
+              {/* 1. Header Banner: Mission Result & FIA Rank */}
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-4 border-b border-white/10">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-red-600 to-rose-700 flex items-center justify-center shadow-lg">
-                    <Trophy className="w-6 h-6 text-yellow-300" />
+                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-red-600 via-rose-600 to-amber-600 flex items-center justify-center shadow-xl shadow-red-950/60 border border-red-400/40 shrink-0">
+                    <Trophy className="w-7 h-7 text-yellow-300 animate-bounce" />
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-racing font-bold text-white text-lg sm:text-xl">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-racing font-black text-white text-lg sm:text-2xl tracking-wider">
                         {playerCar && playerCar.position <= activeScenario.targetPosition
                           ? '🏆 MISSION ACCOMPLISHED'
                           : '⚠️ MISSION FAILED'}
                       </span>
-                      <span className="px-2.5 py-0.5 rounded-full bg-red-600 font-racing font-black text-white text-xs">
+                      <span className="px-3 py-0.5 rounded-full bg-red-600 font-racing font-black text-white text-xs tracking-widest shadow-md">
                         RANK {tacticalScore.rank}
                       </span>
+                      {diagnosticResult && (
+                        <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[11px] font-racing font-bold flex items-center gap-1">
+                          <span>{diagnosticResult.archetype.icon}</span>
+                          <span>{diagnosticResult.archetype.name.split('】')[1] || diagnosticResult.archetype.name}</span>
+                        </span>
+                      )}
                     </div>
-                    <p className="text-xs text-slate-300 mt-0.5">
-                      最終順位 P{playerCar?.position} (目標 P{activeScenario.targetPosition}) • 総合得点: {tacticalScore.totalScore}/100点
+                    <p className="text-xs text-slate-300 mt-1 flex flex-wrap items-center gap-2">
+                      <span>
+                        最終順位: <strong className="text-white font-racing text-sm font-bold">P{playerCar?.position}</strong> (目標 P{activeScenario.targetPosition})
+                      </span>
+                      <span>•</span>
+                      <span>
+                        総合得点: <strong className="text-red-400 font-racing text-sm font-bold">{tacticalScore.totalScore}点</strong> / 100
+                      </span>
+                      <span>•</span>
+                      <span className="text-amber-300 font-mono">
+                        +{diagnosticResult?.totalCpEarnedThisRace || 100} CP 獲得
+                      </span>
                     </p>
                   </div>
                 </div>
 
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={requestGeminiDebrief}
+                    disabled={loadingGeminiDebrief}
+                    className="btn-console-primary px-4 py-2 text-xs flex items-center gap-2 shadow-lg"
+                  >
+                    <Sparkles className="w-4 h-4 text-yellow-300" />
+                    {loadingGeminiDebrief ? 'AI軍師が総括作成中...' : '🤖 AI軍師の総括解説'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resetGameState}
+                    className="btn-console px-3 py-2 text-xs text-slate-300 hover:text-white"
+                    title="レースをリセットして再挑戦"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* 2. New Badges Alert Banner (if any newly unlocked this race) */}
+              {diagnosticResult && diagnosticResult.unlockedBadgesThisRace.length > 0 && (
+                <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-950/80 via-red-950/80 to-slate-900 border-2 border-amber-500/60 shadow-lg shadow-amber-950/50 animate-pulse flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-2xl">🎉</span>
+                    <div>
+                      <div className="text-xs font-racing font-bold text-amber-300 tracking-wider">
+                        NEW TITLES UNLOCKED! (新規称号 {diagnosticResult.unlockedBadgesThisRace.length}件 獲得)
+                      </div>
+                      <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                        {diagnosticResult.unlockedBadgesThisRace.map((badge) => (
+                          <span
+                            key={badge.id}
+                            onClick={() => {
+                              setSelectedBadgeForDetail(badge);
+                              setDebriefTab('badges');
+                            }}
+                            className="px-2 py-0.5 rounded-lg bg-black/60 border border-amber-400/40 text-[11px] font-racing font-bold text-amber-200 cursor-pointer hover:bg-amber-950 transition-colors"
+                          >
+                            {badge.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setDebriefTab('badges')}
+                    className="px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-racing font-black text-xs hover:bg-amber-400 transition-colors shrink-0 cursor-pointer"
+                  >
+                    称号コレクションを見る ➔
+                  </button>
+                </div>
+              )}
+
+              {/* 3. Debrief Navigation Tabs */}
+              <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/90 border border-white/10 overflow-x-auto text-xs font-racing">
                 <button
                   type="button"
-                  onClick={requestGeminiDebrief}
-                  disabled={loadingGeminiDebrief}
-                  className="btn-console-primary px-4 py-2 text-xs flex items-center gap-2"
+                  onClick={() => setDebriefTab('score')}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg font-bold whitespace-nowrap transition-all ${
+                    debriefTab === 'score'
+                      ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
                 >
-                  <Sparkles className="w-4 h-4 text-yellow-300" />
-                  {loadingGeminiDebrief ? 'AI軍師が総括作成中...' : '🤖 AI軍師の総括解説を聞く'}
+                  <Target className="w-3.5 h-3.5" />
+                  <span>🎯 総合採点 ＆ 勝敗分岐</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setDebriefTab('archetype')}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg font-bold whitespace-nowrap transition-all ${
+                    debriefTab === 'archetype'
+                      ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <span>🧠 司令官性格診断</span>
+                  {diagnosticResult && (
+                    <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[10px]">
+                      {diagnosticResult.archetype.icon}
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setDebriefTab('badges')}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg font-bold whitespace-nowrap transition-all ${
+                    debriefTab === 'badges'
+                      ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Award className="w-3.5 h-3.5" />
+                  <span>🎖️ 称号 ＆ 絶望バッジ</span>
+                  <span className="px-1.5 py-0.2 rounded bg-white/10 text-[10px] font-mono">
+                    {careerData.unlockedBadgeIds.length}/{F1_BADGES_CATALOG.length}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setDebriefTab('knowledge')}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg font-bold whitespace-nowrap transition-all ${
+                    debriefTab === 'knowledge'
+                      ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>📚 大百科スマート学習</span>
                 </button>
               </div>
 
-              {/* 4-Axis Tactical Breakdown Bars */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <div className="p-3 rounded-xl bg-slate-900 border border-white/10">
-                  <div className="flex justify-between text-xs text-slate-300">
-                    <span>ピット窓口適正度</span>
-                    <span className="font-racing font-bold text-red-400">
-                      {tacticalScore.pitTimingScore} / 25
-                    </span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden mt-2">
-                    <div
-                      className="h-full bg-red-500"
-                      style={{ width: `${(tacticalScore.pitTimingScore / 25) * 100}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-900 border border-white/10">
-                  <div className="flex justify-between text-xs text-slate-300">
-                    <span>トラフィック回避度</span>
-                    <span className="font-racing font-bold text-amber-400">
-                      {tacticalScore.trafficScore} / 25
-                    </span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden mt-2">
-                    <div
-                      className="h-full bg-amber-500"
-                      style={{ width: `${(tacticalScore.trafficScore / 25) * 100}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-900 border border-white/10">
-                  <div className="flex justify-between text-xs text-slate-300">
-                    <span>タイヤ・熱管理</span>
-                    <span className="font-racing font-bold text-emerald-400">
-                      {tacticalScore.tyreEnergyScore} / 25
-                    </span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden mt-2">
-                    <div
-                      className="h-full bg-emerald-500"
-                      style={{ width: `${(tacticalScore.tyreEnergyScore / 25) * 100}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-900 border border-white/10">
-                  <div className="flex justify-between text-xs text-slate-300">
-                    <span>突発適応・チームワーク</span>
-                    <span className="font-racing font-bold text-cyan-400">
-                      {tacticalScore.chaosTeamScore} / 25
-                    </span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden mt-2">
-                    <div
-                      className="h-full bg-cyan-500"
-                      style={{ width: `${(tacticalScore.chaosTeamScore / 25) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Key Decisions list */}
-              {tacticalScore.keyDecisions.length > 0 && (
-                <div className="space-y-2">
-                  <span className="font-racing font-bold text-xs text-white">
-                    🎯 勝敗を分けた主要な戦術判断
-                  </span>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {tacticalScore.keyDecisions.map((dec, i) => (
-                      <div
-                        key={i}
-                        className={`p-3 rounded-xl border text-xs space-y-1 ${
-                          dec.verdict === 'optimal'
-                            ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200'
-                            : 'bg-red-950/40 border-red-500/40 text-red-200'
-                        }`}
-                      >
-                        <div className="flex justify-between items-center font-racing font-bold">
-                          <span>
-                            LAP {dec.lap}: {dec.title}
-                          </span>
-                          <span
-                            className={
-                              dec.impactSeconds > 0 ? 'text-emerald-400' : 'text-red-400'
-                            }
-                          >
-                            {dec.impactSeconds > 0 ? '+' : ''}
-                            {dec.impactSeconds}s
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-300 leading-relaxed">
-                          {dec.description}
-                        </p>
+              {/* ── TAB 1: 総合採点 ＆ 勝敗分岐 (Score & Key Decisions) ── */}
+              {debriefTab === 'score' && (
+                <div className="space-y-4">
+                  {/* 4-Axis Tactical Breakdown Bars */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-white/10 shadow-sm">
+                      <div className="flex justify-between text-xs text-slate-300">
+                        <span>ピット窓口適正度</span>
+                        <span className="font-racing font-bold text-red-400">
+                          {tacticalScore.pitTimingScore} / 25
+                        </span>
                       </div>
+                      <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden mt-2.5">
+                        <div
+                          className="h-full bg-gradient-to-r from-red-600 to-rose-500 transition-all duration-500"
+                          style={{ width: `${(tacticalScore.pitTimingScore / 25) * 100}%` }}
+                        />
+                      </div>
+                      <div className="text-[10px] text-slate-400 mt-1.5 font-mono">アンダーカット・SCチープピット活用</div>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-white/10 shadow-sm">
+                      <div className="flex justify-between text-xs text-slate-300">
+                        <span>トラフィック回避度</span>
+                        <span className="font-racing font-bold text-amber-400">
+                          {tacticalScore.trafficScore} / 25
+                        </span>
+                      </div>
+                      <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden mt-2.5">
+                        <div
+                          className="h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-500"
+                          style={{ width: `${(tacticalScore.trafficScore / 25) * 100}%` }}
+                        />
+                      </div>
+                      <div className="text-[10px] text-slate-400 mt-1.5 font-mono">クリーンエア合流窓の確保</div>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-white/10 shadow-sm">
+                      <div className="flex justify-between text-xs text-slate-300">
+                        <span>タイヤ・熱管理</span>
+                        <span className="font-racing font-bold text-emerald-400">
+                          {tacticalScore.tyreEnergyScore} / 25
+                        </span>
+                      </div>
+                      <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden mt-2.5">
+                        <div
+                          className="h-full bg-gradient-to-r from-emerald-500 to-green-400 transition-all duration-500"
+                          style={{ width: `${(tacticalScore.tyreEnergyScore / 25) * 100}%` }}
+                        />
+                      </div>
+                      <div className="text-[10px] text-slate-400 mt-1.5 font-mono">表層・内部コア二層熱制御</div>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-white/10 shadow-sm">
+                      <div className="flex justify-between text-xs text-slate-300">
+                        <span>突発適応・チームワーク</span>
+                        <span className="font-racing font-bold text-cyan-400">
+                          {tacticalScore.chaosTeamScore} / 25
+                        </span>
+                      </div>
+                      <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden mt-2.5">
+                        <div
+                          className="h-full bg-gradient-to-r from-cyan-500 to-blue-400 transition-all duration-500"
+                          style={{ width: `${(tacticalScore.chaosTeamScore / 25) * 100}%` }}
+                        />
+                      </div>
+                      <div className="text-[10px] text-slate-400 mt-1.5 font-mono">無線対応・ダブルスタック回避</div>
+                    </div>
+                  </div>
+
+                  {/* Key Decisions Delta list */}
+                  {tacticalScore.keyDecisions.length > 0 && (
+                    <div className="space-y-2">
+                      <span className="font-racing font-bold text-xs text-white flex items-center gap-2">
+                        <span>🎯 勝敗を分けた主要な戦術判断（タイム損得 Delta）</span>
+                      </span>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                        {tacticalScore.keyDecisions.map((dec, i) => (
+                          <div
+                            key={i}
+                            className={`p-3.5 rounded-2xl border text-xs space-y-1.5 transition-all ${
+                              dec.verdict === 'optimal'
+                                ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-200'
+                                : 'bg-red-950/40 border-red-500/40 text-red-200'
+                            }`}
+                          >
+                            <div className="flex justify-between items-center font-racing font-bold">
+                              <span className="flex items-center gap-1.5">
+                                <span>{dec.verdict === 'optimal' ? '✅' : '⚠️'}</span>
+                                <span>LAP {dec.lap}: {dec.title}</span>
+                              </span>
+                              <span
+                                className={`font-mono font-black text-sm ${
+                                  dec.impactSeconds > 0 ? 'text-emerald-400' : 'text-red-400'
+                                }`}
+                              >
+                                {dec.impactSeconds > 0 ? '+' : ''}
+                                {dec.impactSeconds}s
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-300 leading-relaxed font-sans">
+                              {dec.description}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Gemini AI Debrief Display */}
+                  {geminiDebrief && (
+                    <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 text-xs leading-relaxed space-y-2 text-slate-200 shadow-inner">
+                      <div className="flex items-center gap-2 font-racing font-bold text-red-400">
+                        <Sparkles className="w-4 h-4 text-yellow-400" /> チーフストラテジストの総括レポート
+                      </div>
+                      <div className="whitespace-pre-wrap font-mono text-[11px] leading-relaxed">
+                        {geminiDebrief}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ── TAB 2: 司令官性格診断 (F1 Archetype Profile) ── */}
+              {debriefTab === 'archetype' && diagnosticResult && (
+                <div className="space-y-4 animate-in fade-in duration-300">
+                  {/* Archetype Main Card */}
+                  <div className="glass-card-premium p-5 rounded-3xl border border-white/15 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 shadow-xl space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${diagnosticResult.archetype.badgeColor} flex items-center justify-center text-3xl shadow-lg border border-white/20`}>
+                          {diagnosticResult.archetype.icon}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-racing font-black text-white text-lg sm:text-xl">
+                              {diagnosticResult.archetype.name}
+                            </span>
+                          </div>
+                          <div className="text-xs text-slate-400 font-mono">
+                            {diagnosticResult.archetype.englishTitle}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-slate-900/80 border border-white/10 text-right">
+                        <div className="text-[10px] text-slate-400 font-mono">現在のライセンス格付け</div>
+                        <div className="font-racing font-bold text-amber-300 text-xs mt-0.5">
+                          {diagnosticResult.license.badge}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Catchphrase & Historical Lore */}
+                    <div className="p-3.5 rounded-2xl bg-black/40 border border-amber-500/20 text-xs space-y-1.5">
+                      <div className="text-amber-300 font-racing font-bold text-sm italic">
+                        {diagnosticResult.archetype.catchphrase}
+                      </div>
+                      <div className="text-[11px] text-slate-400">
+                        {diagnosticResult.archetype.historicalContext}
+                      </div>
+                    </div>
+
+                    {/* 5-Axis Radar Diagnostic Bars */}
+                    <div className="space-y-2.5 pt-2">
+                      <div className="text-xs font-racing font-bold text-slate-300">
+                        📊 司令官レーダー特性（あなたの5大戦術パラメーター）
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                        {/* 1. 決断速度 */}
+                        <div className="p-3 rounded-xl bg-slate-900 border border-white/10 space-y-1.5">
+                          <div className="flex justify-between font-racing">
+                            <span className="text-slate-300">⚡ 決断速度 (Decision Speed)</span>
+                            <span className="font-bold text-amber-400">{diagnosticResult.radar.decisionSpeed}%</span>
+                          </div>
+                          <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div className="h-full bg-amber-500 transition-all duration-700" style={{ width: `${diagnosticResult.radar.decisionSpeed}%` }} />
+                          </div>
+                        </div>
+
+                        {/* 2. リスク選好度 */}
+                        <div className="p-3 rounded-xl bg-slate-900 border border-white/10 space-y-1.5">
+                          <div className="flex justify-between font-racing">
+                            <span className="text-slate-300">🎲 ギャンブル性 (Risk Appetite)</span>
+                            <span className="font-bold text-rose-400">{diagnosticResult.radar.riskAppetite}%</span>
+                          </div>
+                          <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div className="h-full bg-rose-500 transition-all duration-700" style={{ width: `${diagnosticResult.radar.riskAppetite}%` }} />
+                          </div>
+                        </div>
+
+                        {/* 3. データ忠実度 */}
+                        <div className="p-3 rounded-xl bg-slate-900 border border-white/10 space-y-1.5">
+                          <div className="flex justify-between font-racing">
+                            <span className="text-slate-300">📐 データ忠実度 (Data Adherence)</span>
+                            <span className="font-bold text-cyan-400">{diagnosticResult.radar.dataAdherence}%</span>
+                          </div>
+                          <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div className="h-full bg-cyan-500 transition-all duration-700" style={{ width: `${diagnosticResult.radar.dataAdherence}%` }} />
+                          </div>
+                        </div>
+
+                        {/* 4. ドライバー共感 */}
+                        <div className="p-3 rounded-xl bg-slate-900 border border-white/10 space-y-1.5">
+                          <div className="flex justify-between font-racing">
+                            <span className="text-slate-300">🎙️ ドライバー信頼 (Driver Empathy)</span>
+                            <span className="font-bold text-emerald-400">{diagnosticResult.radar.driverEmpathy}%</span>
+                          </div>
+                          <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div className="h-full bg-emerald-500 transition-all duration-700" style={{ width: `${diagnosticResult.radar.driverEmpathy}%` }} />
+                          </div>
+                        </div>
+
+                        {/* 5. 盤面支配力 */}
+                        <div className="p-3 rounded-xl bg-slate-900 border border-white/10 space-y-1.5 sm:col-span-2">
+                          <div className="flex justify-between font-racing">
+                            <span className="text-slate-300">♟️ 盤面支配力 (Board Control & DRS Train)</span>
+                            <span className="font-bold text-purple-400">{diagnosticResult.radar.boardControl}%</span>
+                          </div>
+                          <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div className="h-full bg-purple-500 transition-all duration-700" style={{ width: `${diagnosticResult.radar.boardControl}%` }} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Strengths & Weaknesses */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                      <div className="p-3 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 space-y-1.5 text-xs">
+                        <div className="font-racing font-bold text-emerald-300 flex items-center gap-1.5">
+                          <span>💪</span> 司令官としての最大の強み
+                        </div>
+                        <ul className="space-y-1 text-slate-300 text-[11px] list-disc list-inside">
+                          {diagnosticResult.archetype.strengths.map((str, idx) => (
+                            <li key={idx}>{str}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="p-3 rounded-2xl bg-red-950/30 border border-red-500/30 space-y-1.5 text-xs">
+                        <div className="font-racing font-bold text-red-300 flex items-center gap-1.5">
+                          <span>⚠️</span> 気をつけるべき落とし穴
+                        </div>
+                        <ul className="space-y-1 text-slate-300 text-[11px] list-disc list-inside">
+                          {diagnosticResult.archetype.weaknesses.map((wk, idx) => (
+                            <li key={idx}>{wk}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* Mentor Tactical Advice */}
+                    <div className="p-3.5 rounded-2xl bg-slate-900 border border-white/10 text-xs space-y-1">
+                      <div className="font-racing font-bold text-white flex items-center gap-1.5">
+                        <span>💡</span> 次戦へのアドバイス
+                      </div>
+                      <p className="text-slate-300 text-[11px] leading-relaxed">
+                        {diagnosticResult.archetype.tacticalAdvice}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── TAB 3: 称号 ＆ 絶望バッジ (Titles & Badges Collection) ── */}
+              {debriefTab === 'badges' && (
+                <div className="space-y-3.5 animate-in fade-in duration-300">
+                  {/* Category filter buttons */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
+                    <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                      {[
+                        { key: 'all', label: `すべて (${F1_BADGES_CATALOG.length})` },
+                        { key: 'masterstroke', label: '🏆 神采配' },
+                        { key: 'quote_meme', label: '📻 名言・無線' },
+                        { key: 'despair_trauma', label: '💀 絶望トラウマ' },
+                      ].map((tab) => (
+                        <button
+                          key={tab.key}
+                          type="button"
+                          onClick={() => setBadgeCategoryFilter(tab.key as any)}
+                          className={`px-3 py-1.5 rounded-xl font-racing font-bold text-xs transition-all cursor-pointer ${
+                            badgeCategoryFilter === tab.key
+                              ? 'bg-red-600 text-white shadow-md'
+                              : 'bg-slate-900 hover:bg-slate-800 text-slate-400 border border-white/10'
+                          }`}
+                        >
+                          {tab.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="text-xs font-mono text-slate-400">
+                      解放済み: <strong className="text-amber-300 font-bold">{careerData.unlockedBadgeIds.length}</strong> / {F1_BADGES_CATALOG.length}
+                    </div>
+                  </div>
+
+                  {/* Badges Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
+                    {F1_BADGES_CATALOG
+                      .filter((b) => badgeCategoryFilter === 'all' || b.category === badgeCategoryFilter)
+                      .map((badge) => {
+                        const isUnlocked = careerData.unlockedBadgeIds.includes(badge.id);
+                        const isNewlyUnlocked = diagnosticResult?.unlockedBadgesThisRace.some((b) => b.id === badge.id);
+
+                        return (
+                          <div
+                            key={badge.id}
+                            onClick={() => setSelectedBadgeForDetail(badge)}
+                            className={`p-3 rounded-2xl border text-xs flex flex-col justify-between transition-all cursor-pointer select-none group ${
+                              isUnlocked
+                                ? `${badge.rarityColor} hover:brightness-125 shadow-md`
+                                : 'bg-slate-950/70 border-white/5 text-slate-600 opacity-60 hover:opacity-80'
+                            } ${isNewlyUnlocked ? 'ring-2 ring-amber-400 animate-pulse' : ''}`}
+                          >
+                            <div>
+                              <div className="flex items-center justify-between pb-1.5">
+                                <span className="text-xl">{badge.icon}</span>
+                                <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded ${
+                                  isUnlocked ? 'bg-black/50 text-white font-bold' : 'bg-slate-900 text-slate-500'
+                                }`}>
+                                  {badge.rarity}
+                                </span>
+                              </div>
+                              <div className={`font-racing font-bold text-xs mt-1 ${
+                                isUnlocked ? 'text-white' : 'text-slate-500'
+                              }`}>
+                                {badge.name}
+                              </div>
+                              <div className="text-[10px] text-slate-400 line-clamp-2 mt-1">
+                                {isUnlocked ? badge.historicalQuote : '🔒 ' + badge.unlockConditionText}
+                              </div>
+                            </div>
+
+                            <div className="pt-2 text-[9px] font-mono flex items-center justify-between text-slate-400 mt-2 border-t border-white/5">
+                              <span>{badge.categoryLabel}</span>
+                              <span className="text-amber-400/80 group-hover:text-amber-300">詳細 ➔</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
+
+              {/* ── TAB 4: 大百科スマート学習 (Pedagogical Links) ── */}
+              {debriefTab === 'knowledge' && (
+                <div className="space-y-3 animate-in fade-in duration-300">
+                  <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-white/10 text-xs leading-relaxed space-y-1.5">
+                    <span className="text-xs font-racing font-bold text-slate-200 flex items-center gap-1.5">
+                      <BookOpen className="w-4 h-4 text-red-400" />
+                      戦術理解を深めて次戦へ活かす — 関連F1大百科・工学解説:
+                    </span>
+                    <p className="text-slate-400 text-[11px]">
+                      今回のレース展開や失着・成功に関係する戦術理論です。タップするとF1大百科の解説ポップアップを開きます。
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    {tacticalScore.linkedKeywords.map((kw) => (
+                      <button
+                        key={kw}
+                        type="button"
+                        onClick={() => handleOpenIntel(kw)}
+                        className="p-3 rounded-2xl bg-red-950/40 hover:bg-red-900/60 border border-red-500/40 text-left transition-all cursor-pointer group shadow-sm flex items-center justify-between"
+                      >
+                        <div>
+                          <div className="font-racing font-bold text-white text-xs group-hover:text-red-300 flex items-center gap-1.5">
+                            <span>💡</span>
+                            <span>{kw.replace('-', ' ').toUpperCase()}</span>
+                          </div>
+                          <div className="text-[10px] text-slate-400 mt-0.5">
+                            F1大百科で理論・数式・実戦例を読む
+                          </div>
+                        </div>
+                        <ExternalLink className="w-3.5 h-3.5 text-red-400 opacity-60 group-hover:opacity-100" />
+                      </button>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Gemini AI Debrief Display */}
-              {geminiDebrief && (
-                <div className="p-4 rounded-xl bg-slate-900/90 border border-white/10 text-xs leading-relaxed space-y-2 text-slate-200">
-                  <div className="flex items-center gap-2 font-racing font-bold text-red-400">
-                    <Sparkles className="w-4 h-4 text-yellow-400" /> チーフストラテジストの総括レポート
-                  </div>
-                  <div className="whitespace-pre-wrap font-mono text-[11px] leading-relaxed">
-                    {geminiDebrief}
-                  </div>
-                </div>
-              )}
+            </div>
+          )}
 
-              {/* ── Interactive Tactical Badges (Pedagogical Links to Library) ── */}
-              <div className="pt-2 border-t border-white/10">
-                <span className="text-xs font-racing font-bold text-slate-300 flex items-center gap-1.5 mb-2">
-                  <BookOpen className="w-3.5 h-3.5 text-red-400" />
-                  疑問を今すぐ解決 — 関連するF1工学・戦略用語 (タップで軍師解説を開く):
-                </span>
-                <div className="flex flex-wrap items-center gap-1.5">
-                  {tacticalScore.linkedKeywords.map((kw) => (
-                    <button
-                      key={kw}
-                      type="button"
-                      onClick={() => handleOpenIntel(kw)}
-                      className="px-2.5 py-1 rounded-lg bg-red-950/50 hover:bg-red-900/60 border border-red-500/40 text-red-200 text-xs font-racing font-bold transition-all cursor-pointer flex items-center gap-1 active:scale-95"
-                    >
-                      <span>💡</span>
-                      <span>{kw.replace('-', ' ').toUpperCase()}</span>
-                    </button>
-                  ))}
+          {/* ── BADGE DETAIL MODAL ── */}
+          {selectedBadgeForDetail && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+              <div className="max-w-md w-full glass-card-premium p-5 rounded-3xl border-2 border-amber-500/60 shadow-2xl space-y-3.5">
+                <div className="flex justify-between items-start">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-slate-900 border border-white/20 flex items-center justify-center text-2xl shadow-md">
+                      {selectedBadgeForDetail.icon}
+                    </div>
+                    <div>
+                      <span className="px-2 py-0.5 rounded bg-amber-950 border border-amber-500/40 text-[10px] font-mono text-amber-300">
+                        {selectedBadgeForDetail.categoryLabel} • {selectedBadgeForDetail.rarity}
+                      </span>
+                      <h3 className="font-racing font-bold text-white text-base mt-1">
+                        {selectedBadgeForDetail.name}
+                      </h3>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedBadgeForDetail(null)}
+                    className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10"
+                  >
+                    <XCircle className="w-5 h-5" />
+                  </button>
                 </div>
+
+                {/* Quote Box */}
+                <div className="p-3 rounded-2xl bg-black/60 border border-amber-500/30 text-xs">
+                  <div className="text-amber-300 font-racing font-bold italic">
+                    {selectedBadgeForDetail.historicalQuote}
+                  </div>
+                </div>
+
+                {/* Lore Box */}
+                <div className="space-y-1 text-xs">
+                  <div className="font-racing font-bold text-slate-300">📖 歴史的背景・エピソード:</div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    {selectedBadgeForDetail.lore}
+                  </p>
+                </div>
+
+                {/* Unlock condition */}
+                <div className="p-3 rounded-2xl bg-slate-900 border border-white/10 space-y-1 text-xs">
+                  <div className="font-racing font-bold text-slate-400">🎯 アンロック獲得条件:</div>
+                  <p className="text-white text-[11px] font-mono">
+                    {selectedBadgeForDetail.unlockConditionText}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedBadgeForDetail(null)}
+                  className="btn-console w-full py-2 text-xs font-racing font-bold text-white text-center"
+                >
+                  閉じる
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ── CAREER & FIA LICENSE MODAL (Top Header Button) ── */}
+          {isCareerModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+              <div className="max-w-2xl w-full glass-card-premium p-6 rounded-3xl border-2 border-red-500/60 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+                <div className="flex justify-between items-start pb-3 border-b border-white/10">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-red-600 flex items-center justify-center text-2xl shadow-lg">
+                      🏆
+                    </div>
+                    <div>
+                      <div className="text-xs font-mono text-amber-300 font-bold">FIA STRATEGIST CAREER</div>
+                      <h3 className="font-racing font-bold text-white text-lg sm:text-xl">
+                        司令官ライセンス ＆ 獲得称号ミュージアム
+                      </h3>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsCareerModalOpen(false)}
+                    className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10"
+                  >
+                    <XCircle className="w-6 h-6" />
+                  </button>
+                </div>
+
+                {/* Career Stats Grid */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+                  <div className="p-3 rounded-2xl bg-slate-900 border border-white/10 text-center">
+                    <div className="text-slate-400 text-[10px] font-mono">ライセンス等級</div>
+                    <div className="font-racing font-bold text-amber-300 text-sm mt-0.5">
+                      GRADE {careerData.grade}
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-slate-900 border border-white/10 text-center">
+                    <div className="text-slate-400 text-[10px] font-mono">累積 Command Points</div>
+                    <div className="font-racing font-bold text-white text-sm mt-0.5">
+                      {careerData.totalCp} CP
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-slate-900 border border-white/10 text-center">
+                    <div className="text-slate-400 text-[10px] font-mono">総参戦レース / 勝利</div>
+                    <div className="font-racing font-bold text-emerald-400 text-sm mt-0.5">
+                      {careerData.totalRacesCompleted}戦 / {careerData.totalWins}勝
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-slate-900 border border-white/10 text-center">
+                    <div className="text-slate-400 text-[10px] font-mono">獲得称号</div>
+                    <div className="font-racing font-bold text-rose-400 text-sm mt-0.5">
+                      {careerData.unlockedBadgeIds.length} / {F1_BADGES_CATALOG.length}
+                    </div>
+                  </div>
+                </div>
+
+                {/* All Badges Museum list */}
+                <div className="space-y-2 pt-2">
+                  <div className="font-racing font-bold text-xs text-white flex justify-between items-center">
+                    <span>🎖️ 全称号コレクション ({careerData.unlockedBadgeIds.length}/{F1_BADGES_CATALOG.length})</span>
+                    <span className="text-[10px] text-slate-400 font-mono">タップで名言と歴史背景を表示</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1">
+                    {F1_BADGES_CATALOG.map((badge) => {
+                      const isUnlocked = careerData.unlockedBadgeIds.includes(badge.id);
+                      return (
+                        <div
+                          key={badge.id}
+                          onClick={() => setSelectedBadgeForDetail(badge)}
+                          className={`p-2.5 rounded-2xl border text-xs flex items-center justify-between cursor-pointer transition-all ${
+                            isUnlocked
+                              ? `${badge.rarityColor} hover:brightness-125`
+                              : 'bg-slate-950/60 border-white/5 text-slate-600 opacity-60'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className="text-xl">{badge.icon}</span>
+                            <div>
+                              <div className={`font-racing font-bold text-xs ${isUnlocked ? 'text-white' : 'text-slate-500'}`}>
+                                {badge.name}
+                              </div>
+                              <div className="text-[10px] text-slate-400 font-mono">
+                                {isUnlocked ? badge.historicalQuote.slice(0, 24) + '...' : '🔒 未獲得'}
+                              </div>
+                            </div>
+                          </div>
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-black/40 text-slate-300">
+                            {badge.rarity}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsCareerModalOpen(false)}
+                  className="btn-console w-full py-2.5 text-xs font-racing font-bold text-white text-center"
+                >
+                  閉じる
+                </button>
               </div>
             </div>
           )}
