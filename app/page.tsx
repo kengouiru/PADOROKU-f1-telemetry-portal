@@ -69,6 +69,7 @@ import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
 export type AppMode = 'season' | 'library';
 export type ActiveHub = 'season' | 'telemetry' | 'news' | 'knowledge' | 'notes';
+export type TelemetrySubTab = 'pace' | 'car_data' | 'strategy' | 'radio' | 'laptable';
 
 interface AppState {
   selectedYear: string;
@@ -186,6 +187,7 @@ export default function DashboardPage() {
   const [state, setState] = useState<AppState>(buildInitialState);
   const [appMode, setAppMode] = useState<AppMode>('season');
   const [activeHub, setActiveHub] = useState<ActiveHub>('season');
+  const [telemetrySubTab, setTelemetrySubTab] = useState<TelemetrySubTab>('pace');
   const [librarySubTab, setLibrarySubTab] = useState<SubTab>('drivers');
   const [quickGlossaryOpen, setQuickGlossaryOpen] = useState(false);
   const [quickGlossaryQuery, setQuickGlossaryQuery] = useState('');
@@ -296,26 +298,26 @@ export default function DashboardPage() {
       setAppMode('season');
       setActiveHub('telemetry');
       setMobileTab('telemetry');
+      setTelemetrySubTab('car_data');
       setDetailedTelemetryTab('delta_matrix');
-      setTimeout(() => {
-        document.getElementById('detailed-telemetry-section')?.scrollIntoView({ behavior: 'smooth' });
-      }, 150);
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (featureId === 'war_room') {
       setAppMode('season');
       setActiveHub('telemetry');
       setMobileTab('telemetry');
+      setTelemetrySubTab('strategy');
       setPitStrategyViewMode('war_room');
-      setTimeout(() => {
-        document.getElementById('pit-strategy-simulator-section')?.scrollIntoView({ behavior: 'smooth' });
-      }, 150);
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (featureId === 'virtual_gp') {
       setAppMode('season');
       setActiveHub('telemetry');
       setMobileTab('telemetry');
+      setTelemetrySubTab('strategy');
       setPitStrategyViewMode('virtual_gp');
-      setTimeout(() => {
-        document.getElementById('pit-strategy-simulator-section')?.scrollIntoView({ behavior: 'smooth' });
-      }, 150);
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (featureId === 'pitwall_pro') {
       setProModalOpen(true);
     } else if (featureId === 'fod_news') {
@@ -330,6 +332,7 @@ export default function DashboardPage() {
       setAppMode('season');
       setActiveHub('telemetry');
       setMobileTab('telemetry');
+      setTelemetrySubTab('pace');
       setDetailedTelemetryTab('charts');
       desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
       mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -337,30 +340,30 @@ export default function DashboardPage() {
       setAppMode('season');
       setActiveHub('telemetry');
       setMobileTab('telemetry');
-      setTimeout(() => {
-        document.getElementById('stint-visualizer-section')?.scrollIntoView({ behavior: 'smooth' });
-      }, 150);
+      setTelemetrySubTab('strategy');
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (featureId === 'position_changes') {
       setAppMode('season');
       setActiveHub('telemetry');
       setMobileTab('telemetry');
-      setTimeout(() => {
-        document.getElementById('position-change-section')?.scrollIntoView({ behavior: 'smooth' });
-      }, 150);
+      setTelemetrySubTab('pace');
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (featureId === 'sector_analysis') {
       setAppMode('season');
       setActiveHub('telemetry');
       setMobileTab('telemetry');
-      setTimeout(() => {
-        document.getElementById('sector-analysis-section')?.scrollIntoView({ behavior: 'smooth' });
-      }, 150);
+      setTelemetrySubTab('pace');
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (featureId === 'team_radios') {
       setAppMode('season');
       setActiveHub('telemetry');
       setMobileTab('telemetry');
-      setTimeout(() => {
-        document.getElementById('team-radio-section')?.scrollIntoView({ behavior: 'smooth' });
-      }, 150);
+      setTelemetrySubTab('radio');
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (featureId === 'fia_rules') {
       setAppMode('library');
       setLibrarySubTab('rules');
@@ -732,7 +735,10 @@ export default function DashboardPage() {
   }, [state.selectedSessionKey]);
 
   const handleLapClick = useCallback((driverNum: string, lapNumber: number) => {
-    timelineRef.current?.scrollToLap(driverNum, lapNumber);
+    setTelemetrySubTab('radio');
+    setTimeout(() => {
+      timelineRef.current?.scrollToLap(driverNum, lapNumber);
+    }, 200);
     // On mobile, switch to telemetry tab when lap is clicked
     if (mobileTab !== 'telemetry') setMobileTab('telemetry');
   }, [mobileTab]);
@@ -754,11 +760,11 @@ export default function DashboardPage() {
   const handleNavigateToTelemetry = useCallback((target?: TelemetryTarget) => {
     setActiveHub('telemetry');
     setMobileTab('telemetry');
+    setTelemetrySubTab('car_data');
 
     if (!target) {
-      setTimeout(() => {
-        document.getElementById('detailed-telemetry-section')?.scrollIntoView({ behavior: 'smooth' });
-      }, 150);
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
 
@@ -786,10 +792,8 @@ export default function DashboardPage() {
       }));
     }
 
-    // Scroll & focus to detailed telemetry section
-    setTimeout(() => {
-      document.getElementById('detailed-telemetry-section')?.scrollIntoView({ behavior: 'smooth' });
-    }, 200);
+    desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
 
     // Scroll & focus timeline / chart to target lap
     if (target.targetLap) {
@@ -840,14 +844,14 @@ export default function DashboardPage() {
         setAppMode('season');
         setActiveHub('telemetry');
         setMobileTab('telemetry');
+        setTelemetrySubTab('car_data');
         setDetailedTelemetryParams({
           circuitId,
           driver1: d1,
           driver2: d2,
         });
-        setTimeout(() => {
-          document.getElementById('detailed-telemetry-section')?.scrollIntoView({ behavior: 'smooth' });
-        }, 150);
+        desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+        mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
       }
       return;
     }
@@ -859,25 +863,28 @@ export default function DashboardPage() {
       setAppMode('season');
       setActiveHub('telemetry');
       setMobileTab('telemetry');
-      setTimeout(() => {
-        document.getElementById('stint-visualizer-section')?.scrollIntoView({ behavior: 'smooth' });
-      }, 150);
+      setTelemetrySubTab('strategy');
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (action.type === 'pit_sim') {
       setAppMode('season');
       setActiveHub('telemetry');
       setMobileTab('telemetry');
-      setTimeout(() => {
-        document.getElementById('pit-strategy-simulator-section')?.scrollIntoView({ behavior: 'smooth' });
-      }, 150);
+      setTelemetrySubTab('strategy');
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (action.type === 'radio') {
       setAppMode('season');
       setActiveHub('telemetry');
       setMobileTab('telemetry');
+      setTelemetrySubTab('radio');
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
       if (action.lapNumber) {
         const drv = state.selectedDrivers[0] ?? '1';
         setTimeout(() => {
           timelineRef.current?.scrollToLap(drv, action.lapNumber!);
-        }, 300);
+        }, 250);
       }
     } else if (action.type === 'library_tyres') {
       setAppMode('library');
@@ -1055,113 +1062,192 @@ export default function DashboardPage() {
         );
       })()}
 
-      <TelemetryChart
-        selectedDrivers={state.selectedDrivers}
-        lapsCache={state.lapsCache}
-        drivers={state.drivers}
-        stints={state.stints}
-        pitStopsCache={state.pitStopsCache}
-        teamRadioCache={state.teamRadioCache}
-        safetyCarPeriods={state.safetyCarPeriods}
-        onLapClick={handleLapClick}
-        transcriptsCache={state.transcriptsCache}
-        onTranscriptFetched={handleTranscriptFetched}
-      />
+      {/* ── WORKSPACE 1: PACE & POSITION (ラップタイム推移・累積ギャップ・周回順位・セクター分析) ── */}
+      {telemetrySubTab === 'pace' && (
+        <div className="space-y-6 animate-fade-in">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <span className="text-base">📈</span>
+              <h2 className="f1-card-title text-white">PACE & POSITION ANALYSIS</h2>
+              <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                ラップタイム推移・累積ギャップ・周回順位変動
+              </span>
+            </div>
+            <div className="text-[11px] font-mono text-slate-400">
+              ※グラフ上のラップ番号をクリックすると無線ログへジャンプ
+            </div>
+          </div>
 
-      {/* ── Lap-by-Lap Position Change Chart ── */}
-      <section id="position-change-section">
-        <PositionChangeChart
-          drivers={state.drivers}
-          stints={state.stints}
-          safetyCarPeriods={state.safetyCarPeriods}
-          totalLaps={currentBenchmark.totalLaps}
-          selectedDrivers={state.selectedDrivers}
-          onDriverSelect={(driverNum) =>
-            handleDriverToggle(driverNum, !state.selectedDrivers.includes(driverNum))
-          }
-        />
-      </section>
-
-      {/* 3-Tier Synchronized Detailed Telemetry (Car Data Comparison) */}
-      <section id="detailed-telemetry-section">
-        <DetailedTelemetryChart
-          initialCircuitId={detailedTelemetryParams.circuitId}
-          initialDriver1Code={detailedTelemetryParams.driver1}
-          initialDriver2Code={detailedTelemetryParams.driver2}
-          initialTab={detailedTelemetryTab}
-        />
-      </section>
-
-      {/* ── Full-Grid Tyre Stints & Strategy Timeline (Stint Visualizer) ── */}
-      <section id="stint-visualizer-section">
-        <StintVisualizer
-          drivers={state.drivers}
-          stints={state.stints}
-          pitStopsCache={state.pitStopsCache}
-          totalLaps={currentBenchmark.totalLaps}
-          isLive={!state.isDemoMode}
-          isLoading={state.isLoading}
-          selectedDrivers={state.selectedDrivers}
-          onDriverSelect={(driverNum) =>
-            handleDriverToggle(driverNum, !state.selectedDrivers.includes(driverNum))
-          }
-          onRefresh={() => {
-            if (state.selectedSessionKey) {
-              handleSessionChange(state.selectedSessionKey);
-            }
-          }}
-        />
-      </section>
-
-      {state.selectedDrivers.length > 0 && (
-        <section id="sector-analysis-section">
-          <SectorAnalysis
-            selectedDrivers={state.selectedDrivers}
-            drivers={state.drivers}
-            lapsCache={state.lapsCache}
-          />
-        </section>
-      )}
-
-      {state.selectedDrivers.length > 0 && (
-        <section id="pit-strategy-simulator-section">
-          <PitStrategySimulator
-            selectedDrivers={state.selectedDrivers}
-            drivers={state.drivers}
-            lapsCache={state.lapsCache}
-            stints={state.stints}
-            initialViewMode={pitStrategyViewMode}
-            onOpenUpgradeModal={() => setProModalOpen(true)}
-          />
-        </section>
-      )}
-
-      {state.selectedDrivers.length > 0 && (
-        <section>
-          <SectionTitle>LAP DETAIL TABLE</SectionTitle>
-          <LapTable
+          <TelemetryChart
             selectedDrivers={state.selectedDrivers}
             lapsCache={state.lapsCache}
             drivers={state.drivers}
             stints={state.stints}
+            pitStopsCache={state.pitStopsCache}
+            teamRadioCache={state.teamRadioCache}
+            safetyCarPeriods={state.safetyCarPeriods}
+            onLapClick={handleLapClick}
+            transcriptsCache={state.transcriptsCache}
+            onTranscriptFetched={handleTranscriptFetched}
           />
-        </section>
+
+          <section id="position-change-section">
+            <PositionChangeChart
+              drivers={state.drivers}
+              stints={state.stints}
+              safetyCarPeriods={state.safetyCarPeriods}
+              totalLaps={currentBenchmark.totalLaps}
+              selectedDrivers={state.selectedDrivers}
+              onDriverSelect={(driverNum) =>
+                handleDriverToggle(driverNum, !state.selectedDrivers.includes(driverNum))
+              }
+            />
+          </section>
+
+          {state.selectedDrivers.length > 0 && (
+            <section id="sector-analysis-section">
+              <SectorAnalysis
+                selectedDrivers={state.selectedDrivers}
+                drivers={state.drivers}
+                lapsCache={state.lapsCache}
+              />
+            </section>
+          )}
+        </div>
       )}
 
-      <section id="team-radio-section">
-        <TeamRadioTimeline
-          ref={timelineRef}
-          selectedDrivers={state.selectedDrivers}
-          teamRadioCache={state.teamRadioCache}
-          pitStopsCache={state.pitStopsCache}
-          raceControlMessages={state.raceControlMessages}
-          drivers={state.drivers}
-          lapsCache={state.lapsCache}
-          transcriptsCache={state.transcriptsCache}
-          onTranscriptFetched={handleTranscriptFetched}
-          onRequireAuth={() => handleRequireAuth('チーム無線 AI解析', 'チーム無線のリアルタイム文字起こしおよびAI戦術要約は認証メンバー専用機能です。')}
-        />
-      </section>
+      {/* ── WORKSPACE 2: COCKPIT CAR TELEMETRY (車速・スロットル・ブレーキ・ギア3連精密比較 ＆ コースマップ) ── */}
+      {telemetrySubTab === 'car_data' && (
+        <div className="space-y-4 animate-fade-in">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <span className="text-base">⚡</span>
+              <h2 className="f1-card-title text-white">COCKPIT CAR TELEMETRY</h2>
+              <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                車速・ペダル・ギア3連精密比較 ＆ コースマップ・デルタマトリクス
+              </span>
+            </div>
+          </div>
+
+          <section id="detailed-telemetry-section">
+            <DetailedTelemetryChart
+              initialCircuitId={detailedTelemetryParams.circuitId}
+              initialDriver1Code={detailedTelemetryParams.driver1}
+              initialDriver2Code={detailedTelemetryParams.driver2}
+              initialTab={detailedTelemetryTab}
+            />
+          </section>
+        </div>
+      )}
+
+      {/* ── WORKSPACE 3: TYRE STINTS & STRATEGY (全車タイヤ履歴・アンダーカット/オーバーカット戦略シミュレーション) ── */}
+      {telemetrySubTab === 'strategy' && (
+        <div className="space-y-6 animate-fade-in">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <span className="text-base">🛞</span>
+              <h2 className="f1-card-title text-white">TYRE STINTS & PIT STRATEGY</h2>
+              <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                全車タイヤ履歴 ＆ 戦略シミュレーション
+              </span>
+            </div>
+          </div>
+
+          <section id="stint-visualizer-section">
+            <StintVisualizer
+              drivers={state.drivers}
+              stints={state.stints}
+              pitStopsCache={state.pitStopsCache}
+              totalLaps={currentBenchmark.totalLaps}
+              isLive={!state.isDemoMode}
+              isLoading={state.isLoading}
+              selectedDrivers={state.selectedDrivers}
+              onDriverSelect={(driverNum) =>
+                handleDriverToggle(driverNum, !state.selectedDrivers.includes(driverNum))
+              }
+              onRefresh={() => {
+                if (state.selectedSessionKey) {
+                  handleSessionChange(state.selectedSessionKey);
+                }
+              }}
+            />
+          </section>
+
+          {state.selectedDrivers.length > 0 && (
+            <section id="pit-strategy-simulator-section">
+              <PitStrategySimulator
+                selectedDrivers={state.selectedDrivers}
+                drivers={state.drivers}
+                lapsCache={state.lapsCache}
+                stints={state.stints}
+                initialViewMode={pitStrategyViewMode}
+                onOpenUpgradeModal={() => setProModalOpen(true)}
+              />
+            </section>
+          )}
+        </div>
+      )}
+
+      {/* ── WORKSPACE 4: TEAM RADIO & RACE CONTROL (チーム無線音声・リアルタイムAI戦術翻訳 ＆ FIA審理速報) ── */}
+      {telemetrySubTab === 'radio' && (
+        <div className="space-y-4 animate-fade-in">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <span className="text-base">📻</span>
+              <h2 className="f1-card-title text-white">TEAM RADIO & RACE CONTROL</h2>
+              <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                無線音声・リアルタイムAI戦術翻訳 ＆ FIA審理速報
+              </span>
+            </div>
+          </div>
+
+          <section id="team-radio-section">
+            <TeamRadioTimeline
+              ref={timelineRef}
+              selectedDrivers={state.selectedDrivers}
+              teamRadioCache={state.teamRadioCache}
+              pitStopsCache={state.pitStopsCache}
+              raceControlMessages={state.raceControlMessages}
+              drivers={state.drivers}
+              lapsCache={state.lapsCache}
+              transcriptsCache={state.transcriptsCache}
+              onTranscriptFetched={handleTranscriptFetched}
+              onRequireAuth={() => handleRequireAuth('チーム無線 AI解析', 'チーム無線のリアルタイム文字起こしおよびAI戦術要約は認証メンバー専用機能です。')}
+            />
+          </section>
+        </div>
+      )}
+
+      {/* ── WORKSPACE 5: LAP-BY-LAP DATA SHEET (全周回ラップタイム・セクター別スプリット・ピット詳細データ) ── */}
+      {telemetrySubTab === 'laptable' && (
+        <div className="space-y-4 animate-fade-in">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <span className="text-base">📋</span>
+              <h2 className="f1-card-title text-white">LAP-BY-LAP DATA SHEET</h2>
+              <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+                全周回ラップタイム・セクター別スプリット・ピット詳細データ
+              </span>
+            </div>
+          </div>
+
+          {state.selectedDrivers.length > 0 ? (
+            <section>
+              <SectionTitle>LAP DETAIL TABLE</SectionTitle>
+              <LapTable
+                selectedDrivers={state.selectedDrivers}
+                lapsCache={state.lapsCache}
+                drivers={state.drivers}
+                stints={state.stints}
+              />
+            </section>
+          ) : (
+            <div className="glass-card p-8 text-center text-slate-400 font-mono text-sm">
+              左サイドバー（または上部メニュー）からドライバーを選択してください。
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 
@@ -1212,9 +1298,17 @@ export default function DashboardPage() {
             ? activeHub === 'season'
               ? '2026年レースカレンダー'
               : activeHub === 'telemetry'
-              ? detailedTelemetryTab === 'delta_matrix'
-                ? 'タイムデルタ(Δt)解析'
-                : 'テレメトリー＆Live'
+              ? telemetrySubTab === 'car_data'
+                ? detailedTelemetryTab === 'delta_matrix'
+                  ? 'コックピット・タイムデルタ(Δt)解析'
+                  : 'コックピット解析 (3連データ＆マップ)'
+                : telemetrySubTab === 'strategy'
+                ? 'タイヤ戦略・ピットシミュレーター'
+                : telemetrySubTab === 'radio'
+                ? 'チーム無線＆レースコントロール'
+                : telemetrySubTab === 'laptable'
+                ? '周回データシート'
+                : 'ペース・順位推移'
               : activeHub === 'news'
               ? 'ニュース＆パドック (FOD公式中継)'
               : 'レースノート＆AI'
@@ -1240,6 +1334,7 @@ export default function DashboardPage() {
             onNavigateToTelemetry={(gpName) => {
               setActiveHub('telemetry');
               setMobileTab('telemetry');
+              setTelemetrySubTab('car_data');
               if (gpName) {
                 let circId = 'bahrain-international';
                 if (gpName.includes('日本') || gpName.includes('鈴鹿')) circId = 'suzuka';
@@ -1271,9 +1366,8 @@ export default function DashboardPage() {
                   circuitId: circId,
                 }));
               }
-              setTimeout(() => {
-                document.getElementById('detailed-telemetry-section')?.scrollIntoView({ behavior: 'smooth' });
-              }, 150);
+              desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+              mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             onNavigateToTyres={() => {
               setAppMode('library');
@@ -1316,12 +1410,16 @@ export default function DashboardPage() {
               }
               if (action.circuitId) {
                 setDetailedTelemetryParams(prev => ({ ...prev, circuitId: action.circuitId! }));
+                setTelemetrySubTab('car_data');
               }
               if (action.section) {
-                setTimeout(() => {
-                  document.getElementById(action.section!)?.scrollIntoView({ behavior: 'smooth' });
-                }, 150);
+                if (action.section.includes('stint')) setTelemetrySubTab('strategy');
+                else if (action.section.includes('detailed')) setTelemetrySubTab('car_data');
+                else if (action.section.includes('radio')) setTelemetrySubTab('radio');
+                else if (action.section.includes('position')) setTelemetrySubTab('pace');
               }
+              desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+              mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             onNavigateToTelemetry={(target) => {
               setAppMode('season');
@@ -1464,12 +1562,12 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setGlobalSearchOpen(true)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 hover:border-white/20 transition-all cursor-pointer"
+              className="btn-console"
               title="選手・チーム・コース・タイヤ・用語の横断検索 (Ctrl+K)"
             >
-              <span className="text-xs">🔍</span>
+              <span className="text-xs text-sky-400">🔍</span>
               <span className="hidden sm:inline">検索</span>
-              <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.2 rounded bg-black/50 text-[9px] text-slate-400 font-mono border border-white/10 ml-0.5">
+              <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.2 rounded bg-black/40 text-[9px] text-slate-400 font-mono border border-white/10 ml-0.5">
                 Ctrl K
               </kbd>
             </button>
@@ -1478,10 +1576,10 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setQuizModalOpen(true)}
-              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold bg-purple-950/60 hover:bg-purple-900/80 text-purple-300 border border-purple-500/40 hover:border-purple-400 transition-all cursor-pointer"
+              className="btn-console"
               title="対話型F1クイズ＆トリビア検定"
             >
-              <span>🏆</span>
+              <span className="text-amber-400">🏆</span>
               <span className="hidden sm:inline">クイズ</span>
             </button>
 
@@ -1489,14 +1587,14 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setAiDrawerOpen((v) => !v)}
-              className={`hidden md:flex px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold items-center gap-1.5 transition-all cursor-pointer shrink-0 ${
+              className={`hidden md:inline-flex btn-console shrink-0 ${
                 aiDrawerOpen
-                  ? 'bg-blue-600 text-white border border-blue-400 shadow-[0_0_12px_rgba(37,99,235,0.4)]'
-                  : 'bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10'
+                  ? 'bg-red-600/20 text-white border-red-500/50 shadow-sm'
+                  : ''
               }`}
               title="AIチーフレースストラテジスト"
             >
-              <span>🤖</span>
+              <span className={aiDrawerOpen ? 'text-red-400' : 'text-slate-400'}>🤖</span>
               <span className="hidden lg:inline">AI</span>
             </button>
 
@@ -1504,15 +1602,15 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setProModalOpen(true)}
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all cursor-pointer shrink-0 border ${
+              className={`btn-console shrink-0 ${
                 isPro
-                  ? 'bg-gradient-to-r from-amber-500/20 to-yellow-400/20 border-amber-500/50 text-amber-300 hover:brightness-125 shadow-sm'
-                  : 'bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 border-amber-400 hover:brightness-110 shadow-md shadow-amber-500/20 font-black'
+                  ? 'border-amber-500/40 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 shadow-sm'
+                  : 'border-amber-500/50 text-amber-200 bg-amber-500/15 hover:bg-amber-500/25'
               }`}
               title="Pitwall Pro メンバーシップ管理・アップグレード"
             >
-              <span>💎</span>
-              <span className="hidden sm:inline">{isPro ? 'PRO' : 'Upgrade'}</span>
+              <span className="text-amber-400">💎</span>
+              <span className="hidden sm:inline font-black">{isPro ? 'PRO' : 'Upgrade'}</span>
             </button>
 
             {/* Auth Button */}
@@ -1522,7 +1620,7 @@ export default function DashboardPage() {
 
         {/* ── Sub-Header: ONLY shown in Library Mode (Clean horizontal pills) ── */}
         {appMode === 'library' && (
-          <div className="h-10 border-t border-white/10 bg-slate-900/90 px-3 sm:px-4 flex items-center justify-between overflow-x-auto no-scrollbar">
+          <div className="h-10 border-t border-white/10 bg-slate-950/90 px-3 sm:px-4 flex items-center justify-between overflow-x-auto no-scrollbar">
             <div className="flex items-center gap-1 w-full max-w-5xl mx-auto py-0.5">
               {(
                 [
@@ -1544,15 +1642,47 @@ export default function DashboardPage() {
                       desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
                       mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
-                    className={`px-3 py-1 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1 shrink-0 whitespace-nowrap cursor-pointer ${
+                    className={`px-3 py-1 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer ${
                       isActive
-                        ? tab === 'drama'
-                          ? 'bg-rose-600 text-white shadow-sm'
-                        : tab === 'rules'
-                          ? 'bg-emerald-600 text-white shadow-sm'
-                        : tab === 'tyres'
-                          ? 'bg-amber-600 text-white shadow-sm'
-                        : 'bg-blue-600 text-white shadow-sm'
+                        ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950/40 border border-red-500/40'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                    }`}
+                  >
+                    <span>{icon}</span>
+                    <span>{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ── Sub-Header: ONLY shown in Telemetry Hub (Clean horizontal workspace pills) ── */}
+        {appMode === 'season' && activeHub === 'telemetry' && (
+          <div className="h-10 border-t border-white/10 bg-slate-950/90 px-3 sm:px-4 flex items-center justify-between overflow-x-auto no-scrollbar">
+            <div className="flex items-center gap-1 w-full max-w-5xl mx-auto py-0.5">
+              {(
+                [
+                  ['pace', '📈', 'ペース・順位'],
+                  ['car_data', '⚡', 'コックピット解析'],
+                  ['strategy', '🛞', 'タイヤ戦略・ピット'],
+                  ['radio', '📻', 'チーム無線・審理'],
+                  ['laptable', '📋', '周回データシート'],
+                ] as [TelemetrySubTab, string, string][]
+              ).map(([tab, icon, label]) => {
+                const isActive = telemetrySubTab === tab;
+                return (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => {
+                      setTelemetrySubTab(tab);
+                      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className={`px-3 py-1 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer ${
+                      isActive
+                        ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950/40 border border-red-500/40'
                         : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
                     }`}
                   >

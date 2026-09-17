@@ -87,30 +87,30 @@ const RaceCountdownCard = React.memo(function RaceCountdownCard({
   // Before mounted on client, render consistent placeholder to eliminate SSR hydration mismatch
   if (!timeLeft.mounted) {
     return (
-      <div className="w-full bg-black/40 p-4 rounded-2xl border border-white/10 text-center shadow-inner">
-        <div className="text-[10px] font-racing font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center justify-center gap-1.5">
+      <div className="w-full bg-slate-950/80 p-4 rounded-2xl border border-white/10 text-center shadow-2xl relative overflow-hidden">
+        <div className="f1-label text-slate-400 mb-2 flex items-center justify-center gap-1.5">
           <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
           <span>決勝スタートまで</span>
         </div>
         <div className="grid grid-cols-4 gap-1.5 font-mono text-center">
-          <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-            <div className="text-xl md:text-2xl font-black text-white/50">--</div>
-            <div className="text-[9px] text-slate-400 uppercase">DAYS</div>
+          <div className="p-2 sm:p-2.5 rounded-xl bg-black/40 border border-white/[0.06] shadow-inner">
+            <div className="f1-hero-metric text-white/40">--</div>
+            <div className="f1-label text-[10px] text-slate-500 mt-0.5">DAYS</div>
           </div>
-          <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-            <div className="text-xl md:text-2xl font-black text-amber-400/50">--</div>
-            <div className="text-[9px] text-slate-400 uppercase">HOURS</div>
+          <div className="p-2 sm:p-2.5 rounded-xl bg-black/40 border border-white/[0.06] shadow-inner">
+            <div className="f1-hero-metric text-amber-400/40">--</div>
+            <div className="f1-label text-[10px] text-slate-500 mt-0.5">HOURS</div>
           </div>
-          <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-            <div className="text-xl md:text-2xl font-black text-white/50">--</div>
-            <div className="text-[9px] text-slate-400 uppercase">MIN</div>
+          <div className="p-2 sm:p-2.5 rounded-xl bg-black/40 border border-white/[0.06] shadow-inner">
+            <div className="f1-hero-metric text-white/40">--</div>
+            <div className="f1-label text-[10px] text-slate-500 mt-0.5">MIN</div>
           </div>
-          <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-            <div className="text-xl md:text-2xl font-black text-red-400/50">--</div>
-            <div className="text-[9px] text-slate-400 uppercase">SEC</div>
+          <div className="p-2 sm:p-2.5 rounded-xl bg-black/40 border border-white/[0.06] shadow-inner">
+            <div className="f1-hero-metric text-red-500/40">--</div>
+            <div className="f1-label text-[10px] text-slate-500 mt-0.5">SEC</div>
           </div>
         </div>
-        <div className="mt-2 text-[10px] text-slate-400 flex items-center justify-center gap-1">
+        <div className="mt-2.5 f1-meta flex items-center justify-center gap-1">
           <span>🎯</span>
           <span>ターゲット: {dates.split('-')[1]?.trim() || dates}</span>
         </div>
@@ -119,45 +119,45 @@ const RaceCountdownCard = React.memo(function RaceCountdownCard({
   }
 
   return (
-    <div className="w-full bg-black/40 p-4 rounded-2xl border border-white/10 text-center shadow-inner">
+    <div className="w-full bg-slate-950/80 p-4 rounded-2xl border border-white/10 text-center shadow-2xl relative overflow-hidden">
       {timeLeft.isPast ? (
         <div className="space-y-2 py-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-racing font-bold">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs font-racing font-bold">
             <span>🏁</span>
             <span>レース完走 / リザルト確定</span>
           </div>
           <div className="text-xs text-slate-300 font-medium">
             公式決勝レース終了・アーカイブ保管済み
           </div>
-          <div className="text-[10px] text-slate-400 font-mono">
+          <div className="f1-meta">
             開催日程: {dates}
           </div>
         </div>
       ) : (
         <>
-          <div className="text-[10px] font-racing font-bold text-slate-400 uppercase tracking-widest mb-1.5 flex items-center justify-center gap-1.5">
+          <div className="f1-label text-slate-400 mb-2 flex items-center justify-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
             <span>決勝スタートまで</span>
           </div>
           <div className="grid grid-cols-4 gap-1.5 font-mono text-center">
-            <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-              <div className="text-xl md:text-2xl font-black text-white" suppressHydrationWarning>{timeLeft.days}</div>
-              <div className="text-[9px] text-slate-400 uppercase">DAYS</div>
+            <div className="p-2 sm:p-2.5 rounded-xl bg-black/40 border border-white/[0.06] shadow-inner">
+              <div className="f1-hero-metric text-white" suppressHydrationWarning>{timeLeft.days}</div>
+              <div className="f1-label text-[10px] text-slate-500 mt-0.5">DAYS</div>
             </div>
-            <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-              <div className="text-xl md:text-2xl font-black text-amber-400" suppressHydrationWarning>{timeLeft.hours}</div>
-              <div className="text-[9px] text-slate-400 uppercase">HOURS</div>
+            <div className="p-2 sm:p-2.5 rounded-xl bg-black/40 border border-white/[0.06] shadow-inner">
+              <div className="f1-hero-metric text-amber-400" suppressHydrationWarning>{timeLeft.hours}</div>
+              <div className="f1-label text-[10px] text-slate-500 mt-0.5">HOURS</div>
             </div>
-            <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-              <div className="text-xl md:text-2xl font-black text-white" suppressHydrationWarning>{timeLeft.minutes}</div>
-              <div className="text-[9px] text-slate-400 uppercase">MIN</div>
+            <div className="p-2 sm:p-2.5 rounded-xl bg-black/40 border border-white/[0.06] shadow-inner">
+              <div className="f1-hero-metric text-white" suppressHydrationWarning>{timeLeft.minutes}</div>
+              <div className="f1-label text-[10px] text-slate-500 mt-0.5">MIN</div>
             </div>
-            <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-              <div className="text-xl md:text-2xl font-black text-red-400 animate-pulse" suppressHydrationWarning>{timeLeft.seconds}</div>
-              <div className="text-[9px] text-slate-400 uppercase">SEC</div>
+            <div className="p-2 sm:p-2.5 rounded-xl bg-black/40 border border-white/[0.06] shadow-inner">
+              <div className="f1-hero-metric text-red-500 animate-pulse" suppressHydrationWarning>{timeLeft.seconds}</div>
+              <div className="f1-label text-[10px] text-slate-500 mt-0.5">SEC</div>
             </div>
           </div>
-          <div className="mt-2 text-[10px] text-slate-400 flex items-center justify-center gap-1">
+          <div className="mt-2.5 f1-meta flex items-center justify-center gap-1">
             <span>🎯</span>
             <span>ターゲット: {dates.split('-')[1]?.trim() || dates}</span>
           </div>
