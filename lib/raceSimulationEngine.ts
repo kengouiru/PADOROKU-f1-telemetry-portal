@@ -1780,7 +1780,8 @@ export interface ChallengeScenario {
   targetPosition: number;
   difficulty: 'easy' | 'normal' | 'hard';
   description: string;
-  gameMode: 'sprint' | 'crisis' | 'procedural';
+  gameMode: 'sprint' | 'crisis' | 'procedural' | 'sandbox' | 'mission';
+  majorCategory?: 'practice' | 'battle';
   playerConfig: DriverSimConfig;
   teammateConfig: DriverSimConfig;
   rivals: DriverSimConfig[];
@@ -1823,12 +1824,7 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
       startTyre: 'INTER',
       pit1Lap: 99,
     },
-    rivals: [
-      GRID_DRIVERS[4], // NOR
-      GRID_DRIVERS[2], // VER
-      GRID_DRIVERS[6], // LEC
-      GRID_DRIVERS[0], // TSU
-    ],
+    rivals: GRID_DRIVERS.filter(d => d.code !== 'RUS' && d.code !== 'ANT'),
     startWeather: 'drizzle',
     weatherForecast: {
       radarDesc: '雨雲通過。気温24℃、急激に天候回復。2周目以降ドライライン急速形成予想。',
@@ -1953,7 +1949,337 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
     actualScLap: 3,
     hiddenTireWearMultiplier: 1.2,
   },
+  {
+    id: 'monaco_overcut_chess',
+    title: '🇲🇨 モナコ: 鉄壁のオーバーカットとトラックポジション死守',
+    tag: 'モナコ市街地・オーバーカット',
+    circuit: SIM_CIRCUITS.find(c => c.id === 'monaco') || SIM_CIRCUITS[6],
+    totalLaps: 7,
+    targetPosition: 1,
+    difficulty: 'hard',
+    gameMode: 'crisis',
+    description:
+      'モナコ市街地戦。前走車フェルスタッペンがピットイン！クリーンエアの中で猛プッシュしてインラップ最速を叩き出し、ピット出口で前に出るオーバーカットを完遂せよ！',
+    playerConfig: {
+      ...GRID_DRIVERS[6], // LEC
+      basePaceOffset: 0.05,
+      startTyre: 'MEDIUM',
+      pit1Lap: 99,
+      isPlayer: true,
+    },
+    teammateConfig: {
+      ...GRID_DRIVERS[7], // HAM
+      basePaceOffset: 0.15,
+      startTyre: 'HARD',
+      pit1Lap: 99,
+    },
+    rivals: GRID_DRIVERS.filter(d => d.code !== 'LEC' && d.code !== 'HAM'),
+    startWeather: 'dry',
+    weatherForecast: {
+      radarDesc: '終日快晴。狭隘な市街地のためオーバーテイク困難度MAX(1.9)。',
+      estimatedLapMin: 99,
+      estimatedLapMax: 99,
+      rainProbabilityPercent: 0,
+    },
+    actualRainLap: 999,
+    actualRainIntensity: 0,
+    scProbability: 0.75,
+    actualScLap: 5,
+    hiddenTireWearMultiplier: 1.05,
+  },
+  {
+    id: 'singapore_chaos_sc',
+    title: '🇸🇬 シンガポール: ナイトレースの多重SCとタイヤ逆張り',
+    tag: 'マリーナベイ・SC多発逆張り',
+    circuit: SIM_CIRCUITS.find(c => c.id === 'singapore') || SIM_CIRCUITS[17],
+    totalLaps: 8,
+    targetPosition: 3,
+    difficulty: 'normal',
+    gameMode: 'crisis',
+    description:
+      '熱帯夜のシンガポール。クラッシュ多発によるSC出動率極大のコース。周囲がステイアウトする中、あえてソフトタイヤに履き替えて終盤の超攻撃的オーバーテイクで表彰台を奪い取れ！',
+    playerConfig: {
+      ...GRID_DRIVERS[10], // ALO
+      basePaceOffset: 0.1,
+      startTyre: 'MEDIUM',
+      pit1Lap: 99,
+      isPlayer: true,
+    },
+    teammateConfig: {
+      ...GRID_DRIVERS[11], // STR
+      basePaceOffset: 0.3,
+      startTyre: 'HARD',
+      pit1Lap: 99,
+    },
+    rivals: GRID_DRIVERS.filter(d => d.code !== 'ALO' && d.code !== 'STR'),
+    startWeather: 'dry',
+    weatherForecast: {
+      radarDesc: '気温31℃、湿度80%の過酷なナイトセッション。SC出動確率極めて高い。',
+      estimatedLapMin: 99,
+      estimatedLapMax: 99,
+      rainProbabilityPercent: 15,
+    },
+    actualRainLap: 999,
+    actualRainIntensity: 0,
+    scProbability: 0.95,
+    actualScLap: 4,
+    hiddenTireWearMultiplier: 1.25,
+  },
 ];
+
+
+// ── Tactical Mission Mode Challenges ──────────────────────────────────────────
+export const MISSION_CHALLENGES: ChallengeScenario[] = [
+  {
+    id: 'cadillac_p22_miracle',
+    title: '🏁【特務】キャデラックの奇跡: 最後尾P22から執念のP10入賞',
+    tag: '新興チーム・入賞ボーダー突破',
+    circuit: SIM_CIRCUITS[8], // Montreal
+    totalLaps: 9,
+    targetPosition: 10,
+    difficulty: 'hard',
+    gameMode: 'mission',
+    description:
+      '2026年新規参入キャデラックF1のコルトン・ハータとしてP22(最後尾)から出走。混戦の中団DRSトレインと他車のピットタイミング隙間を縫い、奇跡の「激戦区1ポイント(P10)」をもぎ取れ！',
+    playerConfig: {
+      ...GRID_DRIVERS[20], // HER (#26 Cadillac)
+      basePaceOffset: 0.45,
+      startTyre: 'HARD',
+      pit1Lap: 99,
+      isPlayer: true,
+    },
+    teammateConfig: {
+      ...GRID_DRIVERS[21], // DRU (#34 Cadillac)
+      basePaceOffset: 0.6,
+      startTyre: 'MEDIUM',
+      pit1Lap: 99,
+    },
+    rivals: GRID_DRIVERS.filter((d) => d.code !== 'HER' && d.code !== 'DRU'),
+    startWeather: 'dry',
+    weatherForecast: {
+      radarDesc: 'ジル・ヴィルヌーヴ・サーキット。中団が大混戦。SC波乱の兆候あり。',
+      estimatedLapMin: 99,
+      estimatedLapMax: 99,
+      rainProbabilityPercent: 25,
+    },
+    scProbability: 0.7,
+    actualScLap: 4,
+    hiddenTireWearMultiplier: 1.15,
+  },
+  {
+    id: 'no_pit_gamble_monza',
+    title: '🛞【特務】タイヤ無交換の奇蹟: デグラデーション限界で残り6周を守り切れ',
+    tag: 'タイヤ温存・ノーピット死守',
+    circuit: SIM_CIRCUITS[15], // Monza
+    totalLaps: 6,
+    targetPosition: 1,
+    difficulty: 'hard',
+    gameMode: 'mission',
+    description:
+      '首位を走るルクレール。ライバルが新品タイヤで猛追する中、あえてピットに入らず摩耗75%のハードタイヤでチェッカーまで逃げ切れるか？！表面・内部温度の超精密管理が試される！',
+    playerConfig: {
+      ...GRID_DRIVERS[6], // LEC
+      basePaceOffset: 0.05,
+      startTyre: 'HARD',
+      pit1Lap: 99,
+      isPlayer: true,
+    },
+    teammateConfig: {
+      ...GRID_DRIVERS[7], // HAM
+      basePaceOffset: 0.15,
+      startTyre: 'SOFT',
+      pit1Lap: 99,
+    },
+    rivals: GRID_DRIVERS.filter((d) => d.code !== 'LEC' && d.code !== 'HAM'),
+    startWeather: 'dry',
+    weatherForecast: {
+      radarDesc: '超高速モンツァ。路面温度42℃。タイヤ表面温度のオーバーヒートに警戒。',
+      estimatedLapMin: 99,
+      estimatedLapMax: 99,
+      rainProbabilityPercent: 0,
+    },
+    scProbability: 0.1,
+    hiddenTireWearMultiplier: 1.4,
+  },
+  {
+    id: 'papaya_rules_1_2',
+    title: '👥【特務】パパヤ・ルール: マクラーレン1-2フィニッシュを死守せよ',
+    tag: 'チームオーダー・ワンツー独占',
+    circuit: SIM_CIRCUITS[14], // Zandvoort
+    totalLaps: 8,
+    targetPosition: 1,
+    difficulty: 'normal',
+    gameMode: 'mission',
+    description:
+      'マクラーレンのピットウォール司令官としてノリス(P1)とピアストリ(P2)を指揮。背後からフェルスタッペン(P3)が急接近！相方へのチームオーダー（ブロック/順位入替）を適切に駆使し1-2フィニッシュを完全達成せよ！',
+    playerConfig: {
+      ...GRID_DRIVERS[4], // NOR
+      basePaceOffset: 0.05,
+      startTyre: 'MEDIUM',
+      pit1Lap: 99,
+      isPlayer: true,
+    },
+    teammateConfig: {
+      ...GRID_DRIVERS[5], // PIA
+      basePaceOffset: 0.08,
+      startTyre: 'MEDIUM',
+      pit1Lap: 99,
+    },
+    rivals: GRID_DRIVERS.filter((d) => d.code !== 'NOR' && d.code !== 'PIA'),
+    startWeather: 'dry',
+    weatherForecast: {
+      radarDesc: '北海からの海風が強いザントフォールト。トラックポジション最優先。',
+      estimatedLapMin: 99,
+      estimatedLapMax: 99,
+      rainProbabilityPercent: 15,
+    },
+    scProbability: 0.4,
+    hiddenTireWearMultiplier: 1.15,
+  },
+  {
+    id: 'slick_on_damp_madness',
+    title: '⚡【特務】雨天スリック逆張り: ダンプ路面を滑走し大逆転勝利せよ',
+    tag: '逆張りスリック・限界走行',
+    circuit: SIM_CIRCUITS[20], // Interlagos
+    totalLaps: 7,
+    targetPosition: 1,
+    difficulty: 'hard',
+    gameMode: 'mission',
+    description:
+      '雨上がりのインテルラゴス。路面水深1.2mm、全車がインターミディエイトを履く中、あえてソフトスリックでスタート！濡れた路面で滑るマシンを手懐け、乾き始めたレコードラインで圧倒的タイム差を削り取れ！',
+    playerConfig: {
+      ...GRID_DRIVERS[2], // VER
+      basePaceOffset: 0.0,
+      startTyre: 'SOFT',
+      pit1Lap: 99,
+      isPlayer: true,
+    },
+    teammateConfig: {
+      ...GRID_DRIVERS[3], // LAW
+      basePaceOffset: 0.2,
+      startTyre: 'INTER',
+      pit1Lap: 99,
+    },
+    rivals: GRID_DRIVERS.filter((d) => d.code !== 'VER' && d.code !== 'LAW'),
+    startWeather: 'drizzle',
+    weatherForecast: {
+      radarDesc: 'スコール通過後。急速にドライラインが形成される見込み。オフライン濡れ注意。',
+      estimatedLapMin: 99,
+      estimatedLapMax: 99,
+      rainProbabilityPercent: 20,
+    },
+    actualRainLap: 1,
+    actualRainIntensity: 1.2,
+    scProbability: 0.5,
+    hiddenTireWearMultiplier: 1.3,
+  },
+];
+
+// Weather re-roll helper for any scenario
+export function rerollScenarioWeather(base: ChallengeScenario): ChallengeScenario {
+  const weatherChoices: WeatherType[] = ['dry', 'variable', 'drizzle', 'monsoon'];
+  const newWeather = weatherChoices[Math.floor(Math.random() * weatherChoices.length)];
+  const hasRain = newWeather !== 'dry';
+  const rainLap = hasRain ? Math.max(2, Math.floor(Math.random() * Math.max(2, base.totalLaps - 1)) + 1) : undefined;
+  const rainIntensity =
+    newWeather === 'monsoon' ? 4.2 : newWeather === 'drizzle' ? 1.4 : hasRain ? 2.5 : 0;
+  const scProb = Math.random() < 0.35 ? 0.85 : Math.random() < 0.7 ? 0.45 : 0.15;
+  const scLap = scProb > 0.4 ? Math.max(2, Math.floor(Math.random() * base.totalLaps) + 1) : undefined;
+
+  let radarDesc = '快晴ドライコンディション。天候安定。';
+  if (newWeather === 'monsoon') {
+    radarDesc = `猛烈なモンスーン豪雨警戒！${rainLap ? `Lap ${rainLap}付近` : '序盤'}に豪雨直撃予測。`;
+  } else if (newWeather === 'drizzle') {
+    radarDesc = `雨上がりダンプ路面。乾きゆくレコードラインを見極めよ。`;
+  } else if (newWeather === 'variable') {
+    radarDesc = `雨雲が接近中。${rainLap ? `Lap ${rainLap}前後に降雨到達の可能性高し。` : '突発降雨警戒。'}`;
+  }
+
+  return {
+    ...base,
+    id: `${base.id}_reroll_${Date.now()}`,
+    startWeather: newWeather,
+    weatherForecast: {
+      radarDesc,
+      estimatedLapMin: rainLap ? Math.max(1, rainLap - 1) : 99,
+      estimatedLapMax: rainLap ? Math.min(base.totalLaps, rainLap + 2) : 99,
+      rainProbabilityPercent: hasRain ? Math.floor(Math.random() * 35) + 65 : 10,
+    },
+    actualRainLap: rainLap,
+    actualRainIntensity: rainIntensity,
+    scProbability: scProb,
+    actualScLap: scLap,
+  };
+}
+
+// Sandbox (Practice) scenario generator
+export function generateSandboxScenario(params: {
+  circuitId: string;
+  playerCode: string;
+  totalLaps?: number;
+  weatherType?: WeatherType;
+  rainStartLap?: number;
+  rainIntensityMm?: number;
+  incidentFrequency?: IncidentFrequency;
+  scLap?: number;
+}): ChallengeScenario {
+  const circuit = SIM_CIRCUITS.find((c) => c.id === params.circuitId) || SIM_CIRCUITS[2];
+  const playerBase = GRID_DRIVERS.find((d) => d.code === params.playerCode) || GRID_DRIVERS[0];
+  const tmBase =
+    GRID_DRIVERS.find((d) => d.team === playerBase.team && d.code !== playerBase.code) || GRID_DRIVERS[1];
+  const rivals = GRID_DRIVERS.filter((d) => d.code !== playerBase.code && d.code !== tmBase.code);
+  const laps = params.totalLaps || 10;
+  const weather = params.weatherType || 'dry';
+  const hasRain = weather !== 'dry';
+  const rainIntensity =
+    params.rainIntensityMm ??
+    (weather === 'monsoon' ? 4.5 : weather === 'drizzle' ? 1.5 : hasRain ? 2.5 : 0);
+  const rainLap = params.rainStartLap ?? (hasRain ? Math.max(2, Math.floor(laps * 0.4)) : undefined);
+  const scProb =
+    params.incidentFrequency === 'high_chaos' ? 0.9 : params.incidentFrequency === 'realistic' ? 0.45 : 0.05;
+
+  let radarDesc = 'フリー練習セッション。天候・路面状況は指定カスタム値に固定。';
+  if (weather === 'monsoon') radarDesc = `【練習】豪雨モンスーンテスト (水量 ${rainIntensity.toFixed(1)}mm)`;
+  else if (weather === 'drizzle') radarDesc = `【練習】雨上がりダンプ＆乾燥ラインテスト (水量 ${rainIntensity.toFixed(1)}mm)`;
+  else if (weather === 'variable')
+    radarDesc = `【練習】降雨急変テスト (Lap ${rainLap || 3}雨量 ${rainIntensity.toFixed(1)}mm)`;
+
+  return {
+    id: `sandbox_${circuit.id}_${Date.now()}`,
+    title: `🔬 ${circuit.name} 戦略サンドボックス (全${laps}周)`,
+    tag: '自由練習・シミュレーション',
+    circuit,
+    totalLaps: laps,
+    targetPosition: 1,
+    difficulty: 'normal',
+    gameMode: 'sandbox',
+    description: `${circuit.name}での自由戦略実験モード。天候・周回数・路面状況を自在に変更し、タイヤ熱力学や22台排水乾燥、ピットタイミングの予行演習を行えます。`,
+    playerConfig: {
+      ...playerBase,
+      startTyre: weather === 'monsoon' ? 'WET' : weather === 'drizzle' ? 'INTER' : 'MEDIUM',
+      pit1Lap: 99,
+      isPlayer: true,
+    },
+    teammateConfig: {
+      ...tmBase,
+      startTyre: weather === 'monsoon' ? 'WET' : 'SOFT',
+      pit1Lap: 99,
+    },
+    rivals,
+    startWeather: weather,
+    weatherForecast: {
+      radarDesc,
+      estimatedLapMin: rainLap ? Math.max(1, rainLap - 1) : 99,
+      estimatedLapMax: rainLap ? Math.min(laps, rainLap + 2) : 99,
+      rainProbabilityPercent: hasRain ? 90 : 5,
+    },
+    actualRainLap: rainLap,
+    actualRainIntensity: rainIntensity,
+    scProbability: scProb,
+    actualScLap: params.scLap,
+    hiddenTireWearMultiplier: 1.1,
+  };
+}
 
 // Sprint full race generator
 export function generateSprintRaceScenario(circuitId: string, playerCode: string = 'TSU'): ChallengeScenario {

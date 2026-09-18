@@ -52,6 +52,12 @@ import {
   Lock,
   Unlock,
   ExternalLink,
+  Dices,
+  SlidersHorizontal,
+  Shuffle,
+  ChevronDown,
+  ChevronUp,
+  Settings,
 } from 'lucide-react';
 import {
   STRATEGIST_ARCHETYPES,
@@ -70,6 +76,9 @@ import {
   GRID_DRIVERS,
   TYRE_PROPERTIES,
   PRESET_CHALLENGES,
+  MISSION_CHALLENGES,
+  rerollScenarioWeather,
+  generateSandboxScenario,
   calculatePitExitTraffic,
   runFullGrandPrixSimulation,
   formatTimeSeconds,
@@ -86,6 +95,8 @@ import {
   type ChallengeScenario,
   type TacticalScoreBreakdown,
   type TeamOrderType,
+  type IncidentFrequency,
+  type WeatherType,
 } from '@/lib/raceSimulationEngine';
 import { GLOSSARY_TERMS, type GlossaryTerm } from '@/data/f1GlossaryData';
 // War Room & 2026 Regulations are now in Library (KnowledgeHistoryHub)
@@ -94,7 +105,8 @@ import { usePlanTier } from '@/lib/tierService';
 
 // Pure Pitwall Command Room Game
 type PitwallMonitor = 'timing' | 'thermals' | 'weather' | 'team' | 'radio';
-type ChallengeModeType = 'crisis' | 'sprint' | 'procedural';
+type GameMajorCategory = 'practice' | 'battle';
+type ChallengeModeType = 'crisis' | 'scenario' | 'sprint' | 'mission' | 'sandbox' | 'procedural';
 
 interface RaceSimulatorHubProps {
   onOpenUpgradeModal?: () => void;
@@ -112,7 +124,7 @@ export default function RaceSimulatorHub({
   const [customInitialPuMode, setCustomInitialPuMode] = useState<EnginePUMode | null>(null);
   const [customTargetBoxLap, setCustomTargetBoxLap] = useState<number | null>(null);
   const [customTargetCompound, setCustomTargetCompound] = useState<TyreCompound | null>(null);
-  const [isBriefingOpen, setIsBriefingOpen] = useState<boolean>(true);
+  const [isBriefingOpen, setIsBriefingOpen] = useState<boolean>(false);
 
   // Audio Sound Effect Mute State (Default: Sound ON as requested by user)
   const [radioAudioEnabled, setRadioAudioEnabled] = useState<boolean>(true);
@@ -125,8 +137,19 @@ export default function RaceSimulatorHub({
   const [selectedPlayerCode, setSelectedPlayerCode] = useState<string>('TSU');
 
   // Active scenario state
+  const [majorCategory, setMajorCategory] = useState<GameMajorCategory>('battle');
   const [presetIdx, setPresetIdx] = useState<number>(0);
+  const [selectedMissionIdx, setSelectedMissionIdx] = useState<number>(0);
   const [customScenario, setCustomScenario] = useState<ChallengeScenario | null>(null);
+  const [isScenarioPickerOpen, setIsScenarioPickerOpen] = useState<boolean>(false);
+  const [isScenarioDrawerOpen, setIsScenarioDrawerOpen] = useState<boolean>(false);
+  const [mobileConsoleView, setMobileConsoleView] = useState<'tower' | 'monitor'>('tower');
+  const [sandboxLaps, setSandboxLaps] = useState<number>(10);
+  const [sandboxWeather, setSandboxWeather] = useState<WeatherType>('dry');
+  const [sandboxRainLap, setSandboxRainLap] = useState<number>(4);
+  const [sandboxRainIntensity, setSandboxRainIntensity] = useState<number>(2.5);
+  const [sandboxIncidentFreq, setSandboxIncidentFreq] = useState<IncidentFrequency>('realistic');
+  const [weatherRerollNotification, setWeatherRerollNotification] = useState<string | null>(null);
 
   const activeScenario = useMemo<ChallengeScenario>(() => {
     if (customScenario) return customScenario;
@@ -172,6 +195,7 @@ export default function RaceSimulatorHub({
   const [isCareerModalOpen, setIsCareerModalOpen] = useState<boolean>(false);
   const [selectedBadgeForDetail, setSelectedBadgeForDetail] = useState<F1Badge | null>(null);
   const [badgeCategoryFilter, setBadgeCategoryFilter] = useState<'all' | BadgeCategory>('all');
+  const [timingTowerViewMode, setTimingTowerViewMode] = useState<'dual' | 'single'>('dual');
 
   // Compute effective player config based on pre-race strategy selection
   const effectivePlayerConfig = useMemo<DriverSimConfig>(() => {
@@ -535,6 +559,55 @@ export default function RaceSimulatorHub({
     resetGameState();
   };
 
+  const startMission = (idx: number) => {
+    setSelectedMissionIdx(idx);
+    const scenario = MISSION_CHALLENGES[idx] || MISSION_CHALLENGES[0];
+    setCustomScenario(scenario);
+    setGameMode('mission');
+    resetGameState();
+  };
+
+  const startSandboxMode = (overrides?: {
+    circuitId?: string;
+    playerCode?: string;
+    totalLaps?: number;
+    weatherType?: WeatherType;
+    rainStartLap?: number;
+    rainIntensityMm?: number;
+    incidentFrequency?: IncidentFrequency;
+  }) => {
+    const cId = overrides?.circuitId || selectedCircuitId;
+    const pCode = overrides?.playerCode || selectedPlayerCode;
+    const laps = overrides?.totalLaps || sandboxLaps;
+    const weather = overrides?.weatherType || sandboxWeather;
+    const rainLap = overrides?.rainStartLap ?? sandboxRainLap;
+    const rainMm = overrides?.rainIntensityMm ?? sandboxRainIntensity;
+    const incFreq = overrides?.incidentFrequency || sandboxIncidentFreq;
+
+    const scenario = generateSandboxScenario({
+      circuitId: cId,
+      playerCode: pCode,
+      totalLaps: laps,
+      weatherType: weather,
+      rainStartLap: rainLap,
+      rainIntensityMm: rainMm,
+      incidentFrequency: incFreq,
+    });
+    setCustomScenario(scenario);
+    setGameMode('sandbox');
+    resetGameState();
+  };
+
+  const handleRerollWeather = () => {
+    const rerolled = rerollScenarioWeather(activeScenario);
+    setCustomScenario(rerolled);
+    resetGameState();
+    setWeatherRerollNotification(
+      `🎲 天候・路面再抽選完了: ${rerolled.weatherForecast.radarDesc} (降雨確率 ${rerolled.weatherForecast.rainProbabilityPercent}%)`
+    );
+    setTimeout(() => setWeatherRerollNotification(null), 5000);
+  };
+
   const resetGameState = () => {
     setChallengeLap(1);
     setChallengePlaying(false);
@@ -623,40 +696,40 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
   // ──────────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="space-y-4 max-w-7xl mx-auto pb-16">
+    <div className="space-y-2.5 max-w-7xl mx-auto pb-12">
       {/* ── Top Header Navigation Bar ── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-950/80 p-3 sm:p-4 rounded-2xl border border-white/10 shadow-xl backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-rose-700 flex items-center justify-center shadow-lg shadow-red-950/50 border border-red-500/30">
-            <Gamepad2 className="w-5 h-5 text-white animate-pulse" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 bg-slate-950/80 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border border-white/10 shadow-lg backdrop-blur-md">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-600 to-rose-700 flex items-center justify-center shadow-md shadow-red-950/50 border border-red-500/30 shrink-0">
+            <Gamepad2 className="w-4 h-4 text-white animate-pulse" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-racing font-bold text-white text-base sm:text-lg tracking-wider">
-                F1 PITWALL STRATEGY COMMAND ROOM
+              <span className="font-racing font-bold text-white text-sm sm:text-base tracking-wider">
+                F1 PITWALL COMMAND ROOM
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-red-950 border border-red-500/40 text-[10px] font-mono text-red-300 font-bold">
+              <span className="px-1.5 py-0.2 rounded bg-red-950 border border-red-500/40 text-[9px] font-mono text-red-300 font-bold">
                 PRO CONSOLE
               </span>
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="text-[10px] text-slate-400 hidden sm:block">
               世界最高峰のF1レース司令塔体験 — 24戦・全11チーム・リアルタイムテレメトリー＆双方向無線
             </p>
           </div>
         </div>
 
-        {/* Top Controls: Sound Toggle & SubHub switcher */}
-        <div className="flex items-center gap-2">
+        {/* Top Controls: Career, Audio, Auto-pause, Library */}
+        <div className="flex items-center gap-1.5 flex-wrap">
           {/* FIA Career & Badges Museum Button */}
           <button
             type="button"
             onClick={() => setIsCareerModalOpen(true)}
-            className="btn-console flex items-center gap-1.5 text-xs px-3 py-1.5 bg-gradient-to-r from-amber-950/50 via-slate-900 to-red-950/40 border-amber-500/40 text-amber-300 hover:text-white hover:border-amber-400 transition-all shadow-sm group"
+            className="btn-console flex items-center gap-1 text-xs px-2.5 py-1 bg-gradient-to-r from-amber-950/50 via-slate-900 to-red-950/40 border-amber-500/40 text-amber-300 hover:text-white hover:border-amber-400 transition-all shadow-sm group"
             title="FIAライセンス等級・累積CP・全30+称号カタログを開く"
           >
             <Award className="w-3.5 h-3.5 text-yellow-400 group-hover:scale-110 transition-transform" />
-            <span className="font-racing text-[11px] font-bold">
-              {careerData.grade === 'S' ? '👑 SUPER S' : `GRADE ${careerData.grade}`}
+            <span className="font-racing text-[10px] font-bold">
+              {careerData.grade === 'S' ? '👑 S' : `GRADE ${careerData.grade}`}
             </span>
             <span className="hidden md:inline px-1 py-0.2 rounded bg-amber-950/80 border border-amber-500/30 text-[9px] font-mono text-amber-200">
               {careerData.unlockedBadgeIds.length}/{F1_BADGES_CATALOG.length}称号
@@ -667,15 +740,15 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
           <button
             type="button"
             onClick={() => setAutoPauseEnabled(!autoPauseEnabled)}
-            className={`btn-console flex items-center gap-1.5 text-xs px-3 py-1.5 ${
+            className={`btn-console flex items-center gap-1 text-xs px-2.5 py-1 ${
               autoPauseEnabled
                 ? 'bg-amber-950/50 border-amber-500/40 text-amber-300'
                 : 'bg-slate-900 border-white/10 text-slate-500'
             }`}
             title="緊急無線やSC出動時に自動で一時停止し、長考・確認できるようにします"
           >
-            <ShieldAlert className="w-3.5 h-3.5" />
-            <span className="font-mono text-[11px] font-bold">
+            <ShieldAlert className="w-3 h-3" />
+            <span className="font-mono text-[10px] font-bold">
               AUTO-PAUSE: {autoPauseEnabled ? 'ON' : 'OFF'}
             </span>
           </button>
@@ -687,7 +760,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
               setRadioAudioEnabled(next);
               if (next) playF1RadioChirp();
             }}
-            className={`btn-console flex items-center gap-1.5 text-xs px-3 py-1.5 ${
+            className={`btn-console flex items-center gap-1 text-xs px-2.5 py-1 ${
               radioAudioEnabled
                 ? 'bg-emerald-950/50 border-emerald-500/40 text-emerald-300'
                 : 'bg-slate-900 border-white/10 text-slate-500'
@@ -696,13 +769,13 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
           >
             {radioAudioEnabled ? (
               <>
-                <Volume2 className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-                <span className="font-mono text-[11px] font-bold">RADIO AUDIO: ON</span>
+                <Volume2 className="w-3 h-3 text-emerald-400 animate-pulse" />
+                <span className="font-mono text-[10px] font-bold">AUDIO</span>
               </>
             ) : (
               <>
-                <VolumeX className="w-3.5 h-3.5" />
-                <span className="font-mono text-[11px]">MUTED</span>
+                <VolumeX className="w-3 h-3" />
+                <span className="font-mono text-[10px]">MUTED</span>
               </>
             )}
           </button>
@@ -711,118 +784,565 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
             <button
               type="button"
               onClick={() => onNavigateToLibrary('strategy')}
-              className="btn-console flex items-center gap-1.5 text-xs px-3 py-1.5 text-slate-400 hover:text-white hover:border-purple-500/40 transition-colors"
+              className="btn-console flex items-center gap-1 text-xs px-2.5 py-1 text-slate-400 hover:text-white hover:border-purple-500/40 transition-colors"
               title="レース戦略公理や2026新技術シミュレーターはF1大百科（Library）で学習できます"
             >
-              <BookOpen className="w-3.5 h-3.5 text-purple-400" />
-              <span className="font-mono text-[11px] font-bold">大百科・規定ラボ ➔</span>
+              <BookOpen className="w-3 h-3 text-purple-400" />
+              <span className="font-mono text-[10px] font-bold">大百科 ➔</span>
             </button>
           )}
         </div>
       </div>
 
-      <div className="space-y-4">
-          {/* ── Mission Mode Selector & Setup Deck ── */}
-          <div className="glass-card-premium p-3 sm:p-4 rounded-2xl border border-white/10">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-              {/* Left: 3 Game Modes */}
-              <div className="flex items-center gap-1.5 bg-slate-900/80 p-1 rounded-xl border border-white/10 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => startPresetCrisis(0)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-racing font-bold transition-all ${
-                    gameMode === 'crisis' && !customScenario
-                      ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <Zap className="w-3.5 h-3.5 text-amber-400" /> クライマックス決断 (5-8周)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => startSprintRace(selectedCircuitId, selectedPlayerCode)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-racing font-bold transition-all ${
-                    gameMode === 'sprint'
-                      ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <Trophy className="w-3.5 h-3.5 text-yellow-400" /> スプリント全周回 (15-19周)
-                </button>
-                <button
-                  type="button"
-                  onClick={startProceduralCrisis}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-racing font-bold transition-all ${
-                    gameMode === 'procedural'
-                      ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  <Compass className="w-3.5 h-3.5 text-purple-400" /> 無限ランダム危機 (一期一会)
-                </button>
-              </div>
+      {/* ── Active Scenario Summary & Trigger Bar (~36px) ── */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 bg-slate-900/90 px-3 py-1.5 rounded-xl border border-white/10 text-xs shadow-sm">
+        <div className="flex items-center gap-2 flex-wrap min-w-0">
+          <span className="px-2 py-0.5 rounded bg-red-950 border border-red-500/40 text-[10px] font-racing font-bold text-red-300 shrink-0">
+            {majorCategory === 'battle' ? '⚔️ 実践' : '🔬 自由練習'}
+          </span>
+          <span className="font-racing font-bold text-white text-xs truncate">
+            {activeScenario.title}
+          </span>
+          <span className="text-slate-400 font-mono text-[11px] hidden sm:inline">
+            ({activeScenario.circuit.name} • {activeScenario.totalLaps}周 • 目標P{activeScenario.targetPosition})
+          </span>
+          <span className="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 text-[10px] font-mono shrink-0">
+            🏎️ {activeScenario.playerConfig.name} ({activeScenario.playerConfig.code})
+          </span>
+          <span className="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 text-[10px] font-mono shrink-0">
+            🛞 初期: {customStartingTyre || activeScenario.playerConfig.startTyre}
+          </span>
+          <span className="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 text-[10px] font-mono shrink-0">
+            🔥 PU: {(customInitialPuMode || activeScenario.playerConfig.machineSetup.puMode).toUpperCase()}
+          </span>
+        </div>
 
-              {/* Center: Circuit & Driver Dropdowns (24 Circuits) */}
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded-xl border border-white/10">
-                  <Flag className="w-3.5 h-3.5 text-red-400" />
-                  <span className="text-[10px] font-mono text-slate-400">サーキット:</span>
-                  <select
-                    value={selectedCircuitId}
-                    onChange={(e) => {
-                      setSelectedCircuitId(e.target.value);
-                      if (gameMode === 'sprint') {
-                        startSprintRace(e.target.value, selectedPlayerCode);
-                      }
-                    }}
-                    className="bg-transparent text-xs text-white font-racing font-bold focus:outline-none cursor-pointer"
-                  >
-                    {SIM_CIRCUITS.map((c) => (
-                      <option key={c.id} value={c.id} className="bg-slate-900 text-white">
-                        {c.flag} {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* Reroll Weather Button */}
+          <button
+            type="button"
+            onClick={handleRerollWeather}
+            className="btn-console text-[11px] px-2 py-1 flex items-center gap-1 text-sky-300 hover:text-white border-sky-500/30"
+            title="天候や雨雲の到達ラップ・SC発生リスクをランダム再抽選"
+          >
+            <Dices className="w-3 h-3 text-sky-400" />
+            <span>🎲 天候再抽選</span>
+          </button>
 
-                <div className="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded-xl border border-white/10">
-                  <Gauge className="w-3.5 h-3.5 text-cyan-400" />
-                  <span className="text-[10px] font-mono text-slate-400">担当ドライバー:</span>
-                  <select
-                    value={selectedPlayerCode}
-                    onChange={(e) => {
-                      setSelectedPlayerCode(e.target.value);
-                      if (gameMode === 'sprint') {
-                        startSprintRace(selectedCircuitId, e.target.value);
-                      }
-                    }}
-                    className="bg-transparent text-xs text-white font-racing font-bold focus:outline-none cursor-pointer"
-                  >
-                    {GRID_DRIVERS.slice(0, 10).map((d) => (
-                      <option key={d.code} value={d.code} className="bg-slate-900 text-white">
-                        #{d.number} {d.name} ({d.team})
-                      </option>
-                    ))}
-                  </select>
-                </div>
+          {/* Toggle Scenario & Strategy Drawer Button */}
+          <button
+            type="button"
+            onClick={() => setIsScenarioDrawerOpen(!isScenarioDrawerOpen)}
+            className={`btn-console text-[11px] px-2.5 py-1 flex items-center gap-1 font-racing font-bold transition-all ${
+              isScenarioDrawerOpen
+                ? 'bg-red-600 text-white border-red-500 shadow-md ring-1 ring-red-400'
+                : 'text-slate-300 hover:text-white border-white/20'
+            }`}
+          >
+            <Settings className="w-3 h-3" />
+            <span>{isScenarioDrawerOpen ? '▲ 設定を閉じる' : '⚙️ モード・作戦設定 ▼'}</span>
+          </button>
+        </div>
+      </div>
 
-                {/* Re-roll button for procedural */}
-                {gameMode === 'procedural' && (
+      {/* Weather Flash Notification */}
+      {weatherRerollNotification && (
+        <div className="px-3 py-1.5 rounded-xl bg-sky-950/80 border border-sky-500/50 text-sky-200 text-xs font-mono flex items-center justify-between animate-in fade-in duration-200 shadow-sm">
+          <div className="flex items-center gap-1.5">
+            <CloudRain className="w-3.5 h-3.5 text-sky-400 animate-bounce" />
+            <span>{weatherRerollNotification}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setWeatherRerollNotification(null)}
+            className="text-sky-400 hover:text-white text-xs px-1 font-bold"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* ── Collapsible Scenario & Setup Drawer ── */}
+      {isScenarioDrawerOpen && (
+        <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => setIsScenarioDrawerOpen(false)}
+              className="btn-console-primary text-xs px-3.5 py-1 font-racing font-bold shadow-md"
+            >
+              🏁 設定完了・ピットウォールへ戻る
+            </button>
+          </div>
+                    <div className="glass-card-premium p-3 sm:p-4 rounded-2xl border border-white/10 space-y-3">
+            {/* Row 1: Major Category Tabs (🔬 シミュレーション vs ⚔️ 実践) */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-racing text-slate-400 font-bold uppercase tracking-wider">GAME MODE:</span>
+                <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-white/10">
                   <button
                     type="button"
-                    onClick={startProceduralCrisis}
-                    className="btn-console flex items-center gap-1.5 text-xs text-purple-300 border-purple-500/30 hover:bg-purple-950/40"
+                    onClick={() => {
+                      setMajorCategory('battle');
+                      if (gameMode === 'sandbox') {
+                        startPresetCrisis(presetIdx);
+                      }
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all ${
+                      majorCategory === 'battle'
+                        ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950 ring-1 ring-red-400/50'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
                   >
-                    <RotateCcw className="w-3.5 h-3.5" /> 次の突発危機へ
+                    <Trophy className="w-3.5 h-3.5 text-yellow-400" />
+                    <span>⚔️ 実践 (本番チャレンジ)</span>
                   </button>
-                )}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMajorCategory('practice');
+                      startSandboxMode();
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all ${
+                      majorCategory === 'practice'
+                        ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-950 ring-1 ring-cyan-400/50'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <SlidersHorizontal className="w-3.5 h-3.5 text-cyan-300" />
+                    <span>🔬 シミュレーション (自由練習)</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Right: Grid Info Badge */}
+              <div className="flex items-center gap-2 text-[11px] font-mono">
+                <span className="text-slate-400">出走グリッド:</span>
+                <span className="px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-500/30 font-bold">
+                  🏁 22 CARS / 11 TEAMS
+                </span>
               </div>
             </div>
 
-            {/* Scenario Briefing Banner */}
+            {/* Row 2: Sub-mode selection depending on major category */}
+            {majorCategory === 'battle' ? (
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                {/* Battle Sub-modes */}
+                <div className="flex flex-wrap items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-white/10 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      startPresetCrisis(presetIdx);
+                      setIsScenarioPickerOpen(true);
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-racing font-bold transition-all ${
+                      (gameMode === 'crisis' || gameMode === 'scenario') && !customScenario
+                        ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Zap className="w-3.5 h-3.5 text-amber-400" />
+                    <span>📜 シナリオ (名場面 5-9周)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      startSprintRace(selectedCircuitId, selectedPlayerCode);
+                      setIsScenarioPickerOpen(false);
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-racing font-bold transition-all ${
+                      gameMode === 'sprint'
+                        ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Flag className="w-3.5 h-3.5 text-yellow-400" />
+                    <span>🏆 スプリント全周回 (15-20周)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      startMission(selectedMissionIdx);
+                      setIsScenarioPickerOpen(true);
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-racing font-bold transition-all ${
+                      gameMode === 'mission'
+                        ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <ShieldAlert className="w-3.5 h-3.5 text-purple-400" />
+                    <span>🎯 特務ミッション (特殊指令)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      startProceduralCrisis();
+                      setIsScenarioPickerOpen(false);
+                    }}
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-racing font-bold transition-all ${
+                      gameMode === 'procedural'
+                        ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Compass className="w-3.5 h-3.5 text-pink-400" />
+                    <span>🎲 突発クライシス (一期一会)</span>
+                  </button>
+                </div>
+
+                {/* Circuit & Driver selector (for sprint / procedural) */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded-xl border border-white/10">
+                    <Flag className="w-3.5 h-3.5 text-red-400" />
+                    <span className="text-[10px] font-mono text-slate-400">サーキット:</span>
+                    <select
+                      value={selectedCircuitId}
+                      onChange={(e) => {
+                        setSelectedCircuitId(e.target.value);
+                        if (gameMode === 'sprint') {
+                          startSprintRace(e.target.value, selectedPlayerCode);
+                        }
+                      }}
+                      className="bg-transparent text-xs text-white font-racing font-bold focus:outline-none cursor-pointer"
+                    >
+                      {SIM_CIRCUITS.map((c) => (
+                        <option key={c.id} value={c.id} className="bg-slate-900 text-white">
+                          {c.flag} {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded-xl border border-white/10">
+                    <Gauge className="w-3.5 h-3.5 text-cyan-400" />
+                    <span className="text-[10px] font-mono text-slate-400">担当ドライバー:</span>
+                    <select
+                      value={selectedPlayerCode}
+                      onChange={(e) => {
+                        setSelectedPlayerCode(e.target.value);
+                        if (gameMode === 'sprint') {
+                          startSprintRace(selectedCircuitId, e.target.value);
+                        }
+                      }}
+                      className="bg-transparent text-xs text-white font-racing font-bold focus:outline-none cursor-pointer"
+                    >
+                      {GRID_DRIVERS.map((d) => (
+                        <option key={d.code} value={d.code} className="bg-slate-900 text-white">
+                          #{d.number} {d.name} ({d.team})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {gameMode === 'procedural' && (
+                    <button
+                      type="button"
+                      onClick={startProceduralCrisis}
+                      className="btn-console flex items-center gap-1.5 text-xs text-pink-300 border-pink-500/30 hover:bg-pink-950/40"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" /> 次の突発危機へ
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* Practice / Sandbox Setup Panel */
+              <div className="p-3.5 rounded-xl bg-cyan-950/20 border border-cyan-500/25 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-cyan-500/20">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">🧪</span>
+                    <span className="font-racing font-bold text-white text-xs tracking-wider">
+                      FREE PRACTICE & STRATEGY SANDBOX / 自由練習シミュレーション設定
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRerollWeather}
+                    className="btn-console flex items-center gap-1.5 text-xs text-cyan-300 border-cyan-500/40 hover:bg-cyan-950/50"
+                    title="天候・路面水量・SC確率を瞬時にランダム再抽選します"
+                  >
+                    <Dices className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>🎲 天候ランダムリロード</span>
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-xs">
+                  {/* Track */}
+                  <div className="p-2 rounded-lg bg-slate-900/90 border border-white/10">
+                    <label className="text-[10px] font-mono text-slate-400 block mb-1">サーキット</label>
+                    <select
+                      value={selectedCircuitId}
+                      onChange={(e) => {
+                        setSelectedCircuitId(e.target.value);
+                        startSandboxMode({ circuitId: e.target.value });
+                      }}
+                      className="w-full bg-transparent text-xs text-white font-racing font-bold focus:outline-none cursor-pointer"
+                    >
+                      {SIM_CIRCUITS.map((c) => (
+                        <option key={c.id} value={c.id} className="bg-slate-900 text-white">
+                          {c.flag} {c.name.split(' ')[0]}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Driver (all 22) */}
+                  <div className="p-2 rounded-lg bg-slate-900/90 border border-white/10">
+                    <label className="text-[10px] font-mono text-slate-400 block mb-1">自車ドライバー</label>
+                    <select
+                      value={selectedPlayerCode}
+                      onChange={(e) => {
+                        setSelectedPlayerCode(e.target.value);
+                        startSandboxMode({ playerCode: e.target.value });
+                      }}
+                      className="w-full bg-transparent text-xs text-white font-racing font-bold focus:outline-none cursor-pointer"
+                    >
+                      {GRID_DRIVERS.map((d) => (
+                        <option key={d.code} value={d.code} className="bg-slate-900 text-white">
+                          #{d.number} {d.code} ({d.team.split(' ')[0]})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Laps */}
+                  <div className="p-2 rounded-lg bg-slate-900/90 border border-white/10">
+                    <label className="text-[10px] font-mono text-slate-400 block mb-1">周回数: {sandboxLaps}周</label>
+                    <select
+                      value={sandboxLaps}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        setSandboxLaps(val);
+                        startSandboxMode({ totalLaps: val });
+                      }}
+                      className="w-full bg-transparent text-xs text-white font-mono focus:outline-none cursor-pointer"
+                    >
+                      {[5, 8, 10, 15, 20].map((l) => (
+                        <option key={l} value={l} className="bg-slate-900 text-white">
+                          全{l}周
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Weather type */}
+                  <div className="p-2 rounded-lg bg-slate-900/90 border border-white/10">
+                    <label className="text-[10px] font-mono text-slate-400 block mb-1">天候コンディション</label>
+                    <select
+                      value={sandboxWeather}
+                      onChange={(e) => {
+                        const val = e.target.value as WeatherType;
+                        setSandboxWeather(val);
+                        startSandboxMode({ weatherType: val });
+                      }}
+                      className="w-full bg-transparent text-xs text-white font-racing font-bold focus:outline-none cursor-pointer"
+                    >
+                      <option value="dry" className="bg-slate-900 text-white">☀️ 快晴ドライ</option>
+                      <option value="variable" className="bg-slate-900 text-white">⛅ 急変・雨雲接近</option>
+                      <option value="drizzle" className="bg-slate-900 text-white">🌤️ 雨上がりダンプ</option>
+                      <option value="monsoon" className="bg-slate-900 text-white">🌊 豪雨モンスーン</option>
+                    </select>
+                  </div>
+
+                  {/* Rain arrival lap */}
+                  <div className="p-2 rounded-lg bg-slate-900/90 border border-white/10">
+                    <label className="text-[10px] font-mono text-slate-400 block mb-1">降雨開始周回</label>
+                    <select
+                      value={sandboxRainLap}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        setSandboxRainLap(val);
+                        startSandboxMode({ rainStartLap: val });
+                      }}
+                      disabled={sandboxWeather === 'dry'}
+                      className="w-full bg-transparent text-xs text-white font-mono focus:outline-none cursor-pointer disabled:opacity-40"
+                    >
+                      {Array.from({ length: sandboxLaps }, (_, i) => i + 1).map((l) => (
+                        <option key={l} value={l} className="bg-slate-900 text-white">
+                          Lap {l}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* SC Frequency */}
+                  <div className="p-2 rounded-lg bg-slate-900/90 border border-white/10">
+                    <label className="text-[10px] font-mono text-slate-400 block mb-1">SC発生頻度</label>
+                    <select
+                      value={sandboxIncidentFreq}
+                      onChange={(e) => {
+                        const val = e.target.value as IncidentFrequency;
+                        setSandboxIncidentFreq(val);
+                        startSandboxMode({ incidentFrequency: val });
+                      }}
+                      className="w-full bg-transparent text-xs text-white font-mono focus:outline-none cursor-pointer"
+                    >
+                      <option value="none" className="bg-slate-900 text-white">OFF (なし)</option>
+                      <option value="realistic" className="bg-slate-900 text-white">標準 (路面連動)</option>
+                      <option value="high_chaos" className="bg-slate-900 text-white">カオス (多発)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Row 3: Scenario Selection Cards (When in Scenario Mode) */}
+            {majorCategory === 'battle' && (gameMode === 'crisis' || gameMode === 'scenario') && !customScenario && (
+              <div className="pt-2 border-t border-white/10 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Zap className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="font-racing font-bold text-white text-xs">
+                      📜 歴史的F1名場面シナリオ選択 (全{PRESET_CHALLENGES.length}シナリオ)
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsScenarioPickerOpen(!isScenarioPickerOpen)}
+                    className="text-[10px] font-mono text-slate-400 hover:text-white px-2 py-0.5 rounded bg-slate-800"
+                  >
+                    {isScenarioPickerOpen ? '▲ 一覧を閉じる' : '▼ シナリオ一覧を展開'}
+                  </button>
+                </div>
+
+                {isScenarioPickerOpen && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 pt-1">
+                    {PRESET_CHALLENGES.map((sc, idx) => {
+                      const isActive = presetIdx === idx && !customScenario;
+                      return (
+                        <button
+                          key={sc.id}
+                          type="button"
+                          onClick={() => startPresetCrisis(idx)}
+                          className={`text-left p-3 rounded-xl border transition-all relative overflow-hidden flex flex-col justify-between gap-2 ${
+                            isActive
+                              ? 'bg-gradient-to-br from-red-950/70 to-slate-900 border-red-500 ring-1 ring-red-500 shadow-lg shadow-red-950/50'
+                              : 'bg-slate-900/80 border-white/10 hover:border-red-500/50 hover:bg-slate-800/80'
+                          }`}
+                        >
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1">
+                                <span>{sc.circuit.flag}</span>
+                                <span>{sc.circuit.name.split(' ')[0]}</span>
+                              </span>
+                              <div className="flex items-center gap-1">
+                                <span
+                                  className={`px-1.5 py-0.2 rounded text-[9px] font-mono uppercase font-bold ${
+                                    sc.difficulty === 'hard'
+                                      ? 'bg-red-900/60 text-red-300 border border-red-500/30'
+                                      : 'bg-emerald-900/60 text-emerald-300 border border-emerald-500/30'
+                                  }`}
+                                >
+                                  {sc.difficulty}
+                                </span>
+                                {isActive && (
+                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-400 text-black animate-pulse">
+                                    ACTIVE
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <h4 className="font-racing font-bold text-white text-xs leading-snug line-clamp-1">
+                              {sc.title}
+                            </h4>
+                            <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed">
+                              {sc.description}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[10px] font-mono pt-1.5 border-t border-white/5 text-slate-400">
+                            <span className="text-red-300 font-bold">目標: P{sc.targetPosition}以内</span>
+                            <span>全{sc.totalLaps}周</span>
+                            <span className="text-cyan-300">{sc.tag}</span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Row 4: Mission Selection Cards (When in Mission Mode) */}
+            {majorCategory === 'battle' && gameMode === 'mission' && (
+              <div className="pt-2 border-t border-white/10 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ShieldAlert className="w-3.5 h-3.5 text-purple-400" />
+                    <span className="font-racing font-bold text-white text-xs">
+                      🎯 特務ミッション選択 (全{MISSION_CHALLENGES.length}ミッション)
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsScenarioPickerOpen(!isScenarioPickerOpen)}
+                    className="text-[10px] font-mono text-slate-400 hover:text-white px-2 py-0.5 rounded bg-slate-800"
+                  >
+                    {isScenarioPickerOpen ? '▲ 一覧を閉じる' : '▼ ミッション一覧を展開'}
+                  </button>
+                </div>
+
+                {isScenarioPickerOpen && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
+                    {MISSION_CHALLENGES.map((m, idx) => {
+                      const isActive = selectedMissionIdx === idx && gameMode === 'mission';
+                      return (
+                        <button
+                          key={m.id}
+                          type="button"
+                          onClick={() => startMission(idx)}
+                          className={`text-left p-3 rounded-xl border transition-all relative overflow-hidden flex flex-col justify-between gap-2 ${
+                            isActive
+                              ? 'bg-gradient-to-br from-purple-950/70 to-slate-900 border-purple-500 ring-1 ring-purple-500 shadow-lg shadow-purple-950/50'
+                              : 'bg-slate-900/80 border-white/10 hover:border-purple-500/50 hover:bg-slate-800/80'
+                          }`}
+                        >
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="text-[10px] font-mono text-purple-300 flex items-center gap-1 font-bold">
+                                <span>#{m.playerConfig.number} {m.playerConfig.code}</span>
+                              </span>
+                              <div className="flex items-center gap-1">
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-mono uppercase font-bold bg-purple-900/60 text-purple-300 border border-purple-500/30">
+                                  {m.difficulty}
+                                </span>
+                                {isActive && (
+                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-purple-400 text-black animate-pulse">
+                                    ACTIVE
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <h4 className="font-racing font-bold text-white text-xs leading-snug line-clamp-2">
+                              {m.title}
+                            </h4>
+                            <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed">
+                              {m.description}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[10px] font-mono pt-1.5 border-t border-white/5 text-slate-400">
+                            <span className="text-purple-300 font-bold">目標: P{m.targetPosition}以内</span>
+                            <span>全{m.totalLaps}周</span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Scenario Briefing Banner & Weather Reroll Action */}
             <div className="mt-3 p-3 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-2">
+              <div className="flex-1">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="font-racing font-bold text-white text-sm">
                     {activeScenario.title}
                   </span>
@@ -832,20 +1352,47 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                   <span className="px-2 py-0.5 rounded bg-slate-800 text-[10px] font-mono text-slate-300">
                     全{activeScenario.totalLaps}周
                   </span>
+                  <span className="px-2 py-0.5 rounded bg-blue-950/80 border border-blue-500/30 text-[10px] font-mono text-blue-300">
+                    {activeScenario.circuit.flag} {activeScenario.circuit.name}
+                  </span>
                 </div>
-                <p className="text-xs text-slate-300 mt-1">{activeScenario.description}</p>
+                <p className="text-xs text-slate-300 mt-1 leading-relaxed">{activeScenario.description}</p>
               </div>
 
-              {/* Weather forecast ticker */}
-              <div className="p-2 rounded-lg bg-slate-950 border border-white/10 flex items-center gap-2 text-xs shrink-0">
-                <CloudRain className="w-4 h-4 text-sky-400 shrink-0" />
-                <span className="font-mono text-slate-300 text-[11px]">
-                  {activeScenario.weatherForecast.radarDesc}
-                </span>
+              {/* Weather forecast ticker + Reroll button */}
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="p-2 rounded-lg bg-slate-950 border border-white/10 flex items-center gap-2 text-xs">
+                  <CloudRain className="w-4 h-4 text-sky-400 shrink-0" />
+                  <span className="font-mono text-slate-300 text-[11px] max-w-[280px] truncate">
+                    {activeScenario.weatherForecast.radarDesc}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleRerollWeather}
+                  className="btn-console flex items-center gap-1.5 text-xs px-3 py-2 text-cyan-300 border-cyan-500/40 hover:bg-cyan-950/60 hover:text-white transition-all shadow-md shadow-cyan-950/30"
+                  title="天候やセーフティカー確率を瞬時にランダム再抽選（リロード）して開始します"
+                >
+                  <Dices className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '6s' }} />
+                  <span className="font-racing font-bold text-[11px]">🎲 天候リロード</span>
+                </button>
               </div>
             </div>
 
-            {/* ── Pre-Race Strategic Briefing & Initial Setup Deck ── */}
+            {/* Weather Reroll Flash Notification */}
+            {weatherRerollNotification && (
+              <div className="p-2.5 rounded-xl bg-cyan-950/80 border border-cyan-500/50 text-cyan-200 text-xs font-mono flex items-center justify-between gap-2 shadow-lg animate-fade-in">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-cyan-300 animate-pulse" />
+                  <span>{weatherRerollNotification}</span>
+                </div>
+                <span className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider">NEW CONDITIONS APPLIED</span>
+              </div>
+            )}
+          </div>
+
+          {/* ── Pre-Race Strategic Briefing & Initial Setup Deck ── */}
             <div className="mt-3 p-3.5 rounded-xl bg-slate-900/95 border border-white/10 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-white/10">
                 <div className="flex items-center gap-2">
@@ -875,7 +1422,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
               </div>
 
               {isBriefingOpen && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 text-xs">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 pt-1 text-xs">
                   {/* 1. Starting Tyre Selector */}
                   <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
                     <div className="flex items-center justify-between">
@@ -960,11 +1507,11 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                           setCustomTargetCompound(e.target.value as TyreCompound);
                           setNextCompoundChoice(e.target.value as TyreCompound);
                         }}
-                        className="bg-slate-900 border border-white/10 rounded-lg px-2 py-1 text-xs text-white font-mono"
+                        className="bg-slate-900 border border-white/10 rounded-lg px-2 py-1 text-xs text-white font-racing font-bold"
                       >
-                        {(['SOFT', 'MEDIUM', 'HARD', 'INTER', 'WET'] as TyreCompound[]).map((cmp) => (
-                          <option key={cmp} value={cmp}>
-                            {cmp}
+                        {(['SOFT', 'MEDIUM', 'HARD', 'INTER', 'WET'] as TyreCompound[]).map((c) => (
+                          <option key={c} value={c}>
+                            {c}
                           </option>
                         ))}
                       </select>
@@ -1018,13 +1565,269 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                       サーキット特性: 抜きにくさ {activeScenario.circuit.overtakeDifficulty} / タイヤ攻撃性 {activeScenario.circuit.tyreAggression}
                     </div>
                   </div>
+
+                  {/* 4. Weather & Safety Car Customization Deck */}
+                  <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-racing text-slate-300 font-bold text-[11px] flex items-center gap-1.5">
+                        <CloudRain className="w-3.5 h-3.5 text-sky-400" /> 天候 ＆ SC状況設定
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleRerollWeather}
+                        className="text-[10px] font-mono text-cyan-300 hover:text-white px-1.5 py-0.5 rounded bg-cyan-950 border border-cyan-500/30 flex items-center gap-1"
+                        title="天候やSC確率を瞬時に再抽選"
+                      >
+                        <Dices className="w-3 h-3 text-cyan-400" />
+                        <span>再抽選</span>
+                      </button>
+                    </div>
+
+                    <div className="space-y-1.5 pt-1">
+                      <div className="flex items-center justify-between gap-1 text-[11px]">
+                        <span className="text-slate-400 shrink-0">天候タイプ:</span>
+                        <select
+                          value={activeScenario.startWeather}
+                          onChange={(e) => {
+                            const newWeather = e.target.value as WeatherType;
+                            const hasRain = newWeather !== 'dry';
+                            const rainLap = hasRain ? Math.max(2, Math.floor(activeScenario.totalLaps * 0.4)) : undefined;
+                            const intensity = newWeather === 'monsoon' ? 4.5 : newWeather === 'drizzle' ? 1.5 : hasRain ? 2.5 : 0;
+                            const updated: ChallengeScenario = {
+                              ...activeScenario,
+                              id: `${activeScenario.id}_custom_${Date.now()}`,
+                              startWeather: newWeather,
+                              weatherForecast: {
+                                radarDesc: newWeather === 'monsoon'
+                                  ? '豪雨モンスーン警戒。路面水量4.5mm到達予想。'
+                                  : newWeather === 'drizzle'
+                                  ? '雨上がりダンプ路面。急速ドライライン形成予想。'
+                                  : hasRain
+                                  ? `雨雲接近中。Lap ${rainLap}前後に降雨予想。`
+                                  : '快晴ドライコンディション。天候安定。',
+                                estimatedLapMin: rainLap ? Math.max(1, rainLap - 1) : 99,
+                                estimatedLapMax: rainLap ? Math.min(activeScenario.totalLaps, rainLap + 2) : 99,
+                                rainProbabilityPercent: hasRain ? 85 : 5,
+                              },
+                              actualRainLap: rainLap,
+                              actualRainIntensity: intensity,
+                            };
+                            setCustomScenario(updated);
+                            resetGameState();
+                          }}
+                          className="bg-slate-900 border border-white/10 rounded px-1.5 py-1 text-xs text-white font-racing font-bold cursor-pointer"
+                        >
+                          <option value="dry" className="bg-slate-900 text-white">☀️ 快晴ドライ</option>
+                          <option value="variable" className="bg-slate-900 text-white">⛅ 急変警戒</option>
+                          <option value="drizzle" className="bg-slate-900 text-white">🌤️ 雨上がりダンプ</option>
+                          <option value="monsoon" className="bg-slate-900 text-white">🌊 豪雨モンスーン</option>
+                        </select>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-1 text-[11px]">
+                        <span className="text-slate-400 shrink-0">降雨周回:</span>
+                        <select
+                          value={activeScenario.actualRainLap || 99}
+                          onChange={(e) => {
+                            const val = Number(e.target.value);
+                            const updated: ChallengeScenario = {
+                              ...activeScenario,
+                              id: `${activeScenario.id}_custom_${Date.now()}`,
+                              actualRainLap: val === 99 ? undefined : val,
+                              actualRainIntensity: val === 99 ? 0 : (activeScenario.actualRainIntensity || 2.5),
+                            };
+                            setCustomScenario(updated);
+                            resetGameState();
+                          }}
+                          className="bg-slate-900 border border-white/10 rounded px-1.5 py-1 text-xs text-white font-mono cursor-pointer"
+                        >
+                          <option value={99}>降雨なし</option>
+                          {Array.from({ length: activeScenario.totalLaps }, (_, i) => i + 1).map((l) => (
+                            <option key={l} value={l}>
+                              Lap {l}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="flex items-center justify-between gap-1 text-[11px]">
+                        <span className="text-slate-400 shrink-0">SC危険度:</span>
+                        <select
+                          value={activeScenario.scProbability > 0.7 ? 'high' : activeScenario.scProbability > 0.3 ? 'normal' : 'low'}
+                          onChange={(e) => {
+                            const prob = e.target.value === 'high' ? 0.85 : e.target.value === 'normal' ? 0.45 : 0.1;
+                            const updated: ChallengeScenario = {
+                              ...activeScenario,
+                              id: `${activeScenario.id}_custom_${Date.now()}`,
+                              scProbability: prob,
+                              actualScLap: prob > 0.4 ? Math.max(2, Math.floor(activeScenario.totalLaps * 0.5)) : undefined,
+                            };
+                            setCustomScenario(updated);
+                            resetGameState();
+                          }}
+                          className="bg-slate-900 border border-white/10 rounded px-1.5 py-1 text-xs text-white font-mono cursor-pointer"
+                        >
+                          <option value="low">低 (安全)</option>
+                          <option value="normal">中 (標準)</option>
+                          <option value="high">高 (大荒れ波乱)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
+        </div>
+      )}
+
+      {/* ── UNIFIED TACTICAL COMMAND STRIP (Always Visible at Top of Race Screen) ── */}
+      <div className="p-2 sm:p-2.5 rounded-xl bg-slate-950/90 border border-white/10 shadow-xl backdrop-blur-md">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2">
+          {/* Left: Lap Playback Controls */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <button
+              type="button"
+              onClick={() => setChallengeLap((l) => Math.max(1, l - 1))}
+              disabled={challengeLap <= 1}
+              className="btn-console text-xs px-2 py-1 disabled:opacity-30"
+            >
+              ◀ 1周戻る
+            </button>
+
+            {/* Main Advance Lap Action Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setAutoPauseAlert(null);
+                setChallengeLap((l) => Math.min(activeScenario.totalLaps, l + 1));
+              }}
+              disabled={challengeLap >= activeScenario.totalLaps}
+              className="btn-console-primary text-xs px-3.5 py-1 font-racing font-bold flex items-center gap-1.5 disabled:opacity-30 shadow-md shadow-red-950 ring-1 ring-red-400/50 hover:brightness-125"
+              title="自分のペースで1周進める"
+            >
+              1周進める ▶
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setChallengePlaying(!challengePlaying)}
+              className={`btn-console px-3 py-1 text-xs flex items-center gap-1 font-racing font-bold ${
+                challengePlaying ? 'bg-amber-600 text-white' : ''
+              }`}
+            >
+              {challengePlaying ? (
+                <>
+                  <Pause className="w-3 h-3" /> PAUSE
+                </>
+              ) : (
+                <>
+                  <Play className="w-3 h-3" /> {challengeLap >= activeScenario.totalLaps ? 'REPLAY' : 'AUTO PLAY'}
+                </>
+              )}
+            </button>
+
+            {/* Speed Selector */}
+            <div className="flex items-center gap-0.5 bg-slate-900 p-0.5 rounded-lg border border-white/10 text-[9px] font-racing">
+              {[
+                { val: 0.5, label: '0.5x' },
+                { val: 1, label: '1x' },
+                { val: 2, label: '2x' },
+                { val: 5, label: '5x' },
+              ].map((spd) => (
+                <button
+                  key={spd.val}
+                  type="button"
+                  onClick={() => setPlaybackSpeed(spd.val)}
+                  className={`px-1.5 py-0.5 rounded ${
+                    playbackSpeed === spd.val
+                      ? 'bg-red-600 text-white font-bold'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {spd.label}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={resetGameState}
+              className="btn-console text-xs px-1.5 py-1 text-slate-400 hover:text-white"
+              title="リセット"
+            >
+              <RotateCcw className="w-3 h-3" />
+            </button>
           </div>
 
-          {/* ── Auto Pause Event Alert Banner ── */}
-          {autoPauseAlert && (
+          {/* Center: Lap Progress Indicator */}
+          <div className="flex items-center gap-2 text-xs font-mono">
+            <span className="font-racing font-bold text-white">
+              LAP {challengeLap} / {activeScenario.totalLaps}
+            </span>
+            {challengePlaying && (
+              <span className="text-[10px] text-amber-300 font-mono">
+                ({(lapTimeRemainingMs / 1000).toFixed(1)}s)
+              </span>
+            )}
+            <div className="w-24 sm:w-32 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-red-600 to-rose-500 transition-all duration-300"
+                style={{ width: `${(challengeLap / activeScenario.totalLaps) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Right: Live Track Condition Ticker */}
+          <div className="flex items-center gap-2 text-[10px] font-mono flex-wrap">
+            {/* Weather condition */}
+            <span className="flex items-center gap-1 text-slate-300">
+              {currentSnapshot?.rainRadar.waterDepthMm! > 0 ? (
+                <>
+                  <CloudRain className="w-3 h-3 text-sky-400" />
+                  <span className="text-sky-300 font-bold">{currentSnapshot?.rainRadar.waterDepthMm}mm</span>
+                  <span className="text-slate-400">({currentSnapshot?.rainRadar.trackPhase})</span>
+                </>
+              ) : (
+                <span>☀️ DRY</span>
+              )}
+            </span>
+
+            <span className="text-amber-400">
+              路面 {currentSnapshot?.rainRadar.trackTempC || 30}°C
+            </span>
+
+            {/* Safety Car status */}
+            <span
+              className={`px-1.5 py-0.2 rounded font-bold ${
+                currentSnapshot?.isSC
+                  ? 'bg-yellow-500 text-slate-950 animate-pulse'
+                  : currentSnapshot?.isVSC
+                  ? 'bg-amber-600 text-white'
+                  : 'bg-emerald-950 text-emerald-400 border border-emerald-500/30'
+              }`}
+            >
+              {currentSnapshot?.isSC ? '🟡 SC' : currentSnapshot?.isVSC ? '🟠 VSC' : '🟢 GREEN'}
+            </span>
+
+            {/* SC risk */}
+            {currentSnapshot?.rainRadar && (
+              <span
+                className={`px-1.5 py-0.2 rounded text-[9px] font-bold border ${
+                  currentSnapshot.rainRadar.incidentRiskLevel === 'CRITICAL'
+                    ? 'bg-red-950 text-red-300 border-red-500 animate-pulse'
+                    : currentSnapshot.rainRadar.incidentRiskLevel === 'HIGH'
+                    ? 'bg-amber-950 text-amber-300 border-amber-500'
+                    : 'bg-slate-900 text-slate-400 border-white/10'
+                }`}
+              >
+                SC RISK {currentSnapshot.rainRadar.incidentRiskPercent}%
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+                {autoPauseAlert && (
             <div className="p-3 rounded-xl bg-gradient-to-r from-amber-950 via-slate-900 to-slate-950 border-2 border-amber-500/80 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 shadow-lg animate-in fade-in duration-200">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping" />
@@ -1048,8 +1851,245 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
             </div>
           )}
 
-          {/* ── Pro Pitwall Multi-Monitor Deck Switcher ── */}
-          <div className="flex items-center gap-1 overflow-x-auto pb-1">
+      {/* ── Mobile View Toggle (screens < lg) ── */}
+      <div className="flex lg:hidden items-center gap-1 p-1 rounded-xl bg-slate-900 border border-white/10 text-xs font-racing font-bold">
+        <button
+          type="button"
+          onClick={() => setMobileConsoleView('tower')}
+          className={`flex-1 py-1.5 rounded-lg text-center transition-all ${
+            mobileConsoleView === 'tower' ? 'bg-red-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          🏁 順位タワー (22台)
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileConsoleView('monitor')}
+          className={`flex-1 py-1.5 rounded-lg text-center transition-all ${
+            mobileConsoleView === 'monitor' ? 'bg-red-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          🖥️ 戦術モニター & 作戦指示
+        </button>
+      </div>
+
+      {/* ── DUAL-PANE PRO PITWALL ARENA ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-2.5 items-start">
+        {/* ── LEFT PANE: Perpetual 22-Car Timing Tower ── */}
+        <div className={`lg:col-span-5 ${mobileConsoleView === 'monitor' ? 'hidden lg:block' : 'block'}`}>
+                          <div className="glass-card-premium p-2.5 sm:p-3 rounded-2xl border border-white/10 space-y-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-white/10">
+                    <div className="flex items-center gap-2">
+                      <span className="font-racing text-sm font-bold text-white flex items-center gap-2">
+                        <Target className="w-4 h-4 text-red-500" /> LIVE TIMING TOWER (全22台)
+                      </span>
+                      {/* Dual / Single View Switcher */}
+                      <div className="flex items-center gap-1 bg-slate-900/90 p-0.5 rounded-lg border border-white/10 text-[10px] font-racing">
+                        <button
+                          type="button"
+                          onClick={() => setTimingTowerViewMode('dual')}
+                          className={`px-2 py-0.5 rounded font-bold transition-all ${
+                            timingTowerViewMode === 'dual'
+                              ? 'bg-red-600 text-white shadow-sm'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                          title="全22台を2列で一望パノラマ表示"
+                        >
+                          2列パノラマ
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setTimingTowerViewMode('single')}
+                          className={`px-2 py-0.5 rounded font-bold transition-all ${
+                            timingTowerViewMode === 'single'
+                              ? 'bg-red-600 text-white shadow-sm'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                          title="F1公式風スクロールタワー"
+                        >
+                          1列タワー
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {currentSnapshot?.rainRadar && (
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-1 border ${
+                            currentSnapshot.rainRadar.incidentRiskLevel === 'CRITICAL'
+                              ? 'bg-red-950/80 border-red-500/60 text-red-300 animate-pulse'
+                              : currentSnapshot.rainRadar.incidentRiskLevel === 'HIGH'
+                              ? 'bg-amber-950/80 border-amber-500/60 text-amber-300'
+                              : currentSnapshot.rainRadar.incidentRiskLevel === 'ELEVATED'
+                              ? 'bg-yellow-950/60 border-yellow-500/40 text-yellow-300'
+                              : 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300'
+                          }`}
+                          title="全22台の密集度・路面状況によるSC/インシデント発生確率"
+                        >
+                          <AlertTriangle className="w-3 h-3" />
+                          <span>
+                            SC RISK: {currentSnapshot.rainRadar.incidentRiskPercent}%
+                          </span>
+                        </span>
+                      )}
+                      <span className="text-xs font-mono text-slate-400">
+                        LAP {challengeLap} / {activeScenario.totalLaps}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* 22-Car Timing Rows */}
+                  {(() => {
+                    const allCars = currentSnapshot?.cars || [];
+                    const renderCarCard = (car: typeof allCars[0]) => {
+                      const isTarget = car.code === activeScenario.playerConfig.code;
+                      const isTeammate = car.code === activeScenario.teammateConfig.code;
+                      const tyreProp = TYRE_PROPERTIES[car.tyreCompound];
+                      const inPoints = car.position <= 10;
+
+                      return (
+                        <div
+                          key={car.code}
+                          className={`p-2 rounded-xl flex items-center justify-between text-xs transition-all ${
+                            isTarget
+                              ? 'bg-gradient-to-r from-red-950/90 to-slate-900 border-2 border-red-500 shadow-md ring-1 ring-red-400/50'
+                              : isTeammate
+                              ? 'bg-gradient-to-r from-emerald-950/70 to-slate-900 border border-emerald-500/60 shadow-sm'
+                              : 'bg-slate-900/80 hover:bg-slate-800/80 border border-white/5'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className={`w-6 text-center font-racing font-black text-xs ${
+                              inPoints ? 'text-amber-300' : 'text-slate-500'
+                            }`}>
+                              P{car.position}
+                            </span>
+                            <div
+                              className="w-1 h-6 rounded-full shrink-0"
+                              style={{ backgroundColor: car.color }}
+                            />
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="font-racing font-bold text-white text-xs truncate">
+                                  {car.name}
+                                </span>
+                                <span className="font-mono text-[9px] text-slate-400">#{car.number}</span>
+                                {isTarget && (
+                                  <span className="px-1.5 py-0.2 rounded bg-red-600 text-[8px] font-bold text-white tracking-widest">
+                                    YOU
+                                  </span>
+                                )}
+                                {isTeammate && (
+                                  <span className="px-1.5 py-0.2 rounded bg-emerald-600 text-[8px] font-bold text-white tracking-widest">
+                                    TM
+                                  </span>
+                                )}
+                                {inPoints && car.pointsAwarded ? (
+                                  <span className="px-1 py-0.2 rounded bg-amber-500/20 border border-amber-500/30 text-[8px] font-mono font-bold text-amber-300 hidden xl:inline-block">
+                                    +{car.pointsAwarded}pt
+                                  </span>
+                                ) : null}
+                                {car.inDrsTrain && (
+                                  <span className="px-1 py-0.2 rounded bg-sky-950 border border-sky-500/40 text-[8px] font-mono font-bold text-sky-300 hidden sm:inline-block">
+                                    🚂 DRS
+                                  </span>
+                                )}
+                                {car.inDirtyAir && !car.inDrsTrain && (
+                                  <span className="px-1 py-0.2 rounded bg-orange-950 border border-orange-500/40 text-[8px] font-mono font-bold text-orange-300 hidden sm:inline-block">
+                                    💨 D-AIR
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-[9px] text-slate-400 font-mono truncate">
+                                {car.team}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 font-mono shrink-0">
+                            {/* Tyre Badge */}
+                            <div className="flex items-center gap-1">
+                              <span
+                                className="px-1.5 py-0.2 rounded text-[9px] font-bold"
+                                style={{
+                                  backgroundColor: `${tyreProp.color}25`,
+                                  color: tyreProp.color,
+                                  border: `1px solid ${tyreProp.color}50`,
+                                }}
+                              >
+                                {car.tyreCompound[0]} (L{car.tyreAge})
+                              </span>
+                            </div>
+
+                            {/* Gap */}
+                            <span className="w-13 text-right font-bold text-slate-300 text-[11px]">
+                              {car.position === 1 ? 'LEADER' : `+${car.gapToLeader.toFixed(1)}s`}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    };
+
+                    if (timingTowerViewMode === 'dual') {
+                      const topHalf = allCars.slice(0, 11);
+                      const bottomHalf = allCars.slice(11, 22);
+
+                      return (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                          {/* Col 1: P1 - P11 */}
+                          <div className="space-y-1.5">
+                            <div className="text-[10px] font-racing font-bold text-slate-400 flex items-center justify-between px-1">
+                              <span>TOP HALF (P1 - P11)</span>
+                              <span className="text-amber-300 font-mono">入賞ボーダー P10</span>
+                            </div>
+                            {topHalf.map((car) => (
+                              <React.Fragment key={car.code}>
+                                {renderCarCard(car)}
+                                {car.position === 10 && (
+                                  <div className="py-1 px-2.5 rounded-lg bg-gradient-to-r from-amber-950/70 to-slate-900 border-dashed border border-amber-500/50 flex items-center justify-between text-[9px] font-racing font-bold text-amber-300 my-1 shadow-sm">
+                                    <span>🏁 POINTS CUTOFF (入賞ボーダーライン 1pt〜25pt)</span>
+                                    <span className="font-mono text-[9px] text-slate-400">これより上が入賞</span>
+                                  </div>
+                                )}
+                              </React.Fragment>
+                            ))}
+                          </div>
+
+                          {/* Col 2: P12 - P22 */}
+                          <div className="space-y-1.5">
+                            <div className="text-[10px] font-racing font-bold text-slate-400 px-1">
+                              <span>MIDFIELD & BACK (P12 - P22)</span>
+                            </div>
+                            {bottomHalf.map((car) => renderCarCard(car))}
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    // Single Column Scroll View
+                    return (
+                      <div className="space-y-1.5 max-h-[640px] overflow-y-auto pr-1">
+                        {allCars.map((car) => (
+                          <React.Fragment key={car.code}>
+                            {renderCarCard(car)}
+                            {car.position === 10 && (
+                              <div className="py-1 px-2.5 rounded-lg bg-gradient-to-r from-amber-950/70 to-slate-900 border-dashed border border-amber-500/50 flex items-center justify-between text-[9px] font-racing font-bold text-amber-300 my-1 shadow-sm">
+                                <span>🏁 POINTS CUTOFF (入賞ボーダーライン P10 / 1pt〜25pt)</span>
+                                <span className="font-mono text-[9px] text-slate-400">これより上位が入賞</span>
+                              </div>
+                            )}
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+        </div>
+
+        {/* ── RIGHT PANE: Multi-Monitor Deck & Docked Tactical Actions ── */}
+        <div className={`lg:col-span-7 space-y-2.5 ${mobileConsoleView === 'tower' ? 'hidden lg:block' : 'block'}`}>
+          {/* Monitor Deck Switcher */}
+                    <div className="flex items-center gap-1 overflow-x-auto pb-1">
             <button
               type="button"
               onClick={() => setActiveMonitor('timing')}
@@ -1124,8 +2164,8 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
             </button>
           </div>
 
-          {/* ── Active Interactive Radio Prompt (Prominent Pop-Up if Active) ── */}
-          {currentSnapshot?.activeRadioPrompt && !radioResponses[currentSnapshot.activeRadioPrompt.id] && (
+          {/* Active Radio Prompt (Pop-up if incoming radio transmission) */}
+                    {currentSnapshot?.activeRadioPrompt && !radioResponses[currentSnapshot.activeRadioPrompt.id] && (
             <div className="p-4 rounded-2xl bg-gradient-to-r from-red-950 via-slate-900 to-slate-950 border-2 border-red-500/80 shadow-2xl shadow-red-950/80 animate-in fade-in slide-in-from-top-2 duration-300">
               <div className="flex items-center justify-between pb-2 border-b border-red-500/30">
                 <div className="flex items-center gap-2">
@@ -1161,129 +2201,11 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
             </div>
           )}
 
-          {/* ── MONITOR DISPLAY AREA ── */}
-          <div className="grid grid-cols-1 gap-4">
-            {/* ══ MONITOR 1: TIMING & TRAFFIC REJOIN WINDOW ══ */}
+          {/* Active Monitor Display Area */}
+          <div className="space-y-2.5">
+            {/* Monitor 1: Pit Exit Traffic Window Radar */}
             {activeMonitor === 'timing' && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {/* Left 2 Cols: Timing Tower */}
-                <div className="lg:col-span-2 glass-card-premium p-4 rounded-2xl border border-white/10 space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <span className="font-racing text-sm font-bold text-white flex items-center gap-2">
-                      <Target className="w-4 h-4 text-red-500" /> LIVE TIMING TOWER
-                    </span>
-                    <div className="flex items-center gap-2">
-                      {currentSnapshot?.rainRadar && (
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-1 border ${
-                            currentSnapshot.rainRadar.incidentRiskLevel === 'CRITICAL'
-                              ? 'bg-red-950/80 border-red-500/60 text-red-300 animate-pulse'
-                              : currentSnapshot.rainRadar.incidentRiskLevel === 'HIGH'
-                              ? 'bg-amber-950/80 border-amber-500/60 text-amber-300'
-                              : currentSnapshot.rainRadar.incidentRiskLevel === 'ELEVATED'
-                              ? 'bg-yellow-950/60 border-yellow-500/40 text-yellow-300'
-                              : 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300'
-                          }`}
-                          title="現在の路面状況・タイヤ適合・コース特性によるインシデント/SC発生確率"
-                        >
-                          <AlertTriangle className="w-3 h-3" />
-                          <span>
-                            SC RISK: {currentSnapshot.rainRadar.incidentRiskPercent}% ({currentSnapshot.rainRadar.incidentRiskLevel})
-                          </span>
-                        </span>
-                      )}
-                      <span className="text-xs font-mono text-slate-400">
-                        LAP {challengeLap} / {activeScenario.totalLaps}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    {currentSnapshot?.cars.map((car) => {
-                      const isTarget = car.code === activeScenario.playerConfig.code;
-                      const isTeammate = car.code === activeScenario.teammateConfig.code;
-                      const tyreProp = TYRE_PROPERTIES[car.tyreCompound];
-                      return (
-                        <div
-                          key={car.code}
-                          className={`p-2.5 rounded-xl flex items-center justify-between text-xs transition-all ${
-                            isTarget
-                              ? 'bg-red-950/60 border-2 border-red-500/70 shadow-lg'
-                              : isTeammate
-                              ? 'bg-emerald-950/40 border border-emerald-500/40'
-                              : 'bg-slate-900/70 border border-white/5'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="w-5 text-center font-racing font-black text-slate-300">
-                              P{car.position}
-                            </span>
-                            <div
-                              className="w-1 h-5 rounded-full"
-                              style={{ backgroundColor: car.color }}
-                            />
-                            <div>
-                              <div className="flex items-center gap-1.5">
-                                <span className="font-racing font-bold text-white">{car.name}</span>
-                                <span className="font-mono text-[10px] text-slate-400">#{car.number}</span>
-                                {isTarget && (
-                                  <span className="px-1.5 py-0.2 rounded bg-red-600 text-[9px] font-bold text-white">
-                                    YOU
-                                  </span>
-                                )}
-                                {isTeammate && (
-                                  <span className="px-1.5 py-0.2 rounded bg-emerald-600 text-[9px] font-bold text-white">
-                                    TEAMMATE
-                                  </span>
-                                )}
-                              </div>
-                              <div className="text-[10px] text-slate-400 font-mono">
-                                {car.team} • {formatTimeSeconds(car.lapTime)}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-3 font-mono">
-                            {/* Tyre Badge */}
-                            <div className="flex items-center gap-1">
-                              <span
-                                className="px-2 py-0.5 rounded text-[10px] font-bold"
-                                style={{
-                                  backgroundColor: `${tyreProp.color}25`,
-                                  color: tyreProp.color,
-                                  border: `1px solid ${tyreProp.color}50`,
-                                }}
-                              >
-                                {car.tyreCompound[0]} (L{car.tyreAge})
-                              </span>
-                              {/* Wear Bar */}
-                              <div className="w-12 h-1.5 bg-slate-800 rounded-full overflow-hidden hidden sm:block">
-                                <div
-                                  className={`h-full ${
-                                    car.tyreWearPercent > 80
-                                      ? 'bg-red-500'
-                                      : car.tyreWearPercent > 50
-                                      ? 'bg-yellow-500'
-                                      : 'bg-emerald-500'
-                                  }`}
-                                  style={{ width: `${car.tyreWearPercent}%` }}
-                                />
-                              </div>
-                            </div>
-
-                            {/* Gap */}
-                            <span className="w-16 text-right font-bold text-slate-300">
-                              {car.position === 1 ? 'LEADER' : `+${car.gapToLeader.toFixed(1)}s`}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Right Col: Pit Exit Traffic Window Radar */}
-                <div className="glass-card-premium p-4 rounded-2xl border border-white/10 space-y-4">
+                              <div className="glass-card-premium p-3 sm:p-4 rounded-2xl border border-white/10 space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="font-racing text-sm font-bold text-white flex items-center gap-2">
                       <Crosshair className="w-4 h-4 text-cyan-400" /> PIT EXIT WINDOW RADAR
@@ -1348,10 +2270,9 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                       : '中団グループのダーティエアに復帰するリスク大。タイヤが熱ダレする恐れがあるため、ステイアウトでオーバーカットを狙う手もあります。'}
                   </div>
                 </div>
-              </div>
             )}
 
-            {/* ══ MONITOR 2: CAR TELEMETRY & DUAL-LAYER TYRE THERMALS ══ */}
+                        {/* ══ MONITOR 2: CAR TELEMETRY & DUAL-LAYER TYRE THERMALS ══ */}
             {activeMonitor === 'thermals' && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* 4 Tyre Cards with Surface vs Core Temps */}
@@ -1451,8 +2372,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                 </div>
               </div>
             )}
-
-            {/* ══ MONITOR 3: WEATHER, TRACK DRYING & INCIDENT RISK PREDICTOR ══ */}
+                        {/* ══ MONITOR 3: WEATHER, TRACK DRYING & INCIDENT RISK PREDICTOR ══ */}
             {activeMonitor === 'weather' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* 1. Doppler Rain Radar */}
@@ -1691,8 +2611,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                 </div>
               </div>
             )}
-
-            {/* ══ MONITOR 4: TEAM STRATEGY & DOUBLE-STACK DYNAMICS ══ */}
+                        {/* ══ MONITOR 4: TEAM STRATEGY & DOUBLE-STACK DYNAMICS ══ */}
             {activeMonitor === 'team' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Teammate Status Card */}
@@ -1806,8 +2725,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                 </div>
               </div>
             )}
-
-            {/* ══ MONITOR 5: DRIVER RADIO & COMMS TIMELINE ══ */}
+                        {/* ══ MONITOR 5: DRIVER RADIO & COMMS TIMELINE ══ */}
             {activeMonitor === 'radio' && (
               <div className="glass-card-premium p-4 rounded-2xl border border-white/10 space-y-3">
                 <div className="flex justify-between items-center">
@@ -1843,116 +2761,15 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
             )}
           </div>
 
-          {/* ── BOTTOM TACTICAL COMMAND DOCK (Always Visible) ── */}
-          <div className="p-3 sm:p-4 rounded-2xl bg-slate-950/90 border border-white/10 shadow-2xl backdrop-blur-md space-y-3">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-              {/* Lap playback controls */}
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setChallengeLap((l) => Math.max(1, l - 1))}
-                  disabled={challengeLap <= 1}
-                  className="btn-console text-xs px-2.5 py-1.5 disabled:opacity-30"
-                >
-                  ◀ 1周戻る
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setChallengePlaying(!challengePlaying)}
-                  className={`btn-console px-4 py-1.5 text-xs flex items-center gap-1.5 font-racing font-bold ${
-                    challengePlaying ? 'bg-amber-600 text-white' : 'btn-console-primary'
-                  }`}
-                >
-                  {challengePlaying ? (
-                    <>
-                      <Pause className="w-3.5 h-3.5" /> PAUSE
-                    </>
-                  ) : (
-                    <>
-                      <Play className="w-3.5 h-3.5" /> {challengeLap >= activeScenario.totalLaps ? 'REPLAY' : 'AUTO PLAY'}
-                    </>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAutoPauseAlert(null);
-                    setChallengeLap((l) => Math.min(activeScenario.totalLaps, l + 1));
-                  }}
-                  disabled={challengeLap >= activeScenario.totalLaps}
-                  className="btn-console-primary text-xs px-3.5 py-1.5 font-racing font-bold flex items-center gap-1.5 disabled:opacity-30 shadow-md"
-                  title="自分のペースで1周ずつ確認しながら進めます"
-                >
-                  1周進める ▶
-                </button>
-
-                {/* Playback speed */}
-                <div className="flex items-center gap-1 bg-slate-900 p-0.5 rounded-lg border border-white/10 text-[10px] font-racing">
-                  {[
-                    { val: 0.5, label: '🐢 0.5x (8秒)' },
-                    { val: 1, label: '🏎️ 1x (5.5秒)' },
-                    { val: 2, label: '⚡ 2x (2.8秒)' },
-                    { val: 5, label: '⏩ 5x (1.2秒)' },
-                  ].map((spd) => (
-                    <button
-                      key={spd.val}
-                      type="button"
-                      onClick={() => setPlaybackSpeed(spd.val)}
-                      className={`px-2 py-1 rounded ${
-                        playbackSpeed === spd.val
-                          ? 'bg-red-600 text-white font-bold'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                      title={`1周あたりの自動進行時間: ${spd.label}`}
-                    >
-                      {spd.label}
-                    </button>
-                  ))}
-                </div>
-
-                <button
-                  type="button"
-                  onClick={resetGameState}
-                  className="btn-console text-xs px-2 py-1.5 text-slate-400 hover:text-white"
-                  title="リセット"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                </button>
-              </div>
-
-              {/* Lap Progress bar */}
-              <div className="flex-1 max-w-xs hidden md:block">
-                <div className="flex justify-between text-[10px] font-mono text-slate-400 mb-1">
-                  <span>START</span>
-                  <span className="text-white font-bold flex items-center gap-1.5">
-                    <span>LAP {challengeLap} / {activeScenario.totalLaps}</span>
-                    {challengePlaying && (
-                      <span className="text-[10px] text-amber-300 font-mono">
-                        (次周まで {(lapTimeRemainingMs / 1000).toFixed(1)}s)
-                      </span>
-                    )}
-                  </span>
-                  <span>FLAG</span>
-                </div>
-                <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-white/10">
-                  <div
-                    className="h-full bg-gradient-to-r from-red-600 to-rose-500 transition-all duration-300"
-                    style={{
-                      width: `${(challengeLap / activeScenario.totalLaps) * 100}%`,
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Action Buttons: BOX NOW, PU MODE, ERS */}
-              <div className="flex flex-wrap items-center gap-2">
-                {/* Compound choice dropdown */}
+          {/* ── DOCKED TACTICAL COMMAND BAR (Always Visible under Monitors) ── */}
+          <div className="p-2.5 sm:p-3 rounded-xl bg-slate-950/90 border border-white/10 shadow-lg backdrop-blur-md">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-mono text-slate-400">次交換タイヤ:</span>
                 <select
                   value={nextCompoundChoice}
                   onChange={(e) => handleCompoundChange(e.target.value as TyreCompound)}
-                  className="bg-slate-900 border border-white/20 text-white text-xs font-racing font-bold px-2 py-1.5 rounded-xl cursor-pointer"
+                  className="bg-slate-900 border border-white/20 text-white text-xs font-racing font-bold px-2 py-1 rounded-lg cursor-pointer"
                 >
                   <option value="SOFT">🔴 SOFT</option>
                   <option value="MEDIUM">🟡 MEDIUM</option>
@@ -1960,12 +2777,14 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                   <option value="INTER">🟢 INTER</option>
                   <option value="WET">🔵 WET</option>
                 </select>
+              </div>
 
+              <div className="flex items-center gap-1.5 flex-wrap">
                 {/* BOX NOW Toggle */}
                 <button
                   type="button"
                   onClick={handleToggleBoxNextLap}
-                  className={`px-4 py-1.5 rounded-xl text-xs font-racing font-bold transition-all shadow-md ${
+                  className={`px-3.5 py-1 rounded-lg text-xs font-racing font-bold transition-all shadow-md ${
                     boxQueuedForNextLap
                       ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white border border-emerald-400 ring-2 ring-emerald-500/50'
                       : 'bg-gradient-to-r from-red-600 to-rose-600 text-white border border-red-500/50 hover:brightness-110'
@@ -1986,13 +2805,14 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                         : 'push';
                     handlePuModeChange(next);
                   }}
-                  className={`btn-console text-xs px-3 py-1.5 ${
+                  className={`btn-console text-xs px-2.5 py-1 ${
                     activePuMode === 'push'
                       ? 'bg-rose-950 border-rose-500 text-rose-300'
                       : activePuMode === 'conserve'
                       ? 'bg-emerald-950 border-emerald-500 text-emerald-300'
                       : ''
                   }`}
+                  title="パワーユニットの出力を切り替えます"
                 >
                   PU: {activePuMode.toUpperCase()}
                 </button>
@@ -2001,20 +2821,22 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                 <button
                   type="button"
                   onClick={handleToggleErs}
-                  className={`btn-console text-xs px-3 py-1.5 ${
+                  className={`btn-console text-xs px-2.5 py-1 ${
                     ersBoostUsedThisLap
                       ? 'bg-cyan-950 border-cyan-500 text-cyan-300 ring-1 ring-cyan-500'
                       : ''
                   }`}
+                  title="ERSバッテリー最大放出オーバーテイクモード"
                 >
                   🚀 ERS BOOST
                 </button>
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* ── RESULT & FULL F1 DEBRIEF CONSOLE (SCORE + ARCHETYPE + BADGES + LIBRARY) ── */}
-          {tacticalScore && (
+                {tacticalScore && (
             <div className="p-5 rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-red-950/50 border-2 border-red-500/60 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-400">
               
               {/* 1. Header Banner: Mission Result & FIA Rank */}
@@ -2787,7 +3609,6 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
               </div>
             </div>
           )}
-        </div>
     </div>
   );
 }
