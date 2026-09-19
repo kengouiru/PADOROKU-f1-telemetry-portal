@@ -1646,7 +1646,10 @@ export default function DashboardPage() {
             </button>
 
             {/* Auth Button */}
-            <AuthButton onOpenAuthModal={() => handleRequireAuth()} />
+            <AuthButton
+              onOpenAuthModal={() => handleRequireAuth()}
+              onOpenUpgradeModal={() => setProModalOpen(true)}
+            />
           </div>
         </div>
 

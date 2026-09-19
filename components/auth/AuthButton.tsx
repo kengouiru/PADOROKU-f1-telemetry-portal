@@ -6,19 +6,18 @@ import { useUserPreferences } from '@/lib/userPreferences';
 import { usePlanTier } from '@/lib/tierService';
 import { KNOWLEDGE_TEAMS, KNOWLEDGE_DRIVERS } from '@/data/f1KnowledgeData';
 import ProfileSettingsModal from './ProfileSettingsModal';
-import PitwallProModal from '@/components/subscription/PitwallProModal';
 
 interface AuthButtonProps {
   onOpenAuthModal: () => void;
+  onOpenUpgradeModal?: () => void;
 }
 
-export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
+export default function AuthButton({ onOpenAuthModal, onOpenUpgradeModal }: AuthButtonProps) {
   const { data: session, status } = useSession();
   const { prefs } = useUserPreferences();
   const { isPro, aiUsage } = usePlanTier();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
-  const [proModalOpen, setProModalOpen] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -205,7 +204,7 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
             <button
               onClick={() => {
                 setDropdownOpen(false);
-                setProModalOpen(true);
+                onOpenUpgradeModal?.();
               }}
               className="w-full text-left px-2.5 py-2 rounded-xl text-slate-200 hover:bg-slate-800 hover:text-white transition-colors flex items-center justify-between font-racing font-bold cursor-pointer"
             >
@@ -241,15 +240,7 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
       {profileModalOpen && (
         <ProfileSettingsModal
           onClose={() => setProfileModalOpen(false)}
-          onOpenUpgradeModal={() => setProModalOpen(true)}
-        />
-      )}
-
-      {/* Pitwall Pro Modal */}
-      {proModalOpen && (
-        <PitwallProModal
-          isOpen={proModalOpen}
-          onClose={() => setProModalOpen(false)}
+          onOpenUpgradeModal={onOpenUpgradeModal}
         />
       )}
     </>
