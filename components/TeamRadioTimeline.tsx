@@ -259,91 +259,278 @@ const TeamRadioTimeline = forwardRef<TeamRadioTimelineHandle, TeamRadioTimelineP
         </div>
       </div>
 
-      {/* FIA Race Control Messages (shared) */}
-      {visibleFia.length > 0 && (
-        <div className="px-4 py-2 bg-slate-900/60 border-b border-white/5 flex flex-col gap-1.5 max-h-32 overflow-y-auto">
-          {visibleFia.map((ev: TimelineEvent) => (
-            <div
-              key={ev.id}
-              className={`flex items-start gap-2 text-xs px-2 py-1.5 rounded border ${flagColor(ev.flag) || 'border-slate-700/40'}`}
-            >
-              <span className="text-slate-500 flex-shrink-0 font-mono mt-0.5">L{ev.lap_number ?? '-'}</span>
-              <span className="text-slate-300 flex-1">{ev.message}</span>
-              {ev.flag && (
-                <span className="text-xs text-slate-400 flex-shrink-0">{ev.flag}</span>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Multi-column grid */}
-      <div className={`grid ${gridClass} divide-y md:divide-y-0 md:divide-x divide-white/5 flex-1 min-h-0`}>
-        {selectedDrivers.map(driverNum => {
-          const driver = drivers.find(d => d.driver_number.toString() === driverNum);
+      {/* Viewport: Dual-pane for 1 driver, multi-column comparison for 2+ drivers */}
+      {colCount === 1 ? (
+        (() => {
+          const driverNum = selectedDrivers[0];
+          const driver = drivers.find((d) => d.driver_number.toString() === driverNum);
           const color = driver ? formatColor(driver.team_colour) : '#38bdf8';
           const events = buildEvents(driverNum);
 
-          // Filter events
-          const filtered = events.filter(ev => {
+          const filtered = events.filter((ev) => {
             if (activeFilter === 'ALL') return true;
-            if (activeFilter === 'FIA') return false; // FIA shown in shared area
+            if (activeFilter === 'FIA') return false;
             if (activeFilter === 'PIT') return ev.eventType === 'pit' || ev.category === 'PIT';
             return ev.category === activeFilter;
           });
 
+          const catStats = {
+            radio: events.filter((e) => e.eventType === 'radio').length,
+            pit: events.filter((e) => e.eventType === 'pit').length,
+            tyre: events.filter((e) => e.category === 'TYRE').length,
+            strategy: events.filter((e) => e.category === 'STRATEGY').length,
+            pace: events.filter((e) => e.category === 'PACE').length,
+            safety: events.filter((e) => e.category === 'SAFETY').length,
+          };
+
           return (
-            <div key={driverNum} className="flex flex-col min-h-0">
-              {/* Column header */}
-              <div
-                className="p-3 border-b border-white/5 flex items-center justify-between bg-slate-900/40"
-                style={{ borderLeftWidth: 3, borderLeftColor: color }}
-              >
-                <div className="flex items-center gap-2">
-                  <span
-                    className="font-racing font-bold text-xs px-1.5 py-0.5 rounded border"
-                    style={{ borderColor: `${color}60`, color, backgroundColor: `${color}15` }}
-                  >
-                    {driver?.name_acronym ?? `#${driverNum}`}
-                  </span>
-                  <span className="text-xs font-bold text-white truncate max-w-[120px]">
-                    {driver?.full_name ?? `Driver #${driverNum}`}
+            <div className="p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start">
+              {/* Left: Driver Audio Timeline Feed (8 cols on lg) */}
+              <div className="lg:col-span-8 flex flex-col rounded-xl border border-white/10 bg-slate-950/40 overflow-hidden shadow-inner">
+                {/* Column header */}
+                <div
+                  className="p-3 border-b border-white/10 flex items-center justify-between bg-slate-900/60"
+                  style={{ borderLeftWidth: 4, borderLeftColor: color }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="font-racing font-bold text-xs px-2 py-0.5 rounded border"
+                      style={{
+                        borderColor: `${color}60`,
+                        color,
+                        backgroundColor: `${color}15`,
+                      }}
+                    >
+                      {driver?.name_acronym ?? `#${driverNum}`}
+                    </span>
+                    <span className="text-xs font-bold text-white">
+                      {driver?.full_name ?? `Driver #${driverNum}`}
+                    </span>
+                    <span className="text-[11px] text-slate-400 font-mono ml-1">
+                      {driver?.team_name}
+                    </span>
+                  </div>
+                  <span className="text-xs text-slate-400 font-mono">
+                    表示: <span className="text-white font-bold">{filtered.length}</span> / {events.length}件
                   </span>
                 </div>
-                <span className="text-xs text-slate-500 font-mono">
-                  {filtered.length}件
-                </span>
+
+                {/* Event card list */}
+                <div className="p-3 overflow-y-auto max-h-[580px] flex flex-col gap-2.5 flex-1">
+                  {filtered.length === 0 ? (
+                    <div className="text-center text-slate-600 text-xs py-12 font-mono">
+                      該当するイベントはありません
+                    </div>
+                  ) : (
+                    filtered.map((ev) => (
+                      <TimelineCard
+                        key={ev.id}
+                        event={ev}
+                        driverColor={color}
+                        transcript={
+                          ev.recording_url
+                            ? transcriptsCache[ev.recording_url]
+                            : undefined
+                        }
+                        isLoadingTranscript={
+                          ev.recording_url
+                            ? loadingUrls.has(ev.recording_url)
+                            : false
+                        }
+                        onFetchTranscript={(url) =>
+                          fetchTranscript(url, driverNum, ev.lap_number)
+                        }
+                        cardRef={(el) => {
+                          if (!cardRefs.current[driverNum])
+                            cardRefs.current[driverNum] = {};
+                          if (ev.lap_number != null) {
+                            cardRefs.current[driverNum][ev.lap_number] = el;
+                          }
+                        }}
+                      />
+                    ))
+                  )}
+                </div>
               </div>
 
-              {/* Event card list */}
-              <div className="p-3 overflow-y-auto max-h-96 flex flex-col gap-2.5 flex-1">
-                {filtered.length === 0 ? (
-                  <div className="text-center text-slate-600 text-xs py-8">
-                    該当するイベントはありません
+              {/* Right: FIA Race Control & Tactical Intelligence Panel (4 cols on lg) */}
+              <div className="lg:col-span-4 flex flex-col gap-3">
+                {/* FIA Race Control Live Feed Card */}
+                <div className="glass-card-premium p-3.5 rounded-xl flex flex-col gap-2.5">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                    <h4 className="text-xs font-racing font-bold text-white tracking-wider flex items-center gap-1.5">
+                      <span>🚩</span>
+                      <span>FIA RACE CONTROL / レース管制速報</span>
+                    </h4>
+                    <span className="text-[10px] font-mono text-slate-400">
+                      {visibleFia.length} 件
+                    </span>
                   </div>
-                ) : (
-                  filtered.map(ev => (
-                    <TimelineCard
-                      key={ev.id}
-                      event={ev}
-                      driverColor={color}
-                      transcript={ev.recording_url ? transcriptsCache[ev.recording_url] : undefined}
-                      isLoadingTranscript={ev.recording_url ? loadingUrls.has(ev.recording_url) : false}
-                      onFetchTranscript={url => fetchTranscript(url, driverNum, ev.lap_number)}
-                      cardRef={el => {
-                        if (!cardRefs.current[driverNum]) cardRefs.current[driverNum] = {};
-                        if (ev.lap_number != null) {
-                          cardRefs.current[driverNum][ev.lap_number] = el;
-                        }
-                      }}
-                    />
-                  ))
-                )}
+
+                  <div className="flex flex-col gap-1.5 max-h-[340px] overflow-y-auto pr-0.5">
+                    {visibleFia.length === 0 ? (
+                      <div className="text-center text-slate-500 text-xs py-8 font-mono">
+                        現在、審理・フラッグ通達はありません
+                      </div>
+                    ) : (
+                      visibleFia.map((ev: TimelineEvent) => (
+                        <div
+                          key={ev.id}
+                          className={`flex items-start gap-2 text-xs px-2.5 py-2 rounded-lg border ${
+                            flagColor(ev.flag) || 'border-white/5 bg-slate-900/60'
+                          }`}
+                        >
+                          <span className="text-slate-400 flex-shrink-0 font-mono text-[11px] mt-0.5">
+                            L{ev.lap_number ?? '-'}
+                          </span>
+                          <span className="text-slate-200 flex-1 leading-relaxed text-[11px]">
+                            {ev.message}
+                          </span>
+                          {ev.flag && (
+                            <span className="text-[10px] font-mono text-amber-300 font-bold flex-shrink-0">
+                              {ev.flag}
+                            </span>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Communication Breakdown Card */}
+                <div className="glass-card-premium p-3.5 rounded-xl flex flex-col gap-2.5">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                    <h4 className="text-xs font-racing font-bold text-white tracking-wider flex items-center gap-1.5">
+                      <span>📊</span>
+                      <span>COMMUNICATION STATS / 無線種別内訳</span>
+                    </h4>
+                    <span className="text-[10px] font-mono text-slate-400">
+                      計 {events.length} 件
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div className="bg-slate-900/70 p-2 rounded-lg border border-white/5">
+                      <span className="text-[10px] font-mono text-slate-400 block">RADIO</span>
+                      <span className="text-xs font-mono font-bold text-sky-400">{catStats.radio}</span>
+                    </div>
+                    <div className="bg-slate-900/70 p-2 rounded-lg border border-white/5">
+                      <span className="text-[10px] font-mono text-slate-400 block">PIT</span>
+                      <span className="text-xs font-mono font-bold text-red-400">{catStats.pit}</span>
+                    </div>
+                    <div className="bg-slate-900/70 p-2 rounded-lg border border-white/5">
+                      <span className="text-[10px] font-mono text-slate-400 block">STRATEGY</span>
+                      <span className="text-xs font-mono font-bold text-purple-400">{catStats.strategy}</span>
+                    </div>
+                    <div className="bg-slate-900/70 p-2 rounded-lg border border-white/5">
+                      <span className="text-[10px] font-mono text-slate-400 block">TYRE</span>
+                      <span className="text-xs font-mono font-bold text-yellow-400">{catStats.tyre}</span>
+                    </div>
+                    <div className="bg-slate-900/70 p-2 rounded-lg border border-white/5">
+                      <span className="text-[10px] font-mono text-slate-400 block">PACE</span>
+                      <span className="text-xs font-mono font-bold text-blue-400">{catStats.pace}</span>
+                    </div>
+                    <div className="bg-slate-900/70 p-2 rounded-lg border border-white/5">
+                      <span className="text-[10px] font-mono text-slate-400 block">SAFETY</span>
+                      <span className="text-xs font-mono font-bold text-orange-400">{catStats.safety}</span>
+                    </div>
+                  </div>
+
+                  <div className="text-[11px] text-slate-400 bg-slate-900/60 p-2.5 rounded-lg border border-white/5 leading-relaxed">
+                    💡 <span className="text-slate-300 font-medium">Gemini 戦術意図要約:</span> 各無線カードの「AI戦術意図を要約」を押すと、ピットウォールがその瞬間に下した戦略的判断が即座に言語化されます。
+                  </div>
+                </div>
               </div>
             </div>
           );
-        })}
-      </div>
+        })()
+      ) : (
+        /* Multi-Driver Side-by-Side Comparison Layout */
+        <>
+          {visibleFia.length > 0 && (
+            <div className="px-4 py-2 bg-slate-900/60 border-b border-white/5 flex flex-col gap-1.5 max-h-32 overflow-y-auto">
+              {visibleFia.map((ev: TimelineEvent) => (
+                <div
+                  key={ev.id}
+                  className={`flex items-start gap-2 text-xs px-2 py-1.5 rounded border ${flagColor(ev.flag) || 'border-slate-700/40'}`}
+                >
+                  <span className="text-slate-500 flex-shrink-0 font-mono mt-0.5">L{ev.lap_number ?? '-'}</span>
+                  <span className="text-slate-300 flex-1">{ev.message}</span>
+                  {ev.flag && (
+                    <span className="text-xs text-slate-400 flex-shrink-0">{ev.flag}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className={`grid ${gridClass} divide-y md:divide-y-0 md:divide-x divide-white/5 flex-1 min-h-0`}>
+            {selectedDrivers.map((driverNum) => {
+              const driver = drivers.find((d) => d.driver_number.toString() === driverNum);
+              const color = driver ? formatColor(driver.team_colour) : '#38bdf8';
+              const events = buildEvents(driverNum);
+
+              const filtered = events.filter((ev) => {
+                if (activeFilter === 'ALL') return true;
+                if (activeFilter === 'FIA') return false;
+                if (activeFilter === 'PIT') return ev.eventType === 'pit' || ev.category === 'PIT';
+                return ev.category === activeFilter;
+              });
+
+              return (
+                <div key={driverNum} className="flex flex-col min-h-0">
+                  {/* Column header */}
+                  <div
+                    className="p-3 border-b border-white/5 flex items-center justify-between bg-slate-900/40"
+                    style={{ borderLeftWidth: 3, borderLeftColor: color }}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="font-racing font-bold text-xs px-1.5 py-0.5 rounded border"
+                        style={{ borderColor: `${color}60`, color, backgroundColor: `${color}15` }}
+                      >
+                        {driver?.name_acronym ?? `#${driverNum}`}
+                      </span>
+                      <span className="text-xs font-bold text-white truncate max-w-[120px]">
+                        {driver?.full_name ?? `Driver #${driverNum}`}
+                      </span>
+                    </div>
+                    <span className="text-xs text-slate-500 font-mono">
+                      {filtered.length}件
+                    </span>
+                  </div>
+
+                  {/* Event card list */}
+                  <div className="p-3 overflow-y-auto max-h-[580px] flex flex-col gap-2.5 flex-1">
+                    {filtered.length === 0 ? (
+                      <div className="text-center text-slate-600 text-xs py-8 font-mono">
+                        該当するイベントはありません
+                      </div>
+                    ) : (
+                      filtered.map((ev) => (
+                        <TimelineCard
+                          key={ev.id}
+                          event={ev}
+                          driverColor={color}
+                          transcript={ev.recording_url ? transcriptsCache[ev.recording_url] : undefined}
+                          isLoadingTranscript={ev.recording_url ? loadingUrls.has(ev.recording_url) : false}
+                          onFetchTranscript={(url) => fetchTranscript(url, driverNum, ev.lap_number)}
+                          cardRef={(el) => {
+                            if (!cardRefs.current[driverNum]) cardRefs.current[driverNum] = {};
+                            if (ev.lap_number != null) {
+                              cardRefs.current[driverNum][ev.lap_number] = el;
+                            }
+                          }}
+                        />
+                      ))
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 });

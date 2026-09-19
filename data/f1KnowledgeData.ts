@@ -10096,6 +10096,14 @@ export const KNOWLEDGE_STRATEGIES: StrategyConcept[] = [
       '路面温度が低く、ハードタイヤの作動温度（100℃前後）突入に2周以上要する場合に強力',
       'ステイアウト中にセーフティカー（SC/VSC）が導入されれば「フリーピットストップ」となり大逆転を生む',
     ],
+    telemetrySession: {
+      year: 2024,
+      meetingKey: 1236,
+      sessionKey: 9163,
+      meetingName: 'Monaco Grand Prix',
+      targetLap: 32,
+      targetDriver: '16',
+    },
     references: [
       {
         id: 1,
@@ -10125,6 +10133,14 @@ export const KNOWLEDGE_STRATEGIES: StrategyConcept[] = [
       'SC先導走行中はブレーキ熱がホイールリムを通じてタイヤ空気圧・温度に影響を与えるため、織り込み走行が必須',
       '赤旗中断（Red Flag）となった場合は、ピットレーン停止中に全車が無償でタイヤ交換とウイング角度調整を行える',
     ],
+    telemetrySession: {
+      year: 2024,
+      meetingKey: 1238,
+      sessionKey: 9165,
+      meetingName: 'Miami Grand Prix',
+      targetLap: 28,
+      targetDriver: '4',
+    },
     references: [
       {
         id: 1,
@@ -10215,6 +10231,14 @@ export const KNOWLEDGE_HISTORY: HistoryArchive[] = [
         strategicContext: 'ウェット路面が乾くクロスオーバーポイントを誰よりも先に見極め、怒涛の追い上げの引き金を引いた無線。',
       },
     ],
+    telemetrySession: {
+      year: 2024,
+      meetingKey: 1237,
+      sessionKey: 9164,
+      meetingName: 'Canadian Grand Prix (Circuit Gilles Villeneuve)',
+      targetLap: 70,
+      targetDriver: '4',
+    },
     references: [
       {
         id: 1,
@@ -10263,6 +10287,14 @@ export const KNOWLEDGE_HISTORY: HistoryArchive[] = [
         audioUrl: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/MAXVER01_1_20230916_142555.mp3',
       },
     ],
+    telemetrySession: {
+      year: 2024,
+      meetingKey: 1250,
+      sessionKey: 9200,
+      meetingName: 'Abu Dhabi Grand Prix (Yas Marina Circuit)',
+      targetLap: 58,
+      targetDriver: '1',
+    },
     references: [
       {
         id: 1,

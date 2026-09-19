@@ -366,6 +366,11 @@ export default function DashboardPage() {
       setMobileTab('notes');
       desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
       mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (featureId === 'library' || featureId === 'knowledge') {
+      setAppMode('library');
+      setActiveHub('knowledge');
+      desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+      mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (
       featureId === 'drivers' ||
       featureId === 'teams' ||
@@ -936,7 +941,7 @@ export default function DashboardPage() {
   }, [state.currentSession]);
 
   const analysisContent = (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-3">
       {/* Persistent AI Guidance Companion Bar if active */}
       {activeAiGuidance && (() => {
         const lower = activeAiGuidance.content.toLowerCase();
@@ -950,10 +955,10 @@ export default function DashboardPage() {
         }).slice(0, 6);
 
         return (
-          <div className="rounded-2xl bg-gradient-to-r from-blue-950/90 via-slate-900/90 to-indigo-950/90 border border-blue-500/40 p-4 shadow-xl space-y-2.5 animate-fade-in">
+          <div className="rounded-xl bg-gradient-to-r from-blue-950/90 via-slate-900/90 to-indigo-950/90 border border-blue-500/30 p-2.5 sm:p-3 shadow-md space-y-2 animate-fade-in">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-lg">🤖</span>
+                <span className="text-base">🤖</span>
                 <h4 className="font-racing font-bold text-xs sm:text-sm text-white flex items-center gap-2">
                   <span>{activeAiGuidance.title}</span>
                   <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30">
@@ -1022,16 +1027,16 @@ export default function DashboardPage() {
                 </button>
               </div>
             </div>
-            <div className="text-xs text-slate-200 whitespace-pre-wrap leading-relaxed pl-6 border-l-2 border-blue-400/50">
+            <div className="text-xs text-slate-200 whitespace-pre-wrap leading-relaxed pl-4 border-l-2 border-blue-400/50">
               {activeAiGuidance.content}
             </div>
 
             {/* Clickable Relevant Term Chips */}
             {relevantTerms.length > 0 && (
-              <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-white/10 mt-1">
+              <div className="flex flex-wrap items-center gap-1.5 pt-1.5 border-t border-white/10 mt-1">
                 <span className="text-[10px] font-racing font-bold text-sky-400 flex items-center gap-1 flex-shrink-0">
                   <span>💡</span>
-                  <span>解説内の重要用語（クリックで図解確認）:</span>
+                  <span>解説内の重要用語:</span>
                 </span>
                 {relevantTerms.map((term) => (
                   <button
@@ -1041,7 +1046,7 @@ export default function DashboardPage() {
                       setQuickGlossaryQuery(term.term.split(' ')[0]);
                       setQuickGlossaryOpen(true);
                     }}
-                    className="px-2 py-0.5 rounded-lg text-[11px] font-mono font-bold bg-slate-800/90 hover:bg-emerald-950/90 text-slate-300 hover:text-emerald-300 border border-white/10 hover:border-emerald-500/40 transition-all flex items-center gap-1 cursor-pointer shadow-sm active:scale-95"
+                    className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-slate-800/90 hover:bg-emerald-950/90 text-slate-300 hover:text-emerald-300 border border-white/10 hover:border-emerald-500/40 transition-all flex items-center gap-1 cursor-pointer shadow-sm active:scale-95"
                   >
                     <span>🧠</span>
                     <span>{term.term.split(' ')[0]}</span>
@@ -1055,7 +1060,7 @@ export default function DashboardPage() {
 
       {/* ── WORKSPACE 1: PACE & POSITION (ラップタイム推移・累積ギャップ・周回順位・セクター分析) ── */}
       {telemetrySubTab === 'pace' && (
-        <div className="space-y-6 animate-fade-in">
+        <div className="space-y-3 sm:space-y-4 animate-fade-in">
           <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
             <div className="flex items-center gap-2">
               <span className="text-base">📈</span>
@@ -1109,7 +1114,7 @@ export default function DashboardPage() {
 
       {/* ── WORKSPACE 2: COCKPIT CAR TELEMETRY (車速・スロットル・ブレーキ・ギア3連精密比較 ＆ コースマップ) ── */}
       {telemetrySubTab === 'car_data' && (
-        <div className="space-y-4 animate-fade-in">
+        <div className="space-y-3 sm:space-y-4 animate-fade-in">
           <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
             <div className="flex items-center gap-2">
               <span className="text-base">⚡</span>
@@ -1133,7 +1138,7 @@ export default function DashboardPage() {
 
       {/* ── WORKSPACE 3: TYRE STINTS & STRATEGY (全車タイヤ履歴・アンダーカット/オーバーカット戦略シミュレーション) ── */}
       {telemetrySubTab === 'strategy' && (
-        <div className="space-y-6 animate-fade-in">
+        <div className="space-y-3 sm:space-y-4 animate-fade-in">
           <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
             <div className="flex items-center gap-2">
               <span className="text-base">🛞</span>
@@ -1181,7 +1186,7 @@ export default function DashboardPage() {
 
       {/* ── WORKSPACE 4: TEAM RADIO & RACE CONTROL (チーム無線音声・リアルタイムAI戦術翻訳 ＆ FIA審理速報) ── */}
       {telemetrySubTab === 'radio' && (
-        <div className="space-y-4 animate-fade-in">
+        <div className="space-y-3 sm:space-y-4 animate-fade-in">
           <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
             <div className="flex items-center gap-2">
               <span className="text-base">📻</span>
@@ -1211,7 +1216,7 @@ export default function DashboardPage() {
 
       {/* ── WORKSPACE 5: LAP-BY-LAP DATA SHEET (全周回ラップタイム・セクター別スプリット・ピット詳細データ) ── */}
       {telemetrySubTab === 'laptable' && (
-        <div className="space-y-4 animate-fade-in">
+        <div className="space-y-3 sm:space-y-4 animate-fade-in">
           <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
             <div className="flex items-center gap-2">
               <span className="text-base">📋</span>
@@ -1313,11 +1318,15 @@ export default function DashboardPage() {
             ? 'コース解説'
             : librarySubTab === 'tyres'
             ? 'タイヤ大百科'
+            : librarySubTab === 'strategy'
+            ? '戦略・作戦室'
             : librarySubTab === 'regulations'
             ? '2026次世代規定'
             : librarySubTab === 'rules'
             ? '規定・用語集'
-            : 'ドラマ・歴史'}
+            : librarySubTab === 'history'
+            ? '歴史アーカイブ'
+            : 'ドラマ・名場面'}
         </span>
       </nav>
 
@@ -1651,8 +1660,10 @@ export default function DashboardPage() {
                   ['teams', '🏎️', 'チーム名鑑'],
                   ['circuits', '🏁', 'コース解説'],
                   ['tyres', '🛞', 'タイヤ大百科'],
+                  ['strategy', '⏱️', '戦略・作戦室'],
                   ['rules', '⚖️', '規定・用語集'],
-                  ['drama', '🎬', 'ドラマ・歴史'],
+                  ['drama', '🎬', 'ドラマ・名場面'],
+                  ['history', '🏛️', '歴史アーカイブ'],
                 ] as [SubTab, string, string][]
               ).map(([tab, icon, label]) => {
                 const isActive = librarySubTab === tab || (tab === 'rules' && (librarySubTab === 'rules' || librarySubTab === 'glossary' || librarySubTab === 'regulations'));
@@ -1885,7 +1896,7 @@ export default function DashboardPage() {
         </div>
 
         {/* ── Fixed Mobile Bottom Navigation Bar (< md) ── */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-black/90 backdrop-blur-md border-t border-white/10 flex items-center justify-around safe-bottom shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-black/90 backdrop-blur-md border-t border-white/10 flex items-center justify-around safe-bottom shadow-[0_-4px_20px_rgba(0,0,0,0.5)] overflow-x-auto no-scrollbar">
           {appMode === 'season' ? (
             (
               [
@@ -1932,8 +1943,10 @@ export default function DashboardPage() {
                 ['teams',    '🏎️', 'チーム'],
                 ['circuits', '🏁', 'コース'],
                 ['tyres',    '🛞', 'タイヤ'],
-                ['rules',    '⚖️', '規定・用語'],
+                ['strategy', '⏱️', '作戦室'],
+                ['rules',    '⚖️', '規定用語'],
                 ['drama',    '🎬', 'ドラマ'],
+                ['history',  '🏛️', '歴史'],
               ] as [SubTab, string, string][]
             ).map(([subTab, icon, label]) => {
               const isActive = activeHub === 'knowledge' && (librarySubTab === subTab || (subTab === 'rules' && (librarySubTab === 'rules' || librarySubTab === 'glossary' || librarySubTab === 'regulations'))) && !aiDrawerOpen;
@@ -1946,14 +1959,14 @@ export default function DashboardPage() {
                     setLibrarySubTab(subTab);
                     if (aiDrawerOpen) setAiDrawerOpen(false);
                   }}
-                  className={`flex-1 flex flex-col items-center py-2.5 px-1 gap-0.5 text-xs transition-all relative ${
+                  className={`flex-1 min-w-[50px] shrink-0 flex flex-col items-center py-2 px-1 gap-0.5 text-xs transition-all relative ${
                     isActive
                       ? 'text-sky-400 font-bold'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
                   <span className={`text-base transition-transform ${isActive ? 'scale-110' : ''}`}>{icon}</span>
-                  <span className="text-[10px] tracking-tight">{label}</span>
+                  <span className="text-[9px] tracking-tight whitespace-nowrap">{label}</span>
                   {isActive && (
                     <span className="absolute bottom-1 w-6 h-0.5 bg-sky-500 rounded-full shadow-[0_0_8px_#38bdf8]" />
                   )}
@@ -2087,20 +2100,6 @@ export default function DashboardPage() {
         onSelectFeature={handleFeatureJump}
         onOpenAuthModal={() => handleRequireAuth()}
         onOpenUpgradeModal={() => setProModalOpen(true)}
-        sessionProps={{
-          selectedYear: state.selectedYear,
-          onYearChange: handleYearChange,
-          selectedMeetingKey: state.selectedMeetingKey,
-          onMeetingChange: handleMeetingChange,
-          selectedSessionKey: state.selectedSessionKey,
-          onSessionChange: handleSessionChange,
-          sessions: state.sessions,
-          drivers: state.drivers,
-          selectedDrivers: state.selectedDrivers,
-          onDriverToggle: handleDriverToggle,
-          isDemoMode: state.isDemoMode,
-          isLoading: state.isLoading,
-        }}
       />
 
       {/* ── PC AI Telemetry Inspector Modal (Independent Sandbox) ── */}

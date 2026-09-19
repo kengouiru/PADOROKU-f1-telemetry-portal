@@ -20,11 +20,11 @@
   "previousSnapshotAvailable": true,
   "previousSnapshotDate": "2026-09-13T04:12:52.800Z",
   "newsSnapshot": {
-    "latestVersion": "news-snapshot-2026-09-12-1789229551902",
-    "timestamp": "2026-09-12T16:12:31.902Z",
-    "createdAt": "2026/9/13 1:12:31",
+    "latestVersion": "news-snapshot-2026-09-19-1789788701184",
+    "timestamp": "2026-09-19T03:31:41.184Z",
+    "createdAt": "2026/9/19 12:31:41",
     "articlesCount": 14,
     "previousSnapshotAvailable": true,
-    "previousSnapshotDate": "2026-09-12T16:12:31.896Z"
+    "previousSnapshotDate": "2026-09-19T03:31:41.181Z"
   }
 }

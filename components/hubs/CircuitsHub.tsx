@@ -150,6 +150,7 @@ export default function CircuitsHub({
   const [characteristicFilter, setCharacteristicFilter] = useState<CircuitCharacteristic>('ALL');
   const [onlyFavorites, setOnlyFavorites] = useState(false);
   const [localSearch, setLocalSearch] = useState<string>('');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedCircuitDetail, setSelectedCircuitDetail] = useState<CircuitProfile | null>(null);
 
   // Automatically select & open modal when initialCircuitId is supplied
@@ -196,6 +197,9 @@ export default function CircuitsHub({
     });
   }, [regionFilter, characteristicFilter, effectiveSearch, onlyFavorites, isFavoriteCircuit]);
 
+  const activeFilterCount =
+    (regionFilter !== 'ALL' ? 1 : 0) + (characteristicFilter !== 'ALL' ? 1 : 0);
+
   const isFiltered =
     regionFilter !== 'ALL' ||
     characteristicFilter !== 'ALL' ||
@@ -228,116 +232,31 @@ export default function CircuitsHub({
   };
 
   return (
-    <div className="flex flex-col gap-4 animate-fade-in">
-      {/* ── Quick Filter Bar Section ── */}
-      <div className="bg-slate-950/70 border border-white/10 rounded-2xl p-4 shadow-lg flex flex-col gap-3.5">
-        {/* Row 1: Region Pills, Counter Badge & Reset Button */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/5 pb-3">
-          {/* Region Pills */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1">
-              <span>🌐</span>
-              <span>地域:</span>
-            </span>
-            {REGION_OPTIONS.map((opt) => {
-              const active = regionFilter === opt.key;
-              return (
-                <button
-                  key={opt.key}
-                  onClick={() => setRegionFilter(opt.key)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 border shadow-sm cursor-pointer ${
-                    active
-                      ? 'bg-blue-600 text-white border-blue-400 shadow-blue-500/20'
-                      : 'bg-slate-900/80 text-slate-400 border-white/5 hover:border-white/20 hover:text-white hover:bg-slate-800'
-                  }`}
-                >
-                  <span>{opt.icon}</span>
-                  <span>{opt.label}</span>
-                </button>
-              );
-            })}
-          </div>
+    <div className="flex flex-col gap-3 sm:gap-4 max-w-7xl mx-auto animate-fade-in pb-6 sm:pb-2">
+      {/* ── 1. Compact Single-Row Action Bar ── */}
+      <div className="glass-card-premium rounded-xl p-2.5 sm:p-3 shadow-md flex flex-wrap items-center justify-between gap-2.5 border border-white/10">
+        {/* Left: Circuit Count Badge & Inline Quick Search */}
+        <div className="flex items-center gap-2.5 flex-1 min-w-[240px]">
+          <span className="text-xs font-mono font-bold bg-slate-900/90 px-2.5 py-1.5 rounded-lg border border-white/10 text-sky-400 shrink-0">
+            表示中: <strong className="text-white text-sm">{filteredCircuits.length}</strong> / {KNOWLEDGE_CIRCUITS.length} 件
+          </span>
 
-          {/* Result Counter & Condition Reset */}
-          <div className="flex items-center gap-2 self-end md:self-auto flex-shrink-0">
-            <span className="text-xs font-mono font-bold bg-slate-900 px-3 py-1.5 rounded-xl border border-white/10 text-sky-400">
-              表示中:{' '}
-              <strong className="text-white text-sm">
-                {filteredCircuits.length}
-              </strong>{' '}
-              / {KNOWLEDGE_CIRCUITS.length} 件
-            </span>
-
-            {/* Quick Starred Only Filter Toggle */}
-            <button
-              onClick={() => setOnlyFavorites((prev) => !prev)}
-              className={`text-xs font-racing font-bold px-3 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 shadow-sm cursor-pointer ${
-                onlyFavorites
-                  ? 'bg-amber-500/25 border-amber-400 text-amber-300 ring-1 ring-amber-400/50'
-                  : 'bg-slate-900 border-white/10 text-slate-400 hover:text-amber-300 hover:border-amber-400/30'
-              }`}
-              title="お気に入りに登録したサーキットのみ表示"
-            >
-              <span>{onlyFavorites ? '★' : '☆'}</span>
-              <span>推しコース ({prefs.favoriteCircuitIds?.length || 0})</span>
-            </button>
-
-            {isFiltered && (
-              <button
-                onClick={handleResetFilters}
-                className="text-xs font-mono font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 px-3 py-1.5 rounded-xl transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
-                title="すべての絞り込み条件をリセット"
-              >
-                <span>✕</span>
-                <span>条件リセット</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Row 2: Characteristic Pills & Inline Free-Word Search Bar */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-          {/* Characteristic Pills */}
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1">
-              <span>🏎️</span>
-              <span>コース特性:</span>
-            </span>
-            {CHARACTERISTIC_OPTIONS.map((opt) => {
-              const active = characteristicFilter === opt.key;
-              return (
-                <button
-                  key={opt.key}
-                  onClick={() => setCharacteristicFilter(opt.key)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all flex items-center gap-1.5 border shadow-sm cursor-pointer ${
-                    active
-                      ? 'bg-purple-600 text-white border-purple-400 shadow-purple-500/20'
-                      : 'bg-slate-900/80 text-slate-400 border-white/5 hover:border-white/20 hover:text-white hover:bg-slate-800'
-                  }`}
-                >
-                  <span>{opt.icon}</span>
-                  <span>{opt.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Inline Free-word Search Input */}
-          <div className="relative w-full lg:w-72">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400 text-xs">
+          <div className="relative flex-1 max-w-sm">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-slate-400 text-xs">
               🔍
             </span>
             <input
               type="text"
-              placeholder="コース名・国名で検索..."
+              placeholder="コース名・国名・特性で検索..."
               value={effectiveSearch}
               onChange={handleSearchInputChange}
-              className="w-full bg-slate-900/90 border border-white/10 rounded-xl pl-8 pr-7 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
+              className="w-full bg-slate-900/80 border border-white/10 rounded-lg pl-7 pr-7 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
             />
             {effectiveSearch && (
               <button
+                type="button"
                 onClick={handleClearLocalSearch}
-                className="absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-400 hover:text-white text-xs cursor-pointer"
+                className="absolute inset-y-0 right-0 flex items-center pr-2 text-slate-400 hover:text-white text-xs cursor-pointer"
                 title="検索条件をクリア"
               >
                 ✕
@@ -345,7 +264,207 @@ export default function CircuitsHub({
             )}
           </div>
         </div>
+
+        {/* Right: Starred Quick Filter, Filter Tray Toggle, Reset */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Favorites quick toggle */}
+          <button
+            type="button"
+            onClick={() => setOnlyFavorites((prev) => !prev)}
+            className={`text-xs font-racing font-bold px-2.5 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 shadow-sm cursor-pointer ${
+              onlyFavorites
+                ? 'bg-amber-500/25 border-amber-400 text-amber-300 ring-1 ring-amber-400/50'
+                : 'bg-slate-900/80 border-white/10 text-slate-400 hover:text-amber-300 hover:border-amber-400/30'
+            }`}
+            title="お気に入りに登録したサーキットのみ表示"
+          >
+            <span>{onlyFavorites ? '★' : '☆'}</span>
+            <span>推しコース ({prefs.favoriteCircuitIds?.length || 0})</span>
+          </button>
+
+          {/* Filter Tray Toggle Button with Badge */}
+          <button
+            type="button"
+            onClick={() => setIsFilterOpen((prev) => !prev)}
+            className={`text-xs font-racing font-bold px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 shadow-sm cursor-pointer ${
+              isFilterOpen
+                ? 'bg-blue-600 text-white border-blue-400 shadow-blue-500/30 ring-1 ring-blue-400/50'
+                : activeFilterCount > 0
+                ? 'bg-blue-950/80 border-blue-500/50 text-blue-300 hover:bg-blue-900/80'
+                : 'bg-slate-900/80 border-white/10 text-slate-300 hover:text-white hover:bg-slate-800'
+            }`}
+            title="詳細フィルター（地域・コース特性）の開閉"
+          >
+            <span>⚙️</span>
+            <span>絞り込み</span>
+            {activeFilterCount > 0 && (
+              <span className="w-4 h-4 rounded-full bg-blue-500 text-white text-[10px] font-mono flex items-center justify-center font-bold">
+                {activeFilterCount}
+              </span>
+            )}
+            <span className="text-[10px] transition-transform">{isFilterOpen ? '▲' : '▼'}</span>
+          </button>
+
+          {/* Reset all button if anything is filtered */}
+          {isFiltered && (
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="text-xs font-mono font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
+              title="すべての絞り込み条件をリセット"
+            >
+              <span>✕</span>
+              <span className="hidden sm:inline">リセット</span>
+            </button>
+          )}
+        </div>
       </div>
+
+      {/* ── 2. Collapsible Filter Tray (On-demand) ── */}
+      {isFilterOpen && (
+        <div className="glass-card-premium rounded-xl p-3 sm:p-4 border border-blue-500/30 shadow-xl flex flex-col gap-3 animate-fade-in">
+          <div className="flex items-center justify-between pb-2 border-b border-white/10 text-xs">
+            <span className="font-racing font-bold text-slate-300 flex items-center gap-1.5">
+              <span>⚙️</span>
+              <span>サーキット絞り込み条件設定</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => setIsFilterOpen(false)}
+              className="text-slate-400 hover:text-white text-xs px-2 py-0.5 rounded hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              閉じる ✕
+            </button>
+          </div>
+
+          {/* Region Section */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <span className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider min-w-[70px] flex items-center gap-1">
+              <span>🌐</span>
+              <span>開催地域:</span>
+            </span>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {REGION_OPTIONS.map((opt) => {
+                const active = regionFilter === opt.key;
+                return (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => setRegionFilter(opt.key)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1 border shadow-sm cursor-pointer ${
+                      active
+                        ? 'bg-blue-600 text-white border-blue-400 shadow-blue-500/20 ring-1 ring-blue-400/40'
+                        : 'bg-slate-900/80 text-slate-400 border-white/5 hover:border-white/20 hover:text-white hover:bg-slate-800'
+                    }`}
+                  >
+                    <span>{opt.icon}</span>
+                    <span>{opt.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Characteristics Section */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-2 border-t border-white/5">
+            <span className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider min-w-[70px] flex items-center gap-1">
+              <span>🏎️</span>
+              <span>コース特性:</span>
+            </span>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {CHARACTERISTIC_OPTIONS.map((opt) => {
+                const active = characteristicFilter === opt.key;
+                return (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    onClick={() => setCharacteristicFilter(opt.key)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1 border shadow-sm cursor-pointer ${
+                      active
+                        ? 'bg-purple-600 text-white border-purple-400 shadow-purple-500/20 ring-1 ring-purple-400/40'
+                        : 'bg-slate-900/80 text-slate-400 border-white/5 hover:border-white/20 hover:text-white hover:bg-slate-800'
+                    }`}
+                  >
+                    <span>{opt.icon}</span>
+                    <span>{opt.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 3. Active Filter Dismissible Chips Strip ── */}
+      {(regionFilter !== 'ALL' || characteristicFilter !== 'ALL' || onlyFavorites || effectiveSearch.trim()) && (
+        <div className="flex flex-wrap items-center gap-1.5 px-1 text-xs">
+          <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1 mr-1">
+            <span>🎯</span>
+            <span>絞り込み中:</span>
+          </span>
+          {regionFilter !== 'ALL' && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-950/80 border border-blue-500/40 text-blue-200 text-[11px] font-mono">
+              <span>{REGION_OPTIONS.find((r) => r.key === regionFilter)?.icon}</span>
+              <span>{REGION_OPTIONS.find((r) => r.key === regionFilter)?.label}</span>
+              <button
+                type="button"
+                onClick={() => setRegionFilter('ALL')}
+                className="hover:text-white text-blue-400 hover:bg-blue-800/50 rounded px-1 ml-0.5 cursor-pointer"
+                title="地域フィルター解除"
+              >
+                ✕
+              </button>
+            </span>
+          )}
+          {characteristicFilter !== 'ALL' && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-950/80 border border-purple-500/40 text-purple-200 text-[11px] font-mono">
+              <span>{CHARACTERISTIC_OPTIONS.find((c) => c.key === characteristicFilter)?.icon}</span>
+              <span>{CHARACTERISTIC_OPTIONS.find((c) => c.key === characteristicFilter)?.label}</span>
+              <button
+                type="button"
+                onClick={() => setCharacteristicFilter('ALL')}
+                className="hover:text-white text-purple-400 hover:bg-purple-800/50 rounded px-1 ml-0.5 cursor-pointer"
+                title="コース特性フィルター解除"
+              >
+                ✕
+              </button>
+            </span>
+          )}
+          {onlyFavorites && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-950/80 border border-amber-500/40 text-amber-200 text-[11px] font-mono">
+              <span>★ 推しコースのみ</span>
+              <button
+                type="button"
+                onClick={() => setOnlyFavorites(false)}
+                className="hover:text-white text-amber-400 hover:bg-amber-800/50 rounded px-1 ml-0.5 cursor-pointer"
+                title="推しコース絞り込み解除"
+              >
+                ✕
+              </button>
+            </span>
+          )}
+          {effectiveSearch.trim() && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-950/80 border border-sky-500/40 text-sky-200 text-[11px] font-mono">
+              <span>&quot;{effectiveSearch}&quot;</span>
+              <button
+                type="button"
+                onClick={handleClearLocalSearch}
+                className="hover:text-white text-sky-400 hover:bg-sky-800/50 rounded px-1 ml-0.5 cursor-pointer"
+                title="検索キーワード解除"
+              >
+                ✕
+              </button>
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={handleResetFilters}
+            className="text-[11px] text-rose-400 hover:text-rose-300 underline ml-1 cursor-pointer font-mono"
+          >
+            すべて解除
+          </button>
+        </div>
+      )}
 
       {/* ── Empty State ── */}
       {filteredCircuits.length === 0 && (
@@ -367,7 +486,7 @@ export default function CircuitsHub({
       )}
 
       {/* ── 24 Circuits Grid ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
         {filteredCircuits.map((circuit) => {
           const chars = getCircuitCharacteristics(circuit);
           const region = getCircuitRegion(circuit.id);
@@ -377,7 +496,7 @@ export default function CircuitsHub({
             <div
               key={circuit.id}
               onClick={() => setSelectedCircuitDetail(circuit)}
-              className="glass-card-premium p-4.5 flex flex-col justify-between gap-3 border-l-4 border-l-sky-500 cursor-pointer hover:border-sky-400 hover:shadow-2xl hover:shadow-sky-500/10 transition-all duration-200 hover:-translate-y-0.5 group relative overflow-hidden rounded-2xl"
+              className="glass-card-premium p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 border-l-4 border-l-sky-500 cursor-pointer hover:border-sky-400 hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 group relative overflow-hidden rounded-xl"
             >
               <div className="space-y-2.5">
                 {/* Card Header: Country, Name, Length */}
@@ -476,9 +595,9 @@ export default function CircuitsHub({
                 )}
 
                 {/* Lap Record Snippet */}
-                <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between">
-                  <span>⏱️ レコード:</span>
-                  <span className="text-slate-200 font-bold truncate ml-1">
+                <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between gap-1">
+                  <span className="whitespace-nowrap shrink-0">⏱️ レコード:</span>
+                  <span className="text-slate-200 font-bold truncate text-right">
                     {circuit.lapRecord.time} ({circuit.lapRecord.driver})
                   </span>
                 </div>
@@ -486,10 +605,10 @@ export default function CircuitsHub({
 
               {/* Card Footer */}
               <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[11px] font-mono text-slate-400">
-                <span className="text-[10px] text-slate-500">
+                <span className="text-[10px] text-slate-500 whitespace-nowrap">
                   {circuit.turns} ターン / DRS {circuit.drsZones}
                 </span>
-                <span className="text-sky-400 group-hover:underline flex items-center gap-0.5 font-bold">
+                <span className="text-sky-400 group-hover:underline flex items-center gap-0.5 font-bold whitespace-nowrap shrink-0">
                   <span>詳細解説を見る</span>
                   <span>➔</span>
                 </span>

@@ -273,15 +273,15 @@ export default function DetailedTelemetryChart({
   };
 
   return (
-    <div className={`glass-card bg-slate-950/95 border border-white/10 rounded-3xl p-4 sm:p-6 shadow-2xl space-y-6 ${className}`}>
+    <div className={`glass-card bg-slate-950/95 border border-white/10 rounded-2xl p-3 sm:p-4 shadow-xl space-y-3 sm:space-y-4 ${className}`}>
       {/* ── Top Header: Title & Quick Presets ── */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-white/10">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-2.5 border-b border-white/10">
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40">
               TELEMETRY INTELLIGENCE
             </span>
-            <span className="text-xs font-mono text-slate-400">
+            <span className="text-[11px] font-mono text-slate-400">
               3段同期テレメトリー & トラックミニマップ連動解析
             </span>
           </div>
@@ -403,7 +403,7 @@ export default function DetailedTelemetryChart({
       ) : (
         <>
       {/* ── Selectors Bar: Driver 1 vs Driver 2 & Circuit ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 glass-card-premium p-3.5 rounded-2xl border border-white/10 shadow-lg relative overflow-hidden">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 glass-card-premium p-2.5 sm:p-3 rounded-xl border border-white/10 shadow-md relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-red-600 via-sky-500 to-amber-500 opacity-60" />
         {/* Driver 1 Selector */}
         <div className="flex items-center gap-2">
@@ -510,9 +510,9 @@ export default function DetailedTelemetryChart({
       </div>
 
       {/* ── Main Layout: Side-by-Side Interactive Mini-Map & 3-Tier Synchronized Charts ── */}
-      <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-3 sm:gap-4 items-start">
         {/* Left Column: Interactive Track Mini-Map (4 cols on xl) */}
-        <div className="xl:col-span-4 space-y-4">
+        <div className="xl:col-span-4 space-y-3">
           <TelemetryTrackMap
             circuitId={selectedCircuit}
             hoverDistPercent={hoverDistPercent}

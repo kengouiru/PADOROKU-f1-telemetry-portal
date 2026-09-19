@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import type { Session, Driver } from '@/lib/types';
 import { useSession, signOut } from 'next-auth/react';
 import { useUserPreferences } from '@/lib/userPreferences';
 import { KNOWLEDGE_TEAMS, KNOWLEDGE_DRIVERS } from '@/data/f1KnowledgeData';
@@ -19,21 +18,6 @@ export interface AppNavigationDrawerProps {
   onSelectFeature: (featureId: string) => void;
   onOpenAuthModal?: () => void;
   onOpenUpgradeModal?: () => void;
-  // Session & Driver selectors (Optional inside drawer)
-  sessionProps?: {
-    selectedYear: string;
-    onYearChange: (year: string) => void;
-    selectedMeetingKey: number | null;
-    onMeetingChange: (meetingKey: number) => void;
-    selectedSessionKey: number | null;
-    onSessionChange: (sessionKey: number) => void;
-    sessions: Session[];
-    drivers: Driver[];
-    selectedDrivers: string[];
-    onDriverToggle: (num: string, checked: boolean) => void;
-    isDemoMode: boolean;
-    isLoading: boolean;
-  };
 }
 
 interface NavItem {
@@ -42,7 +26,8 @@ interface NavItem {
   icon: string;
   badge?: string;
   badgeColor?: string;
-  description?: string;
+  keywords?: string;
+  isSubItem?: boolean;
 }
 
 interface NavGroup {
@@ -53,194 +38,157 @@ interface NavGroup {
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    groupTitle: 'ホーム ＆ メイン画面',
-    groupIcon: '🏠',
+    groupTitle: 'メインハブ (5大画面)',
+    groupIcon: '🏁',
     items: [
       {
         id: 'season_calendar',
-        label: 'ホーム（2026年レースカレンダー＆観戦）',
-        icon: '🏠',
-        badge: 'HOME',
-        badgeColor: 'bg-red-600 text-white',
-        description: '全24戦日程・カウントダウン・ドライバー＆チーム順位表・最新ニュース',
-      },
-    ],
-  },
-  {
-    groupTitle: '注目・最新機能ラボ',
-    groupIcon: '🔥',
-    items: [
-      {
-        id: 'virtual_gp',
-        label: 'ピットウォール司令塔 (PITWALL)',
-        icon: '🎮',
-        badge: 'COMMAND',
-        badgeColor: 'bg-gradient-to-r from-red-600 to-rose-600 text-white font-black',
-        description: '全24戦・全11チーム・実戦テレメトリー＆双方向チーム無線・100点採点',
-      },
-      {
-        id: 'telemetry_delta',
-        label: 'タイムデルタ(Δt) ＆ コーナー解析',
-        icon: '🏁',
-        badge: '2車比較',
-        badgeColor: 'bg-sky-600 text-white',
-        description: 'GPS累積タイム差・全15コーナーApex速度・AIデブリーフ',
-      },
-      {
-        id: 'war_room',
-        label: '戦術司令室 (Pitwall War Room)',
-        icon: '🚨',
-        badge: '戦術',
-        badgeColor: 'bg-amber-600 text-white',
-        description: '天候雨量・路面温度・タイヤ崖検知・SCピット損得計算',
-      },
-      {
-        id: 'fod_news',
-        label: 'FOD公式中継 ＆ パドックニュース',
-        icon: '📺',
-        badge: '公式中継',
-        badgeColor: 'bg-emerald-600 text-white',
-        description: 'フジテレビNEXT/FOD放送日程・一次情報格付けバッジ',
-      },
-      {
-        id: 'quiz',
-        label: 'F1検定クイズ (実況音声演出)',
-        icon: '🏆',
-        badge: '実況演出',
-        badgeColor: 'bg-purple-600 text-white',
-        description: '全4難易度・148問・エンジン音＆ピット無線エフェクト',
-      },
-    ],
-  },
-  {
-    groupTitle: 'レース観戦 ＆ テレメトリー',
-    groupIcon: '🏎️',
-    items: [
-      {
-        id: 'season_calendar',
-        label: 'レースカレンダー ＆ シーズン観戦',
+        label: 'シーズン観戦 ＆ カレンダー',
         icon: '📅',
-        description: '2026年全24戦カレンダー・次戦カウントダウン・概要',
+        badge: 'SEASON',
+        badgeColor: 'bg-red-600/30 text-red-300 border border-red-500/30',
+        keywords: 'カレンダー 日程 順位表 スケジュール ホーム 2026',
       },
       {
         id: 'telemetry_laps',
-        label: 'テレメトリー・ラップペース比較',
+        label: '実戦テレメトリー分析',
         icon: '📊',
-        description: '周回ごとのラップタイム推移・ファステストラップ',
+        badge: 'TELEMETRY',
+        badgeColor: 'bg-red-600/30 text-red-300 border border-red-500/30',
+        keywords: 'テレメトリー ラップタイム 車速 比較 ペース',
+      },
+      {
+        id: 'virtual_gp',
+        label: 'ピットウォール司令塔',
+        icon: '🎮',
+        badge: 'PITWALL',
+        badgeColor: 'bg-red-600/30 text-red-300 border border-red-500/30',
+        keywords: 'ピットウォール シミュレーター 戦術 指揮 司令室',
+      },
+      {
+        id: 'fod_news',
+        label: 'パドックニュース ＆ FOD中継',
+        icon: '📰',
+        badge: 'NEWS',
+        badgeColor: 'bg-red-600/30 text-red-300 border border-red-500/30',
+        keywords: 'ニュース 放送日程 FOD フジテレビ パドック',
+      },
+      {
+        id: 'library',
+        label: 'F1大百科 ＆ ナレッジ',
+        icon: '📚',
+        badge: 'LIBRARY',
+        badgeColor: 'bg-sky-600/30 text-sky-300 border border-sky-500/30',
+        keywords: '百科事典 ライブラリ ナレッジ 知識',
+      },
+    ],
+  },
+  {
+    groupTitle: 'F1大百科ダイレクト目次',
+    groupIcon: '🏎️',
+    items: [
+      {
+        id: 'drivers',
+        label: '選手名鑑 (全22名・レジェンド)',
+        icon: '👤',
+        isSubItem: true,
+        keywords: 'ドライバー 選手名鑑 角田 フェルスタッペン ハミルトン',
+      },
+      {
+        id: 'teams',
+        label: 'チーム名鑑 (全11チーム・PU)',
+        icon: '🏎️',
+        isSubItem: true,
+        keywords: 'コンストラクター チーム レッドブル フェラーリ アウディ ホンダ',
+      },
+      {
+        id: 'circuits',
+        label: 'サーキット解説 (全24コース)',
+        icon: '🏁',
+        isSubItem: true,
+        keywords: 'コース サーキット 鈴鹿 モナコ スパ DRS',
+      },
+      {
+        id: 'tyres',
+        label: 'タイヤ大百科 (ピレリ C1〜C5)',
+        icon: '🛞',
+        isSubItem: true,
+        keywords: 'タイヤ ピレリ コンパウンド 作動温度 摩耗 デグラデーション',
+      },
+      {
+        id: 'glossary',
+        label: 'F1用語辞典 (図解・80語+)',
+        icon: '🧠',
+        isSubItem: true,
+        keywords: '用語 辞書 解説 アペックス アンダーカット トウ スリップストリーム',
+      },
+      {
+        id: 'fia_rules',
+        label: 'FIA公式規則 ＆ 2026年規定',
+        icon: '⚖️',
+        badge: '2026規定',
+        badgeColor: 'bg-amber-500/20 text-amber-300 border border-amber-500/30',
+        isSubItem: true,
+        keywords: 'ルール 規則 FIA 2026 新規定 スチュワード ペナルティ',
+      },
+      {
+        id: 'drama',
+        label: '名勝負ドラマ ＆ 歴史無線',
+        icon: '🎬',
+        isSubItem: true,
+        keywords: '名勝負 ドラマ 歴史 無線 クラシック 確執 アーカイブ',
+      },
+    ],
+  },
+  {
+    groupTitle: '専門ツール ＆ 分析機能',
+    groupIcon: '🛠️',
+    items: [
+      {
+        id: 'telemetry_delta',
+        label: 'タイムデルタ(Δt) ＆ コーナー解析',
+        icon: '⏱️',
+        badge: 'Δt',
+        badgeColor: 'bg-sky-600/30 text-sky-300 border border-sky-500/30',
+        keywords: 'デルタ コーナー GPS タイム差 エイペックス',
       },
       {
         id: 'stint_visualizer',
         label: '全車タイヤスティント ＆ 戦略',
         icon: '🛞',
-        description: '全ドライバーのタイヤ履歴・ピットタイミング一元化',
-      },
-      {
-        id: 'position_changes',
-        label: '周回別順位変動チャート',
-        icon: '📈',
-        description: 'スタートからチェッカーまでの順位アップダウン',
-      },
-      {
-        id: 'sector_analysis',
-        label: 'セクター別タイム解析 (S1/S2/S3)',
-        icon: '⏱️',
-        description: 'セクターごとの最速ドライバーとタイム差比較',
+        badge: 'Stint',
+        badgeColor: 'bg-emerald-600/30 text-emerald-300 border border-emerald-500/30',
+        keywords: 'スティント タイヤ履歴 ピットイン 戦略',
       },
       {
         id: 'team_radios',
-        label: 'チーム無線タイムライン ＆ AI文字起こし',
+        label: 'チーム無線 ＆ AIリアルタイム要約',
         icon: '🎙️',
-        description: '緊迫のレース中生無線音声・AI日本語翻訳と要約',
+        badge: 'Radio',
+        badgeColor: 'bg-purple-600/30 text-purple-300 border border-purple-500/30',
+        keywords: '無線 チームラジオ 音声 文字起こし AI 翻訳',
       },
-    ],
-  },
-  {
-    groupTitle: 'F1大百科 ＆ 歴史ライブラリ',
-    groupIcon: '📚',
-    items: [
-      {
-        id: 'drivers',
-        label: '選手名鑑 (ドライバーハブ)',
-        icon: '👤',
-        description: '現役全22名・スタイル・戦績・名言・バイオグラフィー',
-      },
-      {
-        id: 'teams',
-        label: 'チーム名鑑 (コンストラクター＆PU)',
-        icon: '🏎️',
-        description: 'アウディ・ホンダ含む全11チームの開発哲学とマシン',
-      },
-      {
-        id: 'circuits',
-        label: 'コース解説 (全24サーキット)',
-        icon: '🏁',
-        description: '鈴鹿・モナコ・スパ等のセクター特性・DRSゾーン',
-      },
-      {
-        id: 'tyres',
-        label: 'タイヤ大百科 (ピレリC1〜C5)',
-        icon: '🛞',
-        description: 'コンパウンド特性・作動温度レンジ・劣化メカニズム',
-      },
-      {
-        id: 'glossary',
-        label: 'F1用語辞典 (図解・辞書)',
-        icon: '🧠',
-        description: 'SVG図解付きで初心者の疑問を解決する80語以上の辞書',
-      },
-      {
-        id: 'fia_rules',
-        label: 'FIA公式規則 ＆ 2026年新規定解説',
-        icon: '⚖️',
-        description: '競技・技術規則・2026年新規定図解(アクティブ空力/PU)・スチュワード判定基準',
-      },
-      {
-        id: 'drama',
-        label: '名勝負ドラマ ＆ 歴史無線アーカイブ',
-        icon: '🎬',
-        description: 'F1史に残る名勝負・確執・無線バトルを当時の生音声で',
-      },
-    ],
-  },
-  {
-    groupTitle: 'AIアシスタント ＆ ノート',
-    groupIcon: '🤖',
-    items: [
       {
         id: 'ai_strategist',
         label: 'AIチーフレースストラテジスト',
         icon: '🤖',
-        badge: 'Gemini',
-        badgeColor: 'bg-blue-600 text-white',
-        description: 'レース状況をもとにピット戦略をリアルタイム提案',
+        badge: 'AI',
+        badgeColor: 'bg-blue-600/30 text-blue-300 border border-blue-500/30',
+        keywords: 'AI ストラテジスト アナリスト 作戦 戦略 Gemini',
       },
       {
         id: 'race_notes',
-        label: 'レースノート ＆ 自動レポート',
+        label: 'レースノート ＆ 総括レポート',
         icon: '📝',
-        description: '自分だけの観戦メモ保存・AIによるレース総括レポート',
-      },
-    ],
-  },
-  {
-    groupTitle: '個人設定 ＆ カスタマイズ',
-    groupIcon: '⚙️',
-    items: [
-      {
-        id: 'pitwall_pro',
-        label: 'Pitwall Pro メンバーシップ管理',
-        icon: '💎',
-        badge: 'UPGRADE',
-        badgeColor: 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-black',
-        description: '月額/年額プラン比較・AI無制限・シミュレーター完全開放',
+        keywords: 'ノート メモ レポート 観戦記録',
       },
       {
-        id: 'profile_settings',
-        label: '推しチーム ＆ プロフィール設定',
-        icon: '⚙️',
-        badge: 'カスタム',
-        badgeColor: 'bg-amber-600 text-white',
-        description: '応援チームカラー・推しドライバー・アバター・表示名設定',
+        id: 'quiz',
+        label: 'F1検定クイズ (実況音声演出)',
+        icon: '🏆',
+        badge: 'Quiz',
+        badgeColor: 'bg-amber-600/30 text-amber-300 border border-amber-500/30',
+        keywords: 'クイズ 検定 音声 実況 148問',
       },
     ],
   },
@@ -257,19 +205,18 @@ export default function AppNavigationDrawer({
   onSelectFeature,
   onOpenAuthModal,
   onOpenUpgradeModal,
-  sessionProps,
 }: AppNavigationDrawerProps) {
   const { data: session } = useSession();
   const { isPro } = usePlanTier();
   const { prefs } = useUserPreferences();
-  const [sessionPickerOpen, setSessionPickerOpen] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [profileModalTab, setProfileModalTab] = useState<'avatar' | 'favorites' | 'plan'>('avatar');
   const [avatarError, setAvatarError] = useState(false);
 
   const user = session?.user;
   const activeAvatar = prefs.customAvatarUrl || user?.image || '';
-  const activeDisplayName = prefs.displayName || user?.name || (user ? 'Pro User' : 'ゲスト');
+  const activeDisplayName = prefs.displayName || user?.name || (user ? (isPro ? 'Pro User' : 'Free User') : 'ゲスト');
 
   const selectedTeam = KNOWLEDGE_TEAMS.find((t) => t.id === prefs.favoriteTeamId);
   const selectedDriver = KNOWLEDGE_DRIVERS.find((d) => d.code === prefs.favoriteDriverCode);
@@ -303,29 +250,48 @@ export default function AppNavigationDrawer({
 
   // Determine active item ID
   const getIsActive = (id: string): boolean => {
-    if (id === 'virtual_gp') {
-      return activeHub === 'telemetry' && pitStrategyViewMode === 'virtual_gp';
-    }
-    if (id === 'telemetry_delta') {
-      return activeHub === 'telemetry' && detailedTelemetryTab === 'delta_matrix';
-    }
-    if (id === 'war_room') {
-      return activeHub === 'telemetry' && pitStrategyViewMode === 'war_room';
-    }
-    if (id === 'fod_news') {
-      return activeHub === 'news';
-    }
     if (id === 'season_calendar') {
       return appMode === 'season' && activeHub === 'season';
     }
     if (id === 'telemetry_laps') {
-      return activeHub === 'telemetry' && detailedTelemetryTab !== 'delta_matrix' && pitStrategyViewMode !== 'war_room' && pitStrategyViewMode !== 'virtual_gp';
+      return (
+        appMode === 'season' &&
+        activeHub === 'telemetry' &&
+        detailedTelemetryTab !== 'delta_matrix'
+      );
     }
-    if (id === 'drivers' || id === 'teams' || id === 'circuits' || id === 'tyres' || id === 'drama' || id === 'glossary') {
-      return appMode === 'library' && librarySubTab === id;
+    if (id === 'telemetry_delta') {
+      return (
+        appMode === 'season' &&
+        activeHub === 'telemetry' &&
+        detailedTelemetryTab === 'delta_matrix'
+      );
+    }
+    if (id === 'virtual_gp' || id === 'war_room' || id === 'race_simulator') {
+      return activeHub === 'simulator';
+    }
+    if (id === 'fod_news') {
+      return activeHub === 'news';
+    }
+    if (id === 'library' || id === 'knowledge') {
+      return appMode === 'library' && activeHub === 'knowledge';
+    }
+    if (
+      id === 'drivers' ||
+      id === 'teams' ||
+      id === 'circuits' ||
+      id === 'tyres' ||
+      id === 'drama' ||
+      id === 'glossary'
+    ) {
+      return appMode === 'library' && activeHub === 'knowledge' && librarySubTab === id;
     }
     if (id === 'fia_rules' || id === '2026_regulations') {
-      return appMode === 'library' && (librarySubTab === 'rules' || librarySubTab === 'regulations');
+      return (
+        appMode === 'library' &&
+        activeHub === 'knowledge' &&
+        (librarySubTab === 'rules' || librarySubTab === 'regulations')
+      );
     }
     if (id === 'race_notes') {
       return activeHub === 'notes';
@@ -339,7 +305,7 @@ export default function AppNavigationDrawer({
     const items = group.items.filter(
       (item) =>
         item.label.toLowerCase().includes(q) ||
-        (item.description && item.description.toLowerCase().includes(q))
+        (item.keywords && item.keywords.toLowerCase().includes(q))
     );
     return { ...group, items };
   }).filter((group) => group.items.length > 0);
@@ -420,17 +386,17 @@ export default function AppNavigationDrawer({
         </div>
 
         {/* Navigation List Body */}
-        <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-4 no-scrollbar">
+        <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-3.5 no-scrollbar">
           {filteredGroups.map((group, gIdx) => (
             <div key={gIdx} className="space-y-1">
               {/* Group Title */}
-              <div className="flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider">
+              <div className="flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-racing font-bold text-slate-400 uppercase tracking-wider">
                 <span>{group.groupIcon}</span>
                 <span>{group.groupTitle}</span>
               </div>
 
               {/* Items in Group */}
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {group.items.map((item) => {
                   const isActive = getIsActive(item.id);
                   return (
@@ -438,49 +404,47 @@ export default function AppNavigationDrawer({
                       key={item.id}
                       type="button"
                       onClick={() => {
-                        if (item.id === 'profile_settings') {
-                          setProfileModalOpen(true);
-                          return;
-                        }
-                        if (item.id === 'pitwall_pro') {
-                          onOpenUpgradeModal?.();
-                          onClose();
-                          return;
-                        }
                         onSelectFeature(item.id);
                         onClose();
                       }}
-                      className={`w-full text-left px-3 py-2 rounded-xl transition-all flex items-start gap-2.5 cursor-pointer border ${
+                      title={item.keywords || item.label}
+                      className={`group/btn w-full text-left px-2.5 py-1.5 rounded-lg transition-all flex items-center justify-between gap-2 cursor-pointer border ${
+                        item.isSubItem ? 'ml-3 w-[calc(100%-12px)]' : ''
+                      } ${
                         isActive
-                          ? 'bg-gradient-to-r from-red-600/20 via-red-600/10 to-transparent border-red-500/50 text-white shadow-sm ring-1 ring-red-500/30'
-                          : 'bg-slate-900/40 hover:bg-slate-800/70 border-white/5 hover:border-white/15 text-slate-300 hover:text-white'
+                          ? 'bg-gradient-to-r from-red-600/25 via-red-600/10 to-transparent border-red-500/50 text-white shadow-sm ring-1 ring-red-500/30 font-bold'
+                          : 'bg-slate-900/40 hover:bg-slate-800/70 border-transparent hover:border-white/10 text-slate-300 hover:text-white'
                       }`}
                     >
-                      <span className="text-base mt-0.5 shrink-0">{item.icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-1.5">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-sm shrink-0 w-4 text-center">{item.icon}</span>
+                        <span
+                          className={`text-xs font-racing font-bold truncate ${
+                            isActive ? 'text-red-400' : 'text-slate-300 group-hover/btn:text-white'
+                          }`}
+                        >
+                          {item.label}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {item.badge && (
                           <span
-                            className={`text-xs font-racing font-bold truncate ${
-                              isActive ? 'text-red-400' : 'text-slate-200'
+                            className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded shrink-0 ${
+                              item.badgeColor || 'bg-slate-800 text-slate-300'
                             }`}
                           >
-                            {item.label}
+                            {item.badge}
                           </span>
-                          {item.badge && (
-                            <span
-                              className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded shrink-0 ${
-                                item.badgeColor || 'bg-slate-800 text-slate-300'
-                              }`}
-                            >
-                              {item.badge}
-                            </span>
-                          )}
-                        </div>
-                        {item.description && (
-                          <p className="text-[10px] text-slate-400 leading-tight mt-0.5 line-clamp-1">
-                            {item.description}
-                          </p>
                         )}
+                        <span
+                          className={`text-[10px] transition-transform ${
+                            isActive
+                              ? 'text-red-400 font-bold'
+                              : 'text-slate-600 group-hover/btn:text-slate-400 group-hover/btn:translate-x-0.5'
+                          }`}
+                        >
+                          ›
+                        </span>
                       </div>
                     </button>
                   );
@@ -488,181 +452,94 @@ export default function AppNavigationDrawer({
               </div>
             </div>
           ))}
-
-          {/* Collapsible Session & Driver Filter Tool (Inside Drawer) */}
-          {sessionProps && (
-            <div className="pt-2 border-t border-white/10 space-y-2">
-              <button
-                type="button"
-                onClick={() => setSessionPickerOpen((prev) => !prev)}
-                className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-xl bg-slate-900/60 hover:bg-slate-900 border border-white/5 text-xs font-racing font-bold text-slate-300 cursor-pointer transition-colors"
-              >
-                <div className="flex items-center gap-1.5">
-                  <span>⚙️</span>
-                  <span>テレメトリーセッション・出走選択</span>
-                </div>
-                <span className="text-slate-500 font-mono text-[10px]">
-                  {sessionPickerOpen ? '▲ 閉じる' : '▼ 展開'}
-                </span>
-              </button>
-
-              {sessionPickerOpen && (
-                <div className="p-3 rounded-2xl bg-slate-900/80 border border-white/10 space-y-2.5 text-xs animate-fade-in">
-                  {/* Year */}
-                  <div>
-                    <label className="text-[10px] font-mono text-slate-400 block mb-1">
-                      開催年 (YEAR)
-                    </label>
-                    <select
-                      value={sessionProps.selectedYear}
-                      onChange={(e) => sessionProps.onYearChange(e.target.value)}
-                      className="w-full bg-slate-950 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white"
-                    >
-                      {['2026', '2025', '2024', '2023', '2022', '2021'].map((y) => (
-                        <option key={y} value={y}>
-                          {y}年
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Meeting */}
-                  <div>
-                    <label className="text-[10px] font-mono text-slate-400 block mb-1">
-                      グランプリ (GRAND PRIX)
-                    </label>
-                    <select
-                      value={sessionProps.selectedMeetingKey ?? ''}
-                      onChange={(e) => sessionProps.onMeetingChange(Number(e.target.value))}
-                      className="w-full bg-slate-950 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white"
-                    >
-                      {sessionProps.sessions.map((s) => (
-                        <option key={s.meeting_key} value={s.meeting_key}>
-                          {s.meeting_name || `Round ${s.meeting_key}`}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onSelectFeature('telemetry_laps');
-                      onClose();
-                    }}
-                    className="w-full py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-racing font-bold text-xs transition-colors cursor-pointer shadow-sm mt-1"
-                  >
-                    テレメトリー画面へ適用 ➔
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
-        {/* ── Drawer User Profile & Settings Footer (Discord/Slack/Notion Style) ── */}
-        <div className="p-3 border-t border-white/10 bg-slate-950/95 backdrop-blur-md shrink-0">
+        {/* ── Drawer User Profile & Settings Footer (Discord/Slack/Linear Style) ── */}
+        <div className="p-2.5 border-t border-white/10 bg-slate-950/95 backdrop-blur-md shrink-0">
           {session?.user ? (
-            <div className="space-y-2.5">
-              {/* User Identity Row */}
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  {/* User Avatar */}
-                  {activeAvatar && !avatarError ? (
-                    <div
-                      className="w-8 h-8 rounded-lg overflow-hidden border shadow-sm shrink-0"
-                      style={{ borderColor: teamColor }}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={activeAvatar}
-                        alt={activeDisplayName}
-                        className="w-full h-full object-cover object-top"
-                        onError={() => setAvatarError(true)}
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 font-racing font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
-                      {initial}
-                    </div>
-                  )}
+            <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-900/50 hover:bg-slate-900 border border-white/5 hover:border-white/15 transition-all group">
+              {/* Clickable User Card -> Opens Personal Settings Modal */}
+              <button
+                type="button"
+                onClick={() => {
+                  setProfileModalTab('avatar');
+                  setProfileModalOpen(true);
+                }}
+                className="flex items-center gap-2.5 min-w-0 text-left cursor-pointer flex-1 group/user select-none"
+                title="個人設定画面（プロフィール・推しチーム・プラン）を開く"
+              >
+                {/* User Avatar */}
+                {activeAvatar && !avatarError ? (
+                  <div
+                    className="w-8 h-8 rounded-lg overflow-hidden border shadow-sm shrink-0"
+                    style={{ borderColor: teamColor }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={activeAvatar}
+                      alt={activeDisplayName}
+                      className="w-full h-full object-cover object-top"
+                      onError={() => setAvatarError(true)}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-8 h-8 rounded-lg bg-amber-500 text-slate-950 font-racing font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                    {initial}
+                  </div>
+                )}
 
-                  {/* User Names & Badges */}
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <p className="font-racing font-bold text-xs text-white truncate">
-                        {activeDisplayName}
-                      </p>
-                      <span className={`px-1.5 py-0.2 rounded text-[8px] font-racing font-black ${
+                {/* User Names & Badges */}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <p className="font-racing font-bold text-xs text-white truncate group-hover/user:text-amber-300 transition-colors">
+                      {activeDisplayName}
+                    </p>
+                    <span
+                      className={`px-1.5 py-0.2 rounded text-[8px] font-racing font-black ${
                         isPro
                           ? 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm'
                           : 'bg-slate-800 text-slate-400 border border-white/10'
-                      }`}>
-                        {isPro ? 'PRO' : 'FREE'}
-                      </span>
-                    </div>
-                    {selectedTeam && (
-                      <p className="text-[10px] font-mono truncate" style={{ color: selectedTeam.color }}>
-                        🏁 {selectedTeam.name}
-                      </p>
-                    )}
+                      }`}
+                    >
+                      {isPro ? 'PRO' : 'FREE'}
+                    </span>
                   </div>
+                  {selectedTeam ? (
+                    <p className="text-[10px] font-mono truncate" style={{ color: selectedTeam.color }}>
+                      🏁 {selectedTeam.name}
+                    </p>
+                  ) : (
+                    <p className="text-[10px] font-mono text-slate-400 group-hover/user:text-slate-300">
+                      個人設定を開く ➔
+                    </p>
+                  )}
                 </div>
-
-                {/* Quick Icon Actions */}
-                <div className="flex items-center gap-1 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => setProfileModalOpen(true)}
-                    className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 hover:border-amber-500/40 transition-all cursor-pointer shadow-sm"
-                    title="プロフィール・推しチーム設定 (⚙️)"
-                    aria-label="設定"
-                  >
-                    <span className="text-sm">⚙️</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => signOut()}
-                    className="p-1.5 rounded-lg bg-slate-900 hover:bg-rose-950/60 text-slate-400 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 transition-all cursor-pointer shadow-sm"
-                    title="ログアウト"
-                    aria-label="ログアウト"
-                  >
-                    <span className="text-sm">🚪</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Push button to open Settings */}
-              <button
-                type="button"
-                onClick={() => setProfileModalOpen(true)}
-                className="w-full py-1.5 px-3 rounded-xl bg-slate-900/90 hover:bg-slate-850 text-slate-200 hover:text-white border border-white/10 hover:border-amber-500/30 text-xs font-racing font-bold transition-all flex items-center justify-between cursor-pointer group shadow-sm"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-amber-400">⚙️</span>
-                  <span>推しチーム・プロフィール設定</span>
-                </div>
-                <span className="text-[10px] text-slate-400 group-hover:text-amber-300 font-mono">
-                  編集 ➔
-                </span>
               </button>
 
-              {!isPro && (
+              {/* Quick Icon Actions */}
+              <div className="flex items-center gap-1 shrink-0">
                 <button
                   type="button"
                   onClick={() => {
-                    onOpenUpgradeModal?.();
-                    onClose();
+                    setProfileModalTab('avatar');
+                    setProfileModalOpen(true);
                   }}
-                  className="w-full mt-2 py-1.5 px-3 rounded-xl bg-gradient-to-r from-amber-500/20 via-yellow-400/20 to-red-500/20 border border-amber-500/40 text-amber-300 text-xs font-racing font-bold flex items-center justify-between cursor-pointer hover:brightness-125 transition-all shadow-sm"
+                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-white/10 hover:border-amber-500/40 transition-all cursor-pointer shadow-sm"
+                  title="個人設定画面を開く (⚙️)"
+                  aria-label="個人設定"
                 >
-                  <div className="flex items-center gap-1.5">
-                    <span>💎</span>
-                    <span>Pitwall Pro へアップグレード</span>
-                  </div>
-                  <span className="text-[10px] font-mono text-amber-400">➔</span>
+                  <span className="text-sm">⚙️</span>
                 </button>
-              )}
+                <button
+                  type="button"
+                  onClick={() => signOut()}
+                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-950/60 text-slate-400 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 transition-all cursor-pointer shadow-sm"
+                  title="ログアウト"
+                  aria-label="ログアウト"
+                >
+                  <span className="text-sm">🚪</span>
+                </button>
+              </div>
             </div>
           ) : (
             <div className="space-y-2">
@@ -693,7 +570,11 @@ export default function AppNavigationDrawer({
 
       {/* Settings Modal Portal inside Drawer */}
       {profileModalOpen && (
-        <ProfileSettingsModal onClose={() => setProfileModalOpen(false)} />
+        <ProfileSettingsModal
+          onClose={() => setProfileModalOpen(false)}
+          initialTab={profileModalTab}
+          onOpenUpgradeModal={onOpenUpgradeModal}
+        />
       )}
     </div>
   );

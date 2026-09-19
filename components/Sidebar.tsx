@@ -81,17 +81,17 @@ export default function Sidebar({
   );
 
   const selectClass =
-    'w-full bg-slate-800/60 border border-white/10 text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 transition-colors';
+    'w-full bg-slate-800/60 border border-white/10 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 transition-colors';
 
   return (
-    <aside className="flex flex-col gap-5 min-h-0">
+    <aside className="flex flex-col gap-3.5 min-h-0">
       {/* ── Session Selectors ── */}
       <section>
         <SectionTitle>SESSION</SectionTitle>
-        <div className="flex flex-col gap-2.5">
+        <div className="flex flex-col gap-2">
           {/* Year */}
           <div>
-            <label className="text-xs text-slate-500 mb-1 block">YEAR</label>
+            <label className="text-[11px] text-slate-500 mb-0.5 block">YEAR</label>
             <select
               value={selectedYear}
               onChange={e => onYearChange(e.target.value)}
@@ -105,7 +105,7 @@ export default function Sidebar({
 
           {/* Grand Prix */}
           <div>
-            <label className="text-xs text-slate-500 mb-1 block">GRAND PRIX</label>
+            <label className="text-[11px] text-slate-500 mb-0.5 block">GRAND PRIX</label>
             <select
               value={selectedMeetingKey ?? ''}
               onChange={e => onMeetingChange(Number(e.target.value))}
@@ -127,7 +127,7 @@ export default function Sidebar({
 
           {/* Session */}
           <div>
-            <label className="text-xs text-slate-500 mb-1 block">SESSION</label>
+            <label className="text-[11px] text-slate-500 mb-0.5 block">SESSION</label>
             <select
               value={selectedSessionKey ?? ''}
               onChange={e => onSessionChange(Number(e.target.value))}
@@ -163,7 +163,7 @@ export default function Sidebar({
             {isLoading ? '読み込み中...' : 'ドライバーを選択してください'}
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-1.5 overflow-y-auto max-h-72 pr-0.5">
+          <div className="grid grid-cols-1 gap-1 overflow-y-auto max-h-72 pr-0.5">
             {drivers.map(driver => {
               const num = driver.driver_number.toString();
               const isChecked = selectedDrivers.includes(num);
@@ -175,7 +175,7 @@ export default function Sidebar({
                   key={driver.driver_number}
                   onClick={() => !isDisabled && onDriverToggle(num, !isChecked)}
                   disabled={isDisabled}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg border text-left transition-all text-sm ${
+                  className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg border text-left transition-all text-xs ${
                     isChecked
                       ? 'border-transparent bg-slate-700/60'
                       : isDisabled
@@ -186,7 +186,7 @@ export default function Sidebar({
                 >
                   {/* Team colour indicator */}
                   <span
-                    className="w-1 h-8 rounded-full flex-shrink-0"
+                    className="w-1 h-6 rounded-full flex-shrink-0"
                     style={{ backgroundColor: color }}
                   />
                   {/* Checkbox */}
@@ -202,9 +202,9 @@ export default function Sidebar({
                       <span className="font-racing text-xs font-bold text-white">
                         {driver.name_acronym}
                       </span>
-                      <span className="text-slate-500 text-xs">#{driver.driver_number}</span>
+                      <span className="text-slate-500 text-[11px]">#{driver.driver_number}</span>
                     </div>
-                    <div className="text-slate-400 text-xs truncate">
+                    <div className="text-slate-400 text-[11px] truncate">
                       {driver.team_name}
                     </div>
                   </div>

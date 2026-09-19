@@ -148,12 +148,12 @@ ${noteContent}
   };
 
   return (
-    <div className="flex flex-col gap-6 max-w-6xl mx-auto animate-fade-in pb-8">
+    <div className="flex flex-col gap-3 sm:gap-4 max-w-6xl mx-auto animate-fade-in pb-6">
       {/* Header Banner */}
-      <div className="glass-card-premium p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden rounded-2xl shadow-xl">
+      <div className="glass-card-premium p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 relative overflow-hidden rounded-xl shadow-md">
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-red-600 via-red-500/80 to-transparent" />
         <div>
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-0.5">
             <span className="f1-label text-red-400">
               REPORTING & INTELLIGENCE
             </span>
@@ -161,17 +161,17 @@ ${noteContent}
           <h2 className="f1-section-title text-white">
             RACE NOTES & AI EXECUTIVE REPORT
           </h2>
-          <p className="f1-meta text-slate-400 max-w-xl mt-1">
+          <p className="f1-meta text-slate-400 max-w-xl mt-0.5">
             リアルタイム観戦メモの記録、テレメトリ連動メモ、およびGeminiによるレース総括レポートの自動生成。
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2.5 self-start md:self-auto">
+        <div className="flex items-center gap-2 self-start md:self-auto flex-shrink-0">
           <button
             onClick={handleGenerateAiReport}
             disabled={isGeneratingAi}
-            className="btn-console-primary flex items-center gap-2 text-xs py-2 px-4 shadow-lg shadow-red-900/30 disabled:opacity-50"
+            className="btn-console-primary flex items-center gap-2 text-xs py-1.5 px-3 shadow-md shadow-red-900/30 disabled:opacity-50"
           >
             {isGeneratingAi ? (
               <>
@@ -187,7 +187,7 @@ ${noteContent}
           </button>
           <button
             onClick={handleExportMarkdown}
-            className="btn-console flex items-center gap-1.5 text-xs py-2 px-3.5"
+            className="btn-console flex items-center gap-1.5 text-xs py-1.5 px-3"
             title="Markdownとしてエクスポート"
           >
             <Download className="w-3.5 h-3.5 text-slate-400" />
@@ -197,10 +197,10 @@ ${noteContent}
       </div>
 
       {/* 2-Column Layout: Left (Editable Notes), Right (Generated AI Report) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         {/* Left: Notes Editor */}
-        <div className="glass-card-premium p-5 flex flex-col gap-3 min-h-[480px] rounded-2xl shadow-lg relative overflow-hidden">
-          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+        <div className="glass-card-premium p-3.5 sm:p-4 flex flex-col gap-2.5 min-h-[420px] rounded-xl shadow-md relative overflow-hidden">
+          <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <h3 className="f1-card-title flex items-center gap-2">
               <FileText className="w-4 h-4 text-red-400" />
               <span>LIVE OBSERVATION NOTES</span>
@@ -214,13 +214,13 @@ ${noteContent}
             value={noteContent}
             onChange={(e) => handleContentChange(e.target.value)}
             placeholder="ここにラップごとの気付きや無線内容、タイヤ状況をメモ..."
-            className="w-full flex-1 bg-slate-950/60 border border-white/10 rounded-xl p-4 text-xs text-slate-200 font-mono leading-relaxed focus:outline-none focus:border-red-500/60 transition-colors resize-none"
+            className="w-full flex-1 bg-slate-950/60 border border-white/10 rounded-lg p-3 text-xs text-slate-200 font-mono leading-relaxed focus:outline-none focus:border-red-500/60 transition-colors resize-none"
           />
         </div>
 
         {/* Right: AI Executive Report */}
-        <div className="glass-card-premium p-5 flex flex-col gap-3 min-h-[480px] rounded-2xl shadow-lg border-red-500/20 relative overflow-hidden">
-          <div className="flex items-center justify-between border-b border-white/10 pb-3">
+        <div className="glass-card-premium p-3.5 sm:p-4 flex flex-col gap-2.5 min-h-[420px] rounded-xl shadow-md border-red-500/20 relative overflow-hidden">
+          <div className="flex items-center justify-between border-b border-white/10 pb-2">
             <h3 className="f1-card-title flex items-center gap-2">
               <Bot className="w-4 h-4 text-red-400" />
               <span>AI EXECUTIVE SUMMARY REPORT</span>
@@ -233,15 +233,15 @@ ${noteContent}
             )}
           </div>
 
-          <div className="flex-1 bg-slate-950/60 border border-white/10 rounded-xl p-4 overflow-y-auto max-h-[500px]">
+          <div className="flex-1 bg-slate-950/60 border border-white/10 rounded-lg p-3 overflow-y-auto max-h-[500px]">
             {aiReport ? (
-              <div className="prose prose-invert prose-xs text-xs text-slate-200 leading-relaxed whitespace-pre-wrap font-sans space-y-3">
+              <div className="prose prose-invert prose-xs text-xs text-slate-200 leading-relaxed whitespace-pre-wrap font-sans space-y-2.5">
                 {aiReport}
               </div>
             ) : (
-              <div className="h-full flex flex-col items-center justify-center text-center text-slate-500 gap-3 py-16">
-                <Bot className="w-10 h-10 text-slate-600 stroke-[1.2]" />
-                <p className="f1-meta text-slate-400 max-w-xs leading-relaxed">
+              <div className="h-full flex flex-col items-center justify-center text-center text-slate-500 gap-2.5 py-12">
+                <Bot className="w-9 h-9 text-slate-600 stroke-[1.2]" />
+                <p className="f1-meta text-slate-400 max-w-xs leading-relaxed text-xs">
                   上部の「AIレポート生成」をクリックすると、テレメトリと観戦メモを統合した総括分析レポートがここに表示されます。
                 </p>
               </div>

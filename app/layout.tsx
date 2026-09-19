@@ -64,8 +64,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ja">
-      <body className={`${inter.variable} ${orbitron.variable} antialiased`}>
+    <html lang="ja" className="dark">
+      <body className={`${inter.variable} ${orbitron.variable} bg-slate-950 text-slate-100 antialiased`}>
         <SessionProvider>
           {children}
         </SessionProvider>

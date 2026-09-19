@@ -11,25 +11,30 @@ import {
   type TeamProfile,
 } from '@/data/f1KnowledgeData';
 import { useUserPreferences, getUserPreferences, saveUserPreferences, type UserPreferences } from '@/lib/userPreferences';
-import { usePlanTier } from '@/lib/tierService';
+import { usePlanTier, resetDailyAiUsage } from '@/lib/tierService';
 
 interface ProfileSettingsModalProps {
   onClose: () => void;
+  initialTab?: 'avatar' | 'favorites' | 'plan';
+  onOpenUpgradeModal?: () => void;
 }
 
 const FAN_TYPES = [
   '🏎️ 推し活・ドラマ派',
   '📊 データ分析・テレメトリー派',
   '🔰 F1初心者・勉強中',
-  '🏁 古参レースファン',
-  '🕹️ シムレース・eSports派',
+  '🕹️ シミュレーター・eSports派',
+  '☕ まったり週末観戦派',
 ];
 
-export default function ProfileSettingsModal({ onClose }: ProfileSettingsModalProps) {
+export default function ProfileSettingsModal({
+  onClose,
+  initialTab = 'avatar',
+  onOpenUpgradeModal,
+}: ProfileSettingsModalProps) {
   const { data: session } = useSession();
-  const { isPro } = usePlanTier();
-  const userRole = (session?.user as { role?: string })?.role || (isPro ? 'pro' : 'free');
-  const isProUser = userRole === 'pro';
+  const { isPro, changeTier, aiUsage } = usePlanTier();
+  const isProUser = isPro;
   const { prefs, update, toggleDriver, toggleTeam, toggleCircuit } = useUserPreferences();
   const [mounted, setMounted] = useState(false);
 
@@ -54,7 +59,7 @@ export default function ProfileSettingsModal({ onClose }: ProfileSettingsModalPr
     const current = getUserPreferences();
     return current.fanType || prefs.fanType || '推し活・ドラマ派';
   });
-  const [activeSubTab, setActiveSubTab] = useState<'avatar' | 'favorites' | 'plan'>('avatar');
+  const [activeSubTab, setActiveSubTab] = useState<'avatar' | 'favorites' | 'plan'>(initialTab);
   const [savedNotice, setSavedNotice] = useState(false);
 
   // Sync state whenever modal mounts or preferences change
@@ -110,10 +115,10 @@ export default function ProfileSettingsModal({ onClose }: ProfileSettingsModalPr
   if (!mounted) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-6 bg-black/85 backdrop-blur-md animate-fade-in overflow-y-auto">
       {/* Modal Card */}
       <div
-        className="glass-card bg-slate-950/95 border border-white/15 w-full max-w-2xl max-h-[90vh] flex flex-col rounded-3xl shadow-2xl overflow-hidden relative"
+        className="glass-card bg-slate-950/95 border border-white/15 w-full max-w-2xl max-h-[85vh] my-auto flex flex-col min-h-0 rounded-3xl shadow-2xl overflow-hidden relative"
         style={{ borderTopColor: themeColor, borderTopWidth: 4 }}
       >
         {/* Modal Header */}
@@ -253,7 +258,7 @@ export default function ProfileSettingsModal({ onClose }: ProfileSettingsModalPr
         </div>
 
         {/* Scrollable Content */}
-        <div className="p-4 sm:p-6 overflow-y-auto flex-1 space-y-5">
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1 min-h-0 space-y-5">
           {/* ── SUB-TAB 1: AVATAR PICKER ── */}
           {activeSubTab === 'avatar' && (
             <div className="space-y-4">
@@ -539,42 +544,191 @@ export default function ProfileSettingsModal({ onClose }: ProfileSettingsModalPr
           {/* ── SUB-TAB 3: PLAN ── */}
           {activeSubTab === 'plan' && (
             <div className="space-y-4">
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-950/40 via-yellow-900/20 to-slate-900 border border-amber-500/30 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">🏆</span>
-                    <div>
-                      <h4 className="text-sm font-racing font-bold text-amber-300">
-                        PADOROKU PRO MEMBERSHIP
-                      </h4>
-                      <p className="text-[10px] text-slate-400 font-mono">
-                        プレミアム分析＆AIストラテジスト完全アクセス
-                      </p>
+              {isProUser ? (
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-950/40 via-yellow-900/20 to-slate-900 border border-amber-500/30 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">🏆</span>
+                      <div>
+                        <h4 className="text-sm font-racing font-bold text-amber-300">
+                          PADOROKU PRO MEMBERSHIP
+                        </h4>
+                        <p className="text-[10px] text-slate-400 font-mono">
+                          プレミアム分析＆AIストラテジスト完全アクセス
+                        </p>
+                      </div>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-full text-xs font-racing font-black bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 shadow-md">
+                      ACTIVE
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-2 border-t border-amber-500/20">
+                    <div className="flex items-center gap-2 text-slate-200">
+                      <span className="text-emerald-400">✓</span>
+                      <span>AIストラテジスト（レース戦略リアルタイム予測）</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-200">
+                      <span className="text-emerald-400">✓</span>
+                      <span>チーム無線リアルタイム文字起こし＆AI戦術要約</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-200">
+                      <span className="text-emerald-400">✓</span>
+                      <span>3層同期Car Telemetry詳細テレメトリー分析</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-200">
+                      <span className="text-emerald-400">✓</span>
+                      <span>レースノート保存＆Markdownエクスポート</span>
                     </div>
                   </div>
-                  <span className="px-2.5 py-1 rounded-full text-xs font-racing font-black bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 shadow-md">
-                    ACTIVE
+                </div>
+              ) : (
+                <div className="p-4 rounded-2xl bg-slate-900/80 border border-white/10 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl">⚡</span>
+                      <div>
+                        <h4 className="text-sm font-racing font-bold text-slate-200">
+                          FREE PLAN（無料プラン利用中）
+                        </h4>
+                        <p className="text-[10px] text-slate-400 font-mono">
+                          シーズン観戦・カレンダー・大百科・基本テレメトリー
+                        </p>
+                      </div>
+                    </div>
+                    <span className="px-2.5 py-1 rounded-full text-xs font-racing font-bold bg-slate-800 text-slate-400 border border-white/10">
+                      FREE
+                    </span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-gradient-to-r from-amber-500/10 via-yellow-400/10 to-transparent border border-amber-500/30 flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-racing font-bold text-amber-300">
+                        💎 Pitwall Pro で全機能を無制限解放
+                      </p>
+                      <p className="text-[10px] text-slate-400">
+                        AIストラテジスト・チーム無線リアルタイム翻訳・テレメトリー詳細分析
+                      </p>
+                    </div>
+                    {onOpenUpgradeModal && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onClose();
+                          onOpenUpgradeModal();
+                        }}
+                        className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-racing font-black text-xs hover:brightness-110 transition-all cursor-pointer shrink-0 shadow-md"
+                      >
+                        アップグレード ➔
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Interactive Test Switcher: Toggle between Free and Pro with 1 Click */}
+              <div className="p-4 rounded-2xl bg-slate-900/90 border border-cyan-500/30 shadow-lg space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">🧪</span>
+                    <span className="text-xs font-racing font-bold text-cyan-300 tracking-wide uppercase">
+                      プラン切り替えテスト（動作確認用）
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    ワンクリックで即座に権限を切替
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-2 border-t border-amber-500/20">
-                  <div className="flex items-center gap-2 text-slate-200">
-                    <span className="text-emerald-400">✓</span>
-                    <span>AIストラテジスト（レース戦略リアルタイム予測）</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-200">
-                    <span className="text-emerald-400">✓</span>
-                    <span>チーム無線リアルタイム文字起こし＆AI戦術要約</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-200">
-                    <span className="text-emerald-400">✓</span>
-                    <span>3層同期Car Telemetry詳細テレメトリー分析</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-200">
-                    <span className="text-emerald-400">✓</span>
-                    <span>レースノート保存＆Markdownエクスポート</span>
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {/* Free Tier Selector */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      changeTier('free');
+                      setSavedNotice(true);
+                      setTimeout(() => setSavedNotice(false), 2000);
+                    }}
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
+                      !isProUser
+                        ? 'bg-cyan-950/40 border-cyan-400/80 shadow-md ring-1 ring-cyan-400/50'
+                        : 'bg-slate-950/60 border-white/10 hover:border-cyan-500/40 hover:bg-slate-900/60'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-racing font-bold text-slate-200 flex items-center gap-1.5">
+                        <span>⚡</span>
+                        <span>Free (無料プラン)</span>
+                      </span>
+                      {!isProUser ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                          ✓ 現在適用中
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono text-cyan-400 font-bold hover:underline">
+                          Freeに切り替える ➔
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-400 font-mono">
+                      AI相談: 1日3回制限 / 鈴鹿限定10周
+                    </p>
+                  </button>
+
+                  {/* Pro Tier Selector */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      changeTier('pro');
+                      setSavedNotice(true);
+                      setTimeout(() => setSavedNotice(false), 2000);
+                    }}
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
+                      isProUser
+                        ? 'bg-amber-950/30 border-amber-400/80 shadow-md ring-1 ring-amber-400/50'
+                        : 'bg-slate-950/60 border-white/10 hover:border-amber-500/40 hover:bg-slate-900/60'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-racing font-bold text-amber-300 flex items-center gap-1.5">
+                        <span>💎</span>
+                        <span>Pitwall Pro (無制限)</span>
+                      </span>
+                      {isProUser ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                          ✓ 現在適用中
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-mono text-amber-400 font-bold hover:underline">
+                          Proに切り替える ➔
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-400 font-mono">
+                      AI相談: 無制限 / 全24戦53周フルGP
+                    </p>
+                  </button>
                 </div>
+
+                {!isProUser && (
+                  <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] font-mono">
+                    <span className="text-slate-400">
+                      本日の無料AI相談: <strong className="text-amber-400">{aiUsage.remaining} / {aiUsage.max} 回</strong> 残り
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        resetDailyAiUsage();
+                        setSavedNotice(true);
+                        setTimeout(() => setSavedNotice(false), 2000);
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer border border-white/10 flex items-center gap-1 text-[10px]"
+                    >
+                      <span>🔄</span>
+                      <span>利用枠をリセット</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}

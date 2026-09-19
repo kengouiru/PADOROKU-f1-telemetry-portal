@@ -65,15 +65,11 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
   const [selectedTeam, setSelectedTeam] = useState<string>('ALL');
   const [selectedDriver, setSelectedDriver] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
 
   // AI Summaries per article ID
   const [aiSummaries, setAiSummaries] = useState<Record<string, string>>({});
   const [loadingAiSummary, setLoadingAiSummary] = useState<Record<string, boolean>>({});
-
-  // Backup state
-  const [backupStatus, setBackupStatus] = useState<string | null>(null);
-  const [isSavingBackup, setIsSavingBackup] = useState<boolean>(false);
-  const [lastBackupTime, setLastBackupTime] = useState<string | null>(null);
 
   // Active Calendar (starts with fallback, upgraded via /api/f1-calendar)
   const [calendar, setCalendar] = useState<RaceWeekendSchedule[]>(SEASON_2026_CALENDAR);
@@ -121,49 +117,9 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
     }
   }, []);
 
-  // Fetch News Backup Manifest
-  const checkBackupStatus = useCallback(async () => {
-    try {
-      const res = await fetch('/api/backup/news');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.newsSnapshot?.createdAt) {
-          setLastBackupTime(data.newsSnapshot.createdAt);
-        }
-      }
-    } catch (e) {
-      console.warn('[Backup Status Error]:', e);
-    }
-  }, []);
-
   useEffect(() => {
     fetchNews();
-    checkBackupStatus();
-  }, [fetchNews, checkBackupStatus]);
-
-  // Save current articles to Generation Backup
-  const handleSaveToBackup = async () => {
-    if (articles.length === 0 || isSavingBackup) return;
-    setIsSavingBackup(true);
-    try {
-      const res = await fetch('/api/backup/news', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ articles }),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      setLastBackupTime(data.createdAt);
-      setBackupStatus(`✓ 世代バックアップ保全完了 (${data.articlesCount}件の最新スナップショットを記録)`);
-      setTimeout(() => setBackupStatus(null), 4000);
-    } catch (e) {
-      console.error('[Save Backup Error]:', e);
-      setBackupStatus('⚠️ バックアップの保存に失敗しました');
-      setTimeout(() => setBackupStatus(null), 4000);
-    } finally {
-      setIsSavingBackup(false);
-    }
-  };
+  }, [fetchNews]);
 
   // Generate 3-Line Smart Summary via Gemini AI
   const handleGenerateSummary = async (article: F1NewsArticle) => {
@@ -247,6 +203,10 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
     selectedDriver !== 'ALL' ||
     searchQuery !== '';
 
+  const activeFilterCount =
+    (selectedAuthority !== 'ALL' ? 1 : 0) +
+    (selectedTopic !== 'ALL' ? 1 : 0);
+
   // Filtered Articles
   const filteredNews = useMemo(() => {
     return articles.filter((item) => {
@@ -293,11 +253,11 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
   };
 
   return (
-    <div className="flex flex-col gap-6 max-w-6xl mx-auto animate-fade-in pb-12">
+    <div className="flex flex-col gap-3 sm:gap-4 max-w-6xl mx-auto animate-fade-in pb-8">
       {/* ── 1. Domestic Official Broadcaster (FOD / Fuji TV NEXT) Live Schedule Banner ── */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-sky-950/50 border border-sky-500/30 p-5 md:p-6 shadow-xl">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div className="space-y-2">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-sky-950/50 border border-sky-500/30 p-3.5 sm:p-4 shadow-lg">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
+          <div className="space-y-1.5">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-racing font-bold tracking-wider uppercase shadow-md shadow-red-600/30">
                 国内独占生中継
@@ -311,61 +271,61 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
               </span>
             </div>
 
-            <h2 className="text-xl md:text-2xl font-racing font-bold text-white tracking-wide flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-racing font-bold text-white tracking-wide flex items-center gap-2">
               <span>{upcomingRound.flag}</span>
               <span>次戦: 第{upcomingRound.round}戦 {upcomingRound.gpName}</span>
-              <span className="text-sm font-mono text-slate-400 font-normal hidden sm:inline">
+              <span className="text-xs font-mono text-slate-400 font-normal hidden sm:inline">
                 ({upcomingRound.circuitName})
               </span>
             </h2>
 
-            <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
+            <p className="text-[11px] text-slate-300 max-w-2xl leading-relaxed">
               全{calendar.length}戦のフリー走行・予選・スプリント・決勝を完全生中継。
               解説陣（川井一仁、森脇基恭、米家峰起、中野信治、松田次生）によるピットレーン深層分析と一次情報をリアルタイムでお届けします。
             </p>
           </div>
 
           {/* Broadcast Action Links */}
-          <div className="flex flex-col sm:flex-row lg:flex-col gap-2 flex-shrink-0">
+          <div className="flex flex-col sm:flex-row lg:flex-col gap-1.5 flex-shrink-0">
             <a
               href="https://fod.fujitv.co.jp/"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-racing font-bold shadow-lg shadow-red-600/30 flex items-center justify-center gap-1.5 transition-all"
+              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white text-xs font-racing font-bold shadow-md shadow-red-600/30 flex items-center justify-center gap-1.5 transition-all"
             >
               <span>📺 FOD LIVE配信を見る</span>
               <span className="text-[10px]">↗</span>
             </a>
-            <div className="text-[10px] font-mono text-slate-400 text-center">
+            <div className="text-[9px] font-mono text-slate-400 text-center">
               見逃し配信・追っかけ再生対応
             </div>
           </div>
         </div>
 
         {/* Timetable Cards */}
-        <div className="mt-4 pt-4 border-t border-white/10">
-          <div className="text-[11px] font-mono text-slate-400 font-bold mb-2 flex items-center justify-between">
+        <div className="mt-3 pt-3 border-t border-white/10">
+          <div className="text-[10px] sm:text-[11px] font-mono text-slate-400 font-bold mb-1.5 flex items-center justify-between">
             <span>🗓️ 日本時間（JST）放送タイムテーブル: {upcomingRound.dates}</span>
-            <span className="text-slate-500">{upcomingRound.pirelliCompounds}</span>
+            <span className="text-slate-500 font-normal">{upcomingRound.pirelliCompounds}</span>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1.5">
             {upcomingRound.scheduleJst.map((item, idx) => (
               <div
                 key={idx}
-                className={`p-2.5 rounded-xl border transition-colors ${
+                className={`p-1.5 sm:p-2 rounded-lg border transition-colors ${
                   idx === upcomingRound.scheduleJst.length - 1
                     ? 'bg-red-950/30 border-red-500/40 text-red-200 ring-1 ring-red-500/20'
                     : 'bg-slate-900/70 border-white/10 text-slate-200'
                 }`}
               >
-                <div className="text-[10px] font-mono text-slate-400 font-bold truncate">
+                <div className="text-[9px] font-mono text-slate-400 font-bold truncate">
                   {item.session}
                 </div>
-                <div className="text-xs font-racing font-bold text-white mt-1 truncate">
+                <div className="text-xs font-racing font-bold text-white mt-0.5 truncate">
                   {item.dayTime}
                 </div>
-                <div className="text-[9px] font-mono text-emerald-400 mt-1 flex items-center gap-1">
+                <div className="text-[9px] font-mono text-emerald-400 mt-0.5 flex items-center gap-1">
                   <span>●</span> <span>FOD生配信</span>
                 </div>
               </div>
@@ -374,44 +334,67 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
         </div>
       </div>
 
-      {/* ── 2. Header Banner & Backup Control ── */}
-      <div className="glass-card p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
-        <div className="flex flex-col gap-1 z-10">
+      {/* ── 2. Header & Action Toolbar ── */}
+      <div className="glass-card-premium p-2.5 sm:p-3 rounded-xl flex flex-wrap items-center justify-between gap-2.5 border border-white/10 shadow-md">
+        {/* Left: Title & Count */}
+        <div className="flex items-center gap-2.5 flex-wrap">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span className="text-xs font-racing font-bold text-emerald-400 uppercase tracking-widest">
-              LIVE PADDOCK INTELLIGENCE & FACT-CHECK
-            </span>
+            <h2 className="text-sm sm:text-base font-racing font-bold text-white tracking-wider">
+              最新ニュース ＆ パドックインテリジェンス
+            </h2>
           </div>
-          <h2 className="text-xl font-racing font-black text-white tracking-wider">
-            最新ニュース ＆ パドックインテリジェンス
-          </h2>
-          <p className="text-xs text-slate-400 max-w-xl">
-            FIA公式・チーム一次発表・FOD中継速報の格付けバッジを付与。Gemini AIによる3行スマート要約と世代バックアップに対応。
-          </p>
+          <span className="text-xs font-mono font-bold bg-slate-900/90 px-2.5 py-1 rounded-lg border border-white/10 text-sky-400">
+            表示中: <strong className="text-white text-sm">{filteredNews.length}</strong> / {articles.length} 件
+          </span>
         </div>
 
-        {/* Action Buttons */}
-        <div className="z-10 flex flex-wrap items-center gap-2">
+        {/* Right: Search, Filter Toggle, Backup, Refresh */}
+        <div className="flex items-center gap-2 shrink-0 flex-wrap">
           {/* Search Input */}
-          <input
-            type="text"
-            placeholder="キーワード・チーム・選手名..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full sm:w-56 bg-slate-900/80 border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
-          />
+          <div className="relative w-40 sm:w-52">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-slate-400 text-xs">
+              🔍
+            </span>
+            <input
+              type="text"
+              placeholder="キーワード・選手名..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-slate-900/80 border border-white/10 rounded-lg pl-7 pr-6 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute inset-y-0 right-0 flex items-center pr-2 text-slate-400 hover:text-white text-xs cursor-pointer"
+              >
+                ✕
+              </button>
+            )}
+          </div>
 
-          {/* Backup Save Button */}
+          {/* Filter Tray Toggle Button */}
           <button
             type="button"
-            onClick={handleSaveToBackup}
-            disabled={isSavingBackup || articles.length === 0}
-            className="px-3 py-2 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 text-xs font-racing font-bold transition-all flex items-center gap-1.5 shadow-sm disabled:opacity-50"
-            title="現在のニュース一覧を世代バックアップ (news_snapshot_latest.json) に保存"
+            onClick={() => setIsFilterOpen((prev) => !prev)}
+            className={`text-xs font-racing font-bold px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 shadow-sm cursor-pointer ${
+              isFilterOpen
+                ? 'bg-sky-600 text-white border-sky-400 shadow-sky-500/30 ring-1 ring-sky-400/50'
+                : activeFilterCount > 0
+                ? 'bg-sky-950/80 border-sky-500/50 text-sky-300 hover:bg-sky-900/80'
+                : 'bg-slate-900/80 border-white/10 text-slate-300 hover:text-white hover:bg-slate-800'
+            }`}
+            title="格付け・トピック絞り込みの開閉"
           >
-            <span>💾</span>
-            <span>{isSavingBackup ? '保存中...' : '世代バックアップへ保存'}</span>
+            <span>⚙️</span>
+            <span>絞り込み</span>
+            {activeFilterCount > 0 && (
+              <span className="w-4 h-4 rounded-full bg-sky-500 text-white text-[10px] font-mono flex items-center justify-center font-bold">
+                {activeFilterCount}
+              </span>
+            )}
+            <span className="text-[10px]">{isFilterOpen ? '▲' : '▼'}</span>
           </button>
 
           {/* Refresh Button */}
@@ -419,146 +402,205 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
             type="button"
             onClick={fetchNews}
             disabled={isLoadingNews}
-            className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 transition-colors flex items-center justify-center flex-shrink-0 disabled:opacity-50"
+            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 transition-colors flex items-center justify-center shrink-0 disabled:opacity-50 cursor-pointer"
             title="ニュースを再取得"
           >
             <span className={isLoadingNews ? 'animate-spin' : ''}>🔄</span>
           </button>
+
+          {hasActiveFilter && (
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="text-xs font-mono font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 px-2 py-1.5 rounded-lg transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
+              title="すべての絞り込み条件をリセット"
+            >
+              <span>✕</span>
+              <span className="hidden sm:inline">リセット</span>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Backup Status Toast Notification */}
-      {backupStatus && (
-        <div className="px-4 py-2.5 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-200 text-xs font-mono flex items-center justify-between animate-fadeIn">
-          <span>{backupStatus}</span>
-          <span className="text-[10px] text-emerald-400/80">data/backups/news_snapshot_latest.json</span>
+      {/* ── Collapsible Filter Tray (On-demand) ── */}
+      {isFilterOpen && (
+        <div className="glass-card-premium rounded-xl p-3 sm:p-4 border border-sky-500/30 shadow-xl flex flex-col gap-3 animate-fade-in">
+          <div className="flex items-center justify-between pb-2 border-b border-white/10 text-xs">
+            <span className="font-racing font-bold text-slate-300 flex items-center gap-1.5">
+              <span>⚙️</span>
+              <span>ニュース格付け ＆ トピック絞り込み条件</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => setIsFilterOpen(false)}
+              className="text-slate-400 hover:text-white text-xs px-2 py-0.5 rounded hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              閉じる ✕
+            </button>
+          </div>
+
+          {/* Section 1: Authority */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <span className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider min-w-[90px] flex items-center gap-1">
+              <span>🛡️</span>
+              <span>一次情報格付け:</span>
+            </span>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setSelectedAuthority('ALL')}
+                className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold transition-all cursor-pointer ${
+                  selectedAuthority === 'ALL'
+                    ? 'bg-sky-600 text-white shadow-sm'
+                    : 'bg-slate-900/80 text-slate-400 hover:text-white border border-white/5'
+                }`}
+              >
+                全ソース
+              </button>
+              {(Object.keys(AUTHORITY_CONFIG) as NewsAuthorityLevel[]).map((level) => {
+                const conf = AUTHORITY_CONFIG[level];
+                const isSel = selectedAuthority === level;
+                return (
+                  <button
+                    key={level}
+                    type="button"
+                    onClick={() => setSelectedAuthority(isSel ? 'ALL' : level)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all flex items-center gap-1 border cursor-pointer ${
+                      isSel
+                        ? 'bg-slate-800 text-white border-sky-400 shadow-sm font-bold ring-1 ring-sky-400/40'
+                        : 'bg-slate-900/60 border-white/5 text-slate-400 hover:text-white hover:bg-slate-800'
+                    }`}
+                  >
+                    <span>{conf.icon}</span>
+                    <span>{conf.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Section 2: Topic Categories */}
+          <div className="flex flex-col sm:flex-row sm:items-start gap-2 pt-2 border-t border-white/5">
+            <span className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider min-w-[90px] flex items-center gap-1 pt-1">
+              <span>🏷️</span>
+              <span>トピック分野:</span>
+            </span>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setSelectedTopic('ALL')}
+                className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold transition-all cursor-pointer ${
+                  selectedTopic === 'ALL'
+                    ? 'bg-sky-600 text-white shadow-sm'
+                    : 'bg-slate-900/80 text-slate-400 hover:text-white border border-white/5'
+                }`}
+              >
+                すべて
+              </button>
+              {(Object.keys(TOPIC_ICONS) as TopicTag[]).map((tag) => {
+                const isSel = selectedTopic === tag;
+                const info = TOPIC_ICONS[tag];
+                return (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => setSelectedTopic(isSel ? 'ALL' : tag)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all border cursor-pointer flex items-center gap-1 ${
+                      isSel
+                        ? 'bg-slate-800 text-sky-300 border-sky-400 font-bold ring-1 ring-sky-400/40'
+                        : 'bg-slate-900/60 border-white/5 text-slate-400 hover:text-white hover:bg-slate-800'
+                    }`}
+                  >
+                    <span>{info.icon}</span>
+                    <span>{info.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       )}
 
-      {/* ── 3. Authority Filter & Topic Filters ── */}
-      <div className="space-y-3">
-        {/* Authority Filter Bar */}
-        <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-950/80 rounded-xl border border-white/10">
-          <span className="text-[10px] font-mono font-bold text-slate-400 px-2 py-1">
-            🛡️ 一次情報格付け:
+      {/* ── Active Filter Dismissible Chips Strip ── */}
+      {hasActiveFilter && (
+        <div className="flex flex-wrap items-center gap-1.5 px-1 text-xs">
+          <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1 mr-1">
+            <span>🎯</span>
+            <span>絞り込み中:</span>
           </span>
-          <button
-            type="button"
-            onClick={() => setSelectedAuthority('ALL')}
-            className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
-              selectedAuthority === 'ALL'
-                ? 'bg-sky-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            全ソース表示
-          </button>
-          {(Object.keys(AUTHORITY_CONFIG) as NewsAuthorityLevel[]).map((level) => {
-            const conf = AUTHORITY_CONFIG[level];
-            const isSel = selectedAuthority === level;
-            return (
+          {selectedAuthority !== 'ALL' && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-950/80 border border-blue-500/40 text-blue-200 text-[11px] font-mono">
+              <span>{AUTHORITY_CONFIG[selectedAuthority as NewsAuthorityLevel]?.icon}</span>
+              <span>{AUTHORITY_CONFIG[selectedAuthority as NewsAuthorityLevel]?.label}</span>
               <button
-                key={level}
                 type="button"
-                onClick={() => setSelectedAuthority(isSel ? 'ALL' : level)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all flex items-center gap-1 border ${
-                  isSel
-                    ? 'bg-slate-800 text-white border-white/30 font-bold shadow-sm'
-                    : 'bg-slate-900/60 border-transparent text-slate-400 hover:text-white'
-                }`}
+                onClick={() => setSelectedAuthority('ALL')}
+                className="hover:text-white text-blue-400 hover:bg-blue-800/50 rounded px-1 ml-0.5 cursor-pointer"
+                title="格付け解除"
               >
-                <span>{conf.icon}</span>
-                <span>{conf.label}</span>
+                ✕
               </button>
-            );
-          })}
-        </div>
-
-        {/* Detailed Topic Filter Pills */}
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-              <span>🏷️</span>
-              <span>TOPIC CATEGORIES</span>
             </span>
-
-            {hasActiveFilter && (
+          )}
+          {selectedTopic !== 'ALL' && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-950/80 border border-sky-500/40 text-sky-200 text-[11px] font-mono">
+              <span>{TOPIC_ICONS[selectedTopic as TopicTag]?.icon} {TOPIC_ICONS[selectedTopic as TopicTag]?.label}</span>
               <button
                 type="button"
-                onClick={handleResetFilters}
-                className="text-[11px] text-sky-400 hover:text-sky-300 font-medium flex items-center gap-1 transition-colors"
+                onClick={() => setSelectedTopic('ALL')}
+                className="hover:text-white text-sky-400 hover:bg-sky-800/50 rounded px-1 ml-0.5 cursor-pointer"
+                title="トピック解除"
               >
-                <span>✕</span>
-                <span>フィルターをクリア</span>
+                ✕
               </button>
-            )}
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:flex md:flex-row md:items-center gap-1.5 md:gap-2">
-            <button
-              type="button"
-              onClick={() => setSelectedTopic('ALL')}
-              className={`col-span-2 sm:col-span-1 md:col-auto px-3.5 py-2 md:py-1.5 rounded-xl text-xs font-medium transition-all border flex items-center justify-center gap-1.5 ${
-                selectedTopic === 'ALL'
-                  ? 'bg-blue-600 text-white border-blue-400 font-bold shadow-md shadow-blue-500/30'
-                  : 'bg-slate-900/70 border-white/10 text-slate-400 hover:text-white hover:bg-slate-800/80'
-              }`}
-            >
-              <span>🌐</span>
-              <span>すべてのトピック</span>
-            </button>
-
-            {(Object.keys(TOPIC_ICONS) as TopicTag[]).map((topic) => {
-              const info = TOPIC_ICONS[topic];
-              const isSelected = selectedTopic === topic;
-              return (
-                <button
-                  key={topic}
-                  type="button"
-                  onClick={() => setSelectedTopic(isSelected ? 'ALL' : topic)}
-                  className={`px-3 py-2 md:py-1.5 rounded-xl text-xs font-medium transition-all border flex items-center justify-center gap-1.5 ${
-                    isSelected
-                      ? 'bg-sky-600 text-white border-sky-400 font-bold shadow-md shadow-sky-500/30'
-                      : 'bg-slate-900/70 border-white/10 text-slate-300 hover:text-white hover:bg-slate-800/80'
-                  }`}
-                >
-                  <span>{info.icon}</span>
-                  <span>{info.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Active Filter Chips (if team or driver is selected) */}
-      {(selectedTeam !== 'ALL' || selectedDriver !== 'ALL') && (
-        <div className="flex items-center gap-2 bg-slate-950/60 p-2 rounded-xl border border-white/10 text-xs">
-          <span className="text-slate-500 font-mono text-[11px]">絞り込み中:</span>
+            </span>
+          )}
           {selectedTeam !== 'ALL' && (
-            <span className="bg-slate-800 text-white px-2 py-0.5 rounded-md border border-white/10 flex items-center gap-1 font-bold">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-800 border border-white/10 text-white text-[11px] font-mono">
               <span>🏎️ {selectedTeam}</span>
               <button
                 type="button"
                 onClick={() => setSelectedTeam('ALL')}
-                className="hover:text-red-400 ml-1 text-slate-400"
+                className="hover:text-red-400 ml-1 text-slate-400 cursor-pointer"
+                title="チーム解除"
               >
                 ✕
               </button>
             </span>
           )}
           {selectedDriver !== 'ALL' && (
-            <span className="bg-slate-800 text-sky-300 px-2 py-0.5 rounded-md border border-sky-500/30 flex items-center gap-1 font-mono font-bold">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-800 border border-sky-500/30 text-sky-300 text-[11px] font-mono font-bold">
               <span>👤 {selectedDriver}</span>
               <button
                 type="button"
                 onClick={() => setSelectedDriver('ALL')}
-                className="hover:text-red-400 ml-1 text-slate-400"
+                className="hover:text-red-400 ml-1 text-slate-400 cursor-pointer"
+                title="選手解除"
               >
                 ✕
               </button>
             </span>
           )}
+          {searchQuery && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-950/80 border border-sky-500/40 text-sky-200 text-[11px] font-mono">
+              <span>&quot;{searchQuery}&quot;</span>
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="hover:text-white text-sky-400 hover:bg-sky-800/50 rounded px-1 ml-0.5 cursor-pointer"
+                title="検索解除"
+              >
+                ✕
+              </button>
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={handleResetFilters}
+            className="text-[11px] text-rose-400 hover:text-rose-300 underline ml-1 cursor-pointer font-mono"
+          >
+            すべて解除
+          </button>
         </div>
       )}
 
@@ -580,10 +622,10 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
 
       {/* News Grid */}
       {!isLoadingNews && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
           {filteredNews.length === 0 ? (
-            <div className="col-span-full glass-card p-12 text-center text-slate-500 text-xs flex flex-col items-center gap-3">
-              <span className="text-3xl">📰</span>
+            <div className="col-span-full glass-card p-8 text-center text-slate-500 text-xs flex flex-col items-center gap-2">
+              <span className="text-2xl">📰</span>
               <span>選択したフィルターに該当するニュースが見つかりませんでした</span>
               <button
                 type="button"
@@ -601,9 +643,9 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
               return (
                 <div
                   key={item.id}
-                  className="glass-card p-5 flex flex-col justify-between gap-3 hover:border-white/20 transition-all group relative overflow-hidden"
+                  className="glass-card-premium p-3.5 sm:p-4 rounded-xl flex flex-col justify-between gap-2.5 hover:border-white/20 transition-all group relative overflow-hidden"
                 >
-                  <div className="flex flex-col gap-2.5">
+                  <div className="flex flex-col gap-2">
                     {/* Source Authority & Category Header */}
                     <div className="flex items-center justify-between gap-2 flex-wrap">
                       <div className="flex items-center gap-1.5 flex-wrap">
@@ -731,7 +773,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                         type="button"
                         onClick={() => handleGenerateSummary(item)}
                         disabled={loadingAiSummary[item.id]}
-                        className="py-1 px-2.5 rounded-lg bg-purple-900/40 hover:bg-purple-900/60 border border-purple-500/30 text-purple-200 text-[11px] font-medium flex items-center gap-1.5 transition-all disabled:opacity-50"
+                        className="h-7 px-2.5 rounded-lg bg-purple-900/40 hover:bg-purple-900/60 border border-purple-500/30 text-purple-200 text-[11px] font-medium flex items-center gap-1.5 transition-all disabled:opacity-50 whitespace-nowrap shrink-0 cursor-pointer"
                       >
                         {loadingAiSummary[item.id] ? (
                           <>
@@ -746,7 +788,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                         )}
                       </button>
                     ) : (
-                      <span className="text-[10px] text-emerald-400 flex items-center gap-1">
+                      <span className="text-[10px] text-emerald-400 flex items-center gap-1 whitespace-nowrap shrink-0">
                         <span>✓</span>
                         <span>要約展開中</span>
                       </span>
@@ -757,7 +799,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                       href={item.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sky-400 hover:text-sky-300 text-xs font-medium flex items-center gap-1 group-hover:translate-x-0.5 transition-transform ml-auto"
+                      className="text-sky-400 hover:text-sky-300 text-xs font-medium flex items-center gap-1 group-hover:translate-x-0.5 transition-transform ml-auto whitespace-nowrap shrink-0"
                     >
                       <span>元記事を読む</span>
                       <span>↗</span>

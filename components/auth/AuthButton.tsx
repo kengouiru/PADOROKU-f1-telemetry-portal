@@ -6,6 +6,7 @@ import { useUserPreferences } from '@/lib/userPreferences';
 import { usePlanTier } from '@/lib/tierService';
 import { KNOWLEDGE_TEAMS, KNOWLEDGE_DRIVERS } from '@/data/f1KnowledgeData';
 import ProfileSettingsModal from './ProfileSettingsModal';
+import PitwallProModal from '@/components/subscription/PitwallProModal';
 
 interface AuthButtonProps {
   onOpenAuthModal: () => void;
@@ -17,6 +18,7 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
   const { isPro, aiUsage } = usePlanTier();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [proModalOpen, setProModalOpen] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -40,8 +42,7 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
 
   // Determine active avatar & name (custom preference takes priority over session defaults)
   const user = session?.user;
-  const userRole = (user as { role?: string })?.role || (isPro ? 'pro' : 'free');
-  const isProUser = userRole === 'pro';
+  const isProUser = isPro;
 
   const activeAvatar = prefs.customAvatarUrl || user?.image || '';
   const activeDisplayName = prefs.displayName || user?.name || (isProUser ? 'Pro User' : 'Free User');
@@ -200,6 +201,27 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
               <span>プロフィール・推し設定</span>
             </button>
 
+            {/* Plan Settings / Test Toggle Button */}
+            <button
+              onClick={() => {
+                setDropdownOpen(false);
+                setProModalOpen(true);
+              }}
+              className="w-full text-left px-2.5 py-2 rounded-xl text-slate-200 hover:bg-slate-800 hover:text-white transition-colors flex items-center justify-between font-racing font-bold cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <span>💎</span>
+                <span>プラン確認・切替テスト</span>
+              </div>
+              <span
+                className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold ${
+                  isPro ? 'bg-amber-500/20 text-amber-300' : 'bg-cyan-500/20 text-cyan-300'
+                }`}
+              >
+                {isPro ? 'PRO' : 'FREE'}
+              </span>
+            </button>
+
             {/* Logout Button */}
             <button
               onClick={() => {
@@ -217,7 +239,18 @@ export default function AuthButton({ onOpenAuthModal }: AuthButtonProps) {
 
       {/* Profile Settings Modal */}
       {profileModalOpen && (
-        <ProfileSettingsModal onClose={() => setProfileModalOpen(false)} />
+        <ProfileSettingsModal
+          onClose={() => setProfileModalOpen(false)}
+          onOpenUpgradeModal={() => setProModalOpen(true)}
+        />
+      )}
+
+      {/* Pitwall Pro Modal */}
+      {proModalOpen && (
+        <PitwallProModal
+          isOpen={proModalOpen}
+          onClose={() => setProModalOpen(false)}
+        />
       )}
     </>
   );

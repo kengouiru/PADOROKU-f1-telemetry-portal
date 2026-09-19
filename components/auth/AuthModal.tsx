@@ -86,9 +86,9 @@ export default function AuthModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in overflow-y-auto">
       {/* Modal Card */}
-      <div className="relative w-full max-w-md max-h-[90vh] overflow-y-auto bg-slate-900/95 border border-white/15 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-4 sm:space-y-5 text-white">
+      <div className="relative w-full max-w-md max-h-[85vh] my-auto overflow-y-auto bg-slate-900/95 border border-white/15 rounded-3xl p-5 sm:p-7 shadow-2xl space-y-4 sm:space-y-5 text-white">
         {/* Close Button */}
         <button
           onClick={onClose}

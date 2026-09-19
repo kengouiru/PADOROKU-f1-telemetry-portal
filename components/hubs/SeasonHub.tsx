@@ -87,79 +87,79 @@ const RaceCountdownCard = React.memo(function RaceCountdownCard({
   // Before mounted on client, render consistent placeholder to eliminate SSR hydration mismatch
   if (!timeLeft.mounted) {
     return (
-      <div className="w-full bg-slate-950/80 p-4 rounded-2xl border border-white/10 text-center shadow-2xl relative overflow-hidden">
-        <div className="f1-label text-slate-400 mb-2 flex items-center justify-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+      <div className="w-full bg-slate-950/90 p-2.5 sm:p-3 rounded-xl border border-white/10 text-center shadow-lg relative overflow-hidden">
+        <div className="text-[10px] font-racing font-bold text-slate-400 mb-1.5 flex items-center justify-center gap-1.5 uppercase tracking-wider">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
           <span>決勝スタートまで</span>
         </div>
-        <div className="grid grid-cols-4 gap-1.5 font-mono text-center">
-          <div className="p-2 sm:p-2.5 rounded-xl bg-black/40 border border-white/[0.06] shadow-inner">
-            <div className="f1-hero-metric text-white/40">--</div>
-            <div className="f1-label text-[10px] text-slate-500 mt-0.5">DAYS</div>
+        <div className="grid grid-cols-4 gap-1 font-mono text-center">
+          <div className="p-1.5 rounded-lg bg-black/40 border border-white/[0.06] shadow-inner">
+            <div className="font-racing font-black text-base sm:text-lg text-white/40">--</div>
+            <div className="text-[9px] font-mono text-slate-500">DAYS</div>
           </div>
-          <div className="p-2 sm:p-2.5 rounded-xl bg-black/40 border border-white/[0.06] shadow-inner">
-            <div className="f1-hero-metric text-amber-400/40">--</div>
-            <div className="f1-label text-[10px] text-slate-500 mt-0.5">HOURS</div>
+          <div className="p-1.5 rounded-lg bg-black/40 border border-white/[0.06] shadow-inner">
+            <div className="font-racing font-black text-base sm:text-lg text-amber-400/40">--</div>
+            <div className="text-[9px] font-mono text-slate-500">HOURS</div>
           </div>
-          <div className="p-2 sm:p-2.5 rounded-xl bg-black/40 border border-white/[0.06] shadow-inner">
-            <div className="f1-hero-metric text-white/40">--</div>
-            <div className="f1-label text-[10px] text-slate-500 mt-0.5">MIN</div>
+          <div className="p-1.5 rounded-lg bg-black/40 border border-white/[0.06] shadow-inner">
+            <div className="font-racing font-black text-base sm:text-lg text-white/40">--</div>
+            <div className="text-[9px] font-mono text-slate-500">MIN</div>
           </div>
-          <div className="p-2 sm:p-2.5 rounded-xl bg-black/40 border border-white/[0.06] shadow-inner">
-            <div className="f1-hero-metric text-red-500/40">--</div>
-            <div className="f1-label text-[10px] text-slate-500 mt-0.5">SEC</div>
+          <div className="p-1.5 rounded-lg bg-black/40 border border-white/[0.06] shadow-inner">
+            <div className="font-racing font-black text-base sm:text-lg text-red-500/40">--</div>
+            <div className="text-[9px] font-mono text-slate-500">SEC</div>
           </div>
         </div>
-        <div className="mt-2.5 f1-meta flex items-center justify-center gap-1">
+        <div className="mt-1.5 text-[10px] text-slate-400 font-mono flex items-center justify-center gap-1">
           <span>🎯</span>
-          <span>ターゲット: {dates.split('-')[1]?.trim() || dates}</span>
+          <span className="truncate">ターゲット: {dates.split('-')[1]?.trim() || dates}</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full bg-slate-950/80 p-4 rounded-2xl border border-white/10 text-center shadow-2xl relative overflow-hidden">
+    <div className="w-full bg-slate-950/90 p-2.5 sm:p-3 rounded-xl border border-white/10 text-center shadow-lg relative overflow-hidden">
       {timeLeft.isPast ? (
-        <div className="space-y-2 py-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs font-racing font-bold">
+        <div className="space-y-1.5 py-1">
+          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[11px] font-racing font-bold">
             <span>🏁</span>
             <span>レース完走 / リザルト確定</span>
           </div>
-          <div className="text-xs text-slate-300 font-medium">
+          <div className="text-[11px] text-slate-300 font-medium">
             公式決勝レース終了・アーカイブ保管済み
           </div>
-          <div className="f1-meta">
+          <div className="text-[10px] text-slate-400 font-mono">
             開催日程: {dates}
           </div>
         </div>
       ) : (
         <>
-          <div className="f1-label text-slate-400 mb-2 flex items-center justify-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+          <div className="text-[10px] font-racing font-bold text-slate-400 mb-1.5 flex items-center justify-center gap-1.5 uppercase tracking-wider">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
             <span>決勝スタートまで</span>
           </div>
-          <div className="grid grid-cols-4 gap-1.5 font-mono text-center">
-            <div className="p-2 sm:p-2.5 rounded-xl bg-black/40 border border-white/[0.06] shadow-inner">
-              <div className="f1-hero-metric text-white" suppressHydrationWarning>{timeLeft.days}</div>
-              <div className="f1-label text-[10px] text-slate-500 mt-0.5">DAYS</div>
+          <div className="grid grid-cols-4 gap-1 font-mono text-center">
+            <div className="p-1.5 rounded-lg bg-black/40 border border-white/[0.06] shadow-inner">
+              <div className="font-racing font-black text-base sm:text-lg text-white" suppressHydrationWarning>{timeLeft.days}</div>
+              <div className="text-[9px] font-mono text-slate-500">DAYS</div>
             </div>
-            <div className="p-2 sm:p-2.5 rounded-xl bg-black/40 border border-white/[0.06] shadow-inner">
-              <div className="f1-hero-metric text-amber-400" suppressHydrationWarning>{timeLeft.hours}</div>
-              <div className="f1-label text-[10px] text-slate-500 mt-0.5">HOURS</div>
+            <div className="p-1.5 rounded-lg bg-black/40 border border-white/[0.06] shadow-inner">
+              <div className="font-racing font-black text-base sm:text-lg text-amber-400" suppressHydrationWarning>{timeLeft.hours}</div>
+              <div className="text-[9px] font-mono text-slate-500">HOURS</div>
             </div>
-            <div className="p-2 sm:p-2.5 rounded-xl bg-black/40 border border-white/[0.06] shadow-inner">
-              <div className="f1-hero-metric text-white" suppressHydrationWarning>{timeLeft.minutes}</div>
-              <div className="f1-label text-[10px] text-slate-500 mt-0.5">MIN</div>
+            <div className="p-1.5 rounded-lg bg-black/40 border border-white/[0.06] shadow-inner">
+              <div className="font-racing font-black text-base sm:text-lg text-white" suppressHydrationWarning>{timeLeft.minutes}</div>
+              <div className="text-[9px] font-mono text-slate-500">MIN</div>
             </div>
-            <div className="p-2 sm:p-2.5 rounded-xl bg-black/40 border border-white/[0.06] shadow-inner">
-              <div className="f1-hero-metric text-red-500 animate-pulse" suppressHydrationWarning>{timeLeft.seconds}</div>
-              <div className="f1-label text-[10px] text-slate-500 mt-0.5">SEC</div>
+            <div className="p-1.5 rounded-lg bg-black/40 border border-white/[0.06] shadow-inner">
+              <div className="font-racing font-black text-base sm:text-lg text-red-500 animate-pulse" suppressHydrationWarning>{timeLeft.seconds}</div>
+              <div className="text-[9px] font-mono text-slate-500">SEC</div>
             </div>
           </div>
-          <div className="mt-2.5 f1-meta flex items-center justify-center gap-1">
+          <div className="mt-1.5 text-[10px] text-slate-400 font-mono flex items-center justify-center gap-1">
             <span>🎯</span>
-            <span>ターゲット: {dates.split('-')[1]?.trim() || dates}</span>
+            <span className="truncate">ターゲット: {dates.split('-')[1]?.trim() || dates}</span>
           </div>
         </>
       )}
@@ -179,9 +179,9 @@ export default function SeasonHub({
   // Season State: Defaults to current active season (2026)
   const [selectedSeason, setSelectedSeason] = useState<SeasonYear>(() => getActiveSeasonYear());
   const [activeTab, setActiveTab] = useState<MainTab>('calendar');
-  const [standingsType, setStandingsType] = useState<'drivers' | 'constructors'>('drivers');
   const [calendarFilter, setCalendarFilter] = useState<'all' | 'sprint'>('all');
   const [showSeasonInfo, setShowSeasonInfo] = useState<boolean>(false);
+  const [heroSubView, setHeroSubView] = useState<'schedule' | 'weather'>('schedule');
 
   // Active season calendar & grid — starts with local data, upgradeable via API
   const localCalendar = useMemo(() => getSeasonCalendar(selectedSeason), [selectedSeason]);
@@ -290,11 +290,11 @@ export default function SeasonHub({
   const maxTeamPoints = activeConstructorStandings[0]?.points || 1;
 
   return (
-    <div className="space-y-6 pb-12 animate-fade-in">
+    <div className="space-y-3 sm:space-y-4 pb-8 animate-fade-in max-w-7xl mx-auto">
       {/* ─────────────────────────────────────────────────────────────
           0. SEASON SWITCHER & SMART ROLLOVER STATUS BAR
           ───────────────────────────────────────────────────────────── */}
-      <div className="p-3.5 rounded-2xl bg-gradient-to-r from-slate-900/95 via-slate-950/90 to-slate-900/95 border border-white/10 shadow-xl backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="p-2.5 sm:p-3 rounded-2xl bg-gradient-to-r from-slate-900/95 via-slate-950/90 to-slate-900/95 border border-white/10 shadow-lg backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-2.5">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
             <span className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -420,154 +420,182 @@ export default function SeasonHub({
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          1. NEXT RACE HERO & JST SCHEDULE BANNER
+          1. NEXT RACE HERO & JST SCHEDULE BANNER (Ergonomic Compact Edition)
           ───────────────────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900 via-slate-950 to-neutral-950 p-6 md:p-8 shadow-2xl">
-        {/* Background glow & accents */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
-        <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900/95 via-slate-950 to-neutral-950 p-3.5 sm:p-4 shadow-xl">
+        {/* Background subtle glow */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-red-600/10 rounded-full blur-3xl pointer-events-none -mr-16 -mt-16" />
 
-        <div className="relative z-10 flex flex-col lg:flex-row gap-6 lg:items-center lg:justify-between">
-          {/* Left: Race Information */}
-          <div className="space-y-3 flex-1">
+        <div className="relative z-10 flex flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
+          {/* Left: Race Information & Sub-View (Schedule vs Weather) */}
+          <div className="space-y-2.5 flex-1 min-w-0">
+            {/* Top row: Badges + Circuit meta */}
             <div className="flex flex-wrap items-center gap-2">
-              <span className="px-3 py-1 rounded-full text-xs font-racing font-bold tracking-wider uppercase bg-red-500/20 text-red-400 border border-red-500/30">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-racing font-bold tracking-wider uppercase bg-red-500/20 text-red-400 border border-red-500/30">
                 🏁 {selectedSeason}年 第{selectedRace.round}戦 / 全{activeCalendar.length}戦
               </span>
               {selectedRace.isSprint && (
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-racing font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse">
-                  ⚡ スプリント開催週
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-racing font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse">
+                  ⚡ SPRINT
                 </span>
               )}
-              <span className="text-xs text-slate-400 font-mono flex items-center gap-1">
+              <span className="text-[11px] text-slate-400 font-mono flex items-center gap-1">
                 📅 {selectedRace.dates}
               </span>
             </div>
 
-            <div className="flex items-baseline gap-3">
-              <span className="text-3xl md:text-4xl">{selectedRace.flag}</span>
-              <h1 className="text-2xl md:text-3xl font-racing font-black text-white tracking-tight">
+            {/* Main title + flag */}
+            <div className="flex items-center gap-2.5">
+              <span className="text-2xl sm:text-3xl shrink-0">{selectedRace.flag}</span>
+              <h1 className="text-lg sm:text-2xl font-racing font-black text-white tracking-tight truncate">
                 {selectedRace.gpName}
               </h1>
             </div>
 
-            <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300">
+            {/* Quick specs strip */}
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-300 font-mono">
               <span className="font-semibold text-slate-200">
                 📍 {selectedRace.circuitName} ({selectedRace.city}, {selectedRace.country})
               </span>
-              <span className="text-slate-500">|</span>
-              <span>🛣️ 全長: {selectedRace.lengthKm.toFixed(3)} km</span>
-              <span className="text-slate-500">|</span>
-              <span>🔄 決勝: {selectedRace.laps} 周</span>
-              <span className="text-slate-500">|</span>
-              <span className="text-amber-400 font-mono">🛞 {selectedRace.pirelliCompounds}</span>
+              <span className="text-slate-600 hidden sm:inline">|</span>
+              <span>🛣️ {selectedRace.lengthKm.toFixed(3)} km</span>
+              <span className="text-slate-600 hidden sm:inline">|</span>
+              <span>🔄 {selectedRace.laps} 周</span>
+              <span className="text-slate-600 hidden sm:inline">|</span>
+              <span className="text-amber-400 font-bold">🛞 {selectedRace.pirelliCompounds}</span>
             </div>
 
-            {/* JST Weekend Timetable */}
-            <div className="mt-4 pt-3 border-t border-white/10">
-              <div className="text-[11px] font-racing font-bold text-red-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <span>⏰ 日本時間 (JST) セッション予定</span>
-                <span className="text-[10px] text-slate-500 font-normal">※生中継観戦用</span>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
-                {selectedRace.scheduleJst.map((s) => (
-                  <div
-                    key={s.session}
-                    className="flex items-center justify-between p-2.5 rounded-xl bg-white/[0.03] border border-white/5 text-xs"
+            {/* Sub-view switcher: JST Schedule vs Weather */}
+            <div className="pt-2 border-t border-white/10 space-y-2">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <div className="flex items-center gap-1 bg-slate-950/80 p-0.5 rounded-lg border border-white/10">
+                  <button
+                    type="button"
+                    onClick={() => setHeroSubView('schedule')}
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-racing font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                      heroSubView === 'schedule'
+                        ? 'bg-red-600 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
                   >
-                    <span className="text-slate-300 font-medium">{s.session}</span>
-                    <span className="font-mono font-bold text-amber-300">{s.dayTime}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+                    <span>⏰</span>
+                    <span>JST タイムテーブル ({selectedRace.scheduleJst.length})</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setHeroSubView('weather')}
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-racing font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                      heroSubView === 'weather'
+                        ? 'bg-sky-600 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>🌤️</span>
+                    <span>気象・路面予測 {selectedWeather ? `(${selectedWeather.airTempC}℃)` : ''}</span>
+                  </button>
+                </div>
 
-            {/* Weather & Track Condition Widget */}
-            {selectedWeather && (
-              <div className="mt-4 pt-3 border-t border-white/10">
-                <div className="flex flex-wrap items-center justify-between gap-1 mb-2">
-                  <div className="text-[11px] font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <span>🌤️ 気象・路面コンディション予報</span>
-                    <span className="text-[10px] text-slate-400 font-mono">({selectedWeather.conditionText})</span>
-                  </div>
-                  <span className="text-[10px] font-mono text-slate-400">
-                    降水確率: <span className={selectedWeather.rainProb > 30 ? 'text-sky-400 font-bold' : 'text-slate-300'}>{selectedWeather.rainProb}%</span>
+                {heroSubView === 'schedule' ? (
+                  <span className="text-[10px] text-slate-500 font-mono">※日本国内生中継観戦用</span>
+                ) : selectedWeather ? (
+                  <span className="text-[10px] text-slate-400 font-mono">
+                    降水確率: <strong className={selectedWeather.rainProb > 30 ? 'text-sky-400' : 'text-slate-300'}>{selectedWeather.rainProb}%</strong>
                   </span>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  <div className="bg-white/[0.03] border border-white/5 p-2.5 rounded-xl text-center">
-                    <span className="text-[10px] text-slate-400 block font-mono">気温 / 天候</span>
-                    <span className="text-sm font-bold text-white font-mono mt-0.5 block">
-                      {selectedWeather.weatherIcon} {selectedWeather.airTempC}℃
-                    </span>
-                  </div>
-                  <div className="bg-white/[0.03] border border-white/5 p-2.5 rounded-xl text-center">
-                    <span className="text-[10px] text-slate-400 block font-mono">路面温度 (Track)</span>
-                    <span className="text-sm font-bold text-amber-400 font-mono mt-0.5 block">
-                      🔥 {selectedWeather.trackTempC}℃
-                    </span>
-                  </div>
-                  <div className="bg-white/[0.03] border border-white/5 p-2.5 rounded-xl text-center">
-                    <span className="text-[10px] text-slate-400 block font-mono">湿度 / 降水リスク</span>
-                    <span className="text-sm font-bold text-sky-300 font-mono mt-0.5 block">
-                      💧 {selectedWeather.humidity}% / {selectedWeather.rainProb}%
-                    </span>
-                  </div>
-                  <div className="bg-white/[0.03] border border-white/5 p-2.5 rounded-xl text-center">
-                    <span className="text-[10px] text-slate-400 block font-mono">風速・風向き</span>
-                    <span className="text-xs font-bold text-emerald-300 font-mono mt-1 block truncate" title={selectedWeather.windDirection}>
-                      💨 {selectedWeather.windSpeedKmh}km/h
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-2.5 p-2.5 rounded-xl bg-sky-950/40 border border-sky-500/20 text-[11px] text-slate-300 leading-relaxed flex items-start gap-2">
-                  <span className="text-sky-400 flex-shrink-0 text-sm">💡</span>
-                  <div>
-                    <span className="font-bold text-sky-300 mr-1.5 font-racing">工学的戦術サマリー:</span>
-                    <span>{selectedWeather.tacticalImpact}</span>
-                  </div>
-                </div>
+                ) : null}
               </div>
-            )}
+
+              {/* View 1: JST Timetable */}
+              {heroSubView === 'schedule' && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1.5 animate-fadeIn">
+                  {selectedRace.scheduleJst.map((s) => (
+                    <div
+                      key={s.session}
+                      className="flex flex-col justify-between p-1.5 sm:p-2 rounded-lg bg-white/[0.04] border border-white/5 text-xs"
+                    >
+                      <span className="text-[10px] text-slate-400 font-medium truncate">{s.session}</span>
+                      <span className="font-mono font-bold text-amber-300 text-xs mt-0.5">{s.dayTime}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* View 2: Weather & Track Condition */}
+              {heroSubView === 'weather' && selectedWeather && (
+                <div className="space-y-2 animate-fadeIn">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                    <div className="bg-white/[0.04] border border-white/5 p-1.5 sm:p-2 rounded-lg text-center">
+                      <span className="text-[9px] text-slate-400 block font-mono">気温 / 天候</span>
+                      <span className="text-xs sm:text-sm font-bold text-white font-mono mt-0.5 block">
+                        {selectedWeather.weatherIcon} {selectedWeather.airTempC}℃
+                      </span>
+                    </div>
+                    <div className="bg-white/[0.04] border border-white/5 p-1.5 sm:p-2 rounded-lg text-center">
+                      <span className="text-[9px] text-slate-400 block font-mono">路面温度 (Track)</span>
+                      <span className="text-xs sm:text-sm font-bold text-amber-400 font-mono mt-0.5 block">
+                        🔥 {selectedWeather.trackTempC}℃
+                      </span>
+                    </div>
+                    <div className="bg-white/[0.04] border border-white/5 p-1.5 sm:p-2 rounded-lg text-center">
+                      <span className="text-[9px] text-slate-400 block font-mono">湿度 / 降水リスク</span>
+                      <span className="text-xs sm:text-sm font-bold text-sky-300 font-mono mt-0.5 block">
+                        💧 {selectedWeather.humidity}% / {selectedWeather.rainProb}%
+                      </span>
+                    </div>
+                    <div className="bg-white/[0.04] border border-white/5 p-1.5 sm:p-2 rounded-lg text-center">
+                      <span className="text-[9px] text-slate-400 block font-mono">風速・風向き</span>
+                      <span className="text-[11px] sm:text-xs font-bold text-emerald-300 font-mono mt-0.5 block truncate" title={selectedWeather.windDirection}>
+                        💨 {selectedWeather.windSpeedKmh}km/h
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-2 rounded-lg bg-sky-950/40 border border-sky-500/20 text-[10px] sm:text-[11px] text-slate-300 leading-snug flex items-center gap-1.5">
+                    <span className="text-sky-400 flex-shrink-0">💡</span>
+                    <span className="font-bold text-sky-300 font-racing">戦術影響:</span>
+                    <span className="truncate">{selectedWeather.tacticalImpact}</span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Right: Countdown Clock & Quick Actions */}
-          <div className="flex flex-col items-center lg:items-end gap-4 min-w-[260px]">
+          <div className="flex flex-col items-center lg:items-end gap-2.5 min-w-[240px] sm:min-w-[260px] shrink-0">
             <RaceCountdownCard
               targetDateUtc={selectedRace.targetDateUtc}
               dates={selectedRace.dates}
             />
 
             {/* Quick Actions for Race Viewers */}
-            <div className="flex flex-wrap items-center gap-2 w-full">
+            <div className="flex items-center gap-1.5 w-full">
               {onNavigateToTelemetry && (
                 <button
                   type="button"
                   onClick={() => onNavigateToTelemetry(selectedRace.gpName)}
-                  className="btn-console-primary flex-1 py-2 px-3 text-xs"
+                  className="btn-console-primary flex-1 py-1.5 px-2 text-[11px]"
+                  title="テレメトリー分析を開く"
                 >
                   <span>🏎️</span>
-                  <span>テレメトリー分析へ</span>
+                  <span>テレメトリー</span>
                 </button>
               )}
               <button
                 type="button"
                 onClick={() => setActiveTab('track_analysis')}
-                className="btn-console py-2 px-3 text-xs text-sky-300 border-sky-500/30 hover:border-sky-400"
+                className="btn-console py-1.5 px-2 text-[11px] text-sky-300 border-sky-500/30 hover:border-sky-400"
                 title="3Dコース標高図・戦術プロファイルを見る"
               >
                 <span>🏁</span>
-                <span>コース・戦術詳細</span>
+                <span>コース詳細</span>
               </button>
               {onNavigateToTyres && (
                 <button
                   type="button"
                   onClick={onNavigateToTyres}
-                  className="btn-console py-2 px-3 text-xs"
+                  className="btn-console py-1.5 px-2 text-[11px]"
                   title="タイヤ戦略・コンパウンド解説を見る"
                 >
                   <span>🛞</span>
-                  <span className="hidden sm:inline">タイヤ戦略</span>
+                  <span>タイヤ</span>
                 </button>
               )}
             </div>
@@ -692,7 +720,7 @@ export default function SeasonHub({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5">
             {filteredCalendar.map((gp) => {
               const isSelected = gp.round === selectedRound;
               const isGpPast = new Date(gp.targetDateUtc).getTime() <= new Date().getTime();
@@ -704,13 +732,13 @@ export default function SeasonHub({
                     userHasSelectedRoundRef.current = true;
                     setSelectedRound(gp.round);
                   }}
-                  className={`cursor-pointer p-3.5 rounded-xl border transition-all text-left flex flex-col justify-between group ${
+                  className={`cursor-pointer p-2.5 sm:p-3 rounded-xl border transition-all text-left flex flex-col justify-between group ${
                     isSelected
-                      ? 'bg-red-950/40 border-red-500/70 ring-1 ring-red-500/50 shadow-lg shadow-red-950/60 scale-[1.01]'
+                      ? 'bg-red-950/40 border-red-500/70 ring-1 ring-red-500/50 shadow-md shadow-red-950/60 scale-[1.01]'
                       : 'bg-slate-900/60 hover:bg-slate-800/80 border-white/10 hover:border-white/20'
                   }`}
                 >
-                  <div className={`space-y-1.5 ${gp.isCancelled ? 'opacity-50' : ''}`}>
+                  <div className={`space-y-1 ${gp.isCancelled ? 'opacity-50' : ''}`}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider">
@@ -730,34 +758,34 @@ export default function SeasonHub({
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1">
                         {gp.isSprint && (
                           <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 font-racing">
                             ⚡ SPRINT
                           </span>
                         )}
-                        <span className="text-base">{gp.flag}</span>
+                        <span className="text-sm sm:text-base">{gp.flag}</span>
                       </div>
                     </div>
 
                     <div>
                       <h3
-                        className={`font-racing font-bold text-sm leading-tight transition-colors ${
+                        className={`font-racing font-bold text-xs sm:text-sm leading-tight transition-colors truncate ${
                           gp.isCancelled ? 'line-through text-slate-500' :
                           isSelected ? 'text-red-300' : 'text-white group-hover:text-red-300'
                         }`}
                       >
                         {gp.gpName}
                       </h3>
-                      <p className="text-[11px] text-slate-400 truncate mt-0.5">{gp.circuitName}</p>
+                      <p className="text-[10px] sm:text-[11px] text-slate-400 truncate mt-0.5">{gp.circuitName}</p>
                       {gp.replacementNote && (
-                        <p className="text-[10px] text-amber-400 mt-0.5">{gp.replacementNote}</p>
+                        <p className="text-[9px] text-amber-400 mt-0.5 truncate">{gp.replacementNote}</p>
                       )}
                     </div>
                   </div>
 
-                  <div className="mt-3 pt-2 border-t border-white/5 flex items-center justify-between text-xs font-mono">
-                    <span className="text-slate-400 text-[11px]">{gp.dates.replace(/^202[0-9]年\s*/, '')}</span>
+                  <div className="mt-2 pt-1.5 border-t border-white/5 flex items-center justify-between text-[11px] font-mono">
+                    <span className="text-slate-400">{gp.dates.replace(/^202[0-9]年\s*/, '')}</span>
                     <div className="flex items-center gap-1.5">
                       {gp.pirelliCompounds && (
                         <span className="text-[10px] text-amber-400/90 font-semibold">{gp.pirelliCompounds}</span>
@@ -961,7 +989,7 @@ export default function SeasonHub({
           ───────────────────────────────────────────────────────────── */}
       {activeTab === 'standings' && (
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-2.5">
             <div>
               <div className="text-xs font-bold text-white flex items-center gap-2">
                 <span>🏆</span>
@@ -977,176 +1005,229 @@ export default function SeasonHub({
                   : 'ノリスが悲願の初戴冠、マクラーレンが1998年以来となるコンストラクターズタイトルを奪還'}
               </p>
             </div>
-            <div className="flex items-center gap-1 p-1 bg-slate-900 rounded-lg border border-white/10 text-xs self-start sm:self-auto">
-              <button
-                onClick={() => setStandingsType('drivers')}
-                className={`px-3 py-1 rounded font-racing font-bold ${
-                  standingsType === 'drivers'
-                    ? 'bg-red-600 text-white'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                ドライバー順位
-              </button>
-              <button
-                onClick={() => setStandingsType('constructors')}
-                className={`px-3 py-1 rounded font-racing font-bold ${
-                  standingsType === 'constructors'
-                    ? 'bg-red-600 text-white'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                コンストラクター順位
-              </button>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-950/40 border border-red-500/30 text-red-300 font-mono text-[11px] self-start sm:self-auto shadow-sm">
+              <span>🏁 WDC ＆ WCC 並行総合ダッシュボード</span>
             </div>
           </div>
 
-          {standingsType === 'drivers' ? (
-            <div className="rounded-xl border border-white/10 overflow-hidden bg-slate-900/60">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-950/80 text-slate-400 font-racing uppercase text-[10px] border-b border-white/10">
-                    <tr>
-                      <th className="py-3 px-3 text-center w-12">順位</th>
-                      <th className="py-3 px-3">ドライバー</th>
-                      <th className="py-3 px-3">所属チーム</th>
-                      <th className="py-3 px-3 text-center w-16">勝利数</th>
-                      <th className="py-3 px-3 text-center w-16">表彰台</th>
-                      <th className="py-3 px-4 text-right w-44">ポイント</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {activeDriverStandings.map((d) => {
-                      const percentage = (d.points / maxDriverPoints) * 100;
-                      return (
-                        <tr
-                          key={d.position}
-                          className="hover:bg-white/[0.03] transition-colors group"
-                        >
-                          <td className="py-3 px-3 text-center font-mono font-bold text-slate-300">
-                            {d.position === 1 ? (
-                              <span className="text-amber-400 text-sm">👑 1</span>
-                            ) : d.position <= 3 ? (
-                              <span className="text-white font-bold">{d.position}</span>
-                            ) : (
-                              <span className="text-slate-400">{d.position}</span>
-                            )}
-                          </td>
-                          <td className="py-3 px-3 font-semibold text-white group-hover:text-red-300 transition-colors">
-                            <span className="font-mono text-slate-400 mr-1.5">[{d.driverCode}]</span>
-                            {d.driverName}
-                          </td>
-                          <td className="py-3 px-3 text-slate-300 flex items-center gap-2">
-                            <span
-                              className="w-2.5 h-2.5 rounded-full inline-block shrink-0"
-                              style={{ backgroundColor: d.teamColor }}
-                            />
-                            <span>{d.team}</span>
-                          </td>
-                          <td className="py-3 px-3 text-center font-mono text-slate-300">
-                            {d.wins > 0 ? (
-                              <span className="text-amber-300 font-bold">{d.wins}勝</span>
-                            ) : (
-                              <span className="text-slate-600">-</span>
-                            )}
-                          </td>
-                          <td className="py-3 px-3 text-center font-mono text-slate-300">
-                            {d.podiums > 0 ? (
-                              <span className="text-slate-200">{d.podiums}回</span>
-                            ) : (
-                              <span className="text-slate-600">-</span>
-                            )}
-                          </td>
-                          <td className="py-3 px-4 text-right">
-                            <div className="flex items-center justify-end gap-2.5">
-                              <div className="w-24 h-2 bg-slate-800 rounded-full overflow-hidden hidden sm:block">
-                                <div
-                                  className="h-full rounded-full transition-all duration-500"
-                                  style={{
-                                    width: `${percentage}%`,
-                                    backgroundColor: d.teamColor,
-                                  }}
-                                />
-                              </div>
-                              <span className="font-mono font-bold text-white text-sm w-12 text-right">
-                                {d.points} pt
-                              </span>
-                            </div>
-                          </td>
+          {/* ── DUAL PARALLEL DASHBOARD (WDC 7 cols + WCC 5 cols) ── */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start animate-fade-in">
+              {/* Left Column (7 cols): Drivers' Championship Table */}
+              <div className="lg:col-span-7 space-y-2">
+                <div className="flex items-center justify-between px-1">
+                  <span className="font-racing font-bold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
+                    <span>🏎️</span>
+                    <span>ドライバーズ選手権 (全{activeDriverStandings.length}名)</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">P1-P10 入賞圏</span>
+                </div>
+                <div className="rounded-xl border border-white/10 overflow-hidden bg-slate-900/70 shadow-md">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs table-auto">
+                      <thead className="bg-slate-950/90 text-slate-400 font-racing uppercase text-[10px] border-b border-white/10">
+                        <tr>
+                          <th className="py-2 px-2 text-center w-10">順位</th>
+                          <th className="py-2 px-2">選手名</th>
+                          <th className="py-2 px-2">所属チーム</th>
+                          <th className="py-2 px-1.5 text-center w-10">勝</th>
+                          <th className="py-2 px-1.5 text-center w-10">登壇</th>
+                          <th className="py-2 px-2.5 text-right w-24">ポイント</th>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {activeDriverStandings.map((d) => {
+                          const percentage = (d.points / maxDriverPoints) * 100;
+                          return (
+                            <tr
+                              key={d.position}
+                              className={`hover:bg-white/[0.04] transition-colors group ${
+                                d.position === 10 ? 'border-b-2 border-b-sky-500/30' : ''
+                              }`}
+                            >
+                              <td className="py-1.5 px-2 text-center font-mono font-bold text-slate-300">
+                                {d.position === 1 ? (
+                                  <span className="text-amber-400 text-xs font-black">👑 1</span>
+                                ) : d.position <= 3 ? (
+                                  <span className="text-white font-bold">{d.position}</span>
+                                ) : (
+                                  <span className="text-slate-400">{d.position}</span>
+                                )}
+                              </td>
+                              <td className="py-1.5 px-2 font-semibold text-white group-hover:text-red-300 transition-colors">
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                  <span className="font-mono text-slate-400 text-[10px] shrink-0">[{d.driverCode}]</span>
+                                  <span className="truncate max-w-[140px] sm:max-w-[180px]">{d.driverName}</span>
+                                </div>
+                              </td>
+                              <td className="py-1.5 px-2 text-slate-300">
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                  <span
+                                    className="w-2 h-2 rounded-full inline-block shrink-0"
+                                    style={{ backgroundColor: d.teamColor }}
+                                  />
+                                  <span className="truncate max-w-[110px] sm:max-w-[150px] text-[11px] text-slate-300">{d.team}</span>
+                                </div>
+                              </td>
+                              <td className="py-1.5 px-1.5 text-center font-mono text-slate-300 text-[11px]">
+                                {d.wins > 0 ? (
+                                  <span className="text-amber-300 font-bold">{d.wins}</span>
+                                ) : (
+                                  <span className="text-slate-600">-</span>
+                                )}
+                              </td>
+                              <td className="py-1.5 px-1.5 text-center font-mono text-slate-300 text-[11px]">
+                                {d.podiums > 0 ? (
+                                  <span className="text-slate-200">{d.podiums}</span>
+                                ) : (
+                                  <span className="text-slate-600">-</span>
+                                )}
+                              </td>
+                              <td className="py-1.5 px-2.5 text-right">
+                                <div className="flex items-center justify-end gap-1.5">
+                                  <div className="w-12 h-1 bg-slate-800 rounded-full overflow-hidden hidden sm:block">
+                                    <div
+                                      className="h-full rounded-full"
+                                      style={{
+                                        width: `${percentage}%`,
+                                        backgroundColor: d.teamColor,
+                                      }}
+                                    />
+                                  </div>
+                                  <span className="font-mono font-bold text-white text-xs text-right whitespace-nowrap">
+                                    {d.points} <span className="text-[9px] text-slate-400">pt</span>
+                                  </span>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column (5 cols): Constructors' Standings Table + Title Fight Card */}
+              <div className="lg:col-span-5 space-y-3">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between px-1">
+                    <span className="font-racing font-bold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
+                      <span>🏆</span>
+                      <span>コンストラクターズ (全{activeConstructorStandings.length}組)</span>
+                    </span>
+                  </div>
+                  <div className="rounded-xl border border-white/10 overflow-hidden bg-slate-900/70 shadow-md">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left text-xs table-auto">
+                        <thead className="bg-slate-950/90 text-slate-400 font-racing uppercase text-[10px] border-b border-white/10">
+                          <tr>
+                            <th className="py-2 px-2 text-center w-10">順位</th>
+                            <th className="py-2 px-2">チーム名</th>
+                            <th className="py-2 px-2">PU</th>
+                            <th className="py-2 px-1.5 text-center w-10">勝</th>
+                            <th className="py-2 px-2.5 text-right w-24">獲得点</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                          {activeConstructorStandings.map((team) => {
+                            const percentage = (team.points / maxTeamPoints) * 100;
+                            return (
+                              <tr
+                                key={team.position}
+                                className="hover:bg-white/[0.04] transition-colors group"
+                              >
+                                <td className="py-1.5 px-2 text-center font-mono font-bold text-slate-300">
+                                  {team.position === 1 ? (
+                                    <span className="text-amber-400 text-xs font-black">🏆 1</span>
+                                  ) : (
+                                    team.position
+                                  )}
+                                </td>
+                                <td className="py-1.5 px-2 font-semibold text-white">
+                                  <div className="flex items-center gap-1.5 min-w-0">
+                                    <span
+                                      className="w-2 h-2 rounded-sm shrink-0 shadow-sm"
+                                      style={{ backgroundColor: team.teamColor }}
+                                    />
+                                    <span className="truncate max-w-[130px] sm:max-w-[160px]">{team.teamName}</span>
+                                  </div>
+                                </td>
+                                <td className="py-1.5 px-2 font-mono text-slate-400 text-[10px] truncate max-w-[90px]">
+                                  {team.powerUnit}
+                                </td>
+                                <td className="py-1.5 px-1.5 text-center font-mono text-slate-300 text-[11px]">
+                                  {team.wins > 0 ? (
+                                    <span className="text-amber-300 font-bold">{team.wins}</span>
+                                  ) : (
+                                    <span className="text-slate-600">-</span>
+                                  )}
+                                </td>
+                                <td className="py-1.5 px-2.5 text-right">
+                                  <div className="flex items-center justify-end gap-1.5">
+                                    <div className="w-12 h-1 bg-slate-800 rounded-full overflow-hidden hidden sm:block">
+                                      <div
+                                        className="h-full rounded-full"
+                                        style={{
+                                          width: `${percentage}%`,
+                                          backgroundColor: team.teamColor,
+                                        }}
+                                      />
+                                    </div>
+                                    <span className="font-mono font-bold text-white text-xs text-right whitespace-nowrap">
+                                      {team.points} <span className="text-[9px] text-slate-400">pt</span>
+                                    </span>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Title Fight Intelligence & Gap Analysis Card */}
+                <div className="glass-card-premium p-3 sm:p-3.5 rounded-xl border border-amber-500/20 shadow-md space-y-2.5">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm">🎯</span>
+                      <h4 className="font-racing font-bold text-xs text-white uppercase tracking-wider">
+                        TITLE FIGHT INTELLIGENCE / 王座争い分析
+                      </h4>
+                    </div>
+                    <span className="text-[10px] font-mono text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
+                      第15戦終了時
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                    <div className="p-2 rounded-lg bg-slate-950/60 border border-white/5 space-y-1">
+                      <span className="text-[10px] text-slate-400 block font-sans">🏎️ WDC 首位マージン</span>
+                      <div className="font-bold text-white text-xs truncate">
+                        {activeDriverStandings[0]?.driverName.split(' ')[0]}
+                      </div>
+                      <div className="text-emerald-400 text-[11px] font-bold">
+                        +{activeDriverStandings[0]?.points - (activeDriverStandings[1]?.points || 0)} pt <span className="text-[9px] text-slate-400 font-normal">リード</span>
+                      </div>
+                    </div>
+                    <div className="p-2 rounded-lg bg-slate-950/60 border border-white/5 space-y-1">
+                      <span className="text-[10px] text-slate-400 block font-sans">🏆 WCC 首位マージン</span>
+                      <div className="font-bold text-white text-xs truncate">
+                        {activeConstructorStandings[0]?.teamName.split(' ')[0]}
+                      </div>
+                      <div className="text-emerald-400 text-[11px] font-bold">
+                        +{activeConstructorStandings[0]?.points - (activeConstructorStandings[1]?.points || 0)} pt <span className="text-[9px] text-slate-400 font-normal">リード</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="text-[11px] text-slate-300 bg-slate-950/40 p-2 rounded-lg border border-white/5 leading-relaxed">
+                    💡 <strong className="text-sky-300 font-racing">シーズン展望:</strong> メルセデスの超新星アントネッリが2位ラッセルとの同門対決をリード。コンストラクターズはメルセデスがフェラーリに122ptの大差をつけて独走態勢に入っています。
+                  </div>
+                </div>
               </div>
             </div>
-          ) : (
-            <div className="rounded-xl border border-white/10 overflow-hidden bg-slate-900/60">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-950/80 text-slate-400 font-racing uppercase text-[10px] border-b border-white/10">
-                    <tr>
-                      <th className="py-3 px-3 text-center w-12">順位</th>
-                      <th className="py-3 px-3">チーム名</th>
-                      <th className="py-3 px-3">パワーユニット (PU)</th>
-                      <th className="py-3 px-3 text-center w-16">勝利数</th>
-                      <th className="py-3 px-4 text-right w-44">総獲得ポイント</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {activeConstructorStandings.map((team) => {
-                      const percentage = (team.points / maxTeamPoints) * 100;
-                      return (
-                        <tr
-                          key={team.position}
-                          className="hover:bg-white/[0.03] transition-colors group"
-                        >
-                          <td className="py-3 px-3 text-center font-mono font-bold text-slate-300">
-                            {team.position === 1 ? (
-                              <span className="text-amber-400 text-sm">🏆 1</span>
-                            ) : (
-                              team.position
-                            )}
-                          </td>
-                          <td className="py-3 px-3 font-semibold text-white flex items-center gap-2">
-                            <span
-                              className="w-3 h-3 rounded-md shrink-0 shadow-sm"
-                              style={{ backgroundColor: team.teamColor }}
-                            />
-                            <span>{team.teamName}</span>
-                          </td>
-                          <td className="py-3 px-3 font-mono text-slate-400">{team.powerUnit}</td>
-                          <td className="py-3 px-3 text-center font-mono text-slate-300">
-                            {team.wins > 0 ? (
-                              <span className="text-amber-300 font-bold">{team.wins}勝</span>
-                            ) : (
-                              <span className="text-slate-600">-</span>
-                            )}
-                          </td>
-                          <td className="py-3 px-4 text-right">
-                            <div className="flex items-center justify-end gap-2.5">
-                              <div className="w-28 h-2 bg-slate-800 rounded-full overflow-hidden hidden sm:block">
-                                <div
-                                  className="h-full rounded-full transition-all duration-500"
-                                  style={{
-                                    width: `${percentage}%`,
-                                    backgroundColor: team.teamColor,
-                                  }}
-                                />
-                              </div>
-                              <span className="font-mono font-bold text-white text-sm w-14 text-right">
-                                {team.points} pt
-                              </span>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
         </div>
       )}
 
@@ -1167,20 +1248,20 @@ export default function SeasonHub({
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3">
             {activeGrid.map((team) => (
               <div
                 key={team.teamName}
-                className="p-4 rounded-xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between"
+                className="p-3 rounded-xl border border-white/10 bg-slate-900/60 hover:border-white/20 transition-all flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-2 border-b border-white/10 pb-2">
+                  <div className="flex items-center justify-between mb-1.5 border-b border-white/10 pb-1.5">
                     <div className="flex items-center gap-2">
                       <span
-                        className="w-3.5 h-3.5 rounded-full shadow-sm"
+                        className="w-3 h-3 rounded-full shadow-sm"
                         style={{ backgroundColor: team.teamColor }}
                       />
-                      <h3 className="font-racing font-bold text-base text-white">{team.teamName}</h3>
+                      <h3 className="font-racing font-bold text-sm sm:text-base text-white">{team.teamName}</h3>
                     </div>
                     <span className="text-[10px] font-mono text-slate-400 px-2 py-0.5 rounded bg-white/5 border border-white/5 truncate max-w-[140px]">
                       {team.fullName}
@@ -1188,7 +1269,7 @@ export default function SeasonHub({
                   </div>
 
                   {/* Team Principal & PU specs pill */}
-                  <div className="flex flex-wrap items-center gap-1.5 mb-3 text-[10px] font-mono">
+                  <div className="flex flex-wrap items-center gap-1.5 mb-2 text-[10px] font-mono">
                     <span className="bg-slate-950/80 border border-white/10 px-2 py-0.5 rounded text-slate-300">
                       👔 代表: <strong className="text-slate-100">{team.teamPrincipal}</strong>
                     </span>
@@ -1197,11 +1278,11 @@ export default function SeasonHub({
                     </span>
                   </div>
 
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     {team.drivers.map((driver) => (
                       <div
                         key={driver.number}
-                        className="p-2.5 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between"
+                        className="p-2 rounded-lg bg-black/40 border border-white/5 flex items-center justify-between"
                       >
                         <div className="flex items-center gap-2.5">
                           <span className="font-mono font-black text-xs text-slate-400 w-6 text-center">
