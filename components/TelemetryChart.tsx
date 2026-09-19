@@ -937,8 +937,8 @@ function InlineRadioItem({
           <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 font-racing">
             {category}
           </span>
-          <span className="text-slate-500 text-[10px] font-mono">
-            {radio.date ? new Date(radio.date).toLocaleTimeString('ja-JP') : ''}
+          <span suppressHydrationWarning className="text-slate-500 text-[10px] font-mono">
+            {radio.date ? new Date(radio.date).toLocaleTimeString('ja-JP', { timeZone: 'Asia/Tokyo' }) : ''}
           </span>
         </div>
 

@@ -180,19 +180,19 @@ export default function AIStrategist({
   const { data: authSession } = useSession();
   const { isPro, aiUsage, consumeAi } = usePlanTier();
 
-  const [messages, setMessages] = useState<ChatMessage[]>(() => {
-    if (typeof window === 'undefined') return [];
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+
+  useEffect(() => {
     try {
       const saved = localStorage.getItem('f1_ai_chat_messages_v1');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed.map((m: any) => ({ ...m, isStreaming: false }));
+          setMessages(parsed.map((m: any) => ({ ...m, isStreaming: false })));
         }
       }
     } catch (_) {}
-    return [];
-  });
+  }, []);
   const [input, setInput] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const [modelChoice, setModelChoice] = useState<'flash' | 'pro'>('flash');

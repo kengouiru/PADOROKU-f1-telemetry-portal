@@ -184,7 +184,12 @@ export function isFeatureAllowed(feature: TierFeatureId): boolean {
 
 export function usePlanTier() {
   const [tier, setTierState] = useState<PlanTier>('free');
-  const [aiUsage, setAiUsage] = useState(() => getDailyAiUsage());
+  const [aiUsage, setAiUsage] = useState({
+    used: 0,
+    max: FREE_DAILY_AI_LIMIT,
+    remaining: FREE_DAILY_AI_LIMIT,
+    isUnlimited: false,
+  });
 
   useEffect(() => {
     setTierState(getUserTier());

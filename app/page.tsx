@@ -12,6 +12,7 @@
  * Initial state: 2024 Bahrain GP Race, VER (#1) vs HAM (#44) instant display.
  */
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 
 import type {
   Session, Driver, Lap, Stint, TeamRadio, PitStop,
@@ -48,7 +49,17 @@ import NewsPaddockHub from '@/components/hubs/NewsPaddockHub';
 import KnowledgeHistoryHub, { type SubTab } from '@/components/hubs/KnowledgeHistoryHub';
 import RaceNotesReportHub from '@/components/hubs/RaceNotesReportHub';
 import SeasonHub from '@/components/hubs/SeasonHub';
-import RaceSimulatorHub from '@/components/hubs/RaceSimulatorHub';
+const RaceSimulatorHub = dynamic(() => import('@/components/hubs/RaceSimulatorHub'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-96 w-full items-center justify-center bg-slate-950/80 rounded-2xl border border-white/10 text-slate-400">
+      <div className="flex flex-col items-center gap-3">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-red-500 border-t-transparent" />
+        <span className="font-mono text-xs text-slate-400">PITWALL コックピット起動中...</span>
+      </div>
+    </div>
+  ),
+});
 import QuickGlossaryModal from '@/components/glossary/QuickGlossaryModal';
 import GlobalSearchModal from '@/components/search/GlobalSearchModal';
 import F1QuizModal from '@/components/quiz/F1QuizModal';
@@ -159,9 +170,6 @@ function buildInitialState(): AppState {
     }
   }
 
-  const storedTranscripts = typeof window !== 'undefined'
-    ? JSON.parse(localStorage.getItem('f1_transcripts_cache') ?? '{}') : {};
-
   return {
     selectedYear: DEFAULT_YEAR,
     selectedMeetingKey: DEFAULT_MEETING_KEY,
@@ -177,7 +185,7 @@ function buildInitialState(): AppState {
     raceControlMessages,
     safetyCarPeriods,
     isDemoMode: true,
-    transcriptsCache: storedTranscripts,
+    transcriptsCache: {},
     isLoading: false,
   };
 }
@@ -252,6 +260,16 @@ export default function DashboardPage() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Re-sync transcriptsCache from localStorage only on client after mount (SSR safe)
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('f1_transcripts_cache');
+      if (stored) {
+        setState((prev) => ({ ...prev, transcriptsCache: JSON.parse(stored) }));
+      }
+    } catch (_) {}
   }, []);
 
   const handleRequireAuth = useCallback((title?: string, description?: string) => {
@@ -1396,6 +1414,7 @@ export default function DashboardPage() {
         <ErrorBoundary sectionName="ピットウォール司令塔 (PITWALL)">
           <RaceSimulatorHub
             onOpenUpgradeModal={() => setProModalOpen(true)}
+            onOpenAiStrategist={() => setAiDrawerOpen(true)}
             onNavigateToLibrary={(subTab, termId) => {
               setAppMode('library');
               setLibrarySubTab(subTab as any);
@@ -1546,21 +1565,6 @@ export default function DashboardPage() {
               type="button"
               onClick={() => {
                 setAppMode('season');
-                setActiveHub('simulator');
-              }}
-              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all whitespace-nowrap cursor-pointer ${
-                appMode === 'season' && activeHub === 'simulator'
-                  ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950/60 border border-red-500/40'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <Gamepad2 className="w-3.5 h-3.5" /> PITWALL
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setAppMode('season');
                 setActiveHub('news');
               }}
               className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all whitespace-nowrap cursor-pointer ${
@@ -1588,8 +1592,34 @@ export default function DashboardPage() {
             </button>
           </nav>
 
-          {/* Right: Quick Tools (Search, Quiz, AI, Auth) */}
+          {/* Right: Quick Tools (Search, Quiz, AI, Auth + Dedicated PITWALL Game Launcher) */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Special Standalone PITWALL Game Launcher (特別独立起動ボタン) */}
+            <button
+              type="button"
+              onClick={() => {
+                const screenW = typeof window !== 'undefined' ? window.screen.availWidth || 1920 : 1920;
+                const screenH = typeof window !== 'undefined' ? window.screen.availHeight || 1080 : 1080;
+                const win = window.open(
+                  '/pitwall',
+                  'F1PitwallGame',
+                  `width=${screenW},height=${screenH},left=0,top=0,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes`
+                );
+                if (!win || win.closed || typeof win.closed === 'undefined') {
+                  window.open('/pitwall', '_blank');
+                }
+              }}
+              className="btn-console relative px-3 py-1.5 rounded-xl font-racing font-bold text-xs bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white border border-red-400/60 hover:border-white shadow-lg shadow-red-950/80 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shrink-0 group"
+              title="F1 PITWALL 司令塔ゲームを別画面・全画面で起動"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
+              <Gamepad2 className="w-4 h-4 text-white group-hover:rotate-12 transition-transform" />
+              <span className="tracking-wider">PITWALL</span>
+              <span className="hidden xl:inline-block px-1.5 py-0.2 rounded bg-black/40 text-[9px] font-mono text-amber-300 font-semibold border border-amber-400/30">
+                GAME
+              </span>
+            </button>
+
             {/* Global Command Palette / Search Button (Ctrl+K) */}
             <button
               type="button"
@@ -1628,21 +1658,6 @@ export default function DashboardPage() {
             >
               <span className={aiDrawerOpen ? 'text-red-400' : 'text-slate-400'}>🤖</span>
               <span className="hidden lg:inline">AI</span>
-            </button>
-
-            {/* Pitwall Pro Membership Button */}
-            <button
-              type="button"
-              onClick={() => setProModalOpen(true)}
-              className={`btn-console shrink-0 ${
-                isPro
-                  ? 'border-amber-500/40 text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 shadow-sm'
-                  : 'border-amber-500/50 text-amber-200 bg-amber-500/15 hover:bg-amber-500/25'
-              }`}
-              title="Pitwall Pro メンバーシップ管理・アップグレード"
-            >
-              <span className="text-amber-400">💎</span>
-              <span className="hidden sm:inline font-black">{isPro ? 'PRO' : 'Upgrade'}</span>
             </button>
 
             {/* Auth Button */}
@@ -2127,6 +2142,31 @@ export default function DashboardPage() {
           }, 150);
         }}
       />
+
+      {/* ── Persistent Floating Button to Launch Standalone PITWALL Game ── */}
+      <div className="fixed bottom-4 right-4 z-40 animate-in fade-in slide-in-from-bottom-3 duration-300">
+        <button
+          type="button"
+          onClick={() => {
+            const screenW = typeof window !== 'undefined' ? window.screen.availWidth || 1920 : 1920;
+            const screenH = typeof window !== 'undefined' ? window.screen.availHeight || 1080 : 1080;
+            const win = window.open(
+              '/pitwall',
+              'F1PitwallGame',
+              `width=${screenW},height=${screenH},left=0,top=0,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes`
+            );
+            if (!win || win.closed || typeof win.closed === 'undefined') {
+              window.open('/pitwall', '_blank');
+            }
+          }}
+          className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white font-racing font-bold text-xs sm:text-sm shadow-2xl shadow-red-950/80 border border-white/20 hover:scale-105 active:scale-95 transition-all cursor-pointer group"
+          title="F1 PITWALL 司令塔ゲームを別画面・全画面で起動"
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+          <Gamepad2 className="w-4 h-4 text-white group-hover:rotate-12 transition-transform" />
+          <span>🏎️ PITWALL ゲーム起動</span>
+        </button>
+      </div>
 
       {/* ── Pitwall Pro Membership & Upgrade Modal ── */}
       <PitwallProModal

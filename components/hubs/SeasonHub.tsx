@@ -749,11 +749,11 @@ export default function SeasonHub({
                             中止
                           </span>
                         ) : isGpPast ? (
-                          <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-800 text-slate-400 border border-white/10">
+                          <span suppressHydrationWarning className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-800 text-slate-400 border border-white/10">
                             終了
                           </span>
                         ) : (
-                          <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          <span suppressHydrationWarning className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                             予定
                           </span>
                         )}

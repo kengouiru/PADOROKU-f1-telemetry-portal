@@ -175,3 +175,54 @@ export function stopRadioSpeech(): void {
 export function isRadioSpeechActive(): boolean {
   return isSpeaking;
 }
+
+/**
+ * Authentic F1 Pit-Wall "Box, Box, Box" Radio Call
+ * Plays key-up chirp, speaks "Box, Box. Box this lap.", and plays key-down squelch.
+ */
+export async function playBoxBoxCall(callbacks?: { onStart?: () => void; onEnd?: () => void }): Promise<void> {
+  if (typeof window === 'undefined') return;
+
+  // Key-up chirp
+  await playRadioKeyUpTone();
+
+  if ('speechSynthesis' in window) {
+    stopRadioSpeech();
+    isSpeaking = true;
+    callbacks?.onStart?.();
+
+    const utterance = new SpeechSynthesisUtterance('Box, Box. Box this lap.');
+    utterance.lang = 'en-US';
+    utterance.rate = 1.15;
+    utterance.pitch = 0.95;
+
+    const voices = window.speechSynthesis.getVoices();
+    const enVoice = voices.find(
+      (v) => v.lang.startsWith('en') && (v.name.includes('David') || v.name.includes('George') || v.name.includes('Natural') || v.name.includes('Guy'))
+    ) || voices.find((v) => v.lang.startsWith('en'));
+
+    if (enVoice) {
+      utterance.voice = enVoice;
+    }
+
+    utterance.onend = () => {
+      isSpeaking = false;
+      playRadioKeyDownTone();
+      callbacks?.onEnd?.();
+    };
+
+    utterance.onerror = () => {
+      isSpeaking = false;
+      playRadioKeyDownTone();
+      callbacks?.onEnd?.();
+    };
+
+    window.speechSynthesis.speak(utterance);
+  } else {
+    // If speech synthesis not supported, key-down tone after 1.2s
+    setTimeout(() => {
+      playRadioKeyDownTone();
+      callbacks?.onEnd?.();
+    }, 1200);
+  }
+}

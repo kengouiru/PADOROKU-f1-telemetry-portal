@@ -92,11 +92,11 @@ export function toggleFavoriteCircuit(id: string): boolean {
 }
 
 export function useUserPreferences() {
-  const [prefs, setPrefs] = useState<UserPreferences>(() => getUserPreferences());
-  const [isLoaded, setIsLoaded] = useState(true);
+  const [prefs, setPrefs] = useState<UserPreferences>(DEFAULT_PREFERENCES);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // Re-sync on mount in case storage changed
+    // Re-sync on mount on client from localStorage
     setPrefs(getUserPreferences());
     setIsLoaded(true);
 

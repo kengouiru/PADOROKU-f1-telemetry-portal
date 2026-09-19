@@ -85,7 +85,12 @@ function flagColor(flag: string | null | undefined): string {
 
 function formatTime(iso: string): string {
   try {
-    return new Date(iso).toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    return new Date(iso).toLocaleTimeString('ja-JP', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      timeZone: 'Asia/Tokyo',
+    });
   } catch { return iso; }
 }
 
@@ -660,7 +665,7 @@ function TimelineCard({ event, driverColor, transcript, isLoadingTranscript, onF
             <span className="font-racing text-red-300 font-bold">PIT STOP</span>
             <span className="text-slate-400 font-mono">Lap {event.lap_number}</span>
           </div>
-          <span className="text-slate-500 font-mono text-[11px]">{formatTime(event.date)}</span>
+          <span suppressHydrationWarning className="text-slate-500 font-mono text-[11px]">{formatTime(event.date)}</span>
         </div>
         <div className="flex gap-4 text-slate-300 mt-1">
           <span>
@@ -692,7 +697,7 @@ function TimelineCard({ event, driverColor, transcript, isLoadingTranscript, onF
             )}
             <span className="text-slate-400 font-mono font-bold">L{event.lap_number ?? '?'}</span>
           </div>
-          <span className="text-slate-500 text-[11px] font-mono">{formatTime(event.date)}</span>
+          <span suppressHydrationWarning className="text-slate-500 text-[11px] font-mono">{formatTime(event.date)}</span>
         </div>
 
         {/* Audio Player or Fallback */}

@@ -761,6 +761,10 @@ export interface CarLapSimState {
   pitCount: number;
   isPitting: boolean;
   pitStopDuration?: number;
+  isRetired?: boolean;
+  retirementReason?: string;
+  retirementLap?: number;
+  currentSpeedKmH?: number;
   eventNote?: string;
   teammateGapSeconds?: number;
   doubleStackDelay?: number; // e.g. 4.5s
@@ -823,6 +827,7 @@ export interface SimSnapshot {
   lap: number;
   isSC: boolean;
   isVSC: boolean;
+  isScEnding?: boolean;
   trackTemp: number; // °C
   waterDepthMm: number; // mm
   weatherDescription: string;
@@ -996,6 +1001,68 @@ export function formatTimeSeconds(sec: number): string {
   return `${m}:${Number(s) < 10 ? '0' : ''}${s}`;
 }
 
+// ── Driver Personality Radio Lines ──────────────────────────────────────────
+
+export const DRIVER_RADIO_LINES: Record<
+  string,
+  { rain: string[]; deadTyres: string[]; sc: string[]; push: string[] }
+> = {
+  VER: {
+    rain: [
+      'Mate, it is getting quite wet out here! What is the radar saying?!',
+      'The grip is completely disappearing, mate! We need to think about inters!',
+    ],
+    deadTyres: [
+      'Mate, these tyres are completely gone! I cannot turn the car!',
+      'Tyres are dead. Box me, box me!',
+    ],
+    sc: ['Is the delta positive? Make sure we keep the tyre temps up.', 'Safety car? Are we boxing?!'],
+    push: ['Full push now mate, let\'s go!', 'Simply lovely, pushing to the maximum!'],
+  },
+  LEC: {
+    rain: [
+      'Noooo! It is raining heavily in sector 2! Are we boxing or staying?!',
+      'Track is very slippery, losing grip on corner entry!',
+    ],
+    deadTyres: [
+      'I am losing the rear everywhere! What is Plan C?!',
+      'Tyres are giving up, front right is completely grained!',
+    ],
+    sc: ['Safety Car! Please tell me we pit! Copy?', 'Safety car deployed, check the pit window!'],
+    push: ['Pushing maximum!', 'Understood, attacking now!'],
+  },
+  HAM: {
+    rain: ['It\'s raining quite a bit out here, Bono!', 'Track is losing grip fast, feels like intermediate conditions!'],
+    deadTyres: ['My tyres are dead, Bono!', 'There is a lot of vibration from the front tyres!'],
+    sc: ['Safety Car deployed. Check the gap behind, Bono!', 'Are we boxing under the Safety Car?'],
+    push: ['Hammer time!', 'Leave me to it, pushing now!'],
+  },
+  ALO: {
+    rain: ['The rain is here. I have more pace in hand, tell me when to box!', 'Full wet conditions coming, prepare the pit crew!'],
+    deadTyres: ['No grip left, maximum tyre management needed.', 'Box this lap! Don\'t leave me out here!'],
+    sc: ['Safety Car! We must take the cheap pit stop now!', 'Copy SC. This is our strategic opportunity!'],
+    push: ['Aha! GP2 engine feeling on the straight, but pushing 100%!', 'Understood, time to make magic happen!'],
+  },
+  TSU: {
+    rain: ['Traffic and rain!! Come on, what tyre are we taking?!', 'It is super wet on turn 1!! Box me!!'],
+    deadTyres: ['Tyres are completely dead, mate!! Box box!!', 'Zero grip! The car is sliding everywhere!!'],
+    sc: ['Safety Car, copy! Tell me what to do!', 'Safety car out! Let\'s go for the cheap pit!'],
+    push: ['YEAH!! Let\'s go!! Pushing like hell!!', 'Understood, pushing flat out!!'],
+  },
+  NOR: {
+    rain: ['It\'s raining hard! Are other cars pitting?!', 'Aquaplaning on the main straight! We need inters!'],
+    deadTyres: ['Tyres are dropping off. We need to think about boxing.', 'Front left is dead, losing front-end grip.'],
+    sc: ['Safety car deployed, copy that. Keep me updated on deltas.', 'Cheap pit window open under SC!'],
+    push: ['Pushing now mate! Let\'s hunt them down!', 'Radio check, head down and push!'],
+  },
+  PIA: {
+    rain: ['Rain confirmed in sector 3. Standing water is building.', 'Slick grip dropping fast, inters look viable.'],
+    deadTyres: ['Tyre degradation reaching cliff. Box recommended.', 'Understood, tyres losing peak grip.'],
+    sc: ['Safety car copy. Pit window open.', 'Maintaining delta under Safety Car.'],
+    push: ['Understood. Calm and steady, pushing.', 'Pace is good, closing the gap.'],
+  },
+};
+
 // ── Grand Prix Simulation Engine ──────────────────────────────────────────────
 
 export function runFullGrandPrixSimulation(params: {
@@ -1009,6 +1076,8 @@ export function runFullGrandPrixSimulation(params: {
   scTriggerLap?: number;
   playerOverrides?: Record<number, Partial<PlayerTacticalCommand>>;
   driverRadioResponses?: Record<string, string>; // promptId -> optionId
+  aiDifficulty?: 'beginner' | 'standard' | 'master';
+  incidentRiskMultiplier?: number;
 }): SimSnapshot[] {
   const {
     circuit,
@@ -1021,6 +1090,8 @@ export function runFullGrandPrixSimulation(params: {
     scTriggerLap,
     playerOverrides = {},
     driverRadioResponses = {},
+    aiDifficulty = 'standard',
+    incidentRiskMultiplier = 1.0,
   } = params;
 
   const snapshots: SimSnapshot[] = [];
@@ -1044,6 +1115,9 @@ export function runFullGrandPrixSimulation(params: {
       plannedPit1Tyre: TyreCompound;
       plannedPit2?: number;
       plannedPit2Tyre?: TyreCompound;
+      isRetired: boolean;
+      retirementReason?: string;
+      retirementLap?: number;
     }
   > = {};
 
@@ -1064,6 +1138,9 @@ export function runFullGrandPrixSimulation(params: {
       plannedPit1Tyre: d.pit1Tyre,
       plannedPit2: d.pit2Lap,
       plannedPit2Tyre: d.pit2Tyre,
+      isRetired: false,
+      retirementReason: undefined,
+      retirementLap: undefined,
     };
   }
 
@@ -1156,13 +1233,12 @@ export function runFullGrandPrixSimulation(params: {
     }
 
     // 3. Dynamic Incident / Safety Car Risk Evaluation
-    // Base risk: 4%
-    let calculatedRisk = incidentFrequency === 'high_chaos' ? 12 : incidentFrequency === 'none' ? 1 : 4;
+    let calculatedRisk = incidentFrequency === 'high_chaos' ? 14 : incidentFrequency === 'none' ? 1 : 5;
     // Water depth penalty
-    if (currentWaterDepth > 4.0) calculatedRisk += 48; // Monsoon aquaplaning
-    else if (currentWaterDepth >= 2.2) calculatedRisk += 28; // Wet standing water
-    else if (currentWaterDepth >= 1.0) calculatedRisk += 14; // Damp slippery braking
-    else if (trackPhase === 'DRYING_LINE') calculatedRisk += 8; // Stepping off dry line onto damp patch
+    if (currentWaterDepth > 4.0) calculatedRisk += 52; // Monsoon aquaplaning
+    else if (currentWaterDepth >= 2.2) calculatedRisk += 32; // Wet standing water
+    else if (currentWaterDepth >= 1.0) calculatedRisk += 16; // Damp slippery braking
+    else if (trackPhase === 'DRYING_LINE') calculatedRisk += 10; // Stepping off dry line onto damp patch
 
     // Circuit difficulty bonus
     calculatedRisk += (circuit.overtakeDifficulty - 1.0) * 12;
@@ -1171,23 +1247,25 @@ export function runFullGrandPrixSimulation(params: {
     let slickCarsInWetCount = 0;
     for (const d of drivers) {
       const t = trackers[d.code];
-      if (currentWaterDepth >= 1.0 && (t.currentTyre === 'SOFT' || t.currentTyre === 'MEDIUM' || t.currentTyre === 'HARD')) {
+      if (!t.isRetired && currentWaterDepth >= 1.0 && (t.currentTyre === 'SOFT' || t.currentTyre === 'MEDIUM' || t.currentTyre === 'HARD')) {
         slickCarsInWetCount += 1;
       }
     }
-    calculatedRisk += slickCarsInWetCount * 10;
+    calculatedRisk += slickCarsInWetCount * 12;
 
-    const incidentRiskPercent = Math.min(80, Math.max(4, Math.round(calculatedRisk)));
+    const incidentRiskPercent = Math.min(90, Math.max(4, Math.round(calculatedRisk * incidentRiskMultiplier)));
     const incidentRiskLevel: IncidentRiskLevel =
       incidentRiskPercent >= 55 ? 'CRITICAL' : incidentRiskPercent >= 32 ? 'HIGH' : incidentRiskPercent >= 16 ? 'ELEVATED' : 'LOW';
 
     // 4. Dynamic SC Triggering
     let isSC = false;
+    let isScEnding = false;
     const isVSC = false;
     if (activeScLapsRemaining > 0) {
       isSC = true;
       activeScLapsRemaining -= 1;
       if (activeScLapsRemaining === 0) {
+        isScEnding = true;
         globalCommentary.unshift({
           id: `sc-end-${currentLap}`,
           lap: currentLap,
@@ -1214,39 +1292,59 @@ export function runFullGrandPrixSimulation(params: {
         activeScLapsRemaining = 2; // 2 laps of SC
         lastIncidentLap = currentLap;
 
-        // Choose victim car
-        const potentialVictims = drivers.filter((d) => !d.isPlayer);
-        const victim = potentialVictims[Math.floor(Math.random() * potentialVictims.length)] || drivers[drivers.length - 1];
+        // Choose victim car from non-retired AI cars
+        const potentialVictims = drivers.filter((d) => !d.isPlayer && !trackers[d.code].isRetired);
+        if (potentialVictims.length > 0) {
+          const victim = potentialVictims[Math.floor(Math.random() * potentialVictims.length)];
+          const victimTracker = trackers[victim.code];
+          victimTracker.isRetired = true;
+          victimTracker.retirementLap = currentLap;
 
-        if (currentWaterDepth > 2.0) {
+          let reason = '💥 クラッシュ';
+          if (currentWaterDepth > 2.0) {
+            reason = '💥 クラッシュ (ハイドロプレーニング)';
+            globalCommentary.unshift({
+              id: `sc-wet-${currentLap}`,
+              lap: currentLap,
+              type: 'incident',
+              speaker: 'FIA RACE CONTROL',
+              text: `🚨 SAFETY CAR DEPLOYED — ${victim.name} がターン3の川（ハイドロプレーニング）に足をすくわれスピン・クラッシュ！リタイア（DNF）！チープピットの好機！`,
+            });
+          } else if (trackPhase === 'DRYING_LINE') {
+            reason = '💥 クラッシュ (濡れた路面でスピン)';
+            globalCommentary.unshift({
+              id: `sc-dryline-${currentLap}`,
+              lap: currentLap,
+              type: 'incident',
+              speaker: 'FIA RACE CONTROL',
+              text: `🚨 SAFETY CAR DEPLOYED — ${victim.name} が濡れたオフラインを踏んでコントロールを喪失、ウォールに大破接触！リタイア（DNF）！`,
+            });
+          } else {
+            reason = '💥 デブリ接触・サスペンション破損';
+            globalCommentary.unshift({
+              id: `sc-dry-${currentLap}`,
+              lap: currentLap,
+              type: 'incident',
+              speaker: 'FIA RACE CONTROL',
+              text: `🚨 SAFETY CAR DEPLOYED — ${victim.name} がデブリに乗りサスペンション破損、コースサイドにストップ！リタイア（DNF）！`,
+            });
+          }
+          victimTracker.retirementReason = reason;
+
+          // Victim Driver Radio
+          const radioLine = DRIVER_RADIO_LINES[victim.code]?.deadTyres[0] || 'I am in the wall, mate. Car is completely broken.';
           globalCommentary.unshift({
-            id: `sc-wet-${currentLap}`,
+            id: `radio-dnf-${victim.code}-${currentLap}`,
             lap: currentLap,
-            type: 'incident',
-            speaker: 'FIA RACE CONTROL',
-            text: `🚨 SAFETY CAR DEPLOYED — ${victim.name} がターン3の川（ハイドロプレーニング）に足をすくわれスピン・クラッシュ！チープピットの好機！`,
-          });
-        } else if (trackPhase === 'DRYING_LINE') {
-          globalCommentary.unshift({
-            id: `sc-dryline-${currentLap}`,
-            lap: currentLap,
-            type: 'incident',
-            speaker: 'FIA RACE CONTROL',
-            text: `🚨 SAFETY CAR DEPLOYED — ${victim.name} がオーバーテイク中に濡れたオフラインを踏んでコントロールを喪失、ウォールに接触！`,
-          });
-        } else {
-          globalCommentary.unshift({
-            id: `sc-dry-${currentLap}`,
-            lap: currentLap,
-            type: 'incident',
-            speaker: 'FIA RACE CONTROL',
-            text: `🚨 SAFETY CAR DEPLOYED — ${victim.name} がデブリに乗りバースト、コースサイドにストップ。車両撤去のためセーフティカー出動！`,
+            type: 'radio',
+            speaker: `${victim.name} (${victim.code})`,
+            text: `📻 "${radioLine}"`,
           });
         }
       }
     }
 
-    // Rain start / stop broadcasts
+    // Rain start / stop broadcasts & Driver Personality Radios
     if (isCurrentlyRaining && !wasRainingPrevLap) {
       globalCommentary.unshift({
         id: `rain-start-${currentLap}`,
@@ -1255,6 +1353,23 @@ export function runFullGrandPrixSimulation(params: {
         speaker: 'F1 LIVE BROADCAST',
         text: `🌧️ ターン1付近で雨が降り始めました！路面水量 ${currentWaterDepth.toFixed(1)}mm。インターミディエイトへの交換判断が迫られます！`,
       });
+
+      const rainSpeakers = ['VER', 'LEC', 'HAM', 'TSU', 'NOR', 'ALO'].filter((c) => !trackers[c]?.isRetired);
+      if (rainSpeakers.length > 0) {
+        const speakerCode = rainSpeakers[Math.floor(Math.random() * rainSpeakers.length)];
+        const lines = DRIVER_RADIO_LINES[speakerCode]?.rain;
+        if (lines && lines.length > 0) {
+          const line = lines[Math.floor(Math.random() * lines.length)];
+          const speakerDriver = drivers.find((d) => d.code === speakerCode);
+          globalCommentary.unshift({
+            id: `radio-rain-${speakerCode}-${currentLap}`,
+            lap: currentLap,
+            type: 'radio',
+            speaker: `${speakerDriver?.name || speakerCode} (${speakerCode})`,
+            text: `📻 "${line}"`,
+          });
+        }
+      }
     } else if (!isCurrentlyRaining && wasRainingPrevLap) {
       globalCommentary.unshift({
         id: `rain-stop-${currentLap}`,
@@ -1292,6 +1407,8 @@ export function runFullGrandPrixSimulation(params: {
 
     for (const driver of drivers) {
       const tracker = trackers[driver.code];
+      if (tracker.isRetired) continue;
+
       const isPlayer = driver.code === playerDriver.code;
 
       let wantPit = false;
@@ -1305,23 +1422,36 @@ export function runFullGrandPrixSimulation(params: {
           targetTyre = playerOverride.nextCompound || 'INTER';
         }
       } else {
-        // AI Driver Strategy Logic
+        // AI Driver Strategy Logic based on AI Difficulty setting
+        const isMasterAI = aiDifficulty === 'master';
+        const isBeginnerAI = aiDifficulty === 'beginner';
+
+        const rainReactionLap = isMasterAI
+          ? (rainStartLap || 99)
+          : isBeginnerAI
+          ? (rainStartLap || 99) + 2
+          : (rainStartLap || 99) + (driver.code === 'VER' ? 0 : 1);
+
         if (currentLap === tracker.plannedPit1) {
           wantPit = true;
           targetTyre = tracker.plannedPit1Tyre;
         } else if (currentLap === tracker.plannedPit2) {
           wantPit = true;
           targetTyre = tracker.plannedPit2Tyre || 'HARD';
-        } else if (weather.waterDepth >= 1.2 && tracker.currentTyre !== 'INTER' && tracker.currentTyre !== 'WET') {
-          // AI reacts to rain
-          if (currentLap >= (rainStartLap || 99) + (driver.code === 'VER' ? 0 : 1)) {
+        } else if (weather.waterDepth >= 1.0 && tracker.currentTyre !== 'INTER' && tracker.currentTyre !== 'WET') {
+          if (currentLap >= rainReactionLap) {
             wantPit = true;
             targetTyre = weather.waterDepth >= 4.0 ? 'WET' : 'INTER';
           }
-        } else if (isSC && tracker.tyreAge > 15 && tracker.currentTyre !== 'SOFT') {
-          // AI cheap pit opportunism
+        } else if (isSC && tracker.tyreAge > 14 && tracker.currentTyre !== 'SOFT') {
           wantPit = true;
           targetTyre = 'SOFT';
+        } else if (isMasterAI && currentLap > 3) {
+          const playerPittedPrevLap = playerOverrides[currentLap - 1]?.boxNextLap;
+          if (playerPittedPrevLap && tracker.tyreAge > 12) {
+            wantPit = true;
+            targetTyre = 'HARD';
+          }
         }
       }
 
@@ -1363,6 +1493,44 @@ export function runFullGrandPrixSimulation(params: {
     for (const driver of drivers) {
       const tracker = trackers[driver.code];
       const isPlayer = driver.code === playerDriver.code;
+
+      if (tracker.isRetired) {
+        lapCarStates.push({
+          code: driver.code,
+          name: driver.name,
+          number: driver.number,
+          team: driver.team,
+          color: driver.color,
+          isPlayer,
+          lap: tracker.retirementLap || currentLap,
+          lapTime: 0,
+          cumulativeTime: tracker.cumulativeTime + 999999,
+          position: 22,
+          gapToLeader: 0,
+          gapToAhead: 0,
+          tyreCompound: tracker.currentTyre,
+          tyreAge: tracker.tyreAge,
+          tyreWearPercent: 100,
+          tyreSurfaceTemp: 40,
+          tyreCoreTemp: 40,
+          brakeTemp: 50,
+          thermalWarning: 'NONE',
+          puMode: 'standard',
+          ersBoostUsed: false,
+          ersBatterySoc: 0,
+          fuelRemainingKg: tracker.fuelKg,
+          driverConfidence: 0,
+          pitCount: tracker.pitCount,
+          isPitting: false,
+          isRetired: true,
+          retirementReason: tracker.retirementReason,
+          retirementLap: tracker.retirementLap,
+          currentSpeedKmH: 0,
+          eventNote: 'DNF',
+        });
+        continue;
+      }
+
       const isPitting = pittingCarsThisLap.includes(driver.code);
 
       let lapPitLoss = 0;
@@ -1490,6 +1658,10 @@ export function runFullGrandPrixSimulation(params: {
         globalFastestLap = { code: driver.code, time: lapDuration, lap: currentLap };
       }
 
+      const circuitLenM = 5400;
+      const avgSpeedKmH = Math.round((circuitLenM / Math.max(35, lapDuration)) * 3.6);
+      const currentSpeedKmH = isPitting ? 80 : isSC ? Math.min(155, Math.max(135, Math.round(avgSpeedKmH * 0.72))) : avgSpeedKmH;
+
       lapCarStates.push({
         code: driver.code,
         name: driver.name,
@@ -1518,19 +1690,37 @@ export function runFullGrandPrixSimulation(params: {
         pitCount: tracker.pitCount,
         isPitting,
         pitStopDuration: staticCrewTime > 0 ? Number(staticCrewTime.toFixed(1)) : undefined,
+        currentSpeedKmH,
         eventNote: note,
       });
     }
 
-    // Sort by cumulative race time to establish positions
-    lapCarStates.sort((a, b) => a.cumulativeTime - b.cumulativeTime);
-    const leaderTime = lapCarStates[0].cumulativeTime;
+    // Separate active cars and retired (DNF) cars
+    const activeCars = lapCarStates.filter((c) => !c.isRetired);
+    const retiredCars = lapCarStates.filter((c) => c.isRetired);
+
+    // STRICT SAFETY CAR REGULATION: Position Freeze!
+    if (isSC && currentLap > 1 && snapshots.length > 0) {
+      const prevSnapshot = snapshots[snapshots.length - 1];
+      const prevOrderMap = new Map<string, number>();
+      prevSnapshot.cars.forEach((c) => prevOrderMap.set(c.code, c.position));
+
+      activeCars.sort((a, b) => {
+        if (a.isPitting && !b.isPitting) return 1;
+        if (!a.isPitting && b.isPitting) return -1;
+        return (prevOrderMap.get(a.code) || 99) - (prevOrderMap.get(b.code) || 99);
+      });
+    } else {
+      activeCars.sort((a, b) => a.cumulativeTime - b.cumulativeTime);
+    }
+
+    const leaderTime = activeCars[0]?.cumulativeTime || 0;
     const FIA_POINTS_TABLE = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
 
-    lapCarStates.forEach((car, idx) => {
+    activeCars.forEach((car, idx) => {
       car.position = idx + 1;
       car.gapToLeader = Number((car.cumulativeTime - leaderTime).toFixed(2));
-      const aheadTime = idx === 0 ? leaderTime : lapCarStates[idx - 1].cumulativeTime;
+      const aheadTime = idx === 0 ? leaderTime : activeCars[idx - 1].cumulativeTime;
       car.gapToAhead = Number((car.cumulativeTime - aheadTime).toFixed(2));
       car.pointsAwarded = FIA_POINTS_TABLE[idx] || 0;
 
@@ -1538,19 +1728,25 @@ export function runFullGrandPrixSimulation(params: {
       const inDirtyAir = idx > 0 && car.gapToAhead <= 1.2;
       car.inDirtyAir = inDirtyAir;
 
-      // Following in dirty air heats up front tyre surface by +3°C to +6°C
       if (inDirtyAir) {
         car.tyreSurfaceTemp = Math.min(145, car.tyreSurfaceTemp + 4);
       }
     });
 
+    retiredCars.forEach((car, idx) => {
+      car.position = activeCars.length + idx + 1;
+      car.pointsAwarded = 0;
+    });
+
+    const allOrderedCars = [...activeCars, ...retiredCars];
+
     // Detect DRS Trains: when 3 or more consecutive cars each have gapToAhead <= 1.0s
-    for (let i = 1; i < lapCarStates.length - 1; i++) {
-      if (lapCarStates[i].gapToAhead <= 1.0 && lapCarStates[i + 1].gapToAhead <= 1.0) {
-        lapCarStates[i].inDrsTrain = true;
-        lapCarStates[i + 1].inDrsTrain = true;
-        if (i > 0 && lapCarStates[i - 1].gapToAhead <= 1.0) {
-          lapCarStates[i - 1].inDrsTrain = true;
+    for (let i = 1; i < activeCars.length - 1; i++) {
+      if (activeCars[i].gapToAhead <= 1.0 && activeCars[i + 1].gapToAhead <= 1.0) {
+        activeCars[i].inDrsTrain = true;
+        activeCars[i + 1].inDrsTrain = true;
+        if (i > 0 && activeCars[i - 1].gapToAhead <= 1.0) {
+          activeCars[i - 1].inDrsTrain = true;
         }
       }
     }
@@ -1558,8 +1754,8 @@ export function runFullGrandPrixSimulation(params: {
     // Teammate status for player
     let teammateStatus: TeammateStatus | undefined = undefined;
     if (teammateDriver) {
-      const tmCar = lapCarStates.find((c) => c.code === teammateDriver.code);
-      const playerCar = lapCarStates.find((c) => c.code === playerDriver.code);
+      const tmCar = activeCars.find((c) => c.code === teammateDriver.code);
+      const playerCar = activeCars.find((c) => c.code === playerDriver.code);
       if (tmCar && playerCar) {
         const gap = Number((tmCar.cumulativeTime - playerCar.cumulativeTime).toFixed(1));
         teammateStatus = {
@@ -1607,7 +1803,7 @@ export function runFullGrandPrixSimulation(params: {
 
     // Trigger interactive radio dialogue if conditions match
     let activeRadio: DriverRadioPrompt | undefined = undefined;
-    const playerCarCurrent = lapCarStates.find((c) => c.code === playerDriver.code);
+    const playerCarCurrent = activeCars.find((c) => c.code === playerDriver.code);
 
     if (playerCarCurrent) {
       if (weather.radarDistance <= 3.0 && weather.radarDistance > 0 && !weather.isRaining && currentLap === Math.max(1, (rainStartLap || 99) - 1)) {
@@ -1753,11 +1949,12 @@ export function runFullGrandPrixSimulation(params: {
       lap: currentLap,
       isSC,
       isVSC,
+      isScEnding,
       trackTemp,
       waterDepthMm: weather.waterDepth,
       weatherDescription: weather.desc,
-      cars: lapCarStates,
-      leaderCode: lapCarStates[0].code,
+      cars: allOrderedCars,
+      leaderCode: activeCars[0]?.code || drivers[0].code,
       fastestLap: globalFastestLap,
       commentaryFeed: [...globalCommentary],
       rainRadar: radar,

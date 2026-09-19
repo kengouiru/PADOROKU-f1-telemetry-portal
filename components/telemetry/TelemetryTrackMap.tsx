@@ -3872,7 +3872,7 @@ export const CIRCUIT_TRACK_MAPS: Record<string, CircuitTrackData> = {
 };
 
 // Generic Fallback Track
-const GENERIC_TRACK: CircuitTrackData = {
+export const GENERIC_TRACK: CircuitTrackData = {
   name: 'Standard Grand Prix Circuit',
   svgPath: 'M 100 240 L 260 240 C 320 240 330 200 290 170 L 230 130 C 200 110 220 70 270 70 L 310 70 C 340 70 340 40 300 40 L 150 40 C 90 40 70 80 80 130 L 70 190 C 60 230 80 240 100 240 Z',
   startFinish: { x: 100, y: 240 },
@@ -3897,7 +3897,7 @@ const GENERIC_TRACK: CircuitTrackData = {
 /**
  * Linear interpolation to calculate (x, y) coordinates along track from distance percentage (0 ~ 100%)
  */
-function interpolateTrackCoords(waypoints: Array<{ pct: number; x: number; y: number }>, pct: number): { x: number; y: number } {
+export function interpolateTrackCoords(waypoints: Array<{ pct: number; x: number; y: number }>, pct: number): { x: number; y: number } {
   const clampedPct = Math.max(0, Math.min(100, pct));
   
   // Find surrounding waypoints

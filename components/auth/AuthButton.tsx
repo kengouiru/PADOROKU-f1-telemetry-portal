@@ -105,15 +105,15 @@ export default function AuthButton({ onOpenAuthModal, onOpenUpgradeModal }: Auth
 
           {/* User Name & Role Badge */}
           <div className="flex items-center gap-1">
-            <span className="text-[11px] sm:text-xs font-racing font-bold max-w-[70px] sm:max-w-[120px] truncate hidden sm:inline">
+            <span suppressHydrationWarning className="text-[11px] sm:text-xs font-racing font-bold max-w-[70px] sm:max-w-[120px] truncate hidden sm:inline">
               {activeDisplayName}
             </span>
             {isProUser ? (
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-racing font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm">
+              <span suppressHydrationWarning className="px-1.5 py-0.2 rounded text-[9px] font-racing font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm">
                 PRO
               </span>
             ) : (
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-racing font-bold bg-slate-800 text-slate-300 border border-white/10">
+              <span suppressHydrationWarning className="px-1.5 py-0.2 rounded text-[9px] font-racing font-bold bg-slate-800 text-slate-300 border border-white/10">
                 FREE
               </span>
             )}

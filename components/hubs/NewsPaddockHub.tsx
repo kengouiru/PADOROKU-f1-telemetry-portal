@@ -667,7 +667,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                         </span>
                       </div>
 
-                      <span className="text-[11px] text-slate-500 font-mono flex-shrink-0">
+                      <span suppressHydrationWarning className="text-[11px] text-slate-500 font-mono flex-shrink-0">
                         {formatRelativeTime(item.pubDate)}
                       </span>
                     </div>

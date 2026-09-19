@@ -213,7 +213,7 @@ function NoteCard({
   onDelete: () => void;
 }) {
   const dateStr = new Date(note.timestamp).toLocaleString('ja-JP', {
-    month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit',
+    month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tokyo',
   });
 
   const preview = note.content.slice(0, 80) + (note.content.length > 80 ? '...' : '');
@@ -234,7 +234,7 @@ function NoteCard({
         <span className="flex-shrink-0">
           {note.source === 'ai' ? '🤖' : '✏️'}
         </span>
-        <span className="text-slate-400 flex-shrink-0">{dateStr}</span>
+        <span suppressHydrationWarning className="text-slate-400 flex-shrink-0">{dateStr}</span>
         {note.sessionTag && (
           <span className="text-slate-600 text-xs truncate">{note.sessionTag}</span>
         )}
