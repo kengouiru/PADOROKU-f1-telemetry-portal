@@ -2143,31 +2143,6 @@ export default function DashboardPage() {
         }}
       />
 
-      {/* ── Persistent Floating Button to Launch Standalone PITWALL Game ── */}
-      <div className="fixed bottom-4 right-4 z-40 animate-in fade-in slide-in-from-bottom-3 duration-300">
-        <button
-          type="button"
-          onClick={() => {
-            const screenW = typeof window !== 'undefined' ? window.screen.availWidth || 1920 : 1920;
-            const screenH = typeof window !== 'undefined' ? window.screen.availHeight || 1080 : 1080;
-            const win = window.open(
-              '/pitwall',
-              'F1PitwallGame',
-              `width=${screenW},height=${screenH},left=0,top=0,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes`
-            );
-            if (!win || win.closed || typeof win.closed === 'undefined') {
-              window.open('/pitwall', '_blank');
-            }
-          }}
-          className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white font-racing font-bold text-xs sm:text-sm shadow-2xl shadow-red-950/80 border border-white/20 hover:scale-105 active:scale-95 transition-all cursor-pointer group"
-          title="F1 PITWALL 司令塔ゲームを別画面・全画面で起動"
-        >
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          <Gamepad2 className="w-4 h-4 text-white group-hover:rotate-12 transition-transform" />
-          <span>🏎️ PITWALL ゲーム起動</span>
-        </button>
-      </div>
-
       {/* ── Pitwall Pro Membership & Upgrade Modal ── */}
       <PitwallProModal
         isOpen={proModalOpen}
