@@ -57,6 +57,7 @@ import {
   Shuffle,
   ChevronDown,
   ChevronUp,
+  ChevronRight,
   Settings,
   LayoutGrid,
   Maximize2,
@@ -67,6 +68,7 @@ import {
   HelpCircle,
   Wind,
   TrendingDown,
+  Bot,
 } from 'lucide-react';
 import LiveTrackGpsRadar from '@/components/telemetry/LiveTrackGpsRadar';
 import {
@@ -76,10 +78,13 @@ import {
   diagnoseStrategistProfile,
   loadStrategistCareer,
   saveStrategistCareer,
+  determineTrophyTier,
   type DiagnosticResult,
   type SavedCareerData,
   type F1Badge,
   type BadgeCategory,
+  type TrophyTier,
+  type ScenarioClearRecord,
 } from '@/lib/raceDebriefAnalysis';
 import {
   SIM_CIRCUITS,
@@ -118,6 +123,7 @@ import { usePlanTier } from '@/lib/tierService';
 type PitwallMonitor = 'all' | 'track' | 'timing' | 'thermals' | 'weather' | 'team' | 'radio';
 type GameMajorCategory = 'practice' | 'battle';
 type ChallengeModeType = 'crisis' | 'scenario' | 'sprint' | 'mission' | 'sandbox' | 'procedural';
+export type SimulatorPhase = 'mode_select' | 'briefing' | 'race' | 'debrief';
 
 export interface RivalIntelReport {
   id: string;
@@ -214,12 +220,18 @@ export default function RaceSimulatorHub({
     return PRESET_CHALLENGES[presetIdx] || PRESET_CHALLENGES[0];
   }, [customScenario, presetIdx]);
 
+  // 4-Stage Game Cycle Phase: mode_select -> briefing -> race -> debrief
+  const [simulatorPhase, setSimulatorPhase] = useState<SimulatorPhase>('mode_select');
+
   // Current simulation progression
   const [challengeLap, setChallengeLap] = useState<number>(1);
   const [challengePlaying, setChallengePlaying] = useState<boolean>(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1); // 0.5x, 1x, 2x, 5x
   const [autoPauseEnabled, setAutoPauseEnabled] = useState<boolean>(true);
   const [autoPauseAlert, setAutoPauseAlert] = useState<string | null>(null);
+  const [triggeredAutoPauseEvents, setTriggeredAutoPauseEvents] = useState<Set<string>>(new Set());
+  const [userAssistLevel, setUserAssistLevel] = useState<'assisted' | 'expert'>('assisted');
+  const [currentProgressPct, setCurrentProgressPct] = useState<number>(0);
   const [lapTimeRemainingMs, setLapTimeRemainingMs] = useState<number>(5500);
   const challengeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -267,7 +279,7 @@ export default function RaceSimulatorHub({
   const [isCareerModalOpen, setIsCareerModalOpen] = useState<boolean>(false);
   const [selectedBadgeForDetail, setSelectedBadgeForDetail] = useState<F1Badge | null>(null);
   const [badgeCategoryFilter, setBadgeCategoryFilter] = useState<'all' | BadgeCategory>('all');
-  const [timingTowerViewMode, setTimingTowerViewMode] = useState<'dual' | 'single'>('dual');
+  const [timingTowerMode, setTimingTowerMode] = useState<'gap' | 'int'>('gap');
   const [liveFeedFilter, setLiveFeedFilter] = useState<'all' | 'radio' | 'incident' | 'overtake' | 'broadcast'>('all');
   const [liveFeedExpanded, setLiveFeedExpanded] = useState<boolean>(false);
   const [rivalIntelFilter, setRivalIntelFilter] = useState<
@@ -288,18 +300,22 @@ export default function RaceSimulatorHub({
   }, [activeScenario.playerConfig, customStartingTyre, customInitialPuMode]);
 
   const effectiveTargetBoxLap = useMemo(() => {
-    if (activeScenario.actualRainLap && activeScenario.actualRainLap <= activeScenario.totalLaps) {
-      return activeScenario.actualRainLap;
+    if (effectivePlayerConfig.startTyre === 'INTER' || effectivePlayerConfig.startTyre === 'WET') {
+      return Math.max(3, Math.floor(activeScenario.totalLaps * 0.6));
     }
-    return Math.max(2, Math.floor(activeScenario.totalLaps * 0.6));
-  }, [activeScenario]);
+    if (activeScenario.actualRainLap && activeScenario.actualRainLap <= activeScenario.totalLaps) {
+      return Math.max(2, activeScenario.actualRainLap);
+    }
+    return Math.max(3, Math.floor(activeScenario.totalLaps * 0.6));
+  }, [activeScenario, effectivePlayerConfig.startTyre]);
 
   // Merge pre-race target pit stop with real-time tactical overrides
   const effectivePlayerTacticalCommands = useMemo(() => {
     const commands = { ...playerTacticalCommands };
     const boxLap = customTargetBoxLap || effectiveTargetBoxLap;
     const boxCmp = customTargetCompound || nextCompoundChoice;
-    if (boxLap && boxCmp && !commands[boxLap]?.boxNextLap && Object.keys(playerTacticalCommands).length === 0) {
+    // CRITICAL: NEVER automatically schedule a pit stop on Lap 1! Pit stops happen from Lap 2 onwards.
+    if (boxLap && boxLap > 1 && boxCmp && !commands[boxLap]?.boxNextLap && Object.keys(playerTacticalCommands).length === 0) {
       commands[boxLap] = {
         ...commands[boxLap],
         boxNextLap: true,
@@ -398,15 +414,15 @@ export default function RaceSimulatorHub({
         lap: challengeLap,
         priority: tyreTarget.tyreWearPercent >= 60 || tyreTarget.tyreAge >= 16 ? 'high' : 'medium',
         category: 'tyre',
-        analystRole: '🛞 ライバルタイヤ班',
+        analystRole: '🛞 タイヤ摩耗監視',
         targetCarCode: tyreTarget.code,
         targetCarName: tyreTarget.name,
         targetCarPos: tyreTarget.position,
         targetCarColor: tyreTarget.color,
         headline: '前走車タレ・クリフ監視',
-        summary: `【前走車監視】${tyreTarget.name}（P${tyreTarget.position}）のラップタイムが直近2周で+${degDelta}秒悪化。セクター2でリアがスライドしています。なおストレート最高速は相手が依然+${Math.max(3, deltaSt)}km/h優勢です。`,
+        summary: `${tyreTarget.name}（P${tyreTarget.position}）のラップタイムが直近2周で+${degDelta}秒悪化。セクター2でリアがスライドしています。なおストレート最高速は相手が依然+${Math.max(3, deltaSt)}km/h優勢です。`,
         confidence: tyreTarget.tyreWearPercent >= 65 ? 'high' : 'verified',
-        confidenceLabel: tyreTarget.tyreWearPercent >= 65 ? '確度 92%' : 'データ確定 96%',
+        confidenceLabel: tyreTarget.tyreWearPercent >= 65 ? '確度 92%' : '確度 96%',
         rawTelemetry: {
           lapTimes: [
             `L${Math.max(1, challengeLap - 1)}: ${formatTimeSeconds(tyreTarget.lapTime - parseFloat(degDelta))}`,
@@ -436,15 +452,15 @@ export default function RaceSimulatorHub({
         lap: challengeLap,
         priority: 'medium',
         category: 'telemetry',
-        analystRole: '⚡ テレメトリ班',
+        analystRole: '⚡ 最高速解析',
         targetCarCode: telemTarget.code,
         targetCarName: telemTarget.name,
         targetCarPos: telemTarget.position,
         targetCarColor: telemTarget.color,
         headline: '最高速＆マイクロセクター',
-        summary: `【最高速解析】${telemTarget.code}とのスピードトラップ比較: 相手${stTarget}km/h vs 自車${stPlayer}km/h (${deltaSt >= 0 ? '+' : ''}${deltaSt}km/h)。相手は高速コーナー脱出が強力ですが、シケインの進入で約0.15秒ロスしています。`,
+        summary: `${telemTarget.code}とのスピードトラップ比較: 相手${stTarget}km/h vs 自車${stPlayer}km/h (${deltaSt >= 0 ? '+' : ''}${deltaSt}km/h)。相手は高速コーナー脱出が強力ですが、シケインの進入で約0.15秒ロスしています。`,
         confidence: 'verified',
-        confidenceLabel: 'テレメトリ確定 100%',
+        confidenceLabel: '確度 100%',
         rawTelemetry: {
           lapTimes: [`L${challengeLap}: ${formatTimeSeconds(telemTarget.lapTime)}`],
           speedTrapKmh: stTarget,
@@ -469,15 +485,15 @@ export default function RaceSimulatorHub({
           lap: challengeLap,
           priority: 'high',
           category: 'radio_intercept',
-          analystRole: '📻 敵無線傍受班',
+          analystRole: '📻 敵無線傍受',
           targetCarCode: radioTarget.code,
           targetCarName: radioTarget.name,
           targetCarPos: radioTarget.position,
           targetCarColor: radioTarget.color,
           headline: '敵ピット無線傍受（ブラフ疑い）',
-          summary: `【敵無線傍受】${radioTarget.code}に『Box to overtake, box now』の指示を傍受。…しかしピットクルーがガレージから出てきていません。我々を先にピットインさせるダミー無線の疑いがあります。`,
+          summary: `${radioTarget.code}に『Box to overtake, box now』の指示を傍受。…しかしピットクルーがガレージから出てきていません。我々を先にピットインさせるダミー無線の疑いがあります。`,
           confidence: 'suspect_bluff',
-          confidenceLabel: '❓ ブラフ疑い (55%)',
+          confidenceLabel: 'ブラフ疑い 55%',
           rawTelemetry: {
             lapTimes: [`L${challengeLap}: ${formatTimeSeconds(radioTarget.lapTime)}`],
             speedTrapKmh: radioTarget.currentSpeedKmH || 335,
@@ -496,15 +512,15 @@ export default function RaceSimulatorHub({
           lap: challengeLap,
           priority: 'medium',
           category: 'radio_intercept',
-          analystRole: '📻 敵無線傍受班',
+          analystRole: '📻 敵無線傍受',
           targetCarCode: radioTarget.code,
           targetCarName: radioTarget.name,
           targetCarPos: radioTarget.position,
           targetCarColor: radioTarget.color,
           headline: '敵ドライバー無線傍受',
-          summary: `【敵無線傍受】${radioTarget.code}『フロント左が完全に死んだ！アンダーステアが酷くて曲がれない』と絶叫。フロントタイヤの摩耗限界が近いと推測されます。`,
+          summary: `${radioTarget.code}『フロント左が完全に死んだ！アンダーステアが酷くて曲がれない』と絶叫。フロントタイヤの摩耗限界が近いと推測されます。`,
           confidence: 'high',
-          confidenceLabel: '傍受確認 90%',
+          confidenceLabel: '確度 90%',
           rawTelemetry: {
             lapTimes: [`L${challengeLap}: ${formatTimeSeconds(radioTarget.lapTime)}`],
             speedTrapKmh: radioTarget.currentSpeedKmH || 333,
@@ -529,17 +545,17 @@ export default function RaceSimulatorHub({
         lap: challengeLap,
         priority: 'medium',
         category: 'ers',
-        analystRole: '🔋 敵ERS監視班',
+        analystRole: '🔋 ERS電力監視',
         targetCarCode: ersTarget.code,
         targetCarName: ersTarget.name,
         targetCarPos: ersTarget.position,
         targetCarColor: ersTarget.color,
         headline: 'クリッピング・電力監視',
         summary: isAhead
-          ? `【電力監視】${ersTarget.code}のGPS加速度トレースを解析。メインストレート手前140mで加速が頭打ち（クリッピング発生）。バッテリー残量25%以下と推定されます。`
-          : `【電力監視】後続${ersTarget.code}がチャージモードに切り替え。バッテリー残量低下のため、今周のストレートでの仕掛けは困難とみられます。`,
+          ? `${ersTarget.code}のGPS加速度トレースを解析。メインストレート手前140mで加速が頭打ち（クリッピング発生）。バッテリー残量25%以下と推定されます。`
+          : `後続${ersTarget.code}がチャージモードに切り替え。バッテリー残量低下のため、今周のストレートでの仕掛けは困難とみられます。`,
         confidence: 'high',
-        confidenceLabel: 'GPS解析 88%',
+        confidenceLabel: '確度 88%',
         rawTelemetry: {
           lapTimes: [`L${challengeLap}: ${formatTimeSeconds(ersTarget.lapTime)}`],
           speedTrapKmh: ersTarget.currentSpeedKmH || 331,
@@ -567,17 +583,17 @@ export default function RaceSimulatorHub({
         lap: challengeLap,
         priority: 'high',
         category: 'pit_stop',
-        analystRole: '⏱️ ピット速報班',
+        analystRole: '⏱️ ピット作業速報',
         targetCarCode: pitTarget.code,
         targetCarName: pitTarget.name,
         targetCarPos: pitTarget.position,
         targetCarColor: pitTarget.color,
         headline: 'ライバルピット作業速報',
         summary: isQuick
-          ? `【ピット速報】${pitTarget.team}（${pitTarget.code}）の静止作業時間は${stopDuration}秒！電光石火の好作業です。アウトラップペースは1分24秒台を刻む見込み。`
-          : `【ピット速報】${pitTarget.team}（${pitTarget.code}）のピットで左リア交換に手間取り作業時間${stopDuration}秒のタイムロス。コース復帰位置はトラフィックの中です。`,
+          ? `${pitTarget.team}（${pitTarget.code}）の静止作業時間は${stopDuration}秒！電光石火の好作業です。アウトラップペースは1分24秒台を刻む見込み。`
+          : `${pitTarget.team}（${pitTarget.code}）のピットで左リア交換に手間取り作業時間${stopDuration}秒のタイムロス。コース復帰位置はトラフィックの中です。`,
         confidence: 'verified',
-        confidenceLabel: '目視確認 100%',
+        confidenceLabel: '確定 100%',
         rawTelemetry: {
           lapTimes: [`Pit Lap ${challengeLap}`],
           speedTrapKmh: 80,
@@ -647,34 +663,86 @@ export default function RaceSimulatorHub({
   }, [activeScenario.circuit.baseLapTime, playbackSpeed]);
 
   // Real-time lap progress percentage (0% to 100%) for live track GPS motion
-  const lapProgressPct = useMemo(() => {
+  useEffect(() => {
     if (challengePlaying) {
       const elapsed = Math.max(0, currentIntervalMs - lapTimeRemainingMs);
-      return Math.min(100, Math.max(0, (elapsed / currentIntervalMs) * 100));
+      const pct = Math.min(100, Math.max(0, (elapsed / currentIntervalMs) * 100));
+      setCurrentProgressPct(pct);
     }
-    // When paused or stepping 1 lap, position car at 35% through the lap by default
-    return 35.0;
   }, [challengePlaying, currentIntervalMs, lapTimeRemainingMs]);
 
-  // Auto-pause triggers on critical tactical events
+  // Reset progress to 0 on new lap start and clear completed pit queue
+  useEffect(() => {
+    setCurrentProgressPct(0);
+    if (challengeLap > 1) {
+      const prevLapSnapshot = challengeSnapshots[challengeLap - 2];
+      const playerWasPitting = prevLapSnapshot?.cars.find((c) => c.code === activeScenario.playerConfig.code)?.isPitting;
+      if (playerWasPitting || !playerTacticalCommands[challengeLap]?.boxNextLap) {
+        setBoxQueuedForNextLap(false);
+      }
+    }
+  }, [challengeLap, challengeSnapshots, activeScenario.playerConfig.code, playerTacticalCommands]);
+
+  const lapProgressPct = currentProgressPct;
+
+  // Pit Entry Proximity & Distance Calculation for Tactical Cockpit & BOX BOX button
+  const pitProximity = useMemo(() => {
+    const circuitLengthM = activeScenario.circuit.circuitLengthM || 5400;
+    const baseLapTime = activeScenario.circuit.baseLapTime || 90.0;
+    const pitEntryPct = 94.0; // Pit entry is typically at ~94% of the lap
+    const playerPct = lapProgressPct;
+
+    let remainingPct = 0;
+    if (playerPct <= pitEntryPct) {
+      remainingPct = pitEntryPct - playerPct;
+    } else {
+      remainingPct = (100 - playerPct) + pitEntryPct;
+    }
+
+    const distanceMeters = Math.max(0, Math.round((remainingPct / 100) * circuitLengthM));
+    const avgSpeedMps = Math.max(30, circuitLengthM / Math.max(60, baseLapTime));
+    const secondsToPit = Math.max(0, distanceMeters / avgSpeedMps);
+
+    const isCommitmentZone = distanceMeters < 380;
+    const isApproaching = distanceMeters < 1000;
+    const isPittingNow = !!playerCar?.isPitting;
+
+    return {
+      distanceMeters,
+      secondsToPit: secondsToPit.toFixed(1),
+      isCommitmentZone,
+      isApproaching,
+      isPittingNow,
+    };
+  }, [lapProgressPct, activeScenario.circuit, playerCar?.isPitting]);
+
+  // Auto-pause triggers on critical tactical events (Each event triggers at most once to allow PLAY resume)
   useEffect(() => {
     if (!autoPauseEnabled || !challengePlaying) return;
 
     // 1. Radio Prompt arrived and not yet answered
     if (currentSnapshot?.activeRadioPrompt && !radioResponses[currentSnapshot.activeRadioPrompt.id]) {
-      setChallengePlaying(false);
-      setAutoPauseAlert(
-        `📻 ${currentSnapshot.activeRadioPrompt.speaker} から緊急無線着信！指示を選択してください。`
-      );
-      return;
+      const eventKey = `radio-${currentSnapshot.activeRadioPrompt.id}`;
+      if (!triggeredAutoPauseEvents.has(eventKey)) {
+        setTriggeredAutoPauseEvents((prev) => new Set(prev).add(eventKey));
+        setChallengePlaying(false);
+        setAutoPauseAlert(
+          `📻 ${currentSnapshot.activeRadioPrompt.speaker} から緊急無線着信！指示を選択してください。`
+        );
+        return;
+      }
     }
 
-    // 2. Safety Car deployed (dynamically triggers on any lap when an incident happens)
+    // 2. Safety Car deployed
     const isPrevLapSc = challengeLap > 1 && !!challengeSnapshots[challengeLap - 2]?.isSC;
     if (currentSnapshot?.isSC && !isPrevLapSc) {
-      setChallengePlaying(false);
-      setAutoPauseAlert('🚨 セーフティカー出動！通常22秒のピットロスが11秒に半減するチープピットの好機です。');
-      return;
+      const eventKey = `sc-${challengeLap}`;
+      if (!triggeredAutoPauseEvents.has(eventKey)) {
+        setTriggeredAutoPauseEvents((prev) => new Set(prev).add(eventKey));
+        setChallengePlaying(false);
+        setAutoPauseAlert('🚨 セーフティカー出動！通常22秒のピットロスが11秒に半減するチープピットの好機です。');
+        return;
+      }
     }
 
     // 3. Rain Crossover reached (Slick -> Inter)
@@ -683,11 +751,15 @@ export default function RaceSimulatorHub({
       currentSnapshot.rainRadar.waterDepthMm >= 1.0 &&
       challengeLap === activeScenario.actualRainLap
     ) {
-      setChallengePlaying(false);
-      setAutoPauseAlert(
-        '🌧️ 路面水量が1.0mm突破！インターミディエイトへのクロスオーバー（履き替え分岐点）に到達しました。'
-      );
-      return;
+      const eventKey = `rain-crossover-lap-${challengeLap}`;
+      if (!triggeredAutoPauseEvents.has(eventKey)) {
+        setTriggeredAutoPauseEvents((prev) => new Set(prev).add(eventKey));
+        setChallengePlaying(false);
+        setAutoPauseAlert(
+          '🌧️ 路面水量が1.0mm突破！インターミディエイトへのクロスオーバー（履き替え分岐点）に到達しました。'
+        );
+        return;
+      }
     }
 
     // 4. Drying Track Crossover reached (Inter -> Slick decision)
@@ -695,14 +767,17 @@ export default function RaceSimulatorHub({
       currentSnapshot &&
       currentSnapshot.rainRadar.trackPhase === 'DRYING_LINE' &&
       currentSnapshot.rainRadar.waterDepthMm <= 0.85 &&
-      (playerCar?.tyreCompound === 'INTER' || playerCar?.tyreCompound === 'WET') &&
-      !radioResponses[`radio-drying-${challengeLap}`]
+      (playerCar?.tyreCompound === 'INTER' || playerCar?.tyreCompound === 'WET')
     ) {
-      setChallengePlaying(false);
-      setAutoPauseAlert(
-        '⚡ ドライライン形成中！レコードラインが乾燥しスリックへのクロスオーバー（履き替え分岐点）に到達しました。'
-      );
-      return;
+      const eventKey = `drying-crossover-lap-${challengeLap}`;
+      if (!triggeredAutoPauseEvents.has(eventKey)) {
+        setTriggeredAutoPauseEvents((prev) => new Set(prev).add(eventKey));
+        setChallengePlaying(false);
+        setAutoPauseAlert(
+          '⚡ ドライライン形成中！レコードラインが乾燥しスリックへのクロスオーバー（履き替え分岐点）に到達しました。'
+        );
+        return;
+      }
     }
   }, [
     challengePlaying,
@@ -711,11 +786,14 @@ export default function RaceSimulatorHub({
     radioResponses,
     challengeLap,
     activeScenario,
+    triggeredAutoPauseEvents,
+    playerCar?.tyreCompound,
+    challengeSnapshots,
   ]);
 
-  // Auto playback loop with countdown
+  // Auto playback loop with countdown (only runs when simulatorPhase === 'race')
   useEffect(() => {
-    if (challengePlaying) {
+    if (challengePlaying && simulatorPhase === 'race') {
       setLapTimeRemainingMs(currentIntervalMs);
       const stepMs = 100;
       let elapsed = 0;
@@ -747,7 +825,7 @@ export default function RaceSimulatorHub({
         challengeTimerRef.current = null;
       }
     }
-  }, [challengePlaying, activeScenario.totalLaps, currentIntervalMs]);
+  }, [challengePlaying, simulatorPhase, activeScenario.totalLaps, currentIntervalMs]);
 
   // Evaluate score and diagnose strategist archetype & badges when race completes
   useEffect(() => {
@@ -775,13 +853,20 @@ export default function RaceSimulatorHub({
         const playerCar = challengeSnapshots[challengeSnapshots.length - 1]?.cars.find(
           (c) => c.code === activeScenario.playerConfig.code
         );
-        const isWin = playerCar?.position === 1;
+        const finalPos = playerCar ? playerCar.position : 99;
+        const isWin = finalPos === 1;
         const updatedCareer = saveStrategistCareer(
           diagnostic.totalCpEarnedThisRace,
           diagnostic.unlockedBadgesThisRace.map((b) => b.id),
           score.totalScore,
           isWin,
-          diagnostic.archetype.id
+          diagnostic.archetype.id,
+          {
+            scenarioId: activeScenario.id,
+            finalPos,
+            targetPos: activeScenario.targetPosition,
+            aiDifficulty,
+          }
         );
         setCareerData(updatedCareer);
       }
@@ -798,10 +883,16 @@ export default function RaceSimulatorHub({
     if (nextState && radioAudioEnabled) {
       playBoxBoxCall();
     }
+    // If the car has already passed pit entry / commitment zone (>= 90% lap progress),
+    // pit stop must be scheduled for the NEXT lap (challengeLap + 1).
+    const targetBoxLap = pitProximity.isCommitmentZone || lapProgressPct >= 90
+      ? challengeLap + 1
+      : challengeLap;
+
     setPlayerTacticalCommands((prev) => ({
       ...prev,
-      [challengeLap]: {
-        ...prev[challengeLap],
+      [targetBoxLap]: {
+        ...prev[targetBoxLap],
         boxNextLap: nextState,
         nextCompound: nextCompoundChoice,
       },
@@ -810,11 +901,14 @@ export default function RaceSimulatorHub({
 
   const handleCompoundChange = (comp: TyreCompound) => {
     setNextCompoundChoice(comp);
+    const targetBoxLap = pitProximity.isCommitmentZone || lapProgressPct >= 90
+      ? challengeLap + 1
+      : challengeLap;
     setPlayerTacticalCommands((prev) => {
       const updated = { ...prev };
-      if (boxQueuedForNextLap || updated[challengeLap]?.boxNextLap) {
-        updated[challengeLap] = {
-          ...updated[challengeLap],
+      if (boxQueuedForNextLap || updated[targetBoxLap]?.boxNextLap) {
+        updated[targetBoxLap] = {
+          ...updated[targetBoxLap],
           boxNextLap: true,
           nextCompound: comp,
         };
@@ -834,7 +928,117 @@ export default function RaceSimulatorHub({
     }));
   };
 
+  // ERS Boost eligibility check according to official F1 rules:
+  // 1. Must have a car ahead (position > 1)
+  // 2. Gap to car ahead <= 1.000s at detection point
+  // 3. Not under Safety Car / VSC
+  // 4. Lap > 1 (cannot be used on opening lap)
+  // 5. Battery SOC >= 15%
+  const ersEligibility = useMemo(() => {
+    if (!playerCar) {
+      return { eligible: false, reason: '車両データなし', label: '🔒 LOCKED' };
+    }
+    if (playerCar.position === 1) {
+      return { eligible: false, reason: '首位走行中（前走車なし）のため使用不可', label: '🔒 LEADER' };
+    }
+    if (currentSnapshot?.isSC) {
+      return { eligible: false, reason: 'セーフティカー中は使用禁止', label: '⚠️ SC規制' };
+    }
+    if (challengeLap <= 1) {
+      return { eligible: false, reason: 'オープニングラップ（Lap 1）は使用禁止', label: '🔒 LAP 1' };
+    }
+    if ((playerCar.ersBatterySoc ?? 0) < 15) {
+      return { eligible: false, reason: `バッテリー残量不足 (${Math.round(playerCar.ersBatterySoc ?? 0)}% < 15%)`, label: '🪫 SOC不足' };
+    }
+    if (playerCar.gapToAhead > 1.0) {
+      return {
+        eligible: false,
+        reason: `前走車とのギャップが${playerCar.gapToAhead.toFixed(2)}秒（1.0秒以内が必要）`,
+        label: `🔒 >1.0s (${playerCar.gapToAhead.toFixed(1)}s)`,
+      };
+    }
+    return {
+      eligible: true,
+      reason: `前走車との差${playerCar.gapToAhead.toFixed(3)}s（1.0秒以内）。ERSオーバーテイク発動可能！`,
+      label: '🟢 READY',
+    };
+  }, [playerCar, currentSnapshot?.isSC, challengeLap]);
+
+  // Tactical Assist Mode guidance based on situational awareness & instrument prioritization
+  const tacticalAssistGuidance = useMemo(() => {
+    if (userAssistLevel !== 'assisted' || !currentSnapshot || !playerCar) return null;
+
+    if (currentSnapshot.isSC) {
+      return {
+        type: 'sc',
+        icon: '🚨',
+        target: 'M5 トラフィック / ピット戦略',
+        message: 'セーフティカー導入中。ピットロスタイムが通常の半分（約11秒）に短縮されます。ピット復帰時のトラフィック予想（M5）を確認してください。',
+      };
+    }
+
+    const rainDiff = (activeScenario.actualRainLap || 99) - challengeLap;
+    if (rainDiff >= 0 && rainDiff <= 2 && (activeScenario.actualRainIntensity || 0) > 0) {
+      return {
+        type: 'weather',
+        icon: '🌧️',
+        target: 'M3 天候レーダー / 路面水量',
+        message: `雨雲接近中（約${rainDiff === 0 ? '現在' : `${rainDiff}周後`}）。路面水量モニター（M3）の1.0mmクロスオーバー（スリック限界）推移を注視してください。`,
+      };
+    }
+
+    if (
+      currentSnapshot.rainRadar.waterDepthMm >= 1.0 &&
+      (playerCar.tyreCompound === 'SOFT' || playerCar.tyreCompound === 'MEDIUM' || playerCar.tyreCompound === 'HARD')
+    ) {
+      return {
+        type: 'weather_crossover',
+        icon: '🌊',
+        target: 'ピット指示 (BOX BOX) / M3 天候レーダー',
+        message: '路面水量が1.0mm（インターミディエイト境界面）を超過中。ラップタイムの急激な低下（M1）とタイヤ交換指示を確認してください。',
+      };
+    }
+
+    if (ersEligibility.eligible) {
+      return {
+        type: 'ers',
+        icon: '⚡',
+        target: 'OVERTAKE ボタン / M2 テレメトリー',
+        message: `前走車との差が${playerCar.gapToAhead.toFixed(2)}秒（1.0秒以内）。ERSオーバーテイク発動可能。相手の最高速（M2）と比較して仕掛けを検討してください。`,
+      };
+    }
+
+    if (playerCar.tyreWearPercent >= 60 || (playerCar.tyreSurfaceTemp && playerCar.tyreSurfaceTemp > 125)) {
+      return {
+        type: 'tyre',
+        icon: '🛞',
+        target: 'M4 タイヤ・デグラデーション',
+        message: `タイヤ摩耗${Math.round(playerCar.tyreWearPercent)}%${playerCar.tyreSurfaceTemp ? ` / 表面温度${Math.round(playerCar.tyreSurfaceTemp)}°C` : ''}。グリップ低下によるセクタータイムのタレ（M4）を確認してください。`,
+      };
+    }
+
+    if (pitProximity.isApproaching && !boxQueuedForNextLap && !playerCar.isPitting) {
+      return {
+        type: 'pit',
+        icon: '🏁',
+        target: 'ピット指示 (BOX BOX) / M5 トラフィック',
+        message: `ピット入口まで${pitProximity.distanceMeters}m。今周ピットに入る場合はコミットメントライン到達前にBOX指示が必要です。`,
+      };
+    }
+
+    return {
+      type: 'default',
+      icon: '🔰',
+      target: 'M1 順位タワー / M2 テレメトリー',
+      message: '各セクタータイムと前後ギャップの推移を監視中。天候急変やSC出動、接近戦が発生するとここに即時ガイダンスが表示されます。',
+    };
+  }, [userAssistLevel, currentSnapshot, playerCar, challengeLap, activeScenario, pitProximity, boxQueuedForNextLap, ersEligibility]);
+
   const handleToggleErs = () => {
+    // If activating, user must be eligible
+    if (!ersBoostUsedThisLap && !ersEligibility.eligible) {
+      return;
+    }
     const nextState = !ersBoostUsedThisLap;
     setErsBoostUsedThisLap(nextState);
     setPlayerTacticalCommands((prev) => ({
@@ -891,11 +1095,13 @@ export default function RaceSimulatorHub({
   };
 
   // Mode Initializers
+  // Mode Initializers
   const startSprintRace = (circuitId: string, playerCode: string) => {
     const scenario = generateSprintRaceScenario(circuitId, playerCode);
     setCustomScenario(scenario);
     setGameMode('sprint');
     resetGameState();
+    setSimulatorPhase('briefing');
   };
 
   const startProceduralCrisis = () => {
@@ -903,13 +1109,19 @@ export default function RaceSimulatorHub({
     setCustomScenario(scenario);
     setGameMode('procedural');
     resetGameState();
+    setSimulatorPhase('briefing');
   };
 
   const startPresetCrisis = (idx: number) => {
     setPresetIdx(idx);
     setCustomScenario(null);
     setGameMode('crisis');
+    const sc = PRESET_CHALLENGES[idx] || PRESET_CHALLENGES[0];
+    if (sc.defaultAiDifficulty) {
+      setAiDifficulty(sc.defaultAiDifficulty);
+    }
     resetGameState();
+    setSimulatorPhase('briefing');
   };
 
   const startMission = (idx: number) => {
@@ -917,7 +1129,11 @@ export default function RaceSimulatorHub({
     const scenario = MISSION_CHALLENGES[idx] || MISSION_CHALLENGES[0];
     setCustomScenario(scenario);
     setGameMode('mission');
+    if (scenario.defaultAiDifficulty) {
+      setAiDifficulty(scenario.defaultAiDifficulty);
+    }
     resetGameState();
+    setSimulatorPhase('briefing');
   };
 
   const startSandboxMode = (overrides?: {
@@ -949,6 +1165,7 @@ export default function RaceSimulatorHub({
     setCustomScenario(scenario);
     setGameMode('sandbox');
     resetGameState();
+    setSimulatorPhase('briefing');
   };
 
   const handleRerollWeather = () => {
@@ -980,6 +1197,55 @@ export default function RaceSimulatorHub({
     setCustomTargetBoxLap(null);
     setCustomTargetCompound(null);
     playedChirpIdsRef.current.clear();
+  };
+
+  // ── Game Cycle Navigation Handlers ──
+  const handleStartRace = () => {
+    setChallengeLap(1);
+    setChallengePlaying(true);
+    setAutoPauseAlert(null);
+    setSimulatorPhase('race');
+  };
+
+  const handleRestartRace = () => {
+    setChallengeLap(1);
+    setChallengePlaying(true);
+    setPlayerTacticalCommands({});
+    setRadioResponses({});
+    setBoxQueuedForNextLap(false);
+    setActivePuMode('standard');
+    setErsBoostUsedThisLap(false);
+    setActiveTeamOrder('none');
+    setTacticalScore(null);
+    setDiagnosticResult(null);
+    setDebriefTab('score');
+    setGeminiDebrief(null);
+    setAutoPauseAlert(null);
+    playedChirpIdsRef.current.clear();
+    setSimulatorPhase('race');
+  };
+
+  const handleBackToBriefing = () => {
+    setChallengeLap(1);
+    setChallengePlaying(false);
+    setPlayerTacticalCommands({});
+    setRadioResponses({});
+    setBoxQueuedForNextLap(false);
+    setActivePuMode('standard');
+    setErsBoostUsedThisLap(false);
+    setActiveTeamOrder('none');
+    setTacticalScore(null);
+    setDiagnosticResult(null);
+    setDebriefTab('score');
+    setGeminiDebrief(null);
+    setAutoPauseAlert(null);
+    playedChirpIdsRef.current.clear();
+    setSimulatorPhase('briefing');
+  };
+
+  const handleBackToModeSelect = () => {
+    resetGameState();
+    setSimulatorPhase('mode_select');
   };
 
   // Gemini AI Debrief request
@@ -1119,6 +1385,19 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
             </span>
           </button>
 
+          {/* Trophy Count Button */}
+          <button
+            type="button"
+            onClick={() => setIsCareerModalOpen(true)}
+            className="btn-console flex items-center gap-1 text-xs px-2 py-0.5 border-amber-500/30 hover:border-amber-400 text-amber-300 hover:text-white transition-all"
+            title="獲得トロフィー一覧（クリックでトロフィールーム）"
+          >
+            <Trophy className="w-3 h-3 text-amber-400" />
+            <span suppressHydrationWarning className="px-1 py-0.2 rounded bg-amber-950/80 border border-amber-500/30 text-[9px] font-mono text-amber-200">
+              {Object.keys(careerData.clearedScenarios || {}).length}冠
+            </span>
+          </button>
+
           {/* Auto Pause Toggle Button */}
           <button
             type="button"
@@ -1164,20 +1443,45 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
             )}
           </button>
 
-          {/* Toggle Scenario & Strategy Drawer Button */}
+          {/* Phase Quick Navigation Button */}
           <button
             type="button"
-            onClick={() => setIsScenarioDrawerOpen(!isScenarioDrawerOpen)}
-            className={`btn-console text-[10px] px-2 py-0.5 flex items-center gap-1 font-racing font-bold transition-all ${
-              isScenarioDrawerOpen
-                ? 'bg-red-600 text-white border-red-500 shadow-md ring-1 ring-red-400'
-                : 'text-slate-300 hover:text-white border-white/20'
-            }`}
-            title="シナリオ・天候・マシン作戦の詳細設定"
+            onClick={() => {
+              if (simulatorPhase === 'race' || simulatorPhase === 'debrief') {
+                handleBackToBriefing();
+              } else if (simulatorPhase === 'briefing') {
+                handleBackToModeSelect();
+              } else {
+                setSimulatorPhase('briefing');
+              }
+            }}
+            className="btn-console text-[10px] px-2 py-0.5 flex items-center gap-1 font-racing font-bold transition-all text-slate-300 hover:text-white border-white/20"
+            title="作戦ブリーフィング / モード選択へ"
           >
-            <Settings className="w-3 h-3" />
-            <span>{isScenarioDrawerOpen ? '▲ 閉じる' : '⚙️ 作戦・設定 ▼'}</span>
+            <Settings className="w-3 h-3 text-red-400" />
+            <span>
+              {simulatorPhase === 'mode_select'
+                ? '📋 ブリーフィングへ ➔'
+                : simulatorPhase === 'briefing'
+                ? '🏁 モード選択へ ➔'
+                : '⚙️ 作戦修正'}
+            </span>
           </button>
+
+          {simulatorPhase === 'race' && (
+            <button
+              type="button"
+              onClick={() => {
+                if (window.confirm('レースを中断してモード選択に戻りますか？')) {
+                  handleBackToModeSelect();
+                }
+              }}
+              className="btn-console text-[10px] px-2 py-0.5 flex items-center gap-1 font-racing font-bold transition-all text-rose-400 hover:text-white hover:bg-rose-950/60 border-rose-500/30"
+              title="レースを中断してモード選択に戻る"
+            >
+              <span>🏳️ 中断</span>
+            </button>
+          )}
 
           {onNavigateToLibrary && (
             <button
@@ -1193,8 +1497,1222 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
         </div>
       </div>
 
-      {/* ── UNIFIED TACTICAL COMMAND & STATUS STRIP (Ultra-Compact) ── */}
-      <div className="px-2.5 py-1.5 rounded-xl bg-slate-950/90 border border-white/10 shadow-lg backdrop-blur-md">
+      {/* ════════════════════════════════════════════════════════════════════════
+          PHASE 1: 🏁 MODE SELECT & START SCREEN (モード選択・スタート画面)
+          ════════════════════════════════════════════════════════════════════════ */}
+      {simulatorPhase === 'mode_select' && (
+        <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
+          {/* 1. Strategist Career Status Hero Card */}
+          <div className="glass-card-premium p-4 sm:p-5 rounded-3xl border-2 border-red-500/40 shadow-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-red-950/30">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-600 via-rose-600 to-amber-600 flex items-center justify-center text-3xl shadow-xl shadow-red-950/60 border border-red-400/40 shrink-0">
+                  🏆
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono text-amber-400 font-bold tracking-wider uppercase">
+                      FIA STRATEGIST LICENSE
+                    </span>
+                    <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white font-racing font-black text-xs shadow-md">
+                      GRADE {careerData.grade}
+                    </span>
+                  </div>
+                  <h2 className="font-racing font-black text-white text-xl sm:text-2xl tracking-wide">
+                    F1 ピットウォール司令塔シミュレーター
+                  </h2>
+                  <p className="text-xs text-slate-300 mt-0.5">
+                    レース戦略の最高責任者として、22台が凌ぎを削る過酷なグランプリで栄冠を勝ち取れ。
+                  </p>
+                </div>
+              </div>
+
+              {/* Career Stats Grid */}
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
+                <div className="px-3 py-2 rounded-xl bg-slate-950/80 border border-white/10 text-center min-w-[75px]">
+                  <div className="text-[10px] font-mono text-slate-400">累計CP</div>
+                  <div className="font-racing font-bold text-amber-400 text-sm sm:text-base">
+                    {careerData.totalCp.toLocaleString()}
+                  </div>
+                </div>
+                <div className="px-3 py-2 rounded-xl bg-slate-950/80 border border-amber-500/30 text-center min-w-[75px] shadow-sm">
+                  <div className="text-[10px] font-mono text-amber-400 font-bold">トロフィー</div>
+                  <div className="font-racing font-bold text-amber-300 text-sm sm:text-base flex items-center justify-center gap-1">
+                    <span>🏆</span>
+                    <span>{Object.keys(careerData.clearedScenarios || {}).length}</span>
+                    <span className="text-[10px] text-slate-400 font-normal">
+                      ({Object.values(careerData.clearedScenarios || {}).filter(c => c.trophy === 'gold').length}金)
+                    </span>
+                  </div>
+                </div>
+                <div className="px-3 py-2 rounded-xl bg-slate-950/80 border border-white/10 text-center min-w-[75px]">
+                  <div className="text-[10px] font-mono text-slate-400">戦術バッジ</div>
+                  <div className="font-racing font-bold text-cyan-300 text-sm sm:text-base">
+                    {careerData.unlockedBadgeIds.length} / 25
+                  </div>
+                </div>
+                <div className="px-3 py-2 rounded-xl bg-slate-950/80 border border-white/10 text-center min-w-[75px]">
+                  <div className="text-[10px] font-mono text-slate-400">通算戦績</div>
+                  <div className="font-racing font-bold text-white text-sm sm:text-base">
+                    {careerData.totalWins}勝 / {careerData.totalRacesCompleted}戦
+                  </div>
+                </div>
+                <div className="px-3 py-2 rounded-xl bg-slate-950/80 border border-white/10 text-center min-w-[75px]">
+                  <div className="text-[10px] font-mono text-slate-400">最高得点</div>
+                  <div className="font-racing font-bold text-emerald-400 text-sm sm:text-base">
+                    {careerData.highestScore}点
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsCareerModalOpen(true)}
+                  className="btn-console px-3.5 py-2.5 text-xs font-racing font-bold text-amber-300 border-amber-500/40 hover:bg-amber-950/60 flex items-center gap-1.5 shadow-lg shadow-amber-950/30"
+                >
+                  <Award className="w-4 h-4 text-amber-400" />
+                  <span>キャリア手帳 ➔</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* 2. Major Category Selector (実践 vs 自由練習) */}
+          <div className="glass-card-premium p-4 rounded-2xl border border-white/10 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/10">
+              <div>
+                <span className="text-xs font-mono text-slate-400 font-bold uppercase tracking-wider block">
+                  SELECT GAME MODE / ゲームモード選択
+                </span>
+                <p className="text-xs text-slate-300">
+                  挑戦したいカテゴリーを選択してください。
+                </p>
+              </div>
+
+              <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-white/10">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMajorCategory('battle');
+                    if (gameMode === 'sandbox') {
+                      startPresetCrisis(presetIdx);
+                    }
+                  }}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-racing font-bold transition-all cursor-pointer ${
+                    majorCategory === 'battle'
+                      ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950 ring-1 ring-red-400/50'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Trophy className="w-3.5 h-3.5 text-yellow-400" />
+                  <span>⚔️ 実践モード (本番チャレンジ)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMajorCategory('practice');
+                    startSandboxMode();
+                  }}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-racing font-bold transition-all cursor-pointer ${
+                    majorCategory === 'practice'
+                      ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-950 ring-1 ring-cyan-400/50'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <SlidersHorizontal className="w-3.5 h-3.5 text-cyan-300" />
+                  <span>🔬 自由練習 (Sandbox Lab)</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Sub-modes for Battle */}
+            {majorCategory === 'battle' ? (
+              <div className="space-y-4">
+                {/* Sub-mode Tab Buttons */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGameMode('crisis');
+                      setCustomScenario(null);
+                    }}
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-racing font-bold transition-all border cursor-pointer ${
+                      gameMode === 'crisis' || gameMode === 'scenario'
+                        ? 'bg-red-950/80 border-red-500 text-white shadow-lg shadow-red-950/50'
+                        : 'bg-slate-900/80 border-white/10 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Zap className="w-3.5 h-3.5 text-amber-400" />
+                    <span>📜 名場面シナリオ (5-9周)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGameMode('sprint');
+                      startSprintRace(selectedCircuitId, selectedPlayerCode);
+                    }}
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-racing font-bold transition-all border cursor-pointer ${
+                      gameMode === 'sprint'
+                        ? 'bg-red-950/80 border-red-500 text-white shadow-lg shadow-red-950/50'
+                        : 'bg-slate-900/80 border-white/10 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Flag className="w-3.5 h-3.5 text-yellow-400" />
+                    <span>🏆 スプリント全周回 (15-20周)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGameMode('mission');
+                      startMission(selectedMissionIdx);
+                    }}
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-racing font-bold transition-all border cursor-pointer ${
+                      gameMode === 'mission'
+                        ? 'bg-purple-950/80 border-purple-500 text-white shadow-lg shadow-purple-950/50'
+                        : 'bg-slate-900/80 border-white/10 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <ShieldAlert className="w-3.5 h-3.5 text-purple-400" />
+                    <span>🎯 特務ミッション (特殊指令)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGameMode('procedural');
+                      startProceduralCrisis();
+                    }}
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-racing font-bold transition-all border cursor-pointer ${
+                      gameMode === 'procedural'
+                        ? 'bg-pink-950/80 border-pink-500 text-white shadow-lg shadow-pink-950/50'
+                        : 'bg-slate-900/80 border-white/10 text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Compass className="w-3.5 h-3.5 text-pink-400" />
+                    <span>🎲 突発クライシス (一期一会)</span>
+                  </button>
+                </div>
+
+                {/* Sub-mode 1: Preset Scenarios Grid */}
+                {(gameMode === 'crisis' || gameMode === 'scenario') && (
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-racing text-slate-300 font-bold">
+                        シナリオを選択してブリーフィングへ進む:
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400">
+                        全{PRESET_CHALLENGES.length}シナリオ収録
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {PRESET_CHALLENGES.map((sc, idx) => {
+                        const isActive = presetIdx === idx && !customScenario;
+                        const clearRecord = careerData.clearedScenarios?.[sc.id];
+                        return (
+                          <button
+                            key={sc.id}
+                            type="button"
+                            onClick={() => startPresetCrisis(idx)}
+                            className={`text-left p-3.5 rounded-2xl border transition-all relative overflow-hidden flex flex-col justify-between gap-2.5 group cursor-pointer ${
+                              isActive
+                                ? 'bg-gradient-to-br from-red-950/80 to-slate-900 border-red-500 ring-2 ring-red-500 shadow-xl shadow-red-950/60'
+                                : 'bg-slate-900/90 border-white/10 hover:border-red-500/60 hover:bg-slate-850'
+                            }`}
+                          >
+                            <div className="space-y-1.5">
+                              <div className="flex items-center justify-between gap-1">
+                                <span className="text-xs font-mono text-slate-300 flex items-center gap-1.5">
+                                  <span className="text-base">{sc.circuit.flag}</span>
+                                  <span className="font-bold">{sc.circuit.name}</span>
+                                </span>
+                                <div className="flex items-center gap-1">
+                                  {clearRecord && (
+                                    <span
+                                      className={`px-1.5 py-0.5 rounded text-[10px] font-racing font-bold flex items-center gap-0.5 shadow-sm ${
+                                        clearRecord.trophy === 'gold'
+                                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50'
+                                          : clearRecord.trophy === 'silver'
+                                          ? 'bg-slate-300/20 text-slate-200 border border-slate-400/50'
+                                          : 'bg-amber-800/30 text-amber-400 border border-amber-700/50'
+                                      }`}
+                                    >
+                                      <span>{clearRecord.trophy === 'gold' ? '🏆 GOLD' : clearRecord.trophy === 'silver' ? '🥈 SILVER' : '🥉 BRONZE'}</span>
+                                    </span>
+                                  )}
+                                  <span
+                                    className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase font-bold ${
+                                      sc.difficulty === 'hard'
+                                        ? 'bg-red-900/60 text-red-300 border border-red-500/30'
+                                        : sc.difficulty === 'normal'
+                                        ? 'bg-amber-900/60 text-amber-300 border border-amber-500/30'
+                                        : 'bg-emerald-900/60 text-emerald-300 border border-emerald-500/30'
+                                    }`}
+                                  >
+                                    {sc.difficulty}
+                                  </span>
+                                </div>
+                              </div>
+                              <h4 className="font-racing font-bold text-white text-sm group-hover:text-red-400 transition-colors">
+                                {sc.title}
+                              </h4>
+                              <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
+                                {sc.description}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center justify-between text-xs font-mono pt-2 border-t border-white/10 text-slate-400">
+                              <span className="text-red-400 font-bold">目標: P{sc.targetPosition}以内</span>
+                              <span>全{sc.totalLaps}周</span>
+                              <span className="text-amber-300 flex items-center gap-1">
+                                {clearRecord ? (
+                                  <span className="text-emerald-400 font-bold flex items-center gap-0.5">
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-400" /> 制覇済
+                                  </span>
+                                ) : (
+                                  <span>作戦室へ ➔</span>
+                                )}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Sub-mode 2: Sprint Race Setup */}
+                {gameMode === 'sprint' && (
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-950 to-red-950/40 border border-red-500/30 space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Flag className="w-5 h-5 text-yellow-400" />
+                      <div>
+                        <h4 className="font-racing font-bold text-white text-sm sm:text-base">
+                          スプリントレース (15〜20周・本格周回バトル)
+                        </h4>
+                        <p className="text-xs text-slate-300">
+                          サーキットと担当ドライバーを選択し、フルグリッド22台との戦略戦に挑みます。
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="p-3 rounded-xl bg-slate-900 border border-white/10 space-y-1">
+                        <label className="text-xs font-mono text-slate-400 block">開催サーキット</label>
+                        <select
+                          value={selectedCircuitId}
+                          onChange={(e) => setSelectedCircuitId(e.target.value)}
+                          className="w-full bg-slate-950 text-white font-racing font-bold text-sm p-2 rounded-lg border border-white/10 cursor-pointer focus:outline-none"
+                        >
+                          {SIM_CIRCUITS.map((c) => (
+                            <option key={c.id} value={c.id}>
+                              {c.flag} {c.name} ({c.country})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-slate-900 border border-white/10 space-y-1">
+                        <label className="text-xs font-mono text-slate-400 block">担当自車ドライバー</label>
+                        <select
+                          value={selectedPlayerCode}
+                          onChange={(e) => setSelectedPlayerCode(e.target.value)}
+                          className="w-full bg-slate-950 text-white font-racing font-bold text-sm p-2 rounded-lg border border-white/10 cursor-pointer focus:outline-none"
+                        >
+                          {GRID_DRIVERS.map((d) => (
+                            <option key={d.code} value={d.code}>
+                              #{d.number} {d.name} ({d.team})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => startSprintRace(selectedCircuitId, selectedPlayerCode)}
+                        className="btn-console-primary px-6 py-2.5 text-xs font-racing font-bold flex items-center gap-2 shadow-xl shadow-red-950"
+                      >
+                        <span>🚀 スプリントレース作戦室へ進む ➔</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Sub-mode 3: Grand Missions Grid */}
+                {gameMode === 'mission' && (
+                  <div className="space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-racing text-slate-300 font-bold">
+                        特務ミッションを選択してブリーフィングへ進む:
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400">
+                        全{MISSION_CHALLENGES.length}ミッション収録
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                      {MISSION_CHALLENGES.map((m, idx) => {
+                        const isActive = selectedMissionIdx === idx && gameMode === 'mission';
+                        const clearRecord = careerData.clearedScenarios?.[m.id];
+                        return (
+                          <button
+                            key={m.id}
+                            type="button"
+                            onClick={() => startMission(idx)}
+                            className={`text-left p-3.5 rounded-2xl border transition-all relative overflow-hidden flex flex-col justify-between gap-2.5 group cursor-pointer ${
+                              isActive
+                                ? 'bg-gradient-to-br from-purple-950/80 to-slate-900 border-purple-500 ring-2 ring-purple-500 shadow-xl shadow-purple-950/60'
+                                : 'bg-slate-900/90 border-white/10 hover:border-purple-500/60 hover:bg-slate-850'
+                            }`}
+                          >
+                            <div className="space-y-1.5">
+                              <div className="flex items-center justify-between gap-1">
+                                <span className="text-xs font-mono text-purple-300 font-bold flex items-center gap-1">
+                                  <span>#{m.playerConfig.number} {m.playerConfig.code}</span>
+                                </span>
+                                <div className="flex items-center gap-1">
+                                  {clearRecord && (
+                                    <span
+                                      className={`px-1.5 py-0.5 rounded text-[10px] font-racing font-bold flex items-center gap-0.5 shadow-sm ${
+                                        clearRecord.trophy === 'gold'
+                                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/50'
+                                          : clearRecord.trophy === 'silver'
+                                          ? 'bg-slate-300/20 text-slate-200 border border-slate-400/50'
+                                          : 'bg-amber-800/30 text-amber-400 border border-amber-700/50'
+                                      }`}
+                                    >
+                                      <span>{clearRecord.trophy === 'gold' ? '🏆 GOLD' : clearRecord.trophy === 'silver' ? '🥈 SILVER' : '🥉 BRONZE'}</span>
+                                    </span>
+                                  )}
+                                  <span className="px-2 py-0.5 rounded text-[10px] font-mono uppercase font-bold bg-purple-900/60 text-purple-300 border border-purple-500/30">
+                                    {m.difficulty}
+                                  </span>
+                                </div>
+                              </div>
+                              <h4 className="font-racing font-bold text-white text-sm group-hover:text-purple-400 transition-colors">
+                                {m.title}
+                              </h4>
+                              <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
+                                {m.description}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center justify-between text-xs font-mono pt-2 border-t border-white/10 text-slate-400">
+                              <span className="text-purple-300 font-bold">目標: P{m.targetPosition}以内</span>
+                              <span>全{m.totalLaps}周</span>
+                              <span className="text-purple-300">
+                                {clearRecord ? (
+                                  <span className="text-emerald-400 font-bold flex items-center gap-0.5">
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-400" /> 制覇済
+                                  </span>
+                                ) : (
+                                  <span>作戦室へ ➔</span>
+                                )}
+                              </span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Sub-mode 4: Procedural Crisis */}
+                {gameMode === 'procedural' && (
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-950 to-pink-950/40 border border-pink-500/30 space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Compass className="w-5 h-5 text-pink-400" />
+                      <div>
+                        <h4 className="font-racing font-bold text-white text-sm sm:text-base">
+                          突発クライシス (一期一会のランダム危機脱出)
+                        </h4>
+                        <p className="text-xs text-slate-300">
+                          サーキット、天候急変、セーフティカー出動、前後のライバル状況がすべてランダムに生成される無限のシナリオです。
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={startProceduralCrisis}
+                        className="btn-console px-6 py-2.5 text-xs font-racing font-bold text-pink-300 border-pink-500/40 hover:bg-pink-950/60 flex items-center gap-2 shadow-xl shadow-pink-950"
+                      >
+                        <RotateCcw className="w-4 h-4" />
+                        <span>🎲 新しい突発危機を生成して作戦室へ ➔</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Practice / Sandbox Setup Panel */
+              <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-950 to-cyan-950/30 border border-cyan-500/30 space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-cyan-500/20">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🧪</span>
+                    <div>
+                      <h4 className="font-racing font-bold text-white text-sm sm:text-base">
+                        FREE PRACTICE & STRATEGY SANDBOX / 自由練習シミュレーション
+                      </h4>
+                      <p className="text-xs text-slate-300">
+                        コース、自車、周回数、天候条件、SC頻度を完全自由にカスタムして検証できます。
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 text-xs">
+                  {/* Track */}
+                  <div className="p-2.5 rounded-xl bg-slate-900/90 border border-white/10 space-y-1">
+                    <label className="text-[10px] font-mono text-slate-400 block">サーキット</label>
+                    <select
+                      value={selectedCircuitId}
+                      onChange={(e) => {
+                        setSelectedCircuitId(e.target.value);
+                        startSandboxMode({ circuitId: e.target.value });
+                      }}
+                      className="w-full bg-transparent text-xs text-white font-racing font-bold focus:outline-none cursor-pointer"
+                    >
+                      {SIM_CIRCUITS.map((c) => (
+                        <option key={c.id} value={c.id} className="bg-slate-900 text-white">
+                          {c.flag} {c.name.split(' ')[0]}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Driver */}
+                  <div className="p-2.5 rounded-xl bg-slate-900/90 border border-white/10 space-y-1">
+                    <label className="text-[10px] font-mono text-slate-400 block">自車ドライバー</label>
+                    <select
+                      value={selectedPlayerCode}
+                      onChange={(e) => {
+                        setSelectedPlayerCode(e.target.value);
+                        startSandboxMode({ playerCode: e.target.value });
+                      }}
+                      className="w-full bg-transparent text-xs text-white font-racing font-bold focus:outline-none cursor-pointer"
+                    >
+                      {GRID_DRIVERS.map((d) => (
+                        <option key={d.code} value={d.code} className="bg-slate-900 text-white">
+                          #{d.number} {d.code} ({d.team.split(' ')[0]})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Laps */}
+                  <div className="p-2.5 rounded-xl bg-slate-900/90 border border-white/10 space-y-1">
+                    <label className="text-[10px] font-mono text-slate-400 block">周回数: {sandboxLaps}周</label>
+                    <select
+                      value={sandboxLaps}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        setSandboxLaps(val);
+                        startSandboxMode({ totalLaps: val });
+                      }}
+                      className="w-full bg-transparent text-xs text-white font-mono focus:outline-none cursor-pointer"
+                    >
+                      {[5, 8, 10, 15, 20].map((l) => (
+                        <option key={l} value={l} className="bg-slate-900 text-white">
+                          全{l}周
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Weather */}
+                  <div className="p-2.5 rounded-xl bg-slate-900/90 border border-white/10 space-y-1">
+                    <label className="text-[10px] font-mono text-slate-400 block">天候</label>
+                    <select
+                      value={sandboxWeather}
+                      onChange={(e) => {
+                        const val = e.target.value as WeatherType;
+                        setSandboxWeather(val);
+                        startSandboxMode({ weatherType: val });
+                      }}
+                      className="w-full bg-transparent text-xs text-white font-racing font-bold focus:outline-none cursor-pointer"
+                    >
+                      <option value="dry" className="bg-slate-900 text-white">☀️ 快晴ドライ</option>
+                      <option value="variable" className="bg-slate-900 text-white">⛅ 急変警戒</option>
+                      <option value="drizzle" className="bg-slate-900 text-white">🌤️ 雨上がり</option>
+                      <option value="monsoon" className="bg-slate-900 text-white">🌊 豪雨</option>
+                    </select>
+                  </div>
+
+                  {/* Rain Lap */}
+                  <div className="p-2.5 rounded-xl bg-slate-900/90 border border-white/10 space-y-1">
+                    <label className="text-[10px] font-mono text-slate-400 block">降雨周回</label>
+                    <select
+                      value={sandboxRainLap}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        setSandboxRainLap(val);
+                        startSandboxMode({ rainStartLap: val });
+                      }}
+                      disabled={sandboxWeather === 'dry'}
+                      className="w-full bg-transparent text-xs text-white font-mono focus:outline-none cursor-pointer disabled:opacity-40"
+                    >
+                      {Array.from({ length: sandboxLaps }, (_, i) => i + 1).map((l) => (
+                        <option key={l} value={l} className="bg-slate-900 text-white">
+                          Lap {l}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Incident */}
+                  <div className="p-2.5 rounded-xl bg-slate-900/90 border border-white/10 space-y-1">
+                    <label className="text-[10px] font-mono text-slate-400 block">SC発生頻度</label>
+                    <select
+                      value={sandboxIncidentFreq}
+                      onChange={(e) => {
+                        const val = e.target.value as IncidentFrequency;
+                        setSandboxIncidentFreq(val);
+                        startSandboxMode({ incidentFrequency: val });
+                      }}
+                      className="w-full bg-transparent text-xs text-white font-mono focus:outline-none cursor-pointer"
+                    >
+                      <option value="none" className="bg-slate-900 text-white">OFF (なし)</option>
+                      <option value="realistic" className="bg-slate-900 text-white">標準 (路面連動)</option>
+                      <option value="high_chaos" className="bg-slate-900 text-white">カオス (多発)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => startSandboxMode()}
+                    className="btn-console px-6 py-2.5 text-xs font-racing font-bold text-cyan-300 border-cyan-500/40 hover:bg-cyan-950/60 flex items-center gap-2 shadow-xl shadow-cyan-950"
+                  >
+                    <span>🔬 自由シミュレーション作戦室へ進む ➔</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════════
+          PHASE 2: 📋 BRIEFING & SETUP SCREEN (作戦ブリーフィング＆初期設定画面)
+          ════════════════════════════════════════════════════════════════════════ */}
+      {simulatorPhase === 'briefing' && (
+        <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
+          {/* Briefing Header Banner */}
+          <div className="glass-card-premium p-4 rounded-2xl border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-slate-950 via-slate-900 to-red-950/40">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-base">📋</span>
+                <span className="font-racing font-black text-white text-base sm:text-lg tracking-wider">
+                  TACTICAL BRIEFING & MACHINE SETUP / 作戦ブリーフィング
+                </span>
+                <span className="px-2 py-0.5 rounded bg-red-600 text-white text-[10px] font-racing font-bold uppercase">
+                  {gameMode.toUpperCase()}
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 mt-1">
+                レース前の作戦会議。コース特性と天候レーダーを精査し、初期タイヤ・PUモード・ピット戦略を策定してください。
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={handleBackToModeSelect}
+                className="btn-console px-3 py-1.5 text-xs font-racing font-bold text-slate-400 hover:text-white"
+              >
+                ◀ モード変更
+              </button>
+              <button
+                type="button"
+                onClick={handleStartRace}
+                className="btn-console-primary px-5 py-2 text-xs font-racing font-bold flex items-center gap-2 shadow-lg shadow-red-950 animate-pulse"
+              >
+                <span>🏁 レース開始 ▶</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Two-Column Briefing & Setup Deck */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            {/* Left Column: Circuit Specs, Objectives & Weather Radar */}
+            <div className="lg:col-span-5 space-y-3">
+              {/* Mission Target & Circuit Overview */}
+              <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">{activeScenario.circuit.flag}</span>
+                    <div>
+                      <h3 className="font-racing font-bold text-white text-base">
+                        {activeScenario.circuit.name}
+                      </h3>
+                      <div className="text-[11px] font-mono text-slate-400">
+                        {activeScenario.circuit.country} • 全長 {(activeScenario.circuit.circuitLengthM / 1000).toFixed(3)}km
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    <span className="px-2.5 py-1 rounded-xl bg-red-950/80 border border-red-500/40 text-red-300 font-racing font-bold text-xs">
+                      目標: P{activeScenario.targetPosition} 以内
+                    </span>
+                    <div className="flex items-center gap-1">
+                      {careerData.clearedScenarios?.[activeScenario.id] && (
+                        <span className="px-2 py-0.5 rounded text-[10px] font-racing font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1 shadow-sm">
+                          <span>
+                            {careerData.clearedScenarios[activeScenario.id].trophy === 'gold'
+                              ? '🏆 GOLD'
+                              : careerData.clearedScenarios[activeScenario.id].trophy === 'silver'
+                              ? '🥈 SILVER'
+                              : '🥉 BRONZE'}
+                          </span>
+                          <span>獲得済</span>
+                        </span>
+                      )}
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase font-bold ${
+                          activeScenario.difficulty === 'hard'
+                            ? 'bg-red-900/60 text-red-300 border border-red-500/30'
+                            : activeScenario.difficulty === 'normal'
+                            ? 'bg-amber-900/60 text-amber-300 border border-amber-500/30'
+                            : 'bg-emerald-900/60 text-emerald-300 border border-emerald-500/30'
+                        }`}
+                      >
+                        難易度: {activeScenario.difficulty}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-1">
+                  <div className="text-[11px] font-racing font-bold text-amber-300">
+                    {activeScenario.title}
+                  </div>
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    {activeScenario.description}
+                  </p>
+                </div>
+
+                {/* Circuit Specs Matrix */}
+                <div className="grid grid-cols-3 gap-2 text-center text-xs font-mono">
+                  <div className="p-2 rounded-lg bg-slate-950/60 border border-white/5">
+                    <div className="text-[10px] text-slate-400">ピットロスタイム</div>
+                    <div className="text-cyan-300 font-bold">{activeScenario.circuit.pitLaneLoss}s</div>
+                  </div>
+                  <div className="p-2 rounded-lg bg-slate-950/60 border border-white/5">
+                    <div className="text-[10px] text-slate-400">オーバーテイク</div>
+                    <div className="text-amber-300 font-bold capitalize">{activeScenario.circuit.overtakeDifficulty}</div>
+                  </div>
+                  <div className="p-2 rounded-lg bg-slate-950/60 border border-white/5">
+                    <div className="text-[10px] text-slate-400">タイヤ攻撃性</div>
+                    <div className="text-rose-300 font-bold capitalize">{activeScenario.circuit.tyreAggression}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Weather Radar & SC Risk Forecast */}
+              <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="font-racing font-bold text-white text-xs flex items-center gap-1.5">
+                      <CloudRain className="w-4 h-4 text-sky-400" /> 天候ドップラーレーダー予報
+                    </span>
+                    {activeScenario.lockedSettings?.weather && (
+                      <span className="px-1.5 py-0.2 rounded bg-amber-950/80 border border-amber-500/40 text-[9px] font-mono text-amber-300 flex items-center gap-0.5">
+                        <Lock className="w-2.5 h-2.5" /> シナリオ固定
+                      </span>
+                    )}
+                  </div>
+                  {!activeScenario.lockedSettings?.weather && (
+                    <button
+                      type="button"
+                      onClick={handleRerollWeather}
+                      className="btn-console px-2 py-1 text-[11px] text-cyan-300 border-cyan-500/30 hover:bg-cyan-950/50 flex items-center gap-1"
+                      title="天候やSC確率を再抽選"
+                    >
+                      <Dices className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>🎲 天候再抽選</span>
+                    </button>
+                  )}
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-2">
+                  <div className="flex items-center gap-2 text-xs">
+                    <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping" />
+                    <span className="text-slate-200 font-mono text-[11px] leading-relaxed">
+                      {activeScenario.weatherForecast.radarDesc}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[10px] font-mono text-slate-400">
+                      <span>降水確率: {activeScenario.weatherForecast.rainProbabilityPercent}%</span>
+                      <span>
+                        {activeScenario.actualRainLap
+                          ? `Lap ${activeScenario.actualRainLap} 前後に雨雲到達`
+                          : 'セッション中の降雨なし'}
+                      </span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-sky-500 to-blue-600 transition-all duration-500"
+                        style={{ width: `${activeScenario.weatherForecast.rainProbabilityPercent}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {activeScenario.lockedSettings?.weather && activeScenario.lockedSettings.lockReason && (
+                  <div className="p-2 rounded-lg bg-amber-950/40 border border-amber-500/30 text-[10px] font-mono text-amber-300/90 flex items-start gap-1.5">
+                    <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                    <span>{activeScenario.lockedSettings.lockReason}</span>
+                  </div>
+                )}
+
+                {/* Weather Customizer Controls */}
+                <div className="grid grid-cols-3 gap-2 text-xs">
+                  <div className={`p-2 rounded-lg bg-slate-950/80 border border-white/5 space-y-1 ${activeScenario.lockedSettings?.weather ? 'opacity-60' : ''}`}>
+                    <span className="text-[10px] font-mono text-slate-400 block flex items-center justify-between">
+                      <span>天候タイプ</span>
+                      {activeScenario.lockedSettings?.weather && <Lock className="w-2.5 h-2.5 text-amber-400" />}
+                    </span>
+                    <select
+                      value={activeScenario.startWeather}
+                      disabled={Boolean(activeScenario.lockedSettings?.weather)}
+                      onChange={(e) => {
+                        const newWeather = e.target.value as WeatherType;
+                        const hasRain = newWeather !== 'dry';
+                        const rainLap = hasRain ? Math.max(2, Math.floor(activeScenario.totalLaps * 0.4)) : undefined;
+                        const intensity = newWeather === 'monsoon' ? 4.5 : newWeather === 'drizzle' ? 1.5 : hasRain ? 2.5 : 0;
+                        const updated: ChallengeScenario = {
+                          ...activeScenario,
+                          id: `${activeScenario.id}_custom_${Date.now()}`,
+                          startWeather: newWeather,
+                          weatherForecast: {
+                            radarDesc: newWeather === 'monsoon'
+                              ? '豪雨モンスーン警戒。路面水量4.5mm到達予想。'
+                              : newWeather === 'drizzle'
+                              ? '雨上がりダンプ路面。急速ドライライン形成予想。'
+                              : hasRain
+                              ? `雨雲接近中。Lap ${rainLap}前後に降雨予想。`
+                              : '快晴ドライコンディション。天候安定。',
+                            estimatedLapMin: rainLap ? Math.max(1, rainLap - 1) : 99,
+                            estimatedLapMax: rainLap ? Math.min(activeScenario.totalLaps, rainLap + 2) : 99,
+                            rainProbabilityPercent: hasRain ? 85 : 5,
+                          },
+                          actualRainLap: rainLap,
+                          actualRainIntensity: intensity,
+                        };
+                        setCustomScenario(updated);
+                        resetGameState();
+                      }}
+                      className="w-full bg-transparent text-xs text-white font-racing font-bold focus:outline-none cursor-pointer disabled:cursor-not-allowed"
+                    >
+                      <option value="dry" className="bg-slate-900 text-white">☀️ 快晴</option>
+                      <option value="variable" className="bg-slate-900 text-white">⛅ 急変</option>
+                      <option value="drizzle" className="bg-slate-900 text-white">🌤️ ダンプ</option>
+                      <option value="monsoon" className="bg-slate-900 text-white">🌊 豪雨</option>
+                    </select>
+                  </div>
+
+                  <div className={`p-2 rounded-lg bg-slate-950/80 border border-white/5 space-y-1 ${activeScenario.lockedSettings?.rainLap || activeScenario.lockedSettings?.weather ? 'opacity-60' : ''}`}>
+                    <span className="text-[10px] font-mono text-slate-400 block flex items-center justify-between">
+                      <span>降雨周回</span>
+                      {(activeScenario.lockedSettings?.rainLap || activeScenario.lockedSettings?.weather) && <Lock className="w-2.5 h-2.5 text-amber-400" />}
+                    </span>
+                    <select
+                      value={activeScenario.actualRainLap || 99}
+                      disabled={Boolean(activeScenario.lockedSettings?.rainLap || activeScenario.lockedSettings?.weather)}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        const updated: ChallengeScenario = {
+                          ...activeScenario,
+                          id: `${activeScenario.id}_custom_${Date.now()}`,
+                          actualRainLap: val === 99 ? undefined : val,
+                          actualRainIntensity: val === 99 ? 0 : (activeScenario.actualRainIntensity || 2.5),
+                        };
+                        setCustomScenario(updated);
+                        resetGameState();
+                      }}
+                      className="w-full bg-transparent text-xs text-white font-mono focus:outline-none cursor-pointer disabled:cursor-not-allowed"
+                    >
+                      <option value={99}>降雨なし</option>
+                      {Array.from({ length: activeScenario.totalLaps }, (_, i) => i + 1).map((l) => (
+                        <option key={l} value={l} className="bg-slate-900 text-white">
+                          Lap {l}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="p-2 rounded-lg bg-slate-950/80 border border-white/5 space-y-1">
+                    <span className="text-[10px] font-mono text-slate-400 block">SC危険度</span>
+                    <select
+                      value={activeScenario.scProbability > 0.7 ? 'high' : activeScenario.scProbability > 0.3 ? 'normal' : 'low'}
+                      onChange={(e) => {
+                        const prob = e.target.value === 'high' ? 0.85 : e.target.value === 'normal' ? 0.45 : 0.1;
+                        const updated: ChallengeScenario = {
+                          ...activeScenario,
+                          id: `${activeScenario.id}_custom_${Date.now()}`,
+                          scProbability: prob,
+                          actualScLap: prob > 0.4 ? Math.max(2, Math.floor(activeScenario.totalLaps * 0.5)) : undefined,
+                        };
+                        setCustomScenario(updated);
+                        resetGameState();
+                      }}
+                      className="w-full bg-transparent text-xs text-white font-mono focus:outline-none cursor-pointer"
+                    >
+                      <option value="low" className="bg-slate-900 text-white">低 (安全)</option>
+                      <option value="normal" className="bg-slate-900 text-white">中 (標準)</option>
+                      <option value="high" className="bg-slate-900 text-white">高 (波乱)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: Machine Strategy & Difficulty Setup */}
+            <div className="lg:col-span-7 space-y-3">
+              {/* Machine Initial Setup Deck */}
+              <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 space-y-3">
+                <span className="font-racing font-bold text-white text-xs flex items-center gap-1.5">
+                  <Gauge className="w-4 h-4 text-red-400" /> マシン初期戦術セットアップ
+                </span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  {/* Starting Tyre Selector */}
+                  <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-racing text-slate-300 font-bold text-[11px] flex items-center gap-1">
+                        <span>スタート装着タイヤ</span>
+                        {activeScenario.lockedSettings?.startTyre && (
+                          <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-amber-950/80 border border-amber-500/40 text-amber-300 flex items-center gap-0.5">
+                            <Lock className="w-2.5 h-2.5" /> 固定
+                          </span>
+                        )}
+                      </span>
+                      <span className="text-[10px] font-mono text-emerald-400 font-bold">
+                        {effectivePlayerConfig.startTyre}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-5 gap-1 pt-1">
+                      {(['SOFT', 'MEDIUM', 'HARD', 'INTER', 'WET'] as TyreCompound[]).map((cmp) => {
+                        const isSelected = effectivePlayerConfig.startTyre === cmp;
+                        const isLocked = Boolean(activeScenario.lockedSettings?.startTyre);
+                        const prop = TYRE_PROPERTIES[cmp];
+                        return (
+                          <button
+                            key={cmp}
+                            type="button"
+                            disabled={isLocked}
+                            onClick={() => !isLocked && setCustomStartingTyre(cmp)}
+                            className={`p-2 rounded-lg flex flex-col items-center gap-1 border transition-all text-center ${
+                              isSelected
+                                ? 'bg-red-950 border-red-500 text-white shadow-lg ring-1 ring-red-500'
+                                : isLocked
+                                ? 'bg-slate-950/40 border-white/5 text-slate-600 opacity-30 cursor-not-allowed'
+                                : 'bg-slate-900 border-white/10 text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer'
+                            }`}
+                            title={
+                              isLocked
+                                ? `${cmp} (シナリオ前提条件として固定されています)`
+                                : `${cmp} (${prop.label}): 適正水深 ${prop.optimalWaterRange[0]}〜${prop.optimalWaterRange[1]}mm`
+                            }
+                          >
+                            <span
+                              className="w-2.5 h-2.5 rounded-full"
+                              style={{ backgroundColor: prop.color }}
+                            />
+                            <span className="font-racing font-bold text-[10px]">{cmp}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {activeScenario.lockedSettings?.startTyre && activeScenario.lockedSettings.lockReason ? (
+                      <div className="p-2 rounded-lg bg-amber-950/40 border border-amber-500/30 text-[10px] font-mono text-amber-300/90 flex items-start gap-1.5">
+                        <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                        <span>{activeScenario.lockedSettings.lockReason}</span>
+                      </div>
+                    ) : (
+                      <p className="text-[10px] text-slate-400 font-mono leading-tight">
+                        {effectivePlayerConfig.startTyre === 'SOFT'
+                          ? '序盤ハイペースだがデグラ大。アンダーカット推奨。'
+                          : effectivePlayerConfig.startTyre === 'MEDIUM'
+                          ? '最善のバランス。天候変化への柔軟性が高い。'
+                          : effectivePlayerConfig.startTyre === 'HARD'
+                          ? '長寿スティント。雨待ちステイアウトに適す。'
+                          : effectivePlayerConfig.startTyre === 'INTER'
+                          ? '降雨・ダンプ路面用 (水深0.8〜4.0mm)。'
+                          : '豪雨用 (水深3.5mm以上)。'}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Target Pit Stop Strategy */}
+                  <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-racing text-slate-300 font-bold text-[11px]">
+                        予定ピット戦略
+                      </span>
+                      <span className="text-[10px] font-mono text-amber-400 font-bold">
+                        LAP {customTargetBoxLap || effectiveTargetBoxLap} ➔ {customTargetCompound || nextCompoundChoice}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-1">
+                      <span className="text-[10px] text-slate-400 shrink-0">目標周回:</span>
+                      <select
+                        value={customTargetBoxLap || effectiveTargetBoxLap}
+                        onChange={(e) => setCustomTargetBoxLap(Number(e.target.value))}
+                        className="bg-slate-900 border border-white/10 rounded-lg px-2 py-1 text-xs text-white font-mono"
+                      >
+                        {Array.from({ length: activeScenario.totalLaps }, (_, i) => i + 1).map((l) => (
+                          <option key={l} value={l}>
+                            LAP {l} {l === activeScenario.actualRainLap ? '(雨予想)' : ''}
+                          </option>
+                        ))}
+                      </select>
+
+                      <span className="text-[10px] text-slate-400 shrink-0">➔</span>
+                      <select
+                        value={customTargetCompound || nextCompoundChoice}
+                        onChange={(e) => {
+                          setCustomTargetCompound(e.target.value as TyreCompound);
+                          setNextCompoundChoice(e.target.value as TyreCompound);
+                        }}
+                        className="bg-slate-900 border border-white/10 rounded-lg px-2 py-1 text-xs text-white font-racing font-bold"
+                      >
+                        {(['SOFT', 'MEDIUM', 'HARD', 'INTER', 'WET'] as TyreCompound[]).map((c) => (
+                          <option key={c} value={c}>
+                            {c}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <p className="text-[10px] text-slate-400 font-mono leading-tight">
+                      ※レース中いつでもリアルタイムにBOX指示・タイヤ変更が可能です。
+                    </p>
+                  </div>
+
+                  {/* Initial PU Mode */}
+                  <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-racing text-slate-300 font-bold text-[11px]">
+                        初期PUモード
+                      </span>
+                      <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase">
+                        {effectivePlayerConfig.machineSetup.puMode}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-1 pt-1">
+                      {[
+                        { id: 'push', label: 'PUSH ⚡', desc: '序盤猛攻' },
+                        { id: 'standard', label: 'STD 🏎️', desc: '巡航標準' },
+                        { id: 'conserve', label: 'SAVE 🌱', desc: 'タイヤ温存' },
+                      ].map((mode) => {
+                        const isCurrent = effectivePlayerConfig.machineSetup.puMode === mode.id;
+                        return (
+                          <button
+                            key={mode.id}
+                            type="button"
+                            onClick={() => {
+                              setCustomInitialPuMode(mode.id as EnginePUMode);
+                              setActivePuMode(mode.id as EnginePUMode);
+                            }}
+                            className={`p-2 rounded-lg text-center border transition-all cursor-pointer ${
+                              isCurrent
+                                ? 'bg-cyan-950 border-cyan-500 text-cyan-200 shadow-md font-bold'
+                                : 'bg-slate-900 border-white/10 text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            <div className="font-racing text-[10px]">{mode.label}</div>
+                            <div className="text-[9px] text-slate-400">{mode.desc}</div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Downforce & Driver Info */}
+                  <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-racing text-slate-300 font-bold text-[11px]">
+                        自車セッティング情報
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400">
+                        {effectivePlayerConfig.team}
+                      </span>
+                    </div>
+
+                    <div className="space-y-1 pt-1 text-xs font-mono">
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">ドライバー:</span>
+                        <span className="text-white font-bold">#{effectivePlayerConfig.number} {effectivePlayerConfig.name}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">ダウンフォース:</span>
+                        <span className="text-cyan-300 font-bold">{effectivePlayerConfig.machineSetup.downforce.toUpperCase()} DF</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">クリア目標:</span>
+                        <span className="text-amber-400 font-bold">P{activeScenario.targetPosition} 以内</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* AI Difficulty & User Assist Deck */}
+              <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 space-y-3">
+                <span className="font-racing font-bold text-white text-xs flex items-center gap-1.5">
+                  <ShieldAlert className="w-4 h-4 text-amber-400" /> 難易度 ＆ 操作アシスト設定
+                </span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  {/* AI Difficulty */}
+                  <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-racing text-slate-300 font-bold text-[11px]">
+                        AIライバル難易度
+                      </span>
+                      <span className="text-[10px] font-mono text-amber-400 font-bold">
+                        {aiDifficulty === 'master' ? '🏆 金トロフィー確定' : aiDifficulty === 'standard' ? '🥈 銀トロフィー狙い' : '🥉 銅トロフィー狙い'}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-1">
+                      {[
+                        { id: 'beginner', label: '初級', icon: '🌱', desc: '🥉 銅狙い' },
+                        { id: 'standard', label: '標準', icon: '🏎️', desc: '🥈 銀狙い' },
+                        { id: 'master', label: '達人', icon: '🏆', desc: '🏆 金確定' },
+                      ].map((lvl) => (
+                        <button
+                          key={lvl.id}
+                          type="button"
+                          onClick={() => setAiDifficulty(lvl.id as any)}
+                          className={`p-2 rounded-lg text-center border font-racing font-bold transition-all cursor-pointer ${
+                            aiDifficulty === lvl.id
+                              ? lvl.id === 'master'
+                                ? 'bg-purple-950 border-purple-500 text-white shadow-md ring-1 ring-purple-400'
+                                : lvl.id === 'standard'
+                                ? 'bg-blue-950 border-blue-500 text-white shadow-md ring-1 ring-blue-400'
+                                : 'bg-emerald-950 border-emerald-500 text-white shadow-md ring-1 ring-emerald-400'
+                              : 'bg-slate-900 border-white/10 text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          <div className="text-base">{lvl.icon}</div>
+                          <div className="text-[10px]">{lvl.label}</div>
+                          <div className="text-[8px] text-slate-400 font-normal mt-0.5">{lvl.desc}</div>
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-[9px] text-slate-400 font-mono leading-tight">
+                      ※クリア時の順位（P1優勝で🏆金）または達人AIクリアで金トロフィーを獲得できます。
+                    </p>
+                  </div>
+
+                  {/* Assist Mode */}
+                  <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-racing text-slate-300 font-bold text-[11px]">
+                        操作アシストモード
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setUserAssistLevel('assisted')}
+                        className={`p-2 rounded-lg text-left border font-racing font-bold transition-all cursor-pointer ${
+                          userAssistLevel === 'assisted'
+                            ? 'bg-emerald-950 border-emerald-500 text-emerald-300 shadow-md'
+                            : 'bg-slate-900 border-white/10 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <div className="flex items-center gap-1 text-[11px]">
+                          <span>🔰</span>
+                          <span>アシストあり</span>
+                        </div>
+                        <div className="text-[9px] text-slate-400 font-normal mt-0.5">
+                          計器注視点のガイダンス表示
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setUserAssistLevel('expert')}
+                        className={`p-2 rounded-lg text-left border font-racing font-bold transition-all cursor-pointer ${
+                          userAssistLevel === 'expert'
+                            ? 'bg-cyan-950 border-cyan-500 text-cyan-300 shadow-md'
+                            : 'bg-slate-900 border-white/10 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        <div className="flex items-center gap-1 text-[11px]">
+                          <span>🎯</span>
+                          <span>エキスパート</span>
+                        </div>
+                        <div className="text-[9px] text-slate-400 font-normal mt-0.5">
+                          助言なし・生計器データ勝負
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Action Bar: Start Race Button */}
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-red-950 border border-red-500/40 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-xl">
+                🏁
+              </div>
+              <div>
+                <div className="text-white font-racing font-bold text-sm">
+                  作戦策定完了 — ピットウォール司令室へ
+                </div>
+                <div className="text-xs text-slate-400 font-mono">
+                  全{activeScenario.totalLaps}周 • 目標順位 P{activeScenario.targetPosition} • スタートタイヤ {effectivePlayerConfig.startTyre}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+              <button
+                type="button"
+                onClick={handleBackToModeSelect}
+                className="btn-console px-4 py-2.5 text-xs font-racing font-bold text-slate-300 hover:text-white"
+              >
+                ◀ モード選択へ戻る
+              </button>
+
+              <button
+                type="button"
+                onClick={handleStartRace}
+                className="btn-console-primary px-8 py-3 text-sm font-racing font-black tracking-wider flex items-center gap-2 shadow-2xl shadow-red-950 hover:scale-105 transition-all animate-pulse"
+              >
+                <span>🏁 START RACE / レース開始 ▶</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ════════════════════════════════════════════════════════════════════════
+          PHASE 3: 🏎️ LIVE RACE COCKPIT SCREEN (ピットウォール本番コクピット)
+          ════════════════════════════════════════════════════════════════════════ */}
+      {simulatorPhase === 'race' && (
+        <div className="space-y-3 animate-in fade-in duration-300">
+          {/* ── UNIFIED TACTICAL COMMAND & STATUS STRIP (Ultra-Compact) ── */}
+          <div className="px-2.5 py-1.5 rounded-xl bg-slate-950/90 border border-white/10 shadow-lg backdrop-blur-md">
         <div className="flex flex-wrap items-center justify-between gap-1.5 text-xs">
           {/* Left: Lap Controls & Speed */}
           <div className="flex items-center gap-1 flex-wrap">
@@ -1212,29 +2730,21 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
               type="button"
               onClick={() => {
                 setAutoPauseAlert(null);
-                setChallengeLap((l) => Math.min(activeScenario.totalLaps, l + 1));
+                setChallengePlaying(!challengePlaying);
               }}
-              disabled={challengeLap >= activeScenario.totalLaps}
-              className="btn-console-primary text-[11px] px-2.5 py-0.5 font-racing font-bold flex items-center gap-1 disabled:opacity-30 shadow-sm shadow-red-950 ring-1 ring-red-400/50 hover:brightness-125"
-              title="自分のペースで1周進める"
-            >
-              1周進める ▶
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setChallengePlaying(!challengePlaying)}
-              className={`btn-console px-2 py-0.5 text-[11px] flex items-center gap-1 font-racing font-bold ${
-                challengePlaying ? 'bg-amber-600 text-white' : ''
+              className={`px-3 py-1 rounded-xl text-xs flex items-center gap-1.5 font-racing font-bold shadow-md cursor-pointer transition-all ${
+                challengePlaying
+                  ? 'bg-amber-600 hover:bg-amber-500 text-white ring-2 ring-amber-400/60 shadow-amber-950/60'
+                  : 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-red-950/60 ring-1 ring-red-400/50'
               }`}
             >
               {challengePlaying ? (
                 <>
-                  <Pause className="w-3 h-3" /> PAUSE
+                  <Pause className="w-3.5 h-3.5 fill-current" /> PAUSE
                 </>
               ) : (
                 <>
-                  <Play className="w-3 h-3" /> {challengeLap >= activeScenario.totalLaps ? 'REPLAY' : 'PLAY'}
+                  <Play className="w-3.5 h-3.5 fill-current" /> {challengeLap >= activeScenario.totalLaps ? 'REPLAY' : 'PLAY'}
                 </>
               )}
             </button>
@@ -1304,28 +2814,11 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
             </div>
           </div>
 
-          {/* Right: Live Track Condition, Weather Reroll, AI Difficulty */}
-          <div className="flex items-center gap-1.5 text-[10px] font-mono flex-wrap">
-            {/* Weather condition */}
-            <span className="flex items-center gap-1 text-slate-300">
-              {currentSnapshot?.rainRadar.waterDepthMm! > 0 ? (
-                <>
-                  <CloudRain className="w-3 h-3 text-sky-400" />
-                  <span className="text-sky-300 font-bold">{currentSnapshot?.rainRadar.waterDepthMm}mm</span>
-                  <span className="text-slate-400 hidden xl:inline">({currentSnapshot?.rainRadar.trackPhase})</span>
-                </>
-              ) : (
-                <span>☀️ DRY</span>
-              )}
-            </span>
-
-            <span className="text-amber-400 hidden sm:inline">
-              {currentSnapshot?.rainRadar.trackTempC || 30}°C
-            </span>
-
+          {/* Right: Race Control Status, Weather Reroll, AI Difficulty Selector */}
+          <div className="flex items-center gap-2 text-[10px] font-mono flex-wrap">
             {/* Safety Car status */}
             <span
-              className={`px-1.5 py-0.2 rounded font-bold ${
+              className={`px-2 py-0.5 rounded font-bold font-racing ${
                 currentSnapshot?.isSC
                   ? 'bg-yellow-500 text-slate-950 animate-pulse'
                   : currentSnapshot?.isVSC
@@ -1339,7 +2832,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
             {/* SC risk */}
             {currentSnapshot?.rainRadar && (
               <span
-                className={`px-1.5 py-0.2 rounded text-[9px] font-bold border ${
+                className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${
                   currentSnapshot.rainRadar.incidentRiskLevel === 'CRITICAL'
                     ? 'bg-red-950 text-red-300 border-red-500 animate-pulse'
                     : currentSnapshot.rainRadar.incidentRiskLevel === 'HIGH'
@@ -1355,35 +2848,53 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
             <button
               type="button"
               onClick={handleRerollWeather}
-              className="btn-console text-[10px] px-1.5 py-0.5 flex items-center gap-1 text-sky-300 hover:text-white border-sky-500/30"
+              className="btn-console text-[10px] px-2 py-0.5 flex items-center gap-1 text-sky-300 hover:text-white border-sky-500/30"
               title="天候や雨雲の到達ラップ・SC発生リスクをランダム再抽選"
             >
-              <Dices className="w-2.5 h-2.5 text-sky-400" />
-              <span className="hidden md:inline">天候再抽選</span>
+              <Dices className="w-3 h-3 text-sky-400" />
+              <span className="hidden sm:inline font-racing font-bold">天候再抽選</span>
             </button>
 
-            {/* AI Selector */}
-            <div className="hidden lg:flex items-center gap-0.5 bg-slate-900 px-1 py-0.2 rounded border border-white/10 text-[9px]">
-              <span className="text-slate-400">AI:</span>
-              {(['beginner', 'standard', 'master'] as const).map((diff) => (
-                <button
-                  key={diff}
-                  type="button"
-                  onClick={() => setAiDifficulty(diff)}
-                  className={`px-1 py-0.2 rounded font-bold transition-all ${
-                    aiDifficulty === diff
-                      ? diff === 'master'
-                        ? 'bg-purple-900 text-purple-200'
-                        : diff === 'standard'
-                        ? 'bg-cyan-900 text-cyan-200'
-                        : 'bg-emerald-900 text-emerald-200'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                  title={diff === 'beginner' ? '初級' : diff === 'standard' ? '標準' : '達人'}
-                >
-                  {diff === 'beginner' ? '初' : diff === 'standard' ? '標' : '達'}
-                </button>
-              ))}
+            {/* AI Difficulty Status Tag (Read-only status; set in Briefing) */}
+            <span
+              className="px-2 py-0.5 rounded text-[10px] font-racing font-bold bg-slate-900 border border-white/10 text-slate-300 flex items-center gap-1"
+              title="AIライバル難易度（作戦ブリーフィング画面で設定）"
+            >
+              <Bot className="w-3 h-3 text-cyan-400" />
+              <span>
+                {aiDifficulty === 'master' ? '🏆 達人' : aiDifficulty === 'standard' ? '🏎️ 標準' : '🌱 初級'}
+              </span>
+            </span>
+
+            {/* User Tactical Assist Mode (🔰 アシスト vs 🎯 エキスパート) */}
+            <div className="flex items-center gap-1 bg-slate-900/90 px-1.5 py-0.5 rounded-lg border border-white/10 shadow-inner text-[10px] font-racing">
+              <span className="text-slate-400 font-bold hidden lg:inline">操作:</span>
+              <button
+                type="button"
+                onClick={() => setUserAssistLevel('assisted')}
+                className={`px-1.5 py-0.5 rounded font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                  userAssistLevel === 'assisted'
+                    ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/50 shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+                title="🔰 アシストあり: 注目すべきデータや計器の確認ポイントを助言"
+              >
+                <span>🔰</span>
+                <span className="hidden sm:inline">アシスト</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setUserAssistLevel('expert')}
+                className={`px-1.5 py-0.5 rounded font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                  userAssistLevel === 'expert'
+                    ? 'bg-slate-800 text-cyan-300 border border-cyan-500/50 shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+                title="🎯 エキスパート（ノーアシスト）: 助言なし・生計器データのみで挑む上級者向けモード"
+              >
+                <span>🎯</span>
+                <span className="hidden sm:inline">エキスパート</span>
+              </button>
             </div>
           </div>
         </div>
@@ -1406,823 +2917,9 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
         </div>
       )}
 
-      {/* ── Collapsible Scenario & Setup Drawer ── */}
-      {isScenarioDrawerOpen && (
-        <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={() => setIsScenarioDrawerOpen(false)}
-              className="btn-console-primary text-xs px-3.5 py-1 font-racing font-bold shadow-md"
-            >
-              🏁 設定完了・ピットウォールへ戻る
-            </button>
-          </div>
-                    <div className="glass-card-premium p-3 sm:p-4 rounded-2xl border border-white/10 space-y-3">
-            {/* Row 1: Major Category Tabs (🔬 シミュレーション vs ⚔️ 実践) */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-racing text-slate-400 font-bold uppercase tracking-wider">GAME MODE:</span>
-                <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-white/10">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMajorCategory('battle');
-                      if (gameMode === 'sandbox') {
-                        startPresetCrisis(presetIdx);
-                      }
-                    }}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all ${
-                      majorCategory === 'battle'
-                        ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950 ring-1 ring-red-400/50'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <Trophy className="w-3.5 h-3.5 text-yellow-400" />
-                    <span>⚔️ 実践 (本番チャレンジ)</span>
-                  </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMajorCategory('practice');
-                      startSandboxMode();
-                    }}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all ${
-                      majorCategory === 'practice'
-                        ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md shadow-cyan-950 ring-1 ring-cyan-400/50'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <SlidersHorizontal className="w-3.5 h-3.5 text-cyan-300" />
-                    <span>🔬 シミュレーション (自由練習)</span>
-                  </button>
-                </div>
-              </div>
 
-              {/* Right: Grid Info Badge */}
-              <div className="flex items-center gap-2 text-[11px] font-mono">
-                <span className="text-slate-400">出走グリッド:</span>
-                <span className="px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-500/30 font-bold">
-                  🏁 22 CARS / 11 TEAMS
-                </span>
-              </div>
-            </div>
 
-            {/* Row 2: Sub-mode selection depending on major category */}
-            {majorCategory === 'battle' ? (
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-                {/* Battle Sub-modes */}
-                <div className="flex flex-wrap items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-white/10 shrink-0">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      startPresetCrisis(presetIdx);
-                      setIsScenarioPickerOpen(true);
-                    }}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-racing font-bold transition-all ${
-                      (gameMode === 'crisis' || gameMode === 'scenario') && !customScenario
-                        ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <Zap className="w-3.5 h-3.5 text-amber-400" />
-                    <span>📜 シナリオ (名場面 5-9周)</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      startSprintRace(selectedCircuitId, selectedPlayerCode);
-                      setIsScenarioPickerOpen(false);
-                    }}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-racing font-bold transition-all ${
-                      gameMode === 'sprint'
-                        ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <Flag className="w-3.5 h-3.5 text-yellow-400" />
-                    <span>🏆 スプリント全周回 (15-20周)</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      startMission(selectedMissionIdx);
-                      setIsScenarioPickerOpen(true);
-                    }}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-racing font-bold transition-all ${
-                      gameMode === 'mission'
-                        ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <ShieldAlert className="w-3.5 h-3.5 text-purple-400" />
-                    <span>🎯 特務ミッション (特殊指令)</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      startProceduralCrisis();
-                      setIsScenarioPickerOpen(false);
-                    }}
-                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-racing font-bold transition-all ${
-                      gameMode === 'procedural'
-                        ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    <Compass className="w-3.5 h-3.5 text-pink-400" />
-                    <span>🎲 突発クライシス (一期一会)</span>
-                  </button>
-                </div>
-
-                {/* Circuit & Driver selector (for sprint / procedural) */}
-                <div className="flex flex-wrap items-center gap-2">
-                  <div className="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded-xl border border-white/10">
-                    <Flag className="w-3.5 h-3.5 text-red-400" />
-                    <span className="text-[10px] font-mono text-slate-400">サーキット:</span>
-                    <select
-                      value={selectedCircuitId}
-                      onChange={(e) => {
-                        setSelectedCircuitId(e.target.value);
-                        if (gameMode === 'sprint') {
-                          startSprintRace(e.target.value, selectedPlayerCode);
-                        }
-                      }}
-                      className="bg-transparent text-xs text-white font-racing font-bold focus:outline-none cursor-pointer"
-                    >
-                      {SIM_CIRCUITS.map((c) => (
-                        <option key={c.id} value={c.id} className="bg-slate-900 text-white">
-                          {c.flag} {c.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="flex items-center gap-1.5 bg-slate-900 px-2.5 py-1.5 rounded-xl border border-white/10">
-                    <Gauge className="w-3.5 h-3.5 text-cyan-400" />
-                    <span className="text-[10px] font-mono text-slate-400">担当ドライバー:</span>
-                    <select
-                      value={selectedPlayerCode}
-                      onChange={(e) => {
-                        setSelectedPlayerCode(e.target.value);
-                        if (gameMode === 'sprint') {
-                          startSprintRace(selectedCircuitId, e.target.value);
-                        }
-                      }}
-                      className="bg-transparent text-xs text-white font-racing font-bold focus:outline-none cursor-pointer"
-                    >
-                      {GRID_DRIVERS.map((d) => (
-                        <option key={d.code} value={d.code} className="bg-slate-900 text-white">
-                          #{d.number} {d.name} ({d.team})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {gameMode === 'procedural' && (
-                    <button
-                      type="button"
-                      onClick={startProceduralCrisis}
-                      className="btn-console flex items-center gap-1.5 text-xs text-pink-300 border-pink-500/30 hover:bg-pink-950/40"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" /> 次の突発危機へ
-                    </button>
-                  )}
-                </div>
-              </div>
-            ) : (
-              /* Practice / Sandbox Setup Panel */
-              <div className="p-3.5 rounded-xl bg-cyan-950/20 border border-cyan-500/25 space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-cyan-500/20">
-                  <div className="flex items-center gap-2">
-                    <span className="text-base">🧪</span>
-                    <span className="font-racing font-bold text-white text-xs tracking-wider">
-                      FREE PRACTICE & STRATEGY SANDBOX / 自由練習シミュレーション設定
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleRerollWeather}
-                    className="btn-console flex items-center gap-1.5 text-xs text-cyan-300 border-cyan-500/40 hover:bg-cyan-950/50"
-                    title="天候・路面水量・SC確率を瞬時にランダム再抽選します"
-                  >
-                    <Dices className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>🎲 天候ランダムリロード</span>
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-xs">
-                  {/* Track */}
-                  <div className="p-2 rounded-lg bg-slate-900/90 border border-white/10">
-                    <label className="text-[10px] font-mono text-slate-400 block mb-1">サーキット</label>
-                    <select
-                      value={selectedCircuitId}
-                      onChange={(e) => {
-                        setSelectedCircuitId(e.target.value);
-                        startSandboxMode({ circuitId: e.target.value });
-                      }}
-                      className="w-full bg-transparent text-xs text-white font-racing font-bold focus:outline-none cursor-pointer"
-                    >
-                      {SIM_CIRCUITS.map((c) => (
-                        <option key={c.id} value={c.id} className="bg-slate-900 text-white">
-                          {c.flag} {c.name.split(' ')[0]}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Driver (all 22) */}
-                  <div className="p-2 rounded-lg bg-slate-900/90 border border-white/10">
-                    <label className="text-[10px] font-mono text-slate-400 block mb-1">自車ドライバー</label>
-                    <select
-                      value={selectedPlayerCode}
-                      onChange={(e) => {
-                        setSelectedPlayerCode(e.target.value);
-                        startSandboxMode({ playerCode: e.target.value });
-                      }}
-                      className="w-full bg-transparent text-xs text-white font-racing font-bold focus:outline-none cursor-pointer"
-                    >
-                      {GRID_DRIVERS.map((d) => (
-                        <option key={d.code} value={d.code} className="bg-slate-900 text-white">
-                          #{d.number} {d.code} ({d.team.split(' ')[0]})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Laps */}
-                  <div className="p-2 rounded-lg bg-slate-900/90 border border-white/10">
-                    <label className="text-[10px] font-mono text-slate-400 block mb-1">周回数: {sandboxLaps}周</label>
-                    <select
-                      value={sandboxLaps}
-                      onChange={(e) => {
-                        const val = Number(e.target.value);
-                        setSandboxLaps(val);
-                        startSandboxMode({ totalLaps: val });
-                      }}
-                      className="w-full bg-transparent text-xs text-white font-mono focus:outline-none cursor-pointer"
-                    >
-                      {[5, 8, 10, 15, 20].map((l) => (
-                        <option key={l} value={l} className="bg-slate-900 text-white">
-                          全{l}周
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* Weather type */}
-                  <div className="p-2 rounded-lg bg-slate-900/90 border border-white/10">
-                    <label className="text-[10px] font-mono text-slate-400 block mb-1">天候コンディション</label>
-                    <select
-                      value={sandboxWeather}
-                      onChange={(e) => {
-                        const val = e.target.value as WeatherType;
-                        setSandboxWeather(val);
-                        startSandboxMode({ weatherType: val });
-                      }}
-                      className="w-full bg-transparent text-xs text-white font-racing font-bold focus:outline-none cursor-pointer"
-                    >
-                      <option value="dry" className="bg-slate-900 text-white">☀️ 快晴ドライ</option>
-                      <option value="variable" className="bg-slate-900 text-white">⛅ 急変・雨雲接近</option>
-                      <option value="drizzle" className="bg-slate-900 text-white">🌤️ 雨上がりダンプ</option>
-                      <option value="monsoon" className="bg-slate-900 text-white">🌊 豪雨モンスーン</option>
-                    </select>
-                  </div>
-
-                  {/* Rain arrival lap */}
-                  <div className="p-2 rounded-lg bg-slate-900/90 border border-white/10">
-                    <label className="text-[10px] font-mono text-slate-400 block mb-1">降雨開始周回</label>
-                    <select
-                      value={sandboxRainLap}
-                      onChange={(e) => {
-                        const val = Number(e.target.value);
-                        setSandboxRainLap(val);
-                        startSandboxMode({ rainStartLap: val });
-                      }}
-                      disabled={sandboxWeather === 'dry'}
-                      className="w-full bg-transparent text-xs text-white font-mono focus:outline-none cursor-pointer disabled:opacity-40"
-                    >
-                      {Array.from({ length: sandboxLaps }, (_, i) => i + 1).map((l) => (
-                        <option key={l} value={l} className="bg-slate-900 text-white">
-                          Lap {l}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* SC Frequency */}
-                  <div className="p-2 rounded-lg bg-slate-900/90 border border-white/10">
-                    <label className="text-[10px] font-mono text-slate-400 block mb-1">SC発生頻度</label>
-                    <select
-                      value={sandboxIncidentFreq}
-                      onChange={(e) => {
-                        const val = e.target.value as IncidentFrequency;
-                        setSandboxIncidentFreq(val);
-                        startSandboxMode({ incidentFrequency: val });
-                      }}
-                      className="w-full bg-transparent text-xs text-white font-mono focus:outline-none cursor-pointer"
-                    >
-                      <option value="none" className="bg-slate-900 text-white">OFF (なし)</option>
-                      <option value="realistic" className="bg-slate-900 text-white">標準 (路面連動)</option>
-                      <option value="high_chaos" className="bg-slate-900 text-white">カオス (多発)</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Row 3: Scenario Selection Cards (When in Scenario Mode) */}
-            {majorCategory === 'battle' && (gameMode === 'crisis' || gameMode === 'scenario') && !customScenario && (
-              <div className="pt-2 border-t border-white/10 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Zap className="w-3.5 h-3.5 text-amber-400" />
-                    <span className="font-racing font-bold text-white text-xs">
-                      📜 歴史的F1名場面シナリオ選択 (全{PRESET_CHALLENGES.length}シナリオ)
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsScenarioPickerOpen(!isScenarioPickerOpen)}
-                    className="text-[10px] font-mono text-slate-400 hover:text-white px-2 py-0.5 rounded bg-slate-800"
-                  >
-                    {isScenarioPickerOpen ? '▲ 一覧を閉じる' : '▼ シナリオ一覧を展開'}
-                  </button>
-                </div>
-
-                {isScenarioPickerOpen && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5 pt-1">
-                    {PRESET_CHALLENGES.map((sc, idx) => {
-                      const isActive = presetIdx === idx && !customScenario;
-                      return (
-                        <button
-                          key={sc.id}
-                          type="button"
-                          onClick={() => startPresetCrisis(idx)}
-                          className={`text-left p-3 rounded-xl border transition-all relative overflow-hidden flex flex-col justify-between gap-2 ${
-                            isActive
-                              ? 'bg-gradient-to-br from-red-950/70 to-slate-900 border-red-500 ring-1 ring-red-500 shadow-lg shadow-red-950/50'
-                              : 'bg-slate-900/80 border-white/10 hover:border-red-500/50 hover:bg-slate-800/80'
-                          }`}
-                        >
-                          <div className="space-y-1">
-                            <div className="flex items-center justify-between gap-1">
-                              <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1">
-                                <span>{sc.circuit.flag}</span>
-                                <span>{sc.circuit.name.split(' ')[0]}</span>
-                              </span>
-                              <div className="flex items-center gap-1">
-                                <span
-                                  className={`px-1.5 py-0.2 rounded text-[9px] font-mono uppercase font-bold ${
-                                    sc.difficulty === 'hard'
-                                      ? 'bg-red-900/60 text-red-300 border border-red-500/30'
-                                      : 'bg-emerald-900/60 text-emerald-300 border border-emerald-500/30'
-                                  }`}
-                                >
-                                  {sc.difficulty}
-                                </span>
-                                {isActive && (
-                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-400 text-black animate-pulse">
-                                    ACTIVE
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            <h4 className="font-racing font-bold text-white text-xs leading-snug line-clamp-1">
-                              {sc.title}
-                            </h4>
-                            <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed">
-                              {sc.description}
-                            </p>
-                          </div>
-
-                          <div className="flex items-center justify-between text-[10px] font-mono pt-1.5 border-t border-white/5 text-slate-400">
-                            <span className="text-red-300 font-bold">目標: P{sc.targetPosition}以内</span>
-                            <span>全{sc.totalLaps}周</span>
-                            <span className="text-cyan-300">{sc.tag}</span>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Row 4: Mission Selection Cards (When in Mission Mode) */}
-            {majorCategory === 'battle' && gameMode === 'mission' && (
-              <div className="pt-2 border-t border-white/10 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <ShieldAlert className="w-3.5 h-3.5 text-purple-400" />
-                    <span className="font-racing font-bold text-white text-xs">
-                      🎯 特務ミッション選択 (全{MISSION_CHALLENGES.length}ミッション)
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsScenarioPickerOpen(!isScenarioPickerOpen)}
-                    className="text-[10px] font-mono text-slate-400 hover:text-white px-2 py-0.5 rounded bg-slate-800"
-                  >
-                    {isScenarioPickerOpen ? '▲ 一覧を閉じる' : '▼ ミッション一覧を展開'}
-                  </button>
-                </div>
-
-                {isScenarioPickerOpen && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
-                    {MISSION_CHALLENGES.map((m, idx) => {
-                      const isActive = selectedMissionIdx === idx && gameMode === 'mission';
-                      return (
-                        <button
-                          key={m.id}
-                          type="button"
-                          onClick={() => startMission(idx)}
-                          className={`text-left p-3 rounded-xl border transition-all relative overflow-hidden flex flex-col justify-between gap-2 ${
-                            isActive
-                              ? 'bg-gradient-to-br from-purple-950/70 to-slate-900 border-purple-500 ring-1 ring-purple-500 shadow-lg shadow-purple-950/50'
-                              : 'bg-slate-900/80 border-white/10 hover:border-purple-500/50 hover:bg-slate-800/80'
-                          }`}
-                        >
-                          <div className="space-y-1">
-                            <div className="flex items-center justify-between gap-1">
-                              <span className="text-[10px] font-mono text-purple-300 flex items-center gap-1 font-bold">
-                                <span>#{m.playerConfig.number} {m.playerConfig.code}</span>
-                              </span>
-                              <div className="flex items-center gap-1">
-                                <span className="px-1.5 py-0.2 rounded text-[9px] font-mono uppercase font-bold bg-purple-900/60 text-purple-300 border border-purple-500/30">
-                                  {m.difficulty}
-                                </span>
-                                {isActive && (
-                                  <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-purple-400 text-black animate-pulse">
-                                    ACTIVE
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            <h4 className="font-racing font-bold text-white text-xs leading-snug line-clamp-2">
-                              {m.title}
-                            </h4>
-                            <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed">
-                              {m.description}
-                            </p>
-                          </div>
-
-                          <div className="flex items-center justify-between text-[10px] font-mono pt-1.5 border-t border-white/5 text-slate-400">
-                            <span className="text-purple-300 font-bold">目標: P{m.targetPosition}以内</span>
-                            <span>全{m.totalLaps}周</span>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Scenario Briefing Banner & Weather Reroll Action */}
-            <div className="mt-3 p-3 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-3">
-              <div className="flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-racing font-bold text-white text-sm">
-                    {activeScenario.title}
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-red-950/80 border border-red-500/30 text-[10px] font-mono text-red-300">
-                    目標: P{activeScenario.targetPosition}以内
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-slate-800 text-[10px] font-mono text-slate-300">
-                    全{activeScenario.totalLaps}周
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-blue-950/80 border border-blue-500/30 text-[10px] font-mono text-blue-300">
-                    {activeScenario.circuit.flag} {activeScenario.circuit.name}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-300 mt-1 leading-relaxed">{activeScenario.description}</p>
-              </div>
-
-              {/* Weather forecast ticker + Reroll button */}
-              <div className="flex items-center gap-2 shrink-0">
-                <div className="p-2 rounded-lg bg-slate-950 border border-white/10 flex items-center gap-2 text-xs">
-                  <CloudRain className="w-4 h-4 text-sky-400 shrink-0" />
-                  <span className="font-mono text-slate-300 text-[11px] max-w-[280px] truncate">
-                    {activeScenario.weatherForecast.radarDesc}
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={handleRerollWeather}
-                  className="btn-console flex items-center gap-1.5 text-xs px-3 py-2 text-cyan-300 border-cyan-500/40 hover:bg-cyan-950/60 hover:text-white transition-all shadow-md shadow-cyan-950/30"
-                  title="天候やセーフティカー確率を瞬時にランダム再抽選（リロード）して開始します"
-                >
-                  <Dices className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '6s' }} />
-                  <span className="font-racing font-bold text-[11px]">🎲 天候リロード</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Weather Reroll Flash Notification */}
-            {weatherRerollNotification && (
-              <div className="p-2.5 rounded-xl bg-cyan-950/80 border border-cyan-500/50 text-cyan-200 text-xs font-mono flex items-center justify-between gap-2 shadow-lg animate-fade-in">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-cyan-300 animate-pulse" />
-                  <span>{weatherRerollNotification}</span>
-                </div>
-                <span className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider">NEW CONDITIONS APPLIED</span>
-              </div>
-            )}
-          </div>
-
-          {/* ── Pre-Race Strategic Briefing & Initial Setup Deck ── */}
-            <div className="mt-3 p-3.5 rounded-xl bg-slate-900/95 border border-white/10 space-y-3">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-white/10">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">📋</span>
-                  <span className="font-racing font-bold text-white text-xs tracking-wider uppercase">
-                    PRE-RACE STRATEGY BRIEFING & INITIAL SETUP / レース前戦略ブリーフィング
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  {gameMode === 'crisis' ? (
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-950/80 text-amber-300 border border-amber-500/30">
-                      🏁 途中参戦シナリオ (プリセット初期設定)
-                    </span>
-                  ) : (
-                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-950/80 text-emerald-300 border border-emerald-500/30">
-                      ⚙️ 司令塔カスタム戦略設定可能
-                    </span>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => setIsBriefingOpen(!isBriefingOpen)}
-                    className="text-[10px] font-mono text-slate-400 hover:text-white px-2 py-0.5 rounded bg-slate-800"
-                  >
-                    {isBriefingOpen ? '▲ 閉じる' : '▼ 展開'}
-                  </button>
-                </div>
-              </div>
-
-              {isBriefingOpen && (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 pt-1 text-xs">
-                  {/* 1. Starting Tyre Selector */}
-                  <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-racing text-slate-300 font-bold text-[11px] flex items-center gap-1.5">
-                        <Gauge className="w-3.5 h-3.5 text-red-400" /> スタート装着タイヤ
-                      </span>
-                      <span className="text-[10px] font-mono text-slate-400">
-                        {gameMode === 'crisis' ? 'プリセット' : '選択可能'}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-5 gap-1 pt-1">
-                      {(['SOFT', 'MEDIUM', 'HARD', 'INTER', 'WET'] as TyreCompound[]).map((cmp) => {
-                        const isSelected = effectivePlayerConfig.startTyre === cmp;
-                        const prop = TYRE_PROPERTIES[cmp];
-                        return (
-                          <button
-                            key={cmp}
-                            type="button"
-                            onClick={() => {
-                              setCustomStartingTyre(cmp);
-                            }}
-                            className={`p-1.5 rounded-lg flex flex-col items-center gap-1 border transition-all text-center ${
-                              isSelected
-                                ? 'bg-red-950 border-red-500 text-white shadow-lg ring-1 ring-red-500'
-                                : 'bg-slate-900 border-white/10 text-slate-400 hover:text-white hover:bg-slate-800'
-                            }`}
-                            title={`${cmp} (${prop.label}): 適正水深 ${prop.optimalWaterRange[0]}〜${prop.optimalWaterRange[1]}mm`}
-                          >
-                            <span
-                              className="w-2.5 h-2.5 rounded-full"
-                              style={{ backgroundColor: prop.color }}
-                            />
-                            <span className="font-racing font-bold text-[10px]">{cmp}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <div className="text-[10px] text-slate-400 font-mono leading-tight pt-1">
-                      現在: <span className="font-bold text-white">{effectivePlayerConfig.startTyre}</span> ({TYRE_PROPERTIES[effectivePlayerConfig.startTyre].label}) —
-                      {effectivePlayerConfig.startTyre === 'SOFT'
-                        ? ' 序盤急襲・ハイペースだが摩耗大'
-                        : effectivePlayerConfig.startTyre === 'MEDIUM'
-                        ? ' バランス最善・天候変化への対応力◎'
-                        : effectivePlayerConfig.startTyre === 'HARD'
-                        ? ' 長寿スティント・雨待ちステイアウト'
-                        : effectivePlayerConfig.startTyre === 'INTER'
-                        ? ' 降雨・ダンプ路面用 (水深0.8〜4.0mm)'
-                        : ' 豪雨用 (水深3.5mm以上)'}
-                    </div>
-                  </div>
-
-                  {/* 2. Target Box Strategy */}
-                  <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-racing text-slate-300 font-bold text-[11px] flex items-center gap-1.5">
-                        <Target className="w-3.5 h-3.5 text-amber-400" /> 予定ピット戦略
-                      </span>
-                      <span className="text-[10px] font-mono text-slate-400">
-                        目標LAP & タイヤ
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2 pt-1">
-                      <span className="text-[10px] text-slate-400 shrink-0">目標周回:</span>
-                      <select
-                        value={customTargetBoxLap || effectiveTargetBoxLap}
-                        onChange={(e) => setCustomTargetBoxLap(Number(e.target.value))}
-                        className="bg-slate-900 border border-white/10 rounded-lg px-2 py-1 text-xs text-white font-mono"
-                      >
-                        {Array.from({ length: activeScenario.totalLaps }, (_, i) => i + 1).map((l) => (
-                          <option key={l} value={l}>
-                            LAP {l} {l === activeScenario.actualRainLap ? '(雨予想)' : ''}
-                          </option>
-                        ))}
-                      </select>
-
-                      <span className="text-[10px] text-slate-400 shrink-0">➔</span>
-                      <select
-                        value={customTargetCompound || nextCompoundChoice}
-                        onChange={(e) => {
-                          setCustomTargetCompound(e.target.value as TyreCompound);
-                          setNextCompoundChoice(e.target.value as TyreCompound);
-                        }}
-                        className="bg-slate-900 border border-white/10 rounded-lg px-2 py-1 text-xs text-white font-racing font-bold"
-                      >
-                        {(['SOFT', 'MEDIUM', 'HARD', 'INTER', 'WET'] as TyreCompound[]).map((c) => (
-                          <option key={c} value={c}>
-                            {c}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="text-[10px] text-slate-400 font-mono leading-tight pt-1">
-                      💡 ピット窓口: 通常ロス {activeScenario.circuit.pitLaneLoss}s（SC出動時は約半減の11s）。レース中いつでも手動BOXに変更可能です。
-                    </div>
-                  </div>
-
-                  {/* 3. Machine Setup: PU Mode & Downforce */}
-                  <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-racing text-slate-300 font-bold text-[11px] flex items-center gap-1.5">
-                        <Gauge className="w-3.5 h-3.5 text-cyan-400" /> 初期PUモード ＆ ダウンフォース
-                      </span>
-                      <span className="text-[10px] font-mono text-cyan-400 font-bold">
-                        {effectivePlayerConfig.machineSetup.downforce.toUpperCase()} DF
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-1 pt-1">
-                      {[
-                        { id: 'push', label: 'PUSH ⚡', desc: '序盤ダッシュ' },
-                        { id: 'standard', label: 'STD 🏎️', desc: '巡航標準' },
-                        { id: 'conserve', label: 'SAVE 🌱', desc: 'タイヤ温存' },
-                      ].map((mode) => {
-                        const isCurrent = effectivePlayerConfig.machineSetup.puMode === mode.id;
-                        return (
-                          <button
-                            key={mode.id}
-                            type="button"
-                            onClick={() => {
-                              setCustomInitialPuMode(mode.id as EnginePUMode);
-                              setActivePuMode(mode.id as EnginePUMode);
-                            }}
-                            className={`p-1.5 rounded-lg text-center border transition-all ${
-                              isCurrent
-                                ? 'bg-cyan-950 border-cyan-500 text-cyan-200 shadow-md font-bold'
-                                : 'bg-slate-900 border-white/10 text-slate-400 hover:text-white'
-                            }`}
-                          >
-                            <div className="font-racing text-[10px]">{mode.label}</div>
-                            <div className="text-[9px] text-slate-400">{mode.desc}</div>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    <div className="text-[10px] text-slate-400 font-mono leading-tight pt-1">
-                      サーキット特性: 抜きにくさ {activeScenario.circuit.overtakeDifficulty} / タイヤ攻撃性 {activeScenario.circuit.tyreAggression}
-                    </div>
-                  </div>
-
-                  {/* 4. Weather & Safety Car Customization Deck */}
-                  <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-racing text-slate-300 font-bold text-[11px] flex items-center gap-1.5">
-                        <CloudRain className="w-3.5 h-3.5 text-sky-400" /> 天候 ＆ SC状況設定
-                      </span>
-                      <button
-                        type="button"
-                        onClick={handleRerollWeather}
-                        className="text-[10px] font-mono text-cyan-300 hover:text-white px-1.5 py-0.5 rounded bg-cyan-950 border border-cyan-500/30 flex items-center gap-1"
-                        title="天候やSC確率を瞬時に再抽選"
-                      >
-                        <Dices className="w-3 h-3 text-cyan-400" />
-                        <span>再抽選</span>
-                      </button>
-                    </div>
-
-                    <div className="space-y-1.5 pt-1">
-                      <div className="flex items-center justify-between gap-1 text-[11px]">
-                        <span className="text-slate-400 shrink-0">天候タイプ:</span>
-                        <select
-                          value={activeScenario.startWeather}
-                          onChange={(e) => {
-                            const newWeather = e.target.value as WeatherType;
-                            const hasRain = newWeather !== 'dry';
-                            const rainLap = hasRain ? Math.max(2, Math.floor(activeScenario.totalLaps * 0.4)) : undefined;
-                            const intensity = newWeather === 'monsoon' ? 4.5 : newWeather === 'drizzle' ? 1.5 : hasRain ? 2.5 : 0;
-                            const updated: ChallengeScenario = {
-                              ...activeScenario,
-                              id: `${activeScenario.id}_custom_${Date.now()}`,
-                              startWeather: newWeather,
-                              weatherForecast: {
-                                radarDesc: newWeather === 'monsoon'
-                                  ? '豪雨モンスーン警戒。路面水量4.5mm到達予想。'
-                                  : newWeather === 'drizzle'
-                                  ? '雨上がりダンプ路面。急速ドライライン形成予想。'
-                                  : hasRain
-                                  ? `雨雲接近中。Lap ${rainLap}前後に降雨予想。`
-                                  : '快晴ドライコンディション。天候安定。',
-                                estimatedLapMin: rainLap ? Math.max(1, rainLap - 1) : 99,
-                                estimatedLapMax: rainLap ? Math.min(activeScenario.totalLaps, rainLap + 2) : 99,
-                                rainProbabilityPercent: hasRain ? 85 : 5,
-                              },
-                              actualRainLap: rainLap,
-                              actualRainIntensity: intensity,
-                            };
-                            setCustomScenario(updated);
-                            resetGameState();
-                          }}
-                          className="bg-slate-900 border border-white/10 rounded px-1.5 py-1 text-xs text-white font-racing font-bold cursor-pointer"
-                        >
-                          <option value="dry" className="bg-slate-900 text-white">☀️ 快晴ドライ</option>
-                          <option value="variable" className="bg-slate-900 text-white">⛅ 急変警戒</option>
-                          <option value="drizzle" className="bg-slate-900 text-white">🌤️ 雨上がりダンプ</option>
-                          <option value="monsoon" className="bg-slate-900 text-white">🌊 豪雨モンスーン</option>
-                        </select>
-                      </div>
-
-                      <div className="flex items-center justify-between gap-1 text-[11px]">
-                        <span className="text-slate-400 shrink-0">降雨周回:</span>
-                        <select
-                          value={activeScenario.actualRainLap || 99}
-                          onChange={(e) => {
-                            const val = Number(e.target.value);
-                            const updated: ChallengeScenario = {
-                              ...activeScenario,
-                              id: `${activeScenario.id}_custom_${Date.now()}`,
-                              actualRainLap: val === 99 ? undefined : val,
-                              actualRainIntensity: val === 99 ? 0 : (activeScenario.actualRainIntensity || 2.5),
-                            };
-                            setCustomScenario(updated);
-                            resetGameState();
-                          }}
-                          className="bg-slate-900 border border-white/10 rounded px-1.5 py-1 text-xs text-white font-mono cursor-pointer"
-                        >
-                          <option value={99}>降雨なし</option>
-                          {Array.from({ length: activeScenario.totalLaps }, (_, i) => i + 1).map((l) => (
-                            <option key={l} value={l}>
-                              Lap {l}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div className="flex items-center justify-between gap-1 text-[11px]">
-                        <span className="text-slate-400 shrink-0">SC危険度:</span>
-                        <select
-                          value={activeScenario.scProbability > 0.7 ? 'high' : activeScenario.scProbability > 0.3 ? 'normal' : 'low'}
-                          onChange={(e) => {
-                            const prob = e.target.value === 'high' ? 0.85 : e.target.value === 'normal' ? 0.45 : 0.1;
-                            const updated: ChallengeScenario = {
-                              ...activeScenario,
-                              id: `${activeScenario.id}_custom_${Date.now()}`,
-                              scProbability: prob,
-                              actualScLap: prob > 0.4 ? Math.max(2, Math.floor(activeScenario.totalLaps * 0.5)) : undefined,
-                            };
-                            setCustomScenario(updated);
-                            resetGameState();
-                          }}
-                          className="bg-slate-900 border border-white/10 rounded px-1.5 py-1 text-xs text-white font-mono cursor-pointer"
-                        >
-                          <option value="low">低 (安全)</option>
-                          <option value="normal">中 (標準)</option>
-                          <option value="high">高 (大荒れ波乱)</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-        </div>
-      )}
 
 
 
@@ -2286,77 +2983,91 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
 
 
       {/* ── 4-COLUMN PRO PITWALL COMMAND COCKPIT (TOWER | COURSE & COMMS | DATA | COMMANDS) ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[168px_minmax(0,1.25fr)_minmax(0,1.15fr)_minmax(0,0.85fr)] xl:grid-cols-[172px_minmax(0,1.25fr)_minmax(0,1.15fr)_minmax(0,0.9fr)] 2xl:grid-cols-[176px_minmax(0,1.3fr)_minmax(0,1.2fr)_minmax(0,0.9fr)] gap-2.5 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-[168px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)] xl:grid-cols-[172px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)] 2xl:grid-cols-[176px_minmax(0,1.25fr)_minmax(0,1.05fr)_minmax(0,1.05fr)] gap-2.5 items-start">
         {/* ── COLUMN 1 (LEFT): Perpetual 1-Column Timing Tower (P1-P22) ── */}
         <div className={`w-full ${mobileConsoleView === 'tower' ? 'block' : 'hidden lg:block'}`}>
           <div className="glass-card-premium p-1.5 sm:p-2 rounded-xl border border-white/10 space-y-1">
             <div className="flex items-center justify-between gap-1 pb-1 border-b border-white/10">
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <Target className="w-3 h-3 text-red-500 shrink-0" />
                 <span className="font-racing text-[11px] font-bold text-white tracking-wide">
                   TOWER
                 </span>
+                {/* Mode Switcher: GAP vs INT */}
+                <div className="flex items-center bg-slate-900/90 p-0.5 rounded border border-white/10 text-[8px] font-racing ml-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setTimingTowerMode('gap')}
+                    className={`px-1.5 py-0.2 rounded font-bold transition-all cursor-pointer ${
+                      timingTowerMode === 'gap'
+                        ? 'bg-red-600 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                    title="首位とのタイム差 (GAP TO LEADER)"
+                  >
+                    GAP
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTimingTowerMode('int')}
+                    className={`px-1.5 py-0.2 rounded font-bold transition-all cursor-pointer ${
+                      timingTowerMode === 'int'
+                        ? 'bg-red-600 text-white shadow-sm'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                    title="前走車とのインターバル (INTERVAL / Δ)"
+                  >
+                    INT
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* 22-Car Timing Rows: Ultra-Compact Single Column */}
+            {/* 22-Car Timing Rows: Clean Professional Column */}
             {(() => {
               const allCars = currentSnapshot?.cars || [];
               const renderCarCard = (car: typeof allCars[0]) => {
                 const isTarget = car.code === activeScenario.playerConfig.code;
                 const isTeammate = car.code === activeScenario.teammateConfig.code;
                 const tyreProp = TYRE_PROPERTIES[car.tyreCompound];
-                const inPoints = car.position <= 10;
                 const isOvrWindow = car.position > 1 && car.gapToAhead <= 1.0;
+                const isRetired = !!car.isRetired;
 
                 return (
                   <div
                     key={car.code}
-                    className={`px-1.5 py-0.5 rounded-lg flex items-center justify-between text-xs transition-all ${
-                      isTarget
+                    className={`px-1.5 py-1 rounded-lg flex items-center justify-between text-xs transition-all ${
+                      isRetired
+                        ? 'opacity-40 bg-slate-950/40 text-slate-500 border border-transparent'
+                        : isTarget
                         ? 'bg-gradient-to-r from-red-950/90 via-red-900/30 to-slate-900 border border-red-500 shadow-sm ring-1 ring-red-400/40'
                         : isTeammate
                         ? 'bg-gradient-to-r from-emerald-950/70 via-emerald-900/20 to-slate-900 border border-emerald-500/50 shadow-sm'
                         : 'bg-slate-900/80 hover:bg-slate-800/80 border border-white/5'
                     }`}
                   >
-                    <div className="flex items-center gap-1 min-w-0">
-                      <span className={`w-[26px] text-center font-racing font-bold text-[9.5px] sm:text-[10px] tracking-tight shrink-0 ${
-                        inPoints ? 'text-amber-300' : 'text-slate-400'
-                      }`}>
-                        P{car.position}
+                    {/* Left: Position, Team Stripe, Driver Code (Large), Target/Teammate Tag */}
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="w-[18px] text-right font-racing font-bold text-[10px] text-slate-400 tracking-tight shrink-0">
+                        {isRetired ? '-' : car.position}
                       </span>
                       <div
                         className="w-0.5 h-3.5 rounded-full shrink-0"
-                        style={{ backgroundColor: car.color }}
+                        style={{ backgroundColor: isRetired ? '#475569' : car.color }}
                       />
-                      <div className="flex items-center gap-0.5 flex-nowrap shrink-0">
-                        <span className="font-mono font-black text-white text-[10px] tracking-tight">
+                      <div className="flex items-center gap-1 flex-nowrap shrink-0">
+                        <span className={`font-mono font-black text-[12px] tracking-tight ${isRetired ? 'text-slate-500 line-through' : 'text-white'}`}>
                           {car.code}
                         </span>
-                        {isTarget && (
-                          <span className="px-0.5 py-0 rounded bg-red-600 text-[7px] font-bold text-white tracking-wider">
-                            YOU
-                          </span>
-                        )}
-                        {isTeammate && (
-                          <span className="px-0.5 py-0 rounded bg-emerald-600 text-[7px] font-bold text-white tracking-wider">
-                            TM
-                          </span>
-                        )}
-                        {car.isPitting && (
-                          <span className="px-0.5 py-0 rounded bg-amber-500 text-slate-950 text-[7px] font-mono font-extrabold tracking-wider animate-pulse">
-                            PIT
-                          </span>
-                        )}
                       </div>
                     </div>
 
+                    {/* Right: OVR, Tyre Compound, Gap / PIT / OUT */}
                     <div className="flex items-center gap-1 font-mono shrink-0">
-                      {/* 2026 Manual Override Mode (OVR) Badge */}
-                      {isOvrWindow && !car.isPitting && (
+                      {/* 2026 Manual Override Mode (OVR) Indicator */}
+                      {!isRetired && isOvrWindow && !car.isPitting && (
                         <span
-                          className="px-0.5 py-0 rounded bg-amber-950/80 border border-amber-400/80 text-[7px] font-mono font-bold text-amber-300 shrink-0"
+                          className="text-[7px] font-mono font-bold text-cyan-400/80 shrink-0 leading-none"
                           title="Manual Override Mode (2026年規定: 1秒以内追従時の350kW電力ブースト)"
                         >
                           OVR
@@ -2364,34 +3075,39 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                       )}
 
                       {/* Tyre Badge */}
-                      <span
-                        className="px-1 py-0 rounded text-[8px] font-bold font-mono shrink-0 tracking-tighter"
-                        style={{
-                          backgroundColor: `${tyreProp.color}25`,
-                          color: tyreProp.color,
-                          border: `1px solid ${tyreProp.color}50`,
-                        }}
-                        title={`${car.tyreCompound} - Lap ${car.tyreAge} (${car.tyreWearPercent}% wear)`}
-                      >
-                        {car.tyreCompound[0]}{car.tyreAge}
-                      </span>
+                      {!isRetired && (
+                        <span
+                          className="px-1 py-0 rounded text-[8px] font-bold font-mono shrink-0 tracking-tighter"
+                          style={{
+                            backgroundColor: `${tyreProp.color}25`,
+                            color: tyreProp.color,
+                            border: `1px solid ${tyreProp.color}50`,
+                          }}
+                          title={`${car.tyreCompound} - Lap ${car.tyreAge} (${car.tyreWearPercent}% wear)`}
+                        >
+                          {car.tyreCompound[0]}{car.tyreAge}
+                        </span>
+                      )}
 
-                      {/* Gap / Interval Column (Always ALL: GAP & INT) */}
-                      <div className="text-right min-w-[40px]">
-                        <div className="flex flex-col leading-none">
-                          <span className="font-bold text-white text-[10px] sm:text-[11px] tabular-nums font-mono tracking-tight">
+                      {/* Gap / Interval / PIT / OUT Column */}
+                      <div className="text-right min-w-[36px]">
+                        {isRetired ? (
+                          <span className="px-1.5 py-0.2 rounded bg-rose-950/80 border border-rose-500/40 text-rose-300 text-[7.5px] font-mono font-extrabold tracking-wider inline-block">
+                            OUT
+                          </span>
+                        ) : car.isPitting ? (
+                          <span className="px-1 py-0.2 rounded bg-amber-500 text-slate-950 text-[7.5px] font-mono font-extrabold tracking-wider animate-pulse inline-block">
+                            PIT
+                          </span>
+                        ) : timingTowerMode === 'gap' ? (
+                          <span className="font-bold text-white text-[10.5px] sm:text-[11px] tabular-nums font-mono tracking-tight leading-none">
                             {car.position === 1 ? 'LEAD' : `+${car.gapToLeader.toFixed(1)}`}
                           </span>
-                          <span className={`text-[8px] sm:text-[8.5px] font-mono tabular-nums ${
-                            car.position === 1
-                              ? 'text-slate-500'
-                              : isOvrWindow
-                              ? 'text-amber-300 font-bold'
-                              : 'text-slate-400'
-                          }`}>
-                            {car.position === 1 ? '-' : `Δ${car.gapToAhead.toFixed(1)}`}
+                        ) : (
+                          <span className="font-bold text-white text-[10.5px] sm:text-[11px] tabular-nums font-mono tracking-tight leading-none">
+                            {car.position === 1 ? 'LEAD' : `Δ${car.gapToAhead.toFixed(1)}`}
                           </span>
-                        </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -2442,7 +3158,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
           {/* ── LOWER DECK: WEATHER (LEFT) & TEAM ORDERS (RIGHT) ── */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {/* 1. WEATHER (Balanced Fit - No Clipping) */}
-            <div className={`glass-card-premium p-2 rounded-xl border border-white/10 space-y-1 flex flex-col justify-start transition-all ${
+            <div className={`glass-card-premium p-2.5 rounded-xl border border-white/10 space-y-2 flex flex-col justify-start transition-all ${
               activeHelpCard === 'weather' || hoveredHelpCard === 'weather' ? 'relative z-50' : 'relative z-10 hover:z-40'
             }`}>
               <div className="flex items-center justify-between">
@@ -2470,9 +3186,26 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                   </button>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="px-1.5 py-0.2 rounded bg-sky-950 text-sky-300 border border-sky-500/30 text-[8.5px] font-mono font-bold uppercase">
-                    {currentSnapshot?.rainRadar.intensity || 'DRY'}
-                  </span>
+                  {(() => {
+                    const rawIntensity = currentSnapshot?.rainRadar.intensity || 'DRY';
+                    const intensity = String(rawIntensity).toLowerCase();
+                    const isMonsoon = intensity === 'monsoon' || intensity === 'heavy';
+                    const isWet = intensity === 'heavy' || intensity === 'wet';
+                    const isDamp = intensity === 'moderate' || intensity === 'light' || intensity === 'drizzle';
+                    const icon = isMonsoon ? '🌊' : isWet ? '🌧️' : isDamp ? '☁️' : '☀️';
+                    const badgeColor = isMonsoon
+                      ? 'bg-blue-950 text-blue-300 border-blue-500/40'
+                      : isWet
+                      ? 'bg-sky-950 text-sky-300 border-sky-500/40'
+                      : isDamp
+                      ? 'bg-cyan-950 text-cyan-300 border-cyan-500/40'
+                      : 'bg-emerald-950 text-emerald-300 border-emerald-500/40';
+                    return (
+                      <span className={`px-1.5 py-0.2 rounded-full border text-[8.5px] font-mono font-bold whitespace-nowrap uppercase ${badgeColor}`}>
+                        {icon} {rawIntensity}
+                      </span>
+                    );
+                  })()}
                   <button
                     type="button"
                     onClick={() => setActiveMonitor('weather')}
@@ -2484,15 +3217,17 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                 </div>
               </div>
 
-              <div className="p-1 sm:p-1.5 rounded-lg bg-slate-950 border border-white/10 flex items-center gap-2">
-                {/* Circular animated radar scope (42px) */}
-                <div className="relative w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-full border border-sky-500/30 bg-radial from-sky-950/40 via-slate-950 to-slate-950 overflow-hidden flex items-center justify-center">
-                  <div className="absolute inset-1 rounded-full border border-sky-500/20 border-dashed" />
+              <div className="p-1.5 rounded-lg bg-slate-950 border border-white/10 flex items-center gap-2.5">
+                {/* Circular animated radar scope (48px) with concentric distance rings */}
+                <div className="relative w-12 h-12 sm:w-13 sm:h-13 shrink-0 rounded-full border border-sky-500/40 bg-radial from-sky-950/50 via-slate-950 to-slate-950 overflow-hidden flex items-center justify-center">
+                  <div className="absolute inset-1 rounded-full border border-sky-500/20 border-dashed" title="15km レンジ" />
+                  <div className="absolute inset-2.5 rounded-full border border-sky-500/25" title="10km レンジ" />
+                  <div className="absolute inset-4 rounded-full border border-sky-500/30" title="5km レンジ" />
                   <div className="absolute inset-x-0 top-1/2 h-px bg-sky-500/20" />
                   <div className="absolute inset-y-0 left-1/2 w-px bg-sky-500/20" />
-                  <span className="absolute top-0 text-[5px] font-mono font-bold text-slate-500">N</span>
+                  <span className="absolute top-0 text-[5px] font-mono font-bold text-sky-400">N</span>
                   <div className="absolute inset-0 rounded-full animate-[spin_3.5s_linear_infinite] pointer-events-none origin-center opacity-40 bg-[conic-gradient(from_0deg,transparent_0_300deg,rgba(56,189,248,0.4)_360deg)]" />
-                  <div className="relative z-10 w-1.5 h-1.5 rounded-full bg-red-500 shadow-sm shadow-red-500/80 ring-1 ring-red-400 animate-pulse" />
+                  <div className="relative z-10 w-1.5 h-1.5 rounded-full bg-red-500 shadow-sm shadow-red-500/80 ring-1 ring-red-400 animate-pulse" title="現在地（サーキット）" />
                   {(() => {
                     const radar = currentSnapshot?.rainRadar;
                     if (!radar || radar.distanceKm === undefined) return null;
@@ -2501,7 +3236,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                     }
                     const maxDist = 15;
                     const norm = Math.min(1, radar.distanceKm / maxDist);
-                    const radiusPx = 14;
+                    const radiusPx = 16;
                     const xOffset = -norm * radiusPx * 0.707;
                     const yOffset = norm * radiusPx * 0.707;
                     return (
@@ -2520,11 +3255,26 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                   })()}
                 </div>
 
-                {/* Radar Stats (Compact & clear) */}
-                <div className="flex-1 min-w-0 space-y-0.5 text-[9px] sm:text-[9.5px] font-mono leading-none">
+                {/* Radar Stats (Compact & clear with Rain Countdown) */}
+                <div className="flex-1 min-w-0 space-y-1 text-[9.5px] sm:text-[10px] font-mono leading-none">
+                  {/* Lap Countdown to Rain */}
+                  <div className="flex justify-between items-center pb-0.5 border-b border-white/10">
+                    <span className="text-slate-400">降雨予測:</span>
+                    <span className="font-bold font-racing text-[10px] text-amber-300">
+                      {(() => {
+                        const rainLap = activeScenario.actualRainLap;
+                        if (!rainLap || rainLap > activeScenario.totalLaps) return '降雨なし (DRY)';
+                        const diff = rainLap - challengeLap;
+                        if (diff < 0) return '通過中 (降雨中)';
+                        if (diff === 0) return '🚨 今周回到達！';
+                        return `LAP ${rainLap} (あと${diff}周)`;
+                      })()}
+                    </span>
+                  </div>
+
                   <div className="flex justify-between items-center">
                     <span className="text-slate-400">雨雲距離:</span>
-                    <span className="font-bold text-white text-[9.5px] sm:text-[10px]">
+                    <span className="font-bold text-white text-[10px] sm:text-[10.5px]">
                       {currentSnapshot?.rainRadar.distanceKm! > 10
                         ? '>10km'
                         : currentSnapshot?.rainRadar.distanceKm === 0
@@ -2534,7 +3284,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-slate-400">到達予測:</span>
-                    <span className="font-bold text-amber-400 text-[9.5px] sm:text-[10px]">
+                    <span className="font-bold text-amber-400 text-[10px] sm:text-[10.5px]">
                       {currentSnapshot?.rainRadar.etaMinutes! > 0
                         ? `約${currentSnapshot?.rainRadar.etaMinutes}分後`
                         : currentSnapshot?.rainRadar.distanceKm === 0
@@ -2544,13 +3294,13 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-slate-400">路面水量:</span>
-                    <span className="font-bold text-sky-400 text-[9.5px] sm:text-[10px]">
+                    <span className="font-bold text-sky-400 text-[10px] sm:text-[10.5px]">
                       {currentSnapshot?.rainRadar.waterDepthMm} mm
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-slate-400">路面温度:</span>
-                    <span className="font-bold text-amber-400 text-[9.5px] sm:text-[10px]">
+                    <span className="font-bold text-amber-400 text-[10px] sm:text-[10.5px]">
                       {currentSnapshot?.rainRadar.trackTempC || 30}°C
                     </span>
                   </div>
@@ -2558,12 +3308,12 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
               </div>
 
               {/* Compound Crossover Spectrum Bar (Tightly fit) */}
-              <div className="space-y-0 pt-0">
-                <div className="flex justify-between text-[8.5px] font-mono text-slate-400 leading-none">
+              <div className="space-y-0.5 pt-1">
+                <div className="flex justify-between text-[9px] font-mono text-slate-400 leading-none">
                   <span>水深交差スペクトラム</span>
-                  <span className="text-sky-300 font-bold text-[9px]">{currentSnapshot?.rainRadar.waterDepthMm.toFixed(1)}mm</span>
+                  <span className="text-sky-300 font-bold text-[9.5px]">{currentSnapshot?.rainRadar.waterDepthMm.toFixed(1)}mm</span>
                 </div>
-                <div className="relative pt-1 pb-0">
+                <div className="relative pt-1.5 pb-0.5">
                   {(() => {
                     const depth = currentSnapshot?.rainRadar.waterDepthMm || 0;
                     const maxScale = 5.0;
@@ -2583,7 +3333,6 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                   <div className="w-full h-1.5 rounded-full overflow-hidden flex shadow-inner border border-white/10">
                     <div className="h-full bg-gradient-to-r from-red-500 via-amber-400 to-yellow-300" style={{ width: '16%' }} title="SLICK: 0.0〜0.8mm" />
                     <div className="h-full bg-gradient-to-r from-emerald-500 via-green-400 to-teal-400" style={{ width: '64%' }} title="INTER: 0.8〜4.0mm" />
-                    <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-600" style={{ width: '20%' }} title="WET: 4.0mm+" />
                   </div>
                 </div>
               </div>
@@ -2662,7 +3411,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
             </div>
 
             {/* 2. TEAM ORDERS (Compact) */}
-            <div className="glass-card-premium p-2 rounded-xl border border-white/10 space-y-1.5 flex flex-col justify-start transition-all">
+            <div className="glass-card-premium p-2.5 rounded-xl border border-white/10 space-y-2 flex flex-col justify-start transition-all">
               <div className="flex items-center justify-between pb-1 border-b border-white/10">
                 <span className="font-racing text-xs font-bold text-white flex items-center gap-1.5 tracking-wide">
                   <ShieldAlert className="w-3.5 h-3.5 text-yellow-400" /> TEAM ORDERS
@@ -2674,7 +3423,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
 
               {/* Double Stack Risk Warning (if active) */}
               {currentSnapshot?.teammateStatus?.doubleStackRisk && (
-                <div className="p-0.5 px-1.5 rounded bg-red-950/80 border border-red-500/70 text-[8.5px] text-red-200 flex items-center justify-between">
+                <div className="p-1 px-1.5 rounded bg-red-950/80 border border-red-500/70 text-[8.5px] text-red-200 flex items-center justify-between">
                   <span className="flex items-center gap-1 font-bold text-red-300">
                     <AlertCircle className="w-3 h-3 text-red-400 shrink-0" /> ダブルスタック待機リスク！
                   </span>
@@ -2682,46 +3431,46 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                 </div>
               )}
 
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <button
                   type="button"
                   onClick={() => handleTeamOrder('swap')}
-                  className={`w-full py-1 px-2 rounded-lg border text-left transition-all flex justify-between items-center cursor-pointer ${
+                  className={`w-full py-1.5 px-2.5 rounded-lg border text-left transition-all flex justify-between items-center cursor-pointer ${
                     activeTeamOrder === 'swap'
                       ? 'bg-emerald-950/80 border-emerald-500 text-white shadow-sm'
                       : 'bg-slate-900 hover:bg-slate-800 border-white/10 text-slate-300'
                   }`}
                   title="タイヤ戦略が有利な側を先行させる"
                 >
-                  <span className="font-racing font-bold text-[10px]">🔄 順位入替 (Swap Positions)</span>
+                  <span className="font-racing font-bold text-[10.5px]">🔄 順位入替 (Swap Positions)</span>
                   {activeTeamOrder === 'swap' && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleTeamOrder('defend')}
-                  className={`w-full py-1 px-2 rounded-lg border text-left transition-all flex justify-between items-center cursor-pointer ${
+                  className={`w-full py-1.5 px-2.5 rounded-lg border text-left transition-all flex justify-between items-center cursor-pointer ${
                     activeTeamOrder === 'defend'
                       ? 'bg-amber-950/80 border-amber-500 text-white shadow-sm'
                       : 'bg-slate-900 hover:bg-slate-800 border-white/10 text-slate-300'
                   }`}
                   title="相方に後続を抑え込ませタイム差拡大"
                 >
-                  <span className="font-racing font-bold text-[10px]">🛡️ 後続ブロック (Hold Up Rival)</span>
+                  <span className="font-racing font-bold text-[10.5px]">🛡️ 後続ブロック (Hold Up Rival)</span>
                   {activeTeamOrder === 'defend' && <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />}
                 </button>
 
                 <button
                   type="button"
                   onClick={() => handleTeamOrder('none')}
-                  className={`w-full py-1 px-2 rounded-lg border text-left transition-all flex justify-between items-center cursor-pointer ${
+                  className={`w-full py-1.5 px-2.5 rounded-lg border text-left transition-all flex justify-between items-center cursor-pointer ${
                     activeTeamOrder === 'none'
                       ? 'bg-slate-800 border-white/30 text-white'
                       : 'bg-slate-900 hover:bg-slate-800 border-white/10 text-slate-400'
                   }`}
                   title="チームオーダーなしで自由に競わせる"
                 >
-                  <span className="font-racing font-bold text-[10px]">🏁 自由競争 (Normal Racing)</span>
+                  <span className="font-racing font-bold text-[10.5px]">🏁 自由競争 (Normal Racing)</span>
                   {activeTeamOrder === 'none' && <CheckCircle2 className="w-3.5 h-3.5 text-slate-300 shrink-0" />}
                 </button>
               </div>
@@ -2750,7 +3499,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
             {(activeMonitor === 'all' || activeMonitor === 'track') && (
               <div className="space-y-2.5">
                 {/* 1. LIVE RACE FEED & TEAM RADIO (Positioned side-by-side with MISSION CONTROL INTEL in Column 4) */}
-                <div className="glass-card-premium p-2.5 sm:p-3 rounded-2xl border border-white/10 shadow-lg backdrop-blur-md flex flex-col h-[350px]">
+                <div className="glass-card-premium p-2.5 sm:p-3 rounded-2xl border border-white/10 shadow-lg backdrop-blur-md flex flex-col h-[388px]">
                   <div className="flex flex-wrap items-center justify-between gap-1.5 pb-2 border-b border-white/10 shrink-0">
                     <div className="flex items-center gap-2">
                       <span className="relative flex h-2.5 w-2.5">
@@ -2794,11 +3543,11 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                         }`}
                         title={radioAudioEnabled ? '無線音: ON' : '無線音: 消音中'}
                       >
-                        {radioAudioEnabled ? <Volume2 className="w-3 h-3" /> : <VolumeX className="w-3 h-3" />}
+                        {radioAudioEnabled ? <Volume2 className="w-3 h-3 text-slate-200" /> : <VolumeX className="w-3 h-3 text-slate-500" />}
                       </button>
 
                       {/* Filter Chips */}
-                      <div className="flex items-center bg-slate-900/90 p-0.5 rounded-lg border border-white/10 text-[9px] font-racing">
+                      <div className="flex items-center bg-slate-900/90 p-0.5 rounded-lg border border-white/10 text-[8.5px] font-racing">
                         {(['all', 'radio', 'incident', 'overtake', 'broadcast'] as const).map((filter) => (
                           <button
                             key={filter}
@@ -2806,19 +3555,19 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                             onClick={() => setLiveFeedFilter(filter)}
                             className={`px-1.5 py-0.5 rounded font-bold transition-all cursor-pointer ${
                               liveFeedFilter === filter
-                                ? 'bg-rose-600 text-white shadow-sm'
+                                ? 'bg-slate-700 text-white border border-white/20 shadow-sm'
                                 : 'text-slate-400 hover:text-white'
                             }`}
                           >
                             {filter === 'all'
                               ? 'ALL'
                               : filter === 'radio'
-                              ? '📻'
+                              ? '📻 無線'
                               : filter === 'incident'
-                              ? '⚠️'
+                              ? '⚠️ 警告'
                               : filter === 'overtake'
-                              ? '⚔️'
-                              : '🏁'}
+                              ? '⚔️ 追越'
+                              : '🏁 FIA'}
                           </button>
                         ))}
                       </div>
@@ -2834,50 +3583,56 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                     ) : (
                       filteredFeed.map((msg, idx) => {
                         const isLatest = idx === 0;
+                        const isRadio = msg.type === 'radio';
+                        const isIncident = msg.type === 'incident';
+                        const isOvertake = msg.type === 'overtake';
+
                         return (
                           <div
                             key={msg.id}
-                            className={`p-2 rounded-xl text-xs font-mono leading-relaxed transition-all ${
-                              msg.type === 'incident'
-                                ? 'bg-red-950/70 border border-red-500/50 text-red-100 shadow-sm'
-                                : msg.type === 'radio'
-                                ? 'bg-amber-950/50 border border-amber-500/40 text-amber-100'
-                                : msg.type === 'overtake'
-                                ? 'bg-sky-950/50 border border-sky-500/40 text-sky-100'
-                                : 'bg-slate-900/80 border border-white/10 text-slate-300'
-                            } ${isLatest ? 'ring-1 ring-white/30 shadow-md' : ''}`}
+                            className={`p-2 sm:p-2.5 rounded-xl transition-all border ${
+                              isIncident
+                                ? 'border-white/10 border-l-[3px] border-l-rose-500 bg-slate-900/90'
+                                : isRadio
+                                ? 'border-white/10 border-l-[3px] border-l-amber-400 bg-slate-900/90'
+                                : isOvertake
+                                ? 'border-white/10 border-l-[3px] border-l-sky-400 bg-slate-900/90'
+                                : 'border-white/10 border-l-[3px] border-l-slate-400 bg-slate-900/90'
+                            } ${isLatest ? 'ring-1 ring-white/20 shadow-md' : 'hover:border-white/20'}`}
                           >
-                            <div className="flex items-center justify-between mb-0.5 text-[9px] font-racing">
-                              <div className="flex items-center gap-1 flex-wrap">
+                            <div className="flex items-center justify-between mb-1 text-[9px] font-racing">
+                              <div className="flex items-center gap-1.5 flex-wrap">
                                 <span
-                                  className={`px-1 py-0.2 rounded font-bold uppercase tracking-wider text-[8px] ${
-                                    msg.type === 'incident'
-                                      ? 'bg-red-600 text-white'
-                                      : msg.type === 'radio'
-                                      ? 'bg-amber-500 text-slate-950'
-                                      : msg.type === 'overtake'
-                                      ? 'bg-sky-500 text-slate-950'
-                                      : 'bg-slate-700 text-slate-200'
+                                  className={`px-1.5 py-0.2 rounded font-mono font-bold uppercase tracking-wider text-[8px] ${
+                                    isIncident
+                                      ? 'bg-rose-950 text-rose-300 border border-rose-500/40'
+                                      : isRadio
+                                      ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                                      : isOvertake
+                                      ? 'bg-sky-950 text-sky-300 border border-sky-500/40'
+                                      : 'bg-slate-800 text-slate-300 border border-white/10'
                                   }`}
                                 >
-                                  {msg.type === 'incident'
+                                  {isIncident
                                     ? '⚠️ INCIDENT'
-                                    : msg.type === 'radio'
+                                    : isRadio
                                     ? '📻 RADIO'
-                                    : msg.type === 'overtake'
-                                    ? '⚔️ PASS'
-                                    : '🏁 FIA'}
+                                    : isOvertake
+                                    ? '⚔️ OVERTAKE'
+                                    : '🏁 FIA BROADCAST'}
                                 </span>
-                                <span className="font-bold text-white">{msg.speaker}</span>
+                                <span className="font-racing font-bold text-white text-[11px]">{msg.speaker}</span>
                                 {isLatest && (
-                                  <span className="px-1 py-0.2 rounded bg-rose-500/30 text-rose-300 text-[7px] font-bold animate-pulse">
+                                  <span className="px-1 py-0.2 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 text-[7.5px] font-mono font-bold animate-pulse">
                                     LATEST
                                   </span>
                                 )}
                               </div>
-                              <span className="text-slate-400 font-mono">L{msg.lap}</span>
+                              <span className="text-slate-400 font-mono text-[9px]">L{msg.lap}</span>
                             </div>
-                            <div className="text-slate-200 text-xs">{msg.text}</div>
+                            <div className={`text-xs font-sans leading-relaxed ${isRadio ? 'text-amber-100/90 italic font-medium' : 'text-slate-100'}`}>
+                              {msg.text}
+                            </div>
                           </div>
                         );
                       })
@@ -2886,7 +3641,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                 </div>
 
                 {/* 2. Bottom Deck: CAR TELEMETRY & 4-TYRE THERMALS (Compact & Actionable) */}
-                <div className={`glass-card-premium p-2 sm:p-2.5 rounded-xl border border-white/10 space-y-2 transition-all ${
+                <div className={`glass-card-premium p-2 sm:p-2.5 rounded-xl border border-white/10 space-y-2 transition-all min-h-[238px] flex flex-col justify-between ${
                   activeHelpCard === 'telemetry' || hoveredHelpCard === 'telemetry' ? 'relative z-50' : 'relative z-0 hover:z-30'
                 }`}>
                   <div className="flex items-center justify-between">
@@ -2942,7 +3697,12 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
 
                   {/* 4 Tyre Cards with Surface vs Core Temps */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-                    {['フロント左 (FL)', 'フロント右 (FR)', 'リア左 (RL)', 'リア右 (RR)'].map((tyreName, idx) => {
+                    {[
+                      { code: 'FL', label: '前左' },
+                      { code: 'FR', label: '前右' },
+                      { code: 'RL', label: '後左' },
+                      { code: 'RR', label: '後右' },
+                    ].map((tyre, idx) => {
                       const isFront = idx < 2;
                       const surf = playerCar ? playerCar.tyreSurfaceTemp + (isFront ? -2 : +3) : 100;
                       const core = playerCar ? playerCar.tyreCoreTemp + (isFront ? -1 : +2) : 98;
@@ -2950,8 +3710,8 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                       const isCold = surf < 88;
                       return (
                         <div
-                          key={tyreName}
-                          className={`p-2 rounded-xl border ${
+                          key={tyre.code}
+                          className={`p-1.5 sm:p-2 rounded-xl border ${
                             isOverheat
                               ? 'border-red-500/60 bg-red-950/20'
                               : isCold
@@ -2959,10 +3719,13 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                               : 'border-white/10 bg-slate-900/90'
                           }`}
                         >
-                          <div className="flex justify-between items-center text-[10px] text-slate-300 pb-1 border-b border-white/10">
-                            <span className="font-racing font-bold truncate">{tyreName}</span>
+                          <div className="flex justify-between items-center pb-1 border-b border-white/10">
+                            <div className="flex items-baseline gap-1 min-w-0">
+                              <span className="font-racing font-bold text-white text-[11px] leading-none">{tyre.code}</span>
+                              <span className="text-[8px] text-slate-400 font-mono leading-none">({tyre.label})</span>
+                            </div>
                             <span
-                              className={`px-1 py-0.2 rounded text-[8px] font-bold ${
+                              className={`px-1 py-0.2 rounded text-[7.5px] font-bold shrink-0 ${
                                 isOverheat
                                   ? 'bg-red-600 text-white animate-pulse'
                                   : isCold
@@ -2973,16 +3736,16 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                               {isOverheat ? 'HOT' : isCold ? 'COLD' : 'OPT'}
                             </span>
                           </div>
-                          <div className="mt-1.5 space-y-0.5 text-[11px] font-mono">
-                            <div className="flex justify-between">
-                              <span className="text-slate-400">表面:</span>
+                          <div className="mt-1 space-y-0.5 text-[10px] sm:text-[10.5px] font-mono leading-tight">
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-400 text-[9.5px]">表面:</span>
                               <span className={`font-bold ${isOverheat ? 'text-red-400' : isCold ? 'text-cyan-400' : 'text-emerald-400'}`}>
                                 {surf.toFixed(0)}°C
                               </span>
                             </div>
-                            <div className="flex justify-between text-slate-300">
-                              <span className="text-slate-400">内部:</span>
-                              <span>{core.toFixed(0)}°C</span>
+                            <div className="flex justify-between items-center text-slate-300">
+                              <span className="text-slate-400 text-[9.5px]">内部:</span>
+                              <span className="font-bold">{core.toFixed(0)}°C</span>
                             </div>
                           </div>
                         </div>
@@ -3076,30 +3839,30 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
 
                   {/* 4 Sub-system Telemetry Readouts */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-0.5">
-                    <div className="p-2 rounded-xl bg-slate-900 border border-white/10">
-                      <span className="text-[9px] font-mono text-slate-400 block">ブレーキ温度 (4輪)</span>
-                      <span className="font-racing font-bold text-sm text-amber-400 mt-0.5 block">
+                    <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900 border border-white/10">
+                      <span className="text-[8.5px] font-mono text-slate-400 block truncate">ブレーキ温度 (4輪)</span>
+                      <span className="font-racing font-bold text-xs sm:text-sm text-amber-400 mt-0.5 block">
                         {playerCar?.brakeTemp || 540}°C
                       </span>
                     </div>
 
-                    <div className="p-2 rounded-xl bg-slate-900 border border-white/10">
-                      <span className="text-[9px] font-mono text-slate-400 block">ERS バッテリー SOC</span>
-                      <span className="font-racing font-bold text-sm text-cyan-400 mt-0.5 block">
+                    <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900 border border-white/10">
+                      <span className="text-[8.5px] font-mono text-slate-400 block truncate">ERS バッテリー SOC</span>
+                      <span className="font-racing font-bold text-xs sm:text-sm text-cyan-400 mt-0.5 block">
                         {playerCar?.ersBatterySoc || 85}%
                       </span>
                     </div>
 
-                    <div className="p-2 rounded-xl bg-slate-900 border border-white/10">
-                      <span className="text-[9px] font-mono text-slate-400 block">残燃料搭載量</span>
-                      <span className="font-racing font-bold text-sm text-emerald-400 mt-0.5 block">
+                    <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900 border border-white/10">
+                      <span className="text-[8.5px] font-mono text-slate-400 block truncate">残燃料搭載量</span>
+                      <span className="font-racing font-bold text-xs sm:text-sm text-emerald-400 mt-0.5 block">
                         {playerCar?.fuelRemainingKg || 25.0} kg
                       </span>
                     </div>
 
-                    <div className="p-2 rounded-xl bg-slate-900 border border-white/10">
-                      <span className="text-[9px] font-mono text-slate-400 block">ドライバー信頼度</span>
-                      <span className="font-racing font-bold text-sm text-white mt-0.5 block">
+                    <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900 border border-white/10">
+                      <span className="text-[8.5px] font-mono text-slate-400 block truncate">ドライバー信頼度</span>
+                      <span className="font-racing font-bold text-xs sm:text-sm text-white mt-0.5 block">
                         {playerCar?.driverConfidence || 90}%
                       </span>
                     </div>
@@ -3261,28 +4024,35 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
               <div className="space-y-3">
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {/* 4 Tyre Cards with Surface vs Core Temps */}
-                  {['フロント左 (FL)', 'フロント右 (FR)', 'リア左 (RL)', 'リア右 (RR)'].map(
-                    (tyreName, idx) => {
-                      const isFront = idx < 2;
-                      const surf = playerCar ? playerCar.tyreSurfaceTemp + (isFront ? -2 : +3) : 100;
-                      const core = playerCar ? playerCar.tyreCoreTemp + (isFront ? -1 : +2) : 98;
-                      const isOverheat = surf > 125;
-                      const isCold = surf < 88;
-                      return (
-                        <div
-                          key={tyreName}
-                          className={`glass-card-premium p-2.5 sm:p-3 rounded-2xl border ${
-                            isOverheat
-                              ? 'border-red-500/60 bg-red-950/20'
-                              : isCold
-                              ? 'border-cyan-500/60 bg-cyan-950/20'
-                              : 'border-white/10'
-                          }`}
-                        >
-                          <div className="flex justify-between items-center text-[10px] sm:text-xs text-slate-300 pb-1.5 border-b border-white/10">
-                            <span className="font-racing font-bold truncate">{tyreName}</span>
-                            <span
-                              className={`px-1 py-0.2 rounded text-[9px] font-bold ${
+                  {[
+                    { code: 'FL', label: '前左' },
+                    { code: 'FR', label: '前右' },
+                    { code: 'RL', label: '後左' },
+                    { code: 'RR', label: '後右' },
+                  ].map((tyre, idx) => {
+                    const isFront = idx < 2;
+                    const surf = playerCar ? playerCar.tyreSurfaceTemp + (isFront ? -2 : +3) : 100;
+                    const core = playerCar ? playerCar.tyreCoreTemp + (isFront ? -1 : +2) : 98;
+                    const isOverheat = surf > 125;
+                    const isCold = surf < 88;
+                    return (
+                      <div
+                        key={tyre.code}
+                        className={`glass-card-premium p-2.5 sm:p-3 rounded-2xl border ${
+                          isOverheat
+                            ? 'border-red-500/60 bg-red-950/20'
+                            : isCold
+                            ? 'border-cyan-500/60 bg-cyan-950/20'
+                            : 'border-white/10'
+                        }`}
+                      >
+                        <div className="flex justify-between items-center text-[10px] sm:text-xs text-slate-300 pb-1.5 border-b border-white/10">
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="font-racing font-bold text-white text-sm leading-none">{tyre.code}</span>
+                            <span className="text-[10px] text-slate-400 font-mono leading-none">({tyre.label})</span>
+                          </div>
+                          <span
+                            className={`px-1 py-0.2 rounded text-[9px] font-bold ${
                                 isOverheat
                                   ? 'bg-red-600 text-white animate-pulse'
                                   : isCold
@@ -3560,7 +4330,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
           )}
 
           {/* ── MISSION CONTROL INTEL (Rival Espionage & Shared Analytics) ── */}
-          <div className="glass-card-premium p-2.5 sm:p-3 rounded-2xl border border-white/10 shadow-lg backdrop-blur-md flex flex-col h-[350px]">
+          <div className="glass-card-premium p-2.5 sm:p-3 rounded-2xl border border-white/10 shadow-lg backdrop-blur-md flex flex-col h-[388px]">
             {/* Header */}
             <div className="flex flex-wrap items-center justify-between gap-1.5 pb-1.5 border-b border-white/10 shrink-0">
               <div className="flex items-center gap-1.5">
@@ -3577,7 +4347,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
               </div>
 
               {/* Filter Chips */}
-              <div className="flex items-center bg-slate-900/90 p-0.5 rounded-lg border border-white/10 text-[8px] font-racing">
+              <div className="flex items-center bg-slate-900/90 p-0.5 rounded-lg border border-white/10 text-[8.5px] font-racing">
                 {(['all', 'tyre', 'telemetry', 'radio_intercept', 'ers', 'pit_stop'] as const).map((filter) => (
                   <button
                     key={filter}
@@ -3585,7 +4355,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                     onClick={() => setRivalIntelFilter(filter)}
                     className={`px-1.5 py-0.5 rounded font-bold transition-all cursor-pointer ${
                       rivalIntelFilter === filter
-                        ? 'bg-cyan-600 text-white shadow-sm'
+                        ? 'bg-cyan-950 text-cyan-200 border border-cyan-500/50 shadow-sm font-bold'
                         : 'text-slate-400 hover:text-white'
                     }`}
                     title={
@@ -3605,135 +4375,145 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                     {filter === 'all'
                       ? 'ALL'
                       : filter === 'tyre'
-                      ? '🛞'
+                      ? '🛞 タイヤ'
                       : filter === 'telemetry'
-                      ? '⚡'
+                      ? '⚡ 最高速'
                       : filter === 'radio_intercept'
-                      ? '📻'
+                      ? '📻 傍受'
                       : filter === 'ers'
-                      ? '🔋'
-                      : '⏱️'}
+                      ? '🔋 ERS'
+                      : '⏱️ PIT'}
                   </button>
                 ))}
               </div>
             </div>
 
+            {/* Tactical Assist Mode Guidance Banner */}
+            {userAssistLevel === 'assisted' && tacticalAssistGuidance && (
+              <div className="mt-1.5 p-2 rounded-xl bg-gradient-to-r from-cyan-950/90 via-slate-900 to-cyan-950/70 border border-cyan-500/40 text-xs shadow-sm shrink-0 animate-in fade-in duration-200">
+                <div className="flex items-center justify-between text-[10px] font-racing text-cyan-300 pb-1 border-b border-cyan-500/20">
+                  <div className="flex items-center gap-1.5 font-bold">
+                    <span>{tacticalAssistGuidance.icon}</span>
+                    <span>TACTICAL ASSIST GUIDE (計器確認ガイダンス)</span>
+                  </div>
+                  <span className="font-mono text-[8.5px] text-cyan-400 bg-cyan-950 px-1.5 py-0.5 rounded border border-cyan-500/30">
+                    {tacticalAssistGuidance.target}
+                  </span>
+                </div>
+                <div className="text-[10px] text-slate-200 mt-1 leading-relaxed font-sans">
+                  {tacticalAssistGuidance.message}
+                </div>
+              </div>
+            )}
+
             {/* Reports Stream */}
             <div className="space-y-1.5 overflow-y-auto pr-1 flex-1 min-h-0 pt-1.5">
               {filteredRivalIntel.length === 0 ? (
-                <div className="py-3 text-center text-xs font-mono text-slate-500">
+                <div className="py-4 text-center text-xs font-mono text-slate-500">
                   現在このカテゴリの共有インテルはありません
                 </div>
               ) : (
                 filteredRivalIntel.map((report) => {
                   const isExpanded = selectedIntelRivalId === report.id;
+                  const isHigh = report.priority === 'high';
+                  const isTyre = report.category === 'tyre';
+                  const isTelem = report.category === 'telemetry';
+                  const isRadio = report.category === 'radio_intercept';
+                  const isErs = report.category === 'ers';
+
+                  const borderAccentColor = isHigh
+                    ? 'border-l-rose-500'
+                    : isTyre
+                    ? 'border-l-emerald-400'
+                    : isTelem
+                    ? 'border-l-cyan-400'
+                    : isRadio
+                    ? 'border-l-amber-400'
+                    : isErs
+                    ? 'border-l-purple-400'
+                    : 'border-l-sky-400';
+
                   return (
                     <div
                       key={report.id}
-                      className={`p-2 rounded-xl bg-slate-900/80 border transition-all ${
-                        report.priority === 'high'
-                          ? 'border-red-500/40 bg-gradient-to-r from-red-950/40 via-slate-900/80 to-slate-900/80'
-                          : report.confidence === 'suspect_bluff'
-                          ? 'border-amber-500/40 bg-gradient-to-r from-amber-950/30 via-slate-900/80 to-slate-900/80'
-                          : 'border-white/10 hover:border-white/20'
-                      }`}
+                      className={`p-2 rounded-xl bg-slate-900/90 border border-white/10 border-l-[3px] ${borderAccentColor} hover:border-white/20 transition-all shadow-sm`}
                     >
-                      <div className="flex items-center justify-between text-[9px] mb-1">
+                      <div className="flex items-center justify-between text-[9px] mb-0.5">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          {/* Priority Dot */}
-                          <span
-                            className={`w-1.5 h-1.5 rounded-full ${
-                              report.priority === 'high'
-                                ? 'bg-red-500 animate-ping'
-                                : report.priority === 'medium'
-                                ? 'bg-amber-400'
-                                : 'bg-cyan-400'
-                            }`}
-                          />
-                          {/* Role Badge */}
-                          <span className="font-racing font-bold text-slate-200">
+                          {/* Role Title */}
+                          <span className="font-racing font-bold text-white text-[10.5px]">
                             {report.analystRole}
                           </span>
                           {/* Target Car Badge */}
                           <span
-                            className="px-1 py-0.2 rounded font-mono font-bold text-[8.5px] border"
-                            style={{
-                              backgroundColor: `${report.targetCarColor}20`,
-                              borderColor: `${report.targetCarColor}60`,
-                              color: report.targetCarColor,
-                            }}
+                            className="px-1.5 py-0.2 rounded font-mono font-bold text-[8.5px] border bg-slate-800/80 text-white flex items-center gap-1"
+                            style={{ borderColor: `${report.targetCarColor}60` }}
                           >
-                            {report.targetCarCode} (P{report.targetCarPos})
+                            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: report.targetCarColor }} />
+                            <span>{report.targetCarCode} (P{report.targetCarPos})</span>
                           </span>
                         </div>
 
-                        {/* Confidence Pill */}
-                        <span
-                          className={`px-1.5 py-0.2 rounded text-[8px] font-mono font-bold border ${
-                            report.confidence === 'verified'
-                              ? 'bg-emerald-950/80 border-emerald-500/50 text-emerald-300'
-                              : report.confidence === 'high'
-                              ? 'bg-sky-950/80 border-sky-500/50 text-sky-300'
-                              : report.confidence === 'suspect_bluff'
-                              ? 'bg-amber-950/90 border-amber-500/70 text-amber-300 animate-pulse'
-                              : 'bg-slate-800 border-white/10 text-slate-400'
-                          }`}
-                        >
-                          {report.confidenceLabel}
-                        </span>
+                        {/* Subtle Monochrome Lap & Confidence Meta (No colorful pills) */}
+                        <div className="flex items-center gap-1.5 text-[9px] font-mono text-slate-400">
+                          <span>L{report.lap}</span>
+                          <span className="text-slate-600">·</span>
+                          <span className={report.confidence === 'suspect_bluff' ? 'text-amber-400 font-bold' : 'text-slate-400'}>
+                            {report.confidenceLabel}
+                          </span>
+                        </div>
                       </div>
 
-                      {/* Summary Text (Objective Facts + Situational Assessment) */}
-                      <div className="text-[10px] sm:text-[10.5px] text-slate-200 font-mono leading-relaxed">
+                      {/* Summary Text (Enhanced font-sans with bold numbers) */}
+                      <div className="text-[11.5px] font-sans text-slate-100 leading-snug">
                         {report.summary}
                       </div>
 
-                      {/* Action / Detail Strip */}
-                      <div className="flex items-center justify-between pt-1 border-t border-white/5 text-[8.5px] mt-1">
-                        <span className="text-slate-400 font-mono">L{report.lap} 共有</span>
+                      {/* Action / Detail Strip: Sleek ghost link */}
+                      <div className="flex items-center justify-end pt-1 border-t border-white/5 text-[9px] mt-1">
                         <button
                           type="button"
                           onClick={() => setSelectedIntelRivalId(isExpanded ? null : report.id)}
-                          className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-cyan-500/30 hover:border-cyan-400 font-racing transition-all flex items-center gap-1 cursor-pointer"
+                          className="text-slate-400 hover:text-cyan-300 font-mono transition-colors flex items-center gap-1 cursor-pointer py-0.5 text-[9px]"
                         >
-                          <span>📊 他車データ</span>
-                          <span>{isExpanded ? '▲' : '▼'}</span>
+                          <span>詳細データ</span>
+                          <span className="text-[8px]">{isExpanded ? '▲' : '▼'}</span>
                         </button>
                       </div>
 
                       {/* Expanded Raw Telemetry Drawer */}
                       {isExpanded && (
-                        <div className="p-2 mt-1.5 rounded-lg bg-slate-950/90 border border-cyan-500/30 space-y-1 text-[9px] font-mono text-slate-300 animate-in fade-in duration-200">
+                        <div className="p-2 mt-1.5 rounded-lg bg-slate-950/90 border border-cyan-500/30 space-y-1 text-[9.5px] font-mono text-slate-300 animate-in fade-in duration-200">
                           <div className="flex items-center justify-between pb-1 border-b border-white/10 font-racing font-bold text-cyan-400">
                             <span>{report.targetCarName} ({report.targetCarCode}) 生データ解析</span>
                             <span>P{report.targetCarPos}</span>
                           </div>
                           <div className="grid grid-cols-2 gap-1.5 pt-0.5">
                             <div>
-                              <span className="text-slate-500">直近ラップ: </span>
+                              <span className="text-slate-400">直近ラップ: </span>
                               <span className="text-white font-bold">{report.rawTelemetry.lapTimes.join(' ➔ ')}</span>
                             </div>
                             <div>
-                              <span className="text-slate-500">最高速 (ST): </span>
+                              <span className="text-slate-400">最高速 (ST): </span>
                               <span className="text-white font-bold">{report.rawTelemetry.speedTrapKmh} km/h</span>
                               <span className={report.rawTelemetry.playerDeltaSpeedKmh > 0 ? 'text-rose-400 ml-1' : 'text-emerald-400 ml-1'}>
                                 (自車比 {report.rawTelemetry.playerDeltaSpeedKmh > 0 ? '+' : ''}{report.rawTelemetry.playerDeltaSpeedKmh}km/h)
                               </span>
                             </div>
                             <div>
-                              <span className="text-slate-500">タイヤ: </span>
+                              <span className="text-slate-400">タイヤ: </span>
                               <span className="text-amber-300 font-bold">
                                 {report.rawTelemetry.tyreCompound} ({report.rawTelemetry.tyreAge}周 / 摩耗{report.rawTelemetry.tyreWearPercent}%)
                               </span>
                             </div>
                             <div>
-                              <span className="text-slate-500">ERS残量: </span>
-                              <span className={report.rawTelemetry.ersBatterySoc < 30 ? 'text-red-400 font-bold' : 'text-cyan-300 font-bold'}>
+                              <span className="text-slate-400">ERS残量: </span>
+                              <span className={report.rawTelemetry.ersBatterySoc < 30 ? 'text-rose-400 font-bold' : 'text-cyan-300 font-bold'}>
                                 {report.rawTelemetry.ersBatterySoc}% {report.rawTelemetry.ersBatterySoc < 30 ? '(クリッピング注意)' : ''}
                               </span>
                             </div>
                           </div>
-                          <div className="text-[8px] text-slate-400 pt-0.5 flex justify-between items-center">
+                          <div className="text-[8.5px] text-slate-400 pt-0.5 flex justify-between items-center border-t border-white/5">
                             <span>自車との差: <strong className="text-white">{report.rawTelemetry.gapToPlayerSec.toFixed(1)}秒</strong> ({report.rawTelemetry.isAhead ? '前走' : '後続'})</span>
                             {report.rawTelemetry.pitStopDuration && (
                               <span className="text-amber-300 font-bold">ピット静止: {report.rawTelemetry.pitStopDuration}s</span>
@@ -3748,14 +4528,15 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
             </div>
           </div>
 
-          {/* ── PIT EXIT RADAR (Traffic & Pit Exit Window Radar) ── */}
-          <div className={`glass-card-premium p-2 sm:p-2.5 rounded-xl border border-white/10 space-y-1.5 flex flex-col justify-between transition-all ${
+          {/* ── DOCKED PIT STRATEGY & TACTICAL COMMANDS (Unified Single Card) ── */}
+          <div className={`glass-card-premium p-2 sm:p-2.5 rounded-xl border border-white/10 space-y-2 shadow-lg backdrop-blur-md transition-all min-h-[238px] flex flex-col justify-between ${
             activeHelpCard === 'pit_exit' || hoveredHelpCard === 'pit_exit' ? 'relative z-50' : 'relative z-20 hover:z-40'
           }`}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5">
-                <span className="font-racing text-xs font-bold text-white flex items-center gap-1.5">
-                  <Crosshair className="w-3.5 h-3.5 text-cyan-400" /> PIT EXIT RADAR
+            {/* Header */}
+            <div className="flex items-center justify-between pb-1 border-b border-white/10">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="font-racing text-xs font-bold text-white flex items-center gap-1.5 whitespace-nowrap">
+                  <Crosshair className="w-3.5 h-3.5 text-cyan-400 shrink-0" /> PIT STRATEGY &amp; COMMANDS
                 </span>
                 {/* Help button */}
                 <button
@@ -3766,7 +4547,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                   }}
                   onMouseEnter={() => setHoveredHelpCard('pit_exit')}
                   onMouseLeave={() => setHoveredHelpCard(null)}
-                  className={`w-3.5 h-3.5 rounded-full border text-[9px] font-mono font-bold flex items-center justify-center transition-all shadow-sm ${
+                  className={`w-3.5 h-3.5 rounded-full border text-[9px] font-mono font-bold flex items-center justify-center transition-all shadow-sm shrink-0 ${
                     activeHelpCard === 'pit_exit' || hoveredHelpCard === 'pit_exit'
                       ? 'bg-cyan-400 text-slate-950 border-cyan-300 ring-2 ring-cyan-400/50'
                       : 'bg-slate-800 hover:bg-cyan-950 border-white/20 hover:border-cyan-400 text-slate-400 hover:text-cyan-300'
@@ -3776,9 +4557,10 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                   ?
                 </button>
               </div>
-              <div className="flex items-center gap-1">
+
+              <div className="flex items-center gap-1 shrink-0">
                 <span
-                  className={`px-1.5 py-0.2 rounded-full text-[8.5px] font-mono font-bold ${
+                  className={`px-1.5 py-0.2 rounded-full text-[8.5px] font-mono font-bold whitespace-nowrap ${
                     pitExitTraffic.trafficStatus === 'CLEAN_AIR'
                       ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
                       : pitExitTraffic.trafficStatus === 'CAUTION'
@@ -3803,119 +4585,74 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
               </div>
             </div>
 
+            {/* Pit Entry Proximity Strip (Relocated to Pit Strategy Command Center) */}
+            <div className="flex items-center justify-between gap-1 px-2 py-1 rounded-lg bg-slate-900/90 border border-white/10 text-[10.5px] font-mono whitespace-nowrap overflow-hidden">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <Fuel className="w-3 h-3 text-amber-400 shrink-0" />
+                <span className="text-slate-400 text-[10px] shrink-0">ピット入口まで:</span>
+                <span className="font-bold text-white text-xs tabular-nums shrink-0">
+                  {pitProximity.distanceMeters.toLocaleString()} m
+                </span>
+                <span className="text-slate-400 text-[9.5px] shrink-0">
+                  (約{pitProximity.secondsToPit}秒)
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1 shrink-0">
+                {playerCar?.isPitting ? (
+                  <span className="px-1.5 py-0.2 rounded-full bg-amber-950/80 text-amber-300 border border-amber-500/60 text-[9px] font-racing font-bold flex items-center gap-1">
+                    <span>🛞 IN PIT LANE (作業中)</span>
+                  </span>
+                ) : pitProximity.isCommitmentZone ? (
+                  <span className="px-1.5 py-0.2 rounded-full bg-red-950 text-red-200 border border-red-500/80 text-[9px] font-racing font-bold animate-pulse flex items-center gap-1 shadow-md shadow-red-950">
+                    <AlertTriangle className="w-2.5 h-2.5 text-red-400" />
+                    <span>🚨 COMMITMENT (限界点)</span>
+                  </span>
+                ) : pitProximity.isApproaching ? (
+                  <span className="px-1.5 py-0.2 rounded-full bg-amber-950/80 text-amber-300 border border-amber-500/60 text-[9px] font-racing font-bold flex items-center gap-1">
+                    <span>🟡 APPROACHING PIT</span>
+                  </span>
+                ) : (
+                  <span className="px-1.5 py-0.2 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 text-[9px] font-mono font-bold flex items-center gap-1">
+                    <span>🟢 ON TRACK (巡航中)</span>
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* 1. Pit Exit Traffic Window (Concise F1 Timing) */}
             <div className="grid grid-cols-2 gap-1 p-1.5 rounded-lg bg-slate-900/90 border border-white/10 text-xs font-mono">
               <div className="flex items-baseline justify-between pr-1">
-                <span className="text-[9.5px] text-slate-400">想定復帰:</span>
+                <span className="text-[9.5px] text-slate-400 font-bold">EXIT:</span>
                 <span className="font-racing font-bold text-sm text-white">
                   P{pitExitTraffic.predictedExitPosition}
                 </span>
               </div>
               <div className="flex items-baseline justify-between">
-                <span className="text-[9.5px] text-slate-400">所要ロス:</span>
+                <span className="text-[9.5px] text-slate-400 font-bold">LOSS:</span>
                 <span className="font-mono font-bold text-xs text-amber-400">
-                  {pitExitTraffic.pitLossSeconds}s <span className="text-[8.5px] text-slate-400">({currentSnapshot?.isSC ? 'SC' : '通常'})</span>
+                  {pitExitTraffic.pitLossSeconds}s <span className="text-[8px] text-slate-400 font-normal">({currentSnapshot?.isSC ? 'SC' : 'NORM'})</span>
                 </span>
               </div>
               <div className="flex items-baseline justify-between pr-1">
-                <span className="text-[9.5px] text-slate-400">前走車差:</span>
-                <span className="font-mono font-bold text-[10px] text-white truncate max-w-[90px]">
+                <span className="text-[9.5px] text-slate-400 font-bold">AHEAD:</span>
+                <span className="font-mono font-bold text-[10px] text-white truncate max-w-[100px]">
                   {pitExitTraffic.aheadCarCode
                     ? `+${pitExitTraffic.gapAheadSeconds}s (${pitExitTraffic.aheadCarCode})`
-                    : '首位復帰'}
+                    : 'LEADER'}
                 </span>
               </div>
               <div className="flex items-baseline justify-between">
-                <span className="text-[9.5px] text-slate-400">後続車差:</span>
-                <span className="font-mono font-bold text-[10px] text-white truncate max-w-[90px]">
+                <span className="text-[9.5px] text-slate-400 font-bold">BEHIND:</span>
+                <span className="font-mono font-bold text-[10px] text-white truncate max-w-[100px]">
                   {pitExitTraffic.behindCarCode
                     ? `+${pitExitTraffic.gapBehindSeconds}s (${pitExitTraffic.behindCarCode})`
-                    : '後続なし'}
+                    : 'CLEAR'}
                 </span>
               </div>
             </div>
 
-            {/* Popover overlay: positioned relative to card, elevated to z-50 */}
-            {(activeHelpCard === 'pit_exit' || hoveredHelpCard === 'pit_exit') && (
-              <div
-                style={{ backgroundColor: '#020617' }}
-                className="absolute inset-x-1 top-8 p-3 rounded-2xl bg-slate-950 border border-cyan-500/80 shadow-[0_25px_60px_rgba(0,0,0,1)] z-50 text-left max-h-[380px] overflow-y-auto scrollbar-thin transition-all duration-150 animate-in fade-in zoom-in-95 ring-1 ring-cyan-500/50"
-                onMouseEnter={() => setHoveredHelpCard('pit_exit')}
-                onMouseLeave={() => setHoveredHelpCard(null)}
-              >
-                <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-white/10">
-                  <div className="flex items-center gap-1.5">
-                    <HelpCircle className="w-4 h-4 text-cyan-400" />
-                    <span className="font-racing text-xs font-bold text-cyan-300">PIT EXIT RADAR 戦術判断ガイド</span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveHelpCard(null);
-                      setHoveredHelpCard(null);
-                    }}
-                    className="text-slate-400 hover:text-white text-xs px-1.5 py-0.5 rounded hover:bg-slate-800"
-                    title="閉じる"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <div className="space-y-2 text-[10px] text-slate-300 leading-relaxed">
-                  <div>
-                    <div className="font-bold text-amber-300 flex items-center gap-1 mb-0.5">
-                      <span>🎯</span> <span>このデータは何を見るのか？</span>
-                    </div>
-                    <p className="text-slate-400">
-                      ピットインを行った場合、<strong className="text-white">「コース復帰時に何位・誰の前後何秒差で戻るか」</strong>をリアルタイムにシミュレーション予測する計器です。
-                    </p>
-                  </div>
-
-                  <div>
-                    <div className="font-bold text-emerald-300 flex items-center gap-1 mb-0.5">
-                      <span>📊</span> <span>各指標の見方と判断基準</span>
-                    </div>
-                    <ul className="space-y-1 text-slate-400">
-                      <li>
-                        <strong className="text-white">・想定復帰 (P○):</strong> ピットアウト直後に合流する予測順位。「手前の集団に呑まれるか、単独で走れるか」を見極めます。
-                      </li>
-                      <li>
-                        <strong className="text-amber-300">・所要ロス (通常22s前後 / SC時14s前後):</strong> ピット制限速度走行とタイヤ交換作業で失うタイム。<strong className="text-amber-200">セーフティカー（SC）中はコース上の全車が減速するため、ピットロスが約8〜10秒短縮（チープピット）</strong>されます。SC導入時に即ピットに入るのが圧倒的に有利な理由です。
-                      </li>
-                      <li>
-                        <strong className="text-emerald-300">・CLEAR AIR (緑):</strong> 前走車との差が十分（+3.0秒以上）ある状態。新品タイヤの強力なグリップを邪魔されずに100%発揮し、前を走るライバルを「アンダーカット」で逆転できます。
-                      </li>
-                      <li>
-                        <strong className="text-red-300">・TRAFFIC (赤) / CAUTION (黄):</strong> 遅いバックマーカーや中団集団の真後ろ（+1.0秒以内）に復帰してしまう状態。新品タイヤでも抜けずにタイムを失うため、<strong className="text-amber-200">「ステイアウト」して前が開くまで引っ張る（オーバーカット）</strong>のが定石です。
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="pt-1 border-t border-white/10">
-                    <div className="font-bold text-sky-300 flex items-center gap-1 mb-0.5">
-                      <span>⚡</span> <span>推奨アクション</span>
-                    </div>
-                    <p className="text-slate-300">
-                      <strong className="text-emerald-300">CLEAR AIR</strong> または <strong className="text-amber-300">SC導入</strong> ➔ 即座に <span className="px-1 py-0.2 rounded bg-red-900/60 border border-red-500/50 text-white font-mono font-bold">BOX BOX</span> を押してピットイン！<br />
-                      <strong className="text-red-400">TRAFFIC</strong> ➔ ピットインを1〜2周遅らせ、コース上のギャップが開くのを待つ。
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* DOCKED TACTICAL COMMANDS & PIT EXECUTION (Compact & Streamlined) */}
-          <div className="p-2 sm:p-2.5 rounded-xl bg-slate-950/90 border border-white/10 shadow-lg backdrop-blur-md space-y-1.5">
-            <div className="flex items-center justify-between text-xs font-racing font-bold text-slate-300 pb-1 border-b border-white/10">
-              <span className="flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5 text-amber-400" /> TACTICAL COMMANDS
-              </span>
-              <span className="text-[9.5px] font-mono text-slate-400">
-                PIT IN直前まで変更可能
-              </span>
-            </div>
-
-            {/* 1-Click Tyre Compound Switcher (Changeable right up until Pit In) */}
+            {/* 2. 1-Click Tyre Compound Switcher (Changeable right up until Pit In) */}
             <div className="flex items-center justify-between gap-1.5 bg-slate-900/90 p-1.5 rounded-xl border border-white/10">
               <div className="flex items-center gap-1.5 min-w-0">
                 <span className="text-[9px] font-mono text-slate-400 shrink-0">次タイヤ:</span>
@@ -3958,25 +4695,48 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
               </span>
             </div>
 
-            {/* Quick Action Command Grid: BOX BOX / PU MODE / ERS BOOST */}
+            {/* 3. Quick Action Command Grid: BOX BOX / PU MODE / ERS BOOST */}
             <div className="grid grid-cols-3 gap-1.5">
               {/* 1. BOX BOX Pit Call Button */}
               <button
                 type="button"
+                disabled={playerCar?.isPitting}
                 onClick={() => {
                   handleToggleBoxNextLap();
                   if (radioAudioEnabled) playF1RadioChirp();
                 }}
                 className={`p-1.5 rounded-xl border text-left cursor-pointer transition-all shadow-sm ${
-                  boxQueuedForNextLap
+                  playerCar?.isPitting
+                    ? 'bg-amber-950/70 border-amber-500/50 text-amber-200 cursor-not-allowed'
+                    : boxQueuedForNextLap
                     ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white border-emerald-400 ring-2 ring-emerald-500/50 shadow-emerald-950/50'
+                    : pitProximity.isCommitmentZone
+                    ? 'bg-red-950/90 hover:bg-red-900 border-red-500 text-white ring-2 ring-red-500/60 animate-pulse'
                     : 'bg-slate-900 hover:bg-red-950/60 border-white/10 hover:border-red-500/40 text-slate-300 hover:text-white'
                 }`}
-                title={boxQueuedForNextLap ? 'ピット指示済み（クリックでキャンセル）' : 'ピットイン指示を出す (BOX BOX)'}
+                title={
+                  playerCar?.isPitting
+                    ? '現在ピット作業中'
+                    : boxQueuedForNextLap
+                    ? 'ピット指示済み（クリックでキャンセル）'
+                    : 'ピットイン指示を出す (BOX BOX)'
+                }
               >
-                <div className="text-[8px] font-mono opacity-80">{boxQueuedForNextLap ? 'ORDERED' : 'PIT IN'}</div>
+                <div className="text-[8px] font-mono opacity-80">
+                  {playerCar?.isPitting
+                    ? 'IN PIT'
+                    : boxQueuedForNextLap
+                    ? 'ORDERED'
+                    : pitProximity.isCommitmentZone
+                    ? '⚠️ COMMIT!'
+                    : 'PIT IN'}
+                </div>
                 <div className="text-[10.5px] font-racing font-bold truncate">
-                  {boxQueuedForNextLap ? '✅ BOX BOX' : '🛞 "BOX BOX"'}
+                  {playerCar?.isPitting
+                    ? '🛞 PITTING'
+                    : boxQueuedForNextLap
+                    ? '✅ BOX BOX'
+                    : '🛞 "BOX BOX"'}
                 </div>
               </button>
 
@@ -4011,29 +4771,157 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
               {/* 3. ERS Boost Overtake Toggle */}
               <button
                 type="button"
+                disabled={!ersBoostUsedThisLap && !ersEligibility.eligible}
                 onClick={() => {
-                  handleToggleErs();
-                  if (radioAudioEnabled) playF1RadioChirp();
+                  if (ersBoostUsedThisLap || ersEligibility.eligible) {
+                    handleToggleErs();
+                    if (radioAudioEnabled) playF1RadioChirp();
+                  }
                 }}
-                className={`p-1.5 rounded-xl border text-left cursor-pointer transition-all ${
+                className={`p-1.5 rounded-xl border text-left transition-all ${
                   ersBoostUsedThisLap
-                    ? 'bg-cyan-950 border-cyan-400 text-cyan-200 ring-1 ring-cyan-500'
-                    : 'bg-slate-900 hover:bg-slate-800 border-white/10 text-slate-300'
+                    ? 'bg-cyan-950 border-cyan-400 text-cyan-200 ring-2 ring-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.5)] cursor-pointer animate-pulse'
+                    : ersEligibility.eligible
+                    ? 'bg-emerald-950/90 hover:bg-emerald-900 border-emerald-400 text-emerald-200 ring-1 ring-emerald-500/50 cursor-pointer animate-pulse'
+                    : 'bg-slate-900/60 border-white/5 text-slate-500 cursor-not-allowed opacity-60'
                 }`}
-                title="ERSバッテリー最大放出オーバーテイクモード"
+                title={
+                  ersBoostUsedThisLap
+                    ? 'ERSオーバーテイク稼働中（クリックで解除）'
+                    : ersEligibility.reason
+                }
               >
-                <div className="text-[8px] font-mono text-slate-400">OVERTAKE</div>
-                <div className="text-[10.5px] font-racing font-bold truncate">
-                  {ersBoostUsedThisLap ? '⚡ BOOST ON' : '🚀 ERS BOOST'}
+                <div className="text-[8px] font-mono opacity-80 flex items-center justify-between">
+                  <span>OVERTAKE</span>
+                  {ersBoostUsedThisLap ? (
+                    <span className="text-cyan-300 font-bold">ON</span>
+                  ) : ersEligibility.eligible ? (
+                    <span className="text-emerald-400 font-bold">&le;1.0s</span>
+                  ) : null}
+                </div>
+                <div className="text-[10px] font-racing font-bold truncate">
+                  {ersBoostUsedThisLap
+                    ? '⚡ BOOST ON'
+                    : ersEligibility.eligible
+                    ? '🟢 READY'
+                    : ersEligibility.label}
                 </div>
               </button>
             </div>
+
+            {/* Popover overlay: positioned relative to card, elevated to z-50 */}
+            {(activeHelpCard === 'pit_exit' || hoveredHelpCard === 'pit_exit') && (
+              <div
+                style={{ backgroundColor: '#020617' }}
+                className="absolute inset-x-1 bottom-2 p-3 rounded-2xl bg-slate-950 border border-cyan-500/80 shadow-[0_25px_60px_rgba(0,0,0,1)] z-50 text-left max-h-[380px] overflow-y-auto scrollbar-thin transition-all duration-150 animate-in fade-in zoom-in-95 ring-1 ring-cyan-500/50"
+                onMouseEnter={() => setHoveredHelpCard('pit_exit')}
+                onMouseLeave={() => setHoveredHelpCard(null)}
+              >
+                <div className="flex items-center justify-between pb-1.5 mb-2 border-b border-white/10">
+                  <div className="flex items-center gap-1.5">
+                    <HelpCircle className="w-4 h-4 text-cyan-400" />
+                    <span className="font-racing text-xs font-bold text-cyan-300">PIT STRATEGY &amp; COMMANDS 戦術判断ガイド</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveHelpCard(null);
+                      setHoveredHelpCard(null);
+                    }}
+                    className="text-slate-400 hover:text-white text-xs px-1.5 py-0.5 rounded hover:bg-slate-800"
+                    title="閉じる"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div className="space-y-2 text-[10px] text-slate-300 leading-relaxed">
+                  <div>
+                    <div className="font-bold text-amber-300 flex items-center gap-1 mb-0.5">
+                      <span>🎯</span> <span>このデータは何を見るのか？</span>
+                    </div>
+                    <p className="text-slate-400">
+                      ピットインを行った場合、<strong className="text-white">「コース復帰時に何位・誰の前後何秒差で戻るか」</strong>をリアルタイムにシミュレーション予測し、即座にタイヤ選択とピット指示（BOX BOX）を実行する計器です。
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className="font-bold text-emerald-300 flex items-center gap-1 mb-0.5">
+                      <span>📊</span> <span>各指標の見方と判断基準</span>
+                    </div>
+                    <ul className="space-y-1 text-slate-400">
+                      <li>
+                        <strong className="text-white">・EXIT (想定復帰 P○):</strong> ピットアウト直後に合流する予測順位。「手前の集団に呑まれるか、単独で走れるか」を見極めます。
+                      </li>
+                      <li>
+                        <strong className="text-amber-300">・LOSS (所要ロス / 通常22s前後・SC時14s前後):</strong> ピット制限速度走行とタイヤ交換作業で失うタイム。<strong className="text-amber-200">セーフティカー（SC）中はコース上の全車が減速するため、ピットロスが約8〜10秒短縮（チープピット）</strong>されます。SC導入時に即ピットに入るのが圧倒的に有利な理由です。
+                      </li>
+                      <li>
+                        <strong className="text-emerald-300">・CLEAR AIR (緑):</strong> 前走車との差が十分（+3.0秒以上）ある状態。新品タイヤの強力なグリップを邪魔されずに100%発揮し、前を走るライバルを「アンダーカット」で逆転できます。
+                      </li>
+                      <li>
+                        <strong className="text-red-300">・TRAFFIC (赤) / CAUTION (黄):</strong> 遅いバックマーカーや中団集団の真後ろ（+1.0秒以内）に復帰してしまう状態。新品タイヤでも抜けずにタイムを失うため、<strong className="text-amber-200">「ステイアウト」して前が開くまで引っ張る（オーバーカット）</strong>のが定石です。
+                      </li>
+                      <li>
+                        <strong className="text-cyan-300">・AHEAD / BEHIND (前走車差 / 後続車差):</strong> ピットアウト直後の前走車・後続車とのタイム差。相手ドライバーの略称（例: VER, HAM）も表示されます。
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="pt-1 border-t border-white/10">
+                    <div className="font-bold text-sky-300 flex items-center gap-1 mb-0.5">
+                      <span>⚡</span> <span>推奨アクション</span>
+                    </div>
+                    <p className="text-slate-300">
+                      <strong className="text-emerald-300">CLEAR AIR</strong> または <strong className="text-amber-300">SC導入</strong> ➔ 次タイヤを選んで即座に <span className="px-1 py-0.2 rounded bg-red-900/60 border border-red-500/50 text-white font-mono font-bold">BOX BOX</span> を押す！<br />
+                      <strong className="text-red-400">TRAFFIC</strong> ➔ ピットインを1〜2周遅らせ、コース上のギャップが開くのを待つ。
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-                {tacticalScore && (
-            <div className="p-5 rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-red-950/50 border-2 border-red-500/60 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-400">
+      {/* Checkered Flag Finish Banner */}
+      {challengeLap >= activeScenario.totalLaps && (
+        <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-red-950 via-slate-900 to-amber-950 border-2 border-red-500 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-in zoom-in-95 duration-300">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center text-2xl shadow-lg shrink-0">
+              🏁
+            </div>
+            <div>
+              <div className="text-xs font-mono text-amber-400 font-bold">CHECKERED FLAG — RACE FINISHED</div>
+              <h3 className="font-racing font-bold text-white text-lg sm:text-xl">
+                全{activeScenario.totalLaps}周を完走しました！
+              </h3>
+              <p className="text-xs text-slate-300">
+                最終順位: <strong className="text-white font-racing">P{playerCar?.position}</strong> (目標: P{activeScenario.targetPosition})
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSimulatorPhase('debrief')}
+            className="btn-console-primary px-6 py-3 text-sm font-racing font-bold tracking-wider shadow-xl shadow-red-950/80 flex items-center gap-2 hover:scale-105 transition-all shrink-0 cursor-pointer"
+          >
+            <Trophy className="w-4 h-4 text-yellow-300" />
+            <span>📊 リザルト＆総括解説を見る ➔</span>
+          </button>
+        </div>
+      )}
+    </div>
+  )}
+
+  {/* ════════════════════════════════════════════════════════════════════════
+      PHASE 4: 🏆 DEBRIEF & RESULTS SCREEN (リザルト＆戦術総括解説画面)
+      ════════════════════════════════════════════════════════════════════════ */}
+  {simulatorPhase === 'debrief' && (
+    <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
+      {tacticalScore ? (
+        <>
+          <div className="p-5 rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-red-950/50 border-2 border-red-500/60 shadow-2xl space-y-4">
               
               {/* 1. Header Banner: Mission Result & FIA Rank */}
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 pb-4 border-b border-white/10">
@@ -4094,6 +4982,46 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                   </button>
                 </div>
               </div>
+
+              {/* 1.5 Trophy Award Celebration Banner */}
+              {careerData.clearedScenarios?.[activeScenario.id] && playerCar && playerCar.position <= activeScenario.targetPosition && (
+                <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-950/90 via-yellow-950/80 to-slate-900 border-2 border-amber-400/80 shadow-xl shadow-amber-950/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in zoom-in-95 duration-300">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-yellow-600 flex items-center justify-center text-3xl shadow-lg shrink-0">
+                      {careerData.clearedScenarios[activeScenario.id].trophy === 'gold'
+                        ? '🏆'
+                        : careerData.clearedScenarios[activeScenario.id].trophy === 'silver'
+                        ? '🥈'
+                        : '🥉'}
+                    </div>
+                    <div>
+                      <div className="text-xs font-racing font-bold text-amber-300 tracking-wider">
+                        SCENARIO TROPHY EARNED! (シナリオ制覇トロフィー獲得)
+                      </div>
+                      <div className="text-sm font-racing font-black text-white flex items-center gap-2 mt-0.5">
+                        <span className="uppercase text-amber-200 font-bold">
+                          {careerData.clearedScenarios[activeScenario.id].trophy === 'gold'
+                            ? '🏆 GOLD TROPHY'
+                            : careerData.clearedScenarios[activeScenario.id].trophy === 'silver'
+                            ? '🥈 SILVER TROPHY'
+                            : '🥉 BRONZE TROPHY'}
+                        </span>
+                        <span className="text-xs text-slate-300 font-mono">
+                          (最終順位: P{careerData.clearedScenarios[activeScenario.id].finalPosition} / 目標: P{activeScenario.targetPosition}以内)
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsCareerModalOpen(true)}
+                    className="px-3.5 py-2 rounded-xl bg-amber-400 text-slate-950 font-racing font-black text-xs hover:bg-amber-300 transition-colors shrink-0 cursor-pointer shadow-md flex items-center gap-1.5"
+                  >
+                    <Trophy className="w-3.5 h-3.5" />
+                    <span>トロフィールームを見る ➔</span>
+                  </button>
+                </div>
+              )}
 
               {/* 2. New Badges Alert Banner (if any newly unlocked this race) */}
               {diagnosticResult && diagnosticResult.unlockedBadgesThisRace.length > 0 && (
@@ -4572,9 +5500,73 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                   </div>
                 </div>
               )}
-
             </div>
-          )}
+
+            {/* ── Debrief Action Bar (Restart, Tweak Strategy, Change Mode) ── */}
+            <div className="p-4 rounded-2xl bg-slate-900/95 border border-white/15 shadow-xl flex flex-wrap items-center justify-between gap-3 backdrop-blur-md">
+              <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
+                <span>レース総括完了</span>
+                <span className="text-slate-600">•</span>
+                <span>獲得CP: <strong className="text-amber-400 font-racing">+{diagnosticResult?.totalCpEarnedThisRace || 0} CP</strong></span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleRestartRace}
+                  className="btn-console px-3.5 py-2 text-xs font-racing font-bold text-cyan-300 border-cyan-500/40 hover:bg-cyan-950/60 flex items-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>🔄 同じ設定でリスタート</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleBackToBriefing}
+                  className="btn-console px-3.5 py-2 text-xs font-racing font-bold text-amber-300 border-amber-500/40 hover:bg-amber-950/60 flex items-center gap-1.5 transition-all cursor-pointer"
+                >
+                  <Settings className="w-3.5 h-3.5" />
+                  <span>⚙️ 作戦を修正して再挑戦</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleBackToModeSelect}
+                  className="btn-console-primary px-4 py-2 text-xs font-racing font-bold flex items-center gap-1.5 transition-all shadow-md shadow-red-950 cursor-pointer"
+                >
+                  <Trophy className="w-3.5 h-3.5 text-yellow-300" />
+                  <span>🏆 モード選択に戻る</span>
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="p-8 rounded-3xl bg-slate-950/90 border border-white/10 text-center space-y-4">
+            <div className="text-5xl">🏁</div>
+            <h3 className="text-xl font-racing font-bold text-white">まだレース結果がありません</h3>
+            <p className="text-xs text-slate-400 max-w-md mx-auto">
+              レースを完走すると、ここにFIA戦術評価、判断タイムライン、司令官アーキタイプ診断、AI軍師の総括解説が表示されます。
+            </p>
+            <div className="flex justify-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setSimulatorPhase('race')}
+                className="btn-console px-5 py-2.5 text-xs font-racing font-bold text-cyan-300 border-cyan-500/40 cursor-pointer"
+              >
+                ピットウォールに戻る
+              </button>
+              <button
+                type="button"
+                onClick={handleBackToModeSelect}
+                className="btn-console-primary px-5 py-2.5 text-xs font-racing font-bold cursor-pointer"
+              >
+                モード選択に戻る
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    )}
 
           {/* ── BADGE DETAIL MODAL ── */}
           {selectedBadgeForDetail && (
@@ -4663,26 +5655,32 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                 </div>
 
                 {/* Career Stats Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
-                  <div className="p-3 rounded-2xl bg-slate-900 border border-white/10 text-center">
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+                  <div className="p-2.5 rounded-2xl bg-slate-900 border border-white/10 text-center">
                     <div className="text-slate-400 text-[10px] font-mono">ライセンス等級</div>
                     <div className="font-racing font-bold text-amber-300 text-sm mt-0.5">
                       GRADE {careerData.grade}
                     </div>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-900 border border-white/10 text-center">
+                  <div className="p-2.5 rounded-2xl bg-slate-900 border border-white/10 text-center">
                     <div className="text-slate-400 text-[10px] font-mono">累積 Command Points</div>
                     <div className="font-racing font-bold text-white text-sm mt-0.5">
                       {careerData.totalCp} CP
                     </div>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-900 border border-white/10 text-center">
-                    <div className="text-slate-400 text-[10px] font-mono">総参戦レース / 勝利</div>
+                  <div className="p-2.5 rounded-2xl bg-slate-900 border border-amber-500/30 text-center shadow-sm">
+                    <div className="text-amber-400 text-[10px] font-mono font-bold">トロフィー</div>
+                    <div className="font-racing font-bold text-amber-300 text-sm mt-0.5">
+                      🏆 {Object.keys(careerData.clearedScenarios || {}).length}冠
+                    </div>
+                  </div>
+                  <div className="p-2.5 rounded-2xl bg-slate-900 border border-white/10 text-center">
+                    <div className="text-slate-400 text-[10px] font-mono">総参戦 / 勝利</div>
                     <div className="font-racing font-bold text-emerald-400 text-sm mt-0.5">
                       {careerData.totalRacesCompleted}戦 / {careerData.totalWins}勝
                     </div>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-900 border border-white/10 text-center">
+                  <div className="p-2.5 rounded-2xl bg-slate-900 border border-white/10 text-center">
                     <div className="text-slate-400 text-[10px] font-mono">獲得称号</div>
                     <div className="font-racing font-bold text-rose-400 text-sm mt-0.5">
                       {careerData.unlockedBadgeIds.length} / {F1_BADGES_CATALOG.length}
@@ -4690,8 +5688,84 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                   </div>
                 </div>
 
+                {/* Trophy Room Section */}
+                <div className="space-y-2 pt-2 border-t border-white/10">
+                  <div className="font-racing font-bold text-xs text-white flex justify-between items-center">
+                    <span className="flex items-center gap-1.5 text-amber-300">
+                      <Trophy className="w-4 h-4 text-amber-400" />
+                      トロフィールーム ({Object.keys(careerData.clearedScenarios || {}).length}冠 達成)
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      金: {Object.values(careerData.clearedScenarios || {}).filter((c) => c.trophy === 'gold').length} / 
+                      銀: {Object.values(careerData.clearedScenarios || {}).filter((c) => c.trophy === 'silver').length} / 
+                      銅: {Object.values(careerData.clearedScenarios || {}).filter((c) => c.trophy === 'bronze').length}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+                    {[...PRESET_CHALLENGES, ...MISSION_CHALLENGES].map((sc) => {
+                      const clear = careerData.clearedScenarios?.[sc.id];
+                      return (
+                        <div
+                          key={sc.id}
+                          className={`p-2.5 rounded-2xl border text-xs flex items-center justify-between transition-all ${
+                            clear
+                              ? clear.trophy === 'gold'
+                                ? 'bg-amber-950/40 border-amber-500/50 text-amber-200 shadow-sm'
+                                : clear.trophy === 'silver'
+                                ? 'bg-slate-800/60 border-slate-400/50 text-slate-200'
+                                : 'bg-amber-900/30 border-amber-700/40 text-amber-300'
+                              : 'bg-slate-950/60 border-white/5 text-slate-500 opacity-50'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-xl">
+                              {clear
+                                ? clear.trophy === 'gold'
+                                  ? '🏆'
+                                  : clear.trophy === 'silver'
+                                  ? '🥈'
+                                  : '🥉'
+                                : '🔒'}
+                            </span>
+                            <div>
+                              <div className="font-racing font-bold text-xs line-clamp-1">
+                                {sc.title.replace(/^[^a-zA-Z0-9\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+/, '')}
+                              </div>
+                              <div className="text-[10px] font-mono text-slate-400">
+                                {clear
+                                  ? `P${clear.finalPosition}達成 (${clear.score}点 / AI:${
+                                      clear.aiDifficulty === 'master'
+                                        ? '達人'
+                                        : clear.aiDifficulty === 'standard'
+                                        ? '標準'
+                                        : '初級'
+                                    })`
+                                  : '未クリア (CHALLENGE)'}
+                              </div>
+                            </div>
+                          </div>
+                          {clear && (
+                            <span
+                              className={`text-[9px] font-racing font-bold px-1.5 py-0.5 rounded uppercase ${
+                                clear.trophy === 'gold'
+                                  ? 'bg-amber-500/30 text-amber-300 border border-amber-500/50'
+                                  : clear.trophy === 'silver'
+                                  ? 'bg-slate-400/30 text-slate-200 border border-slate-400/50'
+                                  : 'bg-amber-800/40 text-amber-400 border border-amber-700/50'
+                              }`}
+                            >
+                              {clear.trophy}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 {/* All Badges Museum list */}
-                <div className="space-y-2 pt-2">
+                <div className="space-y-2 pt-2 border-t border-white/10">
                   <div className="font-racing font-bold text-xs text-white flex justify-between items-center">
                     <span>🎖️ 全称号コレクション ({careerData.unlockedBadgeIds.length}/{F1_BADGES_CATALOG.length})</span>
                     <span className="text-[10px] text-slate-400 font-mono">タップで名言と歴史背景を表示</span>

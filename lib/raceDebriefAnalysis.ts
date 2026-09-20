@@ -874,6 +874,18 @@ export function diagnoseStrategistProfile(
 
 const CAREER_STORAGE_KEY = 'f1_padoroku_pitwall_career_v1';
 
+export type TrophyTier = 'gold' | 'silver' | 'bronze';
+
+export interface ScenarioClearRecord {
+  scenarioId: string;
+  clearedAt: string; // ISO string
+  finalPosition: number;
+  targetPosition: number;
+  aiDifficulty: 'beginner' | 'standard' | 'master';
+  trophy: TrophyTier;
+  score: number;
+}
+
 export interface SavedCareerData {
   totalCp: number;
   grade: 'D' | 'C' | 'B' | 'A' | 'S';
@@ -882,42 +894,57 @@ export interface SavedCareerData {
   totalWins: number;
   highestScore: number;
   lastArchetypeId?: string;
+  clearedScenarios?: Record<string, ScenarioClearRecord>;
+}
+
+const TROPHY_TIER_ORDER: Record<TrophyTier, number> = {
+  gold: 3,
+  silver: 2,
+  bronze: 1,
+};
+
+export function determineTrophyTier(
+  finalPos: number,
+  aiDifficulty: 'beginner' | 'standard' | 'master'
+): TrophyTier {
+  // P1優勝 または 達人AIで目標達成した場合は金トロフィー
+  if (finalPos === 1 || aiDifficulty === 'master') {
+    return 'gold';
+  }
+  // 表彰台 (P2-P3) または 標準AIで目標達成した場合は銀トロフィー
+  if (finalPos <= 3 || aiDifficulty === 'standard') {
+    return 'silver';
+  }
+  // それ以外 (初級AIでのクリア等) は銅トロフィー
+  return 'bronze';
 }
 
 export function loadStrategistCareer(): SavedCareerData {
+  const defaultCareer: SavedCareerData = {
+    totalCp: 0,
+    grade: 'D',
+    unlockedBadgeIds: [],
+    totalRacesCompleted: 0,
+    totalWins: 0,
+    highestScore: 0,
+    clearedScenarios: {},
+  };
+
   if (typeof window === 'undefined') {
-    return {
-      totalCp: 0,
-      grade: 'D',
-      unlockedBadgeIds: [],
-      totalRacesCompleted: 0,
-      totalWins: 0,
-      highestScore: 0,
-    };
+    return defaultCareer;
   }
 
   try {
     const raw = localStorage.getItem(CAREER_STORAGE_KEY);
-    if (!raw) {
-      return {
-        totalCp: 0,
-        grade: 'D',
-        unlockedBadgeIds: [],
-        totalRacesCompleted: 0,
-        totalWins: 0,
-        highestScore: 0,
-      };
-    }
-    return JSON.parse(raw);
-  } catch {
+    if (!raw) return defaultCareer;
+    const parsed = JSON.parse(raw);
     return {
-      totalCp: 0,
-      grade: 'D',
-      unlockedBadgeIds: [],
-      totalRacesCompleted: 0,
-      totalWins: 0,
-      highestScore: 0,
+      ...defaultCareer,
+      ...parsed,
+      clearedScenarios: parsed.clearedScenarios || {},
     };
+  } catch {
+    return defaultCareer;
   }
 }
 
@@ -926,12 +953,42 @@ export function saveStrategistCareer(
   newBadgeIds: string[],
   score: number,
   isWin: boolean,
-  archetypeId: string
+  archetypeId: string,
+  scenarioClear?: {
+    scenarioId: string;
+    finalPos: number;
+    targetPos: number;
+    aiDifficulty: 'beginner' | 'standard' | 'master';
+  }
 ): SavedCareerData {
   const current = loadStrategistCareer();
   const updatedBadgeIds = Array.from(new Set([...current.unlockedBadgeIds, ...newBadgeIds]));
   const updatedCp = current.totalCp + cpEarned;
   const license = getLicenseFromCp(updatedCp);
+
+  const updatedClearedScenarios = { ...(current.clearedScenarios || {}) };
+
+  if (scenarioClear && scenarioClear.finalPos <= scenarioClear.targetPos) {
+    const newTier = determineTrophyTier(scenarioClear.finalPos, scenarioClear.aiDifficulty);
+    const existing = updatedClearedScenarios[scenarioClear.scenarioId];
+
+    const shouldUpdate =
+      !existing ||
+      TROPHY_TIER_ORDER[newTier] > TROPHY_TIER_ORDER[existing.trophy] ||
+      (TROPHY_TIER_ORDER[newTier] === TROPHY_TIER_ORDER[existing.trophy] && score > existing.score);
+
+    if (shouldUpdate) {
+      updatedClearedScenarios[scenarioClear.scenarioId] = {
+        scenarioId: scenarioClear.scenarioId,
+        clearedAt: new Date().toISOString(),
+        finalPosition: scenarioClear.finalPos,
+        targetPosition: scenarioClear.targetPos,
+        aiDifficulty: scenarioClear.aiDifficulty,
+        trophy: newTier,
+        score,
+      };
+    }
+  }
 
   const updated: SavedCareerData = {
     totalCp: updatedCp,
@@ -941,6 +998,7 @@ export function saveStrategistCareer(
     totalWins: current.totalWins + (isWin ? 1 : 0),
     highestScore: Math.max(current.highestScore, score),
     lastArchetypeId: archetypeId,
+    clearedScenarios: updatedClearedScenarios,
   };
 
   if (typeof window !== 'undefined') {

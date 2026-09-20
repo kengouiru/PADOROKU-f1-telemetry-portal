@@ -27,7 +27,6 @@ import {
 import type { CarLapSimState } from '@/lib/raceSimulationEngine';
 import {
   Navigation,
-  Fuel,
   AlertTriangle,
   Crosshair,
   ChevronRight,
@@ -245,10 +244,34 @@ export default function LiveTrackGpsRadar({
 
     const svgPath = `M ${pEntry.x} ${pEntry.y} Q ${pEntryOffset.x} ${pEntryOffset.y} ${pMidOffset.x} ${pMidOffset.y} Q ${pExitOffset.x} ${pExitOffset.y} ${pExit.x} ${pExit.y}`;
 
+    // Quadratic Bézier curve interpolation along pit lane:
+    // t = 0.0 -> pEntry, t = 0.5 -> pMidOffset (pit box), t = 1.0 -> pExit
+    const getPitLanePoint = (t: number): { x: number; y: number } => {
+      const clampedT = Math.max(0, Math.min(1, t));
+      if (clampedT <= 0.5) {
+        const u = clampedT / 0.5;
+        const invU = 1 - u;
+        return {
+          x: invU * invU * pEntry.x + 2 * invU * u * pEntryOffset.x + u * u * pMidOffset.x,
+          y: invU * invU * pEntry.y + 2 * invU * u * pEntryOffset.y + u * u * pMidOffset.y,
+        };
+      } else {
+        const u = (clampedT - 0.5) / 0.5;
+        const invU = 1 - u;
+        return {
+          x: invU * invU * pMidOffset.x + 2 * invU * u * pExitOffset.x + u * u * pExit.x,
+          y: invU * invU * pMidOffset.y + 2 * invU * u * pExitOffset.y + u * u * pExit.y,
+        };
+      }
+    };
+
     return {
       pEntry,
       pExit,
       pMid: pMidOffset,
+      pEntryOffset,
+      pExitOffset,
+      getPitLanePoint,
       svgPath,
     };
   }, [getExactTrackPoint, trackData.startFinish, rawBbox]);
@@ -317,10 +340,62 @@ export default function LiveTrackGpsRadar({
 
       // Normal track coordinate via 100% exact SVG path tracking
       let finalCoord = getExactTrackPoint(carPct);
+      let isInPitLane = false;
+      let isInPitBox = false;
 
-      // Pit lane placement if car is currently pitting
+      // Realistic Dynamic Pit Lane Transit & Service Motion:
+      // When a car pits this lap, it traverses the track, turns into pit entry (92%),
+      // travels through the pit lane, stops at pit box (start/finish), and exits at 8%.
+      // This eliminates the bug where pitted cars remain frozen in the pit box.
       if (car.isPitting) {
-        finalCoord = pitLaneGeometry.pMid;
+        const pitOffset = (idx % 6 - 2.5) * 5;
+
+        if (carPct >= 90.0 && carPct < 92.0) {
+          // 1. Approaching & peeling off into pit entry
+          const u = (carPct - 90.0) / 2.0;
+          const trackPt = getExactTrackPoint(carPct);
+          const pitPt = pitLaneGeometry.getPitLanePoint(0.0);
+          finalCoord = {
+            x: trackPt.x * (1 - u) + pitPt.x * u,
+            y: trackPt.y * (1 - u) + pitPt.y * u,
+          };
+          isInPitLane = true;
+        } else if (carPct >= 92.0) {
+          // 2. First half of pit lane (Entry 92% -> Pit Box 100%)
+          const t = ((carPct - 92.0) / 8.0) * 0.5; // 0.0 -> 0.5
+          const pitPt = pitLaneGeometry.getPitLanePoint(t);
+          const offsetFactor = Math.min(1, t / 0.4);
+          finalCoord = {
+            x: pitPt.x + pitOffset * offsetFactor,
+            y: pitPt.y + pitOffset * 0.15 * offsetFactor,
+          };
+          isInPitLane = true;
+          if (carPct >= 96.0) isInPitBox = true;
+        } else if (carPct <= 8.0) {
+          // 3. Second half of pit lane (Pit Box 0% -> Exit 8%)
+          const t = 0.5 + (carPct / 8.0) * 0.5; // 0.5 -> 1.0
+          const pitPt = pitLaneGeometry.getPitLanePoint(t);
+          const offsetFactor = Math.max(0, 1 - (t - 0.5) / 0.4);
+          finalCoord = {
+            x: pitPt.x + pitOffset * offsetFactor,
+            y: pitPt.y + pitOffset * 0.15 * offsetFactor,
+          };
+          isInPitLane = true;
+          if (carPct <= 2.0) isInPitBox = true;
+        } else if (carPct > 8.0 && carPct < 10.0) {
+          // 4. Merging back from pit exit (8%) onto racing line (10%)
+          const u = (carPct - 8.0) / 2.0;
+          const pitPt = pitLaneGeometry.getPitLanePoint(1.0);
+          const trackPt = getExactTrackPoint(carPct);
+          finalCoord = {
+            x: pitPt.x * (1 - u) + trackPt.x * u,
+            y: pitPt.y * (1 - u) + trackPt.y * u,
+          };
+          isInPitLane = true;
+        } else {
+          // 5. On track driving normally before reaching pit entry
+          finalCoord = getExactTrackPoint(carPct);
+        }
       }
 
       return {
@@ -329,28 +404,40 @@ export default function LiveTrackGpsRadar({
         coord: finalCoord,
         isPlayer,
         isTeammate,
+        isInPitLane,
+        isInPitBox,
         isRetired: false,
       };
     });
 
     // Retired cars: park off-track near incident zone with hazard status
-    const retiredList = retiredCars.map((car, idx) => {
-      const isPlayer = car.code === playerCarCode;
-      const isTeammate = car.code === teammateCarCode;
-      const parkPct = (45 + idx * 8) % 100;
-      const baseCoord = getExactTrackPoint(parkPct);
-      return {
-        car,
-        pct: parkPct,
-        coord: { x: baseCoord.x + 12, y: baseCoord.y + 12 },
-        isPlayer,
-        isTeammate,
-        isRetired: true,
-      };
-    });
+    // In real F1 broadcasts & GPS tracking, a retired car is shown at the incident site for 1-2 laps
+    // while marshals and the recovery crane / SC are active. Once recovered behind barriers,
+    // it is cleared from the active circuit radar (while remaining visible in the Timing Tower as DNF).
+    const retiredList = retiredCars
+      .filter((car) => {
+        const retLap = car.retirementLap ?? currentLap;
+        return currentLap <= retLap + 1;
+      })
+      .map((car, idx) => {
+        const isPlayer = car.code === playerCarCode;
+        const isTeammate = car.code === teammateCarCode;
+        const parkPct = (45 + idx * 8) % 100;
+        const baseCoord = getExactTrackPoint(parkPct);
+        return {
+          car,
+          pct: parkPct,
+          coord: { x: baseCoord.x + 12, y: baseCoord.y + 12 },
+          isPlayer,
+          isTeammate,
+          isInPitLane: false,
+          isInPitBox: false,
+          isRetired: true,
+        };
+      });
 
     return [...activeList, ...retiredList];
-  }, [cars, leaderPct, baseLapTime, getExactTrackPoint, pitLaneGeometry, playerCarCode, teammateCarCode]);
+  }, [cars, leaderPct, baseLapTime, getExactTrackPoint, pitLaneGeometry, playerCarCode, teammateCarCode, currentLap]);
 
   // Find player car position and progress
   const playerCarData = useMemo(() => {
@@ -401,35 +488,7 @@ export default function LiveTrackGpsRadar({
     };
   }, [trackData.cornerPins, playerPct]);
 
-  // Pit Entry Proximity & Distance Calculation
-  const pitProximity = useMemo(() => {
-    const pitEntryPct = 93.0;
-    let remainingPct = 0;
-    if (playerPct <= pitEntryPct) {
-      remainingPct = pitEntryPct - playerPct;
-    } else {
-      remainingPct = (100 - playerPct) + pitEntryPct;
-    }
 
-    const distanceMeters = Math.round((remainingPct / 100) * circuitLengthM);
-    const avgSpeedMps = Math.max(30, (circuitLengthM / Math.max(60, baseLapTime)));
-    const secondsToPit = Math.max(0, distanceMeters / avgSpeedMps);
-
-    let status: 'COMMITMENT' | 'APPROACHING' | 'ON_TRACK' = 'ON_TRACK';
-    if (distanceMeters < 350) {
-      status = 'COMMITMENT';
-    } else if (distanceMeters < 950) {
-      status = 'APPROACHING';
-    }
-
-    return {
-      distanceMeters,
-      secondsToPit: secondsToPit.toFixed(1),
-      status,
-      remainingPct,
-      pitEntryPct,
-    };
-  }, [playerPct, circuitLengthM, baseLapTime]);
 
   // Active highlighted car (either hovered or clicked)
   const activeInspectCar = hoveredCar || (selectedCarCode ? cars.find((c) => c.code === selectedCarCode) : null);
@@ -501,60 +560,60 @@ export default function LiveTrackGpsRadar({
         </div>
       </div>
 
-      {/* Safety Car Status Alert Banner */}
+      {/* Safety Car Status Alert Banner (F1 Broadcast Realistic Graphic) */}
       {isSC && (
         <div
-          className={`flex items-center justify-between px-2.5 py-1 rounded-lg border text-xs font-racing font-bold transition-all ${
+          className={`flex items-center justify-between px-2.5 py-1 rounded-lg border text-xs font-mono transition-all ${
             isScEnding
-              ? 'bg-emerald-950/90 border-emerald-400 text-emerald-300 shadow-lg shadow-emerald-950/50 animate-pulse'
-              : 'bg-amber-950/90 border-amber-400 text-amber-300 shadow-lg shadow-amber-950/50 animate-pulse'
+              ? 'bg-emerald-950/80 border-emerald-500/50 text-emerald-200 shadow-md shadow-emerald-950/40'
+              : 'bg-amber-950/80 border-amber-500/50 text-amber-200 shadow-md shadow-amber-950/40'
           }`}
+          title={
+            isScEnding
+              ? 'SAFETY CAR IN THIS LAP: リスタート準備・全車加速態勢'
+              : 'SAFETY CAR DEPLOYED: 追越禁止・全車隊列走行・デルタタイム速度規制遵守'
+          }
         >
-          <div className="flex items-center gap-1.5">
-            <AlertTriangle className={`w-3.5 h-3.5 ${isScEnding ? 'text-emerald-400' : 'text-amber-400'}`} />
-            <span className="text-[11px]">
-              {isScEnding
-                ? '🟢 SAFETY CAR IN THIS LAP (リスタート準備・全車加速態勢)'
-                : '🟡 SAFETY CAR DEPLOYED (追越禁止・全車隊列走行・速度-42%規制)'}
+          <div className="flex items-center gap-2 min-w-0">
+            <span
+              className={`px-1.5 py-0.5 rounded text-[10px] font-black tracking-wider shrink-0 ${
+                isScEnding ? 'bg-emerald-500 text-black' : 'bg-amber-400 text-black'
+              }`}
+            >
+              SC
             </span>
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="relative flex h-1.5 w-1.5 shrink-0">
+                <span
+                  className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                    isScEnding ? 'bg-emerald-400' : 'bg-amber-400'
+                  }`}
+                />
+                <span
+                  className={`relative inline-flex rounded-full h-1.5 w-1.5 ${
+                    isScEnding ? 'bg-emerald-400' : 'bg-amber-400'
+                  }`}
+                />
+              </span>
+              <span className="text-[11px] font-bold tracking-wider uppercase truncate text-white">
+                {isScEnding ? 'SAFETY CAR IN THIS LAP' : 'SAFETY CAR DEPLOYED'}
+              </span>
+            </div>
           </div>
-          <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-black/40 border border-white/10">
-            {isScEnding ? 'GREEN FLAG RESTART NEXT' : 'DELTA TIME ENFORCED'}
+
+          <span
+            className={`text-[9px] font-mono font-bold tracking-wider px-1.5 py-0.5 rounded border shrink-0 ${
+              isScEnding
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                : 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+            }`}
+          >
+            {isScEnding ? 'RESTART' : 'DELTA TIME'}
           </span>
         </div>
       )}
 
-      {/* Pit Lane Proximity Ticker Bar (Compact 1-line strip) */}
-      <div className="flex items-center justify-between gap-1.5 px-2 py-1 rounded-lg bg-slate-950/90 border border-white/10 text-[10.5px] font-mono whitespace-nowrap overflow-hidden">
-        <div className="flex items-center gap-1.5 min-w-0">
-          <Fuel className="w-3 h-3 text-amber-400 shrink-0" />
-          <span className="text-slate-400 text-[10px] shrink-0">ピット入口まで:</span>
-          <span className="font-bold text-white text-xs tabular-nums shrink-0">
-            {pitProximity.distanceMeters.toLocaleString()} m
-          </span>
-          <span className="text-slate-400 text-[9.5px] shrink-0">
-            (約{pitProximity.secondsToPit}秒)
-          </span>
-        </div>
 
-        {/* Dynamic Pit Commitment Status Pill */}
-        <div className="flex items-center gap-1 shrink-0">
-          {pitProximity.status === 'COMMITMENT' ? (
-            <span className="px-1.5 py-0.2 rounded-full bg-red-950 text-red-200 border border-red-500/80 text-[9px] font-racing font-bold animate-pulse flex items-center gap-1 shadow-md shadow-red-950">
-              <AlertTriangle className="w-2.5 h-2.5 text-red-400" />
-              <span>🚨 PIT COMMITMENT (限界点)</span>
-            </span>
-          ) : pitProximity.status === 'APPROACHING' ? (
-            <span className="px-1.5 py-0.2 rounded-full bg-amber-950/80 text-amber-300 border border-amber-500/60 text-[9px] font-racing font-bold flex items-center gap-1">
-              <span>🟡 APPROACHING PIT (BOX準備)</span>
-            </span>
-          ) : (
-            <span className="px-1.5 py-0.2 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 text-[9px] font-mono font-bold flex items-center gap-1">
-              <span>🟢 ON TRACK (巡航中)</span>
-            </span>
-          )}
-        </div>
-      </div>
 
       {/* ── Main Cockpit Area: Integrated Left Leaderboard + Center Large SVG Circuit ── */}
       <div className={`flex flex-col lg:flex-row gap-2.5 items-stretch ${showLeaderboard ? 'min-h-[320px] sm:min-h-[360px] lg:min-h-[420px]' : ''}`}>
@@ -889,7 +948,7 @@ export default function LiveTrackGpsRadar({
               })()}
 
               {/* ── Driver Moving Dots (ALL 22 CARS) - Refined Compact Proportions ── */}
-              {carTrackPositions.map(({ car, coord, isPlayer, isTeammate, isRetired }) => {
+              {carTrackPositions.map(({ car, coord, isPlayer, isTeammate, isInPitLane, isInPitBox, isRetired }) => {
                 const isInspected = activeInspectCar?.code === car.code;
                 const dotRadius = isPlayer ? 4.8 : isTeammate ? 4.2 : 3.6;
 
@@ -1146,6 +1205,34 @@ export default function LiveTrackGpsRadar({
                           </text>
                         </g>
                       )}
+
+                      {/* Pit Stop Servicing Indicator on Track */}
+                      {isInPitBox && (
+                        <g transform="translate(0, 9.5)">
+                          <rect
+                            x="-11"
+                            y="-3.5"
+                            width="22"
+                            height="7"
+                            rx="2"
+                            fill="#f59e0b"
+                            stroke="#ffffff"
+                            strokeWidth="0.8"
+                            className="shadow-md"
+                          />
+                          <text
+                            x="0"
+                            y="1.6"
+                            textAnchor="middle"
+                            fontSize="3.8"
+                            fontFamily="monospace"
+                            fontWeight="black"
+                            fill="#020617"
+                          >
+                            {car.pitStopDuration ? `STOP ${car.pitStopDuration}s` : 'PIT STOP'}
+                          </text>
+                        </g>
+                      )}
                     </g>
 
                     {/* SVG Native Tooltip */}
@@ -1220,7 +1307,7 @@ export default function LiveTrackGpsRadar({
             <span>全出走グリッド動態一覧 (クリックでマップ上フォーカス):</span>
           </span>
           <span className="text-slate-400 text-[8.5px]">
-            {cars.length} 台走行中
+            {cars.filter((c) => !c.isRetired).length} 台走行中
           </span>
         </div>
 

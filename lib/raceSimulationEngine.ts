@@ -35,6 +35,7 @@ export interface CircuitSimProfile {
   flag: string;
   totalLaps: number;
   sprintLaps: number; // For Sprint race mode
+  circuitLengthM: number; // circuit length in meters (e.g. 5807 for Suzuka)
   baseLapTime: number; // in seconds (dry baseline)
   pitLaneLoss: number; // in seconds (travel loss without static service)
   tyreAggression: number; // 1.0 (gentle) to 1.6 (brutal wear)
@@ -50,6 +51,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇦🇺',
     totalLaps: 58,
     sprintLaps: 19,
+    circuitLengthM: 5278,
     baseLapTime: 78.5,
     pitLaneLoss: 20.0,
     tyreAggression: 1.25,
@@ -63,6 +65,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇨🇳',
     totalLaps: 56,
     sprintLaps: 19,
+    circuitLengthM: 5451,
     baseLapTime: 94.0,
     pitLaneLoss: 22.5,
     tyreAggression: 1.4,
@@ -76,6 +79,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇯🇵',
     totalLaps: 53,
     sprintLaps: 17,
+    circuitLengthM: 5807,
     baseLapTime: 90.0,
     pitLaneLoss: 22.0,
     tyreAggression: 1.5,
@@ -89,6 +93,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇧🇭',
     totalLaps: 57,
     sprintLaps: 19,
+    circuitLengthM: 5412,
     baseLapTime: 91.5,
     pitLaneLoss: 21.0,
     tyreAggression: 1.55,
@@ -102,6 +107,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇸🇦',
     totalLaps: 50,
     sprintLaps: 16,
+    circuitLengthM: 6174,
     baseLapTime: 88.5,
     pitLaneLoss: 19.5,
     tyreAggression: 1.05,
@@ -115,6 +121,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇺🇸',
     totalLaps: 57,
     sprintLaps: 19,
+    circuitLengthM: 5412,
     baseLapTime: 89.0,
     pitLaneLoss: 20.5,
     tyreAggression: 1.2,
@@ -128,6 +135,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇮🇹',
     totalLaps: 63,
     sprintLaps: 21,
+    circuitLengthM: 4909,
     baseLapTime: 76.0,
     pitLaneLoss: 24.0,
     tyreAggression: 1.2,
@@ -141,6 +149,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇲🇨',
     totalLaps: 78,
     sprintLaps: 25,
+    circuitLengthM: 3337,
     baseLapTime: 74.0,
     pitLaneLoss: 18.0,
     tyreAggression: 0.85,
@@ -154,6 +163,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇪🇸',
     totalLaps: 66,
     sprintLaps: 22,
+    circuitLengthM: 4657,
     baseLapTime: 76.5,
     pitLaneLoss: 21.0,
     tyreAggression: 1.45,
@@ -167,6 +177,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇨🇦',
     totalLaps: 70,
     sprintLaps: 23,
+    circuitLengthM: 4361,
     baseLapTime: 73.0,
     pitLaneLoss: 18.5,
     tyreAggression: 1.1,
@@ -180,6 +191,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇦🇹',
     totalLaps: 71,
     sprintLaps: 24,
+    circuitLengthM: 4318,
     baseLapTime: 66.0,
     pitLaneLoss: 19.0,
     tyreAggression: 1.3,
@@ -193,6 +205,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇬🇧',
     totalLaps: 52,
     sprintLaps: 17,
+    circuitLengthM: 5891,
     baseLapTime: 87.5,
     pitLaneLoss: 20.0,
     tyreAggression: 1.45,
@@ -206,6 +219,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇧🇪',
     totalLaps: 44,
     sprintLaps: 15,
+    circuitLengthM: 7004,
     baseLapTime: 104.5,
     pitLaneLoss: 21.5,
     tyreAggression: 1.35,
@@ -219,6 +233,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇭🇺',
     totalLaps: 70,
     sprintLaps: 23,
+    circuitLengthM: 4381,
     baseLapTime: 78.0,
     pitLaneLoss: 20.5,
     tyreAggression: 1.3,
@@ -232,6 +247,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇳🇱',
     totalLaps: 72,
     sprintLaps: 24,
+    circuitLengthM: 4259,
     baseLapTime: 71.5,
     pitLaneLoss: 21.0,
     tyreAggression: 1.4,
@@ -245,6 +261,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇮🇹',
     totalLaps: 53,
     sprintLaps: 18,
+    circuitLengthM: 5793,
     baseLapTime: 81.0,
     pitLaneLoss: 23.5,
     tyreAggression: 1.1,
@@ -258,6 +275,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇪🇸',
     totalLaps: 55,
     sprintLaps: 18,
+    circuitLengthM: 5474,
     baseLapTime: 86.0,
     pitLaneLoss: 21.0,
     tyreAggression: 1.25,
@@ -271,6 +289,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇦🇿',
     totalLaps: 51,
     sprintLaps: 17,
+    circuitLengthM: 6003,
     baseLapTime: 102.0,
     pitLaneLoss: 21.0,
     tyreAggression: 1.1,
@@ -284,6 +303,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇸🇬',
     totalLaps: 62,
     sprintLaps: 20,
+    circuitLengthM: 4940,
     baseLapTime: 96.0,
     pitLaneLoss: 25.0,
     tyreAggression: 1.25,
@@ -297,6 +317,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇺🇸',
     totalLaps: 56,
     sprintLaps: 19,
+    circuitLengthM: 5513,
     baseLapTime: 96.5,
     pitLaneLoss: 20.5,
     tyreAggression: 1.4,
@@ -310,6 +331,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇲🇽',
     totalLaps: 71,
     sprintLaps: 24,
+    circuitLengthM: 4304,
     baseLapTime: 78.5,
     pitLaneLoss: 21.5,
     tyreAggression: 1.15,
@@ -323,6 +345,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇧🇷',
     totalLaps: 71,
     sprintLaps: 24,
+    circuitLengthM: 4309,
     baseLapTime: 71.0,
     pitLaneLoss: 20.0,
     tyreAggression: 1.4,
@@ -336,6 +359,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇺🇸',
     totalLaps: 50,
     sprintLaps: 16,
+    circuitLengthM: 6201,
     baseLapTime: 93.0,
     pitLaneLoss: 19.5,
     tyreAggression: 1.05,
@@ -349,6 +373,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇶🇦',
     totalLaps: 57,
     sprintLaps: 19,
+    circuitLengthM: 5419,
     baseLapTime: 84.0,
     pitLaneLoss: 23.0,
     tyreAggression: 1.6,
@@ -362,6 +387,7 @@ export const SIM_CIRCUITS: CircuitSimProfile[] = [
     flag: '🇦🇪',
     totalLaps: 58,
     sprintLaps: 19,
+    circuitLengthM: 5281,
     baseLapTime: 86.0,
     pitLaneLoss: 21.0,
     tyreAggression: 1.25,
@@ -401,7 +427,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   // RB Honda
   {
     code: 'TSU',
-    name: '角田裕毅',
+    name: 'Yuki Tsunoda',
     number: '22',
     team: 'RB Honda',
     color: '#06b6d4',
@@ -416,7 +442,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   },
   {
     code: 'HAD',
-    name: 'イサック・ハジャー',
+    name: 'Isack Hadjar',
     number: '6',
     team: 'RB Honda',
     color: '#0284c7',
@@ -431,7 +457,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   // Red Bull Racing
   {
     code: 'VER',
-    name: 'マックス・フェルスタッペン',
+    name: 'Max Verstappen',
     number: '1',
     team: 'Red Bull Racing',
     color: '#3b82f6',
@@ -445,7 +471,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   },
   {
     code: 'LAW',
-    name: 'リアム・ローソン',
+    name: 'Liam Lawson',
     number: '30',
     team: 'Red Bull Racing',
     color: '#1d4ed8',
@@ -460,7 +486,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   // McLaren
   {
     code: 'NOR',
-    name: 'ランド・ノリス',
+    name: 'Lando Norris',
     number: '4',
     team: 'McLaren',
     color: '#f97316',
@@ -474,7 +500,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   },
   {
     code: 'PIA',
-    name: 'オスカー・ピアストリ',
+    name: 'Oscar Piastri',
     number: '81',
     team: 'McLaren',
     color: '#fb923c',
@@ -489,7 +515,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   // Ferrari
   {
     code: 'LEC',
-    name: 'シャルル・ルクレール',
+    name: 'Charles Leclerc',
     number: '16',
     team: 'Ferrari',
     color: '#ef4444',
@@ -503,7 +529,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   },
   {
     code: 'HAM',
-    name: 'ルイス・ハミルトン',
+    name: 'Lewis Hamilton',
     number: '44',
     team: 'Ferrari',
     color: '#b91c1c',
@@ -518,7 +544,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   // Mercedes
   {
     code: 'RUS',
-    name: 'ジョージ・ラッセル',
+    name: 'George Russell',
     number: '63',
     team: 'Mercedes',
     color: '#22c55e',
@@ -532,7 +558,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   },
   {
     code: 'ANT',
-    name: 'キミ・アントネッリ',
+    name: 'Kimi Antonelli',
     number: '12',
     team: 'Mercedes',
     color: '#16a34a',
@@ -547,7 +573,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   // Aston Martin
   {
     code: 'ALO',
-    name: 'フェルナンド・アロンソ',
+    name: 'Fernando Alonso',
     number: '14',
     team: 'Aston Martin',
     color: '#059669',
@@ -561,7 +587,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   },
   {
     code: 'STR',
-    name: 'ランス・ストロール',
+    name: 'Lance Stroll',
     number: '18',
     team: 'Aston Martin',
     color: '#047857',
@@ -576,7 +602,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   // Williams
   {
     code: 'SAI',
-    name: 'カルロス・サインツ',
+    name: 'Carlos Sainz',
     number: '55',
     team: 'Williams',
     color: '#0284c7',
@@ -590,7 +616,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   },
   {
     code: 'ALB',
-    name: 'アレクサンダー・アルボン',
+    name: 'Alexander Albon',
     number: '23',
     team: 'Williams',
     color: '#0369a1',
@@ -605,7 +631,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   // Alpine
   {
     code: 'GAS',
-    name: 'ピエール・ガスリー',
+    name: 'Pierre Gasly',
     number: '10',
     team: 'Alpine',
     color: '#0090ff',
@@ -619,7 +645,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   },
   {
     code: 'DOO',
-    name: 'ジャック・ドゥーハン',
+    name: 'Jack Doohan',
     number: '7',
     team: 'Alpine',
     color: '#0070cc',
@@ -634,7 +660,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   // Haas
   {
     code: 'OCO',
-    name: 'エステバン・オコン',
+    name: 'Esteban Ocon',
     number: '31',
     team: 'Haas',
     color: '#dc2626',
@@ -648,7 +674,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   },
   {
     code: 'BEA',
-    name: 'オリバー・ベアマン',
+    name: 'Oliver Bearman',
     number: '87',
     team: 'Haas',
     color: '#b91c1c',
@@ -663,7 +689,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   // Audi Revolut
   {
     code: 'HUL',
-    name: 'ニコ・ヒュルケンベルグ',
+    name: 'Nico Hulkenberg',
     number: '27',
     team: 'Audi Revolut',
     color: '#10b981',
@@ -677,7 +703,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   },
   {
     code: 'BOR',
-    name: 'ガブリエル・ボルトレート',
+    name: 'Gabriel Bortoleto',
     number: '5',
     team: 'Audi Revolut',
     color: '#059669',
@@ -692,7 +718,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   // Cadillac Formula 1 Team (2026 Works Entry)
   {
     code: 'HER',
-    name: 'コルトン・ハータ',
+    name: 'Colton Herta',
     number: '26',
     team: 'Cadillac F1',
     color: '#f59e0b',
@@ -706,7 +732,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   },
   {
     code: 'DRU',
-    name: 'フェリペ・ドルゴヴィッチ',
+    name: 'Felipe Drugovich',
     number: '34',
     team: 'Cadillac F1',
     color: '#d97706',
@@ -1115,6 +1141,7 @@ export function runFullGrandPrixSimulation(params: {
       plannedPit1Tyre: TyreCompound;
       plannedPit2?: number;
       plannedPit2Tyre?: TyreCompound;
+      lastPitLap?: number;
       isRetired: boolean;
       retirementReason?: string;
       retirementLap?: number;
@@ -1138,6 +1165,7 @@ export function runFullGrandPrixSimulation(params: {
       plannedPit1Tyre: d.pit1Tyre,
       plannedPit2: d.pit2Lap,
       plannedPit2Tyre: d.pit2Tyre,
+      lastPitLap: undefined,
       isRetired: false,
       retirementReason: undefined,
       retirementLap: undefined,
@@ -1402,8 +1430,8 @@ export function runFullGrandPrixSimulation(params: {
     const playerOverride = playerOverrides[currentLap] || {};
     const lapCarStates: CarLapSimState[] = [];
 
-    // Track which cars pit this lap to detect double-stack
-    const pittingCarsThisLap: string[] = [];
+    // Track which cars pit this lap and what compound they choose
+    const pittingCarsThisLap = new Map<string, TyreCompound>();
 
     for (const driver of drivers) {
       const tracker = trackers[driver.code];
@@ -1439,31 +1467,42 @@ export function runFullGrandPrixSimulation(params: {
           wantPit = true;
           targetTyre = tracker.plannedPit2Tyre || 'HARD';
         } else if (weather.waterDepth >= 1.0 && tracker.currentTyre !== 'INTER' && tracker.currentTyre !== 'WET') {
-          if (currentLap >= rainReactionLap) {
+          if (currentLap >= rainReactionLap && (!tracker.lastPitLap || currentLap > tracker.lastPitLap + 1)) {
             wantPit = true;
             targetTyre = weather.waterDepth >= 4.0 ? 'WET' : 'INTER';
+          }
+        } else if (weather.waterDepth < 0.85 && (tracker.currentTyre === 'INTER' || tracker.currentTyre === 'WET')) {
+          // Drying track crossover: switch from wet/inter back to slicks
+          const dryReactionLap = isMasterAI
+            ? (rainStartLap ? rainStartLap + 3 : currentLap)
+            : isBeginnerAI
+            ? (rainStartLap ? rainStartLap + 5 : currentLap + 2)
+            : (rainStartLap ? rainStartLap + 4 : currentLap + 1);
+          if (currentLap >= dryReactionLap && tracker.tyreAge >= 2 && (!tracker.lastPitLap || currentLap > tracker.lastPitLap + 1)) {
+            wantPit = true;
+            targetTyre = 'MEDIUM';
           }
         } else if (isSC && tracker.tyreAge > 14 && tracker.currentTyre !== 'SOFT') {
           wantPit = true;
           targetTyre = 'SOFT';
         } else if (isMasterAI && currentLap > 3) {
           const playerPittedPrevLap = playerOverrides[currentLap - 1]?.boxNextLap;
-          if (playerPittedPrevLap && tracker.tyreAge > 12) {
+          if (playerPittedPrevLap && tracker.tyreAge > 12 && (!tracker.lastPitLap || currentLap > tracker.lastPitLap + 1)) {
             wantPit = true;
             targetTyre = 'HARD';
           }
         }
       }
 
-      if (wantPit) pittingCarsThisLap.push(driver.code);
+      if (wantPit) pittingCarsThisLap.set(driver.code, targetTyre);
     }
 
     // Check double-stack between player and teammate
     let playerDoubleStackDelay = 0;
     let teammateDoubleStackDelay = 0;
     if (teammateDriver) {
-      const playerPits = pittingCarsThisLap.includes(playerDriver.code);
-      const teammatePits = pittingCarsThisLap.includes(teammateDriver.code);
+      const playerPits = pittingCarsThisLap.has(playerDriver.code);
+      const teammatePits = pittingCarsThisLap.has(teammateDriver.code);
       if (playerPits && teammatePits) {
         const playerTime = trackers[playerDriver.code].cumulativeTime;
         const tmTime = trackers[teammateDriver.code].cumulativeTime;
@@ -1531,7 +1570,7 @@ export function runFullGrandPrixSimulation(params: {
         continue;
       }
 
-      const isPitting = pittingCarsThisLap.includes(driver.code);
+      const isPitting = pittingCarsThisLap.has(driver.code);
 
       let lapPitLoss = 0;
       let staticCrewTime = 0;
@@ -1539,7 +1578,9 @@ export function runFullGrandPrixSimulation(params: {
 
       if (isPitting) {
         tracker.pitCount += 1;
-        const chosenTyre = isPlayer ? playerOverride.nextCompound || 'INTER' : tracker.currentTyre;
+        tracker.lastPitLap = currentLap;
+        const targetTyre = pittingCarsThisLap.get(driver.code) || 'INTER';
+        const chosenTyre = isPlayer ? playerOverride.nextCompound || 'INTER' : targetTyre;
         tracker.currentTyre = chosenTyre;
         tracker.tyreAge = 0;
         tracker.surfaceTemp = 95;
@@ -1570,26 +1611,30 @@ export function runFullGrandPrixSimulation(params: {
       const tyreProp = TYRE_PROPERTIES[tracker.currentTyre];
       const baseLap = circuit.baseLapTime + driver.basePaceOffset;
 
-      // PU Mode modifier
+      // PU Mode modifier & ERS Battery Management
       let puPaceMod = 0;
       if (tracker.puMode === 'push') {
         puPaceMod = -0.35;
         tracker.surfaceTemp += 2.5;
         tracker.coreTemp += 1.2;
-        tracker.ersBatterySoc = Math.max(15, tracker.ersBatterySoc - 8);
+        tracker.ersBatterySoc = Math.max(10, tracker.ersBatterySoc - 14);
       } else if (tracker.puMode === 'conserve') {
         puPaceMod = +0.45;
         tracker.surfaceTemp = Math.max(90, tracker.surfaceTemp - 2.0);
-        tracker.ersBatterySoc = Math.min(100, tracker.ersBatterySoc + 6);
+        tracker.ersBatterySoc = Math.min(98, tracker.ersBatterySoc + 18);
       } else {
+        // Standard mode: realistic lap oscillation (-3% on straights, +2% in braking zones)
         tracker.surfaceTemp += 0.5;
+        const lapRegen = (currentLap % 2 === 0 ? -3 : +2);
+        tracker.ersBatterySoc = Math.min(95, Math.max(35, tracker.ersBatterySoc + lapRegen));
       }
 
-      // ERS Boost modifier
+      // ERS Boost modifier (Manual Override Mode / Overtake)
       let ersPaceMod = 0;
-      if (tracker.ersBoostUsed && tracker.ersBatterySoc > 20) {
-        ersPaceMod = -0.65;
-        tracker.ersBatterySoc = Math.max(5, tracker.ersBatterySoc - 22);
+      if (tracker.ersBoostUsed && tracker.ersBatterySoc > 15) {
+        ersPaceMod = -0.75;
+        // Heavy discharge: drains 35% battery in a single lap of full deployment!
+        tracker.ersBatterySoc = Math.max(5, tracker.ersBatterySoc - 35);
       }
 
       // Tyre wear & cliff calculation
@@ -1658,7 +1703,7 @@ export function runFullGrandPrixSimulation(params: {
         globalFastestLap = { code: driver.code, time: lapDuration, lap: currentLap };
       }
 
-      const circuitLenM = 5400;
+      const circuitLenM = circuit.circuitLengthM || 5400;
       const avgSpeedKmH = Math.round((circuitLenM / Math.max(35, lapDuration)) * 3.6);
       const currentSpeedKmH = isPitting ? 80 : isSC ? Math.min(155, Math.max(135, Math.round(avgSpeedKmH * 0.72))) : avgSpeedKmH;
 
@@ -1968,6 +2013,13 @@ export function runFullGrandPrixSimulation(params: {
 
 // ── Challenge Scenarios & Procedural Generator ────────────────────────────────
 
+export interface ScenarioLockedSettings {
+  startTyre?: boolean;
+  weather?: boolean;
+  rainLap?: boolean;
+  lockReason?: string;
+}
+
 export interface ChallengeScenario {
   id: string;
   title: string;
@@ -1976,6 +2028,8 @@ export interface ChallengeScenario {
   totalLaps: number;
   targetPosition: number;
   difficulty: 'easy' | 'normal' | 'hard';
+  defaultAiDifficulty?: 'beginner' | 'standard' | 'master';
+  lockedSettings?: ScenarioLockedSettings;
   description: string;
   gameMode: 'sprint' | 'crisis' | 'procedural' | 'sandbox' | 'mission';
   majorCategory?: 'practice' | 'battle';
@@ -2005,6 +2059,13 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
     totalLaps: 8,
     targetPosition: 2,
     difficulty: 'hard',
+    defaultAiDifficulty: 'master',
+    lockedSettings: {
+      startTyre: true,
+      weather: true,
+      rainLap: true,
+      lockReason: '雨上がり路面でのスリック決断シナリオのため、初期インター装着および天候はシナリオ指定固定です。',
+    },
     gameMode: 'crisis',
     description:
       '雨上がりのシルバーストン。インターでスタートしたが、太陽が照り急速にレコードラインが乾燥中。インターの熱ダレに耐えきれなくなる前に、誰よりも早くスリックへ飛び込む英断を下せ！',
@@ -2021,8 +2082,8 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
       startTyre: 'INTER',
       pit1Lap: 99,
     },
-    rivals: GRID_DRIVERS.filter(d => d.code !== 'RUS' && d.code !== 'ANT'),
-    startWeather: 'drizzle',
+    rivals: GRID_DRIVERS.filter(d => d.code !== 'RUS' && d.code !== 'ANT').map(d => ({ ...d, startTyre: 'INTER' as TyreCompound, pit1Lap: 99 })),
+    startWeather: 'variable',
     weatherForecast: {
       radarDesc: '雨雲通過。気温24℃、急激に天候回復。2周目以降ドライライン急速形成予想。',
       estimatedLapMin: 99,
@@ -2042,9 +2103,15 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
     totalLaps: 8,
     targetPosition: 3,
     difficulty: 'normal',
+    defaultAiDifficulty: 'standard',
+    lockedSettings: {
+      weather: true,
+      rainLap: true,
+      lockReason: 'ゲリラ豪雨の接近タイミングを見極めるシナリオのため、天候シナリオは固定されています。',
+    },
     gameMode: 'crisis',
     description:
-      '角田裕毅(P5)として出走。鈴鹿の空に低気圧が急速接近中。何周目に雨雲が到達するか見極め、ライバルより1周早くインターへ履き替えてポディウム(P3以内)を奪い取れ！',
+      'Yuki Tsunoda (P5)として出走。鈴鹿の空に低気圧が急速接近中。何周目に雨雲が到達するか見極め、ライバルより1周早くインターへ履き替えてポディウム(P3以内)を奪い取れ！',
     playerConfig: {
       ...GRID_DRIVERS[0], // TSU
       basePaceOffset: 0.2,
@@ -2079,6 +2146,12 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
     totalLaps: 9,
     targetPosition: 1,
     difficulty: 'hard',
+    defaultAiDifficulty: 'master',
+    lockedSettings: {
+      startTyre: true,
+      weather: true,
+      lockReason: 'アンダーカット急襲シナリオのため、ソフトタイヤ・快晴条件で固定されています。',
+    },
     gameMode: 'crisis',
     description:
       'フェルスタッペン(P2)を追うノリス(P2スタート)。モンツァの高速ストレートで前走車のダーティエアを避け、完璧なピットインでクリーンエアに抜け出し逆転優勝を果たせ！',
@@ -2116,6 +2189,11 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
     totalLaps: 7,
     targetPosition: 2,
     difficulty: 'normal',
+    defaultAiDifficulty: 'standard',
+    lockedSettings: {
+      weather: true,
+      lockReason: '突発SC発生シナリオのため、天候は固定されています。',
+    },
     gameMode: 'crisis',
     description:
       'フェラーリのルクレール(P3)として出走。ケメルストレートでクラッシュ発生、SC出動！相方ハミルトンと同時にピットに入るとダブルスタック待機(+4.5秒)が発生する。どちらを優先するか英断を下せ！',
@@ -2154,6 +2232,11 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
     totalLaps: 7,
     targetPosition: 1,
     difficulty: 'hard',
+    defaultAiDifficulty: 'master',
+    lockedSettings: {
+      weather: true,
+      lockReason: 'モナコ市街地戦のため、天候は快晴固定です。',
+    },
     gameMode: 'crisis',
     description:
       'モナコ市街地戦。前走車フェルスタッペンがピットイン！クリーンエアの中で猛プッシュしてインラップ最速を叩き出し、ピット出口で前に出るオーバーカットを完遂せよ！',
@@ -2192,6 +2275,11 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
     totalLaps: 8,
     targetPosition: 3,
     difficulty: 'normal',
+    defaultAiDifficulty: 'standard',
+    lockedSettings: {
+      weather: true,
+      lockReason: 'ナイトレースのSC多発シナリオのため、天候は固定されています。',
+    },
     gameMode: 'crisis',
     description:
       '熱帯夜のシンガポール。クラッシュ多発によるSC出動率極大のコース。周囲がステイアウトする中、あえてソフトタイヤに履き替えて終盤の超攻撃的オーバーテイクで表彰台を奪い取れ！',
@@ -2235,6 +2323,12 @@ export const MISSION_CHALLENGES: ChallengeScenario[] = [
     totalLaps: 9,
     targetPosition: 10,
     difficulty: 'hard',
+    defaultAiDifficulty: 'master',
+    lockedSettings: {
+      startTyre: true,
+      weather: true,
+      lockReason: '最後尾からの奇跡ミッションのため、ハードタイヤ固定です。',
+    },
     gameMode: 'mission',
     description:
       '2026年新規参入キャデラックF1のコルトン・ハータとしてP22(最後尾)から出走。混戦の中団DRSトレインと他車のピットタイミング隙間を縫い、奇跡の「激戦区1ポイント(P10)」をもぎ取れ！',
@@ -2271,6 +2365,12 @@ export const MISSION_CHALLENGES: ChallengeScenario[] = [
     totalLaps: 6,
     targetPosition: 1,
     difficulty: 'hard',
+    defaultAiDifficulty: 'master',
+    lockedSettings: {
+      startTyre: true,
+      weather: true,
+      lockReason: 'タイヤ無交換・ノーピット死守ミッションのため、ハードタイヤ固定です。',
+    },
     gameMode: 'mission',
     description:
       '首位を走るルクレール。ライバルが新品タイヤで猛追する中、あえてピットに入らず摩耗75%のハードタイヤでチェッカーまで逃げ切れるか？！表面・内部温度の超精密管理が試される！',
@@ -2306,6 +2406,12 @@ export const MISSION_CHALLENGES: ChallengeScenario[] = [
     totalLaps: 8,
     targetPosition: 1,
     difficulty: 'normal',
+    defaultAiDifficulty: 'standard',
+    lockedSettings: {
+      startTyre: true,
+      weather: true,
+      lockReason: '1-2フィニッシュ死守ミッションのため、ミディアムタイヤ固定です。',
+    },
     gameMode: 'mission',
     description:
       'マクラーレンのピットウォール司令官としてノリス(P1)とピアストリ(P2)を指揮。背後からフェルスタッペン(P3)が急接近！相方へのチームオーダー（ブロック/順位入替）を適切に駆使し1-2フィニッシュを完全達成せよ！',
@@ -2341,6 +2447,12 @@ export const MISSION_CHALLENGES: ChallengeScenario[] = [
     totalLaps: 7,
     targetPosition: 1,
     difficulty: 'hard',
+    defaultAiDifficulty: 'master',
+    lockedSettings: {
+      startTyre: true,
+      weather: true,
+      lockReason: 'ダンプ路面スリック逆張りミッションのため、ソフトタイヤおよび天候は固定です。',
+    },
     gameMode: 'mission',
     description:
       '雨上がりのインテルラゴス。路面水深1.2mm、全車がインターミディエイトを履く中、あえてソフトスリックでスタート！濡れた路面で滑るマシンを手懐け、乾き始めたレコードラインで圧倒的タイム差を削り取れ！',
@@ -2357,8 +2469,8 @@ export const MISSION_CHALLENGES: ChallengeScenario[] = [
       startTyre: 'INTER',
       pit1Lap: 99,
     },
-    rivals: GRID_DRIVERS.filter((d) => d.code !== 'VER' && d.code !== 'LAW'),
-    startWeather: 'drizzle',
+    rivals: GRID_DRIVERS.filter((d) => d.code !== 'VER' && d.code !== 'LAW').map(d => ({ ...d, startTyre: 'INTER' as TyreCompound, pit1Lap: 99 })),
+    startWeather: 'variable',
     weatherForecast: {
       radarDesc: 'スコール通過後。急速にドライラインが形成される見込み。オフライン濡れ注意。',
       estimatedLapMin: 99,
@@ -2596,25 +2708,34 @@ export function evaluateTacticalScore(
 ): TacticalScoreBreakdown {
   const lastSnap = snapshots[snapshots.length - 1];
   const playerCar = lastSnap?.cars.find((c) => c.code === scenario.playerConfig.code);
-  const finalPos = playerCar ? playerCar.position : 5;
-
-  let pitTiming = 20;
-  let traffic = 20;
-  let tyreEnergy = 20;
-  let chaosTeam = 20;
+  const finalPos = playerCar ? playerCar.position : 20;
 
   const decisions: TacticalScoreBreakdown['keyDecisions'] = [];
   const keywordSet = new Set<string>();
 
-  // Check pit timing vs rain
+  // 1. Position Delta & Target Achievement Score (Max 25 points)
+  let positionScore = 20;
+  if (finalPos <= scenario.targetPosition) {
+    const bonus = (scenario.targetPosition - finalPos) * 2.5;
+    positionScore = Math.min(25, 20 + bonus);
+  } else {
+    const drop = finalPos - scenario.targetPosition;
+    positionScore = Math.max(0, 20 - drop * 2.5);
+  }
+
+  // 2. Pit Timing & Crossover Score (Max 25 points)
+  let pitTiming = 18;
   if (scenario.actualRainLap && scenario.actualRainLap < scenario.totalLaps) {
     const rainLap = scenario.actualRainLap;
-    const playerPitted = Object.keys(playerOverrides).some(
-      (l) => Number(l) <= rainLap + 2 && playerOverrides[Number(l)].boxNextLap
+    const playerPittedOptimal = Object.keys(playerOverrides).some(
+      (l) => Number(l) <= rainLap + 1 && playerOverrides[Number(l)].boxNextLap
     );
-    if (playerPitted) {
-      pitTiming += 5;
-      chaosTeam += 4;
+    const playerPittedLate = Object.keys(playerOverrides).some(
+      (l) => Number(l) === rainLap + 2 && playerOverrides[Number(l)].boxNextLap
+    );
+
+    if (playerPittedOptimal) {
+      pitTiming = 25;
       decisions.push({
         lap: rainLap,
         title: 'クロスオーバー直後の即時インター乗り換え',
@@ -2625,14 +2746,25 @@ export function evaluateTacticalScore(
       });
       keywordSet.add('crossover');
       keywordSet.add('undercut');
+    } else if (playerPittedLate) {
+      pitTiming = 10;
+      decisions.push({
+        lap: rainLap + 2,
+        title: 'ピットイン判断の遅れ（1周ステイアウト過多）',
+        verdict: 'costly',
+        impactSeconds: -4.5,
+        description: '雨の強まりに対してピット判断が1周遅れ、スリックタイヤで水たまりを踏みタイムロスを喫した。',
+        linkedKeywords: ['crossover'],
+      });
+      keywordSet.add('crossover');
     } else {
-      pitTiming -= 8;
+      pitTiming = 0; // Never pitted for wet tyres in rain!
       decisions.push({
         lap: rainLap + 1,
-        title: '雨天時のステイアウト過多によるハイドロプレーニング',
+        title: '豪雨時のスリック走行強行（致命的判断ミス）',
         verdict: 'costly',
-        impactSeconds: -9.2,
-        description: '路面水量が2.0mmを超えた状態でスリックタイヤのまま周回を重ね、1周あたり4秒以上の大出血を招いた。',
+        impactSeconds: -18.5,
+        description: '路面水量が2.0mmを超えた状態でスリックのまま周回を強行。ハイドロプレーニングにより1周あたり5秒以上の大出血を招いた。',
         linkedKeywords: ['crossover', 'degradation'],
       });
       keywordSet.add('crossover');
@@ -2645,7 +2777,7 @@ export function evaluateTacticalScore(
     const scLap = scenario.actualScLap;
     const pitUnderSc = playerOverrides[scLap]?.boxNextLap || playerOverrides[scLap + 1]?.boxNextLap;
     if (pitUnderSc) {
-      pitTiming += 4;
+      pitTiming = Math.min(25, pitTiming + 5);
       decisions.push({
         lap: scLap,
         title: 'セーフティカー時のチープピット敢行',
@@ -2659,21 +2791,37 @@ export function evaluateTacticalScore(
     }
   }
 
-  // Position bonus
+  // 3. Traffic Management (Max 25 points)
+  let traffic = 18;
   if (finalPos <= scenario.targetPosition) {
-    pitTiming = Math.min(25, pitTiming + 2);
-    traffic = Math.min(25, traffic + 3);
-    chaosTeam = Math.min(25, chaosTeam + 2);
+    traffic = 22;
+  } else if (finalPos >= 16) {
+    // Fell back into backend traffic pack
+    traffic = 4;
   } else {
-    traffic = Math.max(10, traffic - 4);
-    chaosTeam = Math.max(10, chaosTeam - 3);
+    traffic = Math.max(8, 18 - (finalPos - scenario.targetPosition) * 1.5);
   }
 
-  const total = Math.min(100, Math.max(35, pitTiming + traffic + tyreEnergy + chaosTeam));
+  // 4. Tyre & Thermal Management (Max 25 points)
+  let tyreEnergy = 18;
+  if (playerCar) {
+    if (playerCar.tyreWearPercent > 80) {
+      tyreEnergy = 2; // Cliff blown
+    } else if (playerCar.thermalWarning === 'OPTIMAL') {
+      tyreEnergy = 24;
+    } else if (playerCar.thermalWarning === 'BLISTERING_WARNING') {
+      tyreEnergy = 8;
+    }
+  }
+  if (finalPos >= 16) {
+    tyreEnergy = Math.min(tyreEnergy, 6);
+  }
+
+  const total = Math.min(100, Math.max(0, Math.round(positionScore + pitTiming + traffic + tyreEnergy)));
   const rank: TacticalScoreBreakdown['rank'] =
     total >= 94 ? 'S+' : total >= 86 ? 'S' : total >= 75 ? 'A' : total >= 65 ? 'B' : total >= 50 ? 'C' : 'D';
 
-  const summary = `総合評価 ${total}点 (Rank ${rank})。最終順位 P${finalPos} (目標 P${scenario.targetPosition})。ピット窓口適正度 ${pitTiming}/25点、トラフィック回避度 ${traffic}/25点、タイヤ・熱管理 ${tyreEnergy}/25点、突発適応・チームワーク ${chaosTeam}/25点。`;
+  const summary = `総合評価 ${total}点 (Rank ${rank})。最終順位 P${finalPos} (目標 P${scenario.targetPosition})。順位達成度 ${positionScore.toFixed(0)}/25点、ピット戦略適正度 ${pitTiming}/25点、トラフィック回避度 ${traffic}/25点、タイヤ・熱管理 ${tyreEnergy}/25点。`;
 
   keywordSet.add('clean-air');
   keywordSet.add('dirty-air');
@@ -2685,7 +2833,7 @@ export function evaluateTacticalScore(
     pitTimingScore: pitTiming,
     trafficScore: traffic,
     tyreEnergyScore: tyreEnergy,
-    chaosTeamScore: chaosTeam,
+    chaosTeamScore: Math.round(positionScore),
     keyDecisions: decisions,
     tacticalSummary: summary,
     linkedKeywords: Array.from(keywordSet),
