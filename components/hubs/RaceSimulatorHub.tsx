@@ -874,7 +874,7 @@ export default function RaceSimulatorHub({
       setTacticalScore(null);
       setDiagnosticResult(null);
     }
-  }, [challengeLap, activeScenario, challengeSnapshots, playerTacticalCommands, radioResponses, tacticalScore]);
+  }, [challengeLap, activeScenario, challengeSnapshots, playerTacticalCommands, radioResponses, tacticalScore, aiDifficulty]);
 
   // Handle player commands
   const handleToggleBoxNextLap = () => {
@@ -6286,7 +6286,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                         <span>{currentSnapshot.activeRadioPrompt.speaker} からの緊急無線</span>
                       </div>
                       <p className="text-xs text-slate-200 bg-black/40 p-2 rounded-lg border border-white/5 font-mono">
-                        "{currentSnapshot.activeRadioPrompt.message}"
+                        &quot;{currentSnapshot.activeRadioPrompt.message}&quot;
                       </p>
                       <div className="space-y-1">
                         {currentSnapshot.activeRadioPrompt.options.map((opt) => (
