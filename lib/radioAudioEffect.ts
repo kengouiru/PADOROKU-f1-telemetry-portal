@@ -29,26 +29,82 @@ function getAudioContext(): AudioContext | null {
   return audioCtx;
 }
 
+/**
+ * Resume AudioContext if suspended (call on user interaction like clicks/taps)
+ */
+export function ensureAudioContextResumed(): void {
+  if (typeof window === 'undefined') return;
+  const ctx = getAudioContext();
+  if (ctx && ctx.state === 'suspended') {
+    ctx.resume().catch(() => {});
+  }
+}
+
 /** Play short radio key-up chirp tone (F1 Team Radio start tone) */
 export function playRadioKeyUpTone(): Promise<void> {
+  return playF1IncomingRadioChirp();
+}
+
+/**
+ * 🏎️ Authentic F1 Team Radio Incoming Chirp (Driver to Pit Wall)
+ * Synthesizes the iconic F1 TV broadcast dual-frequency beep:
+ * - 30ms analog RF squelch burst (bandpass filtered white noise)
+ * - 1750Hz + 2150Hz dual-tone chime (75ms) with natural harmonic decay
+ */
+export function playF1IncomingRadioChirp(): Promise<void> {
   return new Promise((resolve) => {
     const ctx = getAudioContext();
     if (!ctx) return resolve();
 
+    ensureAudioContextResumed();
+
     const now = ctx.currentTime;
+
+    // 1. Initial RF squelch burst (30ms)
+    try {
+      const burstSize = Math.floor(ctx.sampleRate * 0.03);
+      const burstBuffer = ctx.createBuffer(1, burstSize, ctx.sampleRate);
+      const burstData = burstBuffer.getChannelData(0);
+      for (let i = 0; i < burstSize; i++) {
+        burstData[i] = (Math.random() * 2 - 1) * 0.08;
+      }
+      const burstSource = ctx.createBufferSource();
+      burstSource.buffer = burstBuffer;
+
+      const burstFilter = ctx.createBiquadFilter();
+      burstFilter.type = 'bandpass';
+      burstFilter.frequency.setValueAtTime(1400, now);
+      burstFilter.Q.setValueAtTime(2.0, now);
+
+      const burstGain = ctx.createGain();
+      burstGain.gain.setValueAtTime(0.06, now);
+      burstGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+
+      burstSource.connect(burstFilter);
+      burstFilter.connect(burstGain);
+      burstGain.connect(ctx.destination);
+
+      burstSource.start(now);
+      burstSource.stop(now + 0.03);
+    } catch {
+      // Audio buffer creation fallback
+    }
+
+    // 2. Dual-tone broadcast chime (1750Hz + 2150Hz)
     const osc1 = ctx.createOscillator();
     const osc2 = ctx.createOscillator();
     const gain = ctx.createGain();
 
     osc1.type = 'sine';
     osc1.frequency.setValueAtTime(1750, now);
-    osc1.frequency.setValueAtTime(2250, now + 0.04);
+    osc1.frequency.setValueAtTime(2150, now + 0.038);
 
-    osc2.type = 'triangle';
-    osc2.frequency.setValueAtTime(880, now);
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(875, now);
+    osc2.frequency.setValueAtTime(1075, now + 0.038);
 
-    gain.gain.setValueAtTime(0.12, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+    gain.gain.setValueAtTime(0.14, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.085);
 
     osc1.connect(gain);
     osc2.connect(gain);
@@ -56,11 +112,73 @@ export function playRadioKeyUpTone(): Promise<void> {
 
     osc1.start(now);
     osc2.start(now);
-    osc1.stop(now + 0.09);
-    osc2.stop(now + 0.09);
+    osc1.stop(now + 0.088);
+    osc2.stop(now + 0.088);
 
-    setTimeout(resolve, 95);
+    setTimeout(resolve, 90);
   });
+}
+
+/**
+ * 🎙️ Pit Wall Outgoing Transmission Beep (Pit Wall to Driver)
+ * Triggered when the user issues a command (Box Box, Push, Conserve, ERS, Engine Mode):
+ * - Tactile PTT (Push-To-Talk) mic click + dual ascending confirmation tone (1200Hz -> 1600Hz)
+ */
+export function playF1OutgoingRadioBeep(): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  ensureAudioContextResumed();
+
+  const now = ctx.currentTime;
+
+  // Short mic key click
+  try {
+    const clickSize = Math.floor(ctx.sampleRate * 0.015);
+    const clickBuffer = ctx.createBuffer(1, clickSize, ctx.sampleRate);
+    const clickData = clickBuffer.getChannelData(0);
+    for (let i = 0; i < clickSize; i++) {
+      clickData[i] = (Math.random() * 2 - 1) * 0.12;
+    }
+    const clickSource = ctx.createBufferSource();
+    clickSource.buffer = clickBuffer;
+
+    const clickFilter = ctx.createBiquadFilter();
+    clickFilter.type = 'bandpass';
+    clickFilter.frequency.setValueAtTime(2200, now);
+    clickFilter.Q.setValueAtTime(3.0, now);
+
+    const clickGain = ctx.createGain();
+    clickGain.gain.setValueAtTime(0.08, now);
+    clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.015);
+
+    clickSource.connect(clickFilter);
+    clickFilter.connect(clickGain);
+    clickGain.connect(ctx.destination);
+
+    clickSource.start(now);
+    clickSource.stop(now + 0.015);
+  } catch {
+    // Fallback
+  }
+
+  // Dual ascending confirmation pips (1200Hz -> 1600Hz)
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(1200, now + 0.01);
+  osc.frequency.setValueAtTime(1600, now + 0.045);
+
+  gain.gain.setValueAtTime(0.001, now);
+  gain.gain.setValueAtTime(0.10, now + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start(now + 0.01);
+  osc.stop(now + 0.085);
 }
 
 /** Play radio key-down squelch / click (F1 Team Radio transmission cut) */

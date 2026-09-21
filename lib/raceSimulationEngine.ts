@@ -15,6 +15,18 @@
  * - 100-Point 4-Axis Tactical Scoring Engine & Glossary/Library Keyword Linker
  */
 
+import {
+  playF1IncomingRadioChirp,
+  playF1OutgoingRadioBeep,
+  ensureAudioContextResumed,
+} from './radioAudioEffect';
+
+export {
+  playF1IncomingRadioChirp,
+  playF1OutgoingRadioBeep,
+  ensureAudioContextResumed,
+};
+
 export type TyreCompound = 'SOFT' | 'MEDIUM' | 'HARD' | 'INTER' | 'WET';
 export type DownforceSetup = 'low' | 'balanced' | 'high';
 export type EnginePUMode = 'push' | 'standard' | 'conserve';
@@ -797,6 +809,12 @@ export interface CarLapSimState {
   inDrsTrain?: boolean;
   inDirtyAir?: boolean;
   pointsAwarded?: number; // 25, 18, 15, 12, 10, 8, 6, 4, 2, 1 for P1-P10
+  // FIA Sporting Regulations & Telemetry Additions
+  compoundsUsed?: TyreCompound[];
+  mandatoryTwoCompoundsMet?: boolean;
+  trackLimitsCount?: number;
+  pendingPenaltySeconds?: number;
+  drsAvailable?: boolean;
 }
 
 export interface RainRadarStatus {
@@ -864,6 +882,12 @@ export interface SimSnapshot {
   rainRadar: RainRadarStatus;
   activeRadioPrompt?: DriverRadioPrompt;
   teammateStatus?: TeammateStatus;
+  fiaRuleStatus?: {
+    mandatoryDryTireMet: boolean;
+    compoundsUsed: TyreCompound[];
+    pendingPenalties: number;
+    trackLimitsCount: number;
+  };
 }
 
 export interface PlayerTacticalCommand {
@@ -932,29 +956,7 @@ export const TYRE_PROPERTIES: Record<
 // ── Web Audio F1 Radio Chirp Synthesizer ──────────────────────────────────────
 
 export function playF1RadioChirp() {
-  if (typeof window === 'undefined') return;
-  try {
-    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    if (!AudioCtx) return;
-    const audioCtx = new AudioCtx();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.06);
-
-    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.005, audioCtx.currentTime + 0.1);
-
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.1);
-  } catch {
-    // Suppress audio failure if blocked by browser policy
-  }
+  playF1IncomingRadioChirp();
 }
 
 // ── Traffic & Pit Exit Predictor ──────────────────────────────────────────────
@@ -1089,6 +1091,27 @@ export const DRIVER_RADIO_LINES: Record<
   },
 };
 
+// ── Deterministic Pseudo-Random Number Generator (Mulberry32) ───────────────────
+
+export function createSeededRng(seed: number) {
+  let s = Math.floor(seed) >>> 0;
+  return function () {
+    s = (s + 0x6d2b79f5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+export function hashStringToSeed(str: string): number {
+  let hash = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
+}
+
 // ── Grand Prix Simulation Engine ──────────────────────────────────────────────
 
 export function runFullGrandPrixSimulation(params: {
@@ -1104,6 +1127,7 @@ export function runFullGrandPrixSimulation(params: {
   driverRadioResponses?: Record<string, string>; // promptId -> optionId
   aiDifficulty?: 'beginner' | 'standard' | 'master';
   incidentRiskMultiplier?: number;
+  raceLengthMode?: 'sprint' | 'gp_short_25' | 'gp_full_100';
 }): SimSnapshot[] {
   const {
     circuit,
@@ -1118,7 +1142,12 @@ export function runFullGrandPrixSimulation(params: {
     driverRadioResponses = {},
     aiDifficulty = 'standard',
     incidentRiskMultiplier = 1.0,
+    raceLengthMode = 'gp_short_25',
   } = params;
+
+  // Base deterministic seed derived from scenario constants (guarantees zero random drift on tactical tweaks)
+  const baseSeedStr = `${circuit.id}-${totalLaps}-${weatherType}-${rainStartLap}-${scTriggerLap ?? 'nosc'}-${incidentFrequency}-${aiDifficulty}-${raceLengthMode}`;
+  const baseSeed = hashStringToSeed(baseSeedStr);
 
   const snapshots: SimSnapshot[] = [];
 
@@ -1145,6 +1174,11 @@ export function runFullGrandPrixSimulation(params: {
       isRetired: boolean;
       retirementReason?: string;
       retirementLap?: number;
+      // FIA Sporting Regulations & Penalty Tracking
+      compoundsUsed: TyreCompound[];
+      trackLimitsCount: number;
+      pendingPenaltySeconds: number;
+      servedPenaltySeconds: number;
     }
   > = {};
 
@@ -1169,6 +1203,10 @@ export function runFullGrandPrixSimulation(params: {
       isRetired: false,
       retirementReason: undefined,
       retirementLap: undefined,
+      compoundsUsed: [d.startTyre],
+      trackLimitsCount: 0,
+      pendingPenaltySeconds: 0,
+      servedPenaltySeconds: 0,
     };
   }
 
@@ -1303,13 +1341,14 @@ export function runFullGrandPrixSimulation(params: {
         });
       }
     } else {
-      // Check if incident triggers
+      // Check if incident triggers with deterministic PRNG
       let triggerIncident = false;
+      const incidentRng = createSeededRng(baseSeed ^ (currentLap * 10007) ^ 0x1a2b3c4d);
       if (scTriggerLap && currentLap === scTriggerLap) {
         triggerIncident = true;
       } else if (currentLap > 1 && currentLap < totalLaps && currentLap - lastIncidentLap >= 3) {
-        // Roll against calculated risk
-        const roll = Math.random() * 100;
+        // Roll against calculated risk deterministically
+        const roll = incidentRng() * 100;
         if (roll < incidentRiskPercent * 0.75) {
           triggerIncident = true;
         }
@@ -1320,10 +1359,10 @@ export function runFullGrandPrixSimulation(params: {
         activeScLapsRemaining = 2; // 2 laps of SC
         lastIncidentLap = currentLap;
 
-        // Choose victim car from non-retired AI cars
+        // Choose victim car from non-retired AI cars deterministically
         const potentialVictims = drivers.filter((d) => !d.isPlayer && !trackers[d.code].isRetired);
         if (potentialVictims.length > 0) {
-          const victim = potentialVictims[Math.floor(Math.random() * potentialVictims.length)];
+          const victim = potentialVictims[Math.floor(incidentRng() * potentialVictims.length)];
           const victimTracker = trackers[victim.code];
           victimTracker.isRetired = true;
           victimTracker.retirementLap = currentLap;
@@ -1372,7 +1411,7 @@ export function runFullGrandPrixSimulation(params: {
       }
     }
 
-    // Rain start / stop broadcasts & Driver Personality Radios
+    // Rain start / stop broadcasts & Driver Personality Radios (deterministic)
     if (isCurrentlyRaining && !wasRainingPrevLap) {
       globalCommentary.unshift({
         id: `rain-start-${currentLap}`,
@@ -1384,10 +1423,11 @@ export function runFullGrandPrixSimulation(params: {
 
       const rainSpeakers = ['VER', 'LEC', 'HAM', 'TSU', 'NOR', 'ALO'].filter((c) => !trackers[c]?.isRetired);
       if (rainSpeakers.length > 0) {
-        const speakerCode = rainSpeakers[Math.floor(Math.random() * rainSpeakers.length)];
+        const radioRng = createSeededRng(baseSeed ^ (currentLap * 20011) ^ 0x4d3c2b1a);
+        const speakerCode = rainSpeakers[Math.floor(radioRng() * rainSpeakers.length)];
         const lines = DRIVER_RADIO_LINES[speakerCode]?.rain;
         if (lines && lines.length > 0) {
-          const line = lines[Math.floor(Math.random() * lines.length)];
+          const line = lines[Math.floor(radioRng() * lines.length)];
           const speakerDriver = drivers.find((d) => d.code === speakerCode);
           globalCommentary.unshift({
             id: `radio-rain-${speakerCode}-${currentLap}`,
@@ -1528,10 +1568,14 @@ export function runFullGrandPrixSimulation(params: {
       }
     }
 
-    // Calculate lap physics for each car
-    for (const driver of drivers) {
+    // Calculate lap physics for each car with deterministic PRNG per driver
+    for (let dIdx = 0; dIdx < drivers.length; dIdx++) {
+      const driver = drivers[dIdx];
       const tracker = trackers[driver.code];
       const isPlayer = driver.code === playerDriver.code;
+      const crewRng = createSeededRng(baseSeed ^ (currentLap * 10007) ^ (dIdx * 3571) ^ 0x99cc99cc);
+      const trackLimitsRng = createSeededRng(baseSeed ^ (currentLap * 10007) ^ (dIdx * 3571) ^ 0x77bb77bb);
+      const jitterRng = createSeededRng(baseSeed ^ (currentLap * 10007) ^ (dIdx * 3571) ^ 0x55aa55aa);
 
       if (tracker.isRetired) {
         lapCarStates.push({
@@ -1582,11 +1626,23 @@ export function runFullGrandPrixSimulation(params: {
         const targetTyre = pittingCarsThisLap.get(driver.code) || 'INTER';
         const chosenTyre = isPlayer ? playerOverride.nextCompound || 'INTER' : targetTyre;
         tracker.currentTyre = chosenTyre;
+        if (!tracker.compoundsUsed.includes(chosenTyre)) {
+          tracker.compoundsUsed.push(chosenTyre);
+        }
         tracker.tyreAge = 0;
         tracker.surfaceTemp = 95;
         tracker.coreTemp = 90;
 
-        staticCrewTime = driver.crewStopTime + (Math.random() * 0.4 - 0.2);
+        staticCrewTime = driver.crewStopTime + (crewRng() * 0.4 - 0.2);
+
+        // FIA Penalty Serving: Mechanics must stand back and wait before working on the car
+        if (tracker.pendingPenaltySeconds > 0) {
+          staticCrewTime += tracker.pendingPenaltySeconds;
+          tracker.servedPenaltySeconds += tracker.pendingPenaltySeconds;
+          tracker.pendingPenaltySeconds = 0;
+          note = 'BOX STOP (SERVED 5s PENALTY)';
+        }
+
         if (isPlayer && playerDoubleStackDelay > 0) staticCrewTime += playerDoubleStackDelay;
         if (!isPlayer && driver.code === teammateDriver?.code && teammateDoubleStackDelay > 0) {
           staticCrewTime += teammateDoubleStackDelay;
@@ -1594,7 +1650,7 @@ export function runFullGrandPrixSimulation(params: {
 
         const pitLaneLoss = isSC ? circuit.pitLaneLoss * 0.52 : circuit.pitLaneLoss;
         lapPitLoss = pitLaneLoss + staticCrewTime;
-        note = isSC ? 'CHEAP PIT (SC)' : 'BOX STOP';
+        if (!note) note = isSC ? 'CHEAP PIT (SC)' : 'BOX STOP';
 
         globalCommentary.unshift({
           id: `pit-${driver.code}-${currentLap}`,
@@ -1637,10 +1693,32 @@ export function runFullGrandPrixSimulation(params: {
         tracker.ersBatterySoc = Math.max(5, tracker.ersBatterySoc - 35);
       }
 
-      // Tyre wear & cliff calculation
-      const wearMultiplier = tracker.tyreAge > tyreProp.cliffLap ? 3.2 : 1.0;
-      const tyreWearPacePenalty = tracker.tyreAge * tyreProp.wearRate * circuit.tyreAggression * wearMultiplier;
-      const wearPercent = Math.min(100, Math.round((tracker.tyreAge / (tyreProp.cliffLap * 1.5)) * 100));
+      // Team Order physics
+      let teamOrderPaceMod = 0;
+      if (playerOverride.teamOrder && teammateDriver) {
+        if (driver.code === teammateDriver.code) {
+          if (playerOverride.teamOrder === 'swap') {
+            // Teammate yields position cleanly to player (+0.8s lift)
+            const playerTime = trackers[playerDriver.code].cumulativeTime;
+            const tmTime = tracker.cumulativeTime;
+            if (tmTime <= playerTime + 2.0) {
+              teamOrderPaceMod = +0.8;
+              if (!note) note = 'TEAM ORDER (SWAP)';
+            }
+          } else if (playerOverride.teamOrder === 'defend') {
+            if (!note) note = 'TEAM ORDER (DEFEND)';
+          }
+        }
+      }
+
+      // Tyre wear & cliff calculation with race length mode scaling
+      const is25Percent = raceLengthMode === 'gp_short_25';
+      const isFullGp = raceLengthMode === 'gp_full_100';
+      const wearScale = is25Percent ? 3.2 : 1.0;
+      const effectiveCliff = Math.max(5, Math.round(tyreProp.cliffLap / (is25Percent ? 2.5 : 1.0)));
+      const wearMultiplier = tracker.tyreAge > effectiveCliff ? 3.2 : 1.0;
+      const tyreWearPacePenalty = tracker.tyreAge * tyreProp.wearRate * circuit.tyreAggression * wearMultiplier * wearScale;
+      const wearPercent = Math.min(100, Math.round((tracker.tyreAge / (effectiveCliff * 1.5)) * 100));
 
       // Thermal warnings
       let thermalWarning: 'NONE' | 'GRAINING_RISK' | 'BLISTERING_WARNING' | 'OPTIMAL' = 'OPTIMAL';
@@ -1671,9 +1749,43 @@ export function runFullGrandPrixSimulation(params: {
         }
       }
 
-      // Fuel burn off (lighter car = faster lap: -0.035s per lap)
-      tracker.fuelKg = Math.max(2, tracker.fuelKg - 1.55);
-      const fuelPaceBonus = -((totalLaps - currentLap) * 0.035);
+      // Fuel burn off (lighter car = faster lap: -0.033s per lap)
+      const lapFuelBurn = isFullGp ? 1.75 : 1.55;
+      tracker.fuelKg = Math.max(2, tracker.fuelKg - lapFuelBurn);
+      const fuelPaceBonus = -((totalLaps - currentLap) * 0.033);
+
+      // Track limits simulation (push mode on dry track risks track limits)
+      if (tracker.puMode === 'push' && !isSC && trackLimitsRng() < 0.05) {
+        tracker.trackLimitsCount += 1;
+        if (tracker.trackLimitsCount === 3) {
+          globalCommentary.unshift({
+            id: `tl-bw-${driver.code}-${currentLap}`,
+            lap: currentLap,
+            type: 'incident',
+            speaker: 'FIA RACE CONTROL',
+            text: `⚫⚪ BLACK & WHITE FLAG — ${driver.name} (${driver.code}) トラックリミット3回警告！次の逸脱で5秒ペナルティ！`,
+          });
+        } else if (tracker.trackLimitsCount >= 4 && tracker.pendingPenaltySeconds === 0) {
+          tracker.pendingPenaltySeconds = 5;
+          globalCommentary.unshift({
+            id: `tl-pen-${driver.code}-${currentLap}`,
+            lap: currentLap,
+            type: 'incident',
+            speaker: 'FIA RACE CONTROL',
+            text: `⚠️ 5-SECOND TIME PENALTY — ${driver.name} (${driver.code}) トラックリミット複数回違反により5秒ペナルティ裁定！次回ピットで静止待機義務。`,
+          });
+        }
+      }
+
+      // FIA 2-Dry-Compound Rule Check
+      const slickCompounds = tracker.compoundsUsed.filter(c => c === 'SOFT' || c === 'MEDIUM' || c === 'HARD');
+      const distinctSlicks = new Set(slickCompounds);
+      const hadWetConditions = weatherType === 'drizzle' || weatherType === 'monsoon' || (rainStartLap && currentLap >= rainStartLap);
+      const mandatoryTwoCompoundsMet = hadWetConditions || distinctSlicks.size >= 2;
+
+      if (currentLap === totalLaps && !mandatoryTwoCompoundsMet && !tracker.isRetired && raceLengthMode !== 'sprint') {
+        note = 'DSQ (FIA Art. 30.5: 2種ドライタイヤ義務違反)';
+      }
 
       // Track evolution (22 cars laying down rubber every lap improves baseline grip by up to 0.25s)
       const trackEvolutionBonus = -Math.min(0.25, (currentLap / totalLaps) * 0.22);
@@ -1681,14 +1793,15 @@ export function runFullGrandPrixSimulation(params: {
       // SC pacing
       const scPaceAdd = isSC ? circuit.baseLapTime * 0.42 : 0;
 
-      // Jitter
-      const jitter = (Math.random() - 0.5) * 0.35;
+      // Jitter (deterministic)
+      const jitter = (jitterRng() - 0.5) * 0.35;
 
       const lapDuration =
         baseLap +
         tyreProp.speedDelta +
         puPaceMod +
         ersPaceMod +
+        teamOrderPaceMod +
         tyreWearPacePenalty +
         waterPenalty +
         fuelPaceBonus +
@@ -1737,6 +1850,11 @@ export function runFullGrandPrixSimulation(params: {
         pitStopDuration: staticCrewTime > 0 ? Number(staticCrewTime.toFixed(1)) : undefined,
         currentSpeedKmH,
         eventNote: note,
+        compoundsUsed: [...tracker.compoundsUsed],
+        mandatoryTwoCompoundsMet,
+        trackLimitsCount: tracker.trackLimitsCount,
+        pendingPenaltySeconds: tracker.pendingPenaltySeconds,
+        drsAvailable: false,
       });
     }
 
@@ -1759,6 +1877,19 @@ export function runFullGrandPrixSimulation(params: {
       activeCars.sort((a, b) => a.cumulativeTime - b.cumulativeTime);
     }
 
+    // Apply Team Order 'defend' effect on the car immediately behind teammate
+    if (playerOverride.teamOrder === 'defend' && teammateDriver) {
+      const tmIdx = activeCars.findIndex((c) => c.code === teammateDriver.code);
+      if (tmIdx >= 0 && tmIdx < activeCars.length - 1) {
+        const carBehind = activeCars[tmIdx + 1];
+        if (carBehind && carBehind.code !== playerDriver.code) {
+          carBehind.cumulativeTime += 0.6;
+          carBehind.lapTime = Number((carBehind.lapTime + 0.6).toFixed(3));
+          if (!carBehind.eventNote) carBehind.eventNote = 'HELD UP BY DEFENSE';
+        }
+      }
+    }
+
     const leaderTime = activeCars[0]?.cumulativeTime || 0;
     const FIA_POINTS_TABLE = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
 
@@ -1776,6 +1907,10 @@ export function runFullGrandPrixSimulation(params: {
       if (inDirtyAir) {
         car.tyreSurfaceTemp = Math.min(145, car.tyreSurfaceTemp + 4);
       }
+
+      // DRS Available detection: within 1.0s behind ahead car, dry/damp, Lap >= 2, no SC
+      const drsAvailable = idx > 0 && car.gapToAhead <= 1.0 && currentLap >= 2 && !isSC && weather.waterDepth < 0.8;
+      car.drsAvailable = drsAvailable;
     });
 
     retiredCars.forEach((car, idx) => {
@@ -1990,6 +2125,14 @@ export function runFullGrandPrixSimulation(params: {
       }
     }
 
+    const playerTracker = trackers[playerDriver.code];
+    const playerSlicks = playerTracker?.compoundsUsed.filter((c) => c === 'SOFT' || c === 'MEDIUM' || c === 'HARD') || [];
+    const playerMandatoryMet =
+      weatherType === 'drizzle' ||
+      weatherType === 'monsoon' ||
+      (rainStartLap && currentLap >= rainStartLap) ||
+      new Set(playerSlicks).size >= 2;
+
     snapshots.push({
       lap: currentLap,
       isSC,
@@ -2005,6 +2148,12 @@ export function runFullGrandPrixSimulation(params: {
       rainRadar: radar,
       activeRadioPrompt: activeRadio,
       teammateStatus,
+      fiaRuleStatus: {
+        mandatoryDryTireMet: playerMandatoryMet,
+        compoundsUsed: playerTracker ? [...playerTracker.compoundsUsed] : [playerDriver.startTyre],
+        pendingPenalties: playerTracker?.pendingPenaltySeconds || 0,
+        trackLimitsCount: playerTracker?.trackLimitsCount || 0,
+      },
     });
   }
 
