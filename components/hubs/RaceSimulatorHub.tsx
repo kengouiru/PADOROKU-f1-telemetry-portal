@@ -120,9 +120,13 @@ import {
   ensureAudioContextResumed,
 } from '@/lib/radioAudioEffect';
 import { GLOSSARY_TERMS, type GlossaryTerm } from '@/data/f1GlossaryData';
-// War Room & 2026 Regulations are now in Library (KnowledgeHistoryHub)
 import { getGeminiAuthHeaders } from '@/lib/apiKeyService';
 import { usePlanTier } from '@/lib/tierService';
+import { PaddockLiveAtmosphere } from '@/components/pitwall/PaddockLiveAtmosphere';
+import {
+  BriefingSettingHelpModal,
+  type BriefingHelpTopic,
+} from '@/components/pitwall/BriefingSettingHelpModal';
 
 // Pure Pitwall Command Room Game
 type PitwallMonitor = 'all' | 'track' | 'timing' | 'thermals' | 'weather' | 'team' | 'radio';
@@ -194,6 +198,7 @@ export default function RaceSimulatorHub({
   const [customTargetBoxLap, setCustomTargetBoxLap] = useState<number | null>(null);
   const [customTargetCompound, setCustomTargetCompound] = useState<TyreCompound | null>(null);
   const [isBriefingOpen, setIsBriefingOpen] = useState<boolean>(false);
+  const [briefingHelpTopic, setBriefingHelpTopic] = useState<BriefingHelpTopic | null>(null);
 
   // Audio Sound Effect Mute State (Default: Sound ON as requested by user)
   const [radioAudioEnabled, setRadioAudioEnabled] = useState<boolean>(true);
@@ -294,12 +299,17 @@ export default function RaceSimulatorHub({
     'all' | 'tyre' | 'telemetry' | 'radio_intercept' | 'ers' | 'pit_stop'
   >('all');
   const [selectedIntelRivalId, setSelectedIntelRivalId] = useState<string | null>(null);
+  const [minimizeRadioPrompt, setMinimizeRadioPrompt] = useState<boolean>(false);
 
   // Compute effective player config based on pre-race strategy selection
   const effectivePlayerConfig = useMemo<DriverSimConfig>(() => {
+    const isCustomTyre = Boolean(customStartingTyre && customStartingTyre !== activeScenario.playerConfig.startTyre);
     return {
       ...activeScenario.playerConfig,
       startTyre: customStartingTyre || activeScenario.playerConfig.startTyre,
+      initialTyreAge: isCustomTyre ? 0 : activeScenario.playerConfig.initialTyreAge,
+      initialTyreSurfaceTemp: isCustomTyre ? 100 : activeScenario.playerConfig.initialTyreSurfaceTemp,
+      initialTyreCoreTemp: isCustomTyre ? 98 : activeScenario.playerConfig.initialTyreCoreTemp,
       machineSetup: {
         ...activeScenario.playerConfig.machineSetup,
         puMode: customInitialPuMode || activeScenario.playerConfig.machineSetup.puMode,
@@ -747,10 +757,12 @@ export default function RaceSimulatorHub({
     const baseSurf = playerCar.tyreSurfaceTemp;
     const baseCore = playerCar.tyreCoreTemp;
 
-    const flSurf = Math.round(baseSurf - 2 + corneringHeat + puModeHeat);
-    const frSurf = Math.round(baseSurf - 1 + corneringHeat + puModeHeat);
-    const rlSurf = Math.round(baseSurf + 3 + corneringHeat * 0.8 + puModeHeat);
-    const rrSurf = Math.round(baseSurf + 2 + corneringHeat * 0.8 + puModeHeat);
+    // In dirty air behind a rival, front wing loses downforce causing understeer wash and heavy front tyre heating
+    const dirtyAirFrontHeat = playerCar.inDirtyAir ? 3.5 : 0;
+    const flSurf = Math.round(baseSurf + dirtyAirFrontHeat - 1 + corneringHeat + puModeHeat);
+    const frSurf = Math.round(baseSurf + dirtyAirFrontHeat + corneringHeat + puModeHeat);
+    const rlSurf = Math.round(baseSurf + 1 + corneringHeat * 0.8 + puModeHeat);
+    const rrSurf = Math.round(baseSurf + corneringHeat * 0.8 + puModeHeat);
 
     // Dynamic brake temp: heavy braking spikes in corners (around 25%, 55%, 85% of lap)
     const brakeSpike = Math.max(0, Math.sin(rad * 1.5)) * 140;
@@ -2218,19 +2230,22 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
               <button
                 type="button"
                 onClick={handleBackToModeSelect}
-                className="btn-console px-3 py-1.5 text-xs font-racing font-bold text-slate-400 hover:text-white"
+                className="btn-console px-3.5 py-2 text-xs font-racing font-bold text-slate-300 hover:text-white flex items-center gap-1.5"
               >
-                ◀ モード変更
-              </button>
-              <button
-                type="button"
-                onClick={handleStartRace}
-                className="btn-console-primary px-5 py-2 text-xs font-racing font-bold flex items-center gap-2 shadow-lg shadow-red-950 animate-pulse"
-              >
-                <span>🏁 レース開始 ▶</span>
+                <span>◀</span>
+                <span>モード選択へ戻る</span>
               </button>
             </div>
           </div>
+
+          {/* 🏎️ Paddock Live Cam & Garage Bay Atmosphere */}
+          <PaddockLiveAtmosphere
+            teamName={effectivePlayerConfig.team}
+            driverCode={effectivePlayerConfig.code}
+            circuitName={activeScenario.circuit.name}
+            startTyre={effectivePlayerConfig.startTyre}
+            puMode={effectivePlayerConfig.machineSetup.puMode}
+          />
 
           {/* Two-Column Briefing & Setup Deck */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
@@ -2489,9 +2504,19 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                           </span>
                         )}
                       </span>
-                      <span className="text-[10px] font-mono text-emerald-400 font-bold">
-                        {effectivePlayerConfig.startTyre}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-mono text-emerald-400 font-bold">
+                          {effectivePlayerConfig.startTyre}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setBriefingHelpTopic('start_tyre')}
+                          className="p-0.5 rounded text-slate-400 hover:text-cyan-300 hover:bg-slate-800 transition-all cursor-pointer"
+                          title="スタートタイヤの戦術・ルール解説"
+                        >
+                          <HelpCircle className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-5 gap-1 pt-1">
@@ -2554,9 +2579,19 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                       <span className="font-racing text-slate-300 font-bold text-[11px]">
                         予定ピット戦略
                       </span>
-                      <span className="text-[10px] font-mono text-amber-400 font-bold">
-                        LAP {customTargetBoxLap || effectiveTargetBoxLap} ➔ {customTargetCompound || nextCompoundChoice}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-mono text-amber-400 font-bold">
+                          LAP {customTargetBoxLap || effectiveTargetBoxLap} ➔ {customTargetCompound || nextCompoundChoice}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setBriefingHelpTopic('pit_strategy')}
+                          className="p-0.5 rounded text-slate-400 hover:text-cyan-300 hover:bg-slate-800 transition-all cursor-pointer"
+                          title="ピットストップ・アンダーカット戦術解説"
+                        >
+                          <HelpCircle className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
 
                     <div className="flex items-center gap-2 pt-1">
@@ -2601,9 +2636,19 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                       <span className="font-racing text-slate-300 font-bold text-[11px]">
                         初期PUモード
                       </span>
-                      <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase">
-                        {effectivePlayerConfig.machineSetup.puMode}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-mono text-cyan-400 font-bold uppercase">
+                          {effectivePlayerConfig.machineSetup.puMode}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setBriefingHelpTopic('pu_mode')}
+                          className="p-0.5 rounded text-slate-400 hover:text-cyan-300 hover:bg-slate-800 transition-all cursor-pointer"
+                          title="PUモード・電力マネジメント解説"
+                        >
+                          <HelpCircle className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-1 pt-1">
@@ -2670,13 +2715,23 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                   <span className="font-racing font-bold text-white text-xs flex items-center gap-1.5">
                     <Flag className="w-4 h-4 text-red-500" /> レース距離 ＆ FIAレギュレーション
                   </span>
-                  <span className="text-[10px] font-mono text-cyan-400 font-bold">
-                    {raceLengthMode === 'gp_short_25'
-                      ? '短縮GP (25%距離・ピット戦略必須)'
-                      : raceLengthMode === 'gp_full_100'
-                      ? 'フルGP (100%距離・本格リアル物理)'
-                      : 'スプリント (無交換スプリント)'}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono text-cyan-400 font-bold">
+                      {raceLengthMode === 'gp_short_25'
+                        ? '短縮GP (25%距離・ピット戦略必須)'
+                        : raceLengthMode === 'gp_full_100'
+                        ? 'フルGP (100%距離・本格リアル物理)'
+                        : 'スプリント (無交換スプリント)'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setBriefingHelpTopic('race_distance')}
+                      className="p-0.5 rounded text-slate-400 hover:text-cyan-300 hover:bg-slate-800 transition-all cursor-pointer"
+                      title="レース距離とレギュレーション解説"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
@@ -2773,9 +2828,19 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                       <span className="font-racing text-slate-300 font-bold text-[11px]">
                         AIライバル難易度
                       </span>
-                      <span className="text-[10px] font-mono text-amber-400 font-bold">
-                        {aiDifficulty === 'master' ? '🏆 金トロフィー確定' : aiDifficulty === 'standard' ? '🥈 銀トロフィー狙い' : '🥉 銅トロフィー狙い'}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-mono text-amber-400 font-bold">
+                          {aiDifficulty === 'master' ? '🏆 金トロフィー確定' : aiDifficulty === 'standard' ? '🥈 銀トロフィー狙い' : '🥉 銅トロフィー狙い'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setBriefingHelpTopic('ai_difficulty')}
+                          className="p-0.5 rounded text-slate-400 hover:text-cyan-300 hover:bg-slate-800 transition-all cursor-pointer"
+                          title="AI難易度とトロフィー解説"
+                        >
+                          <HelpCircle className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                     <div className="grid grid-cols-3 gap-1">
                       {[
@@ -2814,6 +2879,14 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                       <span className="font-racing text-slate-300 font-bold text-[11px]">
                         操作アシストモード
                       </span>
+                      <button
+                        type="button"
+                        onClick={() => setBriefingHelpTopic('user_assist')}
+                        className="p-0.5 rounded text-slate-400 hover:text-cyan-300 hover:bg-slate-800 transition-all cursor-pointer"
+                        title="操作アシストモード解説"
+                      >
+                        <HelpCircle className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                     <div className="grid grid-cols-2 gap-1.5">
                       <button
@@ -2869,7 +2942,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                   作戦策定完了 — ピットウォール司令室へ
                 </div>
                 <div className="text-xs text-slate-400 font-mono">
-                  全{activeScenario.totalLaps}周 • 目標順位 P{activeScenario.targetPosition} • スタートタイヤ {effectivePlayerConfig.startTyre}
+                  全{activeScenario.totalLaps}周 • 目標順位 P{activeScenario.targetPosition} • スタートタイヤ {effectivePlayerConfig.startTyre} • 初期PU {effectivePlayerConfig.machineSetup.puMode.toUpperCase()}
                 </div>
               </div>
             </div>
@@ -2888,10 +2961,16 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                 onClick={handleStartRace}
                 className="btn-console-primary px-8 py-3 text-sm font-racing font-black tracking-wider flex items-center gap-2 shadow-2xl shadow-red-950 hover:scale-105 transition-all animate-pulse"
               >
-                <span>🏁 START RACE / レース開始 ▶</span>
+                <span>🚀 ピットウォールへ着席 (レース開始) ▶</span>
               </button>
             </div>
           </div>
+
+          {/* ℹ️ Briefing Setting Interactive Help Modal */}
+          <BriefingSettingHelpModal
+            topic={briefingHelpTopic}
+            onClose={() => setBriefingHelpTopic(null)}
+          />
         </div>
       )}
 
@@ -3964,21 +4043,28 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                       </button>
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
-                      <span
-                        className={`px-1.5 py-0.2 rounded-full text-[8.5px] font-mono font-bold whitespace-nowrap shrink-0 ${
-                          !playerCar?.thermalWarning || playerCar?.thermalWarning === 'NONE'
-                            ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
-                            : playerCar?.thermalWarning === 'GRAINING_RISK'
-                            ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
-                            : 'bg-red-950 text-red-300 border border-red-500/40 animate-pulse'
-                        }`}
-                      >
-                        {!playerCar?.thermalWarning || playerCar?.thermalWarning === 'NONE'
-                          ? '🟢 OPTIMAL'
-                          : playerCar?.thermalWarning === 'GRAINING_RISK'
-                          ? '🟡 GRAINING'
-                          : '🔴 BLISTERING'}
-                      </span>
+                      {(() => {
+                        const warning = playerCar?.thermalWarning;
+                        const isBlistering = warning === 'BLISTERING_WARNING';
+                        const isGraining = warning === 'GRAINING_RISK';
+                        return (
+                          <span
+                            className={`px-1.5 py-0.2 rounded-full text-[8.5px] font-mono font-bold whitespace-nowrap shrink-0 ${
+                              isBlistering
+                                ? 'bg-red-950 text-red-300 border border-red-500/40 animate-pulse'
+                                : isGraining
+                                ? 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                                : 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
+                            }`}
+                          >
+                            {isBlistering
+                              ? '🔴 BLISTERING'
+                              : isGraining
+                              ? '🟡 GRAINING'
+                              : '🟢 OPTIMAL'}
+                          </span>
+                        );
+                      })()}
                       <button
                         type="button"
                         onClick={() => setActiveMonitor('thermals')}
@@ -4587,45 +4673,80 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
 
         {/* ── COLUMN 4 (RIGHT): Comms, Live Feed & Tactical Commands ── */}
         <div className={`w-full min-w-0 space-y-2.5 ${mobileConsoleView === 'comms' ? 'block' : 'hidden lg:block'}`}>
-          {/* 1. Active Radio Prompt (Pop-up if incoming radio transmission) */}
-          {currentSnapshot?.activeRadioPrompt && !radioResponses[currentSnapshot.activeRadioPrompt.id] && (
-            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-red-950 via-slate-900 to-slate-950 border-2 border-red-500/80 shadow-2xl shadow-red-950/80 animate-in fade-in slide-in-from-top-2 duration-300">
-              <div className="flex items-center justify-between pb-2 border-b border-red-500/30">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
-                  <span className="font-racing font-bold text-red-300 text-xs tracking-wider uppercase">
-                    📻 INCOMING RADIO ({currentSnapshot.activeRadioPrompt.urgency})
-                  </span>
-                </div>
-                <span className="text-xs font-racing font-bold text-white">
-                  {currentSnapshot.activeRadioPrompt.speaker}
-                </span>
-              </div>
-
-              <div className="py-2.5 text-xs sm:text-sm text-white font-mono leading-relaxed">
-                {currentSnapshot.activeRadioPrompt.message}
-              </div>
-
-              <div className="grid grid-cols-1 gap-1.5 pt-1">
-                {currentSnapshot.activeRadioPrompt.options.map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => handleRadioResponse(currentSnapshot.activeRadioPrompt!.id, opt)}
-                    className="p-2.5 rounded-xl bg-slate-900/90 hover:bg-red-900/40 border border-white/20 hover:border-red-400/60 text-left transition-all cursor-pointer group shadow-md"
-                  >
-                    <div className="text-xs font-racing font-bold text-white group-hover:text-red-300">
-                      {opt.label}
-                    </div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">{opt.effectText}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
           {/* ── MISSION CONTROL INTEL (Rival Espionage & Shared Analytics) ── */}
-          <div className="glass-card-premium p-2.5 sm:p-3 rounded-2xl border border-white/10 shadow-lg backdrop-blur-md flex flex-col h-[388px]">
+          <div className="glass-card-premium p-2.5 sm:p-3 rounded-2xl border border-white/10 shadow-lg backdrop-blur-md flex flex-col h-[388px] relative overflow-hidden">
+            {/* 1. Active Radio Prompt Overlay (Tactical Override - Covers Intel without breaking layout) */}
+            {currentSnapshot?.activeRadioPrompt && !radioResponses[currentSnapshot.activeRadioPrompt.id] && !minimizeRadioPrompt && (
+              <div className="absolute inset-0 z-30 rounded-2xl bg-gradient-to-b from-red-950/98 via-slate-950/98 to-slate-950/98 border-2 border-red-500/90 p-3 sm:p-3.5 flex flex-col justify-between backdrop-blur-xl shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                {/* Header */}
+                <div className="flex items-center justify-between pb-1.5 border-b border-red-500/40 shrink-0">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
+                    <span className="font-racing font-bold text-red-300 text-xs tracking-wider uppercase flex items-center gap-1.5">
+                      <Radio className="w-3.5 h-3.5 text-red-400" />
+                      緊急戦略判断 // {currentSnapshot.activeRadioPrompt.urgency.toUpperCase()}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-racing font-bold text-white px-2 py-0.5 rounded bg-red-900/60 border border-red-400/40">
+                      {currentSnapshot.activeRadioPrompt.speaker}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setMinimizeRadioPrompt(true)}
+                      className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-white/10 transition-colors cursor-pointer"
+                      title="インテル情報を一時確認（プロンプトを最小化）"
+                    >
+                      📊 INTEL確認
+                    </button>
+                  </div>
+                </div>
+
+                {/* Message Body */}
+                <div className="py-2.5 px-3 rounded-xl bg-black/60 border border-red-500/20 text-xs sm:text-sm text-white font-mono leading-relaxed my-auto shadow-inner">
+                  <p className="text-slate-100">{currentSnapshot.activeRadioPrompt.message}</p>
+                </div>
+
+                {/* Option Buttons */}
+                <div className="grid grid-cols-1 gap-1.5 pt-1.5 border-t border-red-500/30 shrink-0">
+                  {currentSnapshot.activeRadioPrompt.options.map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => {
+                        handleRadioResponse(currentSnapshot.activeRadioPrompt!.id, opt);
+                        setMinimizeRadioPrompt(false);
+                      }}
+                      className="p-2 sm:p-2.5 rounded-xl bg-slate-900/90 hover:bg-red-900/50 border border-red-500/40 hover:border-red-400 text-left transition-all cursor-pointer group shadow-md active:scale-[0.98]"
+                    >
+                      <div className="text-xs font-racing font-bold text-white group-hover:text-red-200 flex items-center justify-between">
+                        <span>{opt.label}</span>
+                        <span className="text-[10px] text-red-400 group-hover:text-white font-mono">選択 ▶</span>
+                      </div>
+                      <div className="text-[10px] text-slate-300 mt-0.5 font-sans">{opt.effectText}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Minimized Banner if user wants to peek at Intel data */}
+            {currentSnapshot?.activeRadioPrompt && !radioResponses[currentSnapshot.activeRadioPrompt.id] && minimizeRadioPrompt && (
+              <div className="mb-1.5 p-1.5 rounded-lg bg-red-950/90 border border-red-500 flex items-center justify-between text-xs animate-pulse shrink-0">
+                <span className="text-[10px] font-racing text-red-200 font-bold flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+                  🚨 緊急判断待機中: {currentSnapshot.activeRadioPrompt.speaker}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setMinimizeRadioPrompt(false)}
+                  className="px-2 py-0.5 rounded bg-red-600 hover:bg-red-500 text-white text-[9.5px] font-racing font-bold shadow cursor-pointer transition-colors"
+                >
+                  判断画面を開く ▶
+                </button>
+              </div>
+            )}
+
             {/* Header */}
             <div className="flex flex-wrap items-center justify-between gap-1.5 pb-1.5 border-b border-white/10 shrink-0">
               <div className="flex items-center gap-1.5">

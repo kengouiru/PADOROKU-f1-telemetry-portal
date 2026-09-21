@@ -431,6 +431,10 @@ export interface DriverSimConfig {
   pit2Tyre?: TyreCompound;
   crewStopTime: number;
   isPlayer?: boolean;
+  // Scenario initial thermal & wear presets
+  initialTyreAge?: number;
+  initialTyreSurfaceTemp?: number;
+  initialTyreCoreTemp?: number;
 }
 
 // ── Full 11 Teams Grid (2026/2025 Roster with Teammates) ───────────────────────
@@ -1186,13 +1190,13 @@ export function runFullGrandPrixSimulation(params: {
     trackers[d.code] = {
       cumulativeTime: 0,
       currentTyre: d.startTyre,
-      tyreAge: 0,
+      tyreAge: d.initialTyreAge ?? 0,
       pitCount: 0,
       puMode: d.machineSetup.puMode,
       ersBoostUsed: false,
       ersBatterySoc: 85,
-      surfaceTemp: 100,
-      coreTemp: 98,
+      surfaceTemp: d.initialTyreSurfaceTemp ?? 100,
+      coreTemp: d.initialTyreCoreTemp ?? 98,
       fuelKg: Math.round(totalLaps * 1.55 + 5),
       confidence: 88,
       plannedPit1: d.pit1Lap,
@@ -1722,7 +1726,7 @@ export function runFullGrandPrixSimulation(params: {
 
       // Thermal warnings
       let thermalWarning: 'NONE' | 'GRAINING_RISK' | 'BLISTERING_WARNING' | 'OPTIMAL' = 'OPTIMAL';
-      if (tracker.surfaceTemp > 128) {
+      if (tracker.surfaceTemp > 125) {
         thermalWarning = 'BLISTERING_WARNING';
       } else if (tracker.surfaceTemp < 88 && tracker.puMode === 'push') {
         thermalWarning = 'GRAINING_RISK';
@@ -1905,7 +1909,16 @@ export function runFullGrandPrixSimulation(params: {
       car.inDirtyAir = inDirtyAir;
 
       if (inDirtyAir) {
-        car.tyreSurfaceTemp = Math.min(145, car.tyreSurfaceTemp + 4);
+        const carTracker = trackers[car.code];
+        if (carTracker) {
+          carTracker.surfaceTemp = Math.min(145, carTracker.surfaceTemp + 3.0);
+          car.tyreSurfaceTemp = Math.round(carTracker.surfaceTemp);
+        } else {
+          car.tyreSurfaceTemp = Math.min(145, car.tyreSurfaceTemp + 3.0);
+        }
+        if (car.tyreSurfaceTemp > 125) {
+          car.thermalWarning = 'BLISTERING_WARNING';
+        }
       }
 
       // DRS Available detection: within 1.0s behind ahead car, dry/damp, Lap >= 2, no SC
@@ -2217,7 +2230,7 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
     },
     gameMode: 'crisis',
     description:
-      '雨上がりのシルバーストン。インターでスタートしたが、太陽が照り急速にレコードラインが乾燥中。インターの熱ダレに耐えきれなくなる前に、誰よりも早くスリックへ飛び込む英断を下せ！',
+      '雨上がりのシルバーストン。立ち込める濃霧と雲間から射し込む陽光により、コプスからマゴッツ・ベケッツにかけてのアスファルトが急速に黒光りし始めている。ジョージ・ラッセルから無線が入る――「インターのゴムがオーバーヒートで千切れそうだ！スリックはまだ早いのか？！」。路面水深は1.2mmから0.6mmへ急減中。ライバルが様子見する中、誰よりも早くスリックへ飛び込み、2周で10秒を稼ぎ出す伝説のアンダーカットを断行せよ！',
     playerConfig: {
       ...GRID_DRIVERS[8], // RUS
       basePaceOffset: 0.1,
@@ -2260,7 +2273,7 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
     },
     gameMode: 'crisis',
     description:
-      'Yuki Tsunoda (P5)として出走。鈴鹿の空に低気圧が急速接近中。何周目に雨雲が到達するか見極め、ライバルより1周早くインターへ履き替えてポディウム(P3以内)を奪い取れ！',
+      '鈴鹿サーキットの空を覆い尽くす巨大な雨雲。スプーンカーブの観客席が次々とポンチョを羽織り始めた。無線スピーカーから角田裕毅の鬼気迫る声が響く――「バイザーに雨粒が当たってる！西コースはすでに濡れ始めてるぞ！」。天候ドップラーレーダーは2周以内の土砂降りを警告。首位集団とのギャップは2.4秒。濡れゆく路面でスリックを極限までコントロールし、ライバルがピットに殺到する1周前にインターへ換装して母国鈴鹿の表彰台（P3以内）をもぎ取れ！',
     playerConfig: {
       ...GRID_DRIVERS[0], // TSU
       basePaceOffset: 0.2,
@@ -2303,13 +2316,16 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
     },
     gameMode: 'crisis',
     description:
-      'フェルスタッペン(P2)を追うノリス(P2スタート)。モンツァの高速ストレートで前走車のダーティエアを避け、完璧なピットインでクリーンエアに抜け出し逆転優勝を果たせ！',
+      'ティフォシの地響きのような咆哮が轟く超高速の聖地モンツァ。P2ランド・ノリス（マクラーレン）の視界を塞ぐのは首位フェルスタッペンのリアウイング。超接近戦のダーティエアによりフロントタイヤの表面温度は125℃を超え、悲鳴を上げている。最高速350km/hのストレートではDRSを使っても抜ききれない……勝機はピットストップのみ。完璧なインラップを叩き出し、ピットクルーによる2.2秒の神業作業でクリーンエアへ脱出、逆転優勝を飾れ！',
     playerConfig: {
       ...GRID_DRIVERS[4], // NOR
       basePaceOffset: 0.05,
       startTyre: 'SOFT',
       pit1Lap: 99,
       isPlayer: true,
+      initialTyreSurfaceTemp: 126,
+      initialTyreCoreTemp: 112,
+      initialTyreAge: 7,
     },
     teammateConfig: {
       ...GRID_DRIVERS[5], // PIA
@@ -2317,7 +2333,11 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
       startTyre: 'MEDIUM',
       pit1Lap: 99,
     },
-    rivals: GRID_DRIVERS.filter(d => d.code !== 'NOR' && d.code !== 'PIA'),
+    rivals: GRID_DRIVERS.filter(d => d.code !== 'NOR' && d.code !== 'PIA').map(d =>
+      d.code === 'VER'
+        ? { ...d, initialTyreAge: 7, initialTyreSurfaceTemp: 106, initialTyreCoreTemp: 102 }
+        : d
+    ),
     startWeather: 'dry',
     weatherForecast: {
       radarDesc: '終日快晴。路面温度44℃（高温によるタイヤデグラデーション注意）。',
@@ -2345,7 +2365,7 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
     },
     gameMode: 'crisis',
     description:
-      'フェラーリのルクレール(P3)として出走。ケメルストレートでクラッシュ発生、SC出動！相方ハミルトンと同時にピットに入るとダブルスタック待機(+4.5秒)が発生する。どちらを優先するか英断を下せ！',
+      '深いアルデンヌの森にエンジン音が木霊するスパ・フランコルシャン。ケメルストレートで激しいクラッシュが発生し、レースコントロールから赤白の閃光と共に「SAFETY CAR DEPLOYED」が宣言された！フェラーリのルクレール（P3）とハミルトン（P4）がランデブー走行中。同時にピットへ飛び込めば2台目に4.5秒の静止待機（ダブルスタック）が発生する。どちらを優先し、どちらをステイアウトさせるか――瞬時の決断が名門跳ね馬の運命を決める！',
     playerConfig: {
       ...GRID_DRIVERS[6], // LEC
       basePaceOffset: 0.1,
@@ -2388,7 +2408,7 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
     },
     gameMode: 'crisis',
     description:
-      'モナコ市街地戦。前走車フェルスタッペンがピットイン！クリーンエアの中で猛プッシュしてインラップ最速を叩き出し、ピット出口で前に出るオーバーカットを完遂せよ！',
+      '1ミリのミスも許されないモナコ公国の隘路。ガードレールにタイヤを擦りながら首位を猛追するルクレール。前走車のフェルスタッペンが突如ピットロードへ滑り込んだ！オーバーテイクが物理的に不可能なモナコで勝つ唯一の手段――それはクリーンエアとなった今、タイヤの残りグリップを全て絞り出して異次元のインラップ最速タイムを叩き出す「オーバーカット」。ピット出口のサント・デボーテで前に出ろ！',
     playerConfig: {
       ...GRID_DRIVERS[6], // LEC
       basePaceOffset: 0.05,
@@ -2431,7 +2451,7 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
     },
     gameMode: 'crisis',
     description:
-      '熱帯夜のシンガポール。クラッシュ多発によるSC出動率極大のコース。周囲がステイアウトする中、あえてソフトタイヤに履き替えて終盤の超攻撃的オーバーテイクで表彰台を奪い取れ！',
+      '気温31℃・湿度80%、熱帯夜のマリーナベイ市街地サーキット。過酷なブレーキ熱と肉体疲労でクラッシュが連発し、セーフティカーが頻発する大波乱の展開。アストンマーティンのフェルナンド・アロンソを擁するピットウォールに緊迫が走る。周囲が安全策でハードのままステイアウトを選ぶ中、あえて新品ソフトタイヤを履く超攻撃的ギャンブルを決断。終盤のリスタートでDRSを乱舞させ、電光石火のオーバーテイク劇を演じろ！',
     playerConfig: {
       ...GRID_DRIVERS[10], // ALO
       basePaceOffset: 0.1,
@@ -2480,7 +2500,7 @@ export const MISSION_CHALLENGES: ChallengeScenario[] = [
     },
     gameMode: 'mission',
     description:
-      '2026年新規参入キャデラックF1のコルトン・ハータとしてP22(最後尾)から出走。混戦の中団DRSトレインと他車のピットタイミング隙間を縫い、奇跡の「激戦区1ポイント(P10)」をもぎ取れ！',
+      '2026年、世界最高峰F1に挑む新規参入チーム「キャデラックF1」。コルトン・ハータが駆る26号車は予選トラブルにより無情の最後尾P22グリッドに沈んだ。ジル・ヴィルヌーヴのタイトなシケインで繰り広げられる中団グループの激しいDRSトレイン。タイヤを極限まで保たせ、他車がピットに飛び込む隙間を突いてポジションを挽回。チームの歴史に永遠に刻まれる奇跡の「初参戦・初ポイント（P10）」を奪い取れ！',
     playerConfig: {
       ...GRID_DRIVERS[20], // HER (#26 Cadillac)
       basePaceOffset: 0.45,
@@ -2522,7 +2542,7 @@ export const MISSION_CHALLENGES: ChallengeScenario[] = [
     },
     gameMode: 'mission',
     description:
-      '首位を走るルクレール。ライバルが新品タイヤで猛追する中、あえてピットに入らず摩耗75%のハードタイヤでチェッカーまで逃げ切れるか？！表面・内部温度の超精密管理が試される！',
+      '超高速モンツァの終盤戦。首位を独走するシャルル・ルクレールだが、履いているハードタイヤの摩耗率はすでに75%のクリフ手前。背後からは新品ソフトを履いたライバルたちが毎周1.5秒ずつ差を詰めて迫り来る！「もうグリップが残っていない、どうする？！」ピットに入れば確実に表彰台圏外へ転落する。残りはわずか6周。表面温度とタイヤブリスターを極限でコントロールし、タイヤ無交換（ノーピット）で逃げ切れるか？！',
     playerConfig: {
       ...GRID_DRIVERS[6], // LEC
       basePaceOffset: 0.05,
@@ -2563,7 +2583,7 @@ export const MISSION_CHALLENGES: ChallengeScenario[] = [
     },
     gameMode: 'mission',
     description:
-      'マクラーレンのピットウォール司令官としてノリス(P1)とピアストリ(P2)を指揮。背後からフェルスタッペン(P3)が急接近！相方へのチームオーダー（ブロック/順位入替）を適切に駆使し1-2フィニッシュを完全達成せよ！',
+      '北海の強風が吹き荒れるザントフォールト。マクラーレンがP1ノリス、P2ピアストリのワンツー体制を構築。しかし、背後わずか1秒差には鬼神の如きペースで迫るフェルスタッペン（レッドブル）の影！「パパヤ・ルール（同士討ち厳禁・チーム最優先）」のもと、ピットウォールは2人の若き才能をどう操るのか。スワップか、それともピアストリを盾にしてブロックさせるか。冷徹なチームオーダーで1-2フィニッシュを完遂せよ！',
     playerConfig: {
       ...GRID_DRIVERS[4], // NOR
       basePaceOffset: 0.05,
@@ -2604,7 +2624,7 @@ export const MISSION_CHALLENGES: ChallengeScenario[] = [
     },
     gameMode: 'mission',
     description:
-      '雨上がりのインテルラゴス。路面水深1.2mm、全車がインターミディエイトを履く中、あえてソフトスリックでスタート！濡れた路面で滑るマシンを手懐け、乾き始めたレコードラインで圧倒的タイム差を削り取れ！',
+      'スコール直後のインテルラゴス。路面水深1.2mm、スターティンググリッドに並ぶ全車が緑のインターミディエイトを装着する中、マックス・フェルスタッペンのマシンだけが深紅のソフトスリックを履いてグリッドに静止している。正気の沙汰とは思えないギャンブル。濡れた路面で暴れる野獣のようなF1マシンを手懐け、乾き始めたレコードラインで毎周3秒のタイム差を削り取れ！',
     playerConfig: {
       ...GRID_DRIVERS[2], // VER
       basePaceOffset: 0.0,

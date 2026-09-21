@@ -330,10 +330,14 @@ export default function LiveTrackGpsRadar({
       if (idx === 0 || car.position === 1) {
         carPct = leaderPct;
       } else {
-        // Minimum visual separation: at least idx * 2.8% behind the leader
-        // or their actual natural gap behind the leader, whichever is larger!
-        const minRequiredBehind = idx * 2.8;
-        const naturalBehind = (car.gapToLeader / Math.max(60, baseLapTime)) * 100;
+        // Physical percentage of track behind the leader based on true gap in seconds
+        // (gap in seconds / lap time in seconds) * 100% gives the exact physical track displacement
+        const effectiveLapTime = Math.max(60, baseLapTime);
+        const naturalBehind = (car.gapToLeader / effectiveLapTime) * 100;
+
+        // Keep a micro separation (0.4% ~ 0.35s) only to prevent two cars with identical lap times
+        // from perfectly occluding each other's center, while accurately showing true nose-to-tail DRS battles!
+        const minRequiredBehind = idx * 0.4;
         const actualBehind = Math.max(minRequiredBehind, naturalBehind);
         carPct = ((leaderPct - actualBehind) % 100 + 100) % 100;
       }
