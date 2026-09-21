@@ -50,6 +50,7 @@ export function getCircuitRegion(circuitId: string): CircuitRegion {
     'circuit-de-monaco',
     'silverstone',
     'catalunya',
+    'madrid',
     'redbull-ring',
     'hungaroring',
     'zandvoort',
@@ -91,6 +92,7 @@ export function getCircuitCharacteristics(circuit: CircuitProfile): CircuitChara
     'jeddah',
     'redbull-ring',
     'villeneuve',
+    'madrid',
   ];
   const street = [
     'circuit-de-monaco',
@@ -100,6 +102,7 @@ export function getCircuitCharacteristics(circuit: CircuitProfile): CircuitChara
     'jeddah',
     'miami',
     'albert-park',
+    'madrid',
   ];
   const technical = [
     'suzuka',

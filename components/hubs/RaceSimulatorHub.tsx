@@ -21,7 +21,7 @@
  * 4. ⚡ 2026 LAB (次世代レギュレーション研究室)
  */
 
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import {
   Target,
   AlertTriangle,
@@ -134,6 +134,16 @@ type GameMajorCategory = 'practice' | 'battle';
 type ChallengeModeType = 'crisis' | 'scenario' | 'sprint' | 'mission' | 'sandbox' | 'procedural';
 export type SimulatorPhase = 'mode_select' | 'briefing' | 'race' | 'debrief';
 
+export interface TacticalTimelineEvent {
+  id: string;
+  lap: number;
+  timestamp: string;
+  type: 'pu_mode' | 'pit_stop' | 'compound' | 'ers_boost' | 'radio' | 'team_order';
+  icon: string;
+  title: string;
+  detail: string;
+}
+
 export interface RivalIntelReport {
   id: string;
   lap: number;
@@ -243,6 +253,7 @@ export default function RaceSimulatorHub({
   const [autoPauseEnabled, setAutoPauseEnabled] = useState<boolean>(true);
   const [autoPauseAlert, setAutoPauseAlert] = useState<string | null>(null);
   const [triggeredAutoPauseEvents, setTriggeredAutoPauseEvents] = useState<Set<string>>(new Set());
+  const resumedLapsRef = useRef<Set<number>>(new Set());
   const [userAssistLevel, setUserAssistLevel] = useState<'assisted' | 'expert'>('assisted');
   const [currentProgressPct, setCurrentProgressPct] = useState<number>(0);
   const [lapTimeRemainingMs, setLapTimeRemainingMs] = useState<number>(5500);
@@ -263,6 +274,7 @@ export default function RaceSimulatorHub({
   const [activePuMode, setActivePuMode] = useState<EnginePUMode>('standard');
   const [ersBoostUsedThisLap, setErsBoostUsedThisLap] = useState<boolean>(false);
   const [activeTeamOrder, setActiveTeamOrder] = useState<TeamOrderType>('none');
+  const [tacticalEventTimeline, setTacticalEventTimeline] = useState<TacticalTimelineEvent[]>([]);
 
   // Radio Prompt Tracking (to play audio chirp once per prompt)
   const playedChirpIdsRef = useRef<Set<string>>(new Set());
@@ -769,9 +781,10 @@ export default function RaceSimulatorHub({
     };
   }, [lapProgressPct, activeScenario.circuit, currentSnapshot?.isSC, playerCar?.isPitting, playerCar?.gapToLeader]);
 
-  // Live intra-lap telemetry physics calculations (dynamic micro-variations based on lapProgressPct)
+  // Live intra-lap telemetry physics calculations (dynamic micro-variations based on lapProgressPct and activePuMode)
   const liveTelemetry = useMemo(() => {
     if (!playerCar) return null;
+    const currentMode = activePuMode || playerCar.puMode || 'standard';
     const progress = lapProgressPct; // 0 to 100
     const rad = (progress / 100) * Math.PI * 4; // 2 complete cornering/straight cycles per lap
 
@@ -779,10 +792,10 @@ export default function RaceSimulatorHub({
     // Corners (lateral load) spike surface temp by +2.5~3.5°C, straights cool down
     const corneringHeat = Math.sin(rad) * 2.8;
     const puModeHeat =
-      playerCar.puMode === 'push'
-        ? (progress / 100) * 3.5
-        : playerCar.puMode === 'conserve'
-        ? -(progress / 100) * 2.0
+      currentMode === 'push'
+        ? 3.5 + (progress / 100) * 2.5
+        : currentMode === 'conserve'
+        ? -3.0 - (progress / 100) * 1.5
         : 0;
 
     const baseSurf = playerCar.tyreSurfaceTemp;
@@ -798,12 +811,35 @@ export default function RaceSimulatorHub({
     // Dynamic brake temp: heavy braking spikes in corners (around 25%, 55%, 85% of lap)
     const brakeSpike = Math.max(0, Math.sin(rad * 1.5)) * 140;
     const liveBrakeTemp = Math.round(
-      (playerCar.brakeTemp || 520) + brakeSpike - (playerCar.puMode === 'conserve' ? 60 : 0)
+      (playerCar.brakeTemp || 520) +
+        brakeSpike -
+        (currentMode === 'conserve' ? 60 : 0) +
+        (currentMode === 'push' ? 35 : 0)
     );
 
-    // Dynamic ERS SOC: discharges on exit/straights, recharges under braking
-    const ersOscillation = Math.cos(rad) * 3;
-    const liveErsSoc = Math.min(100, Math.max(5, Math.round(playerCar.ersBatterySoc + ersOscillation)));
+    // Dynamic ERS SOC: discharges on exit/straights, recharges under braking and during SAVE mode
+    const ersOscillation = Math.cos(rad) * 4;
+    const puSocDelta =
+      currentMode === 'push'
+        ? -((progress / 100) * 16) - (ersBoostUsedThisLap ? 12 : 0)
+        : currentMode === 'conserve'
+        ? +((progress / 100) * 18)
+        : 0;
+    const liveErsSoc = Math.min(100, Math.max(5, Math.round(playerCar.ersBatterySoc + ersOscillation + puSocDelta)));
+
+    // Dynamic Live Speed (km/h):
+    // Replicates corners (~125 km/h) and high-speed straights (~315 km/h)
+    const isUnderSC = currentSnapshot?.isSC;
+    let baseSpeed = 0;
+    if (isUnderSC) {
+      baseSpeed = 165 + Math.sin(rad) * 20;
+    } else {
+      const trackSpeedProfile = 220 + Math.cos(rad) * 95;
+      const puSpeedDelta = currentMode === 'push' ? 12 : currentMode === 'conserve' ? -10 : 0;
+      const ersSpeedDelta = ersBoostUsedThisLap ? 15 : 0;
+      baseSpeed = Math.round(trackSpeedProfile + puSpeedDelta + ersSpeedDelta);
+    }
+    const liveSpeedKmH = Math.max(80, Math.min(355, Math.round(baseSpeed)));
 
     // Dynamic Water Depth:
     const baseWater = currentSnapshot?.rainRadar.waterDepthMm ?? 0;
@@ -829,35 +865,56 @@ export default function RaceSimulatorHub({
       brakeTemp: liveBrakeTemp,
       ersBatterySoc: liveErsSoc,
       waterDepthMm: Number(liveWater.toFixed(1)),
+      liveSpeedKmH,
+      puMode: currentMode,
+      ersDeployStatus: ersBoostUsedThisLap
+        ? 'OVERTAKE BOOST (+120kW)'
+        : currentMode === 'push'
+        ? 'DEPLOY (高出力放電▼)'
+        : currentMode === 'conserve'
+        ? 'HARVEST (高回生充電▲)'
+        : 'BALANCED (均衡 0.0MJ)',
     };
-  }, [playerCar, lapProgressPct, currentSnapshot?.rainRadar]);
+  }, [playerCar, lapProgressPct, currentSnapshot?.rainRadar, currentSnapshot?.isSC, activePuMode, ersBoostUsedThisLap]);
 
-  // Auto-pause triggers on critical tactical events (Each event triggers at most once to allow PLAY resume)
+  // Unified Resume / Play handler: single source of truth for resuming playback cleanly
+  const handleResumeOrPlay = useCallback(() => {
+    setAutoPauseAlert(null);
+    resumedLapsRef.current.add(challengeLap);
+
+    if (challengeLap >= activeScenario.totalLaps) {
+      resumedLapsRef.current.clear();
+      setTriggeredAutoPauseEvents(new Set());
+      setChallengeLap(1);
+      setChallengePlaying(true);
+    } else {
+      setChallengePlaying((prev) => !prev);
+    }
+  }, [challengeLap, activeScenario.totalLaps]);
+
+  // Auto-pause triggers on critical tactical events (Consolidates all simultaneous events to prevent cascade double pause)
   useEffect(() => {
-    if (!autoPauseEnabled || !challengePlaying) return;
+    if (!autoPauseEnabled || !challengePlaying || resumedLapsRef.current.has(challengeLap)) return;
+
+    const newTriggeredKeys: string[] = [];
+    const alertParts: string[] = [];
 
     // 1. Radio Prompt arrived and not yet answered
     if (currentSnapshot?.activeRadioPrompt && !radioResponses[currentSnapshot.activeRadioPrompt.id]) {
       const eventKey = `radio-${currentSnapshot.activeRadioPrompt.id}`;
       if (!triggeredAutoPauseEvents.has(eventKey)) {
-        setTriggeredAutoPauseEvents((prev) => new Set(prev).add(eventKey));
-        setChallengePlaying(false);
-        setAutoPauseAlert(
-          `📻 ${currentSnapshot.activeRadioPrompt.speaker} から緊急無線着信！指示を選択してください。`
-        );
-        return;
+        newTriggeredKeys.push(eventKey);
+        alertParts.push(`📻 ${currentSnapshot.activeRadioPrompt.speaker} から緊急無線着信！指示を選択してください。`);
       }
     }
 
     // 2. Safety Car deployed
-    const isPrevLapSc = challengeLap > 1 && !!challengeSnapshots[challengeLap - 2]?.isSC;
+    const isPrevLapSc = challengeLap > 1 && !challengeSnapshots[challengeLap - 2]?.isSC;
     if (currentSnapshot?.isSC && !isPrevLapSc) {
       const eventKey = `sc-${challengeLap}`;
       if (!triggeredAutoPauseEvents.has(eventKey)) {
-        setTriggeredAutoPauseEvents((prev) => new Set(prev).add(eventKey));
-        setChallengePlaying(false);
-        setAutoPauseAlert('🚨 セーフティカー出動！通常22秒のピットロスが11秒に半減するチープピットの好機です。');
-        return;
+        newTriggeredKeys.push(eventKey);
+        alertParts.push('🚨 セーフティカー出動！通常22秒のピットロスが11秒に半減するチープピットの好機です。');
       }
     }
 
@@ -869,12 +926,10 @@ export default function RaceSimulatorHub({
     ) {
       const eventKey = `rain-crossover-lap-${challengeLap}`;
       if (!triggeredAutoPauseEvents.has(eventKey)) {
-        setTriggeredAutoPauseEvents((prev) => new Set(prev).add(eventKey));
-        setChallengePlaying(false);
-        setAutoPauseAlert(
+        newTriggeredKeys.push(eventKey);
+        alertParts.push(
           '🌧️ 路面水量が1.0mm突破！インターミディエイトへのクロスオーバー（履き替え分岐点）に到達しました。'
         );
-        return;
       }
     }
 
@@ -887,13 +942,22 @@ export default function RaceSimulatorHub({
     ) {
       const eventKey = `drying-crossover-lap-${challengeLap}`;
       if (!triggeredAutoPauseEvents.has(eventKey)) {
-        setTriggeredAutoPauseEvents((prev) => new Set(prev).add(eventKey));
-        setChallengePlaying(false);
-        setAutoPauseAlert(
+        newTriggeredKeys.push(eventKey);
+        alertParts.push(
           '⚡ ドライライン形成中！レコードラインが乾燥しスリックへのクロスオーバー（履き替え分岐点）に到達しました。'
         );
-        return;
       }
+    }
+
+    // If one or more critical events occurred on this lap, pause ONCE and record all event keys simultaneously
+    if (newTriggeredKeys.length > 0) {
+      setTriggeredAutoPauseEvents((prev) => {
+        const next = new Set(prev);
+        newTriggeredKeys.forEach((k) => next.add(k));
+        return next;
+      });
+      setChallengePlaying(false);
+      setAutoPauseAlert(alertParts.join(' '));
     }
   }, [
     challengePlaying,
@@ -1017,6 +1081,22 @@ export default function RaceSimulatorHub({
         nextCompound: nextCompoundChoice,
       },
     }));
+
+    const currentTimeStr = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    setTacticalEventTimeline((prev) => [
+      ...prev,
+      {
+        id: `box-${challengeLap}-${Date.now()}`,
+        lap: challengeLap,
+        timestamp: currentTimeStr,
+        type: 'pit_stop',
+        icon: nextState ? '🛞' : '❌',
+        title: nextState ? `BOX 指示 (Lap ${targetBoxLap} ピットイン予定)` : `STAY OUT (ピットキャンセル)`,
+        detail: nextState
+          ? `Lap ${targetBoxLap} でのピットインを指示。交換予定タイヤ: ${nextCompoundChoice}`
+          : `ピットイン指示を取り消し、コース上ステイアウトを選択。`,
+      },
+    ]);
   };
 
   const handleCompoundChange = (comp: TyreCompound) => {
@@ -1036,6 +1116,20 @@ export default function RaceSimulatorHub({
       }
       return updated;
     });
+
+    const currentTimeStr = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    setTacticalEventTimeline((prev) => [
+      ...prev,
+      {
+        id: `comp-${challengeLap}-${Date.now()}`,
+        lap: challengeLap,
+        timestamp: currentTimeStr,
+        type: 'compound',
+        icon: '🔄',
+        title: `タイヤコンパウンド選択: ${comp}`,
+        detail: `次期ピットストップでの装着タイヤを ${comp} に設定。`,
+      },
+    ]);
   };
 
   const handlePuModeChange = (mode: EnginePUMode) => {
@@ -1053,13 +1147,37 @@ export default function RaceSimulatorHub({
       setCustomInitialPuMode(mode);
     }
 
-    setPlayerTacticalCommands((prev) => ({
+    setPlayerTacticalCommands((prev) => {
+      const updated = { ...prev };
+      // Apply to targetLap AND all subsequent laps until changed!
+      for (let l = targetLap; l <= activeScenario.totalLaps; l++) {
+        updated[l] = {
+          ...updated[l],
+          puMode: mode,
+        };
+      }
+      return updated;
+    });
+
+    const modeLabels: Record<EnginePUMode, { name: string; desc: string; icon: string }> = {
+      push: { name: 'PUSH (全開)', desc: 'ペース最優先。タイヤ摩耗と燃料・バッテリー消費が増大', icon: '⚡' },
+      standard: { name: 'STD (標準)', desc: '目標レースデルタを維持する標準マネジメント', icon: '⚖️' },
+      conserve: { name: 'SAVE (保護・回生)', desc: 'タイヤ保護・燃料節約・ERSバッテリー回生重視', icon: '🌱' },
+    };
+
+    const currentTimeStr = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    setTacticalEventTimeline((prev) => [
       ...prev,
-      [targetLap]: {
-        ...prev[targetLap],
-        puMode: mode,
+      {
+        id: `pu-${challengeLap}-${Date.now()}`,
+        lap: challengeLap,
+        timestamp: currentTimeStr,
+        type: 'pu_mode',
+        icon: modeLabels[mode]?.icon || '⚡',
+        title: `PUモード切替: ${modeLabels[mode]?.name || mode}`,
+        detail: `Lap ${targetLap} 以降: ${modeLabels[mode]?.desc || ''}`,
       },
-    }));
+    ]);
   };
 
   // ERS Boost eligibility check according to official F1 rules:
@@ -1183,6 +1301,22 @@ export default function RaceSimulatorHub({
         ersOvertakeActive: nextState,
       },
     }));
+
+    const currentTimeStr = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    if (nextState) {
+      setTacticalEventTimeline((prev) => [
+        ...prev,
+        {
+          id: `ers-${challengeLap}-${Date.now()}`,
+          lap: challengeLap,
+          timestamp: currentTimeStr,
+          type: 'ers_boost',
+          icon: '🔥',
+          title: 'ERS オーバーテイクモード発動',
+          detail: 'MGU-K 120kW/350kWフルパワー放出。ストレートでの追撃／防衛を実行。',
+        },
+      ]);
+    }
   };
 
   const handleTeamOrder = (order: TeamOrderType) => {
@@ -1195,6 +1329,26 @@ export default function RaceSimulatorHub({
         teamOrder: order,
       },
     }));
+
+    const orderLabels: Record<TeamOrderType, { name: string; desc: string; icon: string }> = {
+      swap: { name: 'SWAP (ポジション入替)', desc: '僚機に前を譲るようピットからチームオーダーを通達', icon: '🔀' },
+      defend: { name: 'DEFEND (後続抑え)', desc: '僚機に後続を抑えてギャップを広げる盾の役割を指示', icon: '🛡️' },
+      none: { name: 'FREE (自由交戦)', desc: 'チームオーダーを解除し、フェアなフリーバトルを許可', icon: '🏁' },
+    };
+
+    const currentTimeStr = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    setTacticalEventTimeline((prev) => [
+      ...prev,
+      {
+        id: `to-${challengeLap}-${Date.now()}`,
+        lap: challengeLap,
+        timestamp: currentTimeStr,
+        type: 'team_order',
+        icon: orderLabels[order]?.icon || '📻',
+        title: `チームオーダー: ${orderLabels[order]?.name || order}`,
+        detail: orderLabels[order]?.desc || '',
+      },
+    ]);
   };
 
   // Radio dialogue response
@@ -1228,6 +1382,20 @@ export default function RaceSimulatorHub({
     } else if (option.actionType === 'pu_mode' && option.targetPUMode) {
       handlePuModeChange(option.targetPUMode);
     }
+
+    const currentTimeStr = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    setTacticalEventTimeline((prev) => [
+      ...prev,
+      {
+        id: `radio-${challengeLap}-${Date.now()}`,
+        lap: challengeLap,
+        timestamp: currentTimeStr,
+        type: 'radio',
+        icon: '🎙️',
+        title: `無線応答: 「${option.text || option.label || '指示応答'}」`,
+        detail: `ドライバーの問いかけに対して「${option.explanation || option.text || option.label || option.id}」を選択・指示。`,
+      },
+    ]);
   };
 
   // Mode Initializers
@@ -1323,11 +1491,14 @@ export default function RaceSimulatorHub({
     setActivePuMode('standard');
     setErsBoostUsedThisLap(false);
     setActiveTeamOrder('none');
+    setTacticalEventTimeline([]);
     setTacticalScore(null);
     setDiagnosticResult(null);
     setDebriefTab('score');
     setGeminiDebrief(null);
     setAutoPauseAlert(null);
+    setTriggeredAutoPauseEvents(new Set());
+    resumedLapsRef.current.clear();
     setCustomStartingTyre(null);
     setCustomInitialPuMode(null);
     setCustomTargetBoxLap(null);
@@ -1339,7 +1510,10 @@ export default function RaceSimulatorHub({
   const handleStartRace = () => {
     setChallengeLap(1);
     setChallengePlaying(true);
+    setTacticalEventTimeline([]);
     setAutoPauseAlert(null);
+    setTriggeredAutoPauseEvents(new Set());
+    resumedLapsRef.current.clear();
     setSimulatorPhase('race');
   };
 
@@ -1352,11 +1526,14 @@ export default function RaceSimulatorHub({
     setActivePuMode('standard');
     setErsBoostUsedThisLap(false);
     setActiveTeamOrder('none');
+    setTacticalEventTimeline([]);
     setTacticalScore(null);
     setDiagnosticResult(null);
     setDebriefTab('score');
     setGeminiDebrief(null);
     setAutoPauseAlert(null);
+    setTriggeredAutoPauseEvents(new Set());
+    resumedLapsRef.current.clear();
     playedChirpIdsRef.current.clear();
     setSimulatorPhase('race');
   };
@@ -1370,11 +1547,14 @@ export default function RaceSimulatorHub({
     setActivePuMode('standard');
     setErsBoostUsedThisLap(false);
     setActiveTeamOrder('none');
+    setTacticalEventTimeline([]);
     setTacticalScore(null);
     setDiagnosticResult(null);
     setDebriefTab('score');
     setGeminiDebrief(null);
     setAutoPauseAlert(null);
+    setTriggeredAutoPauseEvents(new Set());
+    resumedLapsRef.current.clear();
     playedChirpIdsRef.current.clear();
     setSimulatorPhase('briefing');
   };
@@ -1390,6 +1570,10 @@ export default function RaceSimulatorHub({
     setLoadingGeminiDebrief(true);
     try {
       const headers = getGeminiAuthHeaders();
+      const timelineSummary = tacticalEventTimeline.length > 0
+        ? tacticalEventTimeline.map(e => `・Lap ${e.lap}: [${e.title}] ${e.detail}`).join('\n')
+        : '・特筆すべき途中指示なし（初期戦略のまま完走）';
+
       const prompt = `あなたはF1世界選手権のチーフストラテジスト（レース戦略最高責任者）です。
 プレイヤーが担当した ${activeScenario.title} のレース結果をプロの視点で徹底総括してください。
 - 最終結果: P${playerCar?.position} (目標 P${activeScenario.targetPosition})
@@ -1401,7 +1585,14 @@ export default function RaceSimulatorHub({
 - チームワーク＆突発対応: ${tacticalScore.chaosTeamScore}/25点
 ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号: ${diagnosticResult.unlockedBadgesThisRace.map(b => b.name).join(', ')}` : ''}
 
-司令官タイプの特徴（長所・短所）にも触れつつ、具体的な周回と判断を挙げながら、どこでタイムを得した／損したのか（アンダーカット、ダーティエア、ダブルスタック、タイヤクリフ等）を熱く分かりやすく論評してください。`;
+【プレイヤーが実際に下した周回別・戦術指示ログ】:
+${timelineSummary}
+
+【チーフストラテジストへの総括指示】:
+1. プレイヤーの司令官タイプ（長所・短所）に触れつつ、上記タイムラインの具体的な周回と判断（PUモード切替、ピットイン指示のタイミング、ERS使用、チームオーダー、無線への応答等）を直接引用・評価してください。
+2. どこでタイムを得したか、あるいは損したか（アンダーカットの成否、ダーティエア被弾、ダブルスタック遅延、タイヤクリフの回避など）を論理的かつリアルに解説してください。
+3. 今後のレースでトップチェッカーを受けるための次なる戦略的アドバイスを一言添えてください。
+文体はF1のパドック・ピットウォールにいるベテラン戦略エンジニアらしい、情熱的かつ鋭い口調で論評してください。`;
 
       const res = await fetch('/api/strategist', {
         method: 'POST',
@@ -3018,7 +3209,11 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
               <div className="flex items-center gap-1 flex-wrap">
                 <button
                   type="button"
-                  onClick={() => setChallengeLap((l) => Math.max(1, l - 1))}
+                  onClick={() => {
+                    const prevLap = Math.max(1, challengeLap - 1);
+                    resumedLapsRef.current.delete(prevLap);
+                    setChallengeLap(prevLap);
+                  }}
                   disabled={challengeLap <= 1}
                   className="btn-console text-[11px] px-1.5 py-0.5 disabled:opacity-30"
                   title="1周戻る"
@@ -3028,10 +3223,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setAutoPauseAlert(null);
-                    setChallengePlaying(!challengePlaying);
-                  }}
+                  onClick={handleResumeOrPlay}
                   className={`px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-xl text-xs flex items-center gap-1.5 font-racing font-bold shadow-md cursor-pointer transition-all ${
                     challengePlaying
                       ? 'bg-amber-600 hover:bg-amber-500 text-white ring-2 ring-amber-400/60 shadow-amber-950/60'
@@ -3321,10 +3513,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   type="button"
-                  onClick={() => {
-                    setAutoPauseAlert(null);
-                    setChallengePlaying(true);
-                  }}
+                  onClick={handleResumeOrPlay}
                   className="px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-racing font-bold text-xs flex items-center gap-1 shadow-md cursor-pointer transition-all active:scale-95"
                 >
                   <Play className="w-3 h-3 fill-current" /> レース再開 (PLAY)
@@ -4268,33 +4457,102 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                     );
                   })()}
 
-                  {/* 4 Sub-system Telemetry Readouts */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 pt-0.5">
+                  {/* 5 Sub-system Telemetry Readouts with Live Speedometer and PU Flow */}
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 pt-0.5">
+                    {/* 1. Live Speedometer */}
                     <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900 border border-white/10">
-                      <span className="text-[8.5px] font-mono text-slate-400 block truncate">ブレーキ温度 (4輪)</span>
-                      <span className="font-racing font-bold text-xs sm:text-sm text-amber-400 mt-0.5 block transition-all">
-                        {liveTelemetry?.brakeTemp ?? (playerCar?.brakeTemp || 540)}°C
-                      </span>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[8.5px] font-mono text-slate-400 block truncate">LIVE 速度</span>
+                        <span className="text-[7.5px] font-mono font-bold text-cyan-400 animate-pulse">● LIVE</span>
+                      </div>
+                      <div className="flex items-baseline gap-1 mt-0.5">
+                        <span className="font-racing font-bold text-xs sm:text-sm text-white">
+                          {liveTelemetry?.liveSpeedKmH ?? 285}
+                        </span>
+                        <span className="text-[8px] text-slate-400 font-mono">km/h</span>
+                      </div>
+                      <div className="mt-0.5 truncate text-[7.5px] font-mono">
+                        {ersBoostUsedThisLap ? (
+                          <span className="text-cyan-300 font-bold animate-pulse">🔥 +15km/h BOOST</span>
+                        ) : (activePuMode || playerCar?.puMode) === 'push' ? (
+                          <span className="text-rose-400 font-bold">⚡ +12km/h (全開)</span>
+                        ) : (activePuMode || playerCar?.puMode) === 'conserve' ? (
+                          <span className="text-emerald-400 font-bold">🌱 -10km/h (L&amp;C)</span>
+                        ) : (
+                          <span className="text-slate-400">STD レースペース</span>
+                        )}
+                      </div>
                     </div>
 
+                    {/* 2. PU Mode & Energy Flow Status */}
+                    <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900 border border-white/10">
+                      <span className="text-[8.5px] font-mono text-slate-400 block truncate">PUモード &amp; 出力流向</span>
+                      <span
+                        className={`font-racing font-bold text-xs sm:text-sm mt-0.5 block truncate ${
+                          (activePuMode || playerCar?.puMode) === 'push'
+                            ? 'text-rose-400'
+                            : (activePuMode || playerCar?.puMode) === 'conserve'
+                            ? 'text-emerald-400'
+                            : 'text-slate-200'
+                        }`}
+                      >
+                        {(activePuMode || playerCar?.puMode) === 'push'
+                          ? '⚡ PUSH'
+                          : (activePuMode || playerCar?.puMode) === 'conserve'
+                          ? '🌱 SAVE'
+                          : '🏎️ STD'}
+                      </span>
+                      <div className="mt-0.5 truncate text-[7.5px] font-mono font-bold text-slate-300">
+                        {liveTelemetry?.ersDeployStatus || 'BALANCED'}
+                      </div>
+                    </div>
+
+                    {/* 3. ERS Battery SOC with Flow Rate */}
                     <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900 border border-white/10">
                       <span className="text-[8.5px] font-mono text-slate-400 block truncate">ERS バッテリー SOC</span>
-                      <span className="font-racing font-bold text-xs sm:text-sm text-cyan-400 mt-0.5 block transition-all">
-                        {liveTelemetry?.ersBatterySoc ?? (playerCar?.ersBatterySoc || 85)}%
+                      <div className="flex items-baseline gap-1 mt-0.5">
+                        <span className="font-racing font-bold text-xs sm:text-sm text-cyan-400 block transition-all">
+                          {liveTelemetry?.ersBatterySoc ?? (playerCar?.ersBatterySoc || 85)}%
+                        </span>
+                      </div>
+                      <div className="mt-0.5 truncate text-[7.5px] font-mono">
+                        {(activePuMode || playerCar?.puMode) === 'push' ? (
+                          <span className="text-rose-300 font-bold">-18%/周 (高消費)</span>
+                        ) : (activePuMode || playerCar?.puMode) === 'conserve' ? (
+                          <span className="text-emerald-300 font-bold">+22%/周 (急速充電)</span>
+                        ) : (
+                          <span className="text-slate-400">±0%/周 (均衡)</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 4. Brake Temp */}
+                    <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900 border border-white/10">
+                      <span className="text-[8.5px] font-mono text-slate-400 block truncate">ブレーキ温度 (4輪)</span>
+                      <span
+                        className={`font-racing font-bold text-xs sm:text-sm mt-0.5 block transition-all ${
+                          (liveTelemetry?.brakeTemp ?? (playerCar?.brakeTemp || 540)) > 620
+                            ? 'text-red-400'
+                            : (liveTelemetry?.brakeTemp ?? (playerCar?.brakeTemp || 540)) > 550
+                            ? 'text-amber-400'
+                            : 'text-emerald-400'
+                        }`}
+                      >
+                        {liveTelemetry?.brakeTemp ?? (playerCar?.brakeTemp || 540)}°C
+                      </span>
+                      <span className="text-[7.5px] font-mono text-slate-400 block mt-0.5 truncate">
+                        適正 400-650°C
                       </span>
                     </div>
 
-                    <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900 border border-white/10">
-                      <span className="text-[8.5px] font-mono text-slate-400 block truncate">残燃料搭載量</span>
+                    {/* 5. Fuel & Confidence */}
+                    <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900 border border-white/10 col-span-2 sm:col-span-1">
+                      <span className="text-[8.5px] font-mono text-slate-400 block truncate">残燃料 / 信頼度</span>
                       <span className="font-racing font-bold text-xs sm:text-sm text-emerald-400 mt-0.5 block">
                         {playerCar?.fuelRemainingKg || 25.0} kg
                       </span>
-                    </div>
-
-                    <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900 border border-white/10">
-                      <span className="text-[8.5px] font-mono text-slate-400 block truncate">ドライバー信頼度</span>
-                      <span className="font-racing font-bold text-xs sm:text-sm text-white mt-0.5 block">
-                        {playerCar?.driverConfidence || 90}%
+                      <span className="text-[7.5px] font-mono text-slate-300 block mt-0.5 truncate">
+                        信頼度: {playerCar?.driverConfidence || 90}%
                       </span>
                     </div>
                   </div>
@@ -5272,9 +5530,20 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                     ? 'bg-emerald-950 border-emerald-500 text-emerald-200 ring-1 ring-emerald-500'
                     : 'bg-slate-900 hover:bg-slate-800 border-white/10 text-slate-300'
                 }`}
-                title="PUモード切替 (PUSH ⚡ / SAVE 🌱 / STD 🏎️)"
+                title={
+                  activePuMode === 'push'
+                    ? 'PUSH稼働中: -0.55sペース短縮 / +12km/h最高速 / バッテリー-18%放電 / タイヤ+4.5°C上昇 (クリックでSAVEへ)'
+                    : activePuMode === 'conserve'
+                    ? 'SAVE稼働中: +0.65sペース抑制 / -10km/h最高速 / バッテリー+22%急速充電 / タイヤ-4.0°C冷却 (クリックでSTDへ)'
+                    : 'STD稼働中: 均衡ペース / プラマイゼロ放電 / 標準タイヤ摩耗 (クリックでPUSHへ)'
+                }
               >
-                <div className="text-[8px] font-mono text-slate-400">ENGINE</div>
+                <div className="text-[8px] font-mono text-slate-400 flex items-center justify-between">
+                  <span>ENGINE</span>
+                  <span className="text-[7.5px] font-bold">
+                    {activePuMode === 'push' ? '放電▼' : activePuMode === 'conserve' ? '回生▲' : '均衡'}
+                  </span>
+                </div>
                 <div className="text-[10.5px] font-racing font-bold truncate">
                   {activePuMode === 'push' ? '⚡ PUSH' : activePuMode === 'conserve' ? '🌱 SAVE' : '🏎️ STD'}
                 </div>
@@ -5741,15 +6010,92 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                     </div>
                   )}
 
+                  {/* Tactical Decision Timeline */}
+                  <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 space-y-3 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">⏱️</span>
+                        <span className="font-racing font-bold text-xs sm:text-sm text-white">
+                          周回別 戦術判断タイムライン (Tactical Command Log)
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono bg-white/10 text-slate-300">
+                          {tacticalEventTimeline.length} 件の記録
+                        </span>
+                      </div>
+                    </div>
+
+                    {tacticalEventTimeline.length === 0 ? (
+                      <div className="p-3.5 rounded-xl bg-slate-950/60 border border-dashed border-white/10 text-center text-xs text-slate-400 font-mono">
+                        レース中の指示変更なし（初期戦略プラン通りに完走）
+                      </div>
+                    ) : (
+                      <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                        {tacticalEventTimeline.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex items-start gap-3 p-2.5 rounded-xl bg-slate-950/70 border border-white/10 text-xs hover:border-white/20 transition-all"
+                          >
+                            <div className="flex flex-col items-center shrink-0 w-14 text-center">
+                              <span className="font-racing font-black text-red-400 text-xs">
+                                LAP {item.lap}
+                              </span>
+                              <span className="text-[9px] font-mono text-slate-400">
+                                {item.timestamp}
+                              </span>
+                            </div>
+
+                            <div className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-sm shrink-0">
+                              {item.icon}
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                              <div className="font-racing font-bold text-slate-200 text-xs">
+                                {item.title}
+                              </div>
+                              <div className="text-[11px] text-slate-400 mt-0.5 font-sans leading-relaxed">
+                                {item.detail}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
                   {/* Gemini AI Debrief Display */}
-                  {geminiDebrief && (
-                    <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 text-xs leading-relaxed space-y-2 text-slate-200 shadow-inner">
+                  {geminiDebrief ? (
+                    <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 text-xs leading-relaxed space-y-2 text-slate-200 shadow-inner animate-in fade-in duration-300">
                       <div className="flex items-center gap-2 font-racing font-bold text-red-400">
                         <Sparkles className="w-4 h-4 text-yellow-400" /> チーフストラテジストの総括レポート
                       </div>
                       <div className="whitespace-pre-wrap font-mono text-[11px] leading-relaxed">
                         {geminiDebrief}
                       </div>
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-300">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-red-600/20 border border-red-500/30 flex items-center justify-center text-base">
+                          🎙️
+                        </div>
+                        <div>
+                          <div className="font-racing font-bold text-white text-xs sm:text-sm">
+                            チーフストラテジストの詳細AI総括
+                          </div>
+                          <div className="text-[11px] text-slate-400">
+                            戦術判断タイムラインと4軸スコアを基に、Gemini AIがプロの総括レポートを作成します。
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={requestGeminiDebrief}
+                        disabled={loadingGeminiDebrief}
+                        className="btn-console-primary px-4 py-2 text-xs flex items-center gap-2 shrink-0 shadow-md cursor-pointer"
+                      >
+                        <Sparkles className="w-4 h-4 text-yellow-300" />
+                        {loadingGeminiDebrief ? 'AI総括レポート生成中...' : '🤖 AI総括レポートを生成'}
+                      </button>
                     </div>
                   )}
                 </div>
@@ -6418,10 +6764,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                   {/* Play / Pause */}
                   <button
                     type="button"
-                    onClick={() => {
-                      setAutoPauseAlert(null);
-                      setChallengePlaying(!challengePlaying);
-                    }}
+                    onClick={handleResumeOrPlay}
                     className={`btn-console px-3 py-1 text-xs font-racing font-bold flex items-center gap-1.5 ${
                       challengePlaying
                         ? 'bg-amber-950 text-amber-300 border-amber-500/60'

@@ -440,15 +440,15 @@ export interface DriverSimConfig {
 // ── Full 11 Teams Grid (2026/2025 Roster with Teammates) ───────────────────────
 
 export const GRID_DRIVERS: DriverSimConfig[] = [
-  // RB Honda
+  // Racing Bulls (RB)
   {
     code: 'TSU',
     name: 'Yuki Tsunoda',
     number: '22',
-    team: 'RB Honda',
+    team: 'Racing Bulls',
     color: '#06b6d4',
-    teammateCode: 'HAD',
-    basePaceOffset: 0.3,
+    teammateCode: 'LAW',
+    basePaceOffset: 0.28,
     machineSetup: { downforce: 'balanced', puMode: 'standard', ersStrategy: 'balanced' },
     startTyre: 'SOFT',
     pit1Lap: 14,
@@ -457,13 +457,13 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
     isPlayer: true,
   },
   {
-    code: 'HAD',
-    name: 'Isack Hadjar',
-    number: '6',
-    team: 'RB Honda',
+    code: 'LAW',
+    name: 'Liam Lawson',
+    number: '30',
+    team: 'Racing Bulls',
     color: '#0284c7',
     teammateCode: 'TSU',
-    basePaceOffset: 0.45,
+    basePaceOffset: 0.35,
     machineSetup: { downforce: 'balanced', puMode: 'standard', ersStrategy: 'balanced' },
     startTyre: 'MEDIUM',
     pit1Lap: 16,
@@ -477,7 +477,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
     number: '1',
     team: 'Red Bull Racing',
     color: '#3b82f6',
-    teammateCode: 'LAW',
+    teammateCode: 'HAD',
     basePaceOffset: 0.0,
     machineSetup: { downforce: 'balanced', puMode: 'standard', ersStrategy: 'balanced' },
     startTyre: 'MEDIUM',
@@ -486,13 +486,13 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
     crewStopTime: 2.1,
   },
   {
-    code: 'LAW',
-    name: 'Liam Lawson',
-    number: '30',
+    code: 'HAD',
+    name: 'Isack Hadjar',
+    number: '6',
     team: 'Red Bull Racing',
     color: '#1d4ed8',
     teammateCode: 'VER',
-    basePaceOffset: 0.28,
+    basePaceOffset: 0.30,
     machineSetup: { downforce: 'balanced', puMode: 'standard', ersStrategy: 'balanced' },
     startTyre: 'MEDIUM',
     pit1Lap: 20,
@@ -651,7 +651,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
     number: '10',
     team: 'Alpine',
     color: '#0090ff',
-    teammateCode: 'DOO',
+    teammateCode: 'COL',
     basePaceOffset: 0.40,
     machineSetup: { downforce: 'balanced', puMode: 'standard', ersStrategy: 'balanced' },
     startTyre: 'MEDIUM',
@@ -660,13 +660,13 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
     crewStopTime: 2.6,
   },
   {
-    code: 'DOO',
-    name: 'Jack Doohan',
-    number: '7',
+    code: 'COL',
+    name: 'Franco Colapinto',
+    number: '43',
     team: 'Alpine',
     color: '#0070cc',
     teammateCode: 'GAS',
-    basePaceOffset: 0.52,
+    basePaceOffset: 0.45,
     machineSetup: { downforce: 'balanced', puMode: 'standard', ersStrategy: 'balanced' },
     startTyre: 'HARD',
     pit1Lap: 25,
@@ -733,32 +733,32 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   },
   // Cadillac Formula 1 Team (2026 Works Entry)
   {
-    code: 'HER',
-    name: 'Colton Herta',
-    number: '26',
+    code: 'PER',
+    name: 'Sergio Perez',
+    number: '11',
     team: 'Cadillac F1',
     color: '#f59e0b',
-    teammateCode: 'DRU',
-    basePaceOffset: 0.46,
+    teammateCode: 'BOT',
+    basePaceOffset: 0.38,
     machineSetup: { downforce: 'low', puMode: 'standard', ersStrategy: 'balanced' },
     startTyre: 'MEDIUM',
     pit1Lap: 18,
     pit1Tyre: 'HARD',
-    crewStopTime: 2.6,
+    crewStopTime: 2.5,
   },
   {
-    code: 'DRU',
-    name: 'Felipe Drugovich',
-    number: '34',
+    code: 'BOT',
+    name: 'Valtteri Bottas',
+    number: '77',
     team: 'Cadillac F1',
     color: '#d97706',
-    teammateCode: 'HER',
-    basePaceOffset: 0.50,
+    teammateCode: 'PER',
+    basePaceOffset: 0.40,
     machineSetup: { downforce: 'low', puMode: 'standard', ersStrategy: 'balanced' },
     startTyre: 'SOFT',
     pit1Lap: 14,
     pit1Tyre: 'HARD',
-    crewStopTime: 2.7,
+    crewStopTime: 2.5,
   },
 ];
 
@@ -1711,17 +1711,18 @@ export function runFullGrandPrixSimulation(params: {
       const tyreProp = TYRE_PROPERTIES[tracker.currentTyre];
       const baseLap = circuit.baseLapTime + driver.basePaceOffset;
 
-      // PU Mode modifier & ERS Battery Management
+      // PU Mode modifier & ERS Battery Management (High-impact tactical trade-offs)
       let puPaceMod = 0;
       if (tracker.puMode === 'push') {
-        puPaceMod = -0.35;
-        tracker.surfaceTemp += 2.5;
-        tracker.coreTemp += 1.2;
-        tracker.ersBatterySoc = Math.max(10, tracker.ersBatterySoc - 14);
+        puPaceMod = -0.55; // aggressive high-combustion engine attack
+        tracker.surfaceTemp += 4.5; // noticeable thermal rise (leads to blister if sustained)
+        tracker.coreTemp += 2.0;
+        tracker.ersBatterySoc = Math.max(6, tracker.ersBatterySoc - 18); // rapid electrical drain
       } else if (tracker.puMode === 'conserve') {
-        puPaceMod = +0.45;
-        tracker.surfaceTemp = Math.max(90, tracker.surfaceTemp - 2.0);
-        tracker.ersBatterySoc = Math.min(98, tracker.ersBatterySoc + 18);
+        puPaceMod = +0.65; // lift & coast pacing
+        tracker.surfaceTemp = Math.max(88, tracker.surfaceTemp - 4.0); // rapid tyre cooling into optimal zone
+        tracker.coreTemp = Math.max(88, tracker.coreTemp - 2.2);
+        tracker.ersBatterySoc = Math.min(98, tracker.ersBatterySoc + 22); // heavy MGU-K regen under braking
       } else {
         // Standard mode: realistic lap oscillation (-3% on straights, +2% in braking zones)
         tracker.surfaceTemp += 0.5;
@@ -1834,18 +1835,49 @@ export function runFullGrandPrixSimulation(params: {
       // Track evolution (22 cars laying down rubber every lap improves baseline grip by up to 0.25s)
       const trackEvolutionBonus = -Math.min(0.25, (currentLap / totalLaps) * 0.22);
 
+      // 1. Standing start launch & initial grid slot stagger on Lap 1:
+      const isOpeningLap = currentLap === 1;
+      let standingStartPenalty = 0;
+      if (isOpeningLap) {
+        // Find driver's initial grid position (0 to 21)
+        const gridIdx = drivers.findIndex((d) => d.code === driver.code);
+        // Physical grid slot offset: P1 starts at slot 1, P22 starts ~160m behind (+0.15s per slot)
+        const gridStagger = gridIdx * 0.15;
+        // Midfield bottlenecking through Turn 1 and Sector 1 accordion deceleration:
+        const t1Bottleneck = gridIdx > 2 ? Math.min(10.5, (gridIdx - 2) * 0.65) : 0;
+        // Base standing start acceleration loss from 0 km/h: +4.2s
+        standingStartPenalty = 4.2 + gridStagger + t1Bottleneck;
+      }
+
+      // 2. Natural Midfield Traffic & Dirty Air Pace Differentiation on laps 2-5:
+      let trafficPaceMod = 0;
+      if (!isOpeningLap && !isSC && currentLap <= 6) {
+        const gridIdx = drivers.findIndex((d) => d.code === driver.code);
+        if (gridIdx >= 4 && gridIdx <= 16) {
+          trafficPaceMod = 0.35 + (gridIdx % 3) * 0.15;
+        } else if (gridIdx > 16) {
+          trafficPaceMod = 0.65;
+        }
+      }
+
       // SC pacing & deterministic micro-jitter
       const jitter = (jitterRng() - 0.5) * 0.35;
 
       let lapDuration: number;
       if (isSC) {
-        // Under Safety Car, the entire field is speed-limited by the FIA SC Delta (~140 km/h)
-        // Deterministic micro-jitter (±0.03s) maintains natural spacing without timing drift
-        const scDeltaLap = circuit.baseLapTime * 1.42 + (jitterRng() - 0.5) * 0.05;
+        // Under Safety Car, the leader is pinned to the SC Delta pace (~140 km/h):
+        // Trailing cars far back can drive up to the maximum SC delta (~1.38x vs 1.42x)
+        // to smoothly and gradually catch up to the back of the queue:
+        const prevLeaderCode = Object.entries(trackers).sort((a, b) => a[1].cumulativeTime - b[1].cumulativeTime)[0]?.[0];
+        const isScLeader = driver.code === (prevLeaderCode || drivers[0].code);
+        const scDeltaRatio = isScLeader ? 1.42 : 1.38;
+        const scDeltaLap = circuit.baseLapTime * scDeltaRatio + (jitterRng() - 0.5) * 0.05;
         lapDuration = scDeltaLap + lapPitLoss;
       } else {
         lapDuration =
           baseLap +
+          standingStartPenalty +
+          trafficPaceMod +
           tyreProp.speedDelta +
           puPaceMod +
           ersPaceMod +
@@ -1866,7 +1898,20 @@ export function runFullGrandPrixSimulation(params: {
 
       const circuitLenM = circuit.circuitLengthM || 5400;
       const avgSpeedKmH = Math.round((circuitLenM / Math.max(35, lapDuration)) * 3.6);
-      const currentSpeedKmH = isPitting ? 80 : isSC ? Math.min(155, Math.max(135, Math.round(avgSpeedKmH * 0.72))) : avgSpeedKmH;
+      let currentSpeedKmH: number;
+      if (isPitting) {
+        currentSpeedKmH = 80;
+      } else if (isSC) {
+        currentSpeedKmH = Math.min(155, Math.max(135, Math.round(avgSpeedKmH * 0.72)));
+      } else {
+        const baseTopSpeed =
+          circuit.id === 'monza' ? 354 : circuit.id === 'spa' ? 342 : circuit.id === 'silverstone' ? 336 : 328;
+        const puSpeedDelta = tracker.puMode === 'push' ? 12 : tracker.puMode === 'conserve' ? -10 : 0;
+        const ersSpeedDelta = tracker.ersBoostUsed ? 14 : 0;
+        currentSpeedKmH = Math.round(
+          baseTopSpeed + puSpeedDelta + ersSpeedDelta - driver.basePaceOffset * 8 + (jitterRng() - 0.5) * 4
+        );
+      }
 
       lapCarStates.push({
         code: driver.code,
@@ -2623,6 +2668,136 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
     actualScLap: 4,
     hiddenTireWearMultiplier: 1.25,
   },
+  {
+    id: 'suzuka_double_stack_dilemma',
+    title: '🇯🇵 鈴鹿: チームメイト同時ピット！ダブルスタック回避とピット順位の極限決断',
+    tag: 'ダブルスタック回避・チームオーダー',
+    circuit: SIM_CIRCUITS[2], // Suzuka
+    totalLaps: 8,
+    targetPosition: 2,
+    difficulty: 'hard',
+    defaultAiDifficulty: 'master',
+    lockedSettings: {
+      startTyre: true,
+      weather: true,
+      lockReason: 'チームメイトとのダブルスタック戦略決断のため、初期条件は固定されています。',
+    },
+    gameMode: 'crisis',
+    description:
+      '伝統の鈴鹿サーキット。角田裕毅（P3）とチームメイト（P4）がわずか1.8秒差のランデブー走行で表彰台圏内を猛追中。Lap 4のシケインで他車クラッシュが発生し、電光掲示板に黄色旗と「SAFETY CAR DEPLOYED」が点滅！「Box Box！2台とも入れるのか？！」とピットから緊迫の無線。同一周回で同時にピットインさせれば、2台目に約4.5秒の待機ロスが発生し、後続のライバル群に飲み込まれてしまう！チームオーダーで順位を入れ替えるか、先入れ・後入れをずらすか――名門ピットウォールの真価が試される！',
+    playerConfig: {
+      ...GRID_DRIVERS[0], // TSU
+      basePaceOffset: 0.1,
+      startTyre: 'SOFT',
+      pit1Lap: 99,
+      isPlayer: true,
+    },
+    teammateConfig: {
+      ...GRID_DRIVERS[1], // HAD
+      basePaceOffset: 0.18,
+      startTyre: 'SOFT',
+      pit1Lap: 99,
+    },
+    rivals: GRID_DRIVERS.filter(d => d.code !== 'TSU' && d.code !== 'HAD'),
+    startWeather: 'dry',
+    weatherForecast: {
+      radarDesc: '鈴鹿上空は晴れ時々曇り。Lap 4前後に高確率でSC出動予想（85%）。',
+      estimatedLapMin: 99,
+      estimatedLapMax: 99,
+      rainProbabilityPercent: 10,
+    },
+    actualRainLap: 999,
+    actualRainIntensity: 0,
+    scProbability: 0.95,
+    actualScLap: 4,
+    hiddenTireWearMultiplier: 1.2,
+  },
+  {
+    id: 'spa_weather_chaos_kemmel',
+    title: '🇧🇪 スパ: 名物スパ・ウェザー！急激な豪雨とケメルストレート迎撃',
+    tag: 'スパ・ウェザー急変・極限豪雨',
+    circuit: SIM_CIRCUITS[12], // Spa
+    totalLaps: 7,
+    targetPosition: 1,
+    difficulty: 'hard',
+    defaultAiDifficulty: 'master',
+    lockedSettings: {
+      weather: true,
+      rainLap: true,
+      lockReason: '急激なスパ・ウェザー豪雨に見舞われるシナリオのため、天候設定は固定されています。',
+    },
+    gameMode: 'crisis',
+    description:
+      '世界屈指の難コース、スパ・フランコルシャン。オールージュを駆け抜けた直後、ケメルストレートからブランシモンにかけて巨大な雷雲が直撃！セクター1はまだ乾いているが、セクター2以降は路面水深が瞬く間に1.0mmから3.5mmのヘビーウェット領域へ急変！「前が全く見えない！アクアプレーニングでコントロール不能だ！」と絶叫が無線に響く。スリックのまま1周耐えるか、インターで奇襲するか、あるいはフルウェットで安全マージンをとるか――天候レーダーのミリ単位の水深を見極めて逆転優勝を勝ち取れ！',
+    playerConfig: {
+      ...GRID_DRIVERS[4], // NOR (McLaren)
+      basePaceOffset: 0.05,
+      startTyre: 'MEDIUM',
+      pit1Lap: 99,
+      isPlayer: true,
+    },
+    teammateConfig: {
+      ...GRID_DRIVERS[5], // PIA
+      basePaceOffset: 0.15,
+      startTyre: 'MEDIUM',
+      pit1Lap: 99,
+    },
+    rivals: GRID_DRIVERS.filter(d => d.code !== 'NOR' && d.code !== 'PIA'),
+    startWeather: 'dry',
+    weatherForecast: {
+      radarDesc: 'アルデンヌ上空に局地雷雨。Lap 3で急激な豪雨（水深3.5mm突破）到達予想（95%）。',
+      estimatedLapMin: 3,
+      estimatedLapMax: 4,
+      rainProbabilityPercent: 95,
+    },
+    actualRainLap: 3,
+    actualRainIntensity: 3.6,
+    scProbability: 0.4,
+    hiddenTireWearMultiplier: 1.3,
+  },
+  {
+    id: 'madrid_inaugural_duel',
+    title: '🇪🇸 マドリング初開催！新設ハイブリッド公道＆超高速バンク迎撃戦',
+    tag: '2026新設コース・バンク迎撃',
+    circuit: SIM_CIRCUITS.find(c => c.id === 'madrid') || SIM_CIRCUITS[11],
+    totalLaps: 8,
+    targetPosition: 5,
+    difficulty: 'hard',
+    defaultAiDifficulty: 'master',
+    lockedSettings: {
+      startTyre: true,
+      weather: true,
+      lockReason: 'マドリング初開催記念シナリオのため、初期条件は固定されています。',
+    },
+    gameMode: 'crisis',
+    description:
+      '2026年F1世界選手権の最大の目玉、新設「マドリング（IFEMAマドリード市街地コース）」初開催！市街地特有の直角コーナーと傾斜10度の超高速バンクが融合した世界初のハイブリッド公道レイアウト。猛暑44℃の路面温度下、角田裕毅（P7）が前方のフェラーリ・アストンマーティンを猛追中。Lap 4で市街地セクションにて他車接触によるバーチャルセーフティカー（VSC）が発生！熱ダレするタイヤをチープピットで救うか、ステイアウトしてバンクのドラフティングで仕留めるか？！',
+    playerConfig: {
+      ...GRID_DRIVERS[0], // TSU
+      basePaceOffset: 0.12,
+      startTyre: 'MEDIUM',
+      pit1Lap: 99,
+      isPlayer: true,
+    },
+    teammateConfig: {
+      ...GRID_DRIVERS[1], // LAW
+      basePaceOffset: 0.25,
+      startTyre: 'HARD',
+      pit1Lap: 99,
+    },
+    rivals: GRID_DRIVERS.filter(d => d.code !== 'TSU' && d.code !== 'LAW'),
+    startWeather: 'dry',
+    weatherForecast: {
+      radarDesc: 'マドリード上空は雲ひとつない快晴。路面温度44℃。Lap 4前後に高確率でVSC出動予想（80%）。',
+      estimatedLapMin: 99,
+      estimatedLapMax: 99,
+      rainProbabilityPercent: 0,
+    },
+    actualRainLap: 999,
+    actualRainIntensity: 0,
+    scProbability: 0.7,
+    hiddenTireWearMultiplier: 1.25,
+  },
 ];
 
 
@@ -2644,21 +2819,21 @@ export const MISSION_CHALLENGES: ChallengeScenario[] = [
     },
     gameMode: 'mission',
     description:
-      '2026年、世界最高峰F1に挑む新規参入チーム「キャデラックF1」。コルトン・ハータが駆る26号車は予選トラブルにより無情の最後尾P22グリッドに沈んだ。ジル・ヴィルヌーヴのタイトなシケインで繰り広げられる中団グループの激しいDRSトレイン。タイヤを極限まで保たせ、他車がピットに飛び込む隙間を突いてポジションを挽回。チームの歴史に永遠に刻まれる奇跡の「初参戦・初ポイント（P10）」を奪い取れ！',
+      '2026年、世界最高峰F1に挑む新規参入チーム「キャデラックF1」。セルジオ・ペレスが駆る11号車は予選トラブルにより無情の最後尾P22グリッドに沈んだ。ジル・ヴィルヌーヴのタイトなシケインで繰り広げられる中団グループの激しいDRSトレイン。タイヤを極限まで保たせ、他車がピットに飛び込む隙間を突いてポジションを挽回。チームの歴史に永遠に刻まれる奇跡の「初参戦・初ポイント（P10）」を奪い取れ！',
     playerConfig: {
-      ...GRID_DRIVERS[20], // HER (#26 Cadillac)
+      ...GRID_DRIVERS[20], // PER (#11 Cadillac)
       basePaceOffset: 0.45,
       startTyre: 'HARD',
       pit1Lap: 99,
       isPlayer: true,
     },
     teammateConfig: {
-      ...GRID_DRIVERS[21], // DRU (#34 Cadillac)
-      basePaceOffset: 0.6,
+      ...GRID_DRIVERS[21], // BOT (#77 Cadillac)
+      basePaceOffset: 0.55,
       startTyre: 'MEDIUM',
       pit1Lap: 99,
     },
-    rivals: GRID_DRIVERS.filter((d) => d.code !== 'HER' && d.code !== 'DRU'),
+    rivals: GRID_DRIVERS.filter((d) => d.code !== 'PER' && d.code !== 'BOT'),
     startWeather: 'dry',
     weatherForecast: {
       radarDesc: 'ジル・ヴィルヌーヴ・サーキット。中団が大混戦。SC波乱の兆候あり。',

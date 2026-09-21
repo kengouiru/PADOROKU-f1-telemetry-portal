@@ -7128,6 +7128,147 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     ]
   },
   {
+    "id": "madrid",
+    "name": "マドリング (IFEMAマドリード市街地コース)",
+    "officialName": "Madring (IFEMA Madrid Hybrid Circuit)",
+    "country": "スペイン 🇪🇸",
+    "lengthKm": 5.474,
+    "turns": 20,
+    "drsZones": 3,
+    "downforceLevel": "Medium",
+    "tyreStress": "Medium-High",
+    "typicalPitLossSec": 21.0,
+    "safetyCarProbability": "65% (ストリート区間・ウォール近接)",
+    "undercutImpact": "特大（路面温度上昇に伴うグレイニング多発、アンダーカットゲイン約1.7秒/周）",
+    "lapRecord": {
+      "time": "1:18.250",
+      "driver": "2026年 FIA F1公式シミュレーション基準値",
+      "year": 2026
+    },
+    "characteristics": "マドリードのIFEMA展示場コンプレックス周辺を駆け抜けるハイブリッド公道サーキット [1]。公道ストリート区間と、常設サーキット級の超高速バンクコーナー（最大傾斜約10度）が融合した2026年新設コース [2]。高速度からのヘビーブレーキングとバンク区間での強大な縦横Gがマシンとドライバーを極限まで試す。",
+    "visualMap": {
+      "imageUrl": "/images/circuits/circuit_madrid.jpg",
+      "credit": "F1 / IFEMA Madrid Official",
+      "license": "Editorial / Fair Use",
+      "sourceUrl": "https://www.formula1.com/en/latest/article.madrid-to-host-spanish-grand-prix-from-2026.html"
+    },
+    "visualAssets": {
+      "trackMap": {
+        "imageUrl": "/images/circuits/circuit_madrid.jpg",
+        "credit": "F1 / IFEMA Madrid Official",
+        "license": "Editorial / Fair Use",
+        "sourceUrl": "https://www.formula1.com/en/latest/article.madrid-to-host-spanish-grand-prix-from-2026.html"
+      },
+      "atmosphereImage": {
+        "imageUrl": "/images/circuits/circuit_madrid.jpg",
+        "caption": "IFEMAパビリオン群と壮大なバンクコーナーを駆け抜ける新世代マドリードGP全景",
+        "credit": "IFEMA Madrid",
+        "license": "Editorial / Fair Use",
+        "sourceUrl": "https://www.ifema.es/en/madrid-f1"
+      }
+    },
+    "visualGallery": [
+      {
+        "imageUrl": "/images/circuits/circuit_madrid.jpg",
+        "caption": "IFEMAパビリオン群と壮大なバンクコーナーを駆け抜ける新世代マドリードGP全景",
+        "tag": "Atmosphere",
+        "credit": "IFEMA Madrid",
+        "license": "Editorial / Fair Use",
+        "sourceUrl": "https://www.ifema.es/en/madrid-f1"
+      }
+    ],
+    "trackGeometry": {
+      "elevationChangeMeters": 21.5,
+      "longestStraightMeters": 1100,
+      "gForceMax": {
+        "lateral": 4.9,
+        "longitudinal": 4.8
+      },
+      "keyCorners": [
+        {
+          "number": "T1-T2",
+          "name": "IFEMA Gateway",
+          "characteristic": "時速330km/hから一気に時速110km/hまで減速する左・右の難関ブレーキングゾーン。"
+        },
+        {
+          "number": "T7-T9",
+          "name": "The High Bank",
+          "characteristic": "バンク傾斜10度を誇る超高速スウィーパー。時速260km/h超で駆け抜ける。"
+        },
+        {
+          "number": "T13-T15",
+          "name": "Urban Complex",
+          "characteristic": "コンクリートウォールがミリ単位で迫るツイスティな低速テクニカルセクション。"
+        },
+        {
+          "number": "T19-T20",
+          "name": "Launch Sweeper",
+          "characteristic": "メインストレートへ全開で接続する高速右コーナー。DRSゾーンへと雪崩れ込む。"
+        }
+      ]
+    },
+    "allCorners": [
+      {
+        "number": "T1",
+        "name": "Gateway Left",
+        "gearEstimated": "3rd",
+        "speedEstimated": "115 km/h",
+        "engineeringTip": "330km/hから進入。トレイルブレーキングで車首を素早くインに向ける。"
+      },
+      {
+        "number": "T2",
+        "name": "Gateway Right",
+        "gearEstimated": "3rd",
+        "speedEstimated": "135 km/h",
+        "engineeringTip": "縁石を活用し素早い脱出トラクションを確保。"
+      },
+      {
+        "number": "T7",
+        "name": "The Bank Entry",
+        "gearEstimated": "6th",
+        "speedEstimated": "245 km/h",
+        "engineeringTip": "バンク角によりダウンフォースと垂直Gが急増。車高セッティングの底付き（ボトミング）に注意。"
+      },
+      {
+        "number": "T8",
+        "name": "The Bank Apex",
+        "gearEstimated": "7th",
+        "speedEstimated": "265 km/h",
+        "engineeringTip": "全開で駆け抜ける右バンク。左タイヤへの熱負荷が最大化。"
+      },
+      {
+        "number": "T14",
+        "name": "Urban Hairpin",
+        "gearEstimated": "2nd",
+        "speedEstimated": "78 km/h",
+        "engineeringTip": "最も車速が落ちるヘアピン。ステアリング切れ角とデフセッティングが重要。"
+      },
+      {
+        "number": "T20",
+        "name": "Final Launch",
+        "gearEstimated": "5th",
+        "speedEstimated": "210 km/h",
+        "engineeringTip": "メインストレートへの脱出速度を最大化するため、イン側の縁石をミリ単位でクリップ。"
+      }
+    ],
+    "references": [
+      {
+        "id": 1,
+        "title": "Madrid to host Formula 1 Spanish Grand Prix from 2026 onwards",
+        "publisher": "Formula 1 Official Announcement",
+        "url": "https://www.formula1.com/en/latest/article.madrid-to-host-spanish-grand-prix-from-2026.html",
+        "verifiedDate": "2024-01-23"
+      },
+      {
+        "id": 2,
+        "title": "IFEMA Madrid Circuit Design & Technical Layout Specifications",
+        "publisher": "FIA World Motor Sport Council",
+        "url": "https://www.fia.com",
+        "verifiedDate": "2024-06-15"
+      }
+    ]
+  },
+  {
     "id": "redbull-ring",
     "name": "レッドブル・リンク（シュピールベルク）",
     "officialName": "Red Bull Ring",

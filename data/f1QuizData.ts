@@ -3404,5 +3404,189 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     "title": "2011 Canadian Grand Prix Official Race Report",
     "archiveNote": "FOD / フジテレビNEXT 2011年カナダGP中継アーカイブ"
   }
+},
+{
+  "id": "quiz-2026-pu-split",
+  "difficulty": "intermediate",
+  "category": "rules",
+  "format": "standard",
+  "categoryLabel": "📜 2026年新規定",
+  "formatLabel": "⚡ パワーユニット",
+  "question": "2026年より導入される新世代F1パワーユニット（PU）規則において、内燃機関（V6ターボエンジン）と電気モーター（MGU-K）の出力配分はどのように定められているか？",
+  "options": [
+    "内燃エンジン 約50% ： 電気モーター 約50%（各約350kW / 約475馬力）",
+    "内燃エンジン 約80% ： 電気モーター 約20%",
+    "完全電動モーター 100%（EV化）",
+    "内燃エンジン 約30% ： 電気モーター 約70%"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「内燃エンジン約50% ： 電気モーター約50%」です！MGU-Hが廃止される一方、MGU-Kの出力が従来の120kW（約160馬力）から約350kW（約475馬力）へと3倍近く引き上げられ、合計1,000馬力超のほぼ半分をハイブリッド電力が担います。",
+  "funFact": "燃料も化石燃料から、100%サステナブル（非化石由来・持続可能合成燃料）のドロップイン燃料へと完全移行します。",
+  "linkSubTab": "regulations",
+  "sourceAttribution": {
+    "title": "2026 Formula 1 Power Unit Technical Regulations",
+    "archiveNote": "FIA World Motor Sport Council Official Documentation"
+  }
+},
+{
+  "id": "quiz-2026-active-aero",
+  "difficulty": "expert",
+  "category": "racecraft",
+  "format": "telemetry_tactics",
+  "categoryLabel": "🔭 空力工学",
+  "formatLabel": "🌀 アクティブエアロ",
+  "question": "2026年マシンに導入されるアクティブ・エアロダイナミクスにおいて、ストレート走行時に空気抵抗（ドラッグ）を削ぎ落とすローダウンフォース形態の呼称は？",
+  "options": [
+    "Xモード（X-Mode）",
+    "Zモード（Z-Mode）",
+    "Sモード（Speed-Mode）",
+    "Fダクト（F-Duct）"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「Xモード（X-Mode）」です！コーナー区間では前後ウイングを立てて最大ダウンフォースを得る「Zモード（Z-Mode）」、指定された直線区間では前後ウイング角を寝かせてドラッグを最小化する「Xモード」へと走行中に形状を切り替えます。",
+  "funFact": "従来のDRS（前走車1秒以内の追従車のみ）と異なり、全車が指定ストレート区間でXモードを使用できるため、マシン全体のエネルギー消費効率が劇的に向上します。",
+  "linkSubTab": "regulations",
+  "sourceAttribution": {
+    "title": "FIA 2026 Aerodynamic Technical Regulations & Concept Car Launch",
+    "archiveNote": "FIA Technical Department Analysis"
+  }
+},
+{
+  "id": "quiz-2026-override-mode",
+  "difficulty": "master",
+  "category": "racecraft",
+  "format": "rule_dilemma",
+  "categoryLabel": "🔭 バトル新兵器",
+  "formatLabel": "🔥 オーバーテイク",
+  "question": "2026年規定において、従来のDRSに代わって「前走車の1秒以内に接近した追従車」に解禁される電動追加ブースト機能の正式名称は？",
+  "options": [
+    "マニュアル・オーバーライド・モード（Manual Override Mode）",
+    "KERSハイパーブースト（Hyper KERS）",
+    "プッシュ・トゥ・パス・プラス（Push-to-Pass+）",
+    "スーパーチャージ・トリガー（Supercharge Trigger）"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「マニュアル・オーバーライド・モード（Manual Override Mode）」です！前走車から1秒以内の追従車は、時速290km/hを超えても電気出力が制限されず、時速355km/hまでフルパワー（350kW）の給電が持続するため、ストレートでの強烈なオーバーテイク加速が可能になります。",
+  "funFact": "首位走者は時速290km/hから電気出力が徐々に0kWへと低下（デレート）するため、後続車との最高速差が明瞭に生じるよう工学的に設計されています。",
+  "linkSubTab": "regulations",
+  "sourceAttribution": {
+    "title": "FIA 2026 Sporting & Technical Regulations: Overtake Override System",
+    "archiveNote": "FIA Single-Seater Commission"
+  }
+},
+{
+  "id": "quiz-madrid-circuit-feature",
+  "difficulty": "intermediate",
+  "category": "circuits",
+  "format": "track_corner",
+  "categoryLabel": "🏁 2026新コース",
+  "formatLabel": "🏙️ マドリング",
+  "question": "2026年にF1スペインGPを開催する新設サーキット「マドリング（IFEMAマドリード）」の最大の特徴となっているコーナー構造は？",
+  "options": [
+    "最大傾斜約10度を誇る常設サーキット級の超高速バンクコーナー",
+    "全長2.2kmにおよぶグリッド最長の直線ストレート",
+    "地下トンネルを時速300km/h超で駆け抜けるアンダーパス",
+    "8の字交差する立体交差ブリッジ"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「最大傾斜約10度の超高速バンクコーナー（The High Bank / T7-T9）」です！マドリングは市街地公道区間と、オランダ・ザントフォールトを彷彿とさせる傾斜10度の急勾配高速バンクが融合した世界初のハイブリッド公道サーキットです。",
+  "funFact": "バンク旋回中は4.5G超の横Gとともに巨大な縦圧縮荷重が加わるため、車高のボトミング（底打ち）防止とサスペンション剛性の最適化が鍵を握ります。",
+  "linkSubTab": "circuits",
+  "sourceAttribution": {
+    "title": "IFEMA Madrid Circuit Track Characteristics & Technical Briefing",
+    "archiveNote": "Formula 1 Circuit Design Group"
+  }
+},
+{
+  "id": "quiz-madrid-location",
+  "difficulty": "beginner",
+  "category": "circuits",
+  "format": "standard",
+  "categoryLabel": "🏁 開催地トリビア",
+  "formatLabel": "🇪🇸 マドリードGP",
+  "question": "2026年にF1カレンダーに初登場するマドリード市街地コースが建設された、国際見本市会場を中心とするエリアの略称・名称は？",
+  "options": [
+    "IFEMA（イフェマ / フェリア・デ・マドリード）",
+    "サンティアゴ・ベルナベウ",
+    "プラド美術館パークウェイ",
+    "プエルタ・デル・ソル"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「IFEMA（イフェマ）」です！マドリード・バラハス国際空港近くの巨大国際展示見本市コンプレックスの敷地および周辺道路を活用してコースが設計されました。",
+  "funFact": "IFEMAの屋内パビリオン群をパドックやチームホスピタリティ施設、観客ラウンジとして活用する、完全天候対応型の画期的なF1拠点となっています。",
+  "linkSubTab": "circuits",
+  "sourceAttribution": {
+    "title": "Madrid F1 Grand Prix Official Venue Specifications",
+    "archiveNote": "IFEMA Madrid & F1 Official Press Release"
+  }
+},
+{
+  "id": "quiz-2026-audi-entry",
+  "difficulty": "beginner",
+  "category": "history",
+  "format": "standard",
+  "categoryLabel": "🏛️ 2026新グリッド",
+  "formatLabel": "🇩🇪 新ワークス参戦",
+  "question": "2026年にスイスの名門ザウバーを買収し、完全自社製パワーユニットを搭載してF1に新規ワークス参戦するドイツの自動車メーカーは？",
+  "options": [
+    "アウディ（Audi）",
+    "ポルシェ（Porsche）",
+    "BMW",
+    "フォルクスワーゲン（Volkswagen）"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「アウディ（Audi）」です！ドイツ・ノイブルクに専用のPUファクトリーを建設し、スイス・ヒンウィルのザウバーを完全子会社化して「Audi Revolut F1 Team」としてF1の頂点に挑みます。",
+  "funFact": "エースドライバーにはドイツ出身のベテラン・ニコ・ヒュルケンベルグ、僚機にはF3・F2王者ガブリエル・ボルトレートが起用されています。",
+  "linkSubTab": "drivers",
+  "sourceAttribution": {
+    "title": "Audi F1 Project Official Milestones & Factory Rollout",
+    "archiveNote": "Audi AG Corporate Communications"
+  }
+},
+{
+  "id": "quiz-2026-cadillac-entry",
+  "difficulty": "intermediate",
+  "category": "history",
+  "format": "standard",
+  "categoryLabel": "🏛️ 2026新グリッド",
+  "formatLabel": "🇺🇸 第11の新チーム",
+  "question": "2026年より「第11のF1チーム」として念願のグリッド入りを果たした、GM（ゼネラルモーターズ）傘下のアメリカン・レーシングチームは？",
+  "options": [
+    "キャデラックF1チーム（Cadillac Formula 1 Team）",
+    "フォード・パフォーマンスF1",
+    "シボレー・コルベットF1",
+    "ペンスキー・レーシング"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「キャデラックF1チーム」です！長年の参入交渉を経てFIAおよびFOMの正式認可を受け、2026年より22台が並ぶ待望の11番目の新チームとしてグリッドに加わりました。",
+  "funFact": "ドライバーには実績十分のベテランコンビ、セルジオ・ペレスとバルテリ・ボッタスを迎え、初年度からポイント獲得を狙います。",
+  "linkSubTab": "drivers",
+  "sourceAttribution": {
+    "title": "Cadillac Formula 1 Entry Approval & 11th Team Ratification",
+    "archiveNote": "FIA Official Bulletin 2025"
+  }
+},
+{
+  "id": "quiz-2026-aston-honda",
+  "difficulty": "intermediate",
+  "category": "history",
+  "format": "standard",
+  "categoryLabel": "🏛️ 2026新グリッド",
+  "formatLabel": "🇯🇵 ホンダ完全ワークス",
+  "question": "2026年新規定に合わせて「完全ワークス体制」の独占パートナーシップを結んだ、アストンマーティンと日本のパワーユニット製造企業は？",
+  "options": [
+    "ホンダ（Honda Racing Corporation / HRC）",
+    "トヨタ（TOYOTA GAZOO Racing）",
+    "日産（NISMO）",
+    "スバル（STI）"
+  ],
+  "correctIndex": 0,
+  "explanation": "正解は「ホンダ（HRC）」です！アストンマーティンは2026年よりホンダの完全ワークスPU「RA626H」の独占供給を受け、天才空力デザイナーのエイドリアン・ニューウェイとともに世界タイトルを目指します。",
+  "funFact": "マクラーレン・ホンダ時代に苦闘を共にしたフェルナンド・アロンソが、成熟した最強体制で再びホンダPUとタッグを組むことでも世界中の熱狂を集めています。",
+  "linkSubTab": "drivers",
+  "sourceAttribution": {
+    "title": "Aston Martin Aramco & Honda Works Partnership 2026 Announcement",
+    "archiveNote": "Honda Motor Co., Ltd. & Aston Martin F1 Press Conference"
+  }
 }
 ];
