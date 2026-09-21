@@ -1224,6 +1224,7 @@ export function runFullGrandPrixSimulation(params: {
   let activeScLapsRemaining = 0;
   let lastIncidentLap = -99;
   let wasRainingPrevLap = false;
+  let wasScActivePrevLap = false;
 
   const playerDriver = drivers.find((d) => d.isPlayer) || drivers[0];
   const teammateDriver = drivers.find((d) => d.team === playerDriver.team && d.code !== playerDriver.code);
@@ -1415,6 +1416,27 @@ export function runFullGrandPrixSimulation(params: {
       }
     }
 
+    // Safety Car Green Flag Restart Broadcast & Radio
+    if (!isSC && wasScActivePrevLap) {
+      globalCommentary.unshift({
+        id: `sc-restart-${currentLap}`,
+        lap: currentLap,
+        type: 'incident',
+        speaker: 'FIA RACE CONTROL',
+        text: '🟢 GREEN FLAG — レース再開！セーフティカー退避。全車ターン1へ向け一斉加速！ローリングスタート！',
+      });
+      if (!trackers[playerDriver.code]?.isRetired) {
+        globalCommentary.unshift({
+          id: `radio-restart-${playerDriver.code}-${currentLap}`,
+          lap: currentLap,
+          type: 'radio',
+          speaker: `${playerDriver.team} RACE ENGINEER`,
+          text: `📻 "Safety Car is in! Warm the tyres, green flag at the line! Push now!"`,
+        });
+      }
+    }
+    wasScActivePrevLap = isSC;
+
     // Rain start / stop broadcasts & Driver Personality Radios (deterministic)
     if (isCurrentlyRaining && !wasRainingPrevLap) {
       globalCommentary.unshift({
@@ -1498,42 +1520,60 @@ export function runFullGrandPrixSimulation(params: {
         const isMasterAI = aiDifficulty === 'master';
         const isBeginnerAI = aiDifficulty === 'beginner';
 
+        const driverLag = (hashStringToSeed(driver.code) % 3);
         const rainReactionLap = isMasterAI
-          ? (rainStartLap || 99)
+          ? (rainStartLap || 99) + (driver.code === 'VER' ? 0 : driverLag)
           : isBeginnerAI
-          ? (rainStartLap || 99) + 2
-          : (rainStartLap || 99) + (driver.code === 'VER' ? 0 : 1);
+          ? (rainStartLap || 99) + 2 + driverLag
+          : (rainStartLap || 99) + (driver.code === 'VER' ? 0 : driverLag);
+
+        // Avoid simultaneous teammate double-stacking unless water depth is flooding
+        const isTeammatePitting = driver.teammateCode && pittingCarsThisLap.has(driver.teammateCode);
+        const MAX_AI_PITTING_PER_LAP = weather.waterDepth >= 4.0 ? 12 : 5;
+        const pitLaneCrowded = pittingCarsThisLap.size >= MAX_AI_PITTING_PER_LAP;
 
         if (currentLap === tracker.plannedPit1) {
-          wantPit = true;
-          targetTyre = tracker.plannedPit1Tyre;
+          if ((!isTeammatePitting && !pitLaneCrowded) || weather.waterDepth > 3.5) {
+            wantPit = true;
+            targetTyre = tracker.plannedPit1Tyre;
+          }
         } else if (currentLap === tracker.plannedPit2) {
-          wantPit = true;
-          targetTyre = tracker.plannedPit2Tyre || 'HARD';
+          if ((!isTeammatePitting && !pitLaneCrowded) || weather.waterDepth > 3.5) {
+            wantPit = true;
+            targetTyre = tracker.plannedPit2Tyre || 'HARD';
+          }
         } else if (weather.waterDepth >= 1.0 && tracker.currentTyre !== 'INTER' && tracker.currentTyre !== 'WET') {
           if (currentLap >= rainReactionLap && (!tracker.lastPitLap || currentLap > tracker.lastPitLap + 1)) {
-            wantPit = true;
-            targetTyre = weather.waterDepth >= 4.0 ? 'WET' : 'INTER';
+            if ((!isTeammatePitting && !pitLaneCrowded) || weather.waterDepth >= 2.5) {
+              wantPit = true;
+              targetTyre = weather.waterDepth >= 4.0 ? 'WET' : 'INTER';
+            }
           }
         } else if (weather.waterDepth < 0.85 && (tracker.currentTyre === 'INTER' || tracker.currentTyre === 'WET')) {
           // Drying track crossover: switch from wet/inter back to slicks
           const dryReactionLap = isMasterAI
-            ? (rainStartLap ? rainStartLap + 3 : currentLap)
+            ? (rainStartLap ? rainStartLap + 3 : currentLap) + driverLag
             : isBeginnerAI
-            ? (rainStartLap ? rainStartLap + 5 : currentLap + 2)
-            : (rainStartLap ? rainStartLap + 4 : currentLap + 1);
+            ? (rainStartLap ? rainStartLap + 5 : currentLap + 2) + driverLag
+            : (rainStartLap ? rainStartLap + 4 : currentLap + 1) + driverLag;
           if (currentLap >= dryReactionLap && tracker.tyreAge >= 2 && (!tracker.lastPitLap || currentLap > tracker.lastPitLap + 1)) {
-            wantPit = true;
-            targetTyre = 'MEDIUM';
+            if (!isTeammatePitting && !pitLaneCrowded) {
+              wantPit = true;
+              targetTyre = 'MEDIUM';
+            }
           }
-        } else if (isSC && tracker.tyreAge > 14 && tracker.currentTyre !== 'SOFT') {
-          wantPit = true;
-          targetTyre = 'SOFT';
+        } else if (isSC && tracker.tyreAge > 12 && tracker.currentTyre !== 'SOFT') {
+          if (!isTeammatePitting && !pitLaneCrowded) {
+            wantPit = true;
+            targetTyre = 'SOFT';
+          }
         } else if (isMasterAI && currentLap > 3) {
           const playerPittedPrevLap = playerOverrides[currentLap - 1]?.boxNextLap;
           if (playerPittedPrevLap && tracker.tyreAge > 12 && (!tracker.lastPitLap || currentLap > tracker.lastPitLap + 1)) {
-            wantPit = true;
-            targetTyre = 'HARD';
+            if (!isTeammatePitting && !pitLaneCrowded) {
+              wantPit = true;
+              targetTyre = 'HARD';
+            }
           }
         }
       }
@@ -1794,25 +1834,29 @@ export function runFullGrandPrixSimulation(params: {
       // Track evolution (22 cars laying down rubber every lap improves baseline grip by up to 0.25s)
       const trackEvolutionBonus = -Math.min(0.25, (currentLap / totalLaps) * 0.22);
 
-      // SC pacing
-      const scPaceAdd = isSC ? circuit.baseLapTime * 0.42 : 0;
-
-      // Jitter (deterministic)
+      // SC pacing & deterministic micro-jitter
       const jitter = (jitterRng() - 0.5) * 0.35;
 
-      const lapDuration =
-        baseLap +
-        tyreProp.speedDelta +
-        puPaceMod +
-        ersPaceMod +
-        teamOrderPaceMod +
-        tyreWearPacePenalty +
-        waterPenalty +
-        fuelPaceBonus +
-        trackEvolutionBonus +
-        scPaceAdd +
-        lapPitLoss +
-        jitter;
+      let lapDuration: number;
+      if (isSC) {
+        // Under Safety Car, the entire field is speed-limited by the FIA SC Delta (~140 km/h)
+        // Deterministic micro-jitter (±0.03s) maintains natural spacing without timing drift
+        const scDeltaLap = circuit.baseLapTime * 1.42 + (jitterRng() - 0.5) * 0.05;
+        lapDuration = scDeltaLap + lapPitLoss;
+      } else {
+        lapDuration =
+          baseLap +
+          tyreProp.speedDelta +
+          puPaceMod +
+          ersPaceMod +
+          teamOrderPaceMod +
+          tyreWearPacePenalty +
+          waterPenalty +
+          fuelPaceBonus +
+          trackEvolutionBonus +
+          lapPitLoss +
+          jitter;
+      }
 
       tracker.cumulativeTime += lapDuration;
 
@@ -1866,19 +1910,28 @@ export function runFullGrandPrixSimulation(params: {
     const activeCars = lapCarStates.filter((c) => !c.isRetired);
     const retiredCars = lapCarStates.filter((c) => c.isRetired);
 
-    // STRICT SAFETY CAR REGULATION: Position Freeze!
-    if (isSC && currentLap > 1 && snapshots.length > 0) {
-      const prevSnapshot = snapshots[snapshots.length - 1];
-      const prevOrderMap = new Map<string, number>();
-      prevSnapshot.cars.forEach((c) => prevOrderMap.set(c.code, c.position));
+    // Under Safety Car and normal racing, track order is naturally determined by cumulativeTime!
+    activeCars.sort((a, b) => a.cumulativeTime - b.cumulativeTime);
 
-      activeCars.sort((a, b) => {
-        if (a.isPitting && !b.isPitting) return 1;
-        if (!a.isPitting && b.isPitting) return -1;
-        return (prevOrderMap.get(a.code) || 99) - (prevOrderMap.get(b.code) || 99);
+    // Pack bunching occurs ONLY on the restart preparation lap (when SC is called in this lap):
+    if (isSC && isScEnding && activeCars.length > 0) {
+      const scLeaderTime = activeCars[0].cumulativeTime;
+      let runningTime = scLeaderTime;
+      activeCars.forEach((car, idx) => {
+        if (idx === 0) {
+          car.cumulativeTime = scLeaderTime;
+        } else {
+          const rawGap = car.cumulativeTime - activeCars[idx - 1].cumulativeTime;
+          // Smoothly compress to restart queue spacing (0.85s to 1.35s)
+          const restartGap = Math.min(Math.max(0.85, rawGap * 0.4), 1.35);
+          runningTime += restartGap;
+          car.cumulativeTime = Number(runningTime.toFixed(3));
+        }
+        const trk = trackers[car.code];
+        if (trk) {
+          trk.cumulativeTime = car.cumulativeTime;
+        }
       });
-    } else {
-      activeCars.sort((a, b) => a.cumulativeTime - b.cumulativeTime);
     }
 
     // Apply Team Order 'defend' effect on the car immediately behind teammate
@@ -1997,6 +2050,97 @@ export function runFullGrandPrixSimulation(params: {
     // Trigger interactive radio dialogue if conditions match
     let activeRadio: DriverRadioPrompt | undefined = undefined;
     const playerCarCurrent = activeCars.find((c) => c.code === playerDriver.code);
+
+    // ── Dynamic Driver & Race Engineer Team Radio Feed Generation ──
+    if (playerCarCurrent) {
+      if (currentLap === 1) {
+        globalCommentary.unshift({
+          id: `radio-start-${currentLap}`,
+          lap: currentLap,
+          type: 'radio',
+          speaker: `${playerDriver.name} (Cockpit)`,
+          text: `📻 「スタート成功、ターン1を抜けた！タイヤのウォームアップに集中している、マシンのバランスは良好だ。」`,
+        });
+      }
+
+      if (isSC && currentLap === scTriggerLap) {
+        globalCommentary.unshift({
+          id: `radio-sc-deploy-${currentLap}`,
+          lap: currentLap,
+          type: 'radio',
+          speaker: 'RACE ENGINEER',
+          text: `📻 「Safety Car deployed, Safety Car deployed. ステアリングのデルタを守れ。ピットの準備は整っている。」`,
+        });
+      }
+
+      if (isScEnding) {
+        globalCommentary.unshift({
+          id: `radio-sc-ending-${currentLap}`,
+          lap: currentLap,
+          type: 'radio',
+          speaker: 'RACE ENGINEER',
+          text: `📻 「Safety Car in this lap! 今周回でSC退出、再開だ！タイヤとブレーキ温度を上げろ、ライン1までオーバーテイク禁止だ。」`,
+        });
+      }
+
+      if (playerCarCurrent.isPitting) {
+        globalCommentary.unshift({
+          id: `radio-pit-exit-${currentLap}`,
+          lap: currentLap,
+          type: 'radio',
+          speaker: 'RACE ENGINEER',
+          text: `📻 「Box完了！新品の${playerCarCurrent.tyreCompound}だ。クリアトラックだ、アウトラップ全力でプッシュしろ (Hammer time)!」`,
+        });
+      }
+
+      if (weather.isRaining && weather.waterDepth >= 0.8 && weather.waterDepth <= 1.8 && currentLap === rainStartLap) {
+        globalCommentary.unshift({
+          id: `radio-rain-start-${currentLap}`,
+          lap: currentLap,
+          type: 'radio',
+          speaker: `${playerDriver.name} (Cockpit)`,
+          text: `📻 「バイザーに雨粒が強く当たり始めた！セクター2のターンでリアのスライドが出ている、路面が滑るぞ！」`,
+        });
+      }
+
+      if (playerCarCurrent.drsAvailable && playerCarCurrent.position > 1 && currentLap % 3 === 0) {
+        const carAhead = activeCars[playerCarCurrent.position - 2];
+        const aheadCode = carAhead ? carAhead.code : '前走車';
+        globalCommentary.unshift({
+          id: `radio-drs-chase-${currentLap}`,
+          lap: currentLap,
+          type: 'radio',
+          speaker: 'RACE ENGINEER',
+          text: `📻 「${aheadCode}のDRS圏内 (+${playerCarCurrent.gapToAhead.toFixed(1)}s) だ！ストレートでOVR/OTボタンを使って仕掛けろ！」`,
+        });
+      } else if (playerCarCurrent.position > 1 && playerCarCurrent.gapToAhead <= 1.0 && (currentLap === 4 || currentLap === 8)) {
+        globalCommentary.unshift({
+          id: `radio-chase-driver-${currentLap}`,
+          lap: currentLap,
+          type: 'radio',
+          speaker: `${playerDriver.name} (Cockpit)`,
+          text: `📻 「スリップストリームに入っている！立ち上がりトラクションが良い、次のブレーキングゾーンで狙う！」`,
+        });
+      }
+
+      if (playerCarCurrent.tyreSurfaceTemp >= 115 && currentLap % 4 === 1 && !isSC) {
+        globalCommentary.unshift({
+          id: `radio-tyre-temp-${currentLap}`,
+          lap: currentLap,
+          type: 'radio',
+          speaker: `${playerDriver.name} (Cockpit)`,
+          text: `📻 「タイヤの表面温度が高すぎる、リアがルーズになってきた！少し冷却したい！」`,
+        });
+      } else if (playerCarCurrent.tyreWearPercent >= 65 && currentLap % 5 === 2) {
+        globalCommentary.unshift({
+          id: `radio-tyre-wear-${currentLap}`,
+          lap: currentLap,
+          type: 'radio',
+          speaker: 'RACE ENGINEER',
+          text: `📻 「タイヤデグラデーション注意。ターン進入で少しリフト＆コーストを入れて、ピットウィンドウまで持たせろ。」`,
+        });
+      }
+    }
 
     if (playerCarCurrent) {
       if (weather.radarDistance <= 3.0 && weather.radarDistance > 0 && !weather.isRaining && currentLap === Math.max(1, (rainStartLap || 99) - 1)) {
@@ -2549,14 +2693,24 @@ export const MISSION_CHALLENGES: ChallengeScenario[] = [
       startTyre: 'HARD',
       pit1Lap: 99,
       isPlayer: true,
+      initialTyreAge: 32,
+      initialTyreSurfaceTemp: 126,
+      initialTyreCoreTemp: 114,
     },
     teammateConfig: {
       ...GRID_DRIVERS[7], // HAM
       basePaceOffset: 0.15,
       startTyre: 'SOFT',
       pit1Lap: 99,
+      initialTyreAge: 1,
+      initialTyreSurfaceTemp: 104,
+      initialTyreCoreTemp: 100,
     },
-    rivals: GRID_DRIVERS.filter((d) => d.code !== 'LEC' && d.code !== 'HAM'),
+    rivals: GRID_DRIVERS.filter((d) => d.code !== 'LEC' && d.code !== 'HAM').map(d =>
+      d.code === 'VER' || d.code === 'NOR'
+        ? { ...d, startTyre: 'SOFT' as TyreCompound, pit1Lap: 99, initialTyreAge: 1, initialTyreSurfaceTemp: 105, initialTyreCoreTemp: 101 }
+        : d
+    ),
     startWeather: 'dry',
     weatherForecast: {
       radarDesc: '超高速モンツァ。路面温度42℃。タイヤ表面温度のオーバーヒートに警戒。',

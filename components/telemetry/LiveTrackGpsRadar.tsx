@@ -332,14 +332,25 @@ export default function LiveTrackGpsRadar({
       } else {
         // Physical percentage of track behind the leader based on true gap in seconds
         // (gap in seconds / lap time in seconds) * 100% gives the exact physical track displacement
-        const effectiveLapTime = Math.max(60, baseLapTime);
-        const naturalBehind = (car.gapToLeader / effectiveLapTime) * 100;
+        const effectiveLapTime = isSC ? Math.max(60, baseLapTime * 1.42) : Math.max(60, baseLapTime);
+        const pitLossSec = car.isPitting ? (isSC ? 11.5 : 22.0) : 0;
 
-        // Keep a micro separation (0.4% ~ 0.35s) only to prevent two cars with identical lap times
-        // from perfectly occluding each other's center, while accurately showing true nose-to-tail DRS battles!
-        const minRequiredBehind = idx * 0.4;
-        const actualBehind = Math.max(minRequiredBehind, naturalBehind);
-        carPct = ((leaderPct - actualBehind) % 100 + 100) % 100;
+        if (car.isPitting) {
+          // Pitting cars progress along circuit using pre-pit gap until pit entry (90%),
+          // traverse pit lane with stationary pit box stop (96% - 3.5%), and exit (8% - 10%)
+          const prePitGap = Math.max(0, car.gapToLeader - pitLossSec);
+          const inLapBehind = (prePitGap / effectiveLapTime) * 100;
+          const minSeparation = idx * 0.35;
+          const actualBehind = Math.max(minSeparation, inLapBehind);
+          carPct = ((leaderPct - actualBehind) % 100 + 100) % 100;
+        } else {
+          const naturalBehind = (car.gapToLeader / effectiveLapTime) * 100;
+          // Keep a micro separation (0.4% ~ 0.35s) only to prevent two cars with identical lap times
+          // from perfectly occluding each other's center, while accurately showing true nose-to-tail battles!
+          const minRequiredBehind = idx * 0.4;
+          const actualBehind = Math.max(minRequiredBehind, naturalBehind);
+          carPct = ((leaderPct - actualBehind) % 100 + 100) % 100;
+        }
       }
 
       // Normal track coordinate via 100% exact SVG path tracking
@@ -364,9 +375,11 @@ export default function LiveTrackGpsRadar({
             y: trackPt.y * (1 - u) + pitPt.y * u,
           };
           isInPitLane = true;
-        } else if (carPct >= 92.0) {
-          // 2. First half of pit lane (Entry 92% -> Pit Box 100%)
-          const t = ((carPct - 92.0) / 8.0) * 0.5; // 0.0 -> 0.5
+        } else if (carPct >= 92.0 && carPct < 96.0) {
+          // 2a. First half of pit lane: Decelerate down pit lane towards team pit stall
+          // t moves from 0.0 to 0.5
+          const progressInApproach = (carPct - 92.0) / 4.0;
+          const t = progressInApproach * 0.5;
           const pitPt = pitLaneGeometry.getPitLanePoint(t);
           const offsetFactor = Math.min(1, t / 0.4);
           finalCoord = {
@@ -374,18 +387,29 @@ export default function LiveTrackGpsRadar({
             y: pitPt.y + pitOffset * 0.15 * offsetFactor,
           };
           isInPitLane = true;
-          if (carPct >= 96.0) isInPitBox = true;
-        } else if (carPct <= 8.0) {
-          // 3. Second half of pit lane (Pit Box 0% -> Exit 8%)
-          const t = 0.5 + (carPct / 8.0) * 0.5; // 0.5 -> 1.0
+        } else if (carPct >= 96.0 || carPct <= 3.5) {
+          // 2b. STATIONARY PIT BOX STOP: Mechanics change tyres!
+          // Car is held completely stationary at t = 0.5 (pit box location)
+          const t = 0.5;
           const pitPt = pitLaneGeometry.getPitLanePoint(t);
-          const offsetFactor = Math.max(0, 1 - (t - 0.5) / 0.4);
+          finalCoord = {
+            x: pitPt.x + pitOffset,
+            y: pitPt.y + pitOffset * 0.15,
+          };
+          isInPitLane = true;
+          isInPitBox = true;
+        } else if (carPct > 3.5 && carPct <= 8.0) {
+          // 3. Second half of pit lane: Accelerate out of pit stall to pit exit line
+          // t moves from 0.5 to 1.0
+          const progressInExit = (carPct - 3.5) / 4.5;
+          const t = 0.5 + progressInExit * 0.5;
+          const pitPt = pitLaneGeometry.getPitLanePoint(t);
+          const offsetFactor = Math.max(0, 1 - progressInExit);
           finalCoord = {
             x: pitPt.x + pitOffset * offsetFactor,
             y: pitPt.y + pitOffset * 0.15 * offsetFactor,
           };
           isInPitLane = true;
-          if (carPct <= 2.0) isInPitBox = true;
         } else if (carPct > 8.0 && carPct < 10.0) {
           // 4. Merging back from pit exit (8%) onto racing line (10%)
           const u = (carPct - 8.0) / 2.0;
@@ -441,7 +465,7 @@ export default function LiveTrackGpsRadar({
       });
 
     return [...activeList, ...retiredList];
-  }, [cars, leaderPct, baseLapTime, getExactTrackPoint, pitLaneGeometry, playerCarCode, teammateCarCode, currentLap]);
+  }, [cars, leaderPct, baseLapTime, getExactTrackPoint, pitLaneGeometry, playerCarCode, teammateCarCode, currentLap, isSC, isScEnding]);
 
   // Find player car position and progress
   const playerCarData = useMemo(() => {
@@ -633,7 +657,7 @@ export default function LiveTrackGpsRadar({
             </div>
 
             <div className="flex-1 overflow-y-auto space-y-1 pr-1 scrollbar-thin max-h-[160px] sm:max-h-[220px] lg:max-h-[380px]">
-              {carTrackPositions.map(({ car, isPlayer, isTeammate, isRetired }) => {
+              {carTrackPositions.map(({ car, isPlayer, isTeammate, isRetired, isInPitLane, pct }) => {
                 const isSelected = activeInspectCar?.code === car.code;
                 const displaySpeed =
                   car.currentSpeedKmH ||
@@ -687,11 +711,15 @@ export default function LiveTrackGpsRadar({
                           TM
                         </span>
                       )}
-                      {car.isPitting && (
+                      {isInPitLane ? (
                         <span className="px-1 py-0.2 rounded bg-amber-500 text-slate-950 text-[8px] font-black animate-pulse">
                           PIT
                         </span>
-                      )}
+                      ) : car.isPitting && pct >= 80.0 && pct < 90.0 ? (
+                        <span className="px-1 py-0.2 rounded bg-amber-600/90 text-amber-100 text-[8px] font-bold">
+                          IN-LAP
+                        </span>
+                      ) : null}
                     </div>
 
                     <div className="text-right shrink-0">
@@ -1070,8 +1098,8 @@ export default function LiveTrackGpsRadar({
                       className="transition-all duration-200 shadow-md"
                     />
 
-                    {/* Pitting Amber Halo Ring */}
-                    {car.isPitting && (
+                    {/* Pitting Amber Halo Ring - only when actively in pit lane or servicing in pit box */}
+                    {isInPitLane && (
                       <circle
                         cx={0}
                         cy={0}
@@ -1168,8 +1196,8 @@ export default function LiveTrackGpsRadar({
                             height="7.5"
                             rx="2"
                             fill="#0f172a"
-                            stroke={car.isPitting ? '#f59e0b' : '#eab308'}
-                            strokeWidth={car.isPitting ? 1.0 : 0.8}
+                            stroke={isInPitLane ? '#f59e0b' : '#eab308'}
+                            strokeWidth={isInPitLane ? 1.0 : 0.8}
                           />
                           <text
                             x="0"
@@ -1178,7 +1206,7 @@ export default function LiveTrackGpsRadar({
                             fontSize="4.5"
                             fontFamily="monospace"
                             fontWeight="black"
-                            fill={car.isPitting ? '#f59e0b' : '#eab308'}
+                            fill={isInPitLane ? '#f59e0b' : '#eab308'}
                           >
                             P1
                           </text>
@@ -1192,8 +1220,8 @@ export default function LiveTrackGpsRadar({
                             height="7"
                             rx="2"
                             fill="#020617"
-                            stroke={car.isPitting ? '#f59e0b' : car.color}
-                            strokeWidth={car.isPitting ? 1.0 : 0.7}
+                            stroke={isInPitLane ? '#f59e0b' : car.color}
+                            strokeWidth={isInPitLane ? 1.0 : 0.7}
                             opacity="0.92"
                           />
                           <text
@@ -1203,7 +1231,7 @@ export default function LiveTrackGpsRadar({
                             fontSize="4.2"
                             fontFamily="monospace"
                             fontWeight="bold"
-                            fill={car.isPitting ? '#f59e0b' : '#ffffff'}
+                            fill={isInPitLane ? '#f59e0b' : '#ffffff'}
                           >
                             {car.code}
                           </text>
@@ -1316,7 +1344,7 @@ export default function LiveTrackGpsRadar({
         </div>
 
         <div className="flex items-center gap-1 overflow-x-auto pb-0.5 scrollbar-thin">
-          {carTrackPositions.map(({ car, isPlayer, isTeammate }) => {
+          {carTrackPositions.map(({ car, isPlayer, isTeammate, isInPitLane }) => {
             const isSelected = activeInspectCar?.code === car.code;
             return (
               <button
@@ -1338,7 +1366,7 @@ export default function LiveTrackGpsRadar({
                 <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: car.color }} />
                 <span className="font-racing font-bold text-[8.5px]">P{car.position}</span>
                 <span className="font-bold">{car.code}</span>
-                {car.isPitting && (
+                {isInPitLane && (
                   <span className="px-0.5 rounded bg-amber-500 text-slate-950 text-[7px] font-black">PIT</span>
                 )}
               </button>

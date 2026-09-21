@@ -24,13 +24,9 @@ TOTAL_SAMPLES = int(SAMPLE_RATE * DURATION)
 left_channel = [0.0] * TOTAL_SAMPLES
 right_channel = [0.0] * TOTAL_SAMPLES
 
-# 1. Pure Diffused Garage Room Acoustics & HVAC Air Movement
-# ZERO pure sine waves! Only multi-stage lowpass filtered brownian noise.
-# This eliminates any "pooo" / whistling / organ tones completely.
-b0_l, b1_l, b2_l = 0.0, 0.0, 0.0
-b0_r, b1_r, b2_r = 0.0, 0.0, 0.0
-
-# Air duct broadband rushing noise (gentle bandpass 300Hz-1200Hz, no tonal peaks)
+# 1. Clean Non-Tonal Room Air (Gentle broadband HVAC air movement)
+# ZERO low-frequency resonant filters, ZERO pure sine waves.
+# Absolutely NO "pooo" / humming / organ drone tones.
 hvac_low_l, hvac_high_l = 0.0, 0.0
 hvac_low_r, hvac_high_r = 0.0, 0.0
 
@@ -38,26 +34,17 @@ for i in range(TOTAL_SAMPLES):
     noise_l = random.uniform(-1.0, 1.0)
     noise_r = random.uniform(-1.0, 1.0)
     
-    # 3-pole steep lowpass at ~110Hz for warm, deep room acoustics
-    b0_l += 0.015 * (noise_l - b0_l)
-    b1_l += 0.015 * (b0_l - b1_l)
-    b2_l += 0.015 * (b1_l - b2_l)
+    # Soft broadband air duct circulation (gentle bandpass ~400Hz-1800Hz, completely flat, non-resonant)
+    hvac_low_l += 0.08 * (noise_l - hvac_low_l)
+    hvac_high_l += 0.22 * (noise_l - hvac_high_l)
+    air_l = (hvac_high_l - hvac_low_l) * 0.02
     
-    b0_r += 0.015 * (noise_r - b0_r)
-    b1_r += 0.015 * (b0_r - b1_r)
-    b2_r += 0.015 * (b1_r - b2_r)
+    hvac_low_r += 0.08 * (noise_r - hvac_low_r)
+    hvac_high_r += 0.22 * (noise_r - hvac_high_r)
+    air_r = (hvac_high_r - hvac_low_r) * 0.02
     
-    # Gentle broad air duct flow (smooth noise only, no sine frequencies)
-    hvac_low_l += 0.06 * (noise_l - hvac_low_l)
-    hvac_high_l += 0.18 * (noise_l - hvac_high_l)
-    air_l = (hvac_high_l - hvac_low_l) * 0.035
-    
-    hvac_low_r += 0.06 * (noise_r - hvac_low_r)
-    hvac_high_r += 0.18 * (noise_r - hvac_high_r)
-    air_r = (hvac_high_r - hvac_low_r) * 0.035
-    
-    left_channel[i] += (b2_l * 0.32) + air_l
-    right_channel[i] += (b2_r * 0.32) + air_r
+    left_channel[i] += air_l
+    right_channel[i] += air_r
 
 # Helper: Paoli DP6000 Wheel Gun (Center-lock impact wrench)
 # Ultra-crisp mechanical hammer impacts + nitrogen exhaust hiss

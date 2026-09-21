@@ -283,16 +283,11 @@ export const PaddockLiveAtmosphere: React.FC<PaddockLiveAtmosphereProps> = ({
       bgAudio.loop = true;
       bgAudio.volume = volume;
 
-      // Try /audio/garage_ambient.mp3 first, fallback to clean studio WAV
-      bgAudio.src = '/audio/garage_ambient.mp3';
-      bgAudio.onerror = () => {
-        bgAudio.src = '/audio/garage_ambient.wav';
-        bgAudio.play().catch((err) => {
-          console.warn('Fallback WAV play error:', err);
-        });
-      };
-
-      bgAudio.play().catch(() => {});
+      // Clean studio WAV ambient track (authentic wheel guns, air lines, zero drone)
+      bgAudio.src = '/audio/garage_ambient.wav';
+      bgAudio.play().catch((err) => {
+        console.warn('Garage ambient audio play error:', err);
+      });
       backgroundAudioRef.current = bgAudio;
 
       // Dynamic Garage Life Loop (Work sounds & background chatter)

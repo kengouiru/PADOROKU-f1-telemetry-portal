@@ -301,6 +301,23 @@ export default function RaceSimulatorHub({
   const [selectedIntelRivalId, setSelectedIntelRivalId] = useState<string | null>(null);
   const [minimizeRadioPrompt, setMinimizeRadioPrompt] = useState<boolean>(false);
 
+  // Synchronize recommended nextCompoundChoice with active scenario context
+  useEffect(() => {
+    if (activeScenario.id === 'silverstone_drying_gamble') {
+      setNextCompoundChoice('MEDIUM');
+      return;
+    }
+    const currentTyre = activeScenario.playerConfig.startTyre;
+    if (currentTyre === 'SOFT') setNextCompoundChoice('MEDIUM');
+    else if (currentTyre === 'MEDIUM') setNextCompoundChoice('HARD');
+    else if (currentTyre === 'HARD') setNextCompoundChoice('MEDIUM');
+    else if (currentTyre === 'INTER') {
+      setNextCompoundChoice(activeScenario.startWeather === 'monsoon' ? 'WET' : 'MEDIUM');
+    } else if (currentTyre === 'WET') {
+      setNextCompoundChoice('INTER');
+    }
+  }, [activeScenario]);
+
   // Compute effective player config based on pre-race strategy selection
   const effectivePlayerConfig = useMemo<DriverSimConfig>(() => {
     const isCustomTyre = Boolean(customStartingTyre && customStartingTyre !== activeScenario.playerConfig.startTyre);
@@ -327,23 +344,11 @@ export default function RaceSimulatorHub({
     return Math.max(3, Math.floor(activeScenario.totalLaps * 0.6));
   }, [activeScenario, effectivePlayerConfig.startTyre]);
 
-  // Merge pre-race target pit stop with real-time tactical overrides
+  // Player tactical overrides: fully driven by real-time pit wall commands (BOX BOX button or radio prompts).
+  // Pre-race scheduled target lap is a tactical reference window, NEVER an unprompted forced pit stop.
   const effectivePlayerTacticalCommands = useMemo(() => {
-    const commands = { ...playerTacticalCommands };
-    const boxLap = customTargetBoxLap || effectiveTargetBoxLap;
-    const boxCmp = customTargetCompound || nextCompoundChoice;
-    // CRITICAL: NEVER automatically schedule a pit stop on Lap 1! Pit stops happen from Lap 2 onwards.
-    // Ensure the pre-race scheduled pit stop persists unless the user explicitly queued/issued a pit stop command (boxNextLap)
-    const hasExplicitPitCommand = Object.values(commands).some((c) => c?.boxNextLap);
-    if (boxLap && boxLap > 1 && boxCmp && !hasExplicitPitCommand) {
-      commands[boxLap] = {
-        ...commands[boxLap],
-        boxNextLap: true,
-        nextCompound: boxCmp,
-      };
-    }
-    return commands;
-  }, [playerTacticalCommands, customTargetBoxLap, effectiveTargetBoxLap, customTargetCompound, nextCompoundChoice]);
+    return playerTacticalCommands;
+  }, [playerTacticalCommands]);
 
   // Compute snapshots dynamically from engine with AI difficulty & incident risk tuning
   const challengeSnapshots = useMemo<SimSnapshot[]>(() => {
@@ -658,15 +663,23 @@ export default function RaceSimulatorHub({
     );
   }, [currentSnapshot, activeScenario]);
 
-  // Check for incoming radio prompt and play audio beep
+  // Check for incoming radio prompt or new team radio feed messages and play F1 radio chirp
   useEffect(() => {
-    if (currentSnapshot?.activeRadioPrompt) {
+    if (!currentSnapshot || !radioAudioEnabled) return;
+
+    if (currentSnapshot.activeRadioPrompt) {
       const promptId = currentSnapshot.activeRadioPrompt.id;
       if (!playedChirpIdsRef.current.has(promptId)) {
         playedChirpIdsRef.current.add(promptId);
-        if (radioAudioEnabled) {
-          playF1RadioChirp();
-        }
+        playF1IncomingRadioChirp();
+      }
+    }
+
+    if (currentSnapshot.commentaryFeed && currentSnapshot.commentaryFeed.length > 0) {
+      const latestRadio = currentSnapshot.commentaryFeed.find((m) => m.type === 'radio');
+      if (latestRadio && !playedChirpIdsRef.current.has(latestRadio.id)) {
+        playedChirpIdsRef.current.add(latestRadio.id);
+        playF1IncomingRadioChirp();
       }
     }
   }, [currentSnapshot, radioAudioEnabled]);
@@ -737,6 +750,24 @@ export default function RaceSimulatorHub({
       isPittingNow,
     };
   }, [lapProgressPct, activeScenario.circuit, playerCar?.isPitting]);
+
+  // Player car's real-time pit status and physical track progress
+  const playerPitStatus = useMemo(() => {
+    const effectiveLapTime = currentSnapshot?.isSC ? Math.max(60, activeScenario.circuit.baseLapTime * 1.42) : Math.max(60, activeScenario.circuit.baseLapTime);
+    const pitLossSec = currentSnapshot?.isSC ? 11.5 : 22.0;
+    const playerEffectiveGap = playerCar?.isPitting ? Math.max(0, playerCar.gapToLeader - pitLossSec) : (playerCar?.gapToLeader || 0);
+    const playerTrackPct = ((lapProgressPct - (playerEffectiveGap / effectiveLapTime) * 100) % 100 + 100) % 100;
+    const isPlayerInPit = !!playerCar?.isPitting && (playerTrackPct >= 90.0 || playerTrackPct <= 4.0);
+    const isPlayerOut = !!playerCar?.isPitting && (playerTrackPct > 4.0 && playerTrackPct <= 12.0);
+    const isPlayerInLap = !!playerCar?.isPitting && (playerTrackPct >= 78.0 && playerTrackPct < 90.0);
+
+    return {
+      playerTrackPct,
+      isPlayerInPit,
+      isPlayerOut,
+      isPlayerInLap,
+    };
+  }, [lapProgressPct, activeScenario.circuit, currentSnapshot?.isSC, playerCar?.isPitting, playerCar?.gapToLeader]);
 
   // Live intra-lap telemetry physics calculations (dynamic micro-variations based on lapProgressPct)
   const liveTelemetry = useMemo(() => {
@@ -2626,7 +2657,7 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                     </div>
 
                     <p className="text-[10px] text-slate-400 font-mono leading-tight">
-                      ※レース中いつでもリアルタイムにBOX指示・タイヤ変更が可能です。
+                      ※戦略目標プランです。レース中の「BOX BOX」ボタンまたは無線指示によってピットインを実行します（勝手に自動ピットインすることはありません）。
                     </p>
                   </div>
 
@@ -3088,14 +3119,22 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                 {/* Safety Car status */}
                 <span
                   className={`px-1.5 py-0.5 rounded font-bold font-racing ${
-                    currentSnapshot?.isSC
+                    currentSnapshot?.isScEnding
+                      ? 'bg-emerald-500 text-slate-950 animate-pulse shadow-sm shadow-emerald-500/50'
+                      : currentSnapshot?.isSC
                       ? 'bg-yellow-500 text-slate-950 animate-pulse'
                       : currentSnapshot?.isVSC
                       ? 'bg-amber-600 text-white'
                       : 'bg-emerald-950 text-emerald-400 border border-emerald-500/30'
                   }`}
                 >
-                  {currentSnapshot?.isSC ? '🟡 SC' : currentSnapshot?.isVSC ? '🟠 VSC' : '🟢 GREEN'}
+                  {currentSnapshot?.isScEnding
+                    ? '🟢 SC IN THIS LAP'
+                    : currentSnapshot?.isSC
+                    ? '🟡 SC'
+                    : currentSnapshot?.isVSC
+                    ? '🟠 VSC'
+                    : '🟢 GREEN'}
                 </span>
 
                 {/* SC risk */}
@@ -3113,16 +3152,6 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                   </span>
                 )}
 
-                {/* Weather Reroll Button */}
-                <button
-                  type="button"
-                  onClick={handleRerollWeather}
-                  className="btn-console text-[10px] px-1.5 py-0.5 flex items-center gap-1 text-sky-300 hover:text-white border-sky-500/30"
-                  title="天候や雨雲の到達ラップ・SC発生リスクをランダム再抽選"
-                >
-                  <Dices className="w-3 h-3 text-sky-400" />
-                  <span className="hidden sm:inline font-racing font-bold">天候再抽選</span>
-                </button>
 
                 {/* AI Difficulty Status Tag */}
                 <span
@@ -3396,6 +3425,14 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                 const isOvrWindow = car.position > 1 && car.gapToAhead <= 1.0;
                 const isRetired = !!car.isRetired;
 
+                const effectiveLapTime = currentSnapshot?.isSC ? Math.max(60, activeScenario.circuit.baseLapTime * 1.42) : Math.max(60, activeScenario.circuit.baseLapTime);
+                const pitLossSec = currentSnapshot?.isSC ? 11.5 : 22.0;
+                const effectiveGap = car.isPitting ? Math.max(0, car.gapToLeader - pitLossSec) : car.gapToLeader;
+                const carTrackPct = ((lapProgressPct - (effectiveGap / effectiveLapTime) * 100) % 100 + 100) % 100;
+                const isCarInPit = car.isPitting && (carTrackPct >= 90.0 || carTrackPct <= 4.0);
+                const isCarOut = car.isPitting && (carTrackPct > 4.0 && carTrackPct <= 12.0);
+                const isCarInLap = car.isPitting && (carTrackPct >= 78.0 && carTrackPct < 90.0);
+
                 return (
                   <div
                     key={car.code}
@@ -3468,9 +3505,17 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                           <span className="px-1.5 py-0.2 rounded bg-rose-950/80 border border-rose-500/40 text-rose-300 text-[7.5px] font-mono font-extrabold tracking-wider inline-block">
                             OUT
                           </span>
-                        ) : car.isPitting ? (
+                        ) : isCarInPit ? (
                           <span className="px-1 py-0.2 rounded bg-amber-500 text-slate-950 text-[7.5px] font-mono font-extrabold tracking-wider animate-pulse inline-block">
                             PIT
+                          </span>
+                        ) : isCarOut ? (
+                          <span className="px-1 py-0.2 rounded bg-emerald-500 text-slate-950 text-[7.5px] font-mono font-extrabold tracking-wider inline-block">
+                            OUT
+                          </span>
+                        ) : isCarInLap ? (
+                          <span className="px-1 py-0.2 rounded bg-amber-600/90 text-amber-100 text-[7.5px] font-mono font-extrabold tracking-wider inline-block">
+                            IN-LAP
                           </span>
                         ) : timingTowerMode === 'gap' ? (
                           <span className="font-bold text-white text-[10.5px] sm:text-[11px] tabular-nums font-mono tracking-tight leading-none">
@@ -4044,9 +4089,14 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       {(() => {
-                        const warning = playerCar?.thermalWarning;
-                        const isBlistering = warning === 'BLISTERING_WARNING';
-                        const isGraining = warning === 'GRAINING_RISK';
+                        const tyreCodes = ['FL', 'FR', 'RL', 'RR'] as const;
+                        const surfs = tyreCodes.map((code) =>
+                          liveTelemetry?.tyres[code]?.surf ?? playerCar?.tyreSurfaceTemp ?? 100
+                        );
+                        const maxSurf = Math.max(...surfs);
+                        const minSurf = Math.min(...surfs);
+                        const isBlistering = maxSurf > 125 || (playerCar?.thermalWarning === 'BLISTERING_WARNING' && maxSurf >= 120);
+                        const isGraining = !isBlistering && (minSurf < 88 || playerCar?.thermalWarning === 'GRAINING_RISK');
                         return (
                           <span
                             className={`px-1.5 py-0.2 rounded-full text-[8.5px] font-mono font-bold whitespace-nowrap shrink-0 ${
@@ -5016,9 +5066,23 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
 
               <div className="flex items-center gap-1 shrink-0">
                 {playerCar?.isPitting ? (
-                  <span className="px-1.5 py-0.2 rounded-full bg-amber-950/80 text-amber-300 border border-amber-500/60 text-[9px] font-racing font-bold flex items-center gap-1">
-                    <span>🛞 IN PIT LANE (作業中)</span>
-                  </span>
+                  playerPitStatus.isPlayerInPit ? (
+                    <span className="px-1.5 py-0.2 rounded-full bg-amber-950/80 text-amber-300 border border-amber-500/60 text-[9px] font-racing font-bold flex items-center gap-1 animate-pulse">
+                      <span>🛞 IN PIT LANE (作業中)</span>
+                    </span>
+                  ) : playerPitStatus.isPlayerOut ? (
+                    <span className="px-1.5 py-0.2 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-500/60 text-[9px] font-racing font-bold flex items-center gap-1">
+                      <span>🏁 OUT-LAP (コース復帰中)</span>
+                    </span>
+                  ) : playerPitStatus.isPlayerInLap ? (
+                    <span className="px-1.5 py-0.2 rounded-full bg-amber-950/80 text-amber-300 border border-amber-500/60 text-[9px] font-racing font-bold flex items-center gap-1">
+                      <span>🟡 IN-LAP (BOX THIS LAP)</span>
+                    </span>
+                  ) : (
+                    <span className="px-1.5 py-0.2 rounded-full bg-emerald-950/60 text-emerald-300 border border-emerald-500/40 text-[9px] font-mono font-bold flex items-center gap-1">
+                      <span>🟢 ON TRACK (インラップ走行中)</span>
+                    </span>
+                  )
                 ) : pitProximity.isCommitmentZone ? (
                   <span className="px-1.5 py-0.2 rounded-full bg-red-950 text-red-200 border border-red-500/80 text-[9px] font-racing font-bold animate-pulse flex items-center gap-1 shadow-md shadow-red-950">
                     <AlertTriangle className="w-2.5 h-2.5 text-red-400" />
@@ -5116,14 +5180,22 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
               {/* 1. BOX BOX Pit Call Button */}
               <button
                 type="button"
-                disabled={playerCar?.isPitting}
+                disabled={playerPitStatus.isPlayerInPit}
                 onClick={() => {
                   handleToggleBoxNextLap();
                   if (radioAudioEnabled) playF1RadioChirp();
                 }}
                 className={`p-1.5 rounded-xl border text-left cursor-pointer transition-all shadow-sm ${
                   playerCar?.isPitting
-                    ? 'bg-amber-950/70 border-amber-500/50 text-amber-200 cursor-not-allowed'
+                    ? playerPitStatus.isPlayerInPit
+                      ? 'bg-amber-950/70 border-amber-500/50 text-amber-200 cursor-not-allowed animate-pulse'
+                      : playerPitStatus.isPlayerOut
+                      ? 'bg-emerald-950/60 border-emerald-500/60 text-emerald-200'
+                      : playerPitStatus.isPlayerInLap
+                      ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white border-amber-400 ring-2 ring-amber-500/50'
+                      : boxQueuedForNextLap
+                      ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white border-emerald-400 ring-2 ring-emerald-500/50 shadow-emerald-950/50'
+                      : 'bg-slate-900 hover:bg-red-950/60 border-white/10 hover:border-red-500/40 text-slate-300 hover:text-white'
                     : boxQueuedForNextLap
                     ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white border-emerald-400 ring-2 ring-emerald-500/50 shadow-emerald-950/50'
                     : pitProximity.isCommitmentZone
@@ -5132,7 +5204,15 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                 }`}
                 title={
                   playerCar?.isPitting
-                    ? '現在ピット作業中'
+                    ? playerPitStatus.isPlayerInPit
+                      ? '現在ピット作業中'
+                      : playerPitStatus.isPlayerOut
+                      ? 'ピット出口からコース復帰中'
+                      : playerPitStatus.isPlayerInLap
+                      ? 'インラップ走行中（ピット進入中）'
+                      : boxQueuedForNextLap
+                      ? '次回ピット指示済み（クリックでキャンセル）'
+                      : 'ピットイン指示を出す (BOX BOX)'
                     : boxQueuedForNextLap
                     ? 'ピット指示済み（クリックでキャンセル）'
                     : 'ピットイン指示を出す (BOX BOX)'
@@ -5140,7 +5220,15 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
               >
                 <div className="text-[8px] font-mono opacity-80">
                   {playerCar?.isPitting
-                    ? 'IN PIT'
+                    ? playerPitStatus.isPlayerInPit
+                      ? 'IN PIT'
+                      : playerPitStatus.isPlayerOut
+                      ? 'OUT-LAP'
+                      : playerPitStatus.isPlayerInLap
+                      ? 'IN-LAP'
+                      : boxQueuedForNextLap
+                      ? 'ORDERED'
+                      : 'PIT IN'
                     : boxQueuedForNextLap
                     ? 'ORDERED'
                     : pitProximity.isCommitmentZone
@@ -5149,7 +5237,15 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                 </div>
                 <div className="text-[10.5px] font-racing font-bold truncate">
                   {playerCar?.isPitting
-                    ? '🛞 PITTING'
+                    ? playerPitStatus.isPlayerInPit
+                      ? '🛞 PITTING'
+                      : playerPitStatus.isPlayerOut
+                      ? '🏁 OUT-LAP'
+                      : playerPitStatus.isPlayerInLap
+                      ? '🏁 BOXING (IN-LAP)'
+                      : boxQueuedForNextLap
+                      ? '✅ BOX BOX'
+                      : '🛞 "BOX BOX"'
                     : boxQueuedForNextLap
                     ? '✅ BOX BOX'
                     : '🛞 "BOX BOX"'}
@@ -6513,11 +6609,29 @@ ${diagnosticResult?.unlockedBadgesThisRace.length ? `- 今回獲得した称号:
                                   {ersBoostUsedThisLap || activePuMode === 'push' ? 'YOU⚡OT' : 'YOU'}
                                 </span>
                               )}
-                              {car.isPitting && (
-                                <span className="px-1 py-0.2 rounded bg-amber-500 text-slate-950 text-[8px] font-black animate-pulse">
-                                  PIT
-                                </span>
-                              )}
+                              {(() => {
+                                const effectiveLapTime = currentSnapshot?.isSC ? Math.max(60, activeScenario.circuit.baseLapTime * 1.42) : Math.max(60, activeScenario.circuit.baseLapTime);
+                                const pitLossSec = currentSnapshot?.isSC ? 11.5 : 22.0;
+                                const effectiveGap = car.isPitting ? Math.max(0, car.gapToLeader - pitLossSec) : car.gapToLeader;
+                                const carTrackPct = ((lapProgressPct - (effectiveGap / effectiveLapTime) * 100) % 100 + 100) % 100;
+                                const isCarInPit = car.isPitting && (carTrackPct >= 90.0 || carTrackPct <= 4.0);
+                                const isCarInLap = car.isPitting && (carTrackPct >= 78.0 && carTrackPct < 90.0);
+                                if (isCarInPit) {
+                                  return (
+                                    <span className="px-1 py-0.2 rounded bg-amber-500 text-slate-950 text-[8px] font-black animate-pulse">
+                                      PIT
+                                    </span>
+                                  );
+                                }
+                                if (isCarInLap) {
+                                  return (
+                                    <span className="px-1 py-0.2 rounded bg-amber-600/90 text-amber-100 text-[8px] font-bold">
+                                      IN-LAP
+                                    </span>
+                                  );
+                                }
+                                return null;
+                              })()}
                             </div>
 
                             <div className="text-right shrink-0">
