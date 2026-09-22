@@ -188,7 +188,7 @@ export default function AIStrategist({
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setMessages(parsed.map((m: any) => ({ ...m, isStreaming: false })));
+          setMessages(parsed.map((m: ChatMessage) => ({ ...m, isStreaming: false })));
         }
       }
     } catch (_) {}

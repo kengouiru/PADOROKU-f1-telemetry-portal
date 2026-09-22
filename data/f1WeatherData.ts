@@ -3,7 +3,7 @@
 /**
  * data/f1WeatherData.ts
  * Meteorological conditions, track temperatures, rain probabilities,
- * and tactical engineering impacts for all 24 Formula 1 circuits (2025 Season).
+ * and tactical engineering impacts for all 2026 Formula 1 circuits (2026 Season - 23 Rounds).
  */
 
 export interface CircuitWeather {
@@ -82,7 +82,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'bahrain-international': {
     circuitId: 'bahrain-international',
-    round: 4,
+    round: 0, // 2026: Cancelled (Iran conflict) → Relocated to Malaysia/Sepang
     gpName: 'バーレーンGP',
     location: 'サヒール (バーレーン)',
     condition: 'hot',
@@ -100,7 +100,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'jeddah': {
     circuitId: 'jeddah',
-    round: 5,
+    round: 0, // 2026: Cancelled (Iran conflict)
     gpName: 'サウジアラビアGP',
     location: 'ジェッダ (サウジアラビア)',
     condition: 'hot',
@@ -118,7 +118,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'miami': {
     circuitId: 'miami',
-    round: 6,
+    round: 4,
     gpName: 'マイアミGP',
     location: 'フロリダ州マイアミ (米国)',
     condition: 'hot',
@@ -136,7 +136,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'imola': {
     circuitId: 'imola',
-    round: 7,
+    round: 0, // 2026: Contract expired after 2025
     gpName: 'エミリア・ロマーニャGP',
     location: 'イモラ (イタリア)',
     condition: 'cloudy',
@@ -154,7 +154,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'circuit-de-monaco': {
     circuitId: 'circuit-de-monaco',
-    round: 8,
+    round: 6,
     gpName: 'モナコGP',
     location: 'モンテカルロ (モナコ)',
     condition: 'sunny',
@@ -172,7 +172,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'catalunya': {
     circuitId: 'catalunya',
-    round: 9,
+    round: 7,
     gpName: 'スペインGP',
     location: 'バルセロナ (スペイン)',
     condition: 'hot',
@@ -190,7 +190,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'villeneuve': {
     circuitId: 'villeneuve',
-    round: 10,
+    round: 5,
     gpName: 'カナダGP',
     location: 'モントリオール (カナダ)',
     condition: 'rain',
@@ -208,7 +208,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'redbull-ring': {
     circuitId: 'redbull-ring',
-    round: 11,
+    round: 8,
     gpName: 'オーストリアGP',
     location: 'シュピールベルク (オーストリア)',
     condition: 'windy',
@@ -226,7 +226,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'silverstone': {
     circuitId: 'silverstone',
-    round: 12,
+    round: 9,
     gpName: 'イギリスGP',
     location: 'シルバーストン (英国)',
     condition: 'cloudy',
@@ -244,7 +244,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'hungaroring': {
     circuitId: 'hungaroring',
-    round: 13,
+    round: 11,
     gpName: 'ハンガリーGP',
     location: 'ブダペスト (ハンガリー)',
     condition: 'hot',
@@ -262,7 +262,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'spa-francorchamps': {
     circuitId: 'spa-francorchamps',
-    round: 12,
+    round: 10,
     gpName: 'ベルギーGP',
     location: 'スパ (ベルギー)',
     condition: 'rain',
@@ -280,7 +280,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'zandvoort': {
     circuitId: 'zandvoort',
-    round: 14,
+    round: 12,
     gpName: 'オランダGP',
     location: 'ザントフォールト (オランダ)',
     condition: 'windy',
@@ -298,7 +298,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'monza': {
     circuitId: 'monza',
-    round: 16,
+    round: 13,
     gpName: 'イタリアGP',
     location: 'モンツァ (イタリア)',
     condition: 'hot',
@@ -316,7 +316,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'baku': {
     circuitId: 'baku',
-    round: 17,
+    round: 15,
     gpName: 'アゼルバイジャンGP',
     location: 'バクー (アゼルバイジャン)',
     condition: 'windy',
@@ -334,7 +334,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'singapore': {
     circuitId: 'singapore',
-    round: 18,
+    round: 17,
     gpName: 'シンガポールGP',
     location: 'マリーナベイ (シンガポール)',
     condition: 'hot',
@@ -352,7 +352,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'cota': {
     circuitId: 'cota',
-    round: 19,
+    round: 18,
     gpName: 'アメリカGP',
     location: 'オースティン (米国テキサス州)',
     condition: 'sunny',
@@ -370,7 +370,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'mexico': {
     circuitId: 'mexico',
-    round: 20,
+    round: 19,
     gpName: 'メキシコGP',
     location: 'メキシコシティ (メキシコ)',
     condition: 'sunny',
@@ -388,7 +388,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'interlagos': {
     circuitId: 'interlagos',
-    round: 21,
+    round: 20,
     gpName: 'サンパウロGP (ブラジル)',
     location: 'インテルラゴス (ブラジル)',
     condition: 'rain',
@@ -406,7 +406,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'las-vegas': {
     circuitId: 'las-vegas',
-    round: 22,
+    round: 21,
     gpName: 'ラスベガスGP',
     location: 'ラスベガス (米国ネバダ州)',
     condition: 'cold',
@@ -424,7 +424,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'losail': {
     circuitId: 'losail',
-    round: 23,
+    round: 22,
     gpName: 'カタールGP',
     location: 'ロサイル (カタール)',
     condition: 'hot',
@@ -442,7 +442,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'yas-marina': {
     circuitId: 'yas-marina',
-    round: 24,
+    round: 23,
     gpName: 'アブダビGP',
     location: 'ヤス・マリーナ (UAE)',
     condition: 'sunny',
@@ -460,7 +460,7 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
   },
   'madrid': {
     circuitId: 'madrid',
-    round: 16,
+    round: 14,
     gpName: 'マドリードGP',
     location: 'マドリード (スペイン)',
     condition: 'sunny',
@@ -475,6 +475,24 @@ export const F1_CIRCUIT_WEATHER_DATA: Record<string, CircuitWeather> = {
     tacticalImpact: '標高約650mのマドリード内陸部に位置する新設ハイブリッド公道コース。直射日光による路面温度上昇が激しく、新舗装によるグレイニング対策が鍵。',
     historicalRainRaces: '2026年初開催',
     tyreOperatingNote: '低速ターンでのトラクション確保と高速区間での熱ダレ抑制の両立が求められる。'
+  },
+  'sepang': {
+    circuitId: 'sepang',
+    round: 16,
+    gpName: 'マレーシアGP (代替開催)',
+    location: 'セパン (マレーシア)',
+    condition: 'rain',
+    conditionText: '熱帯スコール・超高温多湿',
+    weatherIcon: '⛈️',
+    airTempC: 33,
+    trackTempC: 48,
+    humidity: 82,
+    rainProb: 65,
+    windSpeedKmh: 12,
+    windDirection: '南西 (マラッカ海峡からの湿ったモンスーン)',
+    tacticalImpact: '午後の急激な熱帯性豪雨（スコール）によりトラック全体が一瞬で川と化すエクストリームコンディション。路面温度50℃近い猛暑からの急冷でタイヤの内圧変化が激しく、雨雲レーダーの分単位予測が勝敗に直結。',
+    historicalRainRaces: '2001年豪雨波乱、2009年赤旗ハーフポイントレース、2012年ペレス追撃戦',
+    tyreOperatingNote: '超高横Gと高路面温度によりヘビーウェットでもトレッドが即座にオーバーヒートするため、水たまり（パドル）を探す走行ラインが必須。'
   }
 };
 
@@ -482,27 +500,26 @@ export const ROUND_TO_CIRCUIT_ID_MAP: Record<number, string> = {
   1: 'albert-park',
   2: 'shanghai',
   3: 'suzuka',
-  4: 'bahrain-international',
-  5: 'jeddah',
-  6: 'miami',
-  7: 'villeneuve',
-  8: 'circuit-de-monaco',
-  9: 'catalunya',
-  10: 'redbull-ring',
-  11: 'silverstone',
-  12: 'spa-francorchamps',
-  13: 'hungaroring',
-  14: 'zandvoort',
-  15: 'monza',
-  16: 'madrid',
-  17: 'baku',
-  18: 'singapore',
-  19: 'cota',
-  20: 'mexico',
-  21: 'interlagos',
-  22: 'las-vegas',
-  23: 'losail',
-  24: 'yas-marina'
+  4: 'miami',
+  5: 'villeneuve',
+  6: 'circuit-de-monaco',
+  7: 'catalunya',
+  8: 'redbull-ring',
+  9: 'silverstone',
+  10: 'spa-francorchamps',
+  11: 'hungaroring',
+  12: 'zandvoort',
+  13: 'monza',
+  14: 'madrid',
+  15: 'baku',
+  16: 'sepang',
+  17: 'singapore',
+  18: 'cota',
+  19: 'mexico',
+  20: 'interlagos',
+  21: 'las-vegas',
+  22: 'losail',
+  23: 'yas-marina'
 };
 
 export function getCircuitWeather(circuitId: string): CircuitWeather | undefined {

@@ -96,7 +96,7 @@ export const MOCK_DRIVERS: Record<number, Driver[]> = new Proxy(BASE_MOCK_DRIVER
     if (!isNaN(num) && num >= 2026000 && num < 2027000) {
       return DRIVERS_2026;
     }
-    return (target as any)[prop];
+    return Reflect.get(target, prop);
   },
 });
 

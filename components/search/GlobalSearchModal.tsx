@@ -344,7 +344,7 @@ export default function GlobalSearchModal({
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-start justify-center p-3 sm:p-6 pt-12 sm:pt-20 bg-black/80 backdrop-blur-md animate-fade-in text-white">
       {/* Click outside to close */}
-      <div className="absolute inset-0" onClick={onClose} />
+      <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
 
       {/* Modal Container */}
       <div

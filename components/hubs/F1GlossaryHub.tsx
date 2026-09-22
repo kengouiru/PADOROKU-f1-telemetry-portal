@@ -307,7 +307,7 @@ function GlossaryDetailModal({
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 bg-black/80 backdrop-blur-md animate-fade-in text-slate-200">
       {/* Click backdrop to close */}
-      <div className="absolute inset-0" onClick={onClose} />
+      <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
 
       {/* Modal Card with Fixed Header, Scrollable Body, and Fixed Footer */}
       <div className="relative z-10 w-full max-w-2xl max-h-[90vh] sm:max-h-[85vh] bg-slate-900 border border-emerald-500/50 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-scale-up">

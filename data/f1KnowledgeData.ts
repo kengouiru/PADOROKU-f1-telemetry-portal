@@ -300,7 +300,7 @@ export interface HistoryArchive {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 1. ALL 10 CONSTRUCTOR TEAMS (2024/2025 Grid)
+// 1. ALL 11 CONSTRUCTOR TEAMS (2026 Grid)
 // ─────────────────────────────────────────────────────────────
 
 export const KNOWLEDGE_TEAMS: TeamProfile[] = [
@@ -850,8 +850,8 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     color: '#D4AF37',
     visualGallery: [
       {
-        imageUrl: "/images/teams/team_redbull_factory.jpg",
-        caption: "Silverstone HQ & Indiana Operations: 米ゼネラルモーターズの威信をかけた最新鋭オペレーション拠点",
+        imageUrl: "/images/teams/team_cadillac_factory.jpg",
+        caption: "Silverstone HQ & Indiana Operations: キャデラック独自の最新鋭ファクトリーおよび開発オペレーション拠点",
         tag: "Factory",
         credit: "Wikimedia Commons",
         license: "CC BY-SA 4.0",
@@ -1021,7 +1021,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     numberOrigin: '父アンソニーの愛車のナンバープレート「F44」およびカート時代の初優勝番号に由来し、王座獲得後も「1」を使わず「44」を一貫して使用。',
     visualAsset: {
       imageUrl: '/images/drivers/portraits/lewis-hamilton.jpg',
-      caption: 'Lewis Hamilton (Mercedes-AMG Petronas F1 Team)',
+      caption: 'Lewis Hamilton (Scuderia Ferrari)',
       credit: 'Wikimedia Commons',
       license: 'CC BY-SA 4.0',
       sourceUrl: 'https://commons.wikimedia.org/wiki/File:Lewis_Hamilton.jpg',
@@ -3079,7 +3079,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     code: "BOT",
     number: 77,
     fullName: "Valtteri Bottas",
-    country: "フィンランド 🇫🇷",
+    country: "フィンランド 🇫🇮",
     team: 'Cadillac Formula 1 Team',
     teamColor: '#D4AF37',
     status: 'Current',
@@ -3773,7 +3773,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     numberOrigin: 'ジュニアフォーミュラ時代から愛用するラッキーナンバー。',
     visualAsset: {
       imageUrl: '/images/drivers/portraits/liam-lawson.jpg',
-      caption: 'Liam Lawson (Red Bull Racing)',
+      caption: 'Liam Lawson (Visa Cash App RB)',
       credit: 'Wikimedia Commons',
       license: 'CC BY-SA 4.0',
       sourceUrl: '/images/drivers/portraits/liam-lawson.jpg'
@@ -3781,7 +3781,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     visualGallery: [
       {
         imageUrl: '/images/drivers/portraits/liam-lawson.jpg',
-        caption: 'Liam Lawson (Red Bull Racing)',
+        caption: 'Liam Lawson (Visa Cash App RB)',
         tag: 'Portrait',
         credit: 'Wikimedia Commons',
         license: 'CC BY-SA 4.0',
@@ -3794,8 +3794,8 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       steeringWeight: 'ダイレクトで明確なインフォメーション。'
     },
     raceEngineer: {
-      name: 'Hugh Bird',
-      callsign: 'Hugh',
+      name: 'Pierre Hamelin',
+      callsign: 'Pierre',
       dynamic: '的確なギャップ管理とアグレッシブな作戦判断を共有。'
     },
     socialLinks: {
@@ -3996,7 +3996,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     nickname: 'リトル・プロスト / 闘志の塊',
     birthDate: '2004-09-28',
     birthPlace: 'Paris, France',
-    f1Debut: '2025年 オーストラリアGP (RB)',
+    f1Debut: '2025年 オーストラリアGP (Red Bull Racing)',
     driverType: '獰猛な一発アタッカー派',
     numberOrigin: '幼少期のレースキャリアから大切にしているラッキーナンバー。',
     visualAsset: {
@@ -4022,14 +4022,14 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       steeringWeight: 'クイックレシオで俊敏な回頭性。'
     },
     raceEngineer: {
-      name: 'Pierre Hamelin',
-      callsign: 'Pierre',
+      name: 'Hugh Bird',
+      callsign: 'Hugh',
       dynamic: '若き情熱を受け止め、冷静な戦術とタイヤ管理をコーチング。'
     },
     socialLinks: {
       instagram: 'https://www.instagram.com/isackhadjar/'
     },
-    careerSummary: 'ヘルムート・マルコが「才能は本物」と絶賛するレッドブル・ジュニアの切り込み隊長。F2でのタイトル争いを経て、2025年にVisa Cash App RBの正シートを獲得しF1ステップアップを果たした。',
+    careerSummary: 'ヘルムート・マルコが「才能は本物」と絶賛するレッドブル・ジュニアの切り込み隊長。F2でのタイトル争いを経て、2025年にRed Bull Racingの正シートを獲得しF1ステップアップを果たした。',
     entries: 0,
     wins: 0,
     podiums: 0,
@@ -4074,7 +4074,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     numberOrigin: '尊敬するセナの母国ブラジルの系譜を継ぎ、カート時代から愛用してきたナンバー。',
     visualAsset: {
       imageUrl: '/images/drivers/portraits/gabriel-bortoleto.jpg',
-      caption: 'Gabriel Bortoleto (Kick Sauber)',
+      caption: 'Gabriel Bortoleto (Audi F1 Team)',
       credit: 'Wikimedia Commons',
       license: 'CC BY-SA 4.0',
       sourceUrl: '/images/drivers/portraits/gabriel-bortoleto.jpg'
@@ -4082,7 +4082,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     visualGallery: [
       {
         imageUrl: '/images/drivers/portraits/gabriel-bortoleto.jpg',
-        caption: 'Gabriel Bortoleto (Kick Sauber)',
+        caption: 'Gabriel Bortoleto (Audi F1 Team)',
         tag: 'Portrait',
         credit: 'Wikimedia Commons',
         license: 'CC BY-SA 4.0',

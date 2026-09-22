@@ -71,7 +71,7 @@ export interface GridTeam {
 export type Grid2025Team = GridTeam;
 
 // ─────────────────────────────────────────────────────────────
-// 1. 2026 F1 OFFICIAL CALENDAR (ALL 24 ROUNDS - CURRENT SEASON)
+// 1. 2026 F1 OFFICIAL CALENDAR (ALL 23 ROUNDS (Bahrain cancelled, Saudi Arabia cancelled - Iran conflict) - CURRENT SEASON)
 // ─────────────────────────────────────────────────────────────
 
 export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
@@ -91,23 +91,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "3/6 (金) 19:30"
+        "dayTime": "3/7 (金) 10:30"
       },
       {
         "session": "FP2",
-        "dayTime": "3/6 (金) 23:00"
+        "dayTime": "3/7 (金) 14:00"
       },
       {
         "session": "FP3",
-        "dayTime": "3/7 (土) 19:30"
+        "dayTime": "3/8 (土) 10:30"
       },
       {
         "session": "予選",
-        "dayTime": "3/7 (土) 23:00"
+        "dayTime": "3/8 (土) 14:00"
       },
       {
         "session": "決勝",
-        "dayTime": "3/8 (日) 22:00 スタート"
+        "dayTime": "3/8 (日) 13:00 スタート"
       }
     ]
   },
@@ -127,23 +127,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "3/13 (金) 21:30"
+        "dayTime": "3/13 (金) 12:30"
       },
       {
         "session": "スプリント予選",
-        "dayTime": "3/14 (土) 01:30"
+        "dayTime": "3/13 (金) 16:30"
       },
       {
         "session": "スプリント決勝",
-        "dayTime": "3/14 (土) 21:00"
+        "dayTime": "3/14 (土) 12:00"
       },
       {
         "session": "本選予選",
-        "dayTime": "3/15 (日) 01:00"
+        "dayTime": "3/14 (土) 16:00"
       },
       {
         "session": "決勝レース",
-        "dayTime": "3/16 (月) 01:00 スタート"
+        "dayTime": "3/15 (日) 16:00 スタート"
       }
     ]
   },
@@ -163,23 +163,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "3/27 (金) 20:30"
+        "dayTime": "3/27 (金) 11:30"
       },
       {
         "session": "FP2",
-        "dayTime": "3/28 (土) 00:00"
+        "dayTime": "3/27 (金) 15:00"
       },
       {
         "session": "FP3",
-        "dayTime": "3/28 (土) 20:30"
+        "dayTime": "3/28 (土) 11:30"
       },
       {
         "session": "予選",
-        "dayTime": "3/29 (日) 00:00"
+        "dayTime": "3/28 (土) 15:00"
       },
       {
         "session": "決勝",
-        "dayTime": "3/29 (日) 23:00 スタート"
+        "dayTime": "3/29 (日) 14:00 スタート"
       }
     ]
   },
@@ -199,23 +199,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "5/2 (土) 10:00"
+        "dayTime": "5/2 (金) 02:00"
       },
       {
         "session": "スプリント予選",
-        "dayTime": "5/2 (土) 14:30"
+        "dayTime": "5/2 (金) 06:30"
       },
       {
         "session": "スプリント決勝",
-        "dayTime": "5/3 (日) 10:00"
+        "dayTime": "5/3 (土) 02:00"
       },
       {
         "session": "本選予選",
-        "dayTime": "5/3 (日) 14:00"
+        "dayTime": "5/3 (土) 06:00"
       },
       {
         "session": "決勝レース",
-        "dayTime": "5/4 (月) 14:00 スタート"
+        "dayTime": "5/4 (月) 03:00 スタート"
       }
     ]
   },
@@ -235,23 +235,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "5/23 (土) 10:30"
+        "dayTime": "5/23 (土) 02:00"
       },
       {
         "session": "スプリント予選",
-        "dayTime": "5/23 (土) 14:30"
+        "dayTime": "5/23 (土) 06:30"
       },
       {
         "session": "スプリント決勝",
-        "dayTime": "5/24 (日) 10:00"
+        "dayTime": "5/24 (日) 02:00"
       },
       {
         "session": "本選予選",
-        "dayTime": "5/24 (日) 14:00"
+        "dayTime": "5/24 (日) 06:00"
       },
       {
         "session": "決勝レース",
-        "dayTime": "5/25 (月) 14:00 スタート"
+        "dayTime": "5/25 (月) 03:00 スタート"
       }
     ]
   },
@@ -271,23 +271,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "6/6 (土) 05:30"
+        "dayTime": "6/5 (金) 20:30"
       },
       {
         "session": "FP2",
-        "dayTime": "6/6 (土) 09:00"
+        "dayTime": "6/6 (土) 00:00"
       },
       {
         "session": "FP3",
-        "dayTime": "6/7 (日) 04:30"
+        "dayTime": "6/6 (土) 19:30"
       },
       {
         "session": "予選",
-        "dayTime": "6/7 (日) 08:00"
+        "dayTime": "6/6 (土) 23:00"
       },
       {
         "session": "決勝",
-        "dayTime": "6/8 (月) 07:00 スタート"
+        "dayTime": "6/7 (日) 22:00 スタート"
       }
     ]
   },
@@ -307,23 +307,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "6/13 (土) 05:30"
+        "dayTime": "6/12 (金) 20:30"
       },
       {
         "session": "FP2",
-        "dayTime": "6/13 (土) 09:00"
+        "dayTime": "6/13 (土) 00:00"
       },
       {
         "session": "FP3",
-        "dayTime": "6/14 (日) 04:30"
+        "dayTime": "6/13 (土) 19:30"
       },
       {
         "session": "予選",
-        "dayTime": "6/14 (日) 08:00"
+        "dayTime": "6/13 (土) 23:00"
       },
       {
         "session": "決勝",
-        "dayTime": "6/15 (月) 07:00 スタート"
+        "dayTime": "6/14 (日) 22:00 スタート"
       }
     ]
   },
@@ -343,23 +343,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "6/27 (土) 05:30"
+        "dayTime": "6/26 (金) 20:30"
       },
       {
         "session": "FP2",
-        "dayTime": "6/27 (土) 09:00"
+        "dayTime": "6/27 (土) 00:00"
       },
       {
         "session": "FP3",
-        "dayTime": "6/28 (日) 04:30"
+        "dayTime": "6/27 (土) 19:30"
       },
       {
         "session": "予選",
-        "dayTime": "6/28 (日) 08:00"
+        "dayTime": "6/27 (土) 23:00"
       },
       {
         "session": "決勝",
-        "dayTime": "6/29 (月) 07:00 スタート"
+        "dayTime": "6/28 (日) 22:00 スタート"
       }
     ]
   },
@@ -379,23 +379,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "7/4 (土) 05:30"
+        "dayTime": "7/3 (金) 21:30"
       },
       {
         "session": "スプリント予選",
-        "dayTime": "7/4 (土) 09:30"
+        "dayTime": "7/4 (土) 01:30"
       },
       {
         "session": "スプリント決勝",
-        "dayTime": "7/5 (日) 05:00"
+        "dayTime": "7/4 (土) 21:00"
       },
       {
         "session": "本選予選",
-        "dayTime": "7/5 (日) 09:00"
+        "dayTime": "7/5 (日) 01:00"
       },
       {
         "session": "決勝レース",
-        "dayTime": "7/6 (月) 08:00 スタート"
+        "dayTime": "7/5 (日) 23:00 スタート"
       }
     ]
   },
@@ -415,23 +415,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "7/18 (土) 05:30"
+        "dayTime": "7/17 (金) 20:30"
       },
       {
         "session": "FP2",
-        "dayTime": "7/18 (土) 09:00"
+        "dayTime": "7/18 (土) 00:00"
       },
       {
         "session": "FP3",
-        "dayTime": "7/19 (日) 04:30"
+        "dayTime": "7/18 (土) 19:30"
       },
       {
         "session": "予選",
-        "dayTime": "7/19 (日) 08:00"
+        "dayTime": "7/18 (土) 23:00"
       },
       {
         "session": "決勝",
-        "dayTime": "7/20 (月) 07:00 スタート"
+        "dayTime": "7/19 (日) 22:00 スタート"
       }
     ]
   },
@@ -451,23 +451,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "7/25 (土) 05:30"
+        "dayTime": "7/24 (金) 20:30"
       },
       {
         "session": "FP2",
-        "dayTime": "7/25 (土) 09:00"
+        "dayTime": "7/25 (土) 00:00"
       },
       {
         "session": "FP3",
-        "dayTime": "7/26 (日) 04:30"
+        "dayTime": "7/25 (土) 19:30"
       },
       {
         "session": "予選",
-        "dayTime": "7/26 (日) 08:00"
+        "dayTime": "7/25 (土) 23:00"
       },
       {
         "session": "決勝",
-        "dayTime": "7/27 (月) 07:00 スタート"
+        "dayTime": "7/26 (日) 22:00 スタート"
       }
     ]
   },
@@ -487,23 +487,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "8/22 (土) 04:30"
+        "dayTime": "8/21 (金) 20:30"
       },
       {
         "session": "スプリント予選",
-        "dayTime": "8/22 (土) 08:30"
+        "dayTime": "8/22 (土) 00:30"
       },
       {
         "session": "スプリント決勝",
-        "dayTime": "8/23 (日) 04:00"
+        "dayTime": "8/22 (土) 20:00"
       },
       {
         "session": "本選予選",
-        "dayTime": "8/23 (日) 08:00"
+        "dayTime": "8/23 (日) 00:00"
       },
       {
         "session": "決勝レース",
-        "dayTime": "8/24 (月) 07:00 スタート"
+        "dayTime": "8/23 (日) 22:00 スタート"
       }
     ]
   },
@@ -523,23 +523,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "9/5 (土) 04:30"
+        "dayTime": "9/4 (金) 20:30"
       },
       {
         "session": "FP2",
-        "dayTime": "9/5 (土) 08:00"
+        "dayTime": "9/5 (土) 00:00"
       },
       {
         "session": "FP3",
-        "dayTime": "9/6 (日) 04:30"
+        "dayTime": "9/5 (土) 19:30"
       },
       {
         "session": "予選",
-        "dayTime": "9/6 (日) 08:00"
+        "dayTime": "9/5 (土) 23:00"
       },
       {
         "session": "決勝",
-        "dayTime": "9/7 (月) 07:00 スタート"
+        "dayTime": "9/6 (日) 22:00 スタート"
       }
     ]
   },
@@ -559,23 +559,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "9/12 (土) 05:30"
+        "dayTime": "9/11 (金) 20:30"
       },
       {
         "session": "FP2",
-        "dayTime": "9/12 (土) 09:00"
+        "dayTime": "9/12 (土) 00:00"
       },
       {
         "session": "FP3",
-        "dayTime": "9/13 (日) 04:30"
+        "dayTime": "9/12 (土) 19:30"
       },
       {
         "session": "予選",
-        "dayTime": "9/13 (日) 08:00"
+        "dayTime": "9/12 (土) 23:00"
       },
       {
         "session": "決勝",
-        "dayTime": "9/14 (月) 07:00 スタート"
+        "dayTime": "9/13 (日) 22:00 スタート"
       }
     ]
   },
@@ -586,7 +586,7 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "flag": "🇦🇿",
     "circuitName": "バクー市街地コース",
     "city": "バクー",
-    "dates": "2026年 9月24日 - 9月26日",
+    "dates": "2026年 9月25日 - 9月27日",
     "targetDateUtc": "2026-09-26T11:00:00Z",
     "isSprint": false,
     "lengthKm": 6.003,
@@ -595,23 +595,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "9/25 (金) 02:30"
+        "dayTime": "9/25 (金) 18:30"
       },
       {
         "session": "FP2",
-        "dayTime": "9/25 (金) 06:00"
+        "dayTime": "9/25 (金) 22:00"
       },
       {
         "session": "FP3",
-        "dayTime": "9/26 (土) 02:30"
+        "dayTime": "9/26 (土) 18:30"
       },
       {
         "session": "予選",
-        "dayTime": "9/26 (土) 06:00"
+        "dayTime": "9/26 (土) 22:00"
       },
       {
         "session": "決勝",
-        "dayTime": "9/27 (日) 05:00 スタート"
+        "dayTime": "9/27 (日) 20:00 スタート"
       }
     ]
   },
@@ -631,23 +631,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "10/2 (金) 22:30"
+        "dayTime": "10/2 (金) 14:30"
       },
       {
         "session": "FP2",
-        "dayTime": "10/3 (土) 02:00"
+        "dayTime": "10/2 (金) 18:00"
       },
       {
         "session": "FP3",
-        "dayTime": "10/3 (土) 22:30"
+        "dayTime": "10/3 (土) 14:30"
       },
       {
         "session": "予選",
-        "dayTime": "10/4 (日) 02:00"
+        "dayTime": "10/3 (土) 18:00"
       },
       {
         "session": "決勝",
-        "dayTime": "10/5 (月) 01:00 スタート"
+        "dayTime": "10/4 (日) 16:00 スタート"
       }
     ]
   },
@@ -667,23 +667,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "10/10 (土) 02:30"
+        "dayTime": "10/9 (金) 19:30"
       },
       {
         "session": "スプリント予選",
-        "dayTime": "10/10 (土) 06:30"
+        "dayTime": "10/9 (金) 23:30"
       },
       {
         "session": "スプリント決勝",
-        "dayTime": "10/11 (日) 03:00"
+        "dayTime": "10/10 (土) 19:00"
       },
       {
         "session": "本選予選",
-        "dayTime": "10/11 (日) 07:00"
+        "dayTime": "10/10 (土) 23:00"
       },
       {
         "session": "決勝レース",
-        "dayTime": "10/12 (月) 06:00 スタート"
+        "dayTime": "10/11 (日) 21:00 スタート"
       }
     ]
   },
@@ -703,23 +703,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "10/24 (土) 11:30"
+        "dayTime": "10/24 (土) 02:30"
       },
       {
         "session": "FP2",
-        "dayTime": "10/24 (土) 15:00"
+        "dayTime": "10/24 (土) 06:00"
       },
       {
         "session": "FP3",
-        "dayTime": "10/25 (日) 11:30"
+        "dayTime": "10/25 (日) 02:30"
       },
       {
         "session": "予選",
-        "dayTime": "10/25 (日) 15:00"
+        "dayTime": "10/25 (日) 06:00"
       },
       {
         "session": "決勝",
-        "dayTime": "10/26 (月) 14:00 スタート"
+        "dayTime": "10/26 (月) 04:00 スタート"
       }
     ]
   },
@@ -739,23 +739,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "10/31 (土) 12:30"
+        "dayTime": "10/31 (土) 03:30"
       },
       {
         "session": "FP2",
-        "dayTime": "10/31 (土) 16:00"
+        "dayTime": "10/31 (土) 07:00"
       },
       {
         "session": "FP3",
-        "dayTime": "11/1 (日) 11:30"
+        "dayTime": "11/1 (日) 03:30"
       },
       {
         "session": "予選",
-        "dayTime": "11/1 (日) 15:00"
+        "dayTime": "11/1 (日) 07:00"
       },
       {
         "session": "決勝",
-        "dayTime": "11/2 (月) 14:00 スタート"
+        "dayTime": "11/2 (月) 05:00 スタート"
       }
     ]
   },
@@ -775,23 +775,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "11/7 (土) 09:30"
+        "dayTime": "11/7 (土) 00:30"
       },
       {
         "session": "FP2",
-        "dayTime": "11/7 (土) 13:00"
+        "dayTime": "11/7 (土) 04:00"
       },
       {
         "session": "FP3",
-        "dayTime": "11/8 (日) 08:30"
+        "dayTime": "11/8 (日) 00:30"
       },
       {
         "session": "予選",
-        "dayTime": "11/8 (日) 12:00"
+        "dayTime": "11/8 (日) 04:00"
       },
       {
         "session": "決勝",
-        "dayTime": "11/9 (月) 11:00 スタート"
+        "dayTime": "11/9 (月) 02:00 スタート"
       }
     ]
   },
@@ -811,23 +811,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "11/20 (金) 18:30"
+        "dayTime": "11/20 (金) 13:30"
       },
       {
         "session": "FP2",
-        "dayTime": "11/20 (金) 22:00"
+        "dayTime": "11/20 (金) 17:00"
       },
       {
         "session": "FP3",
-        "dayTime": "11/21 (土) 18:30"
+        "dayTime": "11/21 (土) 13:30"
       },
       {
         "session": "予選",
-        "dayTime": "11/21 (土) 22:00"
+        "dayTime": "11/21 (土) 17:00"
       },
       {
         "session": "決勝",
-        "dayTime": "11/22 (日) 22:00 スタート"
+        "dayTime": "11/22 (日) 15:00 スタート"
       }
     ]
   },
@@ -847,23 +847,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "11/28 (土) 07:30"
+        "dayTime": "11/27 (金) 21:30"
       },
       {
         "session": "FP2",
-        "dayTime": "11/28 (土) 11:00"
+        "dayTime": "11/28 (土) 01:00"
       },
       {
         "session": "FP3",
-        "dayTime": "11/29 (日) 08:30"
+        "dayTime": "11/28 (土) 21:30"
       },
       {
         "session": "予選",
-        "dayTime": "11/29 (日) 12:00"
+        "dayTime": "11/29 (日) 01:00"
       },
       {
         "session": "決勝",
-        "dayTime": "11/30 (月) 10:00 スタート"
+        "dayTime": "11/29 (日) 23:00 スタート"
       }
     ]
   },
@@ -883,23 +883,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "12/5 (土) 03:30"
+        "dayTime": "12/4 (金) 20:30"
       },
       {
         "session": "FP2",
-        "dayTime": "12/5 (土) 07:00"
+        "dayTime": "12/5 (土) 00:00"
       },
       {
         "session": "FP3",
-        "dayTime": "12/6 (日) 04:30"
+        "dayTime": "12/5 (土) 19:30"
       },
       {
         "session": "予選",
-        "dayTime": "12/6 (日) 08:00"
+        "dayTime": "12/5 (土) 23:00"
       },
       {
         "session": "決勝",
-        "dayTime": "12/7 (月) 07:00 スタート"
+        "dayTime": "12/6 (日) 22:00 スタート"
       }
     ]
   }

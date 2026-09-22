@@ -13,7 +13,7 @@
  *  - Grid Showcase (2026 New PU Regs & Audi/Honda Works vs 2025 Grid)
  */
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   type SeasonYear,
   getActiveSeasonYear,
@@ -24,9 +24,6 @@ import {
   getNextUpcomingRound,
   isSeasonConcluded,
   type RaceWeekendSchedule,
-  type DriverStanding,
-  type ConstructorStanding,
-  type GridTeam,
 } from '@/data/f1SeasonData';
 import { getWeatherByRound, getCircuitWeather } from '@/data/f1WeatherData';
 import { getGrandPrixReportByRound, getGrandPrixReportByCircuitId } from '@/data/f1GrandPrixReportsData';

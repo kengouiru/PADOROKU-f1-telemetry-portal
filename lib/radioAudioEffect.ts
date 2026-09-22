@@ -46,10 +46,12 @@ export function playRadioKeyUpTone(): Promise<void> {
 }
 
 /**
- * 🏎️ Authentic F1 Team Radio Incoming Chirp (Driver to Pit Wall)
- * Synthesizes the iconic F1 TV broadcast dual-frequency beep:
- * - 30ms analog RF squelch burst (bandpass filtered white noise)
- * - 1750Hz + 2150Hz dual-tone chime (75ms) with natural harmonic decay
+ * 🏎️ Official F1 Team Radio Key-Up Chime (FOM Broadcast "Pip-Pip" Beep)
+ * Accurately synthesizes the world-famous F1 TV broadcast team radio graphic intro sound:
+ * - Beep 1: Crisp high-frequency sine pulse (2150 Hz, 45ms)
+ * - Inter-pulse gap (25ms)
+ * - Beep 2: Ascending secondary pulse (2550 Hz, 52ms)
+ * - Punchy broadcast audio gain (0.32) with clean attack/release envelope
  */
 export function playF1IncomingRadioChirp(): Promise<void> {
   return new Promise((resolve) => {
@@ -60,62 +62,74 @@ export function playF1IncomingRadioChirp(): Promise<void> {
 
     const now = ctx.currentTime;
 
-    // 1. Initial RF squelch burst (30ms)
+    // Subtle RF mic unkey squelch burst (15ms)
     try {
-      const burstSize = Math.floor(ctx.sampleRate * 0.03);
+      const burstSize = Math.floor(ctx.sampleRate * 0.015);
       const burstBuffer = ctx.createBuffer(1, burstSize, ctx.sampleRate);
       const burstData = burstBuffer.getChannelData(0);
       for (let i = 0; i < burstSize; i++) {
-        burstData[i] = (Math.random() * 2 - 1) * 0.08;
+        burstData[i] = (Math.random() * 2 - 1) * 0.04;
       }
       const burstSource = ctx.createBufferSource();
       burstSource.buffer = burstBuffer;
 
       const burstFilter = ctx.createBiquadFilter();
       burstFilter.type = 'bandpass';
-      burstFilter.frequency.setValueAtTime(1400, now);
-      burstFilter.Q.setValueAtTime(2.0, now);
+      burstFilter.frequency.setValueAtTime(2400, now);
+      burstFilter.Q.setValueAtTime(3.0, now);
 
       const burstGain = ctx.createGain();
-      burstGain.gain.setValueAtTime(0.06, now);
-      burstGain.gain.exponentialRampToValueAtTime(0.001, now + 0.03);
+      burstGain.gain.setValueAtTime(0.04, now);
+      burstGain.gain.exponentialRampToValueAtTime(0.001, now + 0.015);
 
       burstSource.connect(burstFilter);
       burstFilter.connect(burstGain);
       burstGain.connect(ctx.destination);
 
       burstSource.start(now);
-      burstSource.stop(now + 0.03);
+      burstSource.stop(now + 0.015);
     } catch {
       // Audio buffer creation fallback
     }
 
-    // 2. Dual-tone broadcast chime (1750Hz + 2150Hz)
+    // ── First Pulse: 2150 Hz for 45ms ("Pip") ──
     const osc1 = ctx.createOscillator();
-    const osc2 = ctx.createOscillator();
-    const gain = ctx.createGain();
-
+    const gain1 = ctx.createGain();
     osc1.type = 'sine';
-    osc1.frequency.setValueAtTime(1750, now);
-    osc1.frequency.setValueAtTime(2150, now + 0.038);
+    osc1.frequency.setValueAtTime(2150, now);
 
-    osc2.type = 'sine';
-    osc2.frequency.setValueAtTime(875, now);
-    osc2.frequency.setValueAtTime(1075, now + 0.038);
+    gain1.gain.setValueAtTime(0.001, now);
+    gain1.gain.linearRampToValueAtTime(0.32, now + 0.003);
+    gain1.gain.setValueAtTime(0.32, now + 0.040);
+    gain1.gain.linearRampToValueAtTime(0.001, now + 0.045);
 
-    gain.gain.setValueAtTime(0.14, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.085);
-
-    osc1.connect(gain);
-    osc2.connect(gain);
-    gain.connect(ctx.destination);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
 
     osc1.start(now);
-    osc2.start(now);
-    osc1.stop(now + 0.088);
-    osc2.stop(now + 0.088);
+    osc1.stop(now + 0.046);
 
-    setTimeout(resolve, 90);
+    // ── Second Pulse: 2550 Hz for 52ms ("Pip") after 24ms gap ──
+    const pulse2Start = now + 0.068;
+    const pulse2End = pulse2Start + 0.052;
+
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(2550, pulse2Start);
+
+    gain2.gain.setValueAtTime(0.001, pulse2Start);
+    gain2.gain.linearRampToValueAtTime(0.34, pulse2Start + 0.003);
+    gain2.gain.setValueAtTime(0.34, pulse2End - 0.005);
+    gain2.gain.linearRampToValueAtTime(0.001, pulse2End);
+
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+
+    osc2.start(pulse2Start);
+    osc2.stop(pulse2End + 0.002);
+
+    setTimeout(resolve, 140);
   });
 }
 

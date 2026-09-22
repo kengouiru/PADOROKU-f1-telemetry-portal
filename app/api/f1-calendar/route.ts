@@ -8,6 +8,7 @@ import { fetchOfficialCalendar } from '@/lib/f1CalendarService';
  * Cache: 6 hours with 24h stale-while-revalidate.
  */
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 21600; // 6 hours
 
 export async function GET(req: NextRequest) {

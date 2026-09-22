@@ -425,10 +425,10 @@ export default function VirtualGrandPrixSimulator({
   }, [isPlaying, playSpeed, maxLaps]);
 
   // Handler for editing driver strategy
-  const handleUpdateDriver = (
+  const handleUpdateDriver = <K extends keyof DriverStrategyConfig>(
     code: string,
-    field: keyof DriverStrategyConfig,
-    value: any
+    field: K,
+    value: DriverStrategyConfig[K]
   ) => {
     setDrivers((prev) =>
       prev.map((d) => (d.code === code ? { ...d, [field]: value } : d))

@@ -147,7 +147,7 @@ export default function AITelemetryInspectorModal({
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 md:p-5 bg-black/85 backdrop-blur-md animate-fade-in">
-      <div className="absolute inset-0" onClick={onClose} />
+      <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
       <div className="relative z-10 w-full max-w-7xl max-h-[92vh] bg-slate-950/95 border border-blue-500/40 rounded-3xl shadow-2xl flex flex-col overflow-hidden text-white">
         
         {/* ── Fixed Modal Header ── */}

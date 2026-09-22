@@ -12,6 +12,7 @@ import React, { useState, useEffect } from 'react';
 import F1GlossaryHub from './F1GlossaryHub';
 import F1RegulationsHub from './F1RegulationsHub';
 import { type InAppLink, type GlossaryTerm } from '@/data/f1GlossaryData';
+import type { TelemetryTarget } from '@/data/f1KnowledgeData';
 
 export type RulesGlossaryMode = 'glossary' | 'regulations';
 
@@ -20,7 +21,7 @@ export interface RulesGlossaryHubProps {
   initialGlossaryTermId?: string | null;
   onNavigateToApp?: (action: InAppLink['action']) => void;
   onNavigateToTab?: (tab: string) => void;
-  onNavigateToTelemetry?: (target?: any) => void;
+  onNavigateToTelemetry?: (target?: TelemetryTarget) => void;
   onSelectTerm?: (term: GlossaryTerm) => void;
 }
 

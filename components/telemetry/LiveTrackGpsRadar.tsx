@@ -322,6 +322,9 @@ export default function LiveTrackGpsRadar({
     // Sort active cars by position (P1 to P22)
     const sorted = [...activeCars].sort((a, b) => a.position - b.position);
 
+    const effectiveLapTime = isSC ? Math.max(60, baseLapTime * 1.42) : Math.max(60, baseLapTime);
+    let cumulativeBehind = 0;
+
     const activeList = sorted.map((car, idx) => {
       const isPlayer = car.code === playerCarCode;
       const isTeammate = car.code === teammateCarCode;
@@ -329,10 +332,8 @@ export default function LiveTrackGpsRadar({
       let carPct = 0;
       if (idx === 0 || car.position === 1) {
         carPct = leaderPct;
+        cumulativeBehind = 0;
       } else {
-        // Physical percentage of track behind the leader based on true gap in seconds
-        // (gap in seconds / lap time in seconds) * 100% gives the exact physical track displacement
-        const effectiveLapTime = isSC ? Math.max(60, baseLapTime * 1.42) : Math.max(60, baseLapTime);
         const pitLossSec = car.isPitting ? (isSC ? 11.5 : 22.0) : 0;
 
         if (car.isPitting) {
@@ -340,16 +341,16 @@ export default function LiveTrackGpsRadar({
           // traverse pit lane with stationary pit box stop (96% - 3.5%), and exit (8% - 10%)
           const prePitGap = Math.max(0, car.gapToLeader - pitLossSec);
           const inLapBehind = (prePitGap / effectiveLapTime) * 100;
-          const minSeparation = idx * 0.35;
+          const minSeparation = idx * 0.4;
           const actualBehind = Math.max(minSeparation, inLapBehind);
           carPct = ((leaderPct - actualBehind) % 100 + 100) % 100;
         } else {
           const naturalBehind = (car.gapToLeader / effectiveLapTime) * 100;
-          // Keep a micro separation (0.4% ~ 0.35s) only to prevent two cars with identical lap times
-          // from perfectly occluding each other's center, while accurately showing true nose-to-tail battles!
-          const minRequiredBehind = idx * 0.4;
-          const actualBehind = Math.max(minRequiredBehind, naturalBehind);
-          carPct = ((leaderPct - actualBehind) % 100 + 100) % 100;
+          // Guaranteed progressive spacing: minimum 1.7% between consecutive cars (2.2% in SC)
+          // Guarantees all 22 cars and labels never overlap or clump together into a single dot!
+          const minStep = isSC ? 2.2 : 1.7;
+          cumulativeBehind = Math.max(cumulativeBehind + minStep, naturalBehind);
+          carPct = ((leaderPct - cumulativeBehind) % 100 + 100) % 100;
         }
       }
 
@@ -761,6 +762,9 @@ export default function LiveTrackGpsRadar({
               <filter id="glow-car-focus" x="-50%" y="-50%" width="200%" height="200%">
                 <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#38bdf8" />
               </filter>
+              <filter id="glow-sc" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="0" stdDeviation="3.5" floodColor="#f59e0b" />
+              </filter>
               <linearGradient id="liveTrackGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.8" />
                 <stop offset="50%" stopColor="#06b6d4" stopOpacity="0.8" />
@@ -933,54 +937,10 @@ export default function LiveTrackGpsRadar({
                 );
               })}
 
-              {/* Lead Safety Car (leads pack ahead of P1 during SC) */}
-              {isSC && (() => {
-                const scPct = (leaderPct + 2.5) % 100;
-                const scCoord = getExactTrackPoint(scPct);
-                return (
-                  <g
-                    transform={`translate(${scCoord.x}, ${scCoord.y})`}
-                    className="cursor-pointer select-none"
-                  >
-                    <circle
-                      cx={0}
-                      cy={0}
-                      r={5.5}
-                      fill="#ca8a04"
-                      stroke="#ffffff"
-                      strokeWidth="1.4"
-                      className="animate-pulse"
-                    />
-                    <g transform={isRotated ? 'rotate(90)' : undefined}>
-                      <rect
-                        x="-8"
-                        y="-11"
-                        width="16"
-                        height="8"
-                        rx="2"
-                        fill="#78350f"
-                        stroke="#fef08a"
-                        strokeWidth="0.8"
-                      />
-                      <text
-                        x="0"
-                        y="-5.5"
-                        textAnchor="middle"
-                        fontSize="4.5"
-                        fontFamily="monospace"
-                        fontWeight="black"
-                        fill="#fef08a"
-                      >
-                        {isScEnding ? 'SC IN' : 'SC'}
-                      </text>
-                    </g>
-                    <title>{isScEnding ? 'SAFETY CAR IN THIS LAP' : 'OFFICIAL FIA SAFETY CAR'}</title>
-                  </g>
-                );
-              })()}
+
 
               {/* ── Driver Moving Dots (ALL 22 CARS) - Refined Compact Proportions ── */}
-              {carTrackPositions.map(({ car, coord, isPlayer, isTeammate, isInPitLane, isInPitBox, isRetired }) => {
+              {carTrackPositions.map(({ car, coord, isPlayer, isTeammate, isInPitLane, isInPitBox, isRetired }, idx) => {
                 const isInspected = activeInspectCar?.code === car.code;
                 const dotRadius = isPlayer ? 4.8 : isTeammate ? 4.2 : 3.6;
 
@@ -1212,7 +1172,7 @@ export default function LiveTrackGpsRadar({
                           </text>
                         </g>
                       ) : (
-                        <g transform="translate(0, -7)">
+                        <g transform={`translate(0, ${idx % 2 === 1 ? 7.5 : -7})`}>
                           <rect
                             x="-8"
                             y="-3.5"
@@ -1276,6 +1236,67 @@ export default function LiveTrackGpsRadar({
                   </g>
                 );
               })}
+
+              {/* ── Lead Safety Car (FOREGROUND LAYER: ALWAYS RENDERED ON TOP OF ALL 22 CARS) ── */}
+              {isSC && (() => {
+                const scPct = (leaderPct + 4.2) % 100;
+                const scCoord = getExactTrackPoint(scPct);
+                return (
+                  <g
+                    transform={`translate(${scCoord.x}, ${scCoord.y})`}
+                    className="cursor-pointer select-none"
+                    style={{ pointerEvents: 'none' }}
+                    filter="url(#glow-sc)"
+                  >
+                    {/* Glowing Beacon / Strobe Halo */}
+                    <circle
+                      cx={0}
+                      cy={0}
+                      r={12.0}
+                      fill="none"
+                      stroke="#facc15"
+                      strokeWidth="2.0"
+                      opacity="0.85"
+                      className="animate-ping"
+                    />
+                    {/* Safety Car Solid Dot */}
+                    <circle
+                      cx={0}
+                      cy={0}
+                      r={7.0}
+                      fill="#eab308"
+                      stroke="#ffffff"
+                      strokeWidth="2.2"
+                      className="animate-pulse"
+                    />
+                    {/* SC Text Badge */}
+                    <g transform={isRotated ? 'rotate(90)' : undefined}>
+                      <rect
+                        x="-12"
+                        y="-15"
+                        width="24"
+                        height="10"
+                        rx="2.5"
+                        fill="#0f172a"
+                        stroke="#facc15"
+                        strokeWidth="1.4"
+                      />
+                      <text
+                        x="0"
+                        y="-8"
+                        textAnchor="middle"
+                        fontSize="5.8"
+                        fontFamily="monospace"
+                        fontWeight="black"
+                        fill="#fef08a"
+                      >
+                        {isScEnding ? 'SC IN' : '🚨 SC'}
+                      </text>
+                    </g>
+                    <title>{isScEnding ? 'SAFETY CAR IN THIS LAP' : 'OFFICIAL FIA SAFETY CAR'}</title>
+                  </g>
+                );
+              })()}
             </g>
           </svg>
 

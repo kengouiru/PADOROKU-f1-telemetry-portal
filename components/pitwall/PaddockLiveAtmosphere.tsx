@@ -63,7 +63,9 @@ export const PaddockLiveAtmosphere: React.FC<PaddockLiveAtmosphereProps> = ({
   // Audio Context getter
   const getAudioContext = useCallback(() => {
     if (!audioContextRef.current) {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (AudioCtx) {
         audioContextRef.current = new AudioCtx();
       }

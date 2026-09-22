@@ -312,17 +312,17 @@ export default function FeatureDirectoryModal({
         <div className="px-4 sm:px-6 py-3 border-b border-white/5 bg-slate-900/60 flex flex-col sm:flex-row items-center justify-between gap-3">
           {/* Category Tabs */}
           <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 no-scrollbar">
-            {[
+            {([
               { id: 'all', label: 'すべて表示', count: ALL_FEATURES.length },
               { id: 'new', label: '🔥 注目新機能', count: ALL_FEATURES.filter((f) => f.category === 'new').length },
               { id: 'telemetry', label: '🏎️ テレメトリー', count: ALL_FEATURES.filter((f) => f.category === 'telemetry').length },
               { id: 'knowledge', label: '📚 F1大百科', count: ALL_FEATURES.filter((f) => f.category === 'knowledge').length },
               { id: 'ai', label: '🤖 AI機能', count: ALL_FEATURES.filter((f) => f.category === 'ai').length },
-            ].map((cat) => (
+            ] as const).map((cat) => (
               <button
                 key={cat.id}
                 type="button"
-                onClick={() => setActiveCategory(cat.id as any)}
+                onClick={() => setActiveCategory(cat.id)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
                   activeCategory === cat.id
                     ? 'bg-red-600 text-white shadow-md shadow-red-600/30 ring-1 ring-red-400/50'

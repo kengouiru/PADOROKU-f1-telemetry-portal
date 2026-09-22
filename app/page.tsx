@@ -1417,7 +1417,7 @@ export default function DashboardPage() {
             onOpenAiStrategist={() => setAiDrawerOpen(true)}
             onNavigateToLibrary={(subTab, termId) => {
               setAppMode('library');
-              setLibrarySubTab(subTab as any);
+              setLibrarySubTab(subTab as SubTab);
               setActiveHub('knowledge');
               if (termId) setTargetGlossaryTermId(termId);
               desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });

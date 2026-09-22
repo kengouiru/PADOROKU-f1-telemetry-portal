@@ -71,6 +71,31 @@ interface ActiveRadioContext {
   radios: TeamRadio[];
 }
 
+interface ChartTooltipEntry {
+  dataKey?: string | number | ((obj: unknown) => unknown);
+  name?: string | number;
+  value?: number | string | readonly (number | string)[] | null;
+  color?: string;
+  payload?: Record<string, unknown>;
+}
+
+interface DotCustomProps {
+  key?: React.Key | null;
+  cx?: number;
+  cy?: number;
+  payload?: Record<string, unknown>;
+}
+
+interface LapDriverMeta {
+  compound: string;
+  tyreAge?: number;
+  s1?: number | null;
+  s2?: number | null;
+  s3?: number | null;
+  hasRadio?: boolean;
+  isPit?: boolean;
+}
+
 export default function TelemetryChart({
   selectedDrivers,
   lapsCache,
@@ -393,9 +418,9 @@ export default function TelemetryChart({
                           <span className="text-[10px] text-slate-400">TELEMETRY</span>
                         </div>
                         <div className="space-y-2">
-                          {payload.map((entry: any) => {
-                            const code = entry.dataKey;
-                            const meta = entry.payload ? entry.payload[`${code}_meta`] : null;
+                          {payload.map((entry: ChartTooltipEntry) => {
+                            const code = String(entry.dataKey ?? '');
+                            const meta = entry.payload ? (entry.payload[`${code}_meta`] as LapDriverMeta | undefined) : null;
                             if (!meta || entry.value == null) return null;
                             const tyreCol = getTyreColor(meta.compound);
                             return (
@@ -405,7 +430,7 @@ export default function TelemetryChart({
                                     {code}
                                   </span>
                                   <span className="text-white font-bold">
-                                    {formatLapTime(entry.value)}
+                                    {formatLapTime(typeof entry.value === 'number' ? entry.value : Number(entry.value))}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
@@ -466,10 +491,11 @@ export default function TelemetryChart({
                     stroke={cfg.color}
                     strokeDasharray={cfg.dash}
                     strokeWidth={2.5}
-                    dot={(props: any) => {
-                      const meta = props.payload ? props.payload[`${cfg.code}_meta`] : null;
+                    dot={(props: DotCustomProps) => {
+                      const meta = props.payload ? (props.payload[`${cfg.code}_meta`] as LapDriverMeta | undefined) : null;
                       if (!meta) return <circle key={props.key} cx={props.cx} cy={props.cy} r={2} fill={cfg.color} />;
                       const tyreCol = getTyreColor(meta.compound);
+                      const lapNum = Number((props.payload as { lap?: number })?.lap ?? 0);
                       if (meta.hasRadio || meta.isPit) {
                         return (
                           <circle
@@ -481,7 +507,7 @@ export default function TelemetryChart({
                             stroke="#fff"
                             strokeWidth={1.5}
                             className="cursor-pointer"
-                            onClick={() => selectRadioContext(cfg.num, props.payload.lap)}
+                            onClick={() => selectRadioContext(cfg.num, lapNum)}
                           />
                         );
                       }
@@ -495,7 +521,7 @@ export default function TelemetryChart({
                           stroke={cfg.color}
                           strokeWidth={1}
                           className="cursor-pointer"
-                          onClick={() => selectRadioContext(cfg.num, props.payload.lap)}
+                          onClick={() => selectRadioContext(cfg.num, lapNum)}
                         />
                       );
                     }}
@@ -531,17 +557,17 @@ export default function TelemetryChart({
                           <span className="text-[10px] text-slate-400">GAP TO {refDriverCode}</span>
                         </div>
                         <div className="space-y-1.5">
-                          {payload.map((entry: any) => {
-                            const code = entry.dataKey;
-                            const meta = entry.payload ? entry.payload[`${code}_meta`] : null;
+                          {payload.map((entry: ChartTooltipEntry) => {
+                            const code = String(entry.dataKey ?? '');
                             if (entry.value == null) return null;
+                            const valNum = Number(entry.value);
                             return (
                               <div key={code} className="flex items-center justify-between gap-3">
                                 <span className="font-bold" style={{ color: entry.color }}>
                                   {code}
                                 </span>
                                 <span className="text-white font-bold">
-                                  {entry.value === 0 ? '基準 (0.0s)' : `+${entry.value.toFixed(2)}s`}
+                                  {valNum === 0 ? '基準 (0.0s)' : `+${valNum.toFixed(2)}s`}
                                 </span>
                               </div>
                             );
@@ -597,15 +623,16 @@ export default function TelemetryChart({
                           <span className="font-racing font-bold text-white">TYRE AGE: {label} LAPS</span>
                         </div>
                         <div className="space-y-1.5">
-                          {payload.map((entry: any) => {
+                          {payload.map((entry: ChartTooltipEntry) => {
                             if (entry.value == null) return null;
+                            const keyStr = String(entry.dataKey ?? '');
                             return (
-                              <div key={entry.dataKey} className="flex items-center justify-between gap-3">
+                              <div key={keyStr} className="flex items-center justify-between gap-3">
                                 <span className="font-bold text-[11px]" style={{ color: entry.color }}>
                                   {entry.name}
                                 </span>
                                 <span className="text-white font-bold">
-                                  {formatLapTime(entry.value)}
+                                  {formatLapTime(typeof entry.value === 'number' ? entry.value : Number(entry.value))}
                                 </span>
                               </div>
                             );

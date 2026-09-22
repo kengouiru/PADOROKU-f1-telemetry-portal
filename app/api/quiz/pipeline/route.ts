@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { QUIZ_QUESTIONS, type QuizQuestion } from '@/data/f1QuizData';
+import { QUIZ_QUESTIONS, type QuizQuestion, type QuizDifficulty, type QuestionFormat } from '@/data/f1QuizData';
 import { validateQuizQuestion, checkQuestionDeduplication, type ExpansionValidationResult, type DeduplicationResult } from '@/lib/dataExpansionPipeline';
 
 export const runtime = 'nodejs';
@@ -121,9 +121,9 @@ function generateFallbackQuestion(topic: string, difficulty: string, format: str
   const ts = Date.now();
   return {
     id: `pipe-gen-${ts}`,
-    difficulty: (difficulty as any) || 'expert',
+    difficulty: (difficulty as QuizDifficulty) || 'expert',
     category: 'rules',
-    format: (format as any) || 'rule_dilemma',
+    format: (format as QuestionFormat) || 'rule_dilemma',
     categoryLabel: '⚖️ 公式規則・審議',
     formatLabel: '⚖️ 規則・事件',
     question: 'セーフティカー（SC）先導中の周回遅れ車両の追い越し（アンラップ）に関するFIA競技規則において、レース再開手順（SC退出）が宣言される正しいタイミングはどれか？',

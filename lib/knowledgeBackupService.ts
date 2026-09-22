@@ -94,10 +94,10 @@ export function getBackupManifest(): BackupManifest | null {
  * - Current application knowledge data is written to latest.
  */
 export function createGenerationBackup(data: {
-  teams: any[];
-  circuits: any[];
-  quizQuestions: any[];
-  regulations: any[];
+  teams: unknown[];
+  circuits: unknown[];
+  quizQuestions: unknown[];
+  regulations: unknown[];
 }): BackupManifest {
   ensureBackupDir();
 
@@ -175,7 +175,7 @@ export function createGenerationBackup(data: {
  * - Save current articles to news_snapshot_latest.json
  * - Update backup_manifest.json
  */
-export function createNewsSnapshotBackup(articles: any[]): {
+export function createNewsSnapshotBackup(articles: unknown[]): {
   success: boolean;
   articlesCount: number;
   createdAt: string;
@@ -318,7 +318,7 @@ export function executeRollback(target: 'knowledge' | 'news' | 'all' = 'all'): {
   message: string;
   restoredTargets: string[];
   restoredVersions: Record<string, string>;
-  stats?: any;
+  stats?: Record<string, unknown>;
 } {
   ensureBackupDir();
   const manifestPath = path.join(BACKUP_DIR, 'backup_manifest.json');

@@ -574,7 +574,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   },
   {
     code: 'ANT',
-    name: 'Kimi Antonelli',
+    name: 'Andrea Kimi Antonelli',
     number: '12',
     team: 'Mercedes',
     color: '#16a34a',
@@ -705,7 +705,7 @@ export const GRID_DRIVERS: DriverSimConfig[] = [
   // Audi Revolut
   {
     code: 'HUL',
-    name: 'Nico Hulkenberg',
+    name: 'Nico Hülkenberg',
     number: '27',
     team: 'Audi Revolut',
     color: '#10b981',
@@ -859,6 +859,8 @@ export interface DriverRadioPrompt {
     moraleDelta: number;
   }[];
 }
+
+export type DriverRadioOption = DriverRadioPrompt['options'][number];
 
 export interface TeammateStatus {
   code: string;
