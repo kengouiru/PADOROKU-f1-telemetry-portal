@@ -1138,7 +1138,7 @@ export function runFullGrandPrixSimulation(params: {
   const {
     circuit,
     totalLaps,
-    drivers,
+    drivers: rawDrivers,
     weatherType,
     rainStartLap = 999,
     rainIntensityMm = 0,
@@ -1150,6 +1150,16 @@ export function runFullGrandPrixSimulation(params: {
     incidentRiskMultiplier = 1.0,
     raceLengthMode = 'gp_short_25',
   } = params;
+
+  // Deduplicate drivers by code to guarantee 100% uniqueness of every car on the grid!
+  const seenDriverCodes = new Set<string>();
+  const drivers: DriverSimConfig[] = [];
+  for (const d of rawDrivers) {
+    if (!seenDriverCodes.has(d.code)) {
+      seenDriverCodes.add(d.code);
+      drivers.push(d);
+    }
+  }
 
   // Base deterministic seed derived from scenario constants (guarantees zero random drift on tactical tweaks)
   const baseSeedStr = `${circuit.id}-${totalLaps}-${weatherType}-${rainStartLap}-${scTriggerLap ?? 'nosc'}-${incidentFrequency}-${aiDifficulty}-${raceLengthMode}`;
@@ -1164,6 +1174,7 @@ export function runFullGrandPrixSimulation(params: {
       cumulativeTime: number;
       currentTyre: TyreCompound;
       tyreAge: number;
+      tyreWearPercent: number;
       pitCount: number;
       puMode: EnginePUMode;
       ersBoostUsed: boolean;
@@ -1185,6 +1196,7 @@ export function runFullGrandPrixSimulation(params: {
       trackLimitsCount: number;
       pendingPenaltySeconds: number;
       servedPenaltySeconds: number;
+      inDirtyAir?: boolean;
     }
   > = {};
 
@@ -1193,6 +1205,7 @@ export function runFullGrandPrixSimulation(params: {
       cumulativeTime: 0,
       currentTyre: d.startTyre,
       tyreAge: d.initialTyreAge ?? 0,
+      tyreWearPercent: Math.round(((d.initialTyreAge ?? 0) / (TYRE_PROPERTIES[d.startTyre].cliffLap * 1.5)) * 100),
       pitCount: 0,
       puMode: d.machineSetup.puMode,
       ersBoostUsed: false,
@@ -1213,6 +1226,7 @@ export function runFullGrandPrixSimulation(params: {
       trackLimitsCount: 0,
       pendingPenaltySeconds: 0,
       servedPenaltySeconds: 0,
+      inDirtyAir: false,
     };
   }
 
@@ -1676,6 +1690,7 @@ export function runFullGrandPrixSimulation(params: {
           tracker.compoundsUsed.push(chosenTyre);
         }
         tracker.tyreAge = 0;
+        tracker.tyreWearPercent = 0;
         tracker.surfaceTemp = 95;
         tracker.coreTemp = 90;
 
@@ -1763,9 +1778,36 @@ export function runFullGrandPrixSimulation(params: {
       const isFullGp = raceLengthMode === 'gp_full_100';
       const wearScale = is25Percent ? 3.2 : 1.0;
       const effectiveCliff = Math.max(5, Math.round(tyreProp.cliffLap / (is25Percent ? 2.5 : 1.0)));
-      const wearMultiplier = tracker.tyreAge > effectiveCliff ? 3.2 : 1.0;
-      const tyreWearPacePenalty = tracker.tyreAge * tyreProp.wearRate * circuit.tyreAggression * wearMultiplier * wearScale;
-      const wearPercent = Math.min(100, Math.round((tracker.tyreAge / (effectiveCliff * 1.5)) * 100));
+
+      // 🏎️ Physical Degradation Factors: PU Mode, Thermal Load, Brake Heat, and Dirty Air
+      const puWearMod = tracker.puMode === 'push' ? 1.45 : tracker.puMode === 'conserve' ? 0.70 : 1.0;
+      const thermalWearMod =
+        tracker.surfaceTemp > 125
+          ? 1.40
+          : tracker.surfaceTemp > 115
+          ? 1.18
+          : tracker.surfaceTemp < 88
+          ? 1.12
+          : 1.0;
+      const brakeHeatMod = tracker.puMode === 'push' ? 1.10 : 1.0;
+      const dirtyAirMod = tracker.inDirtyAir ? 1.25 : 1.0;
+      const combinedPhysicsFactor = puWearMod * thermalWearMod * brakeHeatMod * dirtyAirMod;
+
+      // Cumulative physical tyre wear progression
+      const baseWearIncrement = (100 / (effectiveCliff * 1.5)) * wearScale;
+      tracker.tyreWearPercent = Math.min(100, (tracker.tyreWearPercent || 0) + baseWearIncrement * combinedPhysicsFactor);
+      const wearPercent = Math.min(100, Math.round(tracker.tyreWearPercent));
+
+      // Dynamic cliff detection: either cumulative physical wear reaches 75% or tyre age exceeds effective cliff
+      const isAtCliff = wearPercent >= 75 || tracker.tyreAge > effectiveCliff;
+      const wearMultiplier = isAtCliff ? 3.2 : 1.0;
+      const tyreWearPacePenalty =
+        tracker.tyreAge *
+        tyreProp.wearRate *
+        circuit.tyreAggression *
+        wearMultiplier *
+        wearScale *
+        combinedPhysicsFactor;
 
       // Thermal warnings
       let thermalWarning: 'NONE' | 'GRAINING_RISK' | 'BLISTERING_WARNING' | 'OPTIMAL' = 'OPTIMAL';
@@ -2011,6 +2053,7 @@ export function runFullGrandPrixSimulation(params: {
       if (inDirtyAir) {
         const carTracker = trackers[car.code];
         if (carTracker) {
+          carTracker.inDirtyAir = true;
           carTracker.surfaceTemp = Math.min(145, carTracker.surfaceTemp + 3.0);
           car.tyreSurfaceTemp = Math.round(carTracker.surfaceTemp);
         } else {
@@ -2018,6 +2061,11 @@ export function runFullGrandPrixSimulation(params: {
         }
         if (car.tyreSurfaceTemp > 125) {
           car.thermalWarning = 'BLISTERING_WARNING';
+        }
+      } else {
+        const carTracker = trackers[car.code];
+        if (carTracker) {
+          carTracker.inDirtyAir = false;
         }
       }
 
@@ -2473,12 +2521,12 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
       isPlayer: true,
     },
     teammateConfig: {
-      ...GRID_DRIVERS[1], // HAD
+      ...GRID_DRIVERS[1], // LAW
       basePaceOffset: 0.45,
       startTyre: 'MEDIUM',
       pit1Lap: 99,
     },
-    rivals: GRID_DRIVERS.filter(d => d.code !== 'TSU' && d.code !== 'HAD'),
+    rivals: GRID_DRIVERS.filter(d => d.code !== 'TSU' && d.code !== 'LAW'),
     startWeather: 'dry',
     weatherForecast: {
       radarDesc: '南西より巨大な雨雲接近中。4〜6周目前後に降雨到達予想（確率85%）。',

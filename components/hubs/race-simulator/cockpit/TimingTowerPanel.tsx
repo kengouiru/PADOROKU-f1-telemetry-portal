@@ -200,9 +200,15 @@ export const TimingTowerPanel: React.FC<TimingTowerPanelProps> = ({
             <React.Fragment key={car.code}>
               {renderCarCard(car)}
               {car.position === 10 && (
-                <div className="py-0.5 px-1.5 rounded bg-gradient-to-r from-amber-950/70 to-slate-900 border-dashed border border-amber-500/50 flex items-center justify-between text-[8px] font-racing font-bold text-amber-300 my-0.5 shadow-sm">
-                  <span>POINTS CUTOFF LINE (P10)</span>
-                  <span>1 PT</span>
+                <div
+                  className="flex items-center gap-1 my-0.5 px-0.5 select-none"
+                  title="入賞圏内ボーダーライン (P10: 1pt獲得)"
+                >
+                  <div className="h-px flex-1 min-w-[6px] border-t border-dashed border-amber-500/40" />
+                  <span className="text-[7px] font-racing font-bold text-amber-400/90 tracking-wider whitespace-nowrap px-1 py-0.2 rounded bg-amber-950/40 border border-amber-500/30 shrink-0">
+                    PTS CUTOFF (P10)
+                  </span>
+                  <div className="h-px flex-1 min-w-[6px] border-t border-dashed border-amber-500/40" />
                 </div>
               )}
             </React.Fragment>

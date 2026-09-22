@@ -1817,6 +1817,7 @@ ${timelineSummary}
           ersBoostUsedThisLap={ersBoostUsedThisLap}
           activePuMode={activePuMode}
           pitExitTraffic={pitExitTraffic}
+          raceLengthMode={raceLengthMode}
         />
         {/* ════════════════════════════════════════════════════════════════════════
            COLUMN 4 (RIGHT): Comms, Live Feed & Tactical Commands

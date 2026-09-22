@@ -77,6 +77,7 @@ export interface TacticalDataDeckPanelProps {
     behindCarCode?: string;
     pitLossSeconds: number;
   };
+  raceLengthMode?: 'gp_short_25' | 'gp_full_100' | 'sprint';
 }
 
 export const TacticalDataDeckPanel: React.FC<TacticalDataDeckPanelProps> = ({
@@ -102,6 +103,7 @@ export const TacticalDataDeckPanel: React.FC<TacticalDataDeckPanelProps> = ({
   ersBoostUsedThisLap,
   activePuMode,
   pitExitTraffic,
+  raceLengthMode,
 }) => {
   return (
         <div className={`w-full min-w-0 space-y-2.5 ${mobileConsoleView === 'monitor' ? 'block' : 'hidden lg:block'}`}>
@@ -391,7 +393,7 @@ export const TacticalDataDeckPanel: React.FC<TacticalDataDeckPanelProps> = ({
                     })}
                   </div>
 
-                  {/* Aero Wake (Dirty Air) & Tyre Degradation Metrics */}
+                  {/* Aero Wake (Dirty Air) & Tyre Degradation Metrics (Real-time Physics Engine) */}
                   {(() => {
                     const gapAhead = playerCar?.gapToAhead ?? 99;
                     const isLeader = playerCar?.position === 1;
@@ -407,21 +409,75 @@ export const TacticalDataDeckPanel: React.FC<TacticalDataDeckPanelProps> = ({
                       WET: 0.14,
                     };
                     const baseDeg = baseDegMap[compound] || 0.12;
+                    const circuitFactor = activeScenario.circuit.tyreAggression || 1.0;
                     const ageFactor = 1 + (playerCar?.tyreAge || 0) * 0.035;
-                    const tempFactor = (playerCar?.tyreSurfaceTemp || 100) > 125 ? 1.4 : 1.0;
-                    const degRatePerLap = (baseDeg * ageFactor * tempFactor).toFixed(2);
 
-                    const wearPerLapMap: Record<string, number> = {
+                    // 🏎️ 1. Real-Time PU Mode Factor
+                    // PUSH mode accelerates tyre degradation by +45% through aggressive torque delivery and longitudinal slip.
+                    // CONSERVE mode preserves tyre life by -30% through lift-and-coast and reduced slip angles.
+                    const currentPuMode = activePuMode || liveTelemetry?.puMode || playerCar?.puMode || 'standard';
+                    const puFactor = currentPuMode === 'push' ? 1.45 : currentPuMode === 'conserve' ? 0.70 : 1.0;
+
+                    // 🏎️ 2. Real-Time 4-Tyre Thermal Load (Surface & Core)
+                    const tyreSurfs = liveTelemetry?.tyres
+                      ? [liveTelemetry.tyres.FL.surf, liveTelemetry.tyres.FR.surf, liveTelemetry.tyres.RL.surf, liveTelemetry.tyres.RR.surf]
+                      : [playerCar?.tyreSurfaceTemp || 100];
+                    const avgSurfTemp = tyreSurfs.reduce((a, b) => a + b, 0) / tyreSurfs.length;
+                    const maxSurfTemp = Math.max(...tyreSurfs);
+
+                    const tyreCores = liveTelemetry?.tyres
+                      ? [liveTelemetry.tyres.FL.core, liveTelemetry.tyres.FR.core, liveTelemetry.tyres.RL.core, liveTelemetry.tyres.RR.core]
+                      : [playerCar?.tyreCoreTemp || 98];
+                    const avgCoreTemp = tyreCores.reduce((a, b) => a + b, 0) / tyreCores.length;
+
+                    let thermalFactor = 1.0;
+                    if (avgSurfTemp > 112) {
+                      thermalFactor += (avgSurfTemp - 112) * 0.022; // Overheating friction loss
+                      if (maxSurfTemp >= 125) thermalFactor += 0.25; // Severe blistering spike
+                    } else if (avgSurfTemp < 88) {
+                      thermalFactor += (88 - avgSurfTemp) * 0.015; // Cold graining scrub
+                    }
+                    if (avgCoreTemp > 110) {
+                      thermalFactor += (avgCoreTemp - 110) * 0.015; // Core thermal degradation
+                    }
+
+                    // 🏎️ 3. Brake Temperature Heat Radiation (Brake Heat Soak)
+                    // Discs > 580°C radiate immense heat into wheel rims and inner carcass
+                    const currentBrakeTemp = liveTelemetry?.brakeTemp ?? (playerCar?.brakeTemp || 520);
+                    let brakeHeatFactor = 1.0;
+                    if (currentBrakeTemp > 580) {
+                      brakeHeatFactor += Math.min(0.20, ((currentBrakeTemp - 580) / 100) * 0.08);
+                    } else if (currentBrakeTemp < 460 && currentPuMode === 'conserve') {
+                      brakeHeatFactor = 0.96;
+                    }
+
+                    // 🏎️ 4. Aero Wake (Dirty Air) Downforce Loss & Lateral Scrubbing
+                    const aeroWakeFactor = isDirtyAir ? 1 + (downforceLossPercent / 100) * 0.75 : 1.0;
+
+                    // Combined Physics Multiplier
+                    const combinedPhysicsFactor = puFactor * thermalFactor * brakeHeatFactor * aeroWakeFactor;
+                    const realTimeDegRate = baseDeg * circuitFactor * ageFactor * combinedPhysicsFactor;
+                    const degRatePerLap = realTimeDegRate.toFixed(2);
+
+                    // 🏎️ 5. Dynamic Cliff Prediction based on Real-Time Physics
+                    const baseWearMap: Record<string, number> = {
                       SOFT: 4.8,
                       MEDIUM: 3.2,
                       HARD: 2.2,
                       INTER: 3.5,
                       WET: 3.0,
                     };
-                    const wearRate = wearPerLapMap[compound] || 3.0;
-                    const currentWear = playerCar?.tyreWearPercent || 15;
-                    const lapsToCliff = Math.max(0, Math.round((75 - currentWear) / wearRate));
+                    const baseWear = (baseWearMap[compound] || 3.0) * circuitFactor;
+                    const is25Percent = raceLengthMode === 'gp_short_25';
+                    const wearScale = is25Percent ? 3.2 : 1.0;
+                    const dynamicWearPerLap = baseWear * wearScale * combinedPhysicsFactor;
+                    const currentWear = playerCar?.tyreWearPercent ?? 15;
+                    const lapsToCliff = Math.max(0, Math.round((75 - currentWear) / Math.max(0.5, dynamicWearPerLap)));
                     const isAtCliff = currentWear >= 75;
+
+                    // Physics status flags
+                    const isBlistering = maxSurfTemp >= 125 || avgSurfTemp > 115;
+                    const isGraining = avgSurfTemp < 88 && currentPuMode === 'push';
 
                     return (
                       <div className="p-1.5 rounded-xl bg-slate-950/80 border border-white/10 text-xs font-mono space-y-1">
@@ -448,12 +504,48 @@ export const TacticalDataDeckPanel: React.FC<TacticalDataDeckPanelProps> = ({
 
                         {/* Row 2: Tyre Degradation & Cliff Prediction */}
                         <div className="flex items-center justify-between text-[10px] pt-1 border-t border-white/5">
-                          <div className="flex items-center gap-1.5 min-w-0">
+                          <div className="flex items-center gap-1.5 min-w-0 flex-wrap sm:flex-nowrap">
                             <TrendingDown className={`w-3.5 h-3.5 shrink-0 ${isAtCliff ? 'text-red-400' : 'text-amber-400'}`} />
-                            <span className="text-slate-400 shrink-0">デグラデーション:</span>
-                            <span className="font-mono font-bold text-white text-[10.5px] shrink-0">
+                            <span className="text-slate-400 shrink-0">デグラ:</span>
+                            <span
+                              className="font-mono font-bold text-white text-[10.5px] shrink-0 cursor-help"
+                              title={`【リアルタイム物理演算内訳】\n・PUモード: ${puFactor >= 1 ? '+' : ''}${Math.round((puFactor - 1) * 100)}% (${currentPuMode.toUpperCase()})\n・4輪熱負荷: ${thermalFactor >= 1 ? '+' : ''}${Math.round((thermalFactor - 1) * 100)}% (平均${avgSurfTemp.toFixed(0)}°C)\n・ブレーキ放熱: ${brakeHeatFactor >= 1 ? '+' : ''}${Math.round((brakeHeatFactor - 1) * 100)}% (${currentBrakeTemp.toFixed(0)}°C)\n・空力気流: ${aeroWakeFactor >= 1 ? '+' : ''}${Math.round((aeroWakeFactor - 1) * 100)}%\n・合成物理負荷: x${combinedPhysicsFactor.toFixed(2)}`}
+                            >
                               +{degRatePerLap}s<span className="text-[8.5px] text-slate-400">/周</span>
                             </span>
+                            {/* Live Physics Modifiers Indicator Badges */}
+                            {currentPuMode === 'push' && (
+                              <span
+                                className="px-1 py-0.2 rounded text-[8.5px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse shrink-0"
+                                title="PUSHモード: 高トルク＆タイヤスリップによりデグラが+45%加速"
+                              >
+                                ⚡PUSH熱負荷
+                              </span>
+                            )}
+                            {currentPuMode === 'conserve' && (
+                              <span
+                                className="px-1 py-0.2 rounded text-[8.5px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0"
+                                title="CONSERVEモード: タイヤ滑りを抑制しデグラを-30%温存"
+                              >
+                                🌱温存-30%
+                              </span>
+                            )}
+                            {isBlistering && (
+                              <span
+                                className="px-1 py-0.2 rounded text-[8.5px] font-bold bg-red-500/20 text-red-300 border border-red-500/40 animate-pulse shrink-0"
+                                title={`最高輪温 ${maxSurfTemp.toFixed(0)}°C: ブリスター発生リスクによるグリップ急低下`}
+                              >
+                                🔥熱ダレ
+                              </span>
+                            )}
+                            {isGraining && (
+                              <span
+                                className="px-1 py-0.2 rounded text-[8.5px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shrink-0"
+                                title="タイヤ未暖気での過負荷によるグレイニング摩耗"
+                              >
+                                ❄️冷態摩耗
+                              </span>
+                            )}
                           </div>
                           <div className="flex items-center gap-1.5 shrink-0 ml-1">
                             <span className="text-[9.5px] text-slate-400">クリフ:</span>
@@ -465,7 +557,11 @@ export const TacticalDataDeckPanel: React.FC<TacticalDataDeckPanelProps> = ({
                                   ? 'bg-amber-950 text-amber-300 border border-amber-500/50'
                                   : 'bg-slate-800 text-emerald-300'
                               }`}
-                              title={isAtCliff ? 'タイヤ性能が急激に失われるクリフに突入。直ちにBOX推奨' : `摩耗75%のクリフまであと約${lapsToCliff}周`}
+                              title={
+                                isAtCliff
+                                  ? 'タイヤ性能が急激に失われるクリフに突入。直ちにBOX推奨'
+                                  : `摩耗${currentWear}% (クリフ75%まで約${lapsToCliff}周 / 毎周約${dynamicWearPerLap.toFixed(1)}%摩耗)`
+                              }
                             >
                               {isAtCliff ? '🚨 限界 (要BOX)' : `約 ${lapsToCliff} 周`}
                             </span>
@@ -475,8 +571,8 @@ export const TacticalDataDeckPanel: React.FC<TacticalDataDeckPanelProps> = ({
                     );
                   })()}
 
-                  {/* 5 Sub-system Telemetry Readouts with Live Speedometer and PU Flow */}
-                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 pt-0.5">
+                  {/* 4 Sub-system Telemetry Readouts (SPEED, ERS, BRAKE, FUEL) */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2 pt-0.5">
                     {/* 1. Live Speedometer */}
                     <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
                       <div className="flex items-center justify-between">
@@ -502,34 +598,14 @@ export const TacticalDataDeckPanel: React.FC<TacticalDataDeckPanelProps> = ({
                       </div>
                     </div>
 
-                    {/* 2. PU Mode & Energy Flow Status */}
+                    {/* 2. ERS Battery SOC with Flow Rate */}
                     <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
-                      <span className="text-[10px] font-mono font-bold text-slate-400">PU MODE</span>
-                      <div className="flex items-baseline gap-1 mt-0.5">
-                        <span
-                          className={`font-racing font-bold text-sm sm:text-base ${
-                            (activePuMode || playerCar?.puMode) === 'push'
-                              ? 'text-rose-400'
-                              : (activePuMode || playerCar?.puMode) === 'conserve'
-                              ? 'text-emerald-400'
-                              : 'text-slate-200'
-                          }`}
-                        >
-                          {(activePuMode || playerCar?.puMode) === 'push'
-                            ? '⚡ PUSH'
-                            : (activePuMode || playerCar?.puMode) === 'conserve'
-                            ? '🌱 SAVE'
-                            : 'STD'}
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono font-bold text-slate-400">ERS SOC</span>
+                        <span className="text-[8px] sm:text-[8.5px] font-mono font-bold text-slate-400">
+                          {liveTelemetry?.ersDeployStatus || 'BALANCED'}
                         </span>
                       </div>
-                      <div className="mt-0.5 text-[8.5px] sm:text-[9px] font-mono font-bold text-slate-300 whitespace-nowrap overflow-hidden">
-                        {liveTelemetry?.ersDeployStatus || 'BALANCED'}
-                      </div>
-                    </div>
-
-                    {/* 3. ERS Battery SOC with Flow Rate */}
-                    <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
-                      <span className="text-[10px] font-mono font-bold text-slate-400">ERS SOC</span>
                       <div className="flex items-baseline gap-1 mt-0.5">
                         <span className="font-racing font-bold text-sm sm:text-base text-cyan-400 block transition-all">
                           {liveTelemetry?.ersBatterySoc ?? (playerCar?.ersBatterySoc || 85)}%
@@ -546,7 +622,7 @@ export const TacticalDataDeckPanel: React.FC<TacticalDataDeckPanelProps> = ({
                       </div>
                     </div>
 
-                    {/* 4. Brake Temp */}
+                    {/* 3. Brake Temp */}
                     <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
                       <span className="text-[10px] font-mono font-bold text-slate-400">BRAKE</span>
                       <div className="flex items-baseline gap-1 mt-0.5">
@@ -567,8 +643,8 @@ export const TacticalDataDeckPanel: React.FC<TacticalDataDeckPanelProps> = ({
                       </span>
                     </div>
 
-                    {/* 5. Fuel & Confidence */}
-                    <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900/90 border border-white/10 col-span-2 sm:col-span-1 flex flex-col justify-between">
+                    {/* 4. Fuel & Confidence */}
+                    <div className="p-1.5 sm:p-2 rounded-xl bg-slate-900/90 border border-white/10 flex flex-col justify-between">
                       <span className="text-[10px] font-mono font-bold text-slate-400">FUEL</span>
                       <div className="flex items-baseline gap-1 mt-0.5">
                         <span className="font-racing font-bold text-sm sm:text-base text-emerald-400">
@@ -636,7 +712,7 @@ export const TacticalDataDeckPanel: React.FC<TacticalDataDeckPanelProps> = ({
                               <strong className="text-amber-300">・💨 ダーティエア (DIRTY AIR / 乱流):</strong> 前走車の1.2秒以内を追従すると、前走車の乱気流によりダウンフォースが約15〜22%低下。前輪が滑りやすくなり表面温度が急上昇します。オーバーテイクを仕掛ける時以外は、少し間隔（1.5秒以上）を空けてクリーンエアを吸わせるか、直ちに <span className="text-purple-300 font-bold">ERS BOOST</span> を使って一気に抜き去る判断が必要です。
                             </li>
                             <li>
-                              <strong className="text-sky-300">・📉 デグラデーション (秒/周) ＆ クリフ:</strong> タイヤゴムの摩耗に伴う1周あたりのペース低下値。摩耗率が約75%に達すると「クリフ（崖）」に落ち、1周あたり1〜2秒以上急落します。<span className="text-amber-300 font-bold">「クリフまであと2周」</span>に達したら、次周の <span className="text-red-300 font-bold">BOX BOX</span> を準備してください。
+                              <strong className="text-sky-300">・📉 リアルタイム物理演算デグラデーション (秒/周) ＆ クリフ:</strong> PUモード（PUSHで高トルク滑り+45%加速 / CONSERVEで-30%温存）、4輪の表面＆内部温度、ブレーキ放熱（&gt;580°Cでの熱移転）、ダーティエア乱流から1秒ごとに動的演算。摩耗率が約75%に達すると「クリフ（崖）」に突入しタイムが急落します。<span className="text-amber-300 font-bold">「クリフまであと2周」</span>に達したら、次周の <span className="text-red-300 font-bold">BOX BOX</span> を準備してください。
                             </li>
                             <li>
                               <strong className="text-cyan-400">・ERS バッテリー SOC (%):</strong> ハイブリッドの蓄電量（0〜100%）。<strong className="text-cyan-200">80%以上</strong>あればストレートで「ERS BOOST」を全開投入してオーバーテイクや防衛が可能。30%以下ならチャージ優先。
