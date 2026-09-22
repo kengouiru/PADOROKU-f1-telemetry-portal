@@ -5,7 +5,7 @@
  * Unified Tactical Command & FIA HUD Deck (Ultra-Compact 2-Tier) + Mobile Toggle
  */
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Pause,
   Play,
@@ -13,6 +13,7 @@ import {
   Bot,
   ShieldAlert,
   CloudRain,
+  Sparkles,
 } from 'lucide-react';
 import type {
   ChallengeScenario,
@@ -20,6 +21,8 @@ import type {
   TyreCompound,
   EnginePUMode,
 } from '@/lib/raceSimulationEngine';
+import { MASTER_TRAITS, type DriverTraitDefinition } from '@/data/driverTraitsData';
+import { playF1IncomingRadioChirp } from '@/lib/radioAudioEffect';
 
 export interface CockpitHudDeckProps {
   challengeLap: number;
@@ -54,6 +57,7 @@ export interface CockpitHudDeckProps {
   mobileConsoleView: 'tower' | 'monitor' | 'comms';
   setMobileConsoleView: (view: 'tower' | 'monitor' | 'comms') => void;
   radioResponses: Record<string, string>;
+  isRaceFinished?: boolean;
 }
 
 export const CockpitHudDeck: React.FC<CockpitHudDeckProps> = ({
@@ -83,9 +87,90 @@ export const CockpitHudDeck: React.FC<CockpitHudDeckProps> = ({
   mobileConsoleView,
   setMobileConsoleView,
   radioResponses,
+  isRaceFinished,
 }) => {
+  // Trait Activation Cut-in Flash Banner
+  const [activeCutIn, setActiveCutIn] = useState<{
+    trait: DriverTraitDefinition;
+    driverName: string;
+    team: string;
+  } | null>(null);
+  const seenTraitsRef = useRef<Set<string>>(new Set());
+
+  // Monitor newly activated traits on player car
+  useEffect(() => {
+    if (!playerCar?.activeTraits || playerCar.activeTraits.length === 0) return;
+    for (const tId of playerCar.activeTraits) {
+      const traitKey = `${tId}-${challengeLap}`;
+      if (!seenTraitsRef.current.has(traitKey)) {
+        seenTraitsRef.current.add(traitKey);
+        const traitDef = MASTER_TRAITS[tId];
+        if (traitDef) {
+          setActiveCutIn({
+            trait: traitDef,
+            driverName: playerCar.name,
+            team: playerCar.team,
+          });
+          try {
+            playF1IncomingRadioChirp();
+          } catch {
+            // Audio context safely handled
+          }
+          break;
+        }
+      }
+    }
+  }, [playerCar?.activeTraits, challengeLap, playerCar?.name, playerCar?.team]);
+
+  // Auto-dismiss cut-in banner after 4.5 seconds
+  useEffect(() => {
+    if (!activeCutIn) return;
+    const timer = setTimeout(() => {
+      setActiveCutIn(null);
+    }, 4500);
+    return () => clearTimeout(timer);
+  }, [activeCutIn]);
+
   return (
     <>
+      {/* 🧬 F1 AWS INSIGHTS-STYLE CYBER TRAIT CUT-IN BANNER */}
+      {activeCutIn && (
+        <div className="relative overflow-hidden px-4 py-2.5 rounded-2xl bg-gradient-to-r from-black/95 via-slate-900/95 to-black/95 border-2 border-amber-400 shadow-[0_0_30px_rgba(251,191,36,0.4)] animate-in slide-in-from-top-3 duration-300 backdrop-blur-xl flex items-center justify-between gap-3 text-xs z-30">
+          {/* Cyber glowing strip */}
+          <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-gradient-to-b from-amber-400 via-yellow-300 to-amber-500 shadow-[0_0_12px_rgba(251,191,36,0.8)]" />
+
+          <div className="flex items-center gap-3 pl-1.5">
+            <span className="text-2xl animate-bounce">{activeCutIn.trait.icon}</span>
+            <div>
+              <div className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-wider">
+                <span className="bg-amber-400 text-black font-black px-1.5 py-0.2 rounded font-racing">
+                  {activeCutIn.trait.tier.replace(/_/g, ' ')}
+                </span>
+                <span className="text-amber-300 font-bold flex items-center gap-1">
+                  <Sparkles className="w-2.5 h-2.5" />
+                  固有能力発動 (TRAIT ACTIVATED)
+                </span>
+                <span className="text-slate-400">| {activeCutIn.driverName} ({activeCutIn.team})</span>
+              </div>
+              <div className="font-racing font-black text-sm text-white flex flex-wrap items-center gap-2 mt-0.5">
+                <span className="text-amber-300">{activeCutIn.trait.name}</span>
+                <span className="text-[11px] font-mono font-normal text-emerald-400">
+                  {activeCutIn.trait.tacticalEffectDescription}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setActiveCutIn(null)}
+            className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded-lg hover:bg-white/10 font-bold font-mono transition-colors"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       {/* ── UNIFIED TACTICAL COMMAND & FIA HUD DECK (Ultra-Compact 2-Tier) ── */}
       <div className="px-2.5 py-1.5 rounded-xl bg-slate-950/95 border border-white/10 shadow-lg backdrop-blur-md space-y-1.5">
         {/* Tier 1: Playback Controls, Lap Progress, Car Status, Flags & Toggles */}
@@ -121,7 +206,7 @@ export const CockpitHudDeck: React.FC<CockpitHudDeckProps> = ({
                 </>
               ) : (
                 <>
-                  <Play className="w-3.5 h-3.5 fill-current" /> {challengeLap >= activeScenario.totalLaps ? 'REPLAY' : 'PLAY'}
+                  <Play className="w-3.5 h-3.5 fill-current" /> {isRaceFinished ? 'REPLAY' : 'PLAY'}
                 </>
               )}
             </button>
@@ -163,8 +248,18 @@ export const CockpitHudDeck: React.FC<CockpitHudDeckProps> = ({
 
           {/* Center: Lap Progress + Driver/Tyre/PU Badges */}
           <div className="flex items-center gap-2 text-xs font-mono">
-            <span className="font-racing font-bold text-white text-[11px]">
-              LAP {challengeLap}/{activeScenario.totalLaps}
+            <span className="font-racing font-bold text-white text-[11px] flex items-center gap-1">
+              <span>LAP {challengeLap}/{activeScenario.totalLaps}</span>
+              {challengeLap === activeScenario.totalLaps && !isRaceFinished && (
+                <span className="px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[8.5px] border border-amber-500/40 animate-pulse">
+                  FINAL LAP
+                </span>
+              )}
+              {isRaceFinished && (
+                <span className="px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[8.5px] border border-emerald-500/40">
+                  🏁 FINISH
+                </span>
+              )}
             </span>
             {challengePlaying && (
               <span className="text-[10px] text-amber-300 font-mono">
@@ -334,33 +429,34 @@ export const CockpitHudDeck: React.FC<CockpitHudDeckProps> = ({
               })()}
             </div>
 
-            {/* Right: Pit Window & Traffic Predictor (Clean Air Finder) */}
-            {pitExitTraffic && (
-              <div className="flex items-center gap-1.5 bg-slate-900/90 px-2 py-0.5 rounded-lg border border-white/10 text-[10px]">
-                <span className="text-slate-400 font-racing font-bold">
-                  🚪 ピット出口予測:
+            {/* Tier 3: Active Driver Traits & Tactical Perks Bar */}
+            {playerCar?.activeTraits && playerCar.activeTraits.length > 0 && (
+              <div className="w-full pt-1 border-t border-white/10 flex flex-wrap items-center gap-1.5 text-[10px] font-mono">
+                <span className="font-racing font-bold text-amber-400 flex items-center gap-1">
+                  <span>🧬</span> 特殊能力発動中:
                 </span>
-                <span className="font-bold text-white">
-                  P{pitExitTraffic.predictedExitPosition} 復帰
-                </span>
-                <span
-                  className={`px-1 py-0.2 rounded text-[9px] font-bold ${
-                    pitExitTraffic.trafficStatus === 'CLEAN_AIR'
-                      ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
-                      : pitExitTraffic.trafficStatus === 'IN_TRAFFIC'
-                      ? 'bg-red-950 text-red-300 border border-red-500/50 animate-pulse'
-                      : 'bg-yellow-950 text-yellow-300 border border-yellow-500/40'
-                  }`}
-                >
-                  {pitExitTraffic.trafficStatus === 'CLEAN_AIR'
-                    ? '🟢 クリーンエア'
-                    : pitExitTraffic.trafficStatus === 'IN_TRAFFIC'
-                    ? `⚠️ 混戦 (+${pitExitTraffic.gapAheadSeconds}s ${pitExitTraffic.aheadCarCode || ''})`
-                    : `🟡 要注意 (+${pitExitTraffic.gapAheadSeconds}s)`}
-                </span>
-                <span className="text-[9px] text-slate-400">
-                  (ロス約{pitExitTraffic.pitLossSeconds}s)
-                </span>
+                <div className="flex flex-wrap items-center gap-1">
+                  {playerCar.activeTraits.map((tId) => {
+                    const trait = MASTER_TRAITS[tId];
+                    if (!trait) return null;
+                    return (
+                      <span
+                        key={tId}
+                        className={`inline-flex items-center gap-1 px-1.5 py-0.2 rounded-md font-racing font-bold text-[9px] border shadow-sm ${
+                          trait.tier === 'APEX_GOLD'
+                            ? 'bg-amber-950/80 text-amber-300 border-amber-400/70 shadow-[0_0_8px_rgba(251,191,36,0.3)] animate-pulse'
+                            : trait.tier === 'TITANIUM_TACTICAL'
+                            ? 'bg-cyan-950/80 text-cyan-300 border-cyan-400/60 shadow-[0_0_6px_rgba(34,211,238,0.2)]'
+                            : 'bg-rose-950/80 text-rose-300 border-rose-500/60'
+                        }`}
+                        title={`${trait.name}: ${trait.tacticalEffectDescription}`}
+                      >
+                        <span>{trait.icon}</span>
+                        <span>{trait.badgeLabel}</span>
+                      </span>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>

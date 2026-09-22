@@ -276,39 +276,8 @@ export default function LiveTrackGpsRadar({
     };
   }, [getExactTrackPoint, trackData.startFinish, rawBbox]);
 
-  // 60 FPS continuous animation loop for butter-smooth car movement along the circuit
-  const [animatedPct, setAnimatedPct] = useState<number>(lapProgressPct);
-  const lastTimeRef = useRef<number>(typeof performance !== 'undefined' ? performance.now() : 0);
-
-  useEffect(() => {
-    if (!isPlaying) {
-      setAnimatedPct(lapProgressPct);
-      return;
-    }
-
-    let animFrameId: number;
-    const animate = (now: number) => {
-      const dt = (now - lastTimeRef.current) / 1000;
-      lastTimeRef.current = now;
-      const speed = playbackSpeed || 1;
-      // During Safety Car, lap time slows down by +42% (avg ~145 km/h)
-      const effectiveBaseTime = isSC ? (baseLapTime || 90.0) * 1.42 : (baseLapTime || 90.0);
-      const lapDurationSec = Math.max(2, effectiveBaseTime / speed);
-      setAnimatedPct((prev) => {
-        const next = prev + (dt / lapDurationSec) * 100;
-        return next >= 100 ? next % 100 : next;
-      });
-      animFrameId = requestAnimationFrame(animate);
-    };
-
-    lastTimeRef.current = performance.now();
-    animFrameId = requestAnimationFrame(animate);
-
-    return () => cancelAnimationFrame(animFrameId);
-  }, [isPlaying, playbackSpeed, baseLapTime, lapProgressPct, isSC]);
-
-  // Leader's progress (0% ~ 100%) driven continuously at 60 FPS during playback
-  const leaderPct = Math.max(0, Math.min(100, isPlaying ? animatedPct : lapProgressPct));
+  // Leader's progress (0% ~ 100%) driven 100% in lockstep by master simulation clock in RaceSimulatorHub
+  const leaderPct = Math.max(0, Math.min(100, lapProgressPct));
 
   // Compute positions for all cars with CUMULATIVE MINIMUM VISUAL DISPERSION algorithm
   // Uses exact SVG path tracking and dedicated pit lane placement!
@@ -346,9 +315,10 @@ export default function LiveTrackGpsRadar({
           carPct = ((leaderPct - actualBehind) % 100 + 100) % 100;
         } else {
           const naturalBehind = (car.gapToLeader / effectiveLapTime) * 100;
-          // Guaranteed progressive spacing: minimum 1.7% between consecutive cars (2.2% in SC)
-          // Guarantees all 22 cars and labels never overlap or clump together into a single dot!
-          const minStep = isSC ? 2.2 : 1.7;
+          // Guaranteed progressive spacing: constant 1.4% minimum visual step between consecutive cars.
+          // Eliminates sudden pack jump/glitch when transitioning into Safety Car, while guaranteeing
+          // all 22 cars and labels never overlap or clump together into a single dot!
+          const minStep = 1.4;
           cumulativeBehind = Math.max(cumulativeBehind + minStep, naturalBehind);
           carPct = ((leaderPct - cumulativeBehind) % 100 + 100) % 100;
         }
@@ -450,7 +420,7 @@ export default function LiveTrackGpsRadar({
       })
       .map((car, idx) => {
         const isPlayer = car.code === playerCarCode;
-        const isTeammate = car.code === teammateCarCode;
+        const isTeammate = false; // Retired car must NEVER be rendered as an active teammate TM dot!
         const parkPct = (45 + idx * 8) % 100;
         const baseCoord = getExactTrackPoint(parkPct);
         return {
@@ -658,7 +628,7 @@ export default function LiveTrackGpsRadar({
             </div>
 
             <div className="flex-1 overflow-y-auto space-y-1 pr-1 scrollbar-thin max-h-[160px] sm:max-h-[220px] lg:max-h-[380px]">
-              {carTrackPositions.map(({ car, isPlayer, isTeammate, isRetired, isInPitLane, pct }) => {
+              {carTrackPositions.map(({ car, isPlayer, isTeammate, isRetired, isInPitLane, pct }, idx) => {
                 const isSelected = activeInspectCar?.code === car.code;
                 const displaySpeed =
                   car.currentSpeedKmH ||
@@ -666,7 +636,7 @@ export default function LiveTrackGpsRadar({
 
                 return (
                   <button
-                    key={car.code}
+                    key={`${car.code}-${car.position}-${idx}`}
                     type="button"
                     onClick={() => setSelectedCarCode(car.code === selectedCarCode ? null : car.code)}
                     onMouseEnter={() => setHoveredCar(car)}
@@ -946,7 +916,7 @@ export default function LiveTrackGpsRadar({
 
                 return (
                   <g
-                    key={car.code}
+                    key={`${car.code}-${car.position}-${idx}`}
                     className="cursor-pointer"
                     transform={`translate(${coord.x}, ${coord.y})`}
                     onMouseEnter={() => setHoveredCar(car)}

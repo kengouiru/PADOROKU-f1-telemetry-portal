@@ -11,6 +11,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import type { DriverProfile, Reference, TelemetryTarget } from '@/data/f1KnowledgeData';
+import { getDriverTraits, type DriverTraitDefinition } from '@/data/driverTraitsData';
+import { getDriverSkills } from '@/data/driverSkillsData';
 import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
 import { useUserPreferences } from '@/lib/userPreferences';
 
@@ -23,7 +25,7 @@ interface DriverDetailModalProps {
   onClose: () => void;
 }
 
-type DetailTab = 'overview' | 'style' | 'bio' | 'references';
+type DetailTab = 'overview' | 'traits' | 'style' | 'bio' | 'references';
 
 export default function DriverDetailModal({
   driver,
@@ -50,6 +52,8 @@ export default function DriverDetailModal({
 
   const isLegend = driver.status === 'Legend';
   const themeColor = isLegend ? '#D4AF37' : driver.teamColor;
+  const driverTraits = getDriverTraits(driver.code);
+  const driverSkills = getDriverSkills(driver.code);
 
   // Find currentIndex for Prev / Next navigation
   const currentIndex = allDrivers.findIndex((d) => d.id === driver.id);
@@ -376,6 +380,7 @@ export default function DriverDetailModal({
                 ['style', '🏎️ 走行スタイル & 技術'],
                 ['bio', '📖 人物像 & エピソード'],
                 ['references', `📚 参考文献 (${driver.references.length})`],
+                ['traits', `🎮 ゲーム特性 (${driverTraits.length})`],
               ] as [DetailTab, string][]
             ).map(([tab, label]) => (
               <button
@@ -431,6 +436,7 @@ export default function DriverDetailModal({
                   {renderTextWithCitations(driver.careerSummary)}
                 </p>
               </div>
+
 
               {/* Stats 4-Grid: Compact 4-col on mobile, spacious cards on desktop */}
               <div className="grid grid-cols-4 gap-1.5 sm:gap-3">
@@ -657,6 +663,222 @@ export default function DriverDetailModal({
                     {renderTextWithCitations(driver.drivingStyle.tyreManagement)}
                   </p>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: GAME TRAITS & GAMEPLAY PARAMETERS (Moved after references) */}
+          {activeTab === 'traits' && (
+            <div className="space-y-4 animate-fade-in">
+              <div className="bg-slate-900/90 border border-white/10 p-4 rounded-2xl space-y-2.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h4 className="text-xs font-racing font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>🎮</span>
+                    <span>ゲーム特性・特殊能力 (Game Traits)</span>
+                  </h4>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono text-amber-300/90 bg-amber-950/50 border border-amber-500/30 px-2 py-0.5 rounded-full">
+                      ⚠️ ゲーム専用パラメータ
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded-full border border-white/10">
+                      全 {driverTraits.length} スキル保有
+                    </span>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  過去の名勝負、事件、性格ドラマ、無線交信から着想を得て設計された本アプリのゲーム専用パラメータです。
+                  レースシミュレーター走行中に特定条件（天候、コース、ギャップ、ピット状況）を満たすと動的に発動し、マシンとチームに補正を与えます。
+                </p>
+                {/* Legend explaining the 3 tiers */}
+                <div className="flex flex-wrap items-center gap-3 pt-2 text-[11px] font-mono border-t border-white/5">
+                  <span className="inline-flex items-center gap-1 text-amber-300 font-bold">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,0.8)]" />
+                    APEX GOLD: 固有伝説スキル
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-cyan-300 font-bold">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(34,211,238,0.8)]" />
+                    TITANIUM TACTICAL: 実戦戦術スキル
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-rose-300 font-bold">
+                    <span className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.8)]" />
+                    HAZARD VOLATILITY: リスク・感情要因
+                  </span>
+                </div>
+              </div>
+
+              {/* 5-Axis Driver Core Performance Profile */}
+              <div className="bg-slate-900/90 border border-sky-500/20 p-4 rounded-2xl space-y-3 shadow-md">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">🏎️</span>
+                    <h5 className="text-xs font-racing font-bold text-sky-300 uppercase tracking-wider">
+                      ドライバー基本能力 (5-Axis Ratings)
+                    </h5>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-mono text-slate-400 uppercase">総合能力</span>
+                    <span className="text-sm font-racing font-black text-amber-300 bg-amber-950/60 border border-amber-500/30 px-2.5 py-0.5 rounded-lg">
+                      {driverSkills.overallRating}
+                    </span>
+                  </div>
+                </div>
+
+                {/* 5 Skill Progress Bars */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                  {/* Raw Pace */}
+                  <div className="bg-black/40 p-2.5 rounded-xl border border-white/5 space-y-1">
+                    <div className="flex justify-between text-[10px] font-mono">
+                      <span className="text-slate-300 font-bold">⏱️ 一発の速さ (Raw Pace)</span>
+                      <span className="text-sky-300 font-black">{driverSkills.skills.rawPace} / 99</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-sky-500 to-blue-400 rounded-full" style={{ width: `${driverSkills.skills.rawPace}%` }} />
+                    </div>
+                  </div>
+
+                  {/* Tyre Management */}
+                  <div className="bg-black/40 p-2.5 rounded-xl border border-white/5 space-y-1">
+                    <div className="flex justify-between text-[10px] font-mono">
+                      <span className="text-slate-300 font-bold">🛞 タイヤ管理 (Tyre Mgmt)</span>
+                      <span className="text-emerald-300 font-black">{driverSkills.skills.tyreManagement} / 99</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full" style={{ width: `${driverSkills.skills.tyreManagement}%` }} />
+                    </div>
+                  </div>
+
+                  {/* Wet Weather */}
+                  <div className="bg-black/40 p-2.5 rounded-xl border border-white/5 space-y-1">
+                    <div className="flex justify-between text-[10px] font-mono">
+                      <span className="text-slate-300 font-bold">🌧️ 雨天適応 (Wet Weather)</span>
+                      <span className="text-cyan-300 font-black">{driverSkills.skills.wetWeather} / 99</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full" style={{ width: `${driverSkills.skills.wetWeather}%` }} />
+                    </div>
+                  </div>
+
+                  {/* Racecraft */}
+                  <div className="bg-black/40 p-2.5 rounded-xl border border-white/5 space-y-1">
+                    <div className="flex justify-between text-[10px] font-mono">
+                      <span className="text-slate-300 font-bold">⚔️ バトル・接近戦 (Racecraft)</span>
+                      <span className="text-amber-300 font-black">{driverSkills.skills.racecraft} / 99</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-amber-500 to-orange-400 rounded-full" style={{ width: `${driverSkills.skills.racecraft}%` }} />
+                    </div>
+                  </div>
+
+                  {/* Consistency */}
+                  <div className="bg-black/40 p-2.5 rounded-xl border border-white/5 space-y-1 sm:col-span-2">
+                    <div className="flex justify-between text-[10px] font-mono">
+                      <span className="text-slate-300 font-bold">🧠 精神力・安定度 (Consistency)</span>
+                      <span className="text-purple-300 font-black">{driverSkills.skills.consistency} / 99</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-purple-500 to-pink-400 rounded-full" style={{ width: `${driverSkills.skills.consistency}%` }} />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-[11px] font-mono text-slate-300 bg-slate-950/40 p-2.5 rounded-xl border border-white/5 flex items-start gap-1.5">
+                  <span className="text-sky-400 font-bold flex-shrink-0">🔑 特性サマリー:</span>
+                  <span>{driverSkills.keyStrength}</span>
+                </div>
+              </div>
+
+              {/* Trait Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                {driverTraits.map((trait) => (
+                  <div
+                    key={trait.id}
+                    className={`p-4 rounded-2xl border flex flex-col justify-between space-y-3 transition-all ${
+                      trait.tier === 'APEX_GOLD'
+                        ? 'bg-gradient-to-br from-amber-950/40 via-yellow-950/20 to-slate-900/90 border-amber-400/70 shadow-[0_0_15px_rgba(251,191,36,0.15)]'
+                        : trait.tier === 'TITANIUM_TACTICAL'
+                        ? 'bg-gradient-to-br from-cyan-950/30 via-slate-900/80 to-slate-950/90 border-cyan-400/50 shadow-[0_0_12px_rgba(34,211,238,0.1)]'
+                        : 'bg-gradient-to-br from-rose-950/30 via-slate-900/80 to-slate-950/90 border-rose-500/50 shadow-[0_0_12px_rgba(244,63,94,0.1)]'
+                    }`}
+                  >
+                    <div className="space-y-2">
+                      {/* Card Header: Icon, Name & Tier Badge */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-2xl flex-shrink-0">{trait.icon}</span>
+                          <div>
+                            <h5
+                              className={`text-sm font-racing font-black tracking-wide ${
+                                trait.tier === 'APEX_GOLD'
+                                  ? 'text-amber-300'
+                                  : trait.tier === 'TITANIUM_TACTICAL'
+                                  ? 'text-cyan-300'
+                                  : 'text-rose-300'
+                              }`}
+                            >
+                              {trait.name}
+                            </h5>
+                            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-widest block">
+                              {trait.category.replace(/_/g, ' ')}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                          <span
+                            className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-md uppercase tracking-wider border ${
+                              trait.tier === 'APEX_GOLD'
+                                ? 'bg-amber-400/20 text-amber-200 border-amber-400/50 shadow-sm'
+                                : trait.tier === 'TITANIUM_TACTICAL'
+                                ? 'bg-cyan-400/20 text-cyan-200 border-cyan-400/50 shadow-sm'
+                                : 'bg-rose-500/20 text-rose-200 border-rose-500/50 shadow-sm'
+                            }`}
+                          >
+                            {trait.tier.replace(/_/g, ' ')}
+                          </span>
+                          <span
+                            className={`text-[8.5px] font-mono font-bold px-1.5 py-0.5 rounded border ${
+                              trait.triggerType === 'GUARANTEED'
+                                ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/40'
+                                : 'bg-purple-950/60 text-purple-300 border-purple-500/40'
+                            }`}
+                          >
+                            {trait.triggerType === 'GUARANTEED'
+                              ? '🟢 確定発動'
+                              : `🎲 確率発動 (${Math.round((trait.baseActivationChance ?? 0.5) * 100)}%)`}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Tactical Effect Box */}
+                      <div className="bg-black/40 border border-white/5 p-2.5 rounded-xl space-y-1">
+                        <div className="flex items-center gap-1 text-[10px] font-mono font-bold text-slate-300">
+                          <span>⚡ 発動条件:</span>
+                          <span className="text-white">{trait.triggerConditionText}</span>
+                        </div>
+                        <div className="flex items-start gap-1 text-[11px] text-slate-200 leading-relaxed font-mono">
+                          <span className="text-emerald-400 font-bold flex-shrink-0">効果:</span>
+                          <span>{trait.tacticalEffectDescription}</span>
+                        </div>
+                      </div>
+
+                      {/* Historical Origin Narrative (The Lore / Encyclopedia Link) */}
+                      <div className="space-y-1 pt-1">
+                        <span className="text-[10px] font-racing font-bold text-amber-400/90 uppercase tracking-wider block">
+                          📖 史実の名勝負・ドラマの背景
+                        </span>
+                        <p className="text-xs text-slate-300 leading-relaxed italic bg-slate-950/40 p-2.5 rounded-xl border border-white/5">
+                          &ldquo;{trait.originHistory}&rdquo;
+                        </p>
+                      </div>
+
+                      {/* Quote if available */}
+                      {trait.quote && (
+                        <div className="text-[11px] font-mono text-sky-300/90 bg-sky-950/30 border border-sky-500/20 p-2 rounded-lg">
+                          💬 {trait.quote}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}

@@ -12,6 +12,9 @@ export interface UserPreferences {
   favoriteDriverCodes?: string[];
   favoriteTeamIds?: string[];
   favoriteCircuitIds?: string[];
+  // Strategist Titles & Aura
+  equippedTitleId?: string;
+  unlockedTitleIds?: string[];
 }
 
 const STORAGE_KEY = 'padoroku_user_preferences';
@@ -25,6 +28,8 @@ export const DEFAULT_PREFERENCES: UserPreferences = {
   favoriteDriverCodes: ['HAM', 'VER', 'NOR', 'TSU'],
   favoriteTeamIds: ['ferrari', 'redbull', 'mclaren'],
   favoriteCircuitIds: ['suzuka', 'monaco', 'spa'],
+  equippedTitleId: 'rookie_tactician',
+  unlockedTitleIds: ['rookie_tactician'],
 };
 
 export function getUserPreferences(): UserPreferences {

@@ -24,6 +24,9 @@ export {
   DRAMATIC_MOMENTS as KNOWLEDGE_DRAMA_MOMENTS,
   PADDOCK_DYNAMICS as KNOWLEDGE_PADDOCK_DYNAMICS,
 } from './f1DramaData';
+import type { DriverTraitId, DriverTraitDefinition, TraitTier, TraitCategory } from './driverTraitsData';
+export type { DriverTraitId, DriverTraitDefinition, TraitTier, TraitCategory } from './driverTraitsData';
+export { MASTER_TRAITS, DRIVER_TRAIT_ASSIGNMENTS, getDriverTraits } from './driverTraitsData';
 
 
 
@@ -163,10 +166,8 @@ export interface DriverProfile {
   };
   milestones: DriverMilestone[];
   references: Reference[];
+  traitIds?: DriverTraitId[];
 }
-
-
-
 
 export interface TelemetryTarget {
   year: number;

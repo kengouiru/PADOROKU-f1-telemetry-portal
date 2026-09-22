@@ -80,6 +80,8 @@ import {
 import { GLOSSARY_TERMS, type GlossaryTerm } from '@/data/f1GlossaryData';
 import { getGeminiAuthHeaders } from '@/lib/apiKeyService';
 import { usePlanTier } from '@/lib/tierService';
+import { getUserPreferences, saveUserPreferences } from '@/lib/userPreferences';
+import { getUserTitle } from '@/data/userTitlesData';
 
 
 import type {
@@ -142,6 +144,16 @@ export default function RaceSimulatorHub({
   // Audio Sound Effect Mute State (Default: Sound ON as requested by user)
   const [radioAudioEnabled, setRadioAudioEnabled] = useState<boolean>(true);
 
+  // Strategist User Title & Aura
+  const [equippedTitleId, setEquippedTitleId] = useState<string>('rookie_tactician');
+  useEffect(() => {
+    const prefs = getUserPreferences();
+    if (prefs.equippedTitleId) {
+      setEquippedTitleId(prefs.equippedTitleId);
+    }
+  }, []);
+  const equippedTitle = useMemo(() => getUserTitle(equippedTitleId), [equippedTitleId]);
+
   // Race Length Mode: 'gp_short_25' (25% Distance with 3.2x scaled wear), 'gp_full_100' (100% full GP), 'sprint'
   const [raceLengthMode, setRaceLengthMode] = useState<'gp_short_25' | 'gp_full_100' | 'sprint'>('gp_short_25');
 
@@ -151,6 +163,7 @@ export default function RaceSimulatorHub({
   const [gameMode, setGameMode] = useState<ChallengeModeType>('crisis');
   const [selectedCircuitId, setSelectedCircuitId] = useState<string>('suzuka');
   const [selectedPlayerCode, setSelectedPlayerCode] = useState<string>('TSU');
+  const [selectedCarPackageId, setSelectedCarPackageId] = useState<string>('standard');
 
   // Active scenario state
   const [majorCategory, setMajorCategory] = useState<GameMajorCategory>('battle');
@@ -183,6 +196,7 @@ export default function RaceSimulatorHub({
   const [userAssistLevel, setUserAssistLevel] = useState<'assisted' | 'expert'>('assisted');
   const [currentProgressPct, setCurrentProgressPct] = useState<number>(0);
   const [lapTimeRemainingMs, setLapTimeRemainingMs] = useState<number>(5500);
+  const [isRaceFinished, setIsRaceFinished] = useState<boolean>(false);
   const challengeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Monitor Deck selection
@@ -290,11 +304,19 @@ export default function RaceSimulatorHub({
 
   // Compute snapshots dynamically from engine with AI difficulty & incident risk tuning
   const challengeSnapshots = useMemo<SimSnapshot[]>(() => {
-    const allDrivers = [
+    const rawDrivers = [
       effectivePlayerConfig,
       activeScenario.teammateConfig,
       ...activeScenario.rivals,
     ];
+    const seen = new Set<string>();
+    const allDrivers: DriverSimConfig[] = [];
+    for (const d of rawDrivers) {
+      if (!seen.has(d.code)) {
+        seen.add(d.code);
+        allDrivers.push(d);
+      }
+    }
     return runFullGrandPrixSimulation({
       circuit: activeScenario.circuit,
       totalLaps: activeScenario.totalLaps,
@@ -309,6 +331,7 @@ export default function RaceSimulatorHub({
       aiDifficulty,
       incidentRiskMultiplier,
       raceLengthMode,
+      userTitleId: equippedTitleId,
     });
   }, [
     activeScenario,
@@ -318,6 +341,7 @@ export default function RaceSimulatorHub({
     aiDifficulty,
     incidentRiskMultiplier,
     raceLengthMode,
+    equippedTitleId,
   ]);
 
   // ESC key listener to exit full-screen cockpit mode anytime
@@ -633,18 +657,11 @@ export default function RaceSimulatorHub({
   // 10x: 約9秒 / lap
   // 20x: 約4.5秒 / lap (高速シミュレーション)
   const currentIntervalMs = useMemo(() => {
-    const baseLapSec = activeScenario.circuit.baseLapTime || 90.0;
+    const rawBaseSec = activeScenario.circuit.baseLapTime || 90.0;
+    const baseLapSec = currentSnapshot?.isSC ? rawBaseSec * 1.42 : rawBaseSec;
     return Math.round((baseLapSec * 1000) / playbackSpeed);
-  }, [activeScenario.circuit.baseLapTime, playbackSpeed]);
+  }, [activeScenario.circuit.baseLapTime, playbackSpeed, currentSnapshot?.isSC]);
 
-  // Real-time lap progress percentage (0% to 100%) for live track GPS motion
-  useEffect(() => {
-    if (challengePlaying) {
-      const elapsed = Math.max(0, currentIntervalMs - lapTimeRemainingMs);
-      const pct = Math.min(100, Math.max(0, (elapsed / currentIntervalMs) * 100));
-      setCurrentProgressPct(pct);
-    }
-  }, [challengePlaying, currentIntervalMs, lapTimeRemainingMs]);
 
   // Reset progress to 0 on new lap start and clear completed pit queue
   useEffect(() => {
@@ -810,54 +827,60 @@ export default function RaceSimulatorHub({
     ensureAudioContextResumed();
     resumedLapsRef.current.add(challengeLap);
 
-    if (challengeLap >= activeScenario.totalLaps) {
+    if (isRaceFinished || challengeLap > activeScenario.totalLaps) {
       resumedLapsRef.current.clear();
+      setIsRaceFinished(false);
       setChallengeLap(1);
+      setCurrentProgressPct(0);
       setChallengePlaying(true);
     } else {
       setChallengePlaying((prev) => !prev);
     }
-  }, [challengeLap, activeScenario.totalLaps]);
+  }, [challengeLap, activeScenario.totalLaps, isRaceFinished]);
 
-  // Auto playback loop with countdown (only runs when simulatorPhase === 'race')
+  // Auto playback loop with high-precision timestamp delta & zero clock drift
   useEffect(() => {
     if (challengePlaying && simulatorPhase === 'race') {
-      setLapTimeRemainingMs(currentIntervalMs);
-      const stepMs = 100;
-      let elapsed = 0;
+      const stepMs = 30; // 33 FPS continuous smooth progress
+      let elapsed = Math.round((currentProgressPct / 100) * currentIntervalMs);
+      let lastTime = typeof performance !== 'undefined' ? performance.now() : Date.now();
 
-      const progressInterval = setInterval(() => {
-        elapsed += stepMs;
-        setLapTimeRemainingMs(Math.max(0, currentIntervalMs - elapsed));
+      const timerId = setInterval(() => {
+        const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+        const delta = now - lastTime;
+        lastTime = now;
+        elapsed += delta;
+
+        if (elapsed >= currentIntervalMs) {
+          if (challengeLap >= activeScenario.totalLaps) {
+            // Final lap completed! 100% full finish across the S/F line for all cars!
+            setCurrentProgressPct(100);
+            setLapTimeRemainingMs(0);
+            setChallengePlaying(false);
+            setIsRaceFinished(true);
+          } else {
+            // Advance to next lap cleanly
+            elapsed = 0;
+            setChallengeLap((prev) => prev + 1);
+            setLapTimeRemainingMs(currentIntervalMs);
+            setCurrentProgressPct(0);
+          }
+        } else {
+          setLapTimeRemainingMs(Math.max(0, currentIntervalMs - elapsed));
+          const pct = Math.min(100, Math.max(0, (elapsed / currentIntervalMs) * 100));
+          setCurrentProgressPct(pct);
+        }
       }, stepMs);
 
-      challengeTimerRef.current = setInterval(() => {
-        setChallengeLap((prev) => {
-          if (prev >= activeScenario.totalLaps) {
-            setChallengePlaying(false);
-            return prev;
-          }
-          return prev + 1;
-        });
-        elapsed = 0;
-        setLapTimeRemainingMs(currentIntervalMs);
-      }, currentIntervalMs);
-
       return () => {
-        clearInterval(progressInterval);
-        if (challengeTimerRef.current) clearInterval(challengeTimerRef.current);
+        clearInterval(timerId);
       };
-    } else {
-      if (challengeTimerRef.current) {
-        clearInterval(challengeTimerRef.current);
-        challengeTimerRef.current = null;
-      }
     }
-  }, [challengePlaying, simulatorPhase, activeScenario.totalLaps, currentIntervalMs]);
+  }, [challengePlaying, simulatorPhase, activeScenario.totalLaps, currentIntervalMs, challengeLap, currentProgressPct]);
 
   // Evaluate score and diagnose strategist archetype & badges when race completes
   useEffect(() => {
-    if (challengeLap >= activeScenario.totalLaps && challengeSnapshots.length > 0) {
+    if (isRaceFinished && challengeSnapshots.length > 0) {
       if (!tacticalScore) {
         const score = evaluateTacticalScore(
           challengeSnapshots,
@@ -916,8 +939,8 @@ export default function RaceSimulatorHub({
       }
     }
     // If the car has already passed pit entry / commitment zone (>= 90% lap progress),
-    // pit stop must be scheduled for the NEXT lap (challengeLap + 1).
-    const targetBoxLap = pitProximity.isCommitmentZone || lapProgressPct >= 90
+    // pit stop is scheduled for the NEXT lap (challengeLap + 1), unless it is already the final lap.
+    const targetBoxLap = (pitProximity.isCommitmentZone || lapProgressPct >= 90) && challengeLap < activeScenario.totalLaps
       ? challengeLap + 1
       : challengeLap;
 
@@ -950,7 +973,7 @@ export default function RaceSimulatorHub({
   const handleCompoundChange = (comp: TyreCompound) => {
     if (radioAudioEnabled) playF1OutgoingRadioBeep();
     setNextCompoundChoice(comp);
-    const targetBoxLap = pitProximity.isCommitmentZone || lapProgressPct >= 90
+    const targetBoxLap = (pitProximity.isCommitmentZone || lapProgressPct >= 90) && challengeLap < activeScenario.totalLaps
       ? challengeLap + 1
       : challengeLap;
     setPlayerTacticalCommands((prev) => {
@@ -1077,6 +1100,42 @@ export default function RaceSimulatorHub({
       };
     }
 
+    // ⚠️ Undercut Threat & Overcut Opportunity Radar
+    const prevSnapshot = challengeLap > 1 ? challengeSnapshots[challengeLap - 2] : null;
+    if (prevSnapshot) {
+      const prevCars = prevSnapshot.cars;
+      const prevPlayer = prevCars.find((c) => c.code === playerCar.code);
+      const prevActiveCars = [...prevCars].filter((c) => !c.isRetired).sort((a, b) => a.cumulativeTime - b.cumulativeTime);
+      const pIdx = prevActiveCars.findIndex((c) => c.code === playerCar.code);
+
+      if (pIdx >= 0 && pIdx < prevActiveCars.length - 1) {
+        const rivalCar = prevActiveCars[pIdx + 1];
+        const gap = rivalCar.cumulativeTime - (prevPlayer?.cumulativeTime || 0);
+        const currentRival = currentSnapshot.cars.find((c) => c.code === rivalCar.code);
+        if (currentRival?.isPitting && gap <= 2.8 && !playerCar.isPitting && playerCar.tyreAge >= 4) {
+          return {
+            type: 'undercut_threat',
+            icon: '⚠️',
+            target: '⚡ アンダーカット防衛 / BOX BOX!',
+            message: `後続の ${currentRival.name} (${currentRival.code}) がピットイン（ギャップ ${gap.toFixed(1)}s）！ニュータイヤの強力なペースで逆転される恐れがあります。今すぐBOX指示を出して防衛してください！`,
+          };
+        }
+      }
+
+      if (pIdx > 0) {
+        const rivalAhead = prevActiveCars[pIdx - 1];
+        const currentAhead = currentSnapshot.cars.find((c) => c.code === rivalAhead.code);
+        if (currentAhead?.isPitting && playerCar.tyreWearPercent < 65 && !playerCar.isPitting) {
+          return {
+            type: 'overcut_window',
+            icon: '⚡',
+            target: '🏁 オーバーカット好機 / ステイアウト＆プッシュ',
+            message: `前方の ${currentAhead.name} (${currentAhead.code}) がピットイン！前方にクリアエアが広がりました。あと2周プッシュしてアウトラップを上回り、オーバーカットを狙いましょう！`,
+          };
+        }
+      }
+    }
+
     const rainDiff = (activeScenario.actualRainLap || 99) - challengeLap;
     if (rainDiff >= 0 && rainDiff <= 2 && (activeScenario.actualRainIntensity || 0) > 0) {
       return {
@@ -1132,7 +1191,7 @@ export default function RaceSimulatorHub({
       target: 'M1 順位タワー / M2 テレメトリー',
       message: '各セクタータイムと前後ギャップの推移を監視中。天候急変やSC出動、接近戦が発生するとここに即時ガイダンスが表示されます。',
     };
-  }, [userAssistLevel, currentSnapshot, playerCar, challengeLap, activeScenario, pitProximity, boxQueuedForNextLap, ersEligibility]);
+  }, [userAssistLevel, currentSnapshot, playerCar, challengeLap, activeScenario, pitProximity, boxQueuedForNextLap, ersEligibility, challengeSnapshots]);
 
   const handleToggleErs = () => {
     // If activating, user must be eligible
@@ -1204,18 +1263,25 @@ export default function RaceSimulatorHub({
     if (radioAudioEnabled) playF1OutgoingRadioBeep();
     setRadioResponses((prev) => ({ ...prev, [promptId]: option.id }));
 
+    // For radio prompts, the user is responding directly to the urgent call generated for this lap (promptTriggerLap).
+    // Always target promptTriggerLap (capped at totalLaps) so "BOX NOW!" executes on the intended lap,
+    // even if the user took time to read or playback was running at 5x/10x speed.
+    const promptTriggerLap = currentSnapshot?.activeRadioPrompt?.triggerLap ?? challengeLap;
+    const targetBoxLap = Math.min(activeScenario.totalLaps, promptTriggerLap);
+
     if (option.actionType === 'box') {
       if (radioAudioEnabled) {
         playBoxBoxCall();
       }
       setBoxQueuedForNextLap(true);
+      const chosenCompound = option.targetCompound || nextCompoundChoice;
       if (option.targetCompound) setNextCompoundChoice(option.targetCompound);
       setPlayerTacticalCommands((prev) => ({
         ...prev,
-        [challengeLap]: {
-          ...prev[challengeLap],
+        [targetBoxLap]: {
+          ...prev[targetBoxLap],
           boxNextLap: true,
-          nextCompound: option.targetCompound || nextCompoundChoice,
+          nextCompound: chosenCompound,
         },
       }));
     } else if (option.actionType === 'stay') {
@@ -1224,6 +1290,10 @@ export default function RaceSimulatorHub({
         ...prev,
         [challengeLap]: {
           ...prev[challengeLap],
+          boxNextLap: false,
+        },
+        [challengeLap + 1]: {
+          ...prev[challengeLap + 1],
           boxNextLap: false,
         },
       }));
@@ -1296,6 +1366,7 @@ export default function RaceSimulatorHub({
     rainStartLap?: number;
     rainIntensityMm?: number;
     incidentFrequency?: IncidentFrequency;
+    carPackageId?: string;
   }) => {
     const cId = overrides?.circuitId || selectedCircuitId;
     const pCode = overrides?.playerCode || selectedPlayerCode;
@@ -1304,6 +1375,7 @@ export default function RaceSimulatorHub({
     const rainLap = overrides?.rainStartLap ?? sandboxRainLap;
     const rainMm = overrides?.rainIntensityMm ?? sandboxRainIntensity;
     const incFreq = overrides?.incidentFrequency || sandboxIncidentFreq;
+    const carPkg = overrides?.carPackageId !== undefined ? overrides.carPackageId : selectedCarPackageId;
 
     const scenario = generateSandboxScenario({
       circuitId: cId,
@@ -1313,6 +1385,7 @@ export default function RaceSimulatorHub({
       rainStartLap: rainLap,
       rainIntensityMm: rainMm,
       incidentFrequency: incFreq,
+      historicCarId: carPkg === 'standard' ? undefined : carPkg,
     });
     setCustomScenario(scenario);
     setGameMode('sandbox');
@@ -1333,6 +1406,8 @@ export default function RaceSimulatorHub({
   const resetGameState = () => {
     setChallengeLap(1);
     setChallengePlaying(false);
+    setIsRaceFinished(false);
+    setCurrentProgressPct(0);
     setPlayerTacticalCommands({});
     setRadioResponses({});
     setBoxQueuedForNextLap(false);
@@ -1356,6 +1431,8 @@ export default function RaceSimulatorHub({
   const handleStartRace = () => {
     setChallengeLap(1);
     setChallengePlaying(true);
+    setIsRaceFinished(false);
+    setCurrentProgressPct(0);
     setTacticalEventTimeline([]);
     resumedLapsRef.current.clear();
     setSimulatorPhase('race');
@@ -1364,6 +1441,8 @@ export default function RaceSimulatorHub({
   const handleRestartRace = () => {
     setChallengeLap(1);
     setChallengePlaying(true);
+    setIsRaceFinished(false);
+    setCurrentProgressPct(0);
     setPlayerTacticalCommands({});
     setRadioResponses({});
     setBoxQueuedForNextLap(false);
@@ -1383,6 +1462,8 @@ export default function RaceSimulatorHub({
   const handleBackToBriefing = () => {
     setChallengeLap(1);
     setChallengePlaying(false);
+    setIsRaceFinished(false);
+    setCurrentProgressPct(0);
     setPlayerTacticalCommands({});
     setRadioResponses({});
     setBoxQueuedForNextLap(false);
@@ -1594,6 +1675,21 @@ ${timelineSummary}
           </button>
 
           {/* Phase Quick Navigation Button */}
+          {/* Strategist Equipped Title Badge (Opens Paddock Hall of Fame) */}
+          <button
+            type="button"
+            onClick={() => setIsCareerModalOpen(true)}
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900/90 hover:bg-slate-850 border border-amber-500/40 text-[10px] font-mono text-amber-300 shadow-sm cursor-pointer transition-all hover:scale-105 active:scale-95"
+            title={`軍師称号: ${equippedTitle.name} (${equippedTitle.tacticalPerk.description}) — クリックでパドック殿堂を開く`}
+          >
+            <span>{equippedTitle.icon}</span>
+            <span className="font-bold truncate max-w-[140px]">{equippedTitle.name}</span>
+            {equippedTitle.tacticalPerk.probabilisticBonus > 0 && (
+              <span className="text-[9px] text-emerald-400 font-bold bg-emerald-950/60 px-1 py-0.2 rounded border border-emerald-500/30">
+                +{Math.round(equippedTitle.tacticalPerk.probabilisticBonus * 100)}%
+              </span>
+            )}
+          </button>
           <button
             type="button"
             onClick={() => {
@@ -1677,6 +1773,8 @@ ${timelineSummary}
           startSprintRace={startSprintRace}
           startMission={startMission}
           startProceduralCrisis={startProceduralCrisis}
+          selectedCarPackageId={selectedCarPackageId}
+          setSelectedCarPackageId={setSelectedCarPackageId}
           startSandboxMode={startSandboxMode}
           onOpenCareerModal={() => setIsCareerModalOpen(true)}
         />
@@ -1752,6 +1850,7 @@ ${timelineSummary}
             mobileConsoleView={mobileConsoleView}
             setMobileConsoleView={setMobileConsoleView}
             radioResponses={radioResponses}
+            isRaceFinished={isRaceFinished}
           />
 
       {/* ── 4-COLUMN PRO PITWALL COMMAND COCKPIT (TOWER | COURSE & COMMS | DATA | COMMANDS) ── */}
@@ -1859,17 +1958,17 @@ ${timelineSummary}
         />
       </div>
 
-      {/* Checkered Flag Finish Banner */}
-      {challengeLap >= activeScenario.totalLaps && (
+      {/* Checkered Flag Finish Banner (Appears only after all cars finish across the line) */}
+      {isRaceFinished && (
         <div className="p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-red-950 via-slate-900 to-amber-950 border-2 border-red-500 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-in zoom-in-95 duration-300">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-red-600 flex items-center justify-center text-2xl shadow-lg shrink-0">
               🏁
             </div>
             <div>
-              <div className="text-xs font-mono text-amber-400 font-bold">CHECKERED FLAG — RACE FINISHED</div>
+              <div className="text-xs font-mono text-amber-400 font-bold">CHECKERED FLAG — ALL CARS FINISHED</div>
               <h3 className="font-racing font-bold text-white text-lg sm:text-xl">
-                全{activeScenario.totalLaps}周を完走しました！
+                全{activeScenario.totalLaps}周を完走しました！全車チェッカー！
               </h3>
               <p className="text-xs text-slate-300">
                 最終順位: <strong className="text-white font-racing">P{playerCar?.position}</strong> (目標: P{activeScenario.targetPosition})
@@ -1931,6 +2030,11 @@ ${timelineSummary}
             onClose={() => setIsCareerModalOpen(false)}
             careerData={careerData}
             onSelectBadge={(badge) => setSelectedBadgeForDetail(badge)}
+            equippedTitleId={equippedTitleId}
+            onEquipTitle={(newTitleId) => {
+              setEquippedTitleId(newTitleId);
+              saveUserPreferences({ equippedTitleId: newTitleId });
+            }}
           />
 
           {/* ── INTEL BRIEFING MODAL (F1 大百科・用語集ポップアップ) ── */}

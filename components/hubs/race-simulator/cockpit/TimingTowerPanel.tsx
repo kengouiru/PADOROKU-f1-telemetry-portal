@@ -32,7 +32,15 @@ export const TimingTowerPanel: React.FC<TimingTowerPanelProps> = ({
 }) => {
   const allCars = currentSnapshot?.cars || [];
 
-  const renderCarCard = (car: typeof allCars[0]) => {
+  const sortedCars = React.useMemo(() => {
+    return [...allCars].sort((a, b) => {
+      if (a.isRetired && !b.isRetired) return 1;
+      if (!a.isRetired && b.isRetired) return -1;
+      return a.position - b.position;
+    });
+  }, [allCars]);
+
+  const renderCarCard = (car: typeof allCars[0], idx: number) => {
     const isTarget = car.code === activeScenario.playerConfig.code;
     const isTeammate = car.code === activeScenario.teammateConfig.code;
     const tyreProp = TYRE_PROPERTIES[car.tyreCompound];
@@ -51,7 +59,7 @@ export const TimingTowerPanel: React.FC<TimingTowerPanelProps> = ({
 
     return (
       <div
-        key={car.code}
+        key={`${car.code}-${car.position}-${idx}`}
         className={`px-1.5 py-1 rounded-lg flex items-center justify-between text-xs transition-all ${
           isRetired
             ? 'opacity-40 bg-slate-950/40 text-slate-500 border border-transparent'
@@ -196,9 +204,9 @@ export const TimingTowerPanel: React.FC<TimingTowerPanelProps> = ({
 
         {/* 22-Car Timing Rows: Clean Professional Column */}
         <div className="space-y-0.5 max-h-[580px] overflow-y-auto pr-0.5">
-          {allCars.map((car) => (
-            <React.Fragment key={car.code}>
-              {renderCarCard(car)}
+          {sortedCars.map((car, idx) => (
+            <React.Fragment key={`${car.code}-${car.position}-${idx}`}>
+              {renderCarCard(car, idx)}
               {car.position === 10 && (
                 <div
                   className="flex items-center gap-1 my-0.5 px-0.5 select-none"

@@ -261,19 +261,49 @@ export const TacticalCommandsPanel: React.FC<TacticalCommandsPanelProps> = ({
               </div>
             </div>
 
-            {/* Tactical Assist Mode Guidance Banner */}
+            {/* Tactical Assist Mode Guidance Banner (Threat Radar Enhanced) */}
             {userAssistLevel === 'assisted' && tacticalAssistGuidance && (
-              <div className="mt-1.5 p-2 rounded-xl bg-gradient-to-r from-cyan-950/90 via-slate-900 to-cyan-950/70 border border-cyan-500/40 text-xs shadow-sm shrink-0 animate-in fade-in duration-200">
-                <div className="flex items-center justify-between text-[10px] font-racing text-cyan-300 pb-1 border-b border-cyan-500/20">
+              <div
+                className={`mt-1.5 p-2 rounded-xl border text-xs shadow-sm shrink-0 animate-in fade-in duration-200 ${
+                  tacticalAssistGuidance.type === 'undercut_threat'
+                    ? 'bg-gradient-to-r from-red-950/95 via-slate-900 to-red-950/80 border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.35)] animate-pulse'
+                    : tacticalAssistGuidance.type === 'overcut_window'
+                    ? 'bg-gradient-to-r from-emerald-950/95 via-slate-900 to-emerald-950/80 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.35)]'
+                    : 'bg-gradient-to-r from-cyan-950/90 via-slate-900 to-cyan-950/70 border-cyan-500/40'
+                }`}
+              >
+                <div
+                  className={`flex items-center justify-between text-[10px] font-racing pb-1 border-b ${
+                    tacticalAssistGuidance.type === 'undercut_threat'
+                      ? 'text-red-300 border-red-500/30'
+                      : tacticalAssistGuidance.type === 'overcut_window'
+                      ? 'text-emerald-300 border-emerald-500/30'
+                      : 'text-cyan-300 border-cyan-500/20'
+                  }`}
+                >
                   <div className="flex items-center gap-1.5 font-bold">
                     <span>{tacticalAssistGuidance.icon}</span>
-                    <span>TACTICAL ASSIST GUIDE (計器確認ガイダンス)</span>
+                    <span>
+                      {tacticalAssistGuidance.type === 'undercut_threat'
+                        ? 'TACTICAL ALERT (アンダーカット迎撃警報)'
+                        : tacticalAssistGuidance.type === 'overcut_window'
+                        ? 'TACTICAL WINDOW (オーバーカット好機)'
+                        : 'TACTICAL ASSIST GUIDE (計器確認ガイダンス)'}
+                    </span>
                   </div>
-                  <span className="font-mono text-[8.5px] text-cyan-400 bg-cyan-950 px-1.5 py-0.5 rounded border border-cyan-500/30">
+                  <span
+                    className={`font-mono text-[8.5px] px-1.5 py-0.5 rounded border font-bold ${
+                      tacticalAssistGuidance.type === 'undercut_threat'
+                        ? 'text-red-300 bg-red-950 border-red-500/40'
+                        : tacticalAssistGuidance.type === 'overcut_window'
+                        ? 'text-emerald-300 bg-emerald-950 border-emerald-500/40'
+                        : 'text-cyan-400 bg-cyan-950 border-cyan-500/30'
+                    }`}
+                  >
                     {tacticalAssistGuidance.target}
                   </span>
                 </div>
-                <div className="text-[10px] text-slate-200 mt-1 leading-relaxed font-sans">
+                <div className="text-[10px] text-slate-100 mt-1 leading-relaxed font-sans">
                   {tacticalAssistGuidance.message}
                 </div>
               </div>
