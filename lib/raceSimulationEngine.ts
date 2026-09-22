@@ -2743,12 +2743,12 @@ export const PRESET_CHALLENGES: ChallengeScenario[] = [
       isPlayer: true,
     },
     teammateConfig: {
-      ...GRID_DRIVERS[1], // HAD
+      ...GRID_DRIVERS[1], // LAW
       basePaceOffset: 0.18,
       startTyre: 'SOFT',
       pit1Lap: 99,
     },
-    rivals: GRID_DRIVERS.filter(d => d.code !== 'TSU' && d.code !== 'HAD'),
+    rivals: GRID_DRIVERS.filter(d => d.code !== 'TSU' && d.code !== 'LAW'),
     startWeather: 'dry',
     weatherForecast: {
       radarDesc: '鈴鹿上空は晴れ時々曇り。Lap 4前後に高確率でSC出動予想（85%）。',
