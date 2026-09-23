@@ -1,4 +1,4 @@
-# F1 Telemetry Intelligence Portal - 開発進行規約 ＆ 品質・知財・意思決定記録規範 (.antigravity/rules.md)
+# F1 Telemetry Intelligence Portal - 開発進行規約 ＆ 品質・知財・意思決定記録規範 (GEMINI.md)
 
 本プロジェクトにおけるAIエージェントおよび開発者は、以下の「開発進行プロセス」「データ信頼性・文献蓄積」「著作権・知的財産権保護」「意思決定・変更記録」「ルールの自己成長」を永久規範として厳格に遵守すること。
 

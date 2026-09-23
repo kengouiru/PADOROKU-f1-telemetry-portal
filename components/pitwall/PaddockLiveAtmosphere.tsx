@@ -9,6 +9,9 @@ interface PaddockLiveAtmosphereProps {
   circuitName: string;
   startTyre: string;
   puMode: string;
+  gameMode?: string;
+  onBackToModeSelect?: () => void;
+  layoutVariant?: 'hero' | 'slim_bar';
 }
 
 // Pre-race garage preparation checklist dialogue (Zero in-race calls like "box")
@@ -33,8 +36,11 @@ export const PaddockLiveAtmosphere: React.FC<PaddockLiveAtmosphereProps> = ({
   circuitName,
   startTyre,
   puMode,
+  gameMode,
+  onBackToModeSelect,
+  layoutVariant = 'hero',
 }) => {
-  const [ambientAudioActive, setAmbientAudioActive] = useState<boolean>(false);
+  const [ambientAudioActive, setAmbientAudioActive] = useState<boolean>(true);
   const [hasCustomVideo, setHasCustomVideo] = useState<boolean>(false);
   const [videoLoadFailed, setVideoLoadFailed] = useState<boolean>(false);
   const [cctvTime, setCctvTime] = useState<string>('14:28:09:42');
@@ -345,7 +351,27 @@ export const PaddockLiveAtmosphere: React.FC<PaddockLiveAtmosphereProps> = ({
   };
 
   useEffect(() => {
+    // Automatically start ambient audio on mount (Default ON)
+    startPaddockAmbientAudio();
+
+    // Fallback for strict browser autoplay policies: resume on first user interaction anywhere
+    const handleFirstGesture = () => {
+      if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+        audioContextRef.current.resume();
+      }
+      if (backgroundAudioRef.current && backgroundAudioRef.current.paused) {
+        backgroundAudioRef.current.play().catch(() => {});
+      }
+    };
+
+    window.addEventListener('click', handleFirstGesture, { once: true });
+    window.addEventListener('keydown', handleFirstGesture, { once: true });
+    window.addEventListener('touchstart', handleFirstGesture, { once: true });
+
     return () => {
+      window.removeEventListener('click', handleFirstGesture);
+      window.removeEventListener('keydown', handleFirstGesture);
+      window.removeEventListener('touchstart', handleFirstGesture);
       stopPaddockAmbientAudio();
       if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
         audioContextRef.current.close().catch(() => {});
@@ -354,10 +380,101 @@ export const PaddockLiveAtmosphere: React.FC<PaddockLiveAtmosphereProps> = ({
     };
   }, []);
 
+  // Slim Bar HUD Mode (Plan B: Ambient Glass Cockpit Header)
+  if (layoutVariant === 'slim_bar') {
+    return (
+      <div className="relative overflow-hidden rounded-2xl border border-white/20 bg-slate-950/45 backdrop-blur-xl shadow-2xl p-2.5 sm:p-3 z-20">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          {/* Left: Title + CCTV Live Clock */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-black/45 backdrop-blur-md border border-white/15 shadow-md">
+              <span className="text-sm">📋</span>
+              <span className="font-racing font-black text-white text-xs sm:text-sm tracking-wider">
+                TACTICAL BRIEFING // 作戦ブリーフィング
+              </span>
+              {gameMode && (
+                <span className="px-1.5 py-0.2 rounded bg-red-600/90 text-white text-[9px] font-racing font-bold uppercase shadow-sm">
+                  {gameMode.toUpperCase()}
+                </span>
+              )}
+            </div>
+
+            {/* CCTV Live Feed Tag */}
+            <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-red-950/80 border border-red-500/60 text-[9px] sm:text-[10px] font-mono font-bold text-red-300 shadow-md">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+                <span>LIVE CAM 01</span>
+              </div>
+              <div className="px-2 py-0.5 rounded-lg bg-black/45 backdrop-blur-md border border-white/10 text-[9px] sm:text-[10px] font-mono text-slate-300">
+                {cctvTime}
+              </div>
+              <span className="hidden lg:inline-block text-[10px] font-racing font-bold text-white tracking-wider px-2 py-0.5 rounded-lg bg-black/35 border border-white/10">
+                {teamName.toUpperCase()} • #{driverCode}
+              </span>
+            </div>
+          </div>
+
+          {/* Right: Telemetry, Sound Toggle, Back Button */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Telemetry Quick Badges */}
+            <div className="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-mono text-slate-300 shadow-md">
+              <div className="flex items-center gap-1">
+                <Activity className="w-3 h-3 text-cyan-400 animate-pulse" />
+                <span className="text-slate-400">BLANKET:</span>
+                <span className="text-orange-400 font-bold">85°C</span>
+              </div>
+              <span className="text-white/20">|</span>
+              <div className="flex items-center gap-1">
+                <span className="text-slate-400">MGU-K:</span>
+                <span className="text-emerald-400 font-bold">READY</span>
+              </div>
+            </div>
+
+            {/* Sound Toggle Button */}
+            <button
+              type="button"
+              onClick={toggleAmbientAudio}
+              className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-lg backdrop-blur-md ${
+                ambientAudioActive
+                  ? 'bg-cyan-950/90 text-cyan-300 border border-cyan-400 shadow-cyan-950 ring-1 ring-cyan-400/40'
+                  : 'bg-black/70 hover:bg-slate-900 text-slate-400 hover:text-white border border-white/20'
+              }`}
+              title={ambientAudioActive ? 'ガレージ環境音: ON (クリックでミュート)' : 'ガレージ環境音: OFF (クリックで再生)'}
+            >
+              {ambientAudioActive ? (
+                <>
+                  <Volume2 className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                  <span className="text-[10px] sm:text-[11px] tracking-wider">SOUND ON</span>
+                </>
+              ) : (
+                <>
+                  <VolumeX className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="text-[10px] sm:text-[11px] tracking-wider">SOUND OFF</span>
+                </>
+              )}
+            </button>
+
+            {onBackToModeSelect && (
+              <button
+                type="button"
+                onClick={onBackToModeSelect}
+                className="px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-racing font-bold bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/20 backdrop-blur-md transition-all flex items-center gap-1 cursor-pointer shadow-md"
+              >
+                <span>◀</span>
+                <span>モード選択へ戻る</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Hero Mode (Plan A: Large Garage View with Bottom Overlap)
   return (
     <div className="relative overflow-hidden rounded-2xl border border-white/20 bg-slate-950 shadow-2xl group">
-      {/* ── Visual Media Container: Custom Video OR Photorealistic Cinematic Image ── */}
-      <div className="relative w-full h-[220px] sm:h-[260px] md:h-[300px] overflow-hidden bg-slate-950">
+      {/* ── Visual Media Container: Custom Video OR Photorealistic Cinematic Image (Cinematic Grand View) ── */}
+      <div className="relative w-full h-[320px] sm:h-[360px] md:h-[400px] overflow-hidden bg-slate-950">
         {/* Custom Video Option: /videos/paddock_ambient.mp4 */}
         {!videoLoadFailed && (
           <video
@@ -374,106 +491,132 @@ export const PaddockLiveAtmosphere: React.FC<PaddockLiveAtmosphereProps> = ({
 
         {/* Photorealistic Cinematic F1 Pit Garage Backdrop */}
         <div
-          className={`absolute inset-0 bg-cover bg-center transition-all duration-700 ${
-            hasCustomVideo ? 'opacity-0' : 'opacity-90'
+          className={`absolute inset-0 bg-cover transition-all duration-700 ${
+            hasCustomVideo ? 'opacity-0' : 'opacity-95 group-hover:opacity-100'
           }`}
           style={{
             backgroundImage: "url('/images/f1_garage_briefing.jpg')",
-            backgroundPosition: 'center 45%',
+            backgroundPosition: 'center 35%',
           }}
         />
 
-        {/* Cinematic Vignette & Deep Shadows for HUD Contrast */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-950/60 pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/80 pointer-events-none" />
+        {/* Cinematic Vignette: Clear, bright center with dark top & bottom for HUD readability & overlap */}
+        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-slate-950/90 via-slate-950/40 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent pointer-events-none" />
+        <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-slate-950/60 to-transparent pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-slate-950/60 to-transparent pointer-events-none" />
 
-        {/* CRT Scanline & HUD Grid Lines Overlay */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:24px_24px] opacity-15" />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/[0.03] to-transparent animate-pulse" />
+        {/* CRT Scanline & Subtle HUD Grid Overlay */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:24px_24px] opacity-10" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/[0.02] to-transparent animate-pulse" />
 
-        {/* ── Top CCTV HUD Layer ── */}
-        <div className="absolute top-0 inset-x-0 p-3 sm:p-4 z-20 flex items-center justify-between gap-2">
-          {/* Left: CCTV Feed Tag & Timecode */}
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-red-950/90 border border-red-500/60 text-[10px] sm:text-xs font-mono font-bold text-red-300 shadow-md">
-              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-              <span>LIVE CAM 01 // GARAGE BAY</span>
+        {/* ── Integrated Cockpit HUD Content Layer ── */}
+        <div className="relative z-20 flex flex-col justify-between h-full p-3 sm:p-4 md:p-5">
+          {/* Top Row: Mission Identity, CCTV Feed, Audio & Navigation */}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            {/* Left: Briefing Title & Live CCTV Indicators */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 shadow-md">
+                <span className="text-sm">📋</span>
+                <span className="font-racing font-black text-white text-xs sm:text-sm tracking-wider">
+                  TACTICAL BRIEFING // 作戦ブリーフィング
+                </span>
+                {gameMode && (
+                  <span className="px-1.5 py-0.2 rounded bg-red-600/90 text-white text-[9px] font-racing font-bold uppercase shadow-sm">
+                    {gameMode.toUpperCase()}
+                  </span>
+                )}
+              </div>
+
+              {/* CCTV Feed Tag & Timecode */}
+              <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-red-950/90 border border-red-500/60 text-[9px] sm:text-[10px] font-mono font-bold text-red-300 shadow-md">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
+                  <span>LIVE CAM 01 // GARAGE BAY</span>
+                </div>
+                <div className="px-2 py-0.5 rounded-lg bg-black/60 backdrop-blur-md border border-white/10 text-[9px] sm:text-[10px] font-mono text-slate-300">
+                  {cctvTime}
+                </div>
+                <span className="hidden lg:inline-block text-[10px] font-racing font-bold text-white tracking-wider px-2 py-0.5 rounded-lg bg-black/40 border border-white/10">
+                  {teamName.toUpperCase()} • #{driverCode}
+                </span>
+              </div>
             </div>
-            <div className="px-2 py-1 rounded bg-black/60 backdrop-blur-md border border-white/10 text-[10px] sm:text-xs font-mono text-slate-300">
-              {cctvTime}
-            </div>
-            <span className="hidden md:inline-block text-xs font-racing font-bold text-white tracking-wider px-2 py-0.5 rounded bg-black/40 border border-white/10">
-              {teamName.toUpperCase()} • #{driverCode}
-            </span>
-          </div>
 
-          {/* Right: Clean Minimal Speaker Icon Button for Sound ON/OFF */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={toggleAmbientAudio}
-              className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold flex items-center gap-2 transition-all cursor-pointer shadow-lg backdrop-blur-md ${
-                ambientAudioActive
-                  ? 'bg-cyan-950/90 text-cyan-300 border border-cyan-400 shadow-cyan-950 ring-1 ring-cyan-400/40'
-                  : 'bg-black/70 hover:bg-slate-900 text-slate-400 hover:text-white border border-white/20'
-              }`}
-              title={ambientAudioActive ? 'ガレージ環境音: ON (クリックでミュート)' : 'ガレージ環境音: OFF (クリックで再生)'}
-            >
-              {ambientAudioActive ? (
-                <>
-                  <Volume2 className="w-4 h-4 text-cyan-400 animate-pulse" />
-                  <span className="text-[11px] tracking-wider">SOUND ON</span>
-                </>
-              ) : (
-                <>
-                  <VolumeX className="w-4 h-4 text-slate-400" />
-                  <span className="text-[11px] tracking-wider">SOUND OFF</span>
-                </>
+            {/* Right: Telemetry Quick-Chips, Sound Toggle & Back Button */}
+            <div className="flex items-center gap-2 shrink-0">
+              {/* Telemetry Quick Badges */}
+              <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-mono text-slate-300 shadow-md">
+                <div className="flex items-center gap-1">
+                  <Activity className="w-3 h-3 text-cyan-400 animate-pulse" />
+                  <span className="text-slate-400">BLANKET:</span>
+                  <span className="text-orange-400 font-bold">85°C</span>
+                </div>
+                <span className="text-white/20">|</span>
+                <div className="flex items-center gap-1">
+                  <span className="text-slate-400">MGU-K:</span>
+                  <span className="text-emerald-400 font-bold">READY</span>
+                </div>
+              </div>
+
+              {/* Sound Toggle Button */}
+              <button
+                type="button"
+                onClick={toggleAmbientAudio}
+                className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-lg backdrop-blur-md ${
+                  ambientAudioActive
+                    ? 'bg-cyan-950/90 text-cyan-300 border border-cyan-400 shadow-cyan-950 ring-1 ring-cyan-400/40'
+                    : 'bg-black/70 hover:bg-slate-900 text-slate-400 hover:text-white border border-white/20'
+                }`}
+                title={ambientAudioActive ? 'ガレージ環境音: ON (クリックでミュート)' : 'ガレージ環境音: OFF (クリックで再生)'}
+              >
+                {ambientAudioActive ? (
+                  <>
+                    <Volume2 className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                    <span className="text-[10px] sm:text-[11px] tracking-wider">SOUND ON</span>
+                  </>
+                ) : (
+                  <>
+                    <VolumeX className="w-3.5 h-3.5 text-slate-400" />
+                    <span className="text-[10px] sm:text-[11px] tracking-wider">SOUND OFF</span>
+                  </>
+                )}
+              </button>
+
+              {onBackToModeSelect && (
+                <button
+                  type="button"
+                  onClick={onBackToModeSelect}
+                  className="px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-racing font-bold bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/20 backdrop-blur-md transition-all flex items-center gap-1 cursor-pointer shadow-md"
+                >
+                  <span>◀</span>
+                  <span>モード選択へ戻る</span>
+                </button>
               )}
-            </button>
-          </div>
-        </div>
-
-        {/* ── Bottom HUD Overlay: Telemetry Teleprinter & Machine Status ── */}
-        <div className="absolute bottom-0 inset-x-0 p-3 sm:p-4 z-20 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
-          {/* Left: Garage Atmosphere Description */}
-          <div className="max-w-md space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-mono font-bold flex items-center gap-1">
-                <Flame className="w-3 h-3 text-orange-400" /> PIT CREW PRE-GRID PREPARATION
-              </span>
-              <span className="text-[10px] font-mono text-slate-400">
-                {circuitName}
-              </span>
             </div>
-            <p className="text-xs text-slate-200 font-medium leading-relaxed drop-shadow-md">
-              メカニックたちがタイヤウォーマーを取り外し、最終トルクチェックと無線通信点検を実施中。戦略を決定しピットウォールへ着席してください。
-            </p>
           </div>
 
-          {/* Right: Live Diagnostics Telemetry Card (Glass HUD) */}
-          <div className="shrink-0 p-2.5 rounded-xl bg-black/70 backdrop-blur-md border border-white/20 font-mono text-[10px] space-y-1 text-slate-300 shadow-2xl">
-            <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-1">
-              <span className="font-racing text-amber-300 font-bold flex items-center gap-1">
-                <Activity className="w-3 h-3 text-cyan-400 animate-spin" /> GARAGE TELEMETRY
-              </span>
-              <span className="text-[9px] text-emerald-400 font-bold">CONNECTED</span>
+          {/* Lower Floating Status Bar: Positioned above the card overlap line to avoid collision */}
+          <div className="mb-20 sm:mb-24 md:mb-28 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="px-3 py-1 rounded-xl bg-black/60 backdrop-blur-md border border-white/15 text-[10px] sm:text-xs font-mono text-slate-200 flex items-center gap-2 shadow-xl">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                <span className="font-racing font-bold text-amber-300 flex items-center gap-1">
+                  <Flame className="w-3 h-3 text-orange-400" /> PIT CREW PRE-GRID PREPARATION
+                </span>
+                <span className="text-white/30 hidden sm:inline">•</span>
+                <span className="text-slate-300 hidden sm:inline">{circuitName}</span>
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[9.5px]">
+
+            <div className="hidden md:flex items-center gap-3 px-3 py-1 rounded-xl bg-black/60 backdrop-blur-md border border-white/15 text-[10px] font-mono text-slate-300 shadow-xl">
               <div>
-                <span className="text-slate-400">TYRE BLANKET: </span>
-                <span className="text-orange-400 font-bold">85°C WARM</span>
+                <span className="text-slate-400">INITIAL TYRE: </span>
+                <span className="text-emerald-400 font-bold uppercase">{startTyre}</span>
               </div>
+              <span className="text-white/20">|</span>
               <div>
-                <span className="text-slate-400">MGU-K HYBRID: </span>
-                <span className="text-cyan-300 font-bold">READY (350kW)</span>
-              </div>
-              <div>
-                <span className="text-slate-400">START TYRE: </span>
-                <span className="text-emerald-400 font-bold">{startTyre}</span>
-              </div>
-              <div>
-                <span className="text-slate-400">INITIAL PU: </span>
+                <span className="text-slate-400">ENGINE PU: </span>
                 <span className="text-purple-300 font-bold uppercase">{puMode}</span>
               </div>
             </div>

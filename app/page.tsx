@@ -782,8 +782,27 @@ export default function DashboardPage() {
       return;
     }
 
-    const targetCode = target.targetDriver ? (GLOBAL_DRIVER_NUM_TO_CODE[target.targetDriver] ?? 'VER') : 'VER';
-    const otherCode = targetCode === 'VER' ? 'NOR' : 'VER';
+    // Helper to resolve input ('VER', '44') to 3-letter driver code
+    const resolveDriverCode = (input?: string, fallback: string = 'VER') => {
+      if (!input) return fallback;
+      if (GLOBAL_DRIVER_NUM_TO_CODE[input]) return GLOBAL_DRIVER_NUM_TO_CODE[input];
+      return input.toUpperCase();
+    };
+
+    // Helper to resolve input ('VER', '44') to driver number string
+    const resolveDriverNumber = (input?: string): string | null => {
+      if (!input) return null;
+      if (/^\d+$/.test(input)) return input;
+      for (const [num, code] of Object.entries(GLOBAL_DRIVER_NUM_TO_CODE)) {
+        if (code.toUpperCase() === input.toUpperCase()) return num;
+      }
+      return null;
+    };
+
+    const targetCode = resolveDriverCode(target.targetDriver, 'VER');
+    const targetCode2 = target.targetDriver2
+      ? resolveDriverCode(target.targetDriver2, targetCode === 'VER' ? 'NOR' : 'VER')
+      : (targetCode === 'VER' ? 'NOR' : 'VER');
 
     let circId = 'bahrain-international';
     if (target.meetingName?.includes('Japan') || target.meetingName?.includes('Suzuka')) circId = 'suzuka';
@@ -795,15 +814,22 @@ export default function DashboardPage() {
     setDetailedTelemetryParams({
       circuitId: circId,
       driver1: targetCode,
-      driver2: otherCode,
+      driver2: targetCode2,
     });
 
-    // Auto-select driver if specified and not selected
-    if (target.targetDriver && !state.selectedDrivers.includes(target.targetDriver)) {
-      setState(prev => ({
-        ...prev,
-        selectedDrivers: [...prev.selectedDrivers, target.targetDriver!],
-      }));
+    // Auto-select drivers in main session state
+    const num1 = resolveDriverNumber(target.targetDriver);
+    const num2 = resolveDriverNumber(target.targetDriver2);
+    if (num1 || num2) {
+      setState(prev => {
+        const nextSelected = [...prev.selectedDrivers];
+        if (num1 && !nextSelected.includes(num1)) nextSelected.unshift(num1);
+        if (num2 && !nextSelected.includes(num2)) nextSelected.push(num2);
+        return {
+          ...prev,
+          selectedDrivers: nextSelected.slice(0, 3),
+        };
+      });
     }
 
     desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });

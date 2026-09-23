@@ -981,6 +981,7 @@ export default function KnowledgeHistoryHub({
               team={selectedTeamDetail}
               allTeams={KNOWLEDGE_TEAMS}
               onSelectTeam={(t) => setSelectedTeamDetail(t)}
+              onNavigateToTelemetry={onNavigateToTelemetry}
               onClose={() => setSelectedTeamDetail(null)}
             />
           )}

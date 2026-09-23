@@ -65,6 +65,14 @@ export interface GridTeam {
     isRookie?: boolean;
     note?: string;
   }[];
+  reserves?: {
+    number?: number;
+    code: string;
+    name: string;
+    country: string;
+    flag: string;
+    note?: string;
+  }[];
 }
 
 // Backward compatibility type alias

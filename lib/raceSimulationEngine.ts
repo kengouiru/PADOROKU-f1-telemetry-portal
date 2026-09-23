@@ -2163,9 +2163,11 @@ export function runFullGrandPrixSimulation(params: {
       const slickCompounds = tracker.compoundsUsed.filter(c => c === 'SOFT' || c === 'MEDIUM' || c === 'HARD');
       const distinctSlicks = new Set(slickCompounds);
       const hadWetConditions = weatherType === 'drizzle' || weatherType === 'monsoon' || (rainStartLap && currentLap >= rainStartLap);
-      const mandatoryTwoCompoundsMet = hadWetConditions || distinctSlicks.size >= 2;
+      // Mid-race takeovers (<= 15 laps) and sprint modes assume earlier compound compliance or mission rules
+      const isMidRaceTakeover = totalLaps <= 15 || raceLengthMode === 'sprint';
+      const mandatoryTwoCompoundsMet = hadWetConditions || distinctSlicks.size >= 2 || isMidRaceTakeover;
 
-      if (currentLap === totalLaps && !mandatoryTwoCompoundsMet && !tracker.isRetired && raceLengthMode !== 'sprint') {
+      if (currentLap === totalLaps && !mandatoryTwoCompoundsMet && !tracker.isRetired && !isMidRaceTakeover) {
         note = 'DSQ (FIA Art. 30.5: 2種ドライタイヤ義務違反)';
       }
 

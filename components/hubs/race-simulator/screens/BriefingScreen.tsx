@@ -89,52 +89,62 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
   handleBackToModeSelect,
   handleStartRace,
 }) => {
+  // Solid cockpit card styling (Plan A: High contrast dark cockpit deck with crisp typography)
+  const cardGlassClass =
+    'p-4 rounded-2xl bg-slate-900/90 backdrop-blur-md border border-white/15 shadow-2xl shadow-black/80 space-y-3';
+
+  // Sub-box inside cards (e.g. title/desc, radar desc)
+  const subBoxClass =
+    'p-3 rounded-xl bg-slate-950/90 border border-white/10 space-y-1';
+
+  // Sub-card (e.g. tyre, PU mode, driver info boxes)
+  const subCardClass =
+    'p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2';
+
+  // Small cell (e.g. weather controls)
+  const subCellClass =
+    'p-2 rounded-lg bg-slate-950/80 border border-white/5';
+
+  // Circuit specs cell
+  const subCellSpecClass =
+    'p-2 rounded-lg bg-slate-950/60 border border-white/5';
+
+  // Pillar box in Race Command Scope
+  const pillarClass =
+    'p-3 rounded-xl bg-slate-950/80 border border-white/5 space-y-1';
+
+  // Narrative box
+  const narrativeBoxClass =
+    'p-2.5 rounded-xl bg-slate-950/60 border border-white/10 flex items-start gap-2 text-xs';
+
+  // Unselected button style
+  const unselectedBtnClass =
+    'bg-slate-900 border-white/10 text-slate-400 hover:text-white hover:bg-slate-800';
+
+  // Select dropdown style
+  const selectClass =
+    'bg-slate-900 border border-white/10 rounded-lg px-2 py-1 text-xs text-white font-mono';
+
   return (
-    <div className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
-      {/* Briefing Header Banner */}
-      <div className="glass-card-premium p-4 rounded-2xl border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-r from-slate-950 via-slate-900 to-red-950/40">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-base">📋</span>
-            <span className="font-racing font-black text-white text-base sm:text-lg tracking-wider">
-              TACTICAL BRIEFING & MACHINE SETUP / 作戦ブリーフィング
-            </span>
-            <span className="px-2 py-0.5 rounded bg-red-600 text-white text-[10px] font-racing font-bold uppercase">
-              {gameMode.toUpperCase()}
-            </span>
-          </div>
-          <p className="text-xs text-slate-300 mt-1">
-            レース前の作戦会議。コース特性と天候レーダーを精査し、初期タイヤ・PUモード・ピット戦略を策定してください。
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0">
-          <button
-            type="button"
-            onClick={handleBackToModeSelect}
-            className="btn-console px-3.5 py-2 text-xs font-racing font-bold text-slate-300 hover:text-white flex items-center gap-1.5"
-          >
-            <span>◀</span>
-            <span>モード選択へ戻る</span>
-          </button>
-        </div>
-      </div>
-
-      {/* 🏎️ Paddock Live Cam & Garage Bay Atmosphere */}
+    <div className="relative animate-in fade-in zoom-in-95 duration-300">
+      {/* 🏎️ Unified Cockpit HUD Header: Garage Atmosphere Hero + Briefing Title + CCTV + Audio Controls */}
       <PaddockLiveAtmosphere
         teamName={effectivePlayerConfig.team}
         driverCode={effectivePlayerConfig.code}
         circuitName={activeScenario.circuit.name}
         startTyre={effectivePlayerConfig.startTyre}
         puMode={effectivePlayerConfig.machineSetup.puMode}
+        gameMode={gameMode}
+        onBackToModeSelect={handleBackToModeSelect}
+        layoutVariant="hero"
       />
 
-      {/* Two-Column Briefing & Setup Deck */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      {/* Two-Column Briefing & Setup Deck (Plan A: Hero Overlap Layout) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 relative z-10 px-0.5 sm:px-1 -mt-16 sm:-mt-20 md:-mt-24">
         {/* Left Column: Circuit Specs, Objectives & Weather Radar */}
         <div className="lg:col-span-5 space-y-3">
           {/* Mission Target & Circuit Overview */}
-          <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 space-y-3">
+          <div className={cardGlassClass}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-2xl">{activeScenario.circuit.flag}</span>
@@ -179,7 +189,7 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
               </div>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-1">
+            <div className={subBoxClass}>
               <div className="text-[11px] font-racing font-bold text-amber-300">
                 {activeScenario.title}
               </div>
@@ -190,15 +200,15 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
 
             {/* Circuit Specs Matrix */}
             <div className="grid grid-cols-3 gap-2 text-center text-xs font-mono">
-              <div className="p-2 rounded-lg bg-slate-950/60 border border-white/5">
+              <div className={subCellSpecClass}>
                 <div className="text-[10px] text-slate-400">ピットロスタイム</div>
                 <div className="text-cyan-300 font-bold">{activeScenario.circuit.pitLaneLoss}s</div>
               </div>
-              <div className="p-2 rounded-lg bg-slate-950/60 border border-white/5">
+              <div className={subCellSpecClass}>
                 <div className="text-[10px] text-slate-400">オーバーテイク</div>
                 <div className="text-amber-300 font-bold capitalize">{activeScenario.circuit.overtakeDifficulty}</div>
               </div>
-              <div className="p-2 rounded-lg bg-slate-950/60 border border-white/5">
+              <div className={subCellSpecClass}>
                 <div className="text-[10px] text-slate-400">タイヤ攻撃性</div>
                 <div className="text-rose-300 font-bold capitalize">{activeScenario.circuit.tyreAggression}</div>
               </div>
@@ -206,7 +216,7 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
           </div>
 
           {/* Weather Radar & SC Risk Forecast */}
-          <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 space-y-3">
+          <div className={cardGlassClass}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="font-racing font-bold text-white text-xs flex items-center gap-1.5">
@@ -231,7 +241,7 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
               )}
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-950 border border-white/10 space-y-2">
+            <div className={subBoxClass}>
               <div className="flex items-center gap-2 text-xs">
                 <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping" />
                 <span className="text-slate-200 font-mono text-[11px] leading-relaxed">
@@ -266,7 +276,7 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
 
             {/* Weather Customizer Controls */}
             <div className="grid grid-cols-3 gap-2 text-xs">
-              <div className={`p-2 rounded-lg bg-slate-950/80 border border-white/5 space-y-1 ${activeScenario.lockedSettings?.weather ? 'opacity-60' : ''}`}>
+              <div className={`${subCellClass} space-y-1 ${activeScenario.lockedSettings?.weather ? 'opacity-60' : ''}`}>
                 <span className="text-[10px] font-mono text-slate-400 block flex items-center justify-between">
                   <span>天候タイプ</span>
                   {activeScenario.lockedSettings?.weather && <Lock className="w-2.5 h-2.5 text-amber-400" />}
@@ -310,7 +320,7 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
                 </select>
               </div>
 
-              <div className={`p-2 rounded-lg bg-slate-950/80 border border-white/5 space-y-1 ${activeScenario.lockedSettings?.rainLap || activeScenario.lockedSettings?.weather ? 'opacity-60' : ''}`}>
+              <div className={`${subCellClass} space-y-1 ${activeScenario.lockedSettings?.rainLap || activeScenario.lockedSettings?.weather ? 'opacity-60' : ''}`}>
                 <span className="text-[10px] font-mono text-slate-400 block flex items-center justify-between">
                   <span>降雨周回</span>
                   {(activeScenario.lockedSettings?.rainLap || activeScenario.lockedSettings?.weather) && <Lock className="w-2.5 h-2.5 text-amber-400" />}
@@ -340,7 +350,7 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
                 </select>
               </div>
 
-              <div className="p-2 rounded-lg bg-slate-950/80 border border-white/5 space-y-1">
+              <div className={`${subCellClass} space-y-1`}>
                 <span className="text-[10px] font-mono text-slate-400 block">SC危険度</span>
                 <select
                   value={activeScenario.scProbability > 0.7 ? 'high' : activeScenario.scProbability > 0.3 ? 'normal' : 'low'}
@@ -369,14 +379,14 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
         {/* Right Column: Machine Strategy & Difficulty Setup */}
         <div className="lg:col-span-7 space-y-3">
           {/* Machine Initial Setup Deck */}
-          <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 space-y-3">
+          <div className={cardGlassClass}>
             <span className="font-racing font-bold text-white text-xs flex items-center gap-1.5">
               <Gauge className="w-4 h-4 text-red-400" /> マシン初期戦術セットアップ
             </span>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               {/* Starting Tyre Selector */}
-              <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
+              <div className={subCardClass}>
                 <div className="flex items-center justify-between">
                   <span className="font-racing text-slate-300 font-bold text-[11px] flex items-center gap-1">
                     <span>スタート装着タイヤ</span>
@@ -417,7 +427,7 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
                             ? 'bg-red-950 border-red-500 text-white shadow-lg ring-1 ring-red-500'
                             : isLocked
                             ? 'bg-slate-950/40 border-white/5 text-slate-600 opacity-30 cursor-not-allowed'
-                            : 'bg-slate-900 border-white/10 text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer'
+                            : `${unselectedBtnClass} cursor-pointer`
                         }`}
                         title={
                           isLocked
@@ -456,7 +466,7 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
               </div>
 
               {/* Target Pit Stop Strategy */}
-              <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
+              <div className={subCardClass}>
                 <div className="flex items-center justify-between">
                   <span className="font-racing text-slate-300 font-bold text-[11px]">
                     予定ピット戦略
@@ -481,10 +491,10 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
                   <select
                     value={customTargetBoxLap || effectiveTargetBoxLap}
                     onChange={(e) => setCustomTargetBoxLap(Number(e.target.value))}
-                    className="bg-slate-900 border border-white/10 rounded-lg px-2 py-1 text-xs text-white font-mono"
+                    className={selectClass}
                   >
                     {Array.from({ length: activeScenario.totalLaps }, (_, i) => i + 1).map((l) => (
-                      <option key={l} value={l}>
+                      <option key={l} value={l} className="bg-slate-900 text-white">
                         LAP {l} {l === activeScenario.actualRainLap ? '(雨予想)' : ''}
                       </option>
                     ))}
@@ -497,10 +507,10 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
                       setCustomTargetCompound(e.target.value as TyreCompound);
                       setNextCompoundChoice(e.target.value as TyreCompound);
                     }}
-                    className="bg-slate-900 border border-white/10 rounded-lg px-2 py-1 text-xs text-white font-racing font-bold"
+                    className={`${selectClass} font-racing font-bold`}
                   >
                     {(['SOFT', 'MEDIUM', 'HARD', 'INTER', 'WET'] as TyreCompound[]).map((c) => (
-                      <option key={c} value={c}>
+                      <option key={c} value={c} className="bg-slate-900 text-white">
                         {c}
                       </option>
                     ))}
@@ -513,7 +523,7 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
               </div>
 
               {/* Initial PU Mode */}
-              <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
+              <div className={subCardClass}>
                 <div className="flex items-center justify-between">
                   <span className="font-racing text-slate-300 font-bold text-[11px]">
                     初期PUモード
@@ -551,7 +561,7 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
                         className={`p-2 rounded-lg text-center border transition-all cursor-pointer ${
                           isCurrent
                             ? 'bg-cyan-950 border-cyan-500 text-cyan-200 shadow-md font-bold'
-                            : 'bg-slate-900 border-white/10 text-slate-400 hover:text-white'
+                            : unselectedBtnClass
                         }`}
                       >
                         <div className="font-racing text-[10px]">{mode.label}</div>
@@ -563,7 +573,7 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
               </div>
 
               {/* Downforce & Driver Info */}
-              <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
+              <div className={subCardClass}>
                 <div className="flex items-center justify-between">
                   <span className="font-racing text-slate-300 font-bold text-[11px]">
                     自車セッティング情報
@@ -591,121 +601,117 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
             </div>
           </div>
 
-          {/* 🏁 Race Distance & Regulation Mode Selector */}
-          <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 space-y-3">
+          {/* 🏁 Race Command Scope & Phase Intel (シナリオ投入フェーズ＆指揮区間) */}
+          <div className={cardGlassClass}>
             <div className="flex items-center justify-between">
               <span className="font-racing font-bold text-white text-xs flex items-center gap-1.5">
-                <Flag className="w-4 h-4 text-red-500" /> レース距離 ＆ FIAレギュレーション
+                <Flag className="w-4 h-4 text-red-500" /> レース展開 ＆ 指揮フェーズ
               </span>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono text-cyan-400 font-bold">
-                  {raceLengthMode === 'gp_short_25'
-                    ? '短縮GP (25%距離・ピット戦略必須)'
-                    : raceLengthMode === 'gp_full_100'
-                    ? 'フルGP (100%距離・本格リアル物理)'
-                    : 'スプリント (無交換スプリント)'}
-                </span>
+              <div className="flex items-center gap-1.5">
+                {activeScenario.gameMode === 'mission' ? (
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-950/80 text-purple-300 border border-purple-500/40 flex items-center gap-1">
+                    <span>🎯 特務ミッション</span>
+                    <span>•</span>
+                    <span>限定 {activeScenario.totalLaps} 周</span>
+                  </span>
+                ) : activeScenario.gameMode === 'sprint' ? (
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-950/80 text-amber-300 border border-amber-500/40 flex items-center gap-1">
+                    <span>⚡ スプリント決戦</span>
+                    <span>•</span>
+                    <span>全 {activeScenario.totalLaps} 周</span>
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 flex items-center gap-1">
+                    <span>🏎️ 決勝レース終盤介入</span>
+                    <span>•</span>
+                    <span>残り {activeScenario.totalLaps} 周</span>
+                  </span>
+                )}
                 <button
                   type="button"
                   onClick={() => setBriefingHelpTopic('race_distance')}
-                  className="p-0.5 rounded text-slate-400 hover:text-cyan-300 hover:bg-slate-800 transition-all cursor-pointer"
-                  title="レース距離とレギュレーション解説"
+                  className="p-0.5 rounded text-slate-400 hover:text-cyan-300 hover:bg-slate-800 transition-all cursor-pointer ml-1"
+                  title="レース指揮フェーズと時間加速解説"
                 >
                   <HelpCircle className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-              {/* Option 1: 25% Short GP (Recommended) */}
-              <button
-                type="button"
-                onClick={() => setRaceLengthMode('gp_short_25')}
-                className={`p-3 rounded-xl text-left border transition-all cursor-pointer ${
-                  raceLengthMode === 'gp_short_25'
-                    ? 'bg-red-950/80 border-red-500 text-white shadow-lg ring-1 ring-red-400/50'
-                    : 'bg-slate-950/80 border-white/10 text-slate-400 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center justify-between pb-1">
-                  <span className="font-racing font-bold text-xs text-red-400">
-                    🏁 短縮グランプリ (25%)
+            {/* Tactical Scope 3-Pillar Matrix */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs font-mono">
+              {/* Pillar 1: Intervention & Laps */}
+              <div className={pillarClass}>
+                <div className="text-[10px] text-slate-400">投入タイミング / 指揮区間</div>
+                <div className="font-racing font-bold text-cyan-300 text-sm flex items-baseline gap-1">
+                  <span>
+                    {activeScenario.gameMode === 'mission'
+                      ? `限定 ${activeScenario.totalLaps} 周`
+                      : activeScenario.gameMode === 'sprint'
+                      ? `全 ${activeScenario.totalLaps} 周`
+                      : `残り ${activeScenario.totalLaps} 周`}
                   </span>
-                  <span className="px-1.5 py-0.2 rounded bg-red-600/80 text-[9px] font-mono font-bold text-white">
-                    オススメ
-                  </span>
+                  {activeScenario.circuit.totalLaps > activeScenario.totalLaps && (
+                    <span className="text-[10px] text-slate-500 font-mono">
+                      (全{activeScenario.circuit.totalLaps}周中)
+                    </span>
+                  )}
                 </div>
-                <div className="text-[10px] text-slate-300 font-mono">
-                  周回: 約14〜18周 (所要5〜8分)
+                <div className="text-[9.5px] text-slate-400 leading-tight">
+                  {activeScenario.gameMode === 'mission'
+                    ? '特定戦術ミッション完遂に向けた集中指揮'
+                    : activeScenario.gameMode === 'sprint'
+                    ? 'ピット義務なしの全周スプリントフラットアウト'
+                    : 'レース途中の重要局面からチェッカーまでピットウォールを直接指揮'}
                 </div>
-                <div className="text-[9px] text-slate-400 mt-1 leading-tight">
-                  🛞 スケール摩耗 3.2倍 ＆ <strong>2種ドライタイヤ義務</strong>。短時間でアンダーカットやピットウィンドウの戦略駆け引きを凝縮！
-                </div>
-              </button>
+              </div>
 
-              {/* Option 2: 100% Full GP */}
-              <button
-                type="button"
-                onClick={() => setRaceLengthMode('gp_full_100')}
-                className={`p-3 rounded-xl text-left border transition-all cursor-pointer ${
-                  raceLengthMode === 'gp_full_100'
-                    ? 'bg-purple-950/80 border-purple-500 text-white shadow-lg ring-1 ring-purple-400/50'
-                    : 'bg-slate-950/80 border-white/10 text-slate-400 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center justify-between pb-1">
-                  <span className="font-racing font-bold text-xs text-purple-400">
-                    🏆 フルグランプリ (100%)
-                  </span>
-                  <span className="px-1.5 py-0.2 rounded bg-purple-600/80 text-[9px] font-mono font-bold text-white">
-                    本格派
-                  </span>
+              {/* Pillar 2: Target & Objective */}
+              <div className={pillarClass}>
+                <div className="text-[10px] text-slate-400">作戦目標クリア条件</div>
+                <div className="font-racing font-bold text-amber-300 text-sm">
+                  P{activeScenario.targetPosition} 以内フィニッシュ
                 </div>
-                <div className="text-[10px] text-slate-300 font-mono">
-                  周回: 50〜78周 (10x速で約8分)
+                <div className="text-[9.5px] text-slate-400 leading-tight">
+                  チェッカーフラッグ到達時の順位でリザルトとCP評価を確定
                 </div>
-                <div className="text-[9px] text-slate-400 mt-1 leading-tight">
-                  🏎️ リアル1.0倍摩耗 ＆ 燃料減衰（100kg→0kg）。5x/10x/20xの高速シミュレーションと自動ポーズで完全なF1司令塔を体験！
-                </div>
-              </button>
+              </div>
 
-              {/* Option 3: Sprint Race */}
-              <button
-                type="button"
-                onClick={() => setRaceLengthMode('sprint')}
-                className={`p-3 rounded-xl text-left border transition-all cursor-pointer ${
-                  raceLengthMode === 'sprint'
-                    ? 'bg-amber-950/80 border-amber-500 text-white shadow-lg ring-1 ring-amber-400/50'
-                    : 'bg-slate-950/80 border-white/10 text-slate-400 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center justify-between pb-1">
-                  <span className="font-racing font-bold text-xs text-amber-400">
-                    ⚡ スプリントレース
-                  </span>
-                  <span className="px-1.5 py-0.2 rounded bg-amber-600/80 text-[9px] font-mono font-bold text-white">
-                    超接近戦
+              {/* Pillar 3: Physics & Time Acceleration */}
+              <div className={pillarClass}>
+                <div className="text-[10px] text-slate-400">シミュレーション演算</div>
+                <div className="font-racing font-bold text-emerald-300 text-sm flex items-center gap-1">
+                  <span>リアル1.0x物理</span>
+                  <span className="text-[9px] px-1 py-0.2 rounded bg-emerald-950 text-emerald-400 border border-emerald-500/40">
+                    倍速対応
                   </span>
                 </div>
-                <div className="text-[10px] text-slate-300 font-mono">
-                  周回: 15〜19周 (所要4〜6分)
+                <div className="text-[9.5px] text-slate-400 leading-tight">
+                  不自然な圧縮摩耗なし。レース中に1x〜20xの高速倍速と自動ポーズが可能
                 </div>
-                <div className="text-[9px] text-slate-400 mt-1 leading-tight">
-                  🔥 ピット義務なし ＆ 1.0倍摩耗。全車フラットアウトでタイヤクリフとDRSトレインを防衛する超接近バトル！
-                </div>
-              </button>
+              </div>
+            </div>
+
+            {/* Tactical Concept Narrative Box */}
+            <div className={narrativeBoxClass}>
+              <span className="text-amber-400 text-sm shrink-0">💡</span>
+              <p className="text-slate-300 text-[11px] leading-relaxed">
+                {activeScenario.gameMode === 'mission'
+                  ? `【特務ミッション】限られた周回（限定${activeScenario.totalLaps}周）で特定の過酷な戦術条件をクリアするミッションです。1周ごとの指示が勝敗を分ける極限状況を体験できます。`
+                  : `【レース途中からの指揮引き継ぎ】決勝レースの途中（終盤残り${activeScenario.totalLaps}周）からピットウォール司令官としてレースの指揮を受け持ちます。時間はシミュレーター内で1x〜20xへ自由に加速できるため、長大な周回を不自然に圧縮することなく、リアルなF1物理挙動でチェッカーまでの熱戦を指揮できます。`}
+              </p>
             </div>
           </div>
 
           {/* AI Difficulty & User Assist Deck */}
-          <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 space-y-3">
+          <div className={cardGlassClass}>
             <span className="font-racing font-bold text-white text-xs flex items-center gap-1.5">
               <ShieldAlert className="w-4 h-4 text-amber-400" /> 難易度 ＆ 操作アシスト設定
             </span>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
               {/* AI Difficulty */}
-              <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
+              <div className={subCardClass}>
                 <div className="flex items-center justify-between">
                   <span className="font-racing text-slate-300 font-bold text-[11px]">
                     AIライバル難易度
@@ -741,7 +747,7 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
                             : lvl.id === 'standard'
                             ? 'bg-blue-950 border-blue-500 text-white shadow-md ring-1 ring-blue-400'
                             : 'bg-emerald-950 border-emerald-500 text-white shadow-md ring-1 ring-emerald-400'
-                          : 'bg-slate-900 border-white/10 text-slate-400 hover:text-white'
+                          : unselectedBtnClass
                       }`}
                     >
                       <div className="text-base">{lvl.icon}</div>
@@ -756,7 +762,7 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
               </div>
 
               {/* Assist Mode */}
-              <div className="p-3 rounded-xl bg-slate-950/80 border border-white/10 space-y-2">
+              <div className={subCardClass}>
                 <div className="flex items-center justify-between">
                   <span className="font-racing text-slate-300 font-bold text-[11px]">
                     操作アシストモード
@@ -777,7 +783,7 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
                     className={`p-2 rounded-lg text-left border font-racing font-bold transition-all cursor-pointer ${
                       userAssistLevel === 'assisted'
                         ? 'bg-emerald-950 border-emerald-500 text-emerald-300 shadow-md'
-                        : 'bg-slate-900 border-white/10 text-slate-400 hover:text-white'
+                        : unselectedBtnClass
                     }`}
                   >
                     <div className="flex items-center gap-1 text-[11px]">
@@ -795,7 +801,7 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
                     className={`p-2 rounded-lg text-left border font-racing font-bold transition-all cursor-pointer ${
                       userAssistLevel === 'expert'
                         ? 'bg-cyan-950 border-cyan-500 text-cyan-300 shadow-md'
-                        : 'bg-slate-900 border-white/10 text-slate-400 hover:text-white'
+                        : unselectedBtnClass
                     }`}
                   >
                     <div className="flex items-center gap-1 text-[11px]">
@@ -814,7 +820,7 @@ export const BriefingScreen: React.FC<BriefingScreenProps> = ({
       </div>
 
       {/* Bottom Action Bar: Start Race Button */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-red-950 border border-red-500/40 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="mt-4 p-4 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-red-950 border border-red-500/40 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-xl">
             🏁

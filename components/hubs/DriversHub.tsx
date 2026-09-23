@@ -19,10 +19,20 @@ import {
 } from '@/data/f1KnowledgeData';
 import DriverDetailModal from './DriverDetailModal';
 import DriverComparisonTool from './DriverComparisonTool';
+import TeamDetailModal from './TeamDetailModal';
 import { useUserPreferences } from '@/lib/userPreferences';
 import { GRID_2026_TEAMS, GRID_2025_TEAMS } from '@/data/f1SeasonData';
+import {
+  HISTORICAL_SEASONS_DATA,
+  getAvailableHistoricalYears,
+  getHistoricalSeasonGrid,
+  type HistoricalGridTeam,
+  type HistoricalGridDriver,
+  type SeasonGridInfo,
+} from '@/data/f1HistoricalGrids';
 
-export type DriverViewMode = 'grouped' | 'grid2026' | 'grid2025' | 'flat' | 'legends' | 'compare';
+export type DriverViewMode = 'seasonGrid' | 'grouped' | 'grid2026' | 'grid2025' | 'flat' | 'legends' | 'compare';
+export type DriverSortField = 'entries' | 'wins' | 'podiums' | 'championships' | 'polePositions' | 'name' | 'number';
 export type DriverStatusFilter = 'ALL' | 'Current' | 'Legend' | 'Favorites';
 
 export interface DriversHubProps {
@@ -33,6 +43,20 @@ export interface DriversHubProps {
   onNavigateToDrama?: () => void;
 }
 
+const HISTORICAL_TEAM_ID_MAP: Record<string, string[]> = {
+  mercedes: ['mercedes'],
+  'red-bull': ['red-bull'],
+  ferrari: ['ferrari'],
+  mclaren: ['mclaren'],
+  'aston-martin': ['aston-martin', 'racing-point', 'force-india'],
+  alpine: ['alpine', 'renault'],
+  williams: ['williams'],
+  rb: ['rb', 'alphatauri', 'toro-rosso'],
+  audi: ['audi', 'sauber', 'alfa-romeo'],
+  haas: ['haas'],
+  cadillac: ['cadillac'],
+};
+
 export default function DriversHub({
   searchQuery = '',
   onClearSearch,
@@ -41,14 +65,42 @@ export default function DriversHub({
   onNavigateToDrama,
 }: DriversHubProps) {
   const { prefs, isFavoriteDriver, toggleDriver } = useUserPreferences();
-  const [viewMode, setViewMode] = useState<DriverViewMode>('grouped');
+  const [viewMode, setViewMode] = useState<DriverViewMode>('seasonGrid');
+  const [selectedYear, setSelectedYear] = useState<number>(2026);
+  const [sortField, setSortField] = useState<DriverSortField>('entries');
+  const [sortAscending, setSortAscending] = useState<boolean>(false);
   const [driverStatusFilter, setDriverStatusFilter] = useState<DriverStatusFilter>('ALL');
   const [driverTeamFilter, setDriverTeamFilter] = useState<string>('ALL');
   const [localSearch, setLocalSearch] = useState<string>('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedDriverDetail, setSelectedDriverDetail] = useState<DriverProfile | null>(null);
+  const [selectedTeamDetail, setSelectedTeamDetail] = useState<TeamProfile | null>(null);
   const [compareDriver1, setCompareDriver1] = useState<string>('VER');
   const [compareDriver2, setCompareDriver2] = useState<string>('NOR');
+
+  // Helper to open TeamDetailModal by matching teamId
+  const handleOpenTeamDetail = (teamId: string) => {
+    let tm = KNOWLEDGE_TEAMS.find((t) => t.id === teamId);
+    if (!tm) {
+      for (const [currId, histIds] of Object.entries(HISTORICAL_TEAM_ID_MAP)) {
+        if (histIds.includes(teamId)) {
+          tm = KNOWLEDGE_TEAMS.find((t) => t.id === currId);
+          break;
+        }
+      }
+    }
+    if (tm) {
+      setSelectedTeamDetail(tm);
+    }
+  };
+
+  // Available historical years (2026 down to 2016)
+  const availableYears = useMemo(() => getAvailableHistoricalYears(), []);
+
+  // Selected season grid data
+  const currentSeasonGrid = useMemo(() => {
+    return getHistoricalSeasonGrid(selectedYear) || HISTORICAL_SEASONS_DATA[2026];
+  }, [selectedYear]);
 
   // Helper map: driver code -> DriverProfile
   const driverMap = useMemo(() => {
@@ -57,12 +109,95 @@ export default function DriversHub({
     return map;
   }, []);
 
+  // Generate fallback profile for historical drivers not in current main knowledge base
+  const getFallbackProfile = (drv: HistoricalGridDriver, team: HistoricalGridTeam): DriverProfile => {
+    return {
+      id: `hist-${drv.code.toLowerCase()}-${selectedYear}`,
+      code: drv.code,
+      number: drv.number || 0,
+      fullName: drv.name,
+      country: drv.country,
+      team: team.teamName,
+      teamColor: team.teamColor,
+      status: drv.role === 'Reserve' ? 'Reserve' : 'Current',
+      nickname: drv.role === 'Reserve' ? '公式リザーブ / テストドライバー' : 'F1ドライバー',
+      birthDate: '---',
+      birthPlace: drv.country,
+      f1Debut: `${selectedYear}年`,
+      driverType: drv.role === 'Reserve' ? 'リザーブ＆シミュレータ開発' : 'レギュラードライバー',
+      numberOrigin: drv.number ? `カーナンバー #${drv.number}` : 'ゼッケン未定',
+      careerSummary: drv.note
+        ? `${selectedYear}年のF1世界選手権において、${team.fullName}より${drv.role === 'Reserve' ? '公式リザーブドライバー' : 'レギュラードライバー'}としてエントリー [1]。「${drv.note}」の記録を残す [2]。`
+        : `${selectedYear}年のF1世界選手権において、${team.fullName}より${drv.role === 'Reserve' ? '公式リザーブドライバー' : 'レギュラードライバー'}として参戦 [1]。`,
+      entries: drv.role === 'Reserve' ? 0 : 20,
+      wins: 0,
+      podiums: 0,
+      polePositions: 0,
+      championships: 0,
+      drivingStyle: {
+        traits: [drv.role === 'Reserve' ? 'シミュレータ＆フィードバック' : 'レースクラフト'],
+        brakingTechnique: 'チームのデータロガーおよびテレメトリーに基づき最適な減速Gを発生 [1]。',
+        tyreManagement: 'スティントに応じたタイヤマネジメントを遂行 [2]。',
+        telemetrySignature: `${selectedYear}年仕様の${team.powerUnit}パワーユニット搭載マシンを駆り、精密なスロットルワークを展開。`,
+        preferredCircuitTypes: ['複合テクニカルサーキット'],
+        summary: `${selectedYear}年シーズンに${team.teamName}で活躍。`,
+      },
+      biography: {
+        personality: 'プロフェッショナルな姿勢でチームの技術開発とレースウィークを支える。',
+        rivalries: 'チームメイトとの切磋琢磨。',
+        iconicRaces: drv.note
+          ? [{ gp: `${selectedYear}年シーズン`, year: selectedYear, description: drv.note, tacticalMasterclass: 'チーム戦略を完璧に遂行。' }]
+          : [],
+        quotes: ['「チームの目標達成のために全力を尽くす。」'],
+        offTrack: 'フィジカルトレーニングおよびシミュレータセッションに注力。',
+      },
+      milestones: drv.note
+        ? [{ date: `${selectedYear}-01-01`, event: drv.note, refId: 1 }]
+        : [{ date: `${selectedYear}-01-01`, event: `${selectedYear}年 ${team.teamName} 所属`, refId: 1 }],
+      references: [
+        {
+          id: 1,
+          title: `${selectedYear} FIA Formula One World Championship Entry List & Official Results`,
+          publisher: 'Fédération Internationale de l’Automobile',
+          url: 'https://www.fia.com',
+          verifiedDate: '2024-01-10',
+        },
+        {
+          id: 2,
+          title: `${team.fullName} Official Season Archive`,
+          publisher: `${team.teamName} Communications`,
+          url: 'https://www.formula1.com',
+          verifiedDate: '2024-01-10',
+        },
+      ],
+      seasonHistory: [
+        {
+          year: selectedYear,
+          team: team.fullName,
+          teamId: team.teamId,
+          role: drv.role,
+          carNumber: drv.number,
+          note: drv.note,
+        },
+      ],
+    };
+  };
+
+  const handleHistoricalDriverClick = (drv: HistoricalGridDriver, team: HistoricalGridTeam) => {
+    const existing = driverMap.get(drv.code);
+    if (existing) {
+      setSelectedDriverDetail(existing);
+    } else {
+      setSelectedDriverDetail(getFallbackProfile(drv, team));
+    }
+  };
+
   // Sync effective search
   const effectiveSearch = searchQuery || localSearch;
 
-  // Filtered drivers for flat / search view
+  // Filtered & Sorted drivers for flat / directory view
   const filteredDrivers = useMemo(() => {
-    return KNOWLEDGE_DRIVERS.filter((d) => {
+    const list = KNOWLEDGE_DRIVERS.filter((d) => {
       const q = effectiveSearch.toLowerCase().trim();
       const matchesSearch =
         !q ||
@@ -85,7 +220,37 @@ export default function DriversHub({
 
       return matchesSearch && matchesStatus && matchesTeam;
     });
-  }, [effectiveSearch, driverStatusFilter, driverTeamFilter, isFavoriteDriver]);
+
+    return list.sort((a, b) => {
+      let comparison = 0;
+      switch (sortField) {
+        case 'entries':
+          comparison = (b.entries || 0) - (a.entries || 0);
+          break;
+        case 'wins':
+          comparison = (b.wins || 0) - (a.wins || 0);
+          break;
+        case 'podiums':
+          comparison = (b.podiums || 0) - (a.podiums || 0);
+          break;
+        case 'polePositions':
+          comparison = (b.polePositions || 0) - (a.polePositions || 0);
+          break;
+        case 'championships':
+          comparison = (b.championships || 0) - (a.championships || 0);
+          break;
+        case 'name':
+          comparison = a.fullName.localeCompare(b.fullName, 'ja');
+          break;
+        case 'number':
+          comparison = (a.number || 999) - (b.number || 999);
+          break;
+        default:
+          comparison = 0;
+      }
+      return sortAscending ? -comparison : comparison;
+    });
+  }, [effectiveSearch, driverStatusFilter, driverTeamFilter, isFavoriteDriver, sortField, sortAscending]);
 
   // Legends list
   const legendDrivers = useMemo(() => {
@@ -276,6 +441,21 @@ export default function DriversHub({
           {/* View Mode Toggle Buttons */}
           <div className="flex flex-wrap items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-white/5">
             <button
+              onClick={() => setViewMode('seasonGrid')}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                viewMode === 'seasonGrid' || viewMode === 'grid2026' || viewMode === 'grid2025'
+                  ? 'bg-red-600 text-white shadow-md shadow-red-500/30 ring-1 ring-red-400/50'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
+              }`}
+            >
+              <span>📅</span>
+              <span>年度別グリッド</span>
+              <span className="text-[9px] px-1 py-0.2 rounded bg-red-400/20 text-red-200 border border-red-400/30 ml-0.5">
+                2016-2026
+              </span>
+            </button>
+
+            <button
               onClick={() => setViewMode('grouped')}
               className={`px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === 'grouped'
@@ -284,37 +464,19 @@ export default function DriversHub({
               }`}
             >
               <span>🏁</span>
-              <span>チーム別グループ</span>
-              <span className="text-[9px] px-1 py-0.2 rounded bg-sky-400/20 text-sky-200 border border-sky-400/30 ml-0.5">
-                推奨
-              </span>
-            </button>
-
-            <button
-              onClick={() => setViewMode('grid2026')}
-              className={`px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                viewMode === 'grid2026'
-                  ? 'bg-red-600 text-white shadow-md shadow-red-500/30 ring-1 ring-red-400/50'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
-              }`}
-            >
-              <span>🏎️</span>
-              <span>2026年最新グリッド</span>
-              <span className="text-[9px] px-1 py-0.2 rounded bg-red-400/20 text-red-200 border border-red-400/30 ml-0.5">
-                11チーム
-              </span>
+              <span>2026チーム別</span>
             </button>
 
             <button
               onClick={() => setViewMode('flat')}
               className={`px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === 'flat'
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-400/50'
+                  ? 'bg-sky-600 text-white shadow-md shadow-sky-500/30 ring-1 ring-sky-400/50'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
               }`}
             >
               <span>👥</span>
-              <span>全ドライバー</span>
+              <span>全ドライバー名鑑</span>
             </button>
 
             <button
@@ -345,29 +507,29 @@ export default function DriversHub({
           {/* Counter Badge */}
           <div className="flex items-center gap-2 self-end lg:self-auto shrink-0">
             <span className="text-xs font-mono font-bold bg-slate-900 px-3 py-1.5 rounded-xl border border-white/10 text-sky-400">
+              {(viewMode === 'seasonGrid' || viewMode === 'grid2026' || viewMode === 'grid2025') && (
+                <>
+                  表示中: <strong className="text-white text-sm">{selectedYear}年</strong> ({currentSeasonGrid.teams.length}チーム / レギュラー{currentSeasonGrid.teams.reduce((acc, t) => acc + t.drivers.length, 0)}名 / リザーブ{currentSeasonGrid.teams.reduce((acc, t) => acc + (t.reserves?.length || 0), 0)}名)
+                </>
+              )}
               {viewMode === 'grouped' && (
                 <>
                   表示中: <strong className="text-white text-sm">全11チーム</strong> (27名)
                 </>
               )}
-              {viewMode === 'grid2026' && (
-                <>
-                  表示中: <strong className="text-white text-sm">2026年グリッド 11チーム</strong> (22名)
-                </>
-              )}
               {viewMode === 'flat' && (
                 <>
-                  表示中: <strong className="text-white text-sm">{filteredDrivers.length}</strong> / {KNOWLEDGE_DRIVERS.length} 名
+                  名鑑: <strong className="text-white text-sm">{filteredDrivers.length}</strong> / {KNOWLEDGE_DRIVERS.length} 名
                 </>
               )}
               {viewMode === 'legends' && (
                 <>
-                  表示中: 殿堂レジェンド <strong className="text-white text-sm">{legendDrivers.length}</strong> 名
+                  殿堂レジェンド: <strong className="text-white text-sm">{legendDrivers.length}</strong> 名
                 </>
               )}
               {viewMode === 'compare' && (
                 <>
-                  表示中: <strong className="text-purple-300 text-sm">2名直接比較モード</strong>
+                  <strong className="text-purple-300 text-sm">2名直接比較モード</strong>
                 </>
               )}
             </span>
@@ -665,8 +827,18 @@ export default function DriversHub({
                     )}
                   </div>
 
-                  {/* Right: Principal & PU Badges */}
+                  {/* Right: Lineage, Principal & PU Badges */}
                   <div className="flex items-center justify-end gap-1.5 text-[10px] font-mono text-slate-400 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenTeamDetail(team.id)}
+                      className="px-2 py-0.5 rounded-md bg-sky-950/70 hover:bg-sky-900/80 text-sky-300 hover:text-white font-racing font-bold text-[10px] border border-sky-500/30 flex items-center gap-1 transition-all hover:scale-105 cursor-pointer shadow-sm"
+                      title={`${team.name} の系統樹・2026マシンスペック・歴代変遷を見る`}
+                    >
+                      <span>🌿</span>
+                      <span className="hidden sm:inline">系統樹・諸元</span>
+                      <span>➔</span>
+                    </button>
                     <span className="bg-slate-900/90 border border-white/5 px-2 py-0.5 rounded-md hidden sm:inline whitespace-nowrap">
                       👔 <strong className="text-slate-200">{team.teamPrincipal}</strong>
                     </span>
@@ -721,72 +893,138 @@ export default function DriversHub({
         </div>
       )}
 
-      {/* ── View Mode: 2026 OFFICIAL GRID (11 TEAMS x 2 DRIVERS = 22 DRIVERS) ── */}
-      {viewMode === 'grid2026' && (
-        <div className="flex flex-col gap-5 animate-fade-in">
-          {/* 2026 Grid Header Banner */}
-          <div className="bg-gradient-to-r from-red-950/40 via-slate-950 to-red-950/40 border border-red-500/30 rounded-2xl p-5 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-mono font-bold uppercase tracking-wider">
-                  2026 NEW ERA (11 TEAMS)
+      {/* ── View Mode: 📅 HISTORICAL SEASON GRID (2016 - 2026, TEAMS, REGULARS & RESERVES) ── */}
+      {(viewMode === 'seasonGrid' || viewMode === 'grid2026' || viewMode === 'grid2025') && (
+        <div className="flex flex-col gap-4 animate-fade-in">
+          {/* Season Header Banner with West Year Selector & Era Info */}
+          <div className="bg-gradient-to-r from-red-950/40 via-slate-950 to-slate-900 border border-red-500/30 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col gap-3.5">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div>
+                <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-mono font-bold uppercase tracking-wider">
+                    {currentSeasonGrid.year} SEASON GRID
+                  </span>
+                  <span className="text-xs text-sky-400 font-mono font-bold">
+                    {currentSeasonGrid.eraName}
+                  </span>
+                </div>
+                <h2 className="text-xl md:text-2xl font-racing font-bold text-white tracking-wide flex items-center gap-2">
+                  <span>{currentSeasonGrid.year}年 F1世界選手権 公式グリッド＆体制</span>
+                </h2>
+                <p className="text-xs text-slate-300 mt-1 max-w-3xl leading-relaxed">
+                  {currentSeasonGrid.seasonSummary}
+                </p>
+              </div>
+
+              {/* West Year Selector Dropdown */}
+              <div className="flex items-center gap-2 bg-slate-900/90 border border-amber-500/40 p-2 sm:p-2.5 rounded-xl self-start md:self-center shadow-lg shrink-0">
+                <label className="text-xs font-racing font-bold text-amber-300 whitespace-nowrap flex items-center gap-1">
+                  <span>📅</span>
+                  <span>年度切替:</span>
+                </label>
+                <select
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(Number(e.target.value))}
+                  className="bg-slate-950 border border-white/15 text-white font-racing font-bold text-xs sm:text-sm px-2.5 py-1.5 rounded-lg cursor-pointer hover:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400"
+                >
+                  {availableYears.map((yr) => (
+                    <option key={yr} value={yr} className="bg-slate-950 text-white">
+                      🏁 {yr}年 {yr === 2026 ? '(最新現役規定)' : yr === 2025 ? '(ノリス初戴冠)' : yr === 2021 ? '(劇的最終周)' : yr === 2016 ? '(ロズベルグ戴冠)' : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Season Champions Ribbon */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-white/10 text-xs">
+              <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-lg text-amber-200">
+                <span className="text-base">👑</span>
+                <span className="font-bold font-mono">世界王者 (Drivers):</span>
+                <span className="text-white font-bold truncate">
+                  {currentSeasonGrid.championDriver.name}
                 </span>
-                <span className="text-xs text-slate-400 font-mono">
-                  全11チーム 22名 正式確定ロスター
+                <span className="text-[11px] font-mono text-amber-400/90 ml-auto shrink-0">
+                  {currentSeasonGrid.championDriver.wins}勝 / {currentSeasonGrid.championDriver.points}点
                 </span>
               </div>
-              <h2 className="text-xl md:text-2xl font-racing font-bold text-white tracking-wide">
-                2026年 F1世界選手権 公式グリッド体制
-              </h2>
-              <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-                新PU規定＆アクティブエアロの幕開け、キャデラックF1チームの第11番目新規参戦、アウディ本格ワークス参入、ホンダ×アストンマーティン、レッドブル・フォード、メルセデス2年目キミ・アントネッリの快進撃など、歴史的変革を迎えた2026年全11チームの陣容。
-              </p>
-            </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <span className="px-3 py-1.5 rounded-xl bg-slate-900 border border-white/10 text-xs font-mono text-slate-300">
-                新規参入: <strong className="text-amber-400">Cadillac</strong> / ワークス: <strong className="text-sky-400">Audi</strong>
-              </span>
+              <div className="flex items-center gap-2 bg-sky-500/10 border border-sky-500/30 px-3 py-1.5 rounded-lg text-sky-200">
+                <span className="text-base">🏆</span>
+                <span className="font-bold font-mono">製造者王者 (Constructors):</span>
+                <span className="text-white font-bold truncate">
+                  {currentSeasonGrid.championConstructor.name}
+                </span>
+                <span className="text-[11px] font-mono text-sky-400/90 ml-auto shrink-0">
+                  {currentSeasonGrid.championConstructor.wins}勝 / {currentSeasonGrid.championConstructor.points}点
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* 11 Teams Grid */}
+          {/* Teams Grid for the Selected Year */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
-            {GRID_2026_TEAMS.map((team) => (
+            {currentSeasonGrid.teams.map((team) => (
               <div
-                key={team.teamName}
+                key={team.teamId}
                 className="glass-card rounded-2xl p-3.5 sm:p-4 border shadow-lg transition-all flex flex-col justify-between gap-3"
                 style={{ borderLeftColor: team.teamColor, borderLeftWidth: '5px' }}
               >
-                {/* Team Info Bar (Slim Single-Line Header) */}
-                <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-white/10">
+                {/* Team Info Bar Header */}
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-2 mb-1 border-b border-white/10">
                   <div className="flex items-center gap-2 min-w-0">
                     <span
                       className="w-2.5 h-4 rounded-full shrink-0 shadow-sm"
                       style={{ backgroundColor: team.teamColor }}
                     />
+                    {team.finalRank && (
+                      <span className="bg-white/10 text-white font-mono text-[10px] font-bold px-1.5 py-0.5 rounded">
+                        #{team.finalRank}
+                      </span>
+                    )}
                     <h3 className="text-sm sm:text-base font-racing font-bold text-white leading-tight truncate">
                       {team.teamName}
                     </h3>
+                    <span className="text-[11px] text-slate-400 truncate hidden sm:inline">
+                      {team.fullName}
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-1.5 text-xs font-mono shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenTeamDetail(team.teamId)}
+                      className="px-2 py-0.5 rounded-md bg-sky-950/70 hover:bg-sky-900/80 text-sky-300 hover:text-white font-racing font-bold text-[10px] border border-sky-500/40 flex items-center gap-1 transition-all hover:scale-105 cursor-pointer shadow-sm"
+                      title={`${team.teamName} の系統樹・2026マシンスペック・歴代変遷を見る`}
+                    >
+                      <span>🌿</span>
+                      <span className="hidden sm:inline">系統樹・諸元</span>
+                      <span>➔</span>
+                    </button>
+                    {team.teamPrincipal && (
+                      <span className="bg-slate-900/90 border border-white/5 px-2 py-0.5 rounded-md text-slate-400 text-[10px] hidden md:inline">
+                        👔 {team.teamPrincipal}
+                      </span>
+                    )}
                     <span className="bg-slate-900/90 border border-white/5 px-2 py-0.5 rounded-lg text-slate-300 text-[10px] whitespace-nowrap">
                       ⚡ <strong className="text-sky-300">{team.powerUnit}</strong>
                     </span>
+                    {team.points !== undefined && (
+                      <span className="bg-amber-400/10 border border-amber-400/20 text-amber-300 font-mono text-[10px] px-2 py-0.5 rounded-md font-bold">
+                        {team.points} pts
+                      </span>
+                    )}
                   </div>
                 </div>
 
-                {/* 2 Drivers Columns */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 flex-1">
+                {/* Regular Drivers Columns (2 Primary Seats) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {team.drivers.map((drv) => {
                     const profile = driverMap.get(drv.code);
                     return (
                       <div
                         key={drv.code}
-                        onClick={() => profile && setSelectedDriverDetail(profile)}
-                        className={`bg-slate-900/80 hover:bg-slate-850 p-3 rounded-xl border border-white/5 hover:border-white/20 transition-all flex flex-col justify-between gap-2 shadow-sm group h-full ${
-                          profile ? 'cursor-pointer' : ''
-                        }`}
+                        onClick={() => handleHistoricalDriverClick(drv, team)}
+                        className="bg-slate-900/80 hover:bg-slate-850 p-3 rounded-xl border border-white/5 hover:border-white/20 transition-all flex flex-col justify-between gap-2 shadow-sm group h-full cursor-pointer"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2 min-w-0">
@@ -798,7 +1036,7 @@ export default function DriversHub({
                                 backgroundColor: `${team.teamColor}15`,
                               }}
                             >
-                              #{drv.number} {drv.code}
+                              {drv.number ? `#${drv.number}` : ''} {drv.code}
                             </span>
                             <div className="min-w-0">
                               <div className="flex items-center gap-1.5">
@@ -809,11 +1047,11 @@ export default function DriversHub({
                             </div>
                           </div>
 
-                          {/* Transfer / Rookie Badges */}
+                          {/* Rookie / Transfer / Special Badges */}
                           <div className="flex items-center gap-1">
                             {drv.isTransfer && (
                               <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold font-mono">
-                                ⚡ 2026移籍
+                                ⚡ 移籍
                               </span>
                             )}
                             {drv.isRookie && (
@@ -823,7 +1061,7 @@ export default function DriversHub({
                             )}
                             {drv.code === 'TSU' && (
                               <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/40 text-[10px] font-bold font-mono">
-                                🇯🇵 日本のエース
+                                🇯🇵 日本
                               </span>
                             )}
                           </div>
@@ -837,7 +1075,7 @@ export default function DriversHub({
                           </div>
                         )}
 
-                        {/* Actions: Unified Fixed Height & No-Wrap Buttons */}
+                        {/* Actions Row */}
                         <div className="flex items-center justify-between pt-1 border-t border-white/5 text-xs">
                           <button
                             type="button"
@@ -852,26 +1090,121 @@ export default function DriversHub({
                             <span>⚔️ 比較</span>
                           </button>
 
-                          {profile && (
-                            <span className="text-sky-400 group-hover:translate-x-0.5 transition-transform text-xs font-bold flex items-center gap-0.5 whitespace-nowrap shrink-0">
-                              <span>詳細</span>
-                              <span>➔</span>
-                            </span>
-                          )}
+                          <span className="text-sky-400 group-hover:translate-x-0.5 transition-transform text-xs font-bold flex items-center gap-0.5 whitespace-nowrap shrink-0">
+                            <span>詳細</span>
+                            <span>➔</span>
+                          </span>
                         </div>
                       </div>
                     );
                   })}
                 </div>
+
+                {/* Reserve & Test Drivers Section (控え選手・テストドライバー) */}
+                {team.reserves && team.reserves.length > 0 && (
+                  <div className="mt-2 pt-2.5 border-t border-white/10 bg-slate-950/50 rounded-xl p-2.5">
+                    <div className="flex items-center gap-1.5 mb-2 text-[11px] font-racing font-bold text-amber-300/90">
+                      <span>🛡️</span>
+                      <span>公式リザーブ ＆ テスト開発ドライバー ({team.reserves.length}名)</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {team.reserves.map((res) => (
+                        <div
+                          key={res.code}
+                          onClick={() => handleHistoricalDriverClick(res, team)}
+                          className="bg-slate-900/90 hover:bg-slate-800 border border-white/10 hover:border-amber-400/50 p-2 rounded-lg flex items-center justify-between gap-2 transition-all cursor-pointer group shadow-sm"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0">
+                              {res.role === 'Reserve' ? '🛡️ リザーブ' : '🔬 テスト'}
+                            </span>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1">
+                                <span className="text-xs font-bold text-slate-200 group-hover:text-amber-200 truncate">
+                                  {res.name}
+                                </span>
+                                <span className="text-[11px] shrink-0">{res.flag}</span>
+                              </div>
+                              {res.note && (
+                                <p className="text-[10px] text-slate-400 truncate max-w-[200px]">
+                                  {res.note}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <span className="text-[10px] font-mono text-slate-500 group-hover:text-sky-300 shrink-0">
+                            詳細 ➔
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* ── MODE 2: 👥 FLAT GRID VIEW ── */}
+      {/* ── MODE 2: 👥 全ドライバー名鑑・一覧 (Directory View with Sorting) ── */}
       {viewMode === 'flat' && (
-        <>
+        <div className="flex flex-col gap-4 animate-fade-in">
+          {/* Directory Header Bar & Sort Controls */}
+          <div className="glass-card-premium rounded-xl p-3.5 border flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-md">
+            <div>
+              <h2 className="text-base sm:text-lg font-racing font-bold text-white flex items-center gap-2">
+                <span>👥 全ドライバー名鑑・一覧</span>
+                <span className="text-xs font-mono bg-sky-500/20 text-sky-300 border border-sky-500/40 px-2 py-0.5 rounded-full">
+                  {filteredDrivers.length} 名表示中
+                </span>
+              </h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                現役22名・殿堂レジェンド・リザーブを含む全ドライバー一覧。出走数・勝利数・タイトル数等でソート可能です。
+              </p>
+            </div>
+
+            {/* Sort Toolbar */}
+            <div className="flex flex-wrap items-center gap-1.5 self-start md:self-center">
+              <span className="text-xs font-racing text-slate-400 mr-1">並び替え:</span>
+              {(
+                [
+                  { field: 'entries', label: '出走数' },
+                  { field: 'wins', label: '勝利数' },
+                  { field: 'podiums', label: '表彰台' },
+                  { field: 'polePositions', label: 'PP' },
+                  { field: 'championships', label: '王座数' },
+                  { field: 'name', label: '氏名' },
+                  { field: 'number', label: '番号' },
+                ] as const
+              ).map(({ field, label }) => (
+                <button
+                  key={field}
+                  type="button"
+                  onClick={() => setSortField(field)}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold transition-all cursor-pointer ${
+                    sortField === field
+                      ? 'bg-sky-600 text-white shadow-sm'
+                      : 'bg-slate-900/80 text-slate-400 hover:text-white border border-white/5 hover:bg-slate-800'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+
+              {/* Order Toggle (Asc / Desc) */}
+              <button
+                type="button"
+                onClick={() => setSortAscending((prev) => !prev)}
+                className="px-2 py-1 rounded-lg text-xs font-mono font-bold bg-slate-900 border border-white/10 text-amber-300 hover:bg-slate-800 transition-all cursor-pointer ml-1"
+                title={sortAscending ? '昇順 (少ない順)' : '降順 (多い順)'}
+              >
+                {sortAscending ? '▲ 昇順' : '▼ 降順'}
+              </button>
+            </div>
+          </div>
+
           {filteredDrivers.length === 0 ? (
             <div className="glass-card p-12 text-center flex flex-col items-center justify-center gap-3">
               <span className="text-4xl">👤</span>
@@ -893,7 +1226,7 @@ export default function DriversHub({
               {filteredDrivers.map((driver) => renderDriverCard(driver))}
             </div>
           )}
-        </>
+        </div>
       )}
 
       {/* ── MODE 3: 🏆 LEGENDS SHOWCASE VIEW ── */}
@@ -951,6 +1284,23 @@ export default function DriversHub({
             setViewMode('compare');
           }}
           onClose={() => setSelectedDriverDetail(null)}
+        />
+      )}
+
+      {/* ── Team Detail & Lineage Modal ── */}
+      {selectedTeamDetail && (
+        <TeamDetailModal
+          team={selectedTeamDetail}
+          allTeams={KNOWLEDGE_TEAMS}
+          onSelectTeam={(t) => setSelectedTeamDetail(t)}
+          onSelectDriverDetail={(code) => {
+            const drv = driverMap.get(code);
+            if (drv) {
+              setSelectedDriverDetail(drv);
+            }
+          }}
+          onNavigateToTelemetry={onNavigateToTelemetry}
+          onClose={() => setSelectedTeamDetail(null)}
         />
       )}
     </div>

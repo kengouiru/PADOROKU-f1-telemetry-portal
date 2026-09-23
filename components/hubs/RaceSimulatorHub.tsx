@@ -154,8 +154,8 @@ export default function RaceSimulatorHub({
   }, []);
   const equippedTitle = useMemo(() => getUserTitle(equippedTitleId), [equippedTitleId]);
 
-  // Race Length Mode: 'gp_short_25' (25% Distance with 3.2x scaled wear), 'gp_full_100' (100% full GP), 'sprint'
-  const [raceLengthMode, setRaceLengthMode] = useState<'gp_short_25' | 'gp_full_100' | 'sprint'>('gp_short_25');
+  // Race Length / Physics Mode: Defaults to authentic 1.0x real physics ('gp_full_100') or 'sprint'
+  const [raceLengthMode, setRaceLengthMode] = useState<'gp_short_25' | 'gp_full_100' | 'sprint'>('gp_full_100');
 
   // ════════════════════════════════════════════════════════════════════════════
   // 🎯 CHALLENGE GAME MODE STATE
@@ -184,6 +184,16 @@ export default function RaceSimulatorHub({
     if (customScenario) return customScenario;
     return PRESET_CHALLENGES[presetIdx] || PRESET_CHALLENGES[0];
   }, [customScenario, presetIdx]);
+
+  // Automatically align race simulation physics with scenario type:
+  // Sprint scenarios use 'sprint', while mid-race takeover scenarios use authentic 1.0x real physics ('gp_full_100').
+  useEffect(() => {
+    if (activeScenario.gameMode === 'sprint') {
+      setRaceLengthMode('sprint');
+    } else {
+      setRaceLengthMode('gp_full_100');
+    }
+  }, [activeScenario.gameMode]);
 
   // 4-Stage Game Cycle Phase: mode_select -> briefing -> race -> debrief
   const [simulatorPhase, setSimulatorPhase] = useState<SimulatorPhase>('mode_select');

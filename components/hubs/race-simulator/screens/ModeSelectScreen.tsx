@@ -1376,38 +1376,32 @@ export const ModeSelectScreen: React.FC<ModeSelectScreenProps> = ({
 
                 return (
                   <div className="space-y-3.5">
-                    {/* Header: Track Identity */}
-                    <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl">{targetCircuit.flag}</span>
-                        <div>
-                          <h3 className="font-racing font-black text-white text-base sm:text-lg">
-                            {targetCircuit.name}
-                          </h3>
-                          <span className="text-[10px] font-mono text-slate-400 block">
-                            {targetCircuit.city}, {targetCircuit.country}
-                          </span>
+                    {/* Header: Track Identity & Direct Sandbox Launch */}
+                    <div className="flex items-center justify-between gap-3 pb-2 border-b border-white/10">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl shrink-0">{targetCircuit.flag}</span>
+                          <div>
+                            <h3 className="font-racing font-black text-white text-base sm:text-lg truncate">
+                              {targetCircuit.name}
+                            </h3>
+                            <span className="text-[10px] font-mono text-slate-400 block truncate">
+                              {targetCircuit.city}, {targetCircuit.country}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1.5 flex-wrap text-[10px] font-mono">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-teal-950 text-teal-300 border border-teal-500/40">
-                          🧪 自由シミュレーター
-                        </span>
-                        <span className="px-2 py-0.5 rounded bg-slate-900 border border-white/10 text-slate-300">
-                          📏 {(targetCircuit.circuitLengthM / 1000).toFixed(3)} km
-                        </span>
-                      </div>
-                    </div>
 
-                    {/* Launch Button (コンパクト＆スマートな上部アクションボタン) */}
-                    <button
-                      type="button"
-                      onClick={() => startSandboxMode()}
-                      className="w-full py-2 px-3.5 rounded-lg bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-600 hover:from-teal-500 hover:to-emerald-500 text-white font-racing font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md shadow-teal-950/50 transition-all cursor-pointer hover:scale-[1.005] active:scale-[0.99] border border-teal-400/30"
-                    >
-                      <SlidersHorizontal className="w-3.5 h-3.5 text-teal-200 shrink-0" />
-                      <span>🔬 自由シミュレーション作戦室へ進む ➔</span>
-                    </button>
+                      {/* Launch Button: Header Right Position */}
+                      <button
+                        type="button"
+                        onClick={() => startSandboxMode()}
+                        className="shrink-0 py-2 px-3 sm:px-4 rounded-lg bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-600 hover:from-teal-500 hover:to-emerald-500 text-white font-racing font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-lg shadow-teal-950/60 transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98] border border-teal-400/40"
+                      >
+                        <SlidersHorizontal className="w-3.5 h-3.5 text-teal-200 shrink-0" />
+                        <span className="whitespace-nowrap">自由作戦室へ進む ➔</span>
+                      </button>
+                    </div>
 
                     {/* Machine Performance & Aesthetic Card */}
                     <div className="rounded-xl bg-slate-900/80 border border-teal-500/20 p-3.5 space-y-2.5 shadow-lg relative overflow-hidden">

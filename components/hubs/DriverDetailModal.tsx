@@ -177,7 +177,25 @@ export default function DriverDetailModal({
                 title="この選手を直接比較ツールに送る"
               >
                 <span>⚔️</span>
-                <span className="hidden sm:inline">2名直接比較</span>
+                <span className="hidden sm:inline">2名比較</span>
+              </button>
+            )}
+
+            {onNavigateToTelemetry && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onNavigateToTelemetry({
+                    year: 2026,
+                    targetDriver: driver.code,
+                    meetingName: 'Japan',
+                  });
+                }}
+                className="px-2.5 py-1 rounded-xl bg-blue-600/40 hover:bg-blue-600/70 border border-blue-500/50 text-sky-200 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:scale-105"
+                title="このドライバーのテレメトリー分析画面へ移動"
+              >
+                <span>🏎️</span>
+                <span className="hidden sm:inline">テレメトリー分析</span>
               </button>
             )}
             <span className="text-[10px] text-slate-500 font-mono hidden md:inline">

@@ -379,10 +379,24 @@ export const CockpitHudDeck: React.FC<CockpitHudDeckProps> = ({
                 const fia = currentSnapshot.fiaRuleStatus;
                 const isMet = fia?.mandatoryDryTireMet;
                 const used = fia?.compoundsUsed || [playerCar.tyreCompound];
-                const isSprint = raceLengthMode === 'sprint';
+                const isSprint = raceLengthMode === 'sprint' || activeScenario.gameMode === 'sprint';
+                const isMission = activeScenario.gameMode === 'mission';
+                const isMidRaceTakeover = activeScenario.totalLaps <= 15;
                 return (
                   <div className="flex flex-wrap items-center gap-1">
-                    {!isSprint ? (
+                    {isSprint ? (
+                      <span className="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-amber-950/80 text-amber-300 border border-amber-500/40">
+                        ⚡ スプリント (ピット義務なし)
+                      </span>
+                    ) : isMission ? (
+                      <span className="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-purple-950/80 text-purple-300 border border-purple-500/40">
+                        🎯 特務ミッション (現在: {playerCar.tyreCompound})
+                      </span>
+                    ) : isMidRaceTakeover ? (
+                      <span className="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-cyan-950/80 text-cyan-300 border border-cyan-500/40">
+                        🏎️ 終盤介入 ({used.join(' ➔ ')}{used.length >= 2 ? ' ✅' : ''})
+                      </span>
+                    ) : (
                       <span
                         className={`px-1.5 py-0.2 rounded text-[9.5px] font-bold flex items-center gap-1 ${
                           isMet
@@ -393,10 +407,6 @@ export const CockpitHudDeck: React.FC<CockpitHudDeckProps> = ({
                         <span>🛞 2種ドライタイヤ義務 (Art. 30.5):</span>
                         <span className="font-mono font-black">{used.join(' ➔ ')}</span>
                         <span>{isMet ? '【達成済 ✅】' : '【ピット必須 ⚠️】'}</span>
-                      </span>
-                    ) : (
-                      <span className="px-1.5 py-0.2 rounded text-[9.5px] font-bold bg-amber-950/80 text-amber-300 border border-amber-500/40">
-                        ⚡ スプリント (ピット義務なし)
                       </span>
                     )}
 

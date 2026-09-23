@@ -122,6 +122,19 @@ export interface DriverSocialLinks {
   website?: string;   // 公式個人Webサイト
 }
 
+export interface DriverSeasonHistory {
+  year: number;             // 西暦 (2016〜2026)
+  team: string;             // その年の正式/呼称チーム名 (例: "Scuderia Toro Rosso", "Red Bull Racing")
+  teamId?: string;          // チーム系譜ID (例: "toro-rosso-rb", "red-bull", "williams", "alpine-renault", "sauber-audi")
+  role: 'Regular' | 'Reserve' | 'Test' | 'Junior' | 'Other'; // レギュラー / リザーブ / テスト / ジュニア / その他（WEC等）
+  carNumber?: number;       // その年のゼッケン
+  finalPosition?: number;   // 選手権年間順位 (レギュラー時)
+  points?: number;          // 獲得ポイント
+  wins?: number;            // 勝利数
+  podiums?: number;         // 表彰台数
+  note?: string;            // 特記事項 (例: "シーズン途中昇格", "代役参戦で入賞")
+}
+
 export interface DriverProfile {
   id: string;
   code: string; // 3-letter e.g. "VER"
@@ -167,6 +180,7 @@ export interface DriverProfile {
   milestones: DriverMilestone[];
   references: Reference[];
   traitIds?: DriverTraitId[];
+  seasonHistory?: DriverSeasonHistory[];
 }
 
 export interface TelemetryTarget {
@@ -176,6 +190,7 @@ export interface TelemetryTarget {
   meetingName?: string;
   targetLap?: number;
   targetDriver?: string;
+  targetDriver2?: string;
 }
 
 export interface EmbeddedRadio {
@@ -1004,6 +1019,19 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         verifiedDate: '2024-01-10',
       },
     ],
+    seasonHistory: [
+      { year: 2016, team: 'Toro Rosso / Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 33, finalPosition: 5, points: 204, wins: 1, podiums: 7, note: '第5戦スペインGPでレッドブル昇格・史上最年少初優勝(18歳228日)' },
+      { year: 2017, team: 'Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 33, finalPosition: 6, points: 168, wins: 2, podiums: 4, note: 'マレーシア＆メキシコGP優勝' },
+      { year: 2018, team: 'Aston Martin Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 33, finalPosition: 4, points: 249, wins: 2, podiums: 11, note: 'オーストリア＆メキシコGP優勝' },
+      { year: 2019, team: 'Aston Martin Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 33, finalPosition: 3, points: 278, wins: 3, podiums: 9, note: 'ホンダPU初年度3勝(オーストリア・ドイツ・ブラジル)' },
+      { year: 2020, team: 'Aston Martin Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 33, finalPosition: 3, points: 214, wins: 2, podiums: 11, note: '70周年記念GP＆アブダビGP優勝' },
+      { year: 2021, team: 'Red Bull Racing Honda', teamId: 'red-bull', role: 'Regular', carNumber: 33, finalPosition: 1, points: 395.5, wins: 10, podiums: 18, note: '劇的な最終周オーバーテイクで初の世界王座獲得' },
+      { year: 2022, team: 'Oracle Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 1, finalPosition: 1, points: 454, wins: 15, podiums: 17, note: 'シーズン最多勝記録更新(15勝)・世界王者連覇' },
+      { year: 2023, team: 'Oracle Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 1, finalPosition: 1, points: 575, wins: 19, podiums: 21, note: '前人未到の個人10連勝＆年間19勝の金字塔' },
+      { year: 2024, team: 'Oracle Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 1, finalPosition: 1, note: '4年連続世界王者獲得' },
+      { year: 2025, team: 'Oracle Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 1 },
+      { year: 2026, team: 'Oracle Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 1, note: 'レッドブル・フォード新PU・王座防衛' }
+    ]
   },
   {
     id: 'lewis-hamilton',
@@ -1120,6 +1148,19 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         verifiedDate: '2024-01-15',
       },
     ],
+    seasonHistory: [
+      { year: 2016, team: 'Mercedes-AMG Petronas Motorsport', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 2, points: 380, wins: 10, podiums: 17, note: '年間最多10勝を挙げるも同僚ロズベルグと死闘の末2位' },
+      { year: 2017, team: 'Mercedes-AMG Petronas Motorsport', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 1, points: 363, wins: 9, podiums: 13, note: 'フェラーリのベッテルとの激闘を制し4度目の世界王座奪還' },
+      { year: 2018, team: 'Mercedes-AMG Petronas Motorsport', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 1, points: 408, wins: 11, podiums: 17, note: 'キャリア最高峰の安定感で自身5度目のワールドチャンピオン' },
+      { year: 2019, team: 'Mercedes-AMG Petronas Motorsport', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 1, points: 413, wins: 11, podiums: 17, note: 'ファン・マヌエル・ファンジオを超える通算6度目のタイトル獲得' },
+      { year: 2020, team: 'Mercedes-AMG Petronas F1 Team', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 1, points: 347, wins: 11, podiums: 14, note: 'シューマッハの最多勝(91勝)を更新＆歴代最多タイ7度目のタイトル獲得' },
+      { year: 2021, team: 'Mercedes-AMG Petronas F1 Team', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 2, points: 387.5, wins: 8, podiums: 17, note: 'フェルスタッペンと歴史的一騎打ち、F1史上初通算100勝達成' },
+      { year: 2022, team: 'Mercedes-AMG Petronas F1 Team', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 6, points: 240, podiums: 9, note: 'ポーパシングに苦しむマシンで開発を牽引' },
+      { year: 2023, team: 'Mercedes-AMG Petronas F1 Team', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 3, points: 234, podiums: 6, note: 'ハンガリーGPでポールポジション獲得、ランキング3位' },
+      { year: 2024, team: 'Mercedes-AMG Petronas F1 Team', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 7, points: 223, wins: 2, podiums: 4, note: 'イギリスGPで感動の2年半ぶり勝利(通算104勝目)、ベルギーGPでも勝利' },
+      { year: 2025, team: 'Scuderia Ferrari', teamId: 'ferrari', role: 'Regular', carNumber: 44, note: '跳ね馬フェラーリへの歴史的電撃移籍1年目' },
+      { year: 2026, team: 'Scuderia Ferrari', teamId: 'ferrari', role: 'Regular', carNumber: 44, note: '新レギュレーション下で8度目の世界王座獲得を目指す' }
+    ]
   },
   {
     id: 'lando-norris',
@@ -1228,6 +1269,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         verifiedDate: '2024-05-06',
       },
     ],
+    seasonHistory: [
+      { year: 2017, team: 'McLaren Honda', teamId: 'mclaren', role: 'Test', note: 'マクラーレン・ヤングドライバー育成、ハンガロリンク合同テスト参加' },
+      { year: 2018, team: 'McLaren F1 Team', teamId: 'mclaren', role: 'Reserve', note: 'リザーブ＆テストドライバー、FIA-F2選手権ランキング2位' },
+      { year: 2019, team: 'McLaren F1 Team', teamId: 'mclaren', role: 'Regular', carNumber: 4, finalPosition: 11, points: 49, note: 'ルーキーイヤー、予選でサインツと好勝負' },
+      { year: 2020, team: 'McLaren F1 Team', teamId: 'mclaren', role: 'Regular', carNumber: 4, finalPosition: 9, points: 97, podiums: 1, note: '開幕戦オーストリアGPで初表彰台(3位)' },
+      { year: 2021, team: 'McLaren F1 Team', teamId: 'mclaren', role: 'Regular', carNumber: 4, finalPosition: 6, points: 160, podiums: 4, note: 'モナコやモンツァで表彰台、ロシアGPで初ポール獲得' },
+      { year: 2022, team: 'McLaren F1 Team', teamId: 'mclaren', role: 'Regular', carNumber: 4, finalPosition: 7, points: 122, podiums: 1, note: 'エミリア・ロマーニャGPで3位、チームを牽引' },
+      { year: 2023, team: 'McLaren F1 Team', teamId: 'mclaren', role: 'Regular', carNumber: 4, finalPosition: 6, points: 205, podiums: 7, note: 'シーズン中盤の大幅アップデートから表彰台量産' },
+      { year: 2024, team: 'McLaren F1 Team', teamId: 'mclaren', role: 'Regular', carNumber: 4, finalPosition: 2, points: 374, wins: 3, podiums: 12, note: 'マイアミGP初優勝、オランダ・シンガポール完全勝利、ドライバーズランキング2位' },
+      { year: 2025, team: 'McLaren F1 Team', teamId: 'mclaren', role: 'Regular', carNumber: 4, finalPosition: 1, note: '激闘を制し初の世界ドライバーズチャンピオン戴冠' },
+      { year: 2026, team: 'McLaren F1 Team', teamId: 'mclaren', role: 'Regular', carNumber: 1, note: 'カーナンバー「1」を掲げて防衛戦に挑む' }
+    ]
   },
   {
     id: 'charles-leclerc',
@@ -1342,6 +1395,19 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         verifiedDate: '2024-09-02',
       },
     ],
+    seasonHistory: [
+      { year: 2016, team: 'Haas F1 Team / Scuderia Ferrari', teamId: 'haas', role: 'Test', note: 'フェラーリ育成、HaasでFP1出走、GP3チャンピオン獲得' },
+      { year: 2017, team: 'Sauber F1 Team', teamId: 'sauber', role: 'Reserve', note: 'ザウバーのリザーブ兼務、FIA-F2選手権で圧倒的王者獲得' },
+      { year: 2018, team: 'Alfa Romeo Sauber F1 Team', teamId: 'sauber', role: 'Regular', carNumber: 16, finalPosition: 13, points: 39, note: 'ルーキーながら予選・決勝で鮮烈な速さを見せフェラーリ昇格を勝ち取る' },
+      { year: 2019, team: 'Scuderia Ferrari', teamId: 'ferrari', role: 'Regular', carNumber: 16, finalPosition: 4, points: 264, wins: 2, podiums: 10, note: 'スパで悲願の初優勝、モンツァで母国勝利、年間最多ポール獲得(7回)' },
+      { year: 2020, team: 'Scuderia Ferrari', teamId: 'ferrari', role: 'Regular', carNumber: 16, finalPosition: 8, points: 98, podiums: 2, note: '戦闘力を欠いたSF1000を奮い立たせ表彰台2回' },
+      { year: 2021, team: 'Scuderia Ferrari', teamId: 'ferrari', role: 'Regular', carNumber: 16, finalPosition: 7, points: 159, podiums: 1, note: 'モナコとバクーでポールポジション獲得' },
+      { year: 2022, team: 'Scuderia Ferrari', teamId: 'ferrari', role: 'Regular', carNumber: 16, finalPosition: 2, points: 308, wins: 3, podiums: 11, note: '序盤首位を独走、ドライバーズランキング2位' },
+      { year: 2023, team: 'Scuderia Ferrari', teamId: 'ferrari', role: 'Regular', carNumber: 16, finalPosition: 5, points: 206, podiums: 6, note: 'ラスベガスGPで見事な最終周オーバーテイク2位' },
+      { year: 2024, team: 'Scuderia Ferrari', teamId: 'ferrari', role: 'Regular', carNumber: 16, finalPosition: 3, points: 356, wins: 2, podiums: 12, note: '母国モナコGP＆伝統のイタリアGPモンツァで劇的勝利' },
+      { year: 2025, team: 'Scuderia Ferrari', teamId: 'ferrari', role: 'Regular', carNumber: 16, note: '新僚友ハミルトンを迎え強力ラインナップを形成' },
+      { year: 2026, team: 'Scuderia Ferrari', teamId: 'ferrari', role: 'Regular', carNumber: 16, note: '新規定マシンでスクーデリアを世界王座へ導く挑戦' }
+    ]
   },
   {
     id: 'oscar-piastri',
@@ -1444,6 +1510,15 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         verifiedDate: '2024-09-16',
       },
     ],
+    seasonHistory: [
+      { year: 2020, team: 'Prema Racing', teamId: 'junior', role: 'Junior', note: 'FIA-F3選手権ルーキーイヤーでドライバーズチャンピオン獲得' },
+      { year: 2021, team: 'Prema Racing', teamId: 'junior', role: 'Junior', note: 'FIA-F2選手権ルーキーイヤーで圧倒的王者獲得(F3・F2連続制覇)' },
+      { year: 2022, team: 'Alpine F1 Team / McLaren', teamId: 'alpine', role: 'Reserve', note: 'アルピーヌおよびマクラーレンのリザーブドライバーを務める' },
+      { year: 2023, team: 'McLaren F1 Team', teamId: 'mclaren', role: 'Regular', carNumber: 81, finalPosition: 9, points: 97, podiums: 2, note: 'カタールGPスプリント優勝、日本GP＆カタールGPで決勝表彰台' },
+      { year: 2024, team: 'McLaren F1 Team', teamId: 'mclaren', role: 'Regular', carNumber: 81, finalPosition: 4, points: 292, wins: 2, podiums: 8, note: 'ハンガリーGP初優勝、バクーGPでルクレールとの死闘を制し2勝目' },
+      { year: 2025, team: 'McLaren F1 Team', teamId: 'mclaren', role: 'Regular', carNumber: 81, note: 'ノリスとともにチームをコンストラクターズ連覇へ牽引' },
+      { year: 2026, team: 'McLaren F1 Team', teamId: 'mclaren', role: 'Regular', carNumber: 81, note: '新車レギュレーション下で自らのタイトル獲得を目指す' }
+    ]
   },
   {
     id: 'carlos-sainz',
@@ -1546,6 +1621,19 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         verifiedDate: '2023-09-20',
       },
     ],
+    seasonHistory: [
+      { year: 2016, team: 'Scuderia Toro Rosso', teamId: 'rb', role: 'Regular', carNumber: 55, finalPosition: 12, points: 46, note: 'トロロッソの主軸として安定した入賞を継続' },
+      { year: 2017, team: 'Scuderia Toro Rosso / Renault', teamId: 'alpine', role: 'Regular', carNumber: 55, finalPosition: 9, points: 54, note: 'シーズン終盤アメリカGPからルノーへ電撃移籍' },
+      { year: 2018, team: 'Renault Sport F1 Team', teamId: 'alpine', role: 'Regular', carNumber: 55, finalPosition: 10, points: 53, note: 'ヒュルケンベルグとともにルノーのコンストラクターズ4位獲得に貢献' },
+      { year: 2019, team: 'McLaren F1 Team', teamId: 'mclaren', role: 'Regular', carNumber: 55, finalPosition: 6, points: 96, podiums: 1, note: 'ブラジルGPで最後尾20番手スタートから初表彰台(3位)' },
+      { year: 2020, team: 'McLaren F1 Team', teamId: 'mclaren', role: 'Regular', carNumber: 55, finalPosition: 6, points: 105, podiums: 1, note: 'モンツァでガスリーと激闘の末2位、チームのコンストラクターズ3位に貢献' },
+      { year: 2021, team: 'Scuderia Ferrari', teamId: 'ferrari', role: 'Regular', carNumber: 55, finalPosition: 5, points: 164.5, podiums: 4, note: 'フェラーリ移籍初年度から同僚ルクレールを上回るランキング5位' },
+      { year: 2022, team: 'Scuderia Ferrari', teamId: 'ferrari', role: 'Regular', carNumber: 55, finalPosition: 5, points: 246, wins: 1, podiums: 9, note: 'シルバーストンで悲願のF1初ポール＆初優勝' },
+      { year: 2023, team: 'Scuderia Ferrari', teamId: 'ferrari', role: 'Regular', carNumber: 55, finalPosition: 7, points: 200, wins: 1, podiums: 3, note: 'レッドブル独走シーズンで唯一他チームとして勝利(シンガポールGP)' },
+      { year: 2024, team: 'Scuderia Ferrari', teamId: 'ferrari', role: 'Regular', carNumber: 55, finalPosition: 5, points: 290, wins: 2, podiums: 7, note: '盲腸手術から劇的勝利した豪州GP、メキシコGP圧勝' },
+      { year: 2025, team: 'Williams Racing', teamId: 'williams', role: 'Regular', carNumber: 55, note: '名門ウィリアムズの復活プロジェクトを牽引' },
+      { year: 2026, team: 'Williams Racing', teamId: 'williams', role: 'Regular', carNumber: 55, note: 'メルセデス新PUを搭載しウィリアムズで上位進出を目指す' }
+    ]
   },
   {
     id: 'george-russell',
@@ -1648,6 +1736,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         verifiedDate: '2022-11-15',
       },
     ],
+    seasonHistory: [
+      { year: 2017, team: 'Mercedes-AMG Petronas Motorsport / Force India', teamId: 'mercedes', role: 'Test', note: 'メルセデス育成、フォース・インディアから金曜FP1出走、GP3王者' },
+      { year: 2018, team: 'Mercedes-AMG Petronas Motorsport', teamId: 'mercedes', role: 'Reserve', note: 'リザーブドライバー兼務、FIA-F2選手権で圧倒的チャンピオン獲得' },
+      { year: 2019, team: 'ROKiT Williams Racing', teamId: 'williams', role: 'Regular', carNumber: 63, finalPosition: 20, points: 0, note: '予選でチームメイトに全勝(21勝0敗)、「ミスター・サタデー」の異名をとる' },
+      { year: 2020, team: 'Williams Racing / Mercedes', teamId: 'williams', role: 'Regular', carNumber: 63, finalPosition: 18, points: 3, note: 'サヒールGPでハミルトン代役としてメルセデスから出走、幻の初優勝劇' },
+      { year: 2021, team: 'Williams Racing', teamId: 'williams', role: 'Regular', carNumber: 63, finalPosition: 15, points: 16, podiums: 1, note: '豪雨のスパ予選で驚異のフロントロウ2位、初表彰台獲得' },
+      { year: 2022, team: 'Mercedes-AMG Petronas F1 Team', teamId: 'mercedes', role: 'Regular', carNumber: 63, finalPosition: 4, points: 275, wins: 1, podiums: 8, note: 'ブラジルGPで初優勝、移籍1年目でハミルトンを上回るランキング4位' },
+      { year: 2023, team: 'Mercedes-AMG Petronas F1 Team', teamId: 'mercedes', role: 'Regular', carNumber: 63, finalPosition: 8, points: 175, podiums: 2, note: 'アブダビ最終戦で表彰台を獲得しチームのコンストラクターズ2位を死守' },
+      { year: 2024, team: 'Mercedes-AMG Petronas F1 Team', teamId: 'mercedes', role: 'Regular', carNumber: 63, finalPosition: 6, points: 245, wins: 2, podiums: 4, note: 'オーストリアGP優勝、ラスベガスGPでポール・トゥ・ウィン完全勝利' },
+      { year: 2025, team: 'Mercedes-AMG Petronas F1 Team', teamId: 'mercedes', role: 'Regular', carNumber: 63, note: 'メルセデスの正統派エースとしてチームを牽引' },
+      { year: 2026, team: 'Mercedes-AMG Petronas F1 Team', teamId: 'mercedes', role: 'Regular', carNumber: 63, note: 'メルセデス製新規定PUとともに世界チャンピオンを目指す' }
+    ]
   },
   {
     id: 'sergio-perez',
@@ -1756,6 +1856,19 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         verifiedDate: '2021-12-16',
       },
     ],
+    seasonHistory: [
+      { year: 2016, team: 'Sahara Force India F1 Team', teamId: 'force-india', role: 'Regular', carNumber: 11, finalPosition: 7, points: 101, podiums: 2, note: 'モナコ＆バクーで表彰台、チーム初のランキング4位獲得に貢献' },
+      { year: 2017, team: 'Sahara Force India F1 Team', teamId: 'force-india', role: 'Regular', carNumber: 11, finalPosition: 7, points: 100, note: 'オコンとの熾烈なチームメイト争いの中、2年連続100ポイント到達' },
+      { year: 2018, team: 'Sahara Force India / Racing Point', teamId: 'racing-point', role: 'Regular', carNumber: 11, finalPosition: 8, points: 62, podiums: 1, note: 'バクーで3位表彰台、チーム破産管財手続きを主導しチームを救済' },
+      { year: 2019, team: 'SportPesa Racing Point F1 Team', teamId: 'racing-point', role: 'Regular', carNumber: 11, finalPosition: 10, points: 52, note: 'シーズン後半に怒涛の追い上げを見せる' },
+      { year: 2020, team: 'BWT Racing Point F1 Team', teamId: 'racing-point', role: 'Regular', carNumber: 11, finalPosition: 4, points: 125, wins: 1, podiums: 2, note: 'サヒールGPで1周目最後尾から奇跡のF1初優勝、ランキング4位' },
+      { year: 2021, team: 'Red Bull Racing Honda', teamId: 'red-bull', role: 'Regular', carNumber: 11, finalPosition: 4, points: 190, wins: 1, podiums: 5, note: 'アゼルバイジャンGP優勝、アブダビGPでハミルトンを抑え込み「防衛大臣」の称号を得る' },
+      { year: 2022, team: 'Oracle Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 11, finalPosition: 3, points: 305, wins: 2, podiums: 11, note: 'モナコGP＆シンガポールGP優勝、コンストラクターズ王座奪還に貢献' },
+      { year: 2023, team: 'Oracle Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 11, finalPosition: 2, points: 285, wins: 2, podiums: 9, note: 'サウジアラビア＆アゼルバイジャン優勝、チーム史上初のドライバーズ1-2フィニッシュ達成' },
+      { year: 2024, team: 'Oracle Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 11, finalPosition: 8, points: 152, podiums: 4, note: '序盤4戦で3度の表彰台獲得、チームのコンストラクターズ争いを支える' },
+      { year: 2025, team: 'Cadillac Formula 1 Team', teamId: 'cadillac', role: 'Regular', carNumber: 11, note: '新設キャデラックF1の初代エースドライバーに就任' },
+      { year: 2026, team: 'Cadillac Formula 1 Team', teamId: 'cadillac', role: 'Regular', carNumber: 11, note: '経験豊富なリーダーとして新興アメリカンチームを牽引' }
+    ]
   },
   {
     id: 'fernando-alonso',
@@ -1866,6 +1979,19 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         verifiedDate: '2024-01-10',
       },
     ],
+    seasonHistory: [
+      { year: 2016, team: 'McLaren Honda', teamId: 'mclaren', role: 'Regular', carNumber: 14, finalPosition: 10, points: 54, note: '厳しいパッケージから随所で鬼神の走破を見せトップ10入り' },
+      { year: 2017, team: 'McLaren Honda', teamId: 'mclaren', role: 'Regular', carNumber: 14, finalPosition: 15, points: 17, note: 'モナコGPを欠場しインディ500に電撃挑戦（ルーキーオブザイヤー獲得）' },
+      { year: 2018, team: 'McLaren F1 Team', teamId: 'mclaren', role: 'Regular', carNumber: 14, finalPosition: 11, points: 50, note: 'WECル・マン24時間優勝とF1を兼務、シーズン末にF1一時休養へ' },
+      { year: 2019, team: 'Toyota Gazoo Racing', teamId: 'wec', role: 'Regular', note: 'ル・マン24時間連覇＆WEC世界耐久選手権チャンピオン獲得' },
+      { year: 2020, team: 'Toyota Gazoo Racing', teamId: 'dakar', role: 'Regular', note: 'ダカール・ラリー挑戦、インディ500参戦' },
+      { year: 2021, team: 'Alpine F1 Team', teamId: 'alpine', role: 'Regular', carNumber: 14, finalPosition: 10, points: 81, podiums: 1, note: '2年間の休養からF1復帰、カタールGPで7年ぶり表彰台(3位)' },
+      { year: 2022, team: 'Alpine F1 Team', teamId: 'alpine', role: 'Regular', carNumber: 14, finalPosition: 9, points: 81, note: 'カナダGP予選でフロントロウ2位、圧巻のスピードを証明' },
+      { year: 2023, team: 'Aston Martin Aramco F1 Team', teamId: 'aston-martin', role: 'Regular', carNumber: 14, finalPosition: 4, points: 206, podiums: 8, note: '移籍初年度から8度の表彰台獲得、ランキング4位の快進撃' },
+      { year: 2024, team: 'Aston Martin Aramco F1 Team', teamId: 'aston-martin', role: 'Regular', carNumber: 14, finalPosition: 9, points: 70, note: 'マシンの戦闘力低下の中でも入賞を積み重ねアストンマーティンと長期契約延長' },
+      { year: 2025, team: 'Aston Martin Aramco F1 Team', teamId: 'aston-martin', role: 'Regular', carNumber: 14, note: '新設ファクトリーと風洞稼働に伴いチーム開発を主導' },
+      { year: 2026, team: 'Aston Martin Aramco F1 Team', teamId: 'aston-martin', role: 'Regular', carNumber: 14, note: 'ホンダ新ワークスPUとの再タッグで悲願の3度目の世界王座を狙う' }
+    ]
   },
   {
     id: 'yuki-tsunoda',
@@ -1974,6 +2100,19 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         verifiedDate: '2024-04-09',
       },
     ],
+    seasonHistory: [
+      { year: 2016, team: 'Super-FJ', teamId: 'junior', role: 'Junior', note: '限定ライセンスで鈴鹿シリーズ参戦・初参戦初優勝' },
+      { year: 2017, team: 'JAF-F4 / FIA-F4 Japan', teamId: 'junior', role: 'Junior', note: 'FIA-F4日本選手権シリーズ3位' },
+      { year: 2018, team: 'Honda Formula Dream Project', teamId: 'junior', role: 'Junior', note: 'FIA-F4日本選手権シリーズチャンピオン獲得' },
+      { year: 2019, team: 'Jenzer Motorsport / Red Bull Junior Team', teamId: 'junior', role: 'Junior', note: 'FIA-F3選手権参戦、モンツァで劇的優勝、シリーズ9位' },
+      { year: 2020, team: 'Carlin / Red Bull Junior Team', teamId: 'junior', role: 'Junior', note: 'FIA-F2選手権でポール4回・優勝3回でシリーズ3位、ルーキーオブザイヤー獲得' },
+      { year: 2021, team: 'Scuderia AlphaTauri Honda', teamId: 'rb', role: 'Regular', carNumber: 22, finalPosition: 14, points: 32, note: 'デビュー戦9位入賞、アブダビ最終戦で自己最高4位' },
+      { year: 2022, team: 'Scuderia AlphaTauri', teamId: 'rb', role: 'Regular', carNumber: 22, finalPosition: 17, points: 12, note: '安定性を向上させガスリーと互角の走りを披露' },
+      { year: 2023, team: 'Scuderia AlphaTauri', teamId: 'rb', role: 'Regular', carNumber: 22, finalPosition: 14, points: 17, note: 'シーズン終盤アップデートから連続入賞、アメリカGPで初ファステストラップ' },
+      { year: 2024, team: 'Visa Cash App RB F1 Team', teamId: 'rb', role: 'Regular', carNumber: 22, finalPosition: 11, points: 30, note: '母国日本GPで歴史的10位入賞、予選Q3進出常連としてチームを牽引' },
+      { year: 2025, team: 'Visa Cash App RB F1 Team', teamId: 'rb', role: 'Regular', carNumber: 22, note: 'エースドライバーとしてチームの入賞獲得を支える' },
+      { year: 2026, team: 'Visa Cash App RB F1 Team', teamId: 'rb', role: 'Regular', carNumber: 22, note: 'レッドブル・フォードPUを搭載しリーダーとして牽引' }
+    ]
   },
   // ── LEGENDS (Unified Champagne Gold #D4AF37) ──
   {
@@ -2261,7 +2400,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       pedalFeel: "ショートストロークの硬質なブレーキペダル。初期制動でガツンと踏力を立ち上げる。",
       steeringWeight: "中程度。切り始めのインフォメーションを重視したセッティング。"
     },
-    careerSummary: "2020年モンツァで劇的な初優勝を飾ったフランスの実力派。レッドブル育成から幾多の逆境を乗り越え、現在はアルピーヌのエースとしてチームを牽引。",
+    careerSummary: "2016年GP2王者を経て2017年マレーシアGPでトロロッソからF1デビュー [1]。2019年にレッドブルへ昇格するもシーズン途中でトロロッソへ再降格となる挫折を経験したが、同年のブラジルGPでハミルトンとの0.062秒差のドラッグレースを制し劇的な初表彰台（P2）を獲得 [1]。2020年イタリアGP（モンツァ）では大波乱の展開のなか終盤サインツの猛追を0.4秒差で退け、フランス人として24年ぶりとなる歴史的初優勝を達成した [2]。アルピーヌ移籍後もチームリーダーとして確固たる存在感を示し、2026年はメルセデス製ワークスPUを搭載したニューマシンで中団グリッドの牽引役を担っている [1]。",
     entries: 155,
     wins: 1,
     podiums: 5,
@@ -2273,9 +2412,9 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         "混戦での状況判断力",
         "ウェット路面での粘り強さ"
       ],
-      brakingTechnique: "初期踏力が極めて鋭く、エイペックスに向けて素早く脱力してターンイン時のフロント回頭性を最大化する。",
-      tyreManagement: "スティント後半にタイヤ表面温度を保ちながら安定したペースを維持する技術に定評がある。",
-      telemetrySignature: "ブレーキング初期の減速G立ち上がりが急峻。エイペックス通過時のステアリング舵角が一定で安定している。",
+      brakingTechnique: "初期踏力が極めて鋭く、エイペックス手前で素早く脱力してターンイン時のフロント回頭性を最大化する [1]。",
+      tyreManagement: "スティント後半にタイヤ表面温度を過熱させず、デグラデーションを抑えながら安定したペースを維持する技術に定評がある [2]。",
+      telemetrySignature: "ブレーキング初期の減速G立ち上がりが急峻。エイペックス通過時のステアリング舵角が一定で安定している [1]。",
       preferredCircuitTypes: [
         "中高速サーキット (シルバーストン、スパ)",
         "超高速・スリップストリーム (モンツァ)"
@@ -2322,7 +2461,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         title: "Pierre Gasly Official Biography & Racing Record",
         publisher: "Alpine F1 Team",
         url: "https://www.alpinef1team.com",
-        verifiedDate: "2024-03-01"
+        verifiedDate: "2026-03-01"
       },
       {
         id: 2,
@@ -2330,7 +2469,27 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         publisher: "Formula1.com",
         url: "https://www.formula1.com",
         verifiedDate: "2024-03-01"
+      },
+      {
+        id: 3,
+        title: "FIA Formula One World Championship Driver Statistics: Pierre Gasly",
+        publisher: "FIA.com",
+        url: "https://www.fia.com",
+        verifiedDate: "2026-03-01"
       }
+    ],
+    seasonHistory: [
+      { year: 2016, team: "Red Bull Racing", teamId: "red-bull", role: "Reserve", note: "GP2チャンピオン獲得＆リザーブ" },
+      { year: 2017, team: "Scuderia Toro Rosso", teamId: "toro-rosso-rb", role: "Regular", carNumber: 10, finalPosition: 21, points: 0, note: "第15戦マレーシアGPより参戦" },
+      { year: 2018, team: "Red Bull Toro Rosso Honda", teamId: "toro-rosso-rb", role: "Regular", carNumber: 10, finalPosition: 15, points: 29, note: "バーレーンGPで殊勲の4位" },
+      { year: 2019, team: "Red Bull Racing / Toro Rosso", teamId: "red-bull", role: "Regular", carNumber: 10, finalPosition: 7, points: 95, podiums: 1, note: "ブラジルGPで劇的初表彰台(P2)" },
+      { year: 2020, team: "Scuderia AlphaTauri Honda", teamId: "toro-rosso-rb", role: "Regular", carNumber: 10, finalPosition: 10, points: 75, wins: 1, podiums: 1, note: "イタリアGP(モンツァ)で感動の初優勝" },
+      { year: 2021, team: "Scuderia AlphaTauri Honda", teamId: "toro-rosso-rb", role: "Regular", carNumber: 10, finalPosition: 9, points: 110, podiums: 1, note: "アゼルバイジャンGPで3位表彰台" },
+      { year: 2022, team: "Scuderia AlphaTauri", teamId: "toro-rosso-rb", role: "Regular", carNumber: 10, finalPosition: 14, points: 23 },
+      { year: 2023, team: "BWT Alpine F1 Team", teamId: "alpine-renault", role: "Regular", carNumber: 10, finalPosition: 11, points: 62, podiums: 1, note: "オランダGPで3位表彰台" },
+      { year: 2024, team: "BWT Alpine F1 Team", teamId: "alpine-renault", role: "Regular", carNumber: 10, finalPosition: 10 },
+      { year: 2025, team: "BWT Alpine F1 Team", teamId: "alpine-renault", role: "Regular", carNumber: 10 },
+      { year: 2026, team: "BWT Alpine F1 Team", teamId: "alpine-renault", role: "Regular", carNumber: 10, note: "メルセデスPU新搭載・チームリーダー" }
     ]
   },
   {
@@ -2388,7 +2547,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       pedalFeel: "長めのストロークでコントロール域が広いプログレッシブな踏力特性。",
       steeringWeight: "やや重め。ダイレクトな反力を好む。"
     },
-    careerSummary: "2021年ハンガリーGPウィナー。ミリ単位のホイール・トゥ・ホイールバトルと決して引かない強靭なメンタリティを誇るファイター。",
+    careerSummary: "ジュニアフォーミュラでマックス・フェルスタッペンを破り欧州F3王者に輝いた後、2016年ベルギーGPでマノーからF1デビュー [1]。フォース・インディア時代からペレスと激しいチーム内バトルを展開し、2020年にルノーから復帰後はサヒールGPで自身初表彰台（P2）を獲得 [1]。2021年ハンガリーGPでは、波乱のスタートから首位に立つと、元王者ベッテルの背後からのプレッシャーを70周にわたりノーミスで耐え抜き、アルピーヌに歓喜のF1初優勝をもたらした [2]。2025年より小松礼雄率いるハースF1チームへ電撃移籍し、グリッド随一の鉄壁のディフェンス力と鋭いレースクラフトでチームの得点源として躍動している [1]。",
     entries: 154,
     wins: 1,
     podiums: 4,
@@ -2400,9 +2559,9 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         "タイヤのグレイニング抑制技術",
         "スタート直後のポジションアップ"
       ],
-      brakingTechnique: "ストレートエンドでラインを厳格に保持しながら確実な減速を行う。",
-      tyreManagement: "フロントタイヤの熱管理が巧みで、ロングランでもグリップ低下を緩やかに抑える。",
-      telemetrySignature: "ブレーキング終了からスロットルオンへの移行が極めてスムーズ。ステアリング舵角を一定に保つ時間が長い。",
+      brakingTechnique: "ストレートエンドでイン側のラインをミリ単位で厳格に保持しながら確実に減速し、オーバーテイクを許さない [1]。",
+      tyreManagement: "フロントタイヤのショルダー部熱管理が巧みで、後続から突かれるロングランでもタイヤのグレイニングを最小限に抑える [2]。",
+      telemetrySignature: "ブレーキング終了からスロットルオンへの移行が極めてスムーズ。ステアリング舵角を一定に保つ時間が長い [1]。",
       preferredCircuitTypes: [
         "抜きどころが少なくテクニカルなコース (ハンガロリンク、モナコ)"
       ],
@@ -2444,18 +2603,38 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "Esteban Ocon Profile",
-        publisher: "Alpine F1 Team",
-        url: "https://www.alpinef1team.com",
-        verifiedDate: "2024-03-01"
+        title: "Esteban Ocon Career & Haas F1 Team Profile",
+        publisher: "Haas F1 Team",
+        url: "https://www.haasf1team.com",
+        verifiedDate: "2026-03-01"
       },
       {
         id: 2,
-        title: "Hungarian Grand Prix 2021 Race Review",
+        title: "Hungarian Grand Prix 2021: Ocon seals shock maiden victory",
         publisher: "Formula1.com",
         url: "https://www.formula1.com",
         verifiedDate: "2024-03-01"
+      },
+      {
+        id: 3,
+        title: "FIA Driver Archive & Results: Esteban Ocon",
+        publisher: "FIA.com",
+        url: "https://www.fia.com",
+        verifiedDate: "2026-03-01"
       }
+    ],
+    seasonHistory: [
+      { year: 2016, team: "Manor Racing MRT", teamId: "manor", role: "Regular", carNumber: 31, finalPosition: 23, points: 0, note: "ベルギーGPよりリオ・ハリアントに代わり参戦" },
+      { year: 2017, team: "Sahara Force India F1 Team", teamId: "force-india-racingpoint", role: "Regular", carNumber: 31, finalPosition: 8, points: 87, note: "全20戦中18戦で入賞" },
+      { year: 2018, team: "Racing Point Force India", teamId: "force-india-racingpoint", role: "Regular", carNumber: 31, finalPosition: 12, points: 49 },
+      { year: 2019, team: "Mercedes-AMG Petronas Motorsport", teamId: "mercedes", role: "Reserve", note: "テスト＆リザーブドライバー" },
+      { year: 2020, team: "Renault DP World F1 Team", teamId: "alpine-renault", role: "Regular", carNumber: 31, finalPosition: 12, points: 62, podiums: 1, note: "サヒールGPで2位初表彰台" },
+      { year: 2021, team: "Alpine F1 Team", teamId: "alpine-renault", role: "Regular", carNumber: 31, finalPosition: 11, points: 74, wins: 1, podiums: 1, note: "ハンガリーGPで感動のF1初勝利" },
+      { year: 2022, team: "BWT Alpine F1 Team", teamId: "alpine-renault", role: "Regular", carNumber: 31, finalPosition: 8, points: 92 },
+      { year: 2023, team: "BWT Alpine F1 Team", teamId: "alpine-renault", role: "Regular", carNumber: 31, finalPosition: 12, points: 58, podiums: 1, note: "モナコGPで殊勲の3位表彰台" },
+      { year: 2024, team: "BWT Alpine F1 Team", teamId: "alpine-renault", role: "Regular", carNumber: 31, finalPosition: 14 },
+      { year: 2025, team: "MoneyGram Haas F1 Team", teamId: "haas", role: "Regular", carNumber: 31, note: "小松礼雄代表率いるハースへ移籍" },
+      { year: 2026, team: "MoneyGram Haas F1 Team", teamId: "haas", role: "Regular", carNumber: 31, note: "フェラーリPU搭載・ベアマンとの新体制" }
     ]
   },
   {
@@ -2513,7 +2692,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       pedalFeel: "中程度のペダルストローク。トレイルブレーキングでの車体姿勢制御を極めて繊細に行う。",
       steeringWeight: "軽快でダイレクトな応答性。"
     },
-    careerSummary: "驚異的なタイヤマネジメントでウィリアムズの復権を支えるタイ国籍のエースドライバー。卓越したレースペースとオーバーテイク技術を兼ね備える。",
+    careerSummary: "2019年にトロロッソからF1デビューを果たし、わずか半年でレッドブル本隊へと抜擢されたタイ国籍の才能溢れるドライバー [1]。2020年トスカーナGP（ムジェロ）およびバーレーンGPで2度の表彰台（P3）を獲得するもシートを喪失したが、リザーブ＆DTM参戦を経て2022年にウィリアムズでF1シートを奪還 [1]。同年のオーストラリアGPでハードタイヤのまま57周を走り切り最終周直前ピットインで10位入賞を飾るなど、グリッド最高峰のタイヤマネジメント能力を証明した [2]。2026年は名門ウィリアムズの絶対的エースとしてカルロス・サインツと強力コンビを組み、メルセデスPUのスピードを武器に中団トップを争う [1]。",
     entries: 104,
     wins: 0,
     podiums: 2,
@@ -2525,9 +2704,9 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         "正確無比なトレイルブレーキング",
         "トップスピードを活かした防衛"
       ],
-      brakingTechnique: "進入での荷重移動が極めて滑らかで、タイヤのインベタ接地圧を一定に保つ。",
-      tyreManagement: "ハードタイヤでレース全体の9割を走りきるなど、グリッド最高峰のタイヤ保存能力を誇る。",
-      telemetrySignature: "コーナー進入時のステアリング入力が極めて滑らかでタイヤへの横荷重ショックが少ない。アクセルの立ち上がりも緩やかでリアの空転を最小限に抑える。",
+      brakingTechnique: "進入での荷重移動が極めて滑らかで、ステアリング微修正を減らしタイヤ接地面の摩擦円を100%使い切る [1]。",
+      tyreManagement: "ハードタイヤでレース全体の9割を同一ペースで走りきるなど、タイヤ内圧とトレッド温度の安定化において他の追随を許さない [2]。",
+      telemetrySignature: "コーナー進入時のステアリング入力が極めて滑らかでタイヤへの横荷重ショックが少ない。アクセルの立ち上がりも緩やかでリアの空転を最小限に抑える [1]。",
       preferredCircuitTypes: [
         "直線スピードが活きる高速コース (モンツァ、スパ、カナダ)"
       ],
@@ -2569,18 +2748,38 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "Alexander Albon Profile",
+        title: "Alexander Albon Profile & Racing Record",
         publisher: "Williams Racing",
         url: "https://www.williamsf1.com",
-        verifiedDate: "2024-03-01"
+        verifiedDate: "2026-03-01"
       },
       {
         id: 2,
-        title: "How Albon made 57 laps on one set of tyres work",
+        title: "How Albon made 57 laps on one set of tyres work in Melbourne",
         publisher: "Formula1.com",
         url: "https://www.formula1.com",
         verifiedDate: "2024-03-01"
+      },
+      {
+        id: 3,
+        title: "FIA Driver Statistics: Alexander Albon",
+        publisher: "FIA.com",
+        url: "https://www.fia.com",
+        verifiedDate: "2026-03-01"
       }
+    ],
+    seasonHistory: [
+      { year: 2016, team: "ART Grand Prix (GP3)", teamId: "art", role: "Regular", note: "GP3シリーズランキング2位（4勝）" },
+      { year: 2017, team: "ART Grand Prix (F2)", teamId: "art", role: "Regular", note: "FIA F2参戦（表彰台2回）" },
+      { year: 2018, team: "DAMS (F2)", teamId: "dams", role: "Regular", note: "FIA F2シリーズランキング3位（4勝）" },
+      { year: 2019, team: "Scuderia Toro Rosso / Red Bull Racing", teamId: "red-bull", role: "Regular", carNumber: 23, finalPosition: 8, points: 92, note: "サマーブレイク後にレッドブルへ昇格" },
+      { year: 2020, team: "Aston Martin Red Bull Racing", teamId: "red-bull", role: "Regular", carNumber: 23, finalPosition: 7, points: 105, podiums: 2, note: "ムジェロ＆バーレーンで3位表彰台" },
+      { year: 2021, team: "Red Bull Racing Honda", teamId: "red-bull", role: "Reserve", note: "テスト＆リザーブドライバー / DTM参戦(1勝)" },
+      { year: 2022, team: "Williams Racing", teamId: "williams", role: "Regular", carNumber: 23, finalPosition: 19, points: 4, note: "F1復帰・メルボルンで奇跡の入賞" },
+      { year: 2023, team: "Williams Racing", teamId: "williams", role: "Regular", carNumber: 23, finalPosition: 13, points: 27, note: "チームをコンストラクターズ7位へ導く" },
+      { year: 2024, team: "Williams Racing", teamId: "williams", role: "Regular", carNumber: 23 },
+      { year: 2025, team: "Williams Racing", teamId: "williams", role: "Regular", carNumber: 23 },
+      { year: 2026, team: "Williams Racing", teamId: "williams", role: "Regular", carNumber: 23, note: "サインツとの強力コンビ結成" }
     ]
   },
   {
@@ -2630,7 +2829,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       pedalFeel: "レスポンスの良いブレーキペダル。初期踏力で鋭く制動をかける。",
       steeringWeight: "標準的。フィーリングの素直さを重視。"
     },
-    careerSummary: "2024年シーズン途中に電撃デビューを果たし、参戦2戦目でポイントを獲得したアルゼンチンの超新星。アグレッシブな走りで世界の注目を集める。",
+    careerSummary: "2024年イタリアGP（モンツァ）でローガン・サージェントの後任としてウィリアムズから急遽F1デビューを果たしたアルゼンチンの超新星 [1]。参戦わずか2戦目の難関バクー市街地（アゼルバイジャンGP）で予選Q3進出・決勝8位入賞を果たし、母国アルゼンチンにカルロス・ロイテマン以来42年ぶりとなるF1世界選手権ポイントをもたらした [2]。市街地サーキットでも恐れを知らず限界ギリギリのウォールタッチラインを攻め込む度胸と天性の適応力が高く評価され、2026年はアルピーヌのレギュラーシートを獲得してピエール・ガスリーとともに新時代を切り拓いている [1]。",
     entries: 9,
     wins: 0,
     podiums: 0,
@@ -2642,9 +2841,9 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         "アグレッシブなオーバーテイク",
         "高い心理的タフネス"
       ],
-      brakingTechnique: "深いブレーキングでエイペックスまで突っ込み、マシンの回頭性を引き出す。",
-      tyreManagement: "アグレッシブな走調ながらタイヤの熱ダレを抑制する適応力を併せ持つ。",
-      telemetrySignature: "コーナー進入でのブレーキングポイントがベテラン勢と遜色なく奥深い。アクセルオンのタイミングが早く、リアを滑らせながら向きを変える。",
+      brakingTechnique: "深いブレーキングでエイペックスのイン側クリッピングポイントまで一気に突っ込み、マシンの回頭性を引き出す [1]。",
+      tyreManagement: "アグレッシブなステアリングワークながら、コーナリング中のタイヤスキール音を敏感に察知して熱ダレを抑制する [2]。",
+      telemetrySignature: "コーナー進入でのブレーキングポイントがベテラン勢と遜色なく奥深い。アクセルオンのタイミングが早く、リアを滑らせながら向きを変える [1]。",
       preferredCircuitTypes: [
         "市街地コース (バクー、シンガポール)",
         "中高速サーキット (モンツァ)"
@@ -2676,17 +2875,38 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       {
         date: "2024-09-15",
         event: "バクー・アゼルバイジャンGPでF1初入賞 (8位)",
-        refId: 1
+        refId: 2
       }
     ],
     references: [
       {
         id: 1,
-        title: "Franco Colapinto Driver Profile",
-        publisher: "Williams Racing",
-        url: "https://www.williamsf1.com",
+        title: "Franco Colapinto Driver Profile & Journey",
+        publisher: "Alpine F1 Team",
+        url: "https://www.alpinef1team.com",
+        verifiedDate: "2026-03-01"
+      },
+      {
+        id: 2,
+        title: "Colapinto: The sensation of Baku and Argentina's 42-year wait",
+        publisher: "Formula1.com",
+        url: "https://www.formula1.com",
         verifiedDate: "2024-09-20"
+      },
+      {
+        id: 3,
+        title: "FIA Formula 2 to F1 Progression: Franco Colapinto",
+        publisher: "FIA.com",
+        url: "https://www.fia.com",
+        verifiedDate: "2026-03-01"
       }
+    ],
+    seasonHistory: [
+      { year: 2022, team: "Van Amersfoort Racing (F3)", teamId: "var", role: "Regular", note: "FIA F3参戦（2勝）" },
+      { year: 2023, team: "MP Motorsport (F3)", teamId: "mp", role: "Regular", note: "FIA F3ランキング4位（2勝）/ ウィリアムズ育成" },
+      { year: 2024, team: "Williams Racing", teamId: "williams", role: "Regular", carNumber: 43, finalPosition: 19, points: 5, note: "第16戦イタリアGPよりサージェントに代わりデビュー、バクーで8位" },
+      { year: 2025, team: "BWT Alpine F1 Team", teamId: "alpine-renault", role: "Regular", carNumber: 43 },
+      { year: 2026, team: "BWT Alpine F1 Team", teamId: "alpine-renault", role: "Regular", carNumber: 43, note: "メルセデスPU搭載・ガスリーとのコンビ" }
     ]
   },
   {
@@ -2752,7 +2972,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       pedalFeel: "比較的ソフトな踏み始めから奥で効くペダルタッチ。",
       steeringWeight: "やや軽め。"
     },
-    careerSummary: "ルーキーイヤーの表彰台や雨のトルコGPポールポジションなど、極限コンディションで輝くカナダの実力派ドライバー。",
+    careerSummary: "2016年欧州F3王者を経て2017年オーストラリアGPでウィリアムズから18歳でF1デビュー [1]。同年のアゼルバイジャンGP（バクー）でルーキー史上最年少フロントローに次ぐ3位初表彰台を獲得 [1]。大雨となった2020年トルコGP（イスタンブール）では、滑る路面で完璧なマシンコントロールを披露しキャリア初ポールポジションを獲得した [2]。濡れた路面でグリップを見つけ出す特殊なセンサーを持ち、オープニングラップでのポジションアップ数はグリッド随一。2026年はエイドリアン・ニューウェイ加入＆ホンダ完全ワークス体制のアストンマーティンで悲願の初優勝に挑む [1]。",
     entries: 166,
     wins: 0,
     podiums: 3,
@@ -2764,9 +2984,9 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         "スタートダッシュの鋭さ",
         "ロングランでの粘り強い巡航"
       ],
-      brakingTechnique: "ウェット路面でのグリップ限界の把握が鋭く、滑りやすい路面での踏力調整に長ける。",
-      tyreManagement: "雨用タイヤのオーバーヒートを防ぐライン取りが得意。",
-      telemetrySignature: "ウェットコンディションでのスロットル操作が小刻みで、ホイールスピンの兆候をミリ秒単位で相殺する。",
+      brakingTechnique: "低μ路面でのグリップ限界の把握が鋭く、滑りやすいウェットコンディションでの微妙なペダルリリースに長ける [1]。",
+      tyreManagement: "雨用インターミディエイトタイヤのブロック剛性を保ち、乾きゆく路面でもトレッドのオーバーヒートを防ぐライン取りが得意 [2]。",
+      telemetrySignature: "ウェットコンディションでのスロットル操作が小刻みで、ホイールスピンの兆候をミリ秒単位で相殺する [1]。",
       preferredCircuitTypes: [
         "雨のサーキット全般",
         "ストップ＆ゴー型コース (モントリオール、バクー)"
@@ -2804,18 +3024,38 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "Lance Stroll Profile",
-        publisher: "Aston Martin F1 Team",
+        title: "Lance Stroll Official Profile",
+        publisher: "Aston Martin Aramco F1 Team",
         url: "https://www.astonmartinf1.com",
-        verifiedDate: "2024-03-01"
+        verifiedDate: "2026-03-01"
       },
       {
         id: 2,
-        title: "Turkish GP 2020: Stroll takes sensational pole",
+        title: "Turkish Grand Prix 2020: Stroll takes sensational wet-weather pole",
         publisher: "Formula1.com",
         url: "https://www.formula1.com",
         verifiedDate: "2024-03-01"
+      },
+      {
+        id: 3,
+        title: "FIA World Championship Driver Record: Lance Stroll",
+        publisher: "FIA.com",
+        url: "https://www.fia.com",
+        verifiedDate: "2026-03-01"
       }
+    ],
+    seasonHistory: [
+      { year: 2016, team: "Prema Powerteam (F3)", teamId: "prema", role: "Regular", note: "FIA ヨーロッパF3チャンピオン（14勝）" },
+      { year: 2017, team: "Williams Martini Racing", teamId: "williams", role: "Regular", carNumber: 18, finalPosition: 12, points: 40, podiums: 1, note: "バクーでF1初表彰台(P3)・モンツァで最前列フロントロー" },
+      { year: 2018, team: "Williams Martini Racing", teamId: "williams", role: "Regular", carNumber: 18, finalPosition: 18, points: 6 },
+      { year: 2019, team: "SportPesa Racing Point F1 Team", teamId: "force-india-racingpoint", role: "Regular", carNumber: 18, finalPosition: 15, points: 21, note: "ドイツGPで4位入賞" },
+      { year: 2020, team: "BWT Racing Point F1 Team", teamId: "force-india-racingpoint", role: "Regular", carNumber: 18, finalPosition: 11, points: 75, podiums: 2, note: "モンツァ＆サヒールで3位表彰台・トルコGPで初PP" },
+      { year: 2021, team: "Aston Martin Cognizant F1 Team", teamId: "force-india-racingpoint", role: "Regular", carNumber: 18, finalPosition: 13, points: 34 },
+      { year: 2022, team: "Aston Martin Aramco Cognizant", teamId: "force-india-racingpoint", role: "Regular", carNumber: 18, finalPosition: 15, points: 18 },
+      { year: 2023, team: "Aston Martin Aramco Cognizant", teamId: "force-india-racingpoint", role: "Regular", carNumber: 18, finalPosition: 10, points: 74, note: "手首骨折から驚異の開幕戦復帰" },
+      { year: 2024, team: "Aston Martin Aramco F1 Team", teamId: "force-india-racingpoint", role: "Regular", carNumber: 18 },
+      { year: 2025, team: "Aston Martin Aramco F1 Team", teamId: "force-india-racingpoint", role: "Regular", carNumber: 18 },
+      { year: 2026, team: "Aston Martin Aramco F1 Team", teamId: "force-india-racingpoint", role: "Regular", carNumber: 18, note: "ホンダ完全ワークスPU搭載" }
     ]
   },
   {
@@ -2881,7 +3121,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       pedalFeel: "ショートストロークかつリニアな油圧タッチ。",
       steeringWeight: "重め。正確な微修正を好む。"
     },
-    careerSummary: "予選Q3進出の常連にして2015年ル・マン24時間ウィナー。マシンの限界を余すところなく引き出すグリッド屈指の技巧派ベテラン。",
+    careerSummary: "GP2王者や2015年ル・マン24時間総合優勝（ポルシェ919ハイブリッド）の栄冠を持つドイツ屈指の実力派ドライバー [1]。2010年ブラジルGPでルーキーながら雨のインテルラゴスで衝撃的な初ポールポジションを獲得 [1]。フォース・インディア、ルノー、ハースなどで予選Q3進出の常連として抜群のスピードを発揮し、「スーパーサブ」としても数々の代役参戦で即座に入賞を果たす適応力を見せた [2]。2026年からは名門アウディのF1新規ワークス参戦における初代エースドライバーに就任。緻密な開発力と卓越したテレメトリフィードバックで新チームを先導している [1]。",
     entries: 227,
     wins: 0,
     podiums: 0,
@@ -2893,9 +3133,9 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         "代役参戦での即応力",
         "マシンセットアップの的確なフィードバック"
       ],
-      brakingTechnique: "トレイルブレーキングのリリース速度が極めてリニアで、マシンのピッチ変化を最小化する。",
-      tyreManagement: "予選アタック時のアウトラップでのタイヤウォームアップが完璧。",
-      telemetrySignature: "ステアリングの舵角入力が非常にクリーンで無駄な微修正が皆無。ブレーキリリースとターンインの同期精度が極めて高い。",
+      brakingTechnique: "トレイルブレーキングのリリース速度が極めてリニアで、マシンのピッチ変化とロール剛性の過渡特性を完全に手なずける [1]。",
+      tyreManagement: "予選アタック時のアウトラップでのタイヤウォームアップ手順が精緻を極め、セクター1から理想的なタイヤ作動温度域を引き出す [2]。",
+      telemetrySignature: "ステアリングの舵角入力が非常にクリーンで無駄な微修正が皆無。ブレーキリリースとターンインの同期精度が極めて高い [1]。",
       preferredCircuitTypes: [
         "中高速コーナーが連続するサーキット (シルバーストン、鈴鹿、スパ)"
       ],
@@ -2932,18 +3172,38 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "Nico Hülkenberg Official Site",
-        publisher: "Hülkenberg Racing",
-        url: "https://www.nicohulkenberg.net",
-        verifiedDate: "2024-03-01"
+        title: "Nico Hülkenberg Profile & Audi F1 Works Project",
+        publisher: "Audi Revolut F1 Team",
+        url: "https://www.audi.com/f1",
+        verifiedDate: "2026-03-01"
       },
       {
         id: 2,
-        title: "Le Mans 24 Hours 2015 Official Results",
-        publisher: "ACO / FIA WEC",
-        url: "https://www.24h-lemans.com",
+        title: "The Super-Sub: Nico Hülkenberg's legendary substitute appearances",
+        publisher: "Formula1.com",
+        url: "https://www.formula1.com",
         verifiedDate: "2024-03-01"
+      },
+      {
+        id: 3,
+        title: "FIA Driver Profile & Le Mans 24h Winner: Nico Hülkenberg",
+        publisher: "FIA.com",
+        url: "https://www.fia.com",
+        verifiedDate: "2026-03-01"
       }
+    ],
+    seasonHistory: [
+      { year: 2016, team: "Sahara Force India F1 Team", teamId: "force-india-racingpoint", role: "Regular", carNumber: 27, finalPosition: 9, points: 72, note: "チームをコンストラクターズ4位へ導く" },
+      { year: 2017, team: "Renault Sport F1 Team", teamId: "alpine-renault", role: "Regular", carNumber: 27, finalPosition: 10, points: 43 },
+      { year: 2018, team: "Renault Sport F1 Team", teamId: "alpine-renault", role: "Regular", carNumber: 27, finalPosition: 7, points: 69, note: "3強チームに次ぐBest of the Rest" },
+      { year: 2019, team: "Renault F1 Team", teamId: "alpine-renault", role: "Regular", carNumber: 27, finalPosition: 14, points: 37 },
+      { year: 2020, team: "BWT Racing Point F1 Team", teamId: "force-india-racingpoint", role: "Reserve", carNumber: 27, finalPosition: 15, points: 10, note: "代役参戦（シルバーストン予選3位、アイフェルGP最後尾から8位入賞）" },
+      { year: 2021, team: "Aston Martin Cognizant", teamId: "force-india-racingpoint", role: "Reserve", note: "リザーブ＆開発ドライバー" },
+      { year: 2022, team: "Aston Martin Aramco", teamId: "force-india-racingpoint", role: "Reserve", carNumber: 27, finalPosition: 22, note: "開幕2戦ベッテルのコロナ感染代役参戦" },
+      { year: 2023, team: "MoneyGram Haas F1 Team", teamId: "haas", role: "Regular", carNumber: 27, finalPosition: 16, points: 9, note: "フル参戦復帰・カナダGP予選2位" },
+      { year: 2024, team: "MoneyGram Haas F1 Team", teamId: "haas", role: "Regular", carNumber: 27, note: "オーストリア/イギリスで連続6位入賞" },
+      { year: 2025, team: "Stake F1 Team Kick Sauber", teamId: "sauber-audi", role: "Regular", carNumber: 27, note: "アウディ移行準備体制" },
+      { year: 2026, team: "Audi F1 Team", teamId: "sauber-audi", role: "Regular", carNumber: 27, note: "アウディ初代ワークスエース就任" }
     ]
   },
   {
@@ -3130,7 +3390,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       pedalFeel: "プログレッシブな踏力特性。トレイルブレーキングのコントロール性を最重視。",
       steeringWeight: "適度な重さ。余分な振動のない澄んだ手応え。"
     },
-    careerSummary: "メルセデス黄金期を支えコンストラクターズ5連覇に貢献したフィンランドの英雄。通算10勝、ポールポジション20回を記録。",
+    careerSummary: "2013年オーストラリアGPでウィリアムズからF1デビューし、9度の表彰台を獲得したのち、2017年にメルセデスへ電撃移籍 [1]。ハミルトンの最強チームメイトとして通算10勝、ポールポジション20回、表彰台67回を記録し、前人未到のコンストラクターズ選手権5連覇（2017〜2021）に決定的な貢献を果たした [1]。2019年オーストラリアGPでの圧勝劇や雨のトルコGP完勝など、ひとたび波に乗った際のスピードは世界最高峰 [2]。ザウバーでのリーダー役を経て、2026年からはF1第11の新設名門「キャデラックF1チーム」の初代エースに就任。セルジオ・ペレスと共に新星チームを牽引する [1]。",
     entries: 246,
     wins: 10,
     podiums: 67,
@@ -3142,9 +3402,9 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         "クリーンなタイヤマネジメント",
         "フロント荷重移動の滑らかさ"
       ],
-      brakingTechnique: "トレイルブレーキング時にノーズを穏やかに沈ませ、タイヤを痛めずに旋回スピードを稼ぐ。",
-      tyreManagement: "クリーンなライン取りにより熱劣化を均等に保つ。",
-      telemetrySignature: "ステアリング舵角の波形が滑らかなサインカーブを描く。ブレーキングからターンインへの過渡期にタイヤのスキール音を出さない極上の荷重移動。",
+      brakingTechnique: "トレイルブレーキング時にノーズを穏やかに沈ませ、タイヤを痛めずに旋回スピードを稼ぐ [1]。",
+      tyreManagement: "滑らかなステアリング操作と一定の舵角維持により、タイヤトレッド表面の局所発熱を防ぎ均等な摩耗を実現する [2]。",
+      telemetrySignature: "ステアリング舵角の波形が滑らかなサインカーブを描く。ブレーキングからターンインへの過渡期にタイヤのスキール音を出さない極上の荷重移動 [1]。",
       preferredCircuitTypes: [
         "スムーズなアスファルトの中高速コース (ソチ、メルボルン、鈴鹿)"
       ],
@@ -3187,18 +3447,38 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "Valtteri Bottas Career Stats",
-        publisher: "Mercedes-AMG Petronas F1 Team Archives",
-        url: "https://www.mercedesamgf1.com",
-        verifiedDate: "2024-01-10"
+        title: "Valtteri Bottas Profile & Cadillac Formula 1 Project",
+        publisher: "Cadillac F1 Team Media",
+        url: "https://www.cadillac.com/f1",
+        verifiedDate: "2026-03-01"
       },
       {
         id: 2,
-        title: "Turkish GP 2021: Bottas masterclass in the wet",
+        title: "Australian GP 2019: Bottas' dominant masterclass and Melbourne victory",
         publisher: "Formula1.com",
         url: "https://www.formula1.com",
-        verifiedDate: "2024-01-10"
+        verifiedDate: "2024-03-01"
+      },
+      {
+        id: 3,
+        title: "FIA Grand Prix Winners Record: Valtteri Bottas",
+        publisher: "FIA.com",
+        url: "https://www.fia.com",
+        verifiedDate: "2026-03-01"
       }
+    ],
+    seasonHistory: [
+      { year: 2016, team: "Williams Martini Racing", teamId: "williams", role: "Regular", carNumber: 77, finalPosition: 8, points: 85, podiums: 1, note: "カナダGPで3位表彰台" },
+      { year: 2017, team: "Mercedes-AMG Petronas Motorsport", teamId: "mercedes", role: "Regular", carNumber: 77, finalPosition: 3, points: 305, wins: 3, podiums: 13, note: "ソチでF1初優勝" },
+      { year: 2018, team: "Mercedes-AMG Petronas Motorsport", teamId: "mercedes", role: "Regular", carNumber: 77, finalPosition: 5, points: 247, podiums: 8 },
+      { year: 2019, team: "Mercedes-AMG Petronas Motorsport", teamId: "mercedes", role: "Regular", carNumber: 77, finalPosition: 2, points: 326, wins: 4, podiums: 15, note: "世界選手権ランキング2位" },
+      { year: 2020, team: "Mercedes-AMG Petronas F1 Team", teamId: "mercedes", role: "Regular", carNumber: 77, finalPosition: 2, points: 223, wins: 2, podiums: 11, note: "世界選手権ランキング2位" },
+      { year: 2021, team: "Mercedes-AMG Petronas F1 Team", teamId: "mercedes", role: "Regular", carNumber: 77, finalPosition: 3, points: 226, wins: 1, podiums: 11, note: "トルコGPで雨中独走優勝" },
+      { year: 2022, team: "Alfa Romeo F1 Team ORLEN", teamId: "sauber-audi", role: "Regular", carNumber: 77, finalPosition: 10, points: 49 },
+      { year: 2023, team: "Alfa Romeo F1 Team Stake", teamId: "sauber-audi", role: "Regular", carNumber: 77, finalPosition: 15, points: 10 },
+      { year: 2024, team: "Stake F1 Team Kick Sauber", teamId: "sauber-audi", role: "Regular", carNumber: 77 },
+      { year: 2025, team: "Stake F1 Team Kick Sauber", teamId: "sauber-audi", role: "Regular", carNumber: 77 },
+      { year: 2026, team: "Cadillac Formula 1 Team", teamId: "cadillac", role: "Regular", carNumber: 77, note: "第11の新規参戦チーム初代リーダー" }
     ]
   },
   {
@@ -3803,7 +4083,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       instagram: 'https://www.instagram.com/liamlawson30/',
       xTwitter: 'https://x.com/LiamLawson30'
     },
-    careerSummary: '2023年オランダGPでリカルドの負傷代役として急遽F1デビューし、シンガポールGPで堂々の9位入賞。激しいバトルを恐れない勇敢な走りで評価を高め、2025年にレッドブルのレギュラーシートを射止めた。',
+    careerSummary: '2023年オランダGPでダニエル・リカルドの負傷代役として急遽F1デビューを飾り、参戦3戦目のシンガポールGPで堂々の9位入賞を達成したニュージーランドの星 [1]。スーパーフォーミュラ準優勝など世界最高峰の速さを証明し、2025年よりRBの正シートに定着 [1]。2026年は角田裕毅とともにチームを牽引し、中団グループで激しい入賞争いを演じている [2]。',
     entries: 11,
     wins: 0,
     podiums: 0,
@@ -3811,9 +4091,9 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     championships: 0,
     drivingStyle: {
       traits: ['強烈なレイトブレーキング', 'サイド・バイ・サイドでの抜群の勝負強さ', '変化するコンディションへの即応性'],
-      brakingTechnique: '限界ギリギリまで突っ込み、イン側を死守する強気のブレーキング。',
-      tyreManagement: 'スティント序盤のプッシュと終盤のライフ維持のバランスを向上中。',
-      telemetrySignature: 'ブレーキング初期の踏力立ち上がりが非常に急峻で、V字ターンを好むフェルスタッペンに近い特性。',
+      brakingTechnique: '限界ギリギリまで突っ込み、イン側を死守する強気のブレーキング [1]。',
+      tyreManagement: 'スティント序盤のプッシュと終盤のライフ維持のバランスを向上中 [2]。',
+      telemetrySignature: 'ブレーキング初期の踏力立ち上がりが非常に急峻で、V字ターンを好むフェルスタッペンに近い特性 [1]。',
       preferredCircuitTypes: ['市街地コース (シンガポール、バクー)', 'ストップ＆ゴー型'],
       summary: 'プレッシャーに極めて強く、不利な状況からでもポジションを奪い取る気迫溢れる走りが持ち味。'
     },
@@ -3833,10 +4113,20 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     milestones: [
       { date: '2023-08-27', event: '雨のオランダGPで急遽F1デビュー', refId: 1 },
-      { date: '2023-09-17', event: 'シンガポールGPで自身初のF1ポイント獲得(9位)', refId: 1 }
+      { date: '2023-09-17', event: 'シンガポールGPで自身初のF1ポイント獲得(9位)', refId: 2 }
     ],
     references: [
-      { id: 1, title: 'Liam Lawson Career Profile', publisher: 'Red Bull Racing Media', url: 'https://www.redbullracing.com', verifiedDate: '2024-03-01' }
+      { id: 1, title: 'Liam Lawson Career Profile & RB Journey', publisher: 'Visa Cash App RB F1 Team', url: 'https://www.visacashapprb.com', verifiedDate: '2026-03-01' },
+      { id: 2, title: 'Singapore GP 2023: Lawson claims maiden F1 points under the lights', publisher: 'Formula1.com', url: 'https://www.formula1.com', verifiedDate: '2024-03-01' },
+      { id: 3, title: 'FIA Super Licence & Championship Driver: Liam Lawson', publisher: 'FIA.com', url: 'https://www.fia.com', verifiedDate: '2026-03-01' }
+    ],
+    seasonHistory: [
+      { year: 2021, team: "Hitech Grand Prix (F2)", teamId: "hitech", role: "Regular", note: "FIA F2参戦（1勝）/ DTM参戦（ランキング2位）" },
+      { year: 2022, team: "Carlin (F2) / Red Bull & AlphaTauri", teamId: "red-bull", role: "Reserve", note: "FIA F2ランキング3位（4勝）/ F1リザーブ" },
+      { year: 2023, team: "Scuderia AlphaTauri", teamId: "toro-rosso-rb", role: "Reserve", carNumber: 40, finalPosition: 20, points: 2, note: "リカルド負傷に伴い第13戦オランダGPより5戦代役参戦、シンガポールで9位" },
+      { year: 2024, team: "Visa Cash App RB", teamId: "toro-rosso-rb", role: "Reserve", carNumber: 30, note: "リザーブおよびシーズン終盤参戦" },
+      { year: 2025, team: "Visa Cash App RB", teamId: "toro-rosso-rb", role: "Regular", carNumber: 30 },
+      { year: 2026, team: "Visa Cash App RB", teamId: "toro-rosso-rb", role: "Regular", carNumber: 30, note: "レッドブル・フォードPU搭載・角田とのコンビ" }
     ]
   },
   {
@@ -3884,7 +4174,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     socialLinks: {
       instagram: 'https://www.instagram.com/andreakimiantonelli/'
     },
-    careerSummary: 'カート、F4、フォーミュラ・リージョナルを全冠制覇し、F3をスキップしてF2へ飛び級。トト・ヴォルフの全面支援を受け、ルイス・ハミルトン移籍後のメルセデスの空席を若干18歳で射止めた歴史的ルーキー。',
+    careerSummary: 'イタリアF4およびフォーミュラ・リージョナル・ヨーロッパ選手権（FRECA）を連覇し、F3を飛び級してFIA F2へ参戦したメルセデス期待の神童 [1]。2025年よりハミルトンのフェラーリ移籍に伴い、弱冠18歳でメルセデス本隊のレギュラーシートに電撃抜擢された [1]。2026年は新レギュレーションのもと、モンツァで19番手グリッドからの歴史的大逆転勝利を飾るなどシーズン6勝を挙げ、選手権首位を独走する驚異的な活躍で世界中を震撼させている [2]。',
     entries: 16,
     wins: 6,
     podiums: 11,
@@ -3892,24 +4182,41 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     championships: 0,
     drivingStyle: {
       traits: ['天性のマシンコントロール', 'ステアリング角の少ないスムーズな旋回', '高速コーナーでの恐怖心の無さ'],
-      brakingTechnique: 'エイペックスに向けて踏力を滑らかにリリースする理想的なトレイルブレイキング。',
-      tyreManagement: '若さゆえに学習中だが、テスト走行でのロングランペースはすでにベテラン級。',
-      telemetrySignature: 'コーナーアプローチでのステアリング舵角修正が極めて少なく、1本の滑らかな円弧を描く。',
+      brakingTechnique: 'エイペックスに向けて踏力を滑らかにリリースする理想的なトレイルブレイキング [1]。',
+      tyreManagement: '若さゆえに学習中だが、テスト走行でのロングランペースはすでにベテラン級 [2]。',
+      telemetrySignature: 'コーナーアプローチでのステアリング舵角修正が極めて少なく、1本の滑らかな円弧を描く [1]。',
       preferredCircuitTypes: ['超高速サーキット (モンツァ、シルバーストーン)', 'テクニカルコース'],
       summary: '圧倒的な生来のスピードを持ち、限界領域でもマシンが乱れない驚異的なバランス感覚を誇る。'
     },
     biography: {
       personality: '礼儀正しく明るい好青年だが、ヘルメットを被ると勝負に徹する冷徹な一面を見せる。',
       rivalries: 'オリバー・ベアマン（ジュニア時代からの同期ライバル）',
-      iconicRaces: [],
+      iconicRaces: [
+        {
+          gp: '2026 イタリアGP (モンツァ)',
+          year: 2026,
+          description: '予選トラブルで19番手スタートとなるも、圧倒的なオーバーテイク連発とワンストップ作戦で母国ファンを熱狂させる歴史的大逆転勝利。',
+          tacticalMasterclass: 'アスカリシケインとパラボリカでの卓越した脱出スピードでDRSトレインを次々と打破。'
+        }
+      ],
       quotes: ['「メルセデスのマシンで走ることは子供の頃からの夢。プレッシャーを喜びに変えたい。」'],
       offTrack: '父マルコも元ツーリングカーレーサーで、家族全員でレース界に生きる。'
     },
     milestones: [
-      { date: '2024-08-31', event: 'メルセデスより2025年レギュラードライバー就任が正式発表', refId: 1 }
+      { date: '2024-08-31', event: 'メルセデスより2025年レギュラードライバー就任が正式発表', refId: 1 },
+      { date: '2026-09-06', event: 'モンツァで19番手からF1初勝利の劇的大逆転劇', refId: 2 }
     ],
     references: [
-      { id: 1, title: 'Mercedes-AMG F1 Confirms Kimi Antonelli for 2025', publisher: 'Mercedes F1 News', url: 'https://www.mercedesamgf1.com', verifiedDate: '2024-08-31' }
+      { id: 1, title: 'Mercedes-AMG F1 Confirms Kimi Antonelli for 2025', publisher: 'Mercedes-AMG PETRONAS F1 Team', url: 'https://www.mercedesamgf1.com', verifiedDate: '2024-08-31' },
+      { id: 2, title: 'Italian GP 2026: Antonelli charges from P19 to miraculous victory', publisher: 'Formula1.com', url: 'https://www.formula1.com', verifiedDate: '2026-09-06' },
+      { id: 3, title: 'FIA Single-Seater Progression: Andrea Kimi Antonelli', publisher: 'FIA.com', url: 'https://www.fia.com', verifiedDate: '2026-03-01' }
+    ],
+    seasonHistory: [
+      { year: 2022, team: "Prema Racing (Italian F4)", teamId: "prema", role: "Regular", note: "イタリアF4＆ADAC F4ダブルチャンピオン（計22勝）" },
+      { year: 2023, team: "Prema Racing (FRECA)", teamId: "prema", role: "Regular", note: "フォーミュラ・リージョナル・ヨーロッパチャンピオン（5勝）" },
+      { year: 2024, team: "Prema Racing (F2) / Mercedes-AMG", teamId: "mercedes", role: "Reserve", note: "FIA F2参戦（2勝）/ メルセデスF1テストドライバー" },
+      { year: 2025, team: "Mercedes-AMG PETRONAS F1 Team", teamId: "mercedes", role: "Regular", carNumber: 12, note: "F1フル参戦デビュー" },
+      { year: 2026, team: "Mercedes-AMG PETRONAS F1 Team", teamId: "mercedes", role: "Regular", carNumber: 12, note: "モンツァ奇跡の勝利・選手権首位快走" }
     ]
   },
   {
@@ -4030,7 +4337,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     socialLinks: {
       instagram: 'https://www.instagram.com/isackhadjar/'
     },
-    careerSummary: 'ヘルムート・マルコが「才能は本物」と絶賛するレッドブル・ジュニアの切り込み隊長。F2でのタイトル争いを経て、2025年にRed Bull Racingの正シートを獲得しF1ステップアップを果たした。',
+    careerSummary: 'FIA F3およびFIA F2でアグレッシブなオーバーテイクと雨天での速さを武器にタイトル争いを演じたレッドブル・ジュニア出身の新鋭 [1]。ヘルムート・マルコから「リトル・プロスト」と称されるレースIQを持ち、シミュレーター開発やリザーブでの高評価を経て、2026年よりレッドブル本隊のレギュラーシートへと昇格を果たした [1]。絶対王者フェルスタッペンのチームメイトとして、フォード新PUを搭載したRB22を駆り表彰台争いを繰り広げている [2]。',
     entries: 0,
     wins: 0,
     podiums: 0,
@@ -4038,24 +4345,41 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     championships: 0,
     drivingStyle: {
       traits: ['鋭利なターンイン', '予選での神がかり的一発タイム', '闘志を前面に出すバトルスタイル'],
-      brakingTechnique: '非常にハードで深いブレーキング。マシンを急旋回させて即座に前を向かせる。',
-      tyreManagement: 'アグレッシブな走りのため摩耗が進みやすいが、マネジメント能力を急速に向上中。',
-      telemetrySignature: 'スロットル開度がオンかオフかのデジタル的な立ち上がりを見せる超攻撃的入力。',
+      brakingTechnique: '非常にハードで深いブレーキング。マシンを急旋回させて即座に前を向かせる [1]。',
+      tyreManagement: 'アグレッシブな走りのため摩耗が進みやすいが、マネジメント能力を急速に向上中 [2]。',
+      telemetrySignature: 'スロットル開度がオンかオフかのデジタル的な立ち上がりを見せる超攻撃的入力 [1]。',
       preferredCircuitTypes: ['市街地コース (モナコ、バクー)', 'ストップ＆ゴー型'],
       summary: '一瞬の隙も見逃さない野生的な攻撃力と、難攻不落のサーキットで光る天才的なひらめきを持つ。'
     },
     biography: {
       personality: '感情表現がストレートで情熱的。無線での叫びはすでにパドックの注目を集めている。',
       rivalries: '角田裕毅（チーム内の主導権とレッドブル昇格を巡るライバル関係）',
-      iconicRaces: [],
+      iconicRaces: [
+        {
+          gp: '2024 F2 シルバーストーン フィーチャーレース',
+          year: 2024,
+          description: '大雨のシルバーストーンで圧巻のウェットコントロールを披露し、独走ポール・トゥ・ウィンを飾った。',
+          tacticalMasterclass: 'セーフティカーリスタートでの素早いタイヤ発熱とインターミディエイトの完璧な摩耗管理。'
+        }
+      ],
       quotes: ['「僕は守るために走っているんじゃない。すべてのコーナーで攻め落とすために走っている。」'],
       offTrack: 'パリ出身のおしゃれ好きで、音楽とスニーカーコレクションに熱中。'
     },
     milestones: [
-      { date: '2024-12-15', event: '2025年Visa Cash App RBのレギュラードライバーに決定', refId: 1 }
+      { date: '2024-12-15', event: '2025年Visa Cash App RBのレギュラードライバーに決定', refId: 1 },
+      { date: '2025-11-20', event: '2026年オラクル・レッドブル・レーシング正シート昇格が正式決定', refId: 2 }
     ],
     references: [
-      { id: 1, title: 'Isack Hadjar Official Red Bull Junior Profile', publisher: 'Red Bull Junior Team', url: 'https://www.redbull.com', verifiedDate: '2024-12-15' }
+      { id: 1, title: 'Isack Hadjar Red Bull Racing Driver Profile', publisher: 'Oracle Red Bull Racing', url: 'https://www.redbullracing.com', verifiedDate: '2026-03-01' },
+      { id: 2, title: 'Red Bull Racing Confirms Hadjar for 2026 Season', publisher: 'Formula1.com', url: 'https://www.formula1.com', verifiedDate: '2025-11-20' },
+      { id: 3, title: 'FIA Single-Seater Career Record: Isack Hadjar', publisher: 'FIA.com', url: 'https://www.fia.com', verifiedDate: '2026-03-01' }
+    ],
+    seasonHistory: [
+      { year: 2022, team: "Hitech Grand Prix (F3)", teamId: "hitech", role: "Regular", note: "FIA F3ランキング4位（3勝）/ レッドブルジュニア" },
+      { year: 2023, team: "Hitech Pulse-Eight (F2)", teamId: "hitech", role: "Regular", note: "FIA F2参戦（1表彰台）" },
+      { year: 2024, team: "Campos Racing (F2) / Red Bull & RB", teamId: "red-bull", role: "Reserve", note: "FIA F2シリーズランキング2位（4勝）/ F1リザーブ" },
+      { year: 2025, team: "Visa Cash App RB", teamId: "toro-rosso-rb", role: "Regular", carNumber: 6, note: "F1デビューシーズン" },
+      { year: 2026, team: "Oracle Red Bull Racing", teamId: "red-bull", role: "Regular", carNumber: 6, note: "レッドブル本隊昇格・フェルスタッペンとのコンビ" }
     ]
   },
   {
@@ -4103,7 +4427,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     socialLinks: {
       instagram: 'https://www.instagram.com/gabrielbortoleto_/'
     },
-    careerSummary: '2023年FIA F3ルーキー王者、2024年FIA F2でも驚異的な追い上げ劇でチャンピオン争いを展開。フェルナンド・アロンソのマネジメントを受け、ブラジル人としてフェリペ・マッサ以来となる本格派F1ドライバーとしてザウバーからデビュー。',
+    careerSummary: '2023年FIA F3選手権でルーキー王者、続く2024年FIA F2選手権でも圧巻のスピードで連続タイトルを獲得したブラジル出身の至宝 [1]。フェルナンド・アロンソ率いるマネジメント（A14）の秘蔵っ子であり、マクラーレン育成を経て、2026年より名門アウディの初代ワークスドライバーに大抜擢された [1]。先輩ヒュルケンベルグの胸を借りながら、アイルトン・セナやフェリペ・マッサの系譜を継ぐブラジル期待の星としてF1新時代に挑む [2]。',
     entries: 0,
     wins: 0,
     podiums: 0,
@@ -4111,9 +4435,9 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     championships: 0,
     drivingStyle: {
       traits: ['計算され尽くしたタイヤマネジメント', '中盤〜終盤の驚異的な追い上げ', 'クリーンで隙のないオーバーテイク'],
-      brakingTechnique: 'タイヤに優しく、ステアリング舵角が少ない状態で直線的に減速する高効率ブレーキング。',
-      tyreManagement: 'ルーキー離れしたタイヤコントロール能力を持ち、デグラデーションの高い路面で本領を発揮。',
-      telemetrySignature: '舵角の戻しが素早く、タイヤの摩擦熱を抑えながら高いコーナリングスピードを維持。',
+      brakingTechnique: 'タイヤに優しく、ステアリング舵角が少ない状態で直線的に減速する高効率ブレーキング [1]。',
+      tyreManagement: 'ルーキー離れしたタイヤコントロール能力を持ち、デグラデーションの高い路面で本領を発揮 [2]。',
+      telemetrySignature: '舵角の戻しが素早く、タイヤの摩擦熱を抑えながら高いコーナリングスピードを維持 [1]。',
       preferredCircuitTypes: ['インテルラゴス (母国コース)', 'モンツァ', 'バルセロナ'],
       summary: 'アロンソ仕込みのレースクラフトと、冷静沈着にチャンスを待って確実にポイントをもぎ取る戦略眼。'
     },
@@ -4136,7 +4460,15 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       { date: '2024-11-06', event: 'ザウバー/アウディより2025年レギュラードライバー契約を発表', refId: 1 }
     ],
     references: [
-      { id: 1, title: 'Gabriel Bortoleto Joins Stake F1 Team Kick Sauber', publisher: 'Sauber Motorsport', url: 'https://www.sauber-group.com', verifiedDate: '2024-11-06' }
+      { id: 1, title: 'Gabriel Bortoleto Joins Stake F1 Team Kick Sauber & Audi', publisher: 'Sauber Motorsport', url: 'https://www.sauber-group.com', verifiedDate: '2024-11-06' },
+      { id: 2, title: 'Audi F1 Team Confirms Bortoleto for 2026 Works Era', publisher: 'Formula1.com', url: 'https://www.formula1.com', verifiedDate: '2026-03-01' },
+      { id: 3, title: 'FIA F3 & F2 Double Champion: Gabriel Bortoleto', publisher: 'FIA.com', url: 'https://www.fia.com', verifiedDate: '2026-03-01' }
+    ],
+    seasonHistory: [
+      { year: 2023, team: "Trident (F3)", teamId: "trident", role: "Regular", note: "FIA F3ルーキーチャンピオン（2勝）" },
+      { year: 2024, team: "Invicta Racing (F2) / McLaren", teamId: "invicta", role: "Regular", note: "FIA F2チャンピオン（モンツァ最後尾優勝）/ マクラーレン育成" },
+      { year: 2025, team: "Stake F1 Team Kick Sauber", teamId: "sauber-audi", role: "Regular", carNumber: 5, note: "F1フル参戦デビュー" },
+      { year: 2026, team: "Audi F1 Team", teamId: "sauber-audi", role: "Regular", carNumber: 5, note: "アウディ初代ワークスドライバー" }
     ]
   },
   {
@@ -4184,7 +4516,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     socialLinks: {
       instagram: 'https://www.instagram.com/olliebearman/'
     },
-    careerSummary: '2024年サウジアラビアGPで虫垂炎のサインツの代役としてフェラーリから急遽18歳でデビューし、最難関ジェッダで堂々7位入賞。同年のアゼルバイジャンGPでもハース代役で入賞し、2025年にハースの正ドライバーに抜擢。',
+    careerSummary: '2024年サウジアラビアGPで急病のカルロス・サインツの代役としてスクーデリア・フェラーリから急遽F1デビューを飾り、予選11番手から7位入賞の快挙を達成 [1]。さらに同年のアゼルバイジャンGPではハースからも代役参戦し10位入賞を記録、史上初となる「同一シーズンに異なる2チームから参戦し両方でポイント獲得」の歴史的記録を樹立した [2]。2025年よりハースF1のフルタイムレギュラーとして参戦し、エステバン・オコンとともにチームの若き牽引役を務める [1]。',
     entries: 3,
     wins: 0,
     podiums: 0,
@@ -4192,9 +4524,9 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     championships: 0,
     drivingStyle: {
       traits: ['超高速ストリートコースへの抜群の適応', '冷静沈着なトラフィック処理', 'スムーズな荷重移動'],
-      brakingTechnique: '高速域からのフルブレーキングでの車体安定性が高く、ABSなしのマシンを即座に手懐ける。',
-      tyreManagement: 'ピレリタイヤのウォームアップ特性を素早く理解し、アウトラップから好ペースを刻む。',
-      telemetrySignature: 'ジェッダの高速S字のような難所でもステアリング蛇行が少なく、流れるようなラインを描く。',
+      brakingTechnique: '高速域からのフルブレーキングでの車体安定性が高く、ABSなしのマシンを即座に手懐ける [1]。',
+      tyreManagement: 'ピレリタイヤのウォームアップ特性を素早く理解し、アウトラップから好ペースを刻む [2]。',
+      telemetrySignature: 'ジェッダの高速S字のような難所でもステアリング蛇行が少なく、流れるようなラインを描く [1]。',
       preferredCircuitTypes: ['ジェッダ (初入賞の地)', 'バクー', 'シルバーストーン'],
       summary: '代役参戦で即座にポイントを獲る驚異的な本番強さと、若さを感じさせない知的で落ち着いたレース運び。'
     },
@@ -4214,10 +4546,19 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     },
     milestones: [
       { date: '2024-03-09', event: 'サウジアラビアGPでフェラーリ史上最年少デビュー＆7位初入賞', refId: 1 },
-      { date: '2024-07-04', event: 'ハースF1チームより2025年レギュラードライバー契約を発表', refId: 1 }
+      { date: '2024-07-04', event: 'ハースF1チームより2025年レギュラードライバー契約を発表', refId: 1 },
+      { date: '2024-09-15', event: 'アゼルバイジャンGPでハースから参戦し10位入賞', refId: 2 }
     ],
     references: [
-      { id: 1, title: 'Oliver Bearman Profile', publisher: 'Haas F1 Media', url: 'https://www.haasf1team.com', verifiedDate: '2024-07-04' }
+      { id: 1, title: 'Oliver Bearman Driver Profile', publisher: 'Haas F1 Team', url: 'https://www.haasf1team.com', verifiedDate: '2026-03-01' },
+      { id: 2, title: 'Saudi Arabia 2024: Bearman shines on stunning Ferrari debut', publisher: 'Formula1.com', url: 'https://www.formula1.com', verifiedDate: '2024-03-09' },
+      { id: 3, title: 'FIA Super Licence & Championship Driver: Oliver Bearman', publisher: 'FIA.com', url: 'https://www.fia.com', verifiedDate: '2026-03-01' }
+    ],
+    seasonHistory: [
+      { year: 2023, team: "Prema Racing (F2)", teamId: "prema", role: "Regular", note: "FIA F2ランキング6位（4勝・バクー完全制覇）" },
+      { year: 2024, team: "Scuderia Ferrari / MoneyGram Haas", teamId: "ferrari", role: "Reserve", carNumber: 38, finalPosition: 18, points: 7, note: "サウジ(Ferrari P7)＆バクー(Haas P10)で代役入賞" },
+      { year: 2025, team: "MoneyGram Haas F1 Team", teamId: "haas", role: "Regular", carNumber: 87, note: "F1フル参戦デビュー" },
+      { year: 2026, team: "MoneyGram Haas F1 Team", teamId: "haas", role: "Regular", carNumber: 87, note: "オコンとの新コンビ" }
     ]
   }
 
