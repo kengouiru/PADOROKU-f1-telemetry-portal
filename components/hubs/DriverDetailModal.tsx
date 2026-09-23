@@ -14,6 +14,7 @@ import { getDriverTraits, type DriverTraitDefinition } from '@/data/driverTraits
 import { getDriverSkills } from '@/data/driverSkillsData';
 import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
 import { useUserPreferences } from '@/lib/userPreferences';
+import SmartWikiText from '@/components/common/SmartWikiText';
 
 export interface DriverDetailModalProps {
   driver: DriverProfile;
@@ -86,26 +87,15 @@ export default function DriverDetailModal({
     }, 100);
   };
 
-  // Helper to parse "[1]", "[2]" into clickable citation badges
+  // Helper to parse keywords and "[1]", "[2]" into clickable links and citation badges
   const renderTextWithCitations = (text: string) => {
-    const parts = text.split(/(\[\d+\])/g);
-    return parts.map((part, idx) => {
-      const match = part.match(/\[(\d+)\]/);
-      if (match) {
-        const refId = parseInt(match[1], 10);
-        return (
-          <button
-            key={idx}
-            onClick={() => handleCitationClick(refId)}
-            className="inline-flex items-center px-1 mx-0.5 text-[10px] font-mono font-bold text-sky-400 bg-sky-950/60 hover:bg-sky-800/80 border border-sky-500/40 rounded transition-all cursor-pointer hover:scale-110"
-            title={`参考文献 [${refId}] を確認`}
-          >
-            [{refId}]
-          </button>
-        );
-      }
-      return <span key={idx}>{part}</span>;
-    });
+    return (
+      <SmartWikiText
+        text={text}
+        excludeUrl={`/knowledge/drivers/${driver.code}`}
+        onCitationClick={handleCitationClick}
+      />
+    );
   };
 
   const getInstagramHandle = (url?: string) => {
@@ -123,55 +113,59 @@ export default function DriverDetailModal({
   if (!mounted) return null;
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-4 animate-fade-in pb-16">
-      {/* Top Navigation Bar: Back, Breadcrumbs, Prev / Next & Popout / Actions */}
-      <div className="glass-card bg-slate-950/90 border border-white/15 p-3 sm:px-6 rounded-2xl shadow-xl flex flex-wrap items-center justify-between gap-3 sticky top-2 z-30 backdrop-blur-md">
-        <div className="flex items-center gap-3 min-w-0">
+    <div className="w-full max-w-[1800px] mx-auto animate-fade-in pb-16">
+      {/* ── Solid Flush Sticky Top Navigation Bar: Compact Single-Row, Opaque bg-slate-950, Zero Peeking Ghosting ── */}
+      <div className="sticky top-0 z-50 bg-slate-950 border-b border-white/15 px-3 sm:px-6 py-2.5 shadow-2xl flex items-center justify-between gap-3 mb-4 rounded-b-2xl">
+        {/* Left: Return Button & Breadcrumbs */}
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
           <button
             onClick={onClose}
-            className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-racing font-bold text-xs sm:text-sm flex items-center gap-1.5 border border-white/10 transition-all cursor-pointer shadow hover:scale-105 shrink-0"
+            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-racing font-bold text-xs sm:text-sm flex items-center gap-1.5 border border-white/10 transition-all cursor-pointer shadow hover:scale-105 shrink-0"
             title="一覧に戻る (ESC)"
           >
             <span>◀</span>
-            <span>一覧に戻る</span>
+            <span className="whitespace-nowrap">一覧に戻る</span>
           </button>
           <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 font-mono truncate">
             <span>F1 百科事典</span>
             <span>&gt;</span>
             <span>ドライバー名鑑</span>
             <span>&gt;</span>
-            <span className="text-white font-bold">{driver.fullName}</span>
+            <span className="text-white font-bold truncate">{driver.fullName}</span>
             <span className="text-slate-500 font-mono">({driver.code})</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <button
-            onClick={() => prevDriver && onSelectDriver(prevDriver)}
-            className="px-2.5 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer border border-white/5"
-            title="前の選手 (←キー)"
-          >
-            <span>◀</span>
-            <span className="font-mono font-bold truncate">{prevDriver?.code}</span>
-          </button>
-          <button
-            onClick={() => nextDriver && onSelectDriver(nextDriver)}
-            className="px-2.5 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer border border-white/5"
-            title="次の選手 (→キー)"
-          >
-            <span className="font-mono font-bold truncate">{nextDriver?.code}</span>
-            <span>▶</span>
-          </button>
-        </div>
+        {/* Right: Prev / Next Switcher & Compact Action Buttons (Single Row) */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Quick Prev / Next Switcher */}
+          <div className="flex items-center bg-slate-900 border border-white/10 rounded-xl p-0.5">
+            <button
+              onClick={() => prevDriver && onSelectDriver(prevDriver)}
+              className="px-2 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer border border-white/5"
+              title="前の選手 (←キー)"
+            >
+              <span>◀</span>
+              <span className="font-mono font-bold">{prevDriver?.code}</span>
+            </button>
+            <div className="w-px h-3.5 bg-white/15" />
+            <button
+              onClick={() => nextDriver && onSelectDriver(nextDriver)}
+              className="px-2 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer border border-white/5"
+              title="次の選手 (→キー)"
+            >
+              <span className="font-mono font-bold">{nextDriver?.code}</span>
+              <span>▶</span>
+            </button>
+          </div>
 
-        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-wrap">
           {/* Popout Separate Window Button */}
           <button
             type="button"
             onClick={() => {
               window.open(`/knowledge/drivers/${driver.code}`, '_blank', 'width=1280,height=900,menubar=no,toolbar=no');
             }}
-            className="px-2.5 py-1 rounded-xl bg-sky-950/70 hover:bg-sky-900 border border-sky-500/40 text-sky-300 hover:text-white text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:scale-105"
+            className="px-2.5 py-1 rounded-xl bg-sky-950/80 hover:bg-sky-900 border border-sky-500/40 text-sky-300 hover:text-white text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:scale-105"
             title="この選手を別ウィンドウで開く"
           >
             <span>別ウィンドウで開く</span>
@@ -181,7 +175,7 @@ export default function DriverDetailModal({
           {/* Star Favorite Button */}
           <button
             onClick={() => toggleDriver(driver.code)}
-            className={`px-2.5 py-1 rounded-xl text-xs font-racing flex items-center gap-1.5 transition-all cursor-pointer shadow-sm border ${
+            className={`px-2.5 py-1 rounded-xl text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm border ${
               isFavoriteDriver(driver.code)
                 ? 'bg-amber-400/25 border-amber-400/70 text-amber-300 hover:bg-amber-400/35'
                 : 'bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-300 border-white/10'
@@ -190,7 +184,7 @@ export default function DriverDetailModal({
           >
             <span>{isFavoriteDriver(driver.code) ? '★' : '☆'}</span>
             <span className="hidden md:inline">
-              {isFavoriteDriver(driver.code) ? '推し登録中' : '推し登録'}
+              {isFavoriteDriver(driver.code) ? '推し' : '推し登録'}
             </span>
           </button>
 
@@ -222,13 +216,13 @@ export default function DriverDetailModal({
               title="このドライバーのテレメトリー分析画面へ移動"
             >
               <span>🏎️</span>
-              <span className="hidden md:inline">テレメトリー分析</span>
+              <span className="hidden md:inline">テレメトリー</span>
             </button>
           )}
 
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
+            className="w-7 h-7 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs font-bold transition-all cursor-pointer border border-white/10 shrink-0"
             title="一覧へ戻る (ESC)"
           >
             ✕
@@ -565,7 +559,9 @@ export default function DriverDetailModal({
                 {driver.numberOrigin && (
                   <div className="pt-2 border-t border-white/5 flex items-start gap-2 text-xs">
                     <span className="text-amber-400 font-bold flex-shrink-0">#️⃣ カーナンバー #{driver.number} の由来:</span>
-                    <span className="text-slate-300">{driver.numberOrigin}</span>
+                    <span className="text-slate-300">
+                      <SmartWikiText text={driver.numberOrigin} excludeUrl={`/knowledge/drivers/${driver.code}`} />
+                    </span>
                   </div>
                 )}
               </div>
@@ -747,7 +743,7 @@ export default function DriverDetailModal({
                   🏁 操縦特性サマリー
                 </h4>
                 <p className="text-xs text-slate-200 leading-relaxed">
-                  {driver.drivingStyle.summary}
+                  <SmartWikiText text={driver.drivingStyle.summary} excludeUrl={`/knowledge/drivers/${driver.code}`} />
                 </p>
               </div>
 
@@ -780,19 +776,19 @@ export default function DriverDetailModal({
                     <div className="bg-slate-900/70 p-3 rounded-xl border border-white/5 space-y-1">
                       <span className="text-amber-400 font-bold block text-[11px]">⚖️ 車体バランス</span>
                       <p className="text-slate-300 text-[11px] leading-relaxed">
-                        {driver.engineeringPreference.setupBalance}
+                        <SmartWikiText text={driver.engineeringPreference.setupBalance} excludeUrl={`/knowledge/drivers/${driver.code}`} />
                       </p>
                     </div>
                     <div className="bg-slate-900/70 p-3 rounded-xl border border-white/5 space-y-1">
                       <span className="text-amber-400 font-bold block text-[11px]">🦶 ペダルタッチ・制動感</span>
                       <p className="text-slate-300 text-[11px] leading-relaxed">
-                        {driver.engineeringPreference.pedalFeel}
+                        <SmartWikiText text={driver.engineeringPreference.pedalFeel} excludeUrl={`/knowledge/drivers/${driver.code}`} />
                       </p>
                     </div>
                     <div className="bg-slate-900/70 p-3 rounded-xl border border-white/5 space-y-1">
                       <span className="text-amber-400 font-bold block text-[11px]">🎯 ステアリングフィール</span>
                       <p className="text-slate-300 text-[11px] leading-relaxed">
-                        {driver.engineeringPreference.steeringWeight}
+                        <SmartWikiText text={driver.engineeringPreference.steeringWeight} excludeUrl={`/knowledge/drivers/${driver.code}`} />
                       </p>
                     </div>
                   </div>
@@ -806,7 +802,7 @@ export default function DriverDetailModal({
                   <span>テレメトリー工学解析・ステアリング＆ペダル波形特性</span>
                 </h4>
                 <p className="text-xs text-slate-200 leading-relaxed font-mono text-[11px]">
-                  {driver.drivingStyle.telemetrySignature}
+                  <SmartWikiText text={driver.drivingStyle.telemetrySignature} excludeUrl={`/knowledge/drivers/${driver.code}`} />
                 </p>
 
                 {onNavigateToTelemetry && (

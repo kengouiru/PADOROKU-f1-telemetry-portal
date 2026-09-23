@@ -16,9 +16,9 @@ export default function RegulationsRulesPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-3 sm:p-6 flex flex-col">
-      <div className="w-full max-w-7xl mx-auto space-y-4 animate-fade-in pb-16">
-        {/* Top Navigation Bar */}
-        <div className="glass-card bg-slate-950/90 border border-white/15 p-3 sm:px-6 rounded-2xl shadow-xl flex flex-wrap items-center justify-between gap-3 sticky top-2 z-30 backdrop-blur-md">
+      <div className="w-full max-w-[1800px] mx-auto space-y-4 animate-fade-in pb-16">
+        {/* Top Navigation Bar: Solid Flush Sticky Top Navigation Bar */}
+        <div className="sticky top-0 z-50 bg-slate-950 border-b border-white/15 px-3 sm:px-6 py-2.5 shadow-2xl flex items-center justify-between gap-3 mb-4 rounded-b-2xl">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => {

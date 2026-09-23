@@ -486,7 +486,7 @@ export default function DriversHub({
   }
 
   return (
-    <div className="flex flex-col gap-3 sm:gap-4 max-w-7xl mx-auto animate-fade-in pb-6 sm:pb-2">
+    <div className="flex flex-col gap-3 sm:gap-4 w-full max-w-[1800px] mx-auto animate-fade-in pb-6 sm:pb-2">
       {/* ── Top Bar: View Mode Switcher, Free-Word Search, Summary & Reset ── */}
       <div className="glass-card-premium rounded-xl p-3 sm:p-3.5 shadow-md flex flex-col gap-2.5">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5">
@@ -836,7 +836,7 @@ export default function DriversHub({
 
       {/* ── MODE 1: 🏁 TEAM GROUPED VIEW (Default Recommended) ── */}
       {viewMode === 'grouped' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 sm:gap-4 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3.5 sm:gap-4 items-stretch">
           {KNOWLEDGE_TEAMS.map((team) => {
             // Get paired driver objects for this team
             const pairedDrivers = team.drivers
@@ -932,8 +932,8 @@ export default function DriversHub({
                 </div>
               </div>
 
-              {/* Legends Grid (4 Columns) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Legends Grid (4 to 5 Columns) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
                 {legendDrivers
                   .filter((d) => isDriverMatchQuery(d))
                   .map((driver) => renderDriverCard(driver))}
@@ -1039,7 +1039,7 @@ export default function DriversHub({
           </div>
 
           {/* Teams Grid for the Selected Year */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 items-stretch">
             {currentSeasonGrid.teams.map((team) => (
               <div
                 key={team.teamId}
@@ -1297,7 +1297,7 @@ export default function DriversHub({
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3.5">
               {filteredDrivers.map((driver) => renderDriverCard(driver))}
             </div>
           )}
@@ -1322,7 +1322,7 @@ export default function DriversHub({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
             {legendDrivers
               .filter((d) => isDriverMatchQuery(d))
               .map((driver) => renderDriverCard(driver))}

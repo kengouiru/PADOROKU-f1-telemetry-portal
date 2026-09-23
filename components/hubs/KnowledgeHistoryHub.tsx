@@ -537,7 +537,7 @@ export default function KnowledgeHistoryHub({
   };
 
   return (
-    <div className="flex flex-col gap-3 sm:gap-4 max-w-6xl mx-auto pb-6 sm:pb-2">
+    <div className="flex flex-col gap-3 sm:gap-4 w-full max-w-[1800px] mx-auto pb-6 sm:pb-2 px-2 sm:px-4 lg:px-6">
       {/* ── Prominent Universal Library Command Bar ── */}
       <div ref={searchContainerRef} className="relative z-30">
         <div className="glass-card-premium p-2.5 sm:p-3 rounded-2xl flex items-center gap-3 border border-white/10 shadow-xl backdrop-blur-md">

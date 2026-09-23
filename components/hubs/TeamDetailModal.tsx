@@ -18,6 +18,7 @@ import { getTeamLineage, getTeamCarSpecs, type TeamLineageRecord, type CarTechni
 import { HISTORICAL_SEASONS_DATA, type HistoricalGridTeam, type HistoricalGridDriver } from '@/data/f1HistoricalGrids';
 import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
 import { useUserPreferences } from '@/lib/userPreferences';
+import SmartWikiText from '@/components/common/SmartWikiText';
 
 export interface TeamDetailModalProps {
   team: TeamProfile;
@@ -135,54 +136,58 @@ export default function TeamDetailModal({
   if (!mounted) return null;
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-4 animate-fade-in pb-16">
-      {/* Top Navigation Bar: Back, Breadcrumbs, Prev / Next & Popout / Actions */}
-      <div className="glass-card bg-slate-950/90 border border-white/15 p-3 sm:px-6 rounded-2xl shadow-xl flex flex-wrap items-center justify-between gap-3 sticky top-2 z-30 backdrop-blur-md">
-        <div className="flex items-center gap-3 min-w-0">
+    <div className="w-full max-w-[1800px] mx-auto animate-fade-in pb-16">
+      {/* ── Solid Flush Sticky Top Navigation Bar: Compact Single-Row, Opaque bg-slate-950, Zero Peeking Ghosting ── */}
+      <div className="sticky top-0 z-50 bg-slate-950 border-b border-white/15 px-3 sm:px-6 py-2.5 shadow-2xl flex items-center justify-between gap-3 mb-4 rounded-b-2xl">
+        {/* Left: Return Button & Breadcrumbs */}
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
           <button
             onClick={onClose}
-            className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-racing font-bold text-xs sm:text-sm flex items-center gap-1.5 border border-white/10 transition-all cursor-pointer shadow hover:scale-105 shrink-0"
+            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-racing font-bold text-xs sm:text-sm flex items-center gap-1.5 border border-white/10 transition-all cursor-pointer shadow hover:scale-105 shrink-0"
             title="一覧に戻る (ESC)"
           >
             <span>◀</span>
-            <span>一覧に戻る</span>
+            <span className="whitespace-nowrap">一覧に戻る</span>
           </button>
           <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 font-mono truncate">
             <span>F1 百科事典</span>
             <span>&gt;</span>
             <span>チーム名鑑</span>
             <span>&gt;</span>
-            <span className="text-white font-bold">{team.name}</span>
+            <span className="text-white font-bold truncate">{team.name}</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <button
-            onClick={() => prevTeam && onSelectTeam(prevTeam)}
-            className="px-2.5 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer border border-white/5"
-            title="前のチーム (←キー)"
-          >
-            <span>◀</span>
-            <span className="font-mono font-bold truncate">{prevTeam?.name}</span>
-          </button>
-          <button
-            onClick={() => nextTeam && onSelectTeam(nextTeam)}
-            className="px-2.5 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer border border-white/5"
-            title="次のチーム (→キー)"
-          >
-            <span className="font-mono font-bold truncate">{nextTeam?.name}</span>
-            <span>▶</span>
-          </button>
-        </div>
+        {/* Right: Prev / Next Switcher & Compact Action Buttons (Single Row) */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Quick Prev / Next Switcher */}
+          <div className="flex items-center bg-slate-900 border border-white/10 rounded-xl p-0.5">
+            <button
+              onClick={() => prevTeam && onSelectTeam(prevTeam)}
+              className="px-2 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer border border-white/5"
+              title="前のチーム (←キー)"
+            >
+              <span>◀</span>
+              <span className="font-mono font-bold truncate max-w-[80px] sm:max-w-none">{prevTeam?.name}</span>
+            </button>
+            <div className="w-px h-3.5 bg-white/15" />
+            <button
+              onClick={() => nextTeam && onSelectTeam(nextTeam)}
+              className="px-2 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer border border-white/5"
+              title="次のチーム (→キー)"
+            >
+              <span className="font-mono font-bold truncate max-w-[80px] sm:max-w-none">{nextTeam?.name}</span>
+              <span>▶</span>
+            </button>
+          </div>
 
-        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-wrap">
           {/* Popout Separate Window Button */}
           <button
             type="button"
             onClick={() => {
               window.open(`/knowledge/teams/${team.id}`, '_blank', 'width=1280,height=900,menubar=no,toolbar=no');
             }}
-            className="px-2.5 py-1 rounded-xl bg-sky-950/70 hover:bg-sky-900 border border-sky-500/40 text-sky-300 hover:text-white text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:scale-105"
+            className="px-2.5 py-1 rounded-xl bg-sky-950/80 hover:bg-sky-900 border border-sky-500/40 text-sky-300 hover:text-white text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:scale-105"
             title="このチームを別ウィンドウで開く"
           >
             <span>別ウィンドウで開く</span>
@@ -200,7 +205,7 @@ export default function TeamDetailModal({
                 });
                 onClose();
               }}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-racing font-bold bg-blue-600/90 hover:bg-blue-500 text-white shadow-sm border border-blue-400/40 transition-all hover:scale-105 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-racing font-bold bg-blue-600/90 hover:bg-blue-500 text-white shadow-sm border border-blue-400/40 transition-all hover:scale-105 cursor-pointer"
               title={`${team.drivers[0]} と ${team.drivers[1]} のテレメトリー直接比較画面を開く`}
             >
               <span>📊</span>
@@ -211,7 +216,7 @@ export default function TeamDetailModal({
           {/* Star Favorite Button */}
           <button
             onClick={() => toggleTeam(team.id)}
-            className={`px-2.5 py-1 rounded-xl text-xs font-racing flex items-center gap-1.5 transition-all cursor-pointer shadow-sm border ${
+            className={`px-2.5 py-1 rounded-xl text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm border ${
               isFavoriteTeam(team.id)
                 ? 'bg-amber-400/25 border-amber-400/70 text-amber-300 hover:bg-amber-400/35'
                 : 'bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-300 border-white/10'
@@ -220,13 +225,13 @@ export default function TeamDetailModal({
           >
             <span>{isFavoriteTeam(team.id) ? '★' : '☆'}</span>
             <span className="hidden md:inline">
-              {isFavoriteTeam(team.id) ? '推しチーム登録中' : '推しチーム登録'}
+              {isFavoriteTeam(team.id) ? '推し' : '推し登録'}
             </span>
           </button>
 
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
+            className="w-7 h-7 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs font-bold transition-all cursor-pointer border border-white/10 shrink-0"
             title="一覧へ戻る (ESC)"
           >
             ✕
@@ -491,14 +496,14 @@ export default function TeamDetailModal({
                                     <span>象徴的名車: {node.iconicCar.model}</span>
                                   </div>
                                   <p className="text-[11px] text-slate-300 leading-snug">
-                                    {node.iconicCar.description}
+                                    <SmartWikiText text={node.iconicCar.description} excludeUrl={`/knowledge/teams/${team.id}`} />
                                   </p>
                                 </div>
                               )}
 
                               {/* Historical Summary */}
                               <p className="text-xs text-slate-300 leading-relaxed mt-2.5 pt-2 border-t border-white/5 font-sans">
-                                {node.summary}
+                                <SmartWikiText text={node.summary} excludeUrl={`/knowledge/teams/${team.id}`} />
                               </p>
                             </div>
                           </div>
@@ -552,7 +557,9 @@ export default function TeamDetailModal({
                       <div className="p-3 rounded-xl bg-slate-950/70 border border-white/10 space-y-1">
                         <span className="text-[10px] font-racing text-amber-400 block">🌪️ ACTIVE AERODYNAMICS</span>
                         <span className="text-xs font-bold text-amber-300 font-sans block leading-tight">Z-mode (高DF) / X-mode (低ドラッグ)</span>
-                        <span className="text-[10px] text-slate-400 font-sans block">{carSpecs.activeAero}</span>
+                        <span className="text-[10px] text-slate-400 font-sans block">
+                          <SmartWikiText text={carSpecs.activeAero} excludeUrl={`/knowledge/teams/${team.id}`} />
+                        </span>
                       </div>
 
                       <div className="p-3 rounded-xl bg-slate-950/70 border border-white/10 space-y-1">
@@ -564,7 +571,9 @@ export default function TeamDetailModal({
                       <div className="p-3 rounded-xl bg-slate-950/70 border border-white/10 space-y-1">
                         <span className="text-[10px] font-racing text-emerald-400 block">🌱 持続可能燃料 ＆ 流量規定</span>
                         <span className="text-xs font-bold text-emerald-300 font-sans block">100% アドバンスド持続可能燃料</span>
-                        <span className="text-[10px] text-slate-400 font-mono block">{carSpecs.fuelRegulation}</span>
+                        <span className="text-[10px] text-slate-400 font-mono block">
+                          <SmartWikiText text={carSpecs.fuelRegulation} excludeUrl={`/knowledge/teams/${team.id}`} />
+                        </span>
                       </div>
 
                       <div className="p-3 rounded-xl bg-slate-950/70 border border-white/10 space-y-1">

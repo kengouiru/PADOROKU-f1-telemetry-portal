@@ -20,6 +20,7 @@ import {
   type RegulationCategory,
   type RegulationArticle,
 } from '@/data/f1RegulationsData';
+import SmartWikiText from '@/components/common/SmartWikiText';
 
 interface F1RegulationsHubProps {
   onNavigateToTab?: (tab: string) => void;
@@ -301,7 +302,9 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                             <span className="w-5 h-5 rounded-full bg-red-500/20 text-red-400 font-mono text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
                               {idx + 1}
                             </span>
-                            <p className="text-slate-300 text-xs leading-relaxed">{kp}</p>
+                            <p className="text-slate-300 text-xs leading-relaxed">
+                              <SmartWikiText text={kp} />
+                            </p>
                           </div>
                         ))}
                       </div>
@@ -316,7 +319,7 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                           <span>ピットウォール戦術 &amp; 工学的深層分析</span>
                         </div>
                         <p className="text-slate-300 text-xs leading-relaxed">
-                          {art.inDepthAnalysis}
+                          <SmartWikiText text={art.inDepthAnalysis} />
                         </p>
                       </div>
 
@@ -327,7 +330,7 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                           <span>テレメトリーデータ・波形への直接的影響</span>
                         </div>
                         <p className="text-slate-300 text-xs leading-relaxed">
-                          {art.telemetryTacticalImpact}
+                          <SmartWikiText text={art.telemetryTacticalImpact} />
                         </p>
                       </div>
                     </div>
@@ -344,11 +347,11 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                           </span>
                         </div>
                         <p className="text-slate-300 text-xs leading-relaxed mb-2">
-                          {art.historicalCaseStudy.description}
+                          <SmartWikiText text={art.historicalCaseStudy.description} />
                         </p>
                         <div className="bg-slate-900/80 rounded-lg p-2.5 border border-white/5 text-[11px] text-amber-300">
                           <span className="font-bold">🏁 FIA規則への影響・裁定結果: </span>
-                          {art.historicalCaseStudy.outcome}
+                          <SmartWikiText text={art.historicalCaseStudy.outcome} />
                         </div>
                       </div>
                     )}
