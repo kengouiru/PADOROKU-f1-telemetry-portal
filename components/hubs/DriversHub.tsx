@@ -929,7 +929,7 @@ export default function DriversHub({
                 >
                   {availableYears.map((yr) => (
                     <option key={yr} value={yr} className="bg-slate-950 text-white">
-                      🏁 {yr}年 {yr === 2026 ? '(最新現役規定)' : yr === 2025 ? '(ノリス初戴冠)' : yr === 2021 ? '(劇的最終周)' : yr === 2016 ? '(ロズベルグ戴冠)' : ''}
+                      {yr}年
                     </option>
                   ))}
                 </select>
