@@ -23,6 +23,7 @@ import type {
 } from '@/lib/raceSimulationEngine';
 import { MASTER_TRAITS, type DriverTraitDefinition } from '@/data/driverTraitsData';
 import { playF1IncomingRadioChirp } from '@/lib/radioAudioEffect';
+import type { MobileConsoleView } from '../types';
 
 export interface CockpitHudDeckProps {
   challengeLap: number;
@@ -54,8 +55,8 @@ export interface CockpitHudDeckProps {
   setWeatherRerollNotification: (notif: string | null) => void;
   autoPauseAlert?: string | null;
   setAutoPauseAlert?: (alert: string | null) => void;
-  mobileConsoleView: 'tower' | 'monitor' | 'comms';
-  setMobileConsoleView: (view: 'tower' | 'monitor' | 'comms') => void;
+  mobileConsoleView: MobileConsoleView;
+  setMobileConsoleView: (view: MobileConsoleView) => void;
   radioResponses: Record<string, string>;
   isRaceFinished?: boolean;
 }
@@ -493,15 +494,31 @@ export const CockpitHudDeck: React.FC<CockpitHudDeckProps> = ({
       {/* ── END HUD DECK ── */}
 
       {/* ── Mobile View Toggle (screens < lg) ── */}
-      <div className="grid grid-cols-3 lg:hidden gap-1 p-1 rounded-xl bg-slate-900 border border-white/10 text-xs font-racing font-bold">
+      <div className="grid grid-cols-4 lg:hidden gap-1 p-1 rounded-xl bg-slate-900/95 border border-white/10 text-[11px] font-racing font-bold shadow-md">
+        <button
+          type="button"
+          onClick={() => setMobileConsoleView('integrated')}
+          className={`py-1.5 rounded-lg text-center transition-all relative ${
+            mobileConsoleView === 'integrated'
+              ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-sm ring-1 ring-red-400/50'
+              : 'text-slate-400 hover:text-white'
+          }`}
+          title="縦画面最適化: コースレーダー＆親指作戦デッキを同一画面で操作"
+        >
+          <span>🏎️ 統合</span>
+          {currentSnapshot?.activeRadioPrompt && !radioResponses[currentSnapshot.activeRadioPrompt.id] && (
+            <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+          )}
+        </button>
         <button
           type="button"
           onClick={() => setMobileConsoleView('tower')}
           className={`py-1.5 rounded-lg text-center transition-all ${
             mobileConsoleView === 'tower' ? 'bg-red-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
           }`}
+          title="全22台の順位・ギャップ・インターバル詳細タワー"
         >
-          🏁 順位タワー
+          🏁 順位
         </button>
         <button
           type="button"
@@ -509,8 +526,9 @@ export const CockpitHudDeck: React.FC<CockpitHudDeckProps> = ({
           className={`py-1.5 rounded-lg text-center transition-all ${
             mobileConsoleView === 'monitor' ? 'bg-red-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
           }`}
+          title="詳細テレメトリー・気象レーダー・戦略ウィンドウ"
         >
-          🖥️ コース・データ
+          📊 データ
         </button>
         <button
           type="button"
@@ -518,8 +536,9 @@ export const CockpitHudDeck: React.FC<CockpitHudDeckProps> = ({
           className={`py-1.5 rounded-lg text-center transition-all relative ${
             mobileConsoleView === 'comms' ? 'bg-red-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
           }`}
+          title="無線交信・ライバル偵察インテル"
         >
-          <span>📻 無線・BOX</span>
+          <span>📻 無線</span>
           {currentSnapshot?.activeRadioPrompt && !radioResponses[currentSnapshot.activeRadioPrompt.id] && (
             <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500 animate-ping" />
           )}

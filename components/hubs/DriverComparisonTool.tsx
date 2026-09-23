@@ -51,6 +51,13 @@ const PRESET_MATCHUPS: { d1: string; d2: string; label: string; desc: string }[]
   { d1: 'LEC', d2: 'SAI', label: 'LEC vs SAI', desc: '元フェラーリ盟友対決' },
   { d1: 'TSU', d2: 'LAW', label: 'TSU vs LAW', desc: 'RB同門・昇格争覇' },
   { d1: 'SEN', d2: 'PRO', label: 'SEN vs PRO', desc: '史上最大の伝説因縁' },
+  { d1: 'MSC', d2: 'HAK', label: 'MSC vs HAK', desc: '世紀のライバル頂上決戦' },
+  { d1: 'HAM', d2: 'VET', label: 'HAM vs VET', desc: '2010年代4冠vs7冠激突' },
+  { d1: 'VER', d2: 'SEN', label: 'VER vs SEN', desc: '時代を超えた鬼神アタッカー' },
+  { d1: 'HAM', d2: 'MSC', label: 'HAM vs MSC', desc: '歴代最多7冠王者直接比較' },
+  { d1: 'RAI', d2: 'ALO', label: 'RAI vs ALO', desc: '2000年代の熱狂と知略' },
+  { d1: 'LAU', d2: 'PRO', label: 'LAU vs PRO', desc: '1984年 0.5点差の頭脳戦' },
+  { d1: 'MAN', d2: 'PIQ', label: 'MAN vs PIQ', desc: 'ホンダターボ黄金期の内戦' },
 ];
 
 export default function DriverComparisonTool({

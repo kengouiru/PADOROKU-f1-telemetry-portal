@@ -12,9 +12,10 @@ import {
   type ChallengeScenario,
   type SimSnapshot,
 } from '@/lib/raceSimulationEngine';
+import type { MobileConsoleView } from '../types';
 
 export interface TimingTowerPanelProps {
-  mobileConsoleView: 'tower' | 'monitor' | 'comms';
+  mobileConsoleView: MobileConsoleView;
   timingTowerMode: 'gap' | 'int';
   setTimingTowerMode: (mode: 'gap' | 'int') => void;
   currentSnapshot?: SimSnapshot | null;

@@ -20,12 +20,12 @@ import type {
   EnginePUMode,
   TeamOrderType,
 } from '@/lib/raceSimulationEngine';
-import type { PitwallMonitor } from '../types';
+import type { PitwallMonitor, MobileConsoleView } from '../types';
 
 export type HelpCardType = 'weather' | 'pit_exit' | 'telemetry' | null;
 
 export interface TrackMapAndWeatherDeckProps {
-  mobileConsoleView: 'tower' | 'monitor' | 'comms';
+  mobileConsoleView: MobileConsoleView;
   activeScenario: ChallengeScenario;
   currentSnapshot?: SimSnapshot | null;
   lapProgressPct: number;
@@ -68,7 +68,7 @@ export const TrackMapAndWeatherDeck: React.FC<TrackMapAndWeatherDeckProps> = ({
   handleTeamOrder,
 }) => {
   return (
-    <div className={`w-full min-w-0 space-y-2.5 ${mobileConsoleView === 'monitor' ? 'block' : 'hidden lg:block'}`}>
+    <div className={`w-full min-w-0 space-y-2.5 ${mobileConsoleView === 'monitor' || mobileConsoleView === 'integrated' ? 'block' : 'hidden lg:block'}`}>
       <LiveTrackGpsRadar
         circuitId={activeScenario.circuit.id}
         circuitName={activeScenario.circuit.name}
@@ -90,7 +90,7 @@ export const TrackMapAndWeatherDeck: React.FC<TrackMapAndWeatherDeckProps> = ({
       />
 
       {/* ── LOWER DECK: WEATHER (LEFT) & TEAM ORDERS (RIGHT) ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+      <div className={`gap-2 ${mobileConsoleView === 'integrated' ? 'hidden lg:grid grid-cols-1 md:grid-cols-2' : 'grid grid-cols-1 md:grid-cols-2'}`}>
         {/* 1. WEATHER (Balanced Fit - No Clipping) */}
         <div className={`glass-card-premium p-2.5 rounded-xl border border-white/10 space-y-2 flex flex-col justify-start transition-all ${
           activeHelpCard === 'weather' || hoveredHelpCard === 'weather' ? 'relative z-50' : 'relative z-10 hover:z-40'

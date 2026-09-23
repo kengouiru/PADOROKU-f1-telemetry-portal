@@ -89,6 +89,7 @@ import type {
   GameMajorCategory,
   ChallengeModeType,
   SimulatorPhase,
+  MobileConsoleView,
   TacticalTimelineEvent,
   RivalIntelReport,
   RaceSimulatorHubProps,
@@ -172,7 +173,7 @@ export default function RaceSimulatorHub({
   const [customScenario, setCustomScenario] = useState<ChallengeScenario | null>(null);
   const [isScenarioPickerOpen, setIsScenarioPickerOpen] = useState<boolean>(false);
   const [isScenarioDrawerOpen, setIsScenarioDrawerOpen] = useState<boolean>(false);
-  const [mobileConsoleView, setMobileConsoleView] = useState<'tower' | 'monitor' | 'comms'>('monitor');
+  const [mobileConsoleView, setMobileConsoleView] = useState<MobileConsoleView>('integrated');
   const [sandboxLaps, setSandboxLaps] = useState<number>(10);
   const [sandboxWeather, setSandboxWeather] = useState<WeatherType>('dry');
   const [sandboxRainLap, setSandboxRainLap] = useState<number>(4);
@@ -1864,7 +1865,7 @@ ${timelineSummary}
           />
 
       {/* ── 4-COLUMN PRO PITWALL COMMAND COCKPIT (TOWER | COURSE & COMMS | DATA | COMMANDS) ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[168px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)] xl:grid-cols-[172px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)] 2xl:grid-cols-[176px_minmax(0,1.25fr)_minmax(0,1.05fr)_minmax(0,1.05fr)] gap-2.5 items-start">
+      <div className="grid grid-cols-1 landscape:grid-cols-2 lg:grid-cols-[168px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)] xl:grid-cols-[172px_minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,1fr)] 2xl:grid-cols-[176px_minmax(0,1.25fr)_minmax(0,1.05fr)_minmax(0,1.05fr)] gap-2.5 items-start">
         {/* ════════════════════════════════════════════════════════════════════════
            COLUMN 1 (LEFT): Perpetual 1-Column Timing Tower (P1-P22)
            ════════════════════════════════════════════════════════════════════════ */}

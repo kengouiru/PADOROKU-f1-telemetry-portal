@@ -12,6 +12,7 @@ export type PitwallMonitor = 'all' | 'track' | 'timing' | 'thermals' | 'weather'
 export type GameMajorCategory = 'practice' | 'battle';
 export type ChallengeModeType = 'crisis' | 'scenario' | 'sprint' | 'mission' | 'sandbox' | 'procedural';
 export type SimulatorPhase = 'mode_select' | 'briefing' | 'race' | 'debrief';
+export type MobileConsoleView = 'integrated' | 'tower' | 'monitor' | 'comms';
 
 export interface TacticalTimelineEvent {
   id: string;

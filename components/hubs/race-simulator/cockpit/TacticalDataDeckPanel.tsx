@@ -26,7 +26,7 @@ import {
   type SimSnapshot,
   type EnginePUMode,
 } from '@/lib/raceSimulationEngine';
-import type { PitwallMonitor } from '../types';
+import type { PitwallMonitor, MobileConsoleView } from '../types';
 import type { HelpCardType } from './TrackMapAndWeatherDeck';
 
 export type LiveFeedFilterType = 'all' | 'radio' | 'incident' | 'overtake' | 'broadcast';
@@ -47,7 +47,7 @@ export interface LiveTelemetryData {
 }
 
 export interface TacticalDataDeckPanelProps {
-  mobileConsoleView: 'tower' | 'monitor' | 'comms';
+  mobileConsoleView: MobileConsoleView;
   activeMonitor: PitwallMonitor;
   setActiveMonitor: (monitor: PitwallMonitor) => void;
   filteredFeed: NonNullable<SimSnapshot['commentaryFeed']>;

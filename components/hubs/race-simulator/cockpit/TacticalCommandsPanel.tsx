@@ -25,13 +25,13 @@ import type {
   EnginePUMode,
   DriverRadioOption,
 } from '@/lib/raceSimulationEngine';
-import type { PitwallMonitor, RivalIntelReport } from '../types';
+import type { PitwallMonitor, RivalIntelReport, MobileConsoleView } from '../types';
 import type { HelpCardType } from './TrackMapAndWeatherDeck';
 
 export type RivalIntelCategory = 'all' | 'tyre' | 'ers' | 'telemetry' | 'radio_intercept' | 'pit_stop';
 
 export interface TacticalCommandsPanelProps {
-  mobileConsoleView: 'tower' | 'monitor' | 'comms';
+  mobileConsoleView: MobileConsoleView;
   currentSnapshot?: SimSnapshot | null;
   radioResponses: Record<string, string>;
   minimizeRadioPrompt: boolean;
@@ -129,12 +129,11 @@ export const TacticalCommandsPanel: React.FC<TacticalCommandsPanelProps> = ({
   onNavigateToLibrary,
 }) => {
   return (
-        <div className={`w-full min-w-0 space-y-2.5 ${mobileConsoleView === 'comms' ? 'block' : 'hidden lg:block'}`}>
-          {/* ── MISSION CONTROL INTEL (Rival Espionage & Shared Analytics) ── */}
-          <div className="glass-card-premium p-2.5 sm:p-3 rounded-2xl border border-white/10 shadow-lg backdrop-blur-md flex flex-col h-[388px] relative overflow-hidden">
+    <div className={`w-full min-w-0 space-y-2.5 ${mobileConsoleView === 'comms' || mobileConsoleView === 'integrated' ? 'block' : 'hidden lg:block'}`}>
+      {/* ── 1. ACTIVE EMERGENCY RADIO PROMPT (Prominent Alert Above Commands) ── */}
             {/* 1. Active Radio Prompt Overlay (Tactical Override - Covers Intel without breaking layout) */}
             {currentSnapshot?.activeRadioPrompt && !radioResponses[currentSnapshot.activeRadioPrompt.id] && !minimizeRadioPrompt && (
-              <div className="absolute inset-0 z-30 rounded-2xl bg-gradient-to-b from-red-950/98 via-slate-950/98 to-slate-950/98 border-2 border-red-500/90 p-3 sm:p-3.5 flex flex-col justify-between backdrop-blur-xl shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+              <div className="relative z-30 mb-2 rounded-2xl bg-gradient-to-b from-red-950/98 via-slate-950/98 to-slate-950/98 border-2 border-red-500/90 p-3 sm:p-3.5 flex flex-col justify-between backdrop-blur-xl shadow-2xl animate-in fade-in zoom-in-95 duration-200">
                 {/* Header */}
                 <div className="flex items-center justify-between pb-1.5 border-b border-red-500/40 shrink-0">
                   <div className="flex items-center gap-2">
@@ -204,233 +203,7 @@ export const TacticalCommandsPanel: React.FC<TacticalCommandsPanelProps> = ({
               </div>
             )}
 
-            {/* Header */}
-            <div className="flex flex-wrap items-center justify-between gap-1.5 pb-1.5 border-b border-white/10 shrink-0">
-              <div className="flex items-center gap-1.5">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-                </span>
-                <span className="font-racing text-xs font-bold text-white flex items-center gap-1 tracking-wider">
-                  <ShieldAlert className="w-3.5 h-3.5 text-cyan-400" /> MISSION CONTROL INTEL
-                </span>
-                <span className="text-[8px] font-mono text-cyan-300 bg-cyan-950/60 border border-cyan-500/30 px-1 py-0.2 rounded">
-                  分析班共有
-                </span>
-              </div>
-
-              {/* Filter Chips */}
-              <div className="flex items-center bg-slate-900/90 p-0.5 rounded-lg border border-white/10 text-[8.5px] font-racing">
-                {(['all', 'tyre', 'telemetry', 'radio_intercept', 'ers', 'pit_stop'] as const).map((filter) => (
-                  <button
-                    key={filter}
-                    type="button"
-                    onClick={() => setRivalIntelFilter(filter)}
-                    className={`px-1.5 py-0.5 rounded font-bold transition-all cursor-pointer ${
-                      rivalIntelFilter === filter
-                        ? 'bg-cyan-950 text-cyan-200 border border-cyan-500/50 shadow-sm font-bold'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                    title={
-                      filter === 'all'
-                        ? '全インテル表示'
-                        : filter === 'tyre'
-                        ? 'ライバルタイヤ監視'
-                        : filter === 'telemetry'
-                        ? '最高速・セクター解析'
-                        : filter === 'radio_intercept'
-                        ? '敵無線傍受・ブラフ看破'
-                        : filter === 'ers'
-                        ? 'ERS・クリッピング監視'
-                        : 'ピット作業速報'
-                    }
-                  >
-                    {filter === 'all'
-                      ? 'ALL'
-                      : filter === 'tyre'
-                      ? '🛞 タイヤ'
-                      : filter === 'telemetry'
-                      ? '⚡ 最高速'
-                      : filter === 'radio_intercept'
-                      ? '📻 傍受'
-                      : filter === 'ers'
-                      ? '🔋 ERS'
-                      : '⏱️ PIT'}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Tactical Assist Mode Guidance Banner (Threat Radar Enhanced) */}
-            {userAssistLevel === 'assisted' && tacticalAssistGuidance && (
-              <div
-                className={`mt-1.5 p-2 rounded-xl border text-xs shadow-sm shrink-0 animate-in fade-in duration-200 ${
-                  tacticalAssistGuidance.type === 'undercut_threat'
-                    ? 'bg-gradient-to-r from-red-950/95 via-slate-900 to-red-950/80 border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.35)] animate-pulse'
-                    : tacticalAssistGuidance.type === 'overcut_window'
-                    ? 'bg-gradient-to-r from-emerald-950/95 via-slate-900 to-emerald-950/80 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.35)]'
-                    : 'bg-gradient-to-r from-cyan-950/90 via-slate-900 to-cyan-950/70 border-cyan-500/40'
-                }`}
-              >
-                <div
-                  className={`flex items-center justify-between text-[10px] font-racing pb-1 border-b ${
-                    tacticalAssistGuidance.type === 'undercut_threat'
-                      ? 'text-red-300 border-red-500/30'
-                      : tacticalAssistGuidance.type === 'overcut_window'
-                      ? 'text-emerald-300 border-emerald-500/30'
-                      : 'text-cyan-300 border-cyan-500/20'
-                  }`}
-                >
-                  <div className="flex items-center gap-1.5 font-bold">
-                    <span>{tacticalAssistGuidance.icon}</span>
-                    <span>
-                      {tacticalAssistGuidance.type === 'undercut_threat'
-                        ? 'TACTICAL ALERT (アンダーカット迎撃警報)'
-                        : tacticalAssistGuidance.type === 'overcut_window'
-                        ? 'TACTICAL WINDOW (オーバーカット好機)'
-                        : 'TACTICAL ASSIST GUIDE (計器確認ガイダンス)'}
-                    </span>
-                  </div>
-                  <span
-                    className={`font-mono text-[8.5px] px-1.5 py-0.5 rounded border font-bold ${
-                      tacticalAssistGuidance.type === 'undercut_threat'
-                        ? 'text-red-300 bg-red-950 border-red-500/40'
-                        : tacticalAssistGuidance.type === 'overcut_window'
-                        ? 'text-emerald-300 bg-emerald-950 border-emerald-500/40'
-                        : 'text-cyan-400 bg-cyan-950 border-cyan-500/30'
-                    }`}
-                  >
-                    {tacticalAssistGuidance.target}
-                  </span>
-                </div>
-                <div className="text-[10px] text-slate-100 mt-1 leading-relaxed font-sans">
-                  {tacticalAssistGuidance.message}
-                </div>
-              </div>
-            )}
-
-            {/* Reports Stream */}
-            <div className="space-y-1.5 overflow-y-auto pr-1 flex-1 min-h-0 pt-1.5">
-              {filteredRivalIntel.length === 0 ? (
-                <div className="py-4 text-center text-xs font-mono text-slate-500">
-                  現在このカテゴリの共有インテルはありません
-                </div>
-              ) : (
-                filteredRivalIntel.map((report) => {
-                  const isExpanded = selectedIntelRivalId === report.id;
-                  const isHigh = report.priority === 'high';
-                  const isTyre = report.category === 'tyre';
-                  const isTelem = report.category === 'telemetry';
-                  const isRadio = report.category === 'radio_intercept';
-                  const isErs = report.category === 'ers';
-
-                  const borderAccentColor = isHigh
-                    ? 'border-l-rose-500'
-                    : isTyre
-                    ? 'border-l-emerald-400'
-                    : isTelem
-                    ? 'border-l-cyan-400'
-                    : isRadio
-                    ? 'border-l-amber-400'
-                    : isErs
-                    ? 'border-l-purple-400'
-                    : 'border-l-sky-400';
-
-                  return (
-                    <div
-                      key={report.id}
-                      className={`p-2 rounded-xl bg-slate-900/90 border border-white/10 border-l-[3px] ${borderAccentColor} hover:border-white/20 transition-all shadow-sm`}
-                    >
-                      <div className="flex items-center justify-between text-[9px] mb-0.5">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          {/* Role Title */}
-                          <span className="font-racing font-bold text-white text-[10.5px]">
-                            {report.analystRole}
-                          </span>
-                          {/* Target Car Badge */}
-                          <span
-                            className="px-1.5 py-0.2 rounded font-mono font-bold text-[8.5px] border bg-slate-800/80 text-white flex items-center gap-1"
-                            style={{ borderColor: `${report.targetCarColor}60` }}
-                          >
-                            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: report.targetCarColor }} />
-                            <span>{report.targetCarCode} (P{report.targetCarPos})</span>
-                          </span>
-                        </div>
-
-                        {/* Subtle Monochrome Lap & Confidence Meta (No colorful pills) */}
-                        <div className="flex items-center gap-1.5 text-[9px] font-mono text-slate-400">
-                          <span>L{report.lap}</span>
-                          <span className="text-slate-600">·</span>
-                          <span className={report.confidence === 'suspect_bluff' ? 'text-amber-400 font-bold' : 'text-slate-400'}>
-                            {report.confidenceLabel}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Summary Text (Enhanced font-sans with bold numbers) */}
-                      <div className="text-[11.5px] font-sans text-slate-100 leading-snug">
-                        {report.summary}
-                      </div>
-
-                      {/* Action / Detail Strip: Sleek ghost link */}
-                      <div className="flex items-center justify-end pt-1 border-t border-white/5 text-[9px] mt-1">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedIntelRivalId(isExpanded ? null : report.id)}
-                          className="text-slate-400 hover:text-cyan-300 font-mono transition-colors flex items-center gap-1 cursor-pointer py-0.5 text-[9px]"
-                        >
-                          <span>詳細データ</span>
-                          <span className="text-[8px]">{isExpanded ? '▲' : '▼'}</span>
-                        </button>
-                      </div>
-
-                      {/* Expanded Raw Telemetry Drawer */}
-                      {isExpanded && (
-                        <div className="p-2 mt-1.5 rounded-lg bg-slate-950/90 border border-cyan-500/30 space-y-1 text-[9.5px] font-mono text-slate-300 animate-in fade-in duration-200">
-                          <div className="flex items-center justify-between pb-1 border-b border-white/10 font-racing font-bold text-cyan-400">
-                            <span>{report.targetCarName} ({report.targetCarCode}) 生データ解析</span>
-                            <span>P{report.targetCarPos}</span>
-                          </div>
-                          <div className="grid grid-cols-2 gap-1.5 pt-0.5">
-                            <div>
-                              <span className="text-slate-400">直近ラップ: </span>
-                              <span className="text-white font-bold">{report.rawTelemetry.lapTimes.join(' ➔ ')}</span>
-                            </div>
-                            <div>
-                              <span className="text-slate-400">最高速 (ST): </span>
-                              <span className="text-white font-bold">{report.rawTelemetry.speedTrapKmh} km/h</span>
-                              <span className={report.rawTelemetry.playerDeltaSpeedKmh > 0 ? 'text-rose-400 ml-1' : 'text-emerald-400 ml-1'}>
-                                (自車比 {report.rawTelemetry.playerDeltaSpeedKmh > 0 ? '+' : ''}{report.rawTelemetry.playerDeltaSpeedKmh}km/h)
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-slate-400">タイヤ: </span>
-                              <span className="text-amber-300 font-bold">
-                                {report.rawTelemetry.tyreCompound} ({report.rawTelemetry.tyreAge}周 / 摩耗{report.rawTelemetry.tyreWearPercent}%)
-                              </span>
-                            </div>
-                            <div>
-                              <span className="text-slate-400">ERS残量: </span>
-                              <span className={report.rawTelemetry.ersBatterySoc < 30 ? 'text-rose-400 font-bold' : 'text-cyan-300 font-bold'}>
-                                {report.rawTelemetry.ersBatterySoc}% {report.rawTelemetry.ersBatterySoc < 30 ? '(クリッピング注意)' : ''}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="text-[8.5px] text-slate-400 pt-0.5 flex justify-between items-center border-t border-white/5">
-                            <span>自車との差: <strong className="text-white">{report.rawTelemetry.gapToPlayerSec.toFixed(1)}秒</strong> ({report.rawTelemetry.isAhead ? '前走' : '後続'})</span>
-                            {report.rawTelemetry.pitStopDuration && (
-                              <span className="text-amber-300 font-bold">ピット静止: {report.rawTelemetry.pitStopDuration}s</span>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
-
+      {/* ── 2. DOCKED PIT STRATEGY & TACTICAL COMMANDS (Unified Single Card) ── */}
           {/* ── DOCKED PIT STRATEGY & TACTICAL COMMANDS (Unified Single Card) ── */}
           <div className={`glass-card-premium p-2 sm:p-2.5 rounded-xl border border-white/10 space-y-2 shadow-lg backdrop-blur-md transition-all min-h-[238px] flex flex-col justify-between ${
             activeHelpCard === 'pit_exit' || hoveredHelpCard === 'pit_exit' ? 'relative z-50' : 'relative z-20 hover:z-40'
@@ -841,8 +614,236 @@ export const TacticalCommandsPanel: React.FC<TacticalCommandsPanelProps> = ({
               </div>
             )}
           </div>
-        </div>
 
+      {/* ── 3. MISSION CONTROL INTEL (Rival Espionage & Shared Analytics) ── */}
+      <div className={`glass-card-premium p-2.5 sm:p-3 rounded-2xl border border-white/10 shadow-lg backdrop-blur-md flex flex-col h-[388px] relative overflow-hidden ${mobileConsoleView === 'integrated' ? 'hidden lg:flex' : 'flex'}`}>
+            {/* Header */}
+            <div className="flex flex-wrap items-center justify-between gap-1.5 pb-1.5 border-b border-white/10 shrink-0">
+              <div className="flex items-center gap-1.5">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                </span>
+                <span className="font-racing text-xs font-bold text-white flex items-center gap-1 tracking-wider">
+                  <ShieldAlert className="w-3.5 h-3.5 text-cyan-400" /> MISSION CONTROL INTEL
+                </span>
+                <span className="text-[8px] font-mono text-cyan-300 bg-cyan-950/60 border border-cyan-500/30 px-1 py-0.2 rounded">
+                  分析班共有
+                </span>
+              </div>
+
+              {/* Filter Chips */}
+              <div className="flex items-center bg-slate-900/90 p-0.5 rounded-lg border border-white/10 text-[8.5px] font-racing">
+                {(['all', 'tyre', 'telemetry', 'radio_intercept', 'ers', 'pit_stop'] as const).map((filter) => (
+                  <button
+                    key={filter}
+                    type="button"
+                    onClick={() => setRivalIntelFilter(filter)}
+                    className={`px-1.5 py-0.5 rounded font-bold transition-all cursor-pointer ${
+                      rivalIntelFilter === filter
+                        ? 'bg-cyan-950 text-cyan-200 border border-cyan-500/50 shadow-sm font-bold'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                    title={
+                      filter === 'all'
+                        ? '全インテル表示'
+                        : filter === 'tyre'
+                        ? 'ライバルタイヤ監視'
+                        : filter === 'telemetry'
+                        ? '最高速・セクター解析'
+                        : filter === 'radio_intercept'
+                        ? '敵無線傍受・ブラフ看破'
+                        : filter === 'ers'
+                        ? 'ERS・クリッピング監視'
+                        : 'ピット作業速報'
+                    }
+                  >
+                    {filter === 'all'
+                      ? 'ALL'
+                      : filter === 'tyre'
+                      ? '🛞 タイヤ'
+                      : filter === 'telemetry'
+                      ? '⚡ 最高速'
+                      : filter === 'radio_intercept'
+                      ? '📻 傍受'
+                      : filter === 'ers'
+                      ? '🔋 ERS'
+                      : '⏱️ PIT'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Tactical Assist Mode Guidance Banner (Threat Radar Enhanced) */}
+            {userAssistLevel === 'assisted' && tacticalAssistGuidance && (
+              <div
+                className={`mt-1.5 p-2 rounded-xl border text-xs shadow-sm shrink-0 animate-in fade-in duration-200 ${
+                  tacticalAssistGuidance.type === 'undercut_threat'
+                    ? 'bg-gradient-to-r from-red-950/95 via-slate-900 to-red-950/80 border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.35)] animate-pulse'
+                    : tacticalAssistGuidance.type === 'overcut_window'
+                    ? 'bg-gradient-to-r from-emerald-950/95 via-slate-900 to-emerald-950/80 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.35)]'
+                    : 'bg-gradient-to-r from-cyan-950/90 via-slate-900 to-cyan-950/70 border-cyan-500/40'
+                }`}
+              >
+                <div
+                  className={`flex items-center justify-between text-[10px] font-racing pb-1 border-b ${
+                    tacticalAssistGuidance.type === 'undercut_threat'
+                      ? 'text-red-300 border-red-500/30'
+                      : tacticalAssistGuidance.type === 'overcut_window'
+                      ? 'text-emerald-300 border-emerald-500/30'
+                      : 'text-cyan-300 border-cyan-500/20'
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 font-bold">
+                    <span>{tacticalAssistGuidance.icon}</span>
+                    <span>
+                      {tacticalAssistGuidance.type === 'undercut_threat'
+                        ? 'TACTICAL ALERT (アンダーカット迎撃警報)'
+                        : tacticalAssistGuidance.type === 'overcut_window'
+                        ? 'TACTICAL WINDOW (オーバーカット好機)'
+                        : 'TACTICAL ASSIST GUIDE (計器確認ガイダンス)'}
+                    </span>
+                  </div>
+                  <span
+                    className={`font-mono text-[8.5px] px-1.5 py-0.5 rounded border font-bold ${
+                      tacticalAssistGuidance.type === 'undercut_threat'
+                        ? 'text-red-300 bg-red-950 border-red-500/40'
+                        : tacticalAssistGuidance.type === 'overcut_window'
+                        ? 'text-emerald-300 bg-emerald-950 border-emerald-500/40'
+                        : 'text-cyan-400 bg-cyan-950 border-cyan-500/30'
+                    }`}
+                  >
+                    {tacticalAssistGuidance.target}
+                  </span>
+                </div>
+                <div className="text-[10px] text-slate-100 mt-1 leading-relaxed font-sans">
+                  {tacticalAssistGuidance.message}
+                </div>
+              </div>
+            )}
+
+            {/* Reports Stream */}
+            <div className="space-y-1.5 overflow-y-auto pr-1 flex-1 min-h-0 pt-1.5">
+              {filteredRivalIntel.length === 0 ? (
+                <div className="py-4 text-center text-xs font-mono text-slate-500">
+                  現在このカテゴリの共有インテルはありません
+                </div>
+              ) : (
+                filteredRivalIntel.map((report) => {
+                  const isExpanded = selectedIntelRivalId === report.id;
+                  const isHigh = report.priority === 'high';
+                  const isTyre = report.category === 'tyre';
+                  const isTelem = report.category === 'telemetry';
+                  const isRadio = report.category === 'radio_intercept';
+                  const isErs = report.category === 'ers';
+
+                  const borderAccentColor = isHigh
+                    ? 'border-l-rose-500'
+                    : isTyre
+                    ? 'border-l-emerald-400'
+                    : isTelem
+                    ? 'border-l-cyan-400'
+                    : isRadio
+                    ? 'border-l-amber-400'
+                    : isErs
+                    ? 'border-l-purple-400'
+                    : 'border-l-sky-400';
+
+                  return (
+                    <div
+                      key={report.id}
+                      className={`p-2 rounded-xl bg-slate-900/90 border border-white/10 border-l-[3px] ${borderAccentColor} hover:border-white/20 transition-all shadow-sm`}
+                    >
+                      <div className="flex items-center justify-between text-[9px] mb-0.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {/* Role Title */}
+                          <span className="font-racing font-bold text-white text-[10.5px]">
+                            {report.analystRole}
+                          </span>
+                          {/* Target Car Badge */}
+                          <span
+                            className="px-1.5 py-0.2 rounded font-mono font-bold text-[8.5px] border bg-slate-800/80 text-white flex items-center gap-1"
+                            style={{ borderColor: `${report.targetCarColor}60` }}
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: report.targetCarColor }} />
+                            <span>{report.targetCarCode} (P{report.targetCarPos})</span>
+                          </span>
+                        </div>
+
+                        {/* Subtle Monochrome Lap & Confidence Meta (No colorful pills) */}
+                        <div className="flex items-center gap-1.5 text-[9px] font-mono text-slate-400">
+                          <span>L{report.lap}</span>
+                          <span className="text-slate-600">·</span>
+                          <span className={report.confidence === 'suspect_bluff' ? 'text-amber-400 font-bold' : 'text-slate-400'}>
+                            {report.confidenceLabel}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Summary Text (Enhanced font-sans with bold numbers) */}
+                      <div className="text-[11.5px] font-sans text-slate-100 leading-snug">
+                        {report.summary}
+                      </div>
+
+                      {/* Action / Detail Strip: Sleek ghost link */}
+                      <div className="flex items-center justify-end pt-1 border-t border-white/5 text-[9px] mt-1">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedIntelRivalId(isExpanded ? null : report.id)}
+                          className="text-slate-400 hover:text-cyan-300 font-mono transition-colors flex items-center gap-1 cursor-pointer py-0.5 text-[9px]"
+                        >
+                          <span>詳細データ</span>
+                          <span className="text-[8px]">{isExpanded ? '▲' : '▼'}</span>
+                        </button>
+                      </div>
+
+                      {/* Expanded Raw Telemetry Drawer */}
+                      {isExpanded && (
+                        <div className="p-2 mt-1.5 rounded-lg bg-slate-950/90 border border-cyan-500/30 space-y-1 text-[9.5px] font-mono text-slate-300 animate-in fade-in duration-200">
+                          <div className="flex items-center justify-between pb-1 border-b border-white/10 font-racing font-bold text-cyan-400">
+                            <span>{report.targetCarName} ({report.targetCarCode}) 生データ解析</span>
+                            <span>P{report.targetCarPos}</span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-1.5 pt-0.5">
+                            <div>
+                              <span className="text-slate-400">直近ラップ: </span>
+                              <span className="text-white font-bold">{report.rawTelemetry.lapTimes.join(' ➔ ')}</span>
+                            </div>
+                            <div>
+                              <span className="text-slate-400">最高速 (ST): </span>
+                              <span className="text-white font-bold">{report.rawTelemetry.speedTrapKmh} km/h</span>
+                              <span className={report.rawTelemetry.playerDeltaSpeedKmh > 0 ? 'text-rose-400 ml-1' : 'text-emerald-400 ml-1'}>
+                                (自車比 {report.rawTelemetry.playerDeltaSpeedKmh > 0 ? '+' : ''}{report.rawTelemetry.playerDeltaSpeedKmh}km/h)
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-slate-400">タイヤ: </span>
+                              <span className="text-amber-300 font-bold">
+                                {report.rawTelemetry.tyreCompound} ({report.rawTelemetry.tyreAge}周 / 摩耗{report.rawTelemetry.tyreWearPercent}%)
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-slate-400">ERS残量: </span>
+                              <span className={report.rawTelemetry.ersBatterySoc < 30 ? 'text-rose-400 font-bold' : 'text-cyan-300 font-bold'}>
+                                {report.rawTelemetry.ersBatterySoc}% {report.rawTelemetry.ersBatterySoc < 30 ? '(クリッピング注意)' : ''}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="text-[8.5px] text-slate-400 pt-0.5 flex justify-between items-center border-t border-white/5">
+                            <span>自車との差: <strong className="text-white">{report.rawTelemetry.gapToPlayerSec.toFixed(1)}秒</strong> ({report.rawTelemetry.isAhead ? '前走' : '後続'})</span>
+                            {report.rawTelemetry.pitStopDuration && (
+                              <span className="text-amber-300 font-bold">ピット静止: {report.rawTelemetry.pitStopDuration}s</span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+      </div>
+    </div>
   );
 };
 

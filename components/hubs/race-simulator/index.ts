@@ -3,6 +3,7 @@ export type {
   GameMajorCategory,
   ChallengeModeType,
   SimulatorPhase,
+  MobileConsoleView,
   TacticalTimelineEvent,
   RivalIntelReport,
   RaceSimulatorHubProps,

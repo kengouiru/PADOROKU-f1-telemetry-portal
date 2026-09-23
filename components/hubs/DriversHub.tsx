@@ -257,6 +257,10 @@ export default function DriversHub({
     return KNOWLEDGE_DRIVERS.filter((d) => d.status === 'Legend');
   }, []);
 
+  const totalLegendTitles = useMemo(() => {
+    return legendDrivers.reduce((sum, d) => sum + (d.championships || 0), 0);
+  }, [legendDrivers]);
+
   // Helper to check if a driver matches search query & status filter
   const isDriverMatchQuery = (d: DriverProfile) => {
     if (driverStatusFilter === 'Favorites' && !isFavoriteDriver(d.code)) return false;
@@ -873,12 +877,12 @@ export default function DriversHub({
                       </span>
                     </h3>
                     <p className="text-xs text-slate-300 mt-0.5">
-                      F1史上に不滅の足跡を刻んだ4名のワールドチャンピオン。セナ、シューマッハ、プロスト、ラウダの栄光。
+                      F1史上に不滅の足跡を刻んだ殿堂入りドライバーたち。セナ、シューマッハ、プロスト、ラウダ、ベッテル、ライコネンらの栄光と伝説。
                     </p>
                   </div>
                 </div>
                 <div className="text-xs font-mono text-amber-300/90 bg-slate-950/80 px-3 py-1.5 rounded-lg border border-amber-500/30 self-end sm:self-auto">
-                  合計 18回 のドライバーズタイトル
+                  合計 {totalLegendTitles}回 のドライバーズタイトル
                 </div>
               </div>
 
@@ -1240,7 +1244,7 @@ export default function DriversHub({
                   F1 HISTORIC LEGENDS (殿堂入りレジェンド一覧)
                 </h3>
                 <p className="text-xs text-slate-300 mt-1">
-                  モータースポーツの歴史を決定づけた偉大な4名のレジェンド。
+                  モータースポーツの歴史を決定づけた偉大な{legendDrivers.length}名の殿堂入りレジェンド。
                   テレメトリー比較、ドライビング技術論、歴史的アーカイブと直接リンクしています。
                 </p>
               </div>

@@ -526,6 +526,123 @@ export default function DriverDetailModal({
                 )}
               </div>
 
+              {/* 🏎️ Career Season History Timeline (2016-2026 or all-time) */}
+              {driver.seasonHistory && driver.seasonHistory.length > 0 && (
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <span>🏎️</span>
+                      <span>歴代シーズン軌跡・在籍体制 ({driver.seasonHistory.length} シーズン)</span>
+                    </h4>
+                    <span className="text-[10px] font-mono text-slate-400">
+                      {driver.seasonHistory[driver.seasonHistory.length - 1].year}年 〜 {driver.seasonHistory[0].year}年
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5 max-h-[360px] overflow-y-auto pr-1 scrollbar-thin">
+                    {driver.seasonHistory.map((sh, idx) => {
+                      const isChampion = sh.finalPosition === 1;
+                      const isPodiumYear = sh.finalPosition && sh.finalPosition <= 3;
+                      return (
+                        <div
+                          key={`${sh.year}-${idx}`}
+                          className={`p-2.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono transition-all ${
+                            isChampion
+                              ? 'bg-amber-950/40 border-amber-500/60 shadow-sm'
+                              : isPodiumYear
+                              ? 'bg-slate-900/90 border-sky-500/40'
+                              : 'bg-slate-900/60 border-white/5 hover:border-white/15'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            {/* Year Badge */}
+                            <span className="px-2 py-0.5 rounded font-racing font-bold text-xs bg-slate-950 border border-white/10 text-white shrink-0">
+                              {sh.year}年
+                            </span>
+
+                            {/* Role Badge */}
+                            <span
+                              className={`px-1.5 py-0.2 rounded text-[9.5px] font-racing font-bold shrink-0 border ${
+                                sh.role === 'Regular'
+                                  ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40'
+                                  : sh.role === 'Reserve'
+                                  ? 'bg-sky-950/80 text-sky-300 border-sky-500/40'
+                                  : sh.role === 'Test'
+                                  ? 'bg-purple-950/80 text-purple-300 border-purple-500/40'
+                                  : sh.role === 'Junior'
+                                  ? 'bg-amber-950/80 text-amber-300 border-amber-500/40'
+                                  : 'bg-slate-800 text-slate-300 border-white/10'
+                              }`}
+                            >
+                              {sh.role === 'Regular'
+                                ? '🟢 REGULAR'
+                                : sh.role === 'Reserve'
+                                ? '🛡️ RESERVE'
+                                : sh.role === 'Test'
+                                ? '🔬 TEST'
+                                : sh.role === 'Junior'
+                                ? '🌱 JUNIOR'
+                                : 'OTHER'}
+                            </span>
+
+                            {/* Team Name */}
+                            <span className="font-bold text-slate-100 truncate text-xs">
+                              {sh.team}
+                            </span>
+
+                            {/* Car Number */}
+                            {sh.carNumber && (
+                              <span className="text-[10px] text-slate-400 bg-slate-800 px-1 rounded shrink-0">
+                                #{sh.carNumber}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto text-[11px]">
+                            {/* Results & Standing */}
+                            {sh.finalPosition && sh.finalPosition <= 30 && (
+                              <span
+                                className={`font-racing font-bold ${
+                                  isChampion
+                                    ? 'text-amber-300 flex items-center gap-1 font-black'
+                                    : isPodiumYear
+                                    ? 'text-sky-300'
+                                    : 'text-slate-300'
+                                }`}
+                              >
+                                {isChampion ? '👑 年間王者 P1' : `年間 P${sh.finalPosition}`}
+                              </span>
+                            )}
+
+                            {sh.points !== undefined && (
+                              <span className="text-slate-400 text-[10.5px]">
+                                {sh.points} pts
+                              </span>
+                            )}
+
+                            {sh.wins && sh.wins > 0 ? (
+                              <span className="text-amber-400 font-bold text-[10.5px]">
+                                🏆 {sh.wins}勝
+                              </span>
+                            ) : null}
+
+                            {/* Note */}
+                            {sh.note && (
+                              <span
+                                className="text-[10px] text-slate-400 max-w-[200px] truncate hidden md:inline"
+                                title={sh.note}
+                              >
+                                {sh.note}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Career Milestones Timeline */}
               <div className="space-y-2">
                 <h4 className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
