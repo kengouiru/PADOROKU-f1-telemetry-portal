@@ -687,7 +687,20 @@ export default function KnowledgeHistoryHub({
 
       {/* ── Sub-Tab 1: TEAMS (Compact Grid + Collapsible PU Filter + Detail Modal) ── */}
       {activeSubTab === 'teams' && (
-        <div className="flex flex-col gap-3 animate-fade-in">
+        selectedTeamDetail ? (
+          <TeamDetailModal
+            team={selectedTeamDetail}
+            allTeams={KNOWLEDGE_TEAMS}
+            onSelectTeam={(t) => setSelectedTeamDetail(t)}
+            onSelectDriverDetail={() => {
+              setActiveSubTab('drivers');
+              setSelectedTeamDetail(null);
+            }}
+            onNavigateToTelemetry={onNavigateToTelemetry}
+            onClose={() => setSelectedTeamDetail(null)}
+          />
+        ) : (
+          <div className="flex flex-col gap-3 animate-fade-in">
           {/* Sleek Compact Action Bar */}
           <div className="glass-card-premium rounded-xl p-2.5 sm:p-3 shadow-md flex flex-wrap items-center justify-between gap-2.5 border border-white/10">
             {/* Left: Title & Count */}
@@ -975,17 +988,8 @@ export default function KnowledgeHistoryHub({
             })}
           </div>
 
-          {/* Team Detail Modal */}
-          {selectedTeamDetail && (
-            <TeamDetailModal
-              team={selectedTeamDetail}
-              allTeams={KNOWLEDGE_TEAMS}
-              onSelectTeam={(t) => setSelectedTeamDetail(t)}
-              onNavigateToTelemetry={onNavigateToTelemetry}
-              onClose={() => setSelectedTeamDetail(null)}
-            />
-          )}
-        </div>
+          </div>
+        )
       )}
 
       {/* ── Sub-Tab 2: DRIVERS (Team Grouped / Flat / Legends + Detail Modal) ── */}

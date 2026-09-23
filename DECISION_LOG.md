@@ -4,6 +4,32 @@
 
 ---
 
+## [2026-09-23] F1百科事典のモーダル脱却・独立URLルート化・2026王者誤記是正・シームレス双方向連携の実装
+- **決定事項 (Decision)**:
+  ユーザーからの3点の具体的指摘および「百科事典全体を独立URLページに移行して相互リンクし、マルチウィンドウ/別タブ閲覧を可能にする」という構想に基づき、アーキテクチャの大規模改修を実施。
+  1. **ジョージ・ラッセル2026世界王者誤記の是正**:
+     - `data/f1HistoricalGrids.ts` において、2026シーズンは第16戦モンツァ終了時点でタイトル未確定（進行中）であるため、`championDriver` および `championConstructor` を解除。
+     - `isOngoing: true`、`ongoingStatusText: '2026シーズン進行中 (第16戦モンツァ終了時点 - タイトル未確定)'`、`leaderDriver: RUS (285 pts / 6 wins)`、`leaderConstructor: Mercedes-AMG (495 pts / 11 wins)` を配備。
+     - `DriversHub.tsx` および `DriverDetailModal.tsx`（View）において、2026年は「世界王者」ではなく「📊 ポイント首位 (Leader)」および「🏁 チーム首位 (Leader)」、「暫定 P1 (進行中)」として正確に表示。
+  2. **ドライバー名鑑の「系譜ボタン」撤廃 ＆ チーム名ダイレクトリンク化**:
+     - `DriversHub.tsx` から `🌿 系統樹・諸元 ➔` ボタンを完全削除。
+     - グリッド表示およびチーム別グループ表示において、所属チーム名（`team.name` / `team.teamName`）をクリック可能にし、即座に該当チームの詳細（系譜・諸元・歴史）へシームレス遷移する動線を確立。
+  3. **暗幕モーダル（`fixed inset-0 bg-black/85 backdrop-blur-md`）の完全撤廃と全画面（Page View）化**:
+     - `DriverDetailModal.tsx` および `TeamDetailModal.tsx` から `createPortal` および最前面フロート暗幕オーバーレイを完全撤廃。
+     - `max-h-[92vh]` のスクロールクリッピングを解除し、自然なブラウザスクロールが可能な洗練されたページコンポーネント（`DriverDetailView`, `TeamDetailView`）へ刷新。
+     - ヘッダー部に「◀ 一覧に戻る」ナビゲーション、パンくずリスト（ホーム ➔ 百科 ➔ ドライバー/チーム）、前後の選手/チームへ素早く切り替えられる「◀ ALB / COL ▶」スイッチャー、および別タブ/別ウィンドウで開く「別ウィンドウで開く ↗」ボタンを配備。
+  4. **Next.js App Router 独立URLルート（Dedicated Routes）の創設**:
+     - `/knowledge/drivers/[code]`（例: `/knowledge/drivers/SAI`）
+     - `/knowledge/teams/[id]`（例: `/knowledge/teams/williams`）
+     - `/knowledge/rules`（競技・技術レギュレーション解説）
+     を新設。ブラウザのタブ・ウィンドウを2つ並べて「ドライバー情報を見ながらチーム系譜を比較」「ルールを見ながらテレメトリーを考察」といったマルチウィンドウ閲覧やURL共有・ディープリンクを完全サポート。
+- **背景・理由 (Rationale)**:
+  モーダルウィンドウの多重ポップアップによるUIの閉塞感、スクロール阻害、戻る進むのブラウザ履歴喪失、他画面との同時参照不能といったUX課題を解決するため。また、2026年リアルタイム進行中データとしての厳密な正確性（ハルシネーションの撲滅）を徹底するため。
+- **却下した代替案 (Rejected Alternatives)**:
+  - 「モーダルの透明度やサイズのみを微調整する案」: 別画面との同時参照やマルチタブ表示、URLによる直接共有というWeb本来の強みが活かせず、抜本的解決にならないため却下。
+
+---
+
 ## [2026-09-23] PITWALLゲーム スマホ縦画面（ポートレート）統合コクピット ＆ 横画面（ランドスケープ）自動適応の実装
 - **決定事項 (Decision)**:
   `RaceSimulatorHub.tsx`、`CockpitHudDeck.tsx`、`TrackMapAndWeatherDeck.tsx`、`TacticalCommandsPanel.tsx`、`TimingTowerPanel.tsx`、`TacticalDataDeckPanel.tsx` を連動改修し、スマートフォンにおける「縦画面のまま片手・親指で完結するカジュアルプレイ体験（Portrait Command Deck）」および「横画面へのシームレスな2カラム自動適応」を実装。

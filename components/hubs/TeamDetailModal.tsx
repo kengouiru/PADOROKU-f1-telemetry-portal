@@ -13,14 +13,13 @@
  */
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { createPortal } from 'react-dom';
 import type { TeamProfile, Reference, TelemetryTarget } from '@/data/f1KnowledgeData';
 import { getTeamLineage, getTeamCarSpecs, type TeamLineageRecord, type CarTechnicalSpecs } from '@/data/f1TeamLineageData';
 import { HISTORICAL_SEASONS_DATA, type HistoricalGridTeam, type HistoricalGridDriver } from '@/data/f1HistoricalGrids';
 import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
 import { useUserPreferences } from '@/lib/userPreferences';
 
-interface TeamDetailModalProps {
+export interface TeamDetailModalProps {
   team: TeamProfile;
   allTeams: TeamProfile[];
   onSelectTeam: (team: TeamProfile) => void;
@@ -135,85 +134,114 @@ export default function TeamDetailModal({
 
   if (!mounted) return null;
 
-  return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-2.5 sm:p-6 bg-black/85 backdrop-blur-md animate-fade-in">
-      {/* Modal Card */}
-      <div
-        ref={modalContentRef}
-        className="glass-card bg-slate-950/95 border border-white/15 w-full max-w-5xl max-h-[94vh] flex flex-col rounded-3xl shadow-2xl overflow-hidden relative"
-        style={{ borderTopColor: themeColor, borderTopWidth: 4 }}
-      >
-        {/* Top Navigation Bar */}
-        <div className="p-3 sm:px-6 bg-slate-900/90 border-b border-white/10 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => prevTeam && onSelectTeam(prevTeam)}
-              className="px-2.5 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1.5 transition-all"
-              title="前のチーム (←キー)"
-            >
-              <span>◀</span>
-              <span className="font-mono font-bold">{prevTeam?.name}</span>
-            </button>
-            <button
-              onClick={() => nextTeam && onSelectTeam(nextTeam)}
-              className="px-2.5 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1.5 transition-all"
-              title="次のチーム (→キー)"
-            >
-              <span className="font-mono font-bold">{nextTeam?.name}</span>
-              <span>▶</span>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Quick Telemetry Compare Action Button */}
-            {onNavigateToTelemetry && team.drivers.length >= 2 && (
-              <button
-                onClick={() => {
-                  onNavigateToTelemetry({
-                    year: 2026,
-                    targetDriver: team.drivers[0],
-                    targetDriver2: team.drivers[1],
-                  });
-                  onClose();
-                }}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-racing font-bold bg-blue-600/90 hover:bg-blue-500 text-white shadow-sm border border-blue-400/40 transition-all hover:scale-105"
-                title={`${team.drivers[0]} と ${team.drivers[1]} のテレメトリー直接比較画面を開く`}
-              >
-                <span>📊</span>
-                <span>テレメトリー比較</span>
-              </button>
-            )}
-
-            {/* Star Favorite Button */}
-            <button
-              onClick={() => toggleTeam(team.id)}
-              className={`px-2.5 py-1 rounded-xl text-xs font-racing flex items-center gap-1.5 transition-all cursor-pointer shadow-sm border ${
-                isFavoriteTeam(team.id)
-                  ? 'bg-amber-400/25 border-amber-400/70 text-amber-300 hover:bg-amber-400/35'
-                  : 'bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-300 border-white/10'
-              }`}
-              title={isFavoriteTeam(team.id) ? '推しチームから外す' : '推しチーム (マイパドック) に登録'}
-            >
-              <span>{isFavoriteTeam(team.id) ? '★' : '☆'}</span>
-              <span className="hidden sm:inline">
-                {isFavoriteTeam(team.id) ? '推しチーム登録中' : '推しチーム登録'}
-              </span>
-            </button>
-
-            <span className="text-[10px] text-slate-500 font-mono hidden md:inline">
-              [←] [→] でチーム切替 / [ESC] で閉じる
-            </span>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-sm font-bold transition-all hover:scale-105"
-            >
-              ✕
-            </button>
+  return (
+    <div className="w-full max-w-7xl mx-auto space-y-4 animate-fade-in pb-16">
+      {/* Top Navigation Bar: Back, Breadcrumbs, Prev / Next & Popout / Actions */}
+      <div className="glass-card bg-slate-950/90 border border-white/15 p-3 sm:px-6 rounded-2xl shadow-xl flex flex-wrap items-center justify-between gap-3 sticky top-2 z-30 backdrop-blur-md">
+        <div className="flex items-center gap-3 min-w-0">
+          <button
+            onClick={onClose}
+            className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-racing font-bold text-xs sm:text-sm flex items-center gap-1.5 border border-white/10 transition-all cursor-pointer shadow hover:scale-105 shrink-0"
+            title="一覧に戻る (ESC)"
+          >
+            <span>◀</span>
+            <span>一覧に戻る</span>
+          </button>
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 font-mono truncate">
+            <span>F1 百科事典</span>
+            <span>&gt;</span>
+            <span>チーム名鑑</span>
+            <span>&gt;</span>
+            <span className="text-white font-bold">{team.name}</span>
           </div>
         </div>
 
-        {/* Scrollable Modal Container: Wraps Hero Header, Sticky Sub-Tabs & Content */}
-        <div className="overflow-y-auto flex-1 flex flex-col min-h-0">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <button
+            onClick={() => prevTeam && onSelectTeam(prevTeam)}
+            className="px-2.5 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer border border-white/5"
+            title="前のチーム (←キー)"
+          >
+            <span>◀</span>
+            <span className="font-mono font-bold truncate">{prevTeam?.name}</span>
+          </button>
+          <button
+            onClick={() => nextTeam && onSelectTeam(nextTeam)}
+            className="px-2.5 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer border border-white/5"
+            title="次のチーム (→キー)"
+          >
+            <span className="font-mono font-bold truncate">{nextTeam?.name}</span>
+            <span>▶</span>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-wrap">
+          {/* Popout Separate Window Button */}
+          <button
+            type="button"
+            onClick={() => {
+              window.open(`/knowledge/teams/${team.id}`, '_blank', 'width=1280,height=900,menubar=no,toolbar=no');
+            }}
+            className="px-2.5 py-1 rounded-xl bg-sky-950/70 hover:bg-sky-900 border border-sky-500/40 text-sky-300 hover:text-white text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:scale-105"
+            title="このチームを別ウィンドウで開く"
+          >
+            <span>別ウィンドウで開く</span>
+            <span>↗</span>
+          </button>
+
+          {/* Quick Telemetry Compare Action Button */}
+          {onNavigateToTelemetry && team.drivers.length >= 2 && (
+            <button
+              onClick={() => {
+                onNavigateToTelemetry({
+                  year: 2026,
+                  targetDriver: team.drivers[0],
+                  targetDriver2: team.drivers[1],
+                });
+                onClose();
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-racing font-bold bg-blue-600/90 hover:bg-blue-500 text-white shadow-sm border border-blue-400/40 transition-all hover:scale-105 cursor-pointer"
+              title={`${team.drivers[0]} と ${team.drivers[1]} のテレメトリー直接比較画面を開く`}
+            >
+              <span>📊</span>
+              <span className="hidden md:inline">テレメトリー比較</span>
+            </button>
+          )}
+
+          {/* Star Favorite Button */}
+          <button
+            onClick={() => toggleTeam(team.id)}
+            className={`px-2.5 py-1 rounded-xl text-xs font-racing flex items-center gap-1.5 transition-all cursor-pointer shadow-sm border ${
+              isFavoriteTeam(team.id)
+                ? 'bg-amber-400/25 border-amber-400/70 text-amber-300 hover:bg-amber-400/35'
+                : 'bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-300 border-white/10'
+            }`}
+            title={isFavoriteTeam(team.id) ? '推しチームから外す' : '推しチーム (マイパドック) に登録'}
+          >
+            <span>{isFavoriteTeam(team.id) ? '★' : '☆'}</span>
+            <span className="hidden md:inline">
+              {isFavoriteTeam(team.id) ? '推しチーム登録中' : '推しチーム登録'}
+            </span>
+          </button>
+
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
+            title="一覧へ戻る (ESC)"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      {/* Main Full-Width Team Card */}
+      <div
+        ref={modalContentRef}
+        className="glass-card bg-slate-950/95 border border-white/15 w-full flex flex-col rounded-3xl shadow-2xl overflow-hidden relative"
+        style={{ borderTopColor: themeColor, borderTopWidth: 4 }}
+      >
+        {/* Container: Wraps Hero Header, Sticky Sub-Tabs & Content */}
+        <div className="flex flex-col">
           {/* Team Hero Header */}
           <div className="p-3.5 sm:p-6 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-gradient-to-b from-slate-900/60 to-transparent flex-shrink-0">
             <div className="flex items-start sm:items-center gap-3 sm:gap-4">
@@ -843,7 +871,8 @@ export default function TeamDetailModal({
           </div>
         </div>
       </div>
-    </div>,
-    document.body
+    </div>
   );
 }
+
+export { TeamDetailModal as TeamDetailView };

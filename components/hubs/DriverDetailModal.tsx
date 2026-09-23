@@ -9,17 +9,17 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import type { DriverProfile, Reference, TelemetryTarget } from '@/data/f1KnowledgeData';
 import { getDriverTraits, type DriverTraitDefinition } from '@/data/driverTraitsData';
 import { getDriverSkills } from '@/data/driverSkillsData';
 import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
 import { useUserPreferences } from '@/lib/userPreferences';
 
-interface DriverDetailModalProps {
+export interface DriverDetailModalProps {
   driver: DriverProfile;
   allDrivers: DriverProfile[];
   onSelectDriver: (driver: DriverProfile) => void;
+  onSelectTeamDetail?: (teamId: string) => void;
   onNavigateToTelemetry?: (target?: TelemetryTarget) => void;
   onCompareDriver?: (driverCode: string) => void;
   onClose: () => void;
@@ -31,6 +31,7 @@ export default function DriverDetailModal({
   driver,
   allDrivers,
   onSelectDriver,
+  onSelectTeamDetail,
   onNavigateToTelemetry,
   onCompareDriver,
   onClose,
@@ -121,98 +122,128 @@ export default function DriverDetailModal({
 
   if (!mounted) return null;
 
-  return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fade-in">
-      {/* Modal Card */}
-      <div
-        ref={modalContentRef}
-        className="glass-card bg-slate-950/95 border border-white/15 w-full max-w-4xl max-h-[92vh] flex flex-col rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden relative"
-        style={{ borderTopColor: themeColor, borderTopWidth: 4 }}
-      >
-        {/* Top Navigation Bar: Prev / Next & Close */}
-        <div className="p-2.5 sm:px-6 bg-slate-900/90 border-b border-white/10 flex items-center justify-between gap-2 flex-shrink-0">
-          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-            <button
-              onClick={() => prevDriver && onSelectDriver(prevDriver)}
-              className="px-2 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer"
-              title="前の選手 (←キー)"
-            >
-              <span>◀</span>
-              <span className="font-mono font-bold truncate">{prevDriver?.code}</span>
-            </button>
-            <button
-              onClick={() => nextDriver && onSelectDriver(nextDriver)}
-              className="px-2 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer"
-              title="次の選手 (→キー)"
-            >
-              <span className="font-mono font-bold truncate">{nextDriver?.code}</span>
-              <span>▶</span>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-            {/* Star Favorite Button */}
-            <button
-              onClick={() => toggleDriver(driver.code)}
-              className={`px-2.5 py-1 rounded-xl text-xs font-racing flex items-center gap-1.5 transition-all cursor-pointer shadow-sm border ${
-                isFavoriteDriver(driver.code)
-                  ? 'bg-amber-400/25 border-amber-400/70 text-amber-300 hover:bg-amber-400/35'
-                  : 'bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-300 border-white/10'
-              }`}
-              title={isFavoriteDriver(driver.code) ? 'お気に入りから外す' : 'お気に入り (マイパドック) に登録'}
-            >
-              <span>{isFavoriteDriver(driver.code) ? '★' : '☆'}</span>
-              <span className="hidden sm:inline">
-                {isFavoriteDriver(driver.code) ? '推し登録中' : '推し登録'}
-              </span>
-            </button>
-
-            {onCompareDriver && (
-              <button
-                onClick={() => {
-                  onClose();
-                  onCompareDriver(driver.code);
-                }}
-                className="px-2.5 py-1 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/40 text-purple-200 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm"
-                title="この選手を直接比較ツールに送る"
-              >
-                <span>⚔️</span>
-                <span className="hidden sm:inline">2名比較</span>
-              </button>
-            )}
-
-            {onNavigateToTelemetry && (
-              <button
-                onClick={() => {
-                  onClose();
-                  onNavigateToTelemetry({
-                    year: 2026,
-                    targetDriver: driver.code,
-                    meetingName: 'Japan',
-                  });
-                }}
-                className="px-2.5 py-1 rounded-xl bg-blue-600/40 hover:bg-blue-600/70 border border-blue-500/50 text-sky-200 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:scale-105"
-                title="このドライバーのテレメトリー分析画面へ移動"
-              >
-                <span>🏎️</span>
-                <span className="hidden sm:inline">テレメトリー分析</span>
-              </button>
-            )}
-            <span className="text-[10px] text-slate-500 font-mono hidden md:inline">
-              キーボード [←] [→] で選手切り替え / [ESC] で閉じる
-            </span>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
-              title="閉じる (ESC)"
-            >
-              ✕
-            </button>
+  return (
+    <div className="w-full max-w-7xl mx-auto space-y-4 animate-fade-in pb-16">
+      {/* Top Navigation Bar: Back, Breadcrumbs, Prev / Next & Popout / Actions */}
+      <div className="glass-card bg-slate-950/90 border border-white/15 p-3 sm:px-6 rounded-2xl shadow-xl flex flex-wrap items-center justify-between gap-3 sticky top-2 z-30 backdrop-blur-md">
+        <div className="flex items-center gap-3 min-w-0">
+          <button
+            onClick={onClose}
+            className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-racing font-bold text-xs sm:text-sm flex items-center gap-1.5 border border-white/10 transition-all cursor-pointer shadow hover:scale-105 shrink-0"
+            title="一覧に戻る (ESC)"
+          >
+            <span>◀</span>
+            <span>一覧に戻る</span>
+          </button>
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 font-mono truncate">
+            <span>F1 百科事典</span>
+            <span>&gt;</span>
+            <span>ドライバー名鑑</span>
+            <span>&gt;</span>
+            <span className="text-white font-bold">{driver.fullName}</span>
+            <span className="text-slate-500 font-mono">({driver.code})</span>
           </div>
         </div>
 
-        {/* Scrollable Modal Container: Wraps Hero Header, Sticky Sub-Tabs & Content */}
-        <div className="overflow-y-auto flex-1 flex flex-col min-h-0">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <button
+            onClick={() => prevDriver && onSelectDriver(prevDriver)}
+            className="px-2.5 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer border border-white/5"
+            title="前の選手 (←キー)"
+          >
+            <span>◀</span>
+            <span className="font-mono font-bold truncate">{prevDriver?.code}</span>
+          </button>
+          <button
+            onClick={() => nextDriver && onSelectDriver(nextDriver)}
+            className="px-2.5 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer border border-white/5"
+            title="次の選手 (→キー)"
+          >
+            <span className="font-mono font-bold truncate">{nextDriver?.code}</span>
+            <span>▶</span>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-wrap">
+          {/* Popout Separate Window Button */}
+          <button
+            type="button"
+            onClick={() => {
+              window.open(`/knowledge/drivers/${driver.code}`, '_blank', 'width=1280,height=900,menubar=no,toolbar=no');
+            }}
+            className="px-2.5 py-1 rounded-xl bg-sky-950/70 hover:bg-sky-900 border border-sky-500/40 text-sky-300 hover:text-white text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:scale-105"
+            title="この選手を別ウィンドウで開く"
+          >
+            <span>別ウィンドウで開く</span>
+            <span>↗</span>
+          </button>
+
+          {/* Star Favorite Button */}
+          <button
+            onClick={() => toggleDriver(driver.code)}
+            className={`px-2.5 py-1 rounded-xl text-xs font-racing flex items-center gap-1.5 transition-all cursor-pointer shadow-sm border ${
+              isFavoriteDriver(driver.code)
+                ? 'bg-amber-400/25 border-amber-400/70 text-amber-300 hover:bg-amber-400/35'
+                : 'bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-300 border-white/10'
+            }`}
+            title={isFavoriteDriver(driver.code) ? 'お気に入りから外す' : 'お気に入り (マイパドック) に登録'}
+          >
+            <span>{isFavoriteDriver(driver.code) ? '★' : '☆'}</span>
+            <span className="hidden md:inline">
+              {isFavoriteDriver(driver.code) ? '推し登録中' : '推し登録'}
+            </span>
+          </button>
+
+          {onCompareDriver && (
+            <button
+              onClick={() => {
+                onClose();
+                onCompareDriver(driver.code);
+              }}
+              className="px-2.5 py-1 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/40 text-purple-200 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm"
+              title="この選手を直接比較ツールに送る"
+            >
+              <span>⚔️</span>
+              <span className="hidden md:inline">2名比較</span>
+            </button>
+          )}
+
+          {onNavigateToTelemetry && (
+            <button
+              onClick={() => {
+                onClose();
+                onNavigateToTelemetry({
+                  year: 2026,
+                  targetDriver: driver.code,
+                  meetingName: 'Japan',
+                });
+              }}
+              className="px-2.5 py-1 rounded-xl bg-blue-600/40 hover:bg-blue-600/70 border border-blue-500/50 text-sky-200 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:scale-105"
+              title="このドライバーのテレメトリー分析画面へ移動"
+            >
+              <span>🏎️</span>
+              <span className="hidden md:inline">テレメトリー分析</span>
+            </button>
+          )}
+
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-sm font-bold transition-all cursor-pointer"
+            title="一覧へ戻る (ESC)"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      {/* Main Full-Width Driver Card */}
+      <div
+        ref={modalContentRef}
+        className="glass-card bg-slate-950/95 border border-white/15 w-full flex flex-col rounded-3xl shadow-2xl overflow-hidden relative"
+        style={{ borderTopColor: themeColor, borderTopWidth: 4 }}
+      >
+        {/* Container: Wraps Hero Header, Sticky Sub-Tabs & Content */}
+        <div className="flex flex-col">
           {/* Driver Hero Header */}
           <div
             className={`p-3.5 sm:p-6 border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 flex-shrink-0 ${
@@ -304,10 +335,23 @@ export default function DriverDetailModal({
                   <span className="truncate">{driver.fullName}</span>
                   {isLegend && <span className="text-amber-400 text-sm sm:text-lg">👑</span>}
                 </h2>
-                <p className="text-xs text-slate-400 truncate">
-                  <strong className="text-slate-200">{driver.team}</strong>
-                  {driver.nickname && <span className="ml-1.5 text-slate-400">({driver.nickname})</span>}
-                </p>
+                <div className="text-xs text-slate-400 truncate flex items-center gap-1.5 pt-0.5">
+                  <span className="text-slate-500 font-mono text-[11px]">所属:</span>
+                  {onSelectTeamDetail ? (
+                    <button
+                      type="button"
+                      onClick={() => onSelectTeamDetail(driver.team)}
+                      className="text-slate-200 hover:text-sky-300 font-bold hover:underline cursor-pointer flex items-center gap-1 transition-colors text-left"
+                      title={`${driver.team} のチーム詳細・系譜を見る`}
+                    >
+                      <span>{driver.team}</span>
+                      <span className="text-[10px] text-sky-400">➔</span>
+                    </button>
+                  ) : (
+                    <strong className="text-slate-200">{driver.team}</strong>
+                  )}
+                  {driver.nickname && <span className="ml-1 text-slate-400">({driver.nickname})</span>}
+                </div>
 
                 {/* Official Social Links (Instagram / X / Web) */}
                 {driver.socialLinks && (
@@ -541,7 +585,8 @@ export default function DriverDetailModal({
 
                   <div className="space-y-1.5 max-h-[360px] overflow-y-auto pr-1 scrollbar-thin">
                     {driver.seasonHistory.map((sh, idx) => {
-                      const isChampion = sh.finalPosition === 1;
+                      const is2026Ongoing = sh.year === 2026;
+                      const isChampion = sh.finalPosition === 1 && !is2026Ongoing;
                       const isPodiumYear = sh.finalPosition && sh.finalPosition <= 3;
                       return (
                         <div
@@ -549,6 +594,8 @@ export default function DriverDetailModal({
                           className={`p-2.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs font-mono transition-all ${
                             isChampion
                               ? 'bg-amber-950/40 border-amber-500/60 shadow-sm'
+                              : is2026Ongoing && sh.finalPosition === 1
+                              ? 'bg-emerald-950/30 border-emerald-500/40 shadow-sm'
                               : isPodiumYear
                               ? 'bg-slate-900/90 border-sky-500/40'
                               : 'bg-slate-900/60 border-white/5 hover:border-white/15'
@@ -586,9 +633,21 @@ export default function DriverDetailModal({
                             </span>
 
                             {/* Team Name */}
-                            <span className="font-bold text-slate-100 truncate text-xs">
-                              {sh.team}
-                            </span>
+                            {onSelectTeamDetail ? (
+                              <button
+                                type="button"
+                                onClick={() => onSelectTeamDetail(sh.teamId || sh.team)}
+                                className="font-bold text-slate-100 hover:text-sky-300 truncate text-xs hover:underline cursor-pointer flex items-center gap-1 text-left"
+                                title={`${sh.team} のチーム詳細を見る`}
+                              >
+                                <span>{sh.team}</span>
+                                <span className="text-[9px] text-sky-400">➔</span>
+                              </button>
+                            ) : (
+                              <span className="font-bold text-slate-100 truncate text-xs">
+                                {sh.team}
+                              </span>
+                            )}
 
                             {/* Car Number */}
                             {sh.carNumber && (
@@ -605,12 +664,18 @@ export default function DriverDetailModal({
                                 className={`font-racing font-bold ${
                                   isChampion
                                     ? 'text-amber-300 flex items-center gap-1 font-black'
+                                    : is2026Ongoing && sh.finalPosition === 1
+                                    ? 'text-emerald-300 font-bold'
                                     : isPodiumYear
                                     ? 'text-sky-300'
                                     : 'text-slate-300'
                                 }`}
                               >
-                                {isChampion ? '👑 年間王者 P1' : `年間 P${sh.finalPosition}`}
+                                {isChampion
+                                  ? '👑 年間王者 P1'
+                                  : is2026Ongoing
+                                  ? `暫定 P${sh.finalPosition} (進行中)`
+                                  : `年間 P${sh.finalPosition}`}
                               </span>
                             )}
 
@@ -1236,7 +1301,8 @@ export default function DriverDetailModal({
         </div>
         </div>
       </div>
-    </div>,
-    document.body
+    </div>
   );
 }
+
+export { DriverDetailModal as DriverDetailView };

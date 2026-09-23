@@ -33,7 +33,9 @@ export interface SeasonGridInfo {
   year: number;
   eraName: string; // e.g., "1.6L V6 ターボハイブリッド新規定", "グラウンドエフェクト新時代"
   seasonSummary: string;
-  championDriver: {
+  isOngoing?: boolean;
+  ongoingStatusText?: string;
+  championDriver?: {
     code: string;
     name: string;
     team: string;
@@ -41,7 +43,21 @@ export interface SeasonGridInfo {
     points: number;
     wins: number;
   };
-  championConstructor: {
+  championConstructor?: {
+    name: string;
+    powerUnit: string;
+    points: number;
+    wins: number;
+  };
+  leaderDriver?: {
+    code: string;
+    name: string;
+    team: string;
+    carNumber: number;
+    points: number;
+    wins: number;
+  };
+  leaderConstructor?: {
     name: string;
     powerUnit: string;
     points: number;
@@ -56,7 +72,9 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
     year: 2026,
     eraName: '持続可能燃料 ＆ 350kW電動MGU-K 新レギュレーション時代',
     seasonSummary: 'MGU-H撤廃と電動出力3倍化の新PU規定が導入。新規ワークスのアウディと第11チームのキャデラックが参戦し、11チーム・22台体制へ拡大。アストンマーティンはホンダの完全ワークスPU体制へ移行。',
-    championDriver: {
+    isOngoing: true,
+    ongoingStatusText: '2026シーズン進行中 (第16戦モンツァ終了時点 - タイトル未確定)',
+    leaderDriver: {
       code: 'RUS',
       name: 'ジョージ・ラッセル',
       team: 'Mercedes-AMG',
@@ -64,7 +82,7 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
       points: 285,
       wins: 6,
     },
-    championConstructor: {
+    leaderConstructor: {
       name: 'Mercedes-AMG PETRONAS F1 Team',
       powerUnit: 'Mercedes M17 Works',
       points: 495,

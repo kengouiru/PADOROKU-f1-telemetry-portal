@@ -437,6 +437,54 @@ export default function DriversHub({
     );
   };
 
+  // If a driver detail is selected, render DriverDetailModal as a Dedicated Full-Page View
+  if (selectedDriverDetail) {
+    return (
+      <DriverDetailModal
+        driver={selectedDriverDetail}
+        allDrivers={
+          viewMode === 'legends'
+            ? legendDrivers
+            : viewMode === 'flat'
+            ? filteredDrivers
+            : KNOWLEDGE_DRIVERS
+        }
+        onSelectDriver={(d) => setSelectedDriverDetail(d)}
+        onSelectTeamDetail={(teamId) => {
+          handleOpenTeamDetail(teamId);
+          setSelectedDriverDetail(null);
+        }}
+        onNavigateToTelemetry={onNavigateToTelemetry}
+        onCompareDriver={(code) => {
+          setCompareDriver1(code);
+          setViewMode('compare');
+          setSelectedDriverDetail(null);
+        }}
+        onClose={() => setSelectedDriverDetail(null)}
+      />
+    );
+  }
+
+  // If a team detail is selected, render TeamDetailModal as a Dedicated Full-Page View
+  if (selectedTeamDetail) {
+    return (
+      <TeamDetailModal
+        team={selectedTeamDetail}
+        allTeams={KNOWLEDGE_TEAMS}
+        onSelectTeam={(t) => setSelectedTeamDetail(t)}
+        onSelectDriverDetail={(code) => {
+          const drv = driverMap.get(code);
+          if (drv) {
+            setSelectedDriverDetail(drv);
+            setSelectedTeamDetail(null);
+          }
+        }}
+        onNavigateToTelemetry={onNavigateToTelemetry}
+        onClose={() => setSelectedTeamDetail(null)}
+      />
+    );
+  }
+
   return (
     <div className="flex flex-col gap-3 sm:gap-4 max-w-7xl mx-auto animate-fade-in pb-6 sm:pb-2">
       {/* ── Top Bar: View Mode Switcher, Free-Word Search, Summary & Reset ── */}
@@ -821,9 +869,17 @@ export default function DriversHub({
                       className="w-2.5 h-4 rounded-full shrink-0 shadow-sm"
                       style={{ backgroundColor: team.color }}
                     />
-                    <h3 className="text-sm sm:text-base font-racing font-bold text-white leading-tight truncate">
-                      {team.name}
-                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenTeamDetail(team.id)}
+                      className="group/team flex items-center gap-1.5 hover:text-sky-300 transition-colors cursor-pointer text-left min-w-0"
+                      title={`${team.name} のチーム詳細・スペック・系譜を見る`}
+                    >
+                      <h3 className="text-sm sm:text-base font-racing font-bold text-white group-hover/team:text-sky-300 leading-tight truncate">
+                        {team.name}
+                      </h3>
+                      <span className="text-xs text-sky-400 opacity-60 group-hover/team:opacity-100 group-hover/team:translate-x-0.5 transition-all">➔</span>
+                    </button>
                     {team.constructorTitles > 0 && (
                       <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold shrink-0">
                         🏆 {team.constructorTitles}冠
@@ -831,18 +887,8 @@ export default function DriversHub({
                     )}
                   </div>
 
-                  {/* Right: Lineage, Principal & PU Badges */}
+                  {/* Right: Principal & PU Badges */}
                   <div className="flex items-center justify-end gap-1.5 text-[10px] font-mono text-slate-400 shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => handleOpenTeamDetail(team.id)}
-                      className="px-2 py-0.5 rounded-md bg-sky-950/70 hover:bg-sky-900/80 text-sky-300 hover:text-white font-racing font-bold text-[10px] border border-sky-500/30 flex items-center gap-1 transition-all hover:scale-105 cursor-pointer shadow-sm"
-                      title={`${team.name} の系統樹・2026マシンスペック・歴代変遷を見る`}
-                    >
-                      <span>🌿</span>
-                      <span className="hidden sm:inline">系統樹・諸元</span>
-                      <span>➔</span>
-                    </button>
                     <span className="bg-slate-900/90 border border-white/5 px-2 py-0.5 rounded-md hidden sm:inline whitespace-nowrap">
                       👔 <strong className="text-slate-200">{team.teamPrincipal}</strong>
                     </span>
@@ -940,28 +986,55 @@ export default function DriversHub({
               </div>
             </div>
 
-            {/* Season Champions Ribbon */}
+            {/* Season Champions / Standings Leader Ribbon */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-white/10 text-xs">
-              <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-lg text-amber-200">
-                <span className="text-base">👑</span>
-                <span className="font-bold font-mono">世界王者 (Drivers):</span>
-                <span className="text-white font-bold truncate">
-                  {currentSeasonGrid.championDriver.name}
-                </span>
-                <span className="text-[11px] font-mono text-amber-400/90 ml-auto shrink-0">
-                  {currentSeasonGrid.championDriver.wins}勝 / {currentSeasonGrid.championDriver.points}点
-                </span>
-              </div>
-              <div className="flex items-center gap-2 bg-sky-500/10 border border-sky-500/30 px-3 py-1.5 rounded-lg text-sky-200">
-                <span className="text-base">🏆</span>
-                <span className="font-bold font-mono">製造者王者 (Constructors):</span>
-                <span className="text-white font-bold truncate">
-                  {currentSeasonGrid.championConstructor.name}
-                </span>
-                <span className="text-[11px] font-mono text-sky-400/90 ml-auto shrink-0">
-                  {currentSeasonGrid.championConstructor.wins}勝 / {currentSeasonGrid.championConstructor.points}点
-                </span>
-              </div>
+              {currentSeasonGrid.isOngoing ? (
+                <>
+                  <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-emerald-200">
+                    <span className="text-base">📊</span>
+                    <span className="font-bold font-mono">ポイント首位 (Leader):</span>
+                    <span className="text-white font-bold truncate">
+                      {currentSeasonGrid.leaderDriver?.name || 'ジョージ・ラッセル'}
+                    </span>
+                    <span className="text-[11px] font-mono text-emerald-400/90 ml-auto shrink-0">
+                      {currentSeasonGrid.leaderDriver?.wins || 6}勝 / {currentSeasonGrid.leaderDriver?.points || 285}点
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-sky-500/10 border border-sky-500/30 px-3 py-1.5 rounded-lg text-sky-200">
+                    <span className="text-base">🏁</span>
+                    <span className="font-bold font-mono">チーム首位 (Leader):</span>
+                    <span className="text-white font-bold truncate">
+                      {currentSeasonGrid.leaderConstructor?.name || 'Mercedes-AMG'}
+                    </span>
+                    <span className="text-[11px] font-mono text-sky-400/90 ml-auto shrink-0">
+                      {currentSeasonGrid.ongoingStatusText || '2026シーズン進行中 (未確定)'}
+                    </span>
+                  </div>
+                </>
+              ) : currentSeasonGrid.championDriver && currentSeasonGrid.championConstructor ? (
+                <>
+                  <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 px-3 py-1.5 rounded-lg text-amber-200">
+                    <span className="text-base">👑</span>
+                    <span className="font-bold font-mono">世界王者 (Drivers):</span>
+                    <span className="text-white font-bold truncate">
+                      {currentSeasonGrid.championDriver.name}
+                    </span>
+                    <span className="text-[11px] font-mono text-amber-400/90 ml-auto shrink-0">
+                      {currentSeasonGrid.championDriver.wins}勝 / {currentSeasonGrid.championDriver.points}点
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-sky-500/10 border border-sky-500/30 px-3 py-1.5 rounded-lg text-sky-200">
+                    <span className="text-base">🏆</span>
+                    <span className="font-bold font-mono">製造者王者 (Constructors):</span>
+                    <span className="text-white font-bold truncate">
+                      {currentSeasonGrid.championConstructor.name}
+                    </span>
+                    <span className="text-[11px] font-mono text-sky-400/90 ml-auto shrink-0">
+                      {currentSeasonGrid.championConstructor.wins}勝 / {currentSeasonGrid.championConstructor.points}点
+                    </span>
+                  </div>
+                </>
+              ) : null}
             </div>
           </div>
 
@@ -985,25 +1058,23 @@ export default function DriversHub({
                         #{team.finalRank}
                       </span>
                     )}
-                    <h3 className="text-sm sm:text-base font-racing font-bold text-white leading-tight truncate">
-                      {team.teamName}
-                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenTeamDetail(team.teamId)}
+                      className="group/team flex items-center gap-1.5 hover:text-sky-300 transition-colors cursor-pointer text-left min-w-0"
+                      title={`${team.teamName} のチーム詳細・スペック・系譜を見る`}
+                    >
+                      <h3 className="text-sm sm:text-base font-racing font-bold text-white group-hover/team:text-sky-300 leading-tight truncate">
+                        {team.teamName}
+                      </h3>
+                      <span className="text-xs text-sky-400 opacity-60 group-hover/team:opacity-100 group-hover/team:translate-x-0.5 transition-all">➔</span>
+                    </button>
                     <span className="text-[11px] text-slate-400 truncate hidden sm:inline">
                       {team.fullName}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-1.5 text-xs font-mono shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => handleOpenTeamDetail(team.teamId)}
-                      className="px-2 py-0.5 rounded-md bg-sky-950/70 hover:bg-sky-900/80 text-sky-300 hover:text-white font-racing font-bold text-[10px] border border-sky-500/40 flex items-center gap-1 transition-all hover:scale-105 cursor-pointer shadow-sm"
-                      title={`${team.teamName} の系統樹・2026マシンスペック・歴代変遷を見る`}
-                    >
-                      <span>🌿</span>
-                      <span className="hidden sm:inline">系統樹・諸元</span>
-                      <span>➔</span>
-                    </button>
                     {team.teamPrincipal && (
                       <span className="bg-slate-900/90 border border-white/5 px-2 py-0.5 rounded-md text-slate-400 text-[10px] hidden md:inline">
                         👔 {team.teamPrincipal}
@@ -1267,44 +1338,6 @@ export default function DriversHub({
           onNavigateToTelemetry={onNavigateToTelemetry}
           onNavigateToDrama={onNavigateToDrama}
           onSelectDriverDetail={(d) => setSelectedDriverDetail(d)}
-        />
-      )}
-
-      {/* ── Driver Detail Modal ── */}
-      {selectedDriverDetail && (
-        <DriverDetailModal
-          driver={selectedDriverDetail}
-          allDrivers={
-            viewMode === 'legends'
-              ? legendDrivers
-              : viewMode === 'flat'
-              ? filteredDrivers
-              : KNOWLEDGE_DRIVERS
-          }
-          onSelectDriver={(d) => setSelectedDriverDetail(d)}
-          onNavigateToTelemetry={onNavigateToTelemetry}
-          onCompareDriver={(code) => {
-            setCompareDriver1(code);
-            setViewMode('compare');
-          }}
-          onClose={() => setSelectedDriverDetail(null)}
-        />
-      )}
-
-      {/* ── Team Detail & Lineage Modal ── */}
-      {selectedTeamDetail && (
-        <TeamDetailModal
-          team={selectedTeamDetail}
-          allTeams={KNOWLEDGE_TEAMS}
-          onSelectTeam={(t) => setSelectedTeamDetail(t)}
-          onSelectDriverDetail={(code) => {
-            const drv = driverMap.get(code);
-            if (drv) {
-              setSelectedDriverDetail(drv);
-            }
-          }}
-          onNavigateToTelemetry={onNavigateToTelemetry}
-          onClose={() => setSelectedTeamDetail(null)}
         />
       )}
     </div>
