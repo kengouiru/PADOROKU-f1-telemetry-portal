@@ -45,6 +45,20 @@ const HISTORICAL_TEAM_ID_MAP: Record<string, string[]> = {
   cadillac: ['cadillac'],
 };
 
+const TEAM_FUEL_PARTNERS: Record<string, { partner: string; fuelName: string; note: string }> = {
+  ferrari: { partner: 'Shell (シェル)', fuelName: 'Shell V-Power 100% Advanced E-Fuel', note: 'スクーデリアとの75年以上に及ぶパートナーシップ。新燃焼室プレチャンバー技術に最適化。' },
+  mercedes: { partner: 'PETRONAS (ペトロナス)', fuelName: 'PETRONAS Primax 100% Sustainable', note: '2014年ハイブリッド時代の8連覇を支えたペトロナスとの共同研究による超高効率合成燃料。' },
+  'red-bull': { partner: 'ExxonMobil / Mobil 1', fuelName: 'Mobil 1 Synergy 100% Sustainable', note: 'ミルトンキーンズのRed Bull Ford Powertrains専用ラボで調合される高エネルギー密度燃料。' },
+  mclaren: { partner: 'PETRONAS (ペトロナス)', fuelName: 'PETRONAS Primax (Mercedes Works Spec)', note: 'メルセデスPUワークス仕様と同一のペトロナス製高効率持続可能燃料を使用。' },
+  'aston-martin': { partner: 'Aramco (アラムコ)', fuelName: 'Aramco 100% Advanced Synthetic E-Fuel', note: '世界最大のエネルギー企業アラムコとホンダHRCが共同開発。ニューウェイ空力と排熱効率を極限調和。' },
+  alpine: { partner: 'Castrol / BP', fuelName: 'Castrol EDGE 100% Sustainable Fuel', note: 'ビリー＝シャティヨンとエンストン双方の知見を結集した高オクタン価カーボンニュートラル燃料。' },
+  williams: { partner: 'PETRONAS (ペトロナス)', fuelName: 'PETRONAS Primax (Mercedes Spec)', note: 'メルセデス・パワートレインズの供給プロトコルに準拠した最新規格燃料。' },
+  rb: { partner: 'ExxonMobil / Mobil 1', fuelName: 'Mobil 1 Synergy (Red Bull Ford Spec)', note: 'シニアチーム（Red Bull）と同一のフォード製PU対応持続可能燃料。' },
+  audi: { partner: 'BP / Castrol (BPワークス)', fuelName: 'BP E-Fuel Advanced Formula 1', note: 'アウディF1のフルワークスパートナーとしてBPが独占開発。ノイブルク製独自PU専用調合。' },
+  haas: { partner: 'Shell (シェル)', fuelName: 'Shell V-Power (Ferrari Customer Spec)', note: 'フェラーリPUに最適化されたシェルの第2世代バイオマス合成燃料。' },
+  cadillac: { partner: 'Shell (シェル) / GM Tech', fuelName: 'Shell V-Power (Ferrari PU Transition Spec)', note: 'フェラーリPUカスタマー契約に基づくシェル供給。将来のGM自社製PUへ向けたデータ蓄積を並行。' },
+};
+
 export default function TeamDetailModal({
   team,
   allTeams,
@@ -63,6 +77,7 @@ export default function TeamDetailModal({
   const themeColor = team.color || '#38bdf8';
   const lineageRecord = useMemo(() => getTeamLineage(team.id), [team.id]);
   const carSpecs = useMemo(() => getTeamCarSpecs(team.id), [team.id]);
+  const fuelPartner = TEAM_FUEL_PARTNERS[team.id];
 
   // Find currentIndex for Prev / Next navigation
   const currentIndex = allTeams.findIndex((t) => t.id === team.id);
@@ -323,8 +338,8 @@ export default function TeamDetailModal({
             )}
           </div>
 
-          {/* Modal Sub-Tabs (Sticky when scrolling) */}
-          <div className="sticky top-0 z-20 flex items-center gap-2 px-3.5 sm:px-6 pt-2 sm:pt-2.5 border-b border-white/10 bg-slate-950/95 backdrop-blur-md overflow-x-auto flex-shrink-0 shadow-sm">
+          {/* Modal Sub-Tabs (Sticky below top nav bar when scrolling) */}
+          <div className="sticky top-[48px] z-40 flex items-center gap-2 px-3.5 sm:px-6 pt-2 sm:pt-2.5 border-b border-white/15 bg-slate-950 overflow-x-auto flex-shrink-0 shadow-md">
             {(
               [
                 ['lineage', '🌿 チーム系統樹 & 系譜'],
@@ -582,6 +597,102 @@ export default function TeamDetailModal({
                         <span className="text-[10px] text-slate-400 font-sans block">{carSpecs.brakes}</span>
                       </div>
                     </div>
+
+                    {/* 2026 Power Split & Energy Deployment Architecture */}
+                    <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950/40 border border-white/10 space-y-3.5">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-base">⚡</span>
+                          <h4 className="text-xs font-racing font-bold text-white uppercase tracking-wider">
+                            2026 パワーユニット 50:50 出力配分 ＆ エネルギー回生構造
+                          </h4>
+                        </div>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-950 text-sky-300 border border-sky-500/30">
+                          MGU-H撤廃 / 回生電力8.5倍化
+                        </span>
+                      </div>
+
+                      {/* Visual Dual Power Split Bar */}
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between text-[11px] font-mono">
+                          <span className="text-orange-400 font-bold flex items-center gap-1">
+                            <span>🔥</span> 1.6L V6 ICE内燃機関 (~400 kW / 53%)
+                          </span>
+                          <span className="text-cyan-300 font-bold flex items-center gap-1">
+                            MGU-K 電動モーター (350 kW / 47%) <span>⚡</span>
+                          </span>
+                        </div>
+                        <div className="h-4 w-full bg-slate-800 rounded-full overflow-hidden flex border border-white/10 p-0.5">
+                          <div
+                            className="h-full bg-gradient-to-r from-red-600 via-orange-500 to-amber-500 rounded-l-full relative flex items-center justify-center text-[9px] font-bold font-mono text-white transition-all shadow-[0_0_12px_rgba(239,68,68,0.4)]"
+                            style={{ width: '53.3%' }}
+                          >
+                            <span className="drop-shadow">ICE 53.3% (~540 PS)</span>
+                          </div>
+                          <div
+                            className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 rounded-r-full relative flex items-center justify-center text-[9px] font-bold font-mono text-white transition-all shadow-[0_0_12px_rgba(56,189,248,0.4)]"
+                            style={{ width: '46.7%' }}
+                          >
+                            <span className="drop-shadow">MGU-K 46.7% (476 PS)</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between text-[10px] text-slate-400 font-sans">
+                          <span>3,000 MJ/h エネルギー流量制限 (100% E-Fuel)</span>
+                          <span>旧規定120kWから約3倍増 / 1周最大9MJ回生可能</span>
+                        </div>
+                      </div>
+
+                      {/* Technical Features: Active Aero & E-Fuel Partner */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                        {/* Active Aero Modes */}
+                        <div className="p-3 rounded-xl bg-slate-950/70 border border-white/5 space-y-2">
+                          <span className="text-[10px] font-racing text-amber-300 block font-bold">
+                            🌪️ 空力モード切替 ＆ MOM (Manual Override)
+                          </span>
+                          <div className="grid grid-cols-2 gap-2 text-[11px]">
+                            <div className="p-2 rounded-lg bg-slate-900/90 border border-amber-500/20">
+                              <span className="text-amber-400 font-bold block font-racing">Z-MODE</span>
+                              <span className="text-[10px] text-slate-300 block font-bold">コーナリング高DF</span>
+                              <span className="text-[9px] text-slate-400 block">前・後翼通常迎角で最大コーナリング速度を確保</span>
+                            </div>
+                            <div className="p-2 rounded-lg bg-slate-900/90 border border-sky-500/20">
+                              <span className="text-sky-400 font-bold block font-racing">X-MODE</span>
+                              <span className="text-[10px] text-slate-300 block font-bold">ストレート低ドラッグ</span>
+                              <span className="text-[9px] text-slate-400 block">ウイング迎角低減で全車直線でドラッグ55%削減</span>
+                            </div>
+                          </div>
+                          <div className="text-[10px] text-slate-300 bg-purple-950/40 border border-purple-500/20 p-2 rounded-lg">
+                            <span className="font-bold text-purple-300">⚡ MOM (マニュアル・オーバーライド): </span>
+                            前方車両と1秒以内で電気ブーストが起動。337km/hまでフルパワー供給を維持しオーバーテイクを演出。
+                          </div>
+                        </div>
+
+                        {/* Sustainable Fuel Partner */}
+                        {fuelPartner && (
+                          <div className="p-3 rounded-xl bg-slate-950/70 border border-emerald-500/20 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-racing text-emerald-400 block font-bold">
+                                🌱 公式持続可能燃料パートナー
+                              </span>
+                              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30">
+                                100% E-Fuel
+                              </span>
+                            </div>
+                            <div className="p-2.5 rounded-lg bg-slate-900/90 border border-white/5 space-y-1">
+                              <div className="text-xs font-bold text-white font-racing">
+                                {fuelPartner.partner}
+                              </div>
+                              <div className="text-[11px] font-mono text-emerald-300 font-medium">
+                                {fuelPartner.fuelName}
+                              </div>
+                              <p className="text-[10px] text-slate-300 font-sans leading-relaxed pt-1">
+                                {fuelPartner.note}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -633,7 +744,7 @@ export default function TeamDetailModal({
                       <span>空力コンセプト & フロア負圧</span>
                     </h4>
                     <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                      {team.philosophy.aeroFocus}
+                      {renderTextWithCitations(team.philosophy.aeroFocus)}
                     </p>
                   </div>
 
@@ -643,7 +754,7 @@ export default function TeamDetailModal({
                       <span>サスペンション & メカニカル接地力</span>
                     </h4>
                     <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                      {team.philosophy.mechanicalFocus}
+                      {renderTextWithCitations(team.philosophy.mechanicalFocus)}
                     </p>
                   </div>
                 </div>

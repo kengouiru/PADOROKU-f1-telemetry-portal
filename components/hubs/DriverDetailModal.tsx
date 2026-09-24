@@ -15,6 +15,8 @@ import { getDriverSkills } from '@/data/driverSkillsData';
 import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
 import { useUserPreferences } from '@/lib/userPreferences';
 import SmartWikiText from '@/components/common/SmartWikiText';
+import { getVaultRadiosByDriver, type VaultRadioItem } from '@/data/f1RadioVaultData';
+import { getProxiedAudioUrl } from '@/lib/telemetryUtils';
 
 export interface DriverDetailModalProps {
   driver: DriverProfile;
@@ -56,6 +58,41 @@ export default function DriverDetailModal({
   const themeColor = isLegend ? '#D4AF37' : driver.teamColor;
   const driverTraits = getDriverTraits(driver.code);
   const driverSkills = getDriverSkills(driver.code);
+  const driverRadios = React.useMemo(() => getVaultRadiosByDriver(driver.code), [driver.code]);
+
+  const [activeRadioId, setActiveRadioId] = useState<string | null>(null);
+  const [isRadioPlaying, setIsRadioPlaying] = useState(false);
+  const radioAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (radioAudioRef.current) {
+        radioAudioRef.current.pause();
+        radioAudioRef.current = null;
+      }
+    };
+  }, []);
+
+  const handlePlayRadio = (radio: VaultRadioItem) => {
+    if (!radio.audioUrl) return;
+    if (activeRadioId === radio.id && isRadioPlaying) {
+      radioAudioRef.current?.pause();
+      setIsRadioPlaying(false);
+      return;
+    }
+    if (activeRadioId !== radio.id) {
+      if (radioAudioRef.current) radioAudioRef.current.pause();
+      setActiveRadioId(radio.id);
+      const audio = new Audio(getProxiedAudioUrl(radio.audioUrl));
+      radioAudioRef.current = audio;
+      audio.onended = () => setIsRadioPlaying(false);
+      audio.play().catch(() => setIsRadioPlaying(false));
+      setIsRadioPlaying(true);
+    } else {
+      radioAudioRef.current?.play().catch(() => {});
+      setIsRadioPlaying(true);
+    }
+  };
 
   // Find currentIndex for Prev / Next navigation
   const currentIndex = allDrivers.findIndex((d) => d.id === driver.id);
@@ -428,8 +465,8 @@ export default function DriverDetailModal({
             )}
           </div>
 
-          {/* Modal Sub-Tabs (Sticky at top when scrolling) */}
-          <div className="sticky top-0 z-20 flex items-center gap-2 px-3.5 sm:px-6 pt-2 sm:pt-2.5 border-b border-white/10 bg-slate-950/95 backdrop-blur-md overflow-x-auto flex-shrink-0 shadow-sm">
+          {/* Modal Sub-Tabs (Sticky below top nav bar when scrolling) */}
+          <div className="sticky top-[48px] z-40 flex items-center gap-2 px-3.5 sm:px-6 pt-2 sm:pt-2.5 border-b border-white/15 bg-slate-950 overflow-x-auto flex-shrink-0 shadow-md">
             {(
               [
                 ['overview', '📊 プロフィール & 実績'],
@@ -1099,7 +1136,7 @@ export default function DriverDetailModal({
                       <span>担当: {driver.raceEngineer.name}</span>
                     </p>
                     <p className="text-slate-300 text-[11px] leading-relaxed">
-                      {driver.raceEngineer.dynamic}
+                      {renderTextWithCitations(driver.raceEngineer.dynamic)}
                     </p>
                   </div>
                 </div>
@@ -1129,9 +1166,9 @@ export default function DriverDetailModal({
                   <span>👤</span>
                   <span>人物像・レースでの振る舞い</span>
                 </h4>
-                <p className="text-xs text-slate-200 leading-relaxed">
-                  {driver.biography.personality}
-                </p>
+                <div className="text-xs text-slate-200 leading-relaxed">
+                  {renderTextWithCitations(driver.biography.personality)}
+                </div>
               </div>
 
               {/* Rivalries & History */}
@@ -1140,9 +1177,9 @@ export default function DriverDetailModal({
                   <span>⚔️</span>
                   <span>ライバル関係史・パドックの人間模様</span>
                 </h4>
-                <p className="text-xs text-slate-200 leading-relaxed">
-                  {driver.biography.rivalries}
-                </p>
+                <div className="text-xs text-slate-200 leading-relaxed">
+                  {renderTextWithCitations(driver.biography.rivalries)}
+                </div>
               </div>
 
               {/* Top 3 Iconic Races Breakdown */}
@@ -1150,13 +1187,13 @@ export default function DriverDetailModal({
                 <div className="space-y-2.5">
                   <h4 className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                     <span>🏆</span>
-                    <span>キャリアを象徴する伝説のレース</span>
+                    <span>キャリアを象徴する伝説のレース (Defining Races)</span>
                   </h4>
                   <div className="space-y-3">
                     {driver.biography.iconicRaces.map((race, idx) => (
                       <div
                         key={idx}
-                        className="bg-slate-950/70 border border-white/10 rounded-2xl p-4 space-y-2"
+                        className="bg-slate-950/70 border border-white/10 rounded-2xl p-4 space-y-2 hover:border-sky-500/30 transition-all"
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-bold text-white font-racing">
@@ -1166,12 +1203,95 @@ export default function DriverDetailModal({
                             MASTERCLASS #{idx + 1}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-300 leading-relaxed">
-                          {race.description}
-                        </p>
-                        <div className="bg-purple-950/30 border border-purple-500/20 p-2.5 rounded-xl text-[11px] text-purple-200 flex items-start gap-1.5">
-                          <span className="text-purple-400 font-bold">⚡ 戦術的決定打:</span>
-                          <span className="text-slate-300">{race.tacticalMasterclass}</span>
+                        <div className="text-xs text-slate-300 leading-relaxed font-sans">
+                          {renderTextWithCitations(race.description)}
+                        </div>
+                        <div className="bg-purple-950/30 border border-purple-500/20 p-2.5 rounded-xl text-[11px] text-purple-200 flex items-start gap-1.5 font-sans">
+                          <span className="text-purple-400 font-bold shrink-0">⚡ 戦術的決定打:</span>
+                          <span className="text-slate-300">{renderTextWithCitations(race.tacticalMasterclass)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Driver's Curated Legendary Team Radios (Pillar from Radio Vault) */}
+              {driverRadios.length > 0 && (
+                <div className="space-y-3 pt-1">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-racing font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <span>📻</span>
+                      <span>伝説のチーム無線アーカイブ ({driverRadios.length}件)</span>
+                    </h4>
+                    <span className="text-[10px] font-mono text-slate-400">
+                      日本語訳・実況コンテキスト付
+                    </span>
+                  </div>
+
+                  <div className="space-y-3">
+                    {driverRadios.map((radio) => (
+                      <div
+                        key={radio.id}
+                        className="p-4 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-rose-500/25 space-y-2.5 shadow-md hover:border-rose-500/40 transition-all"
+                      >
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">{radio.icon}</span>
+                            <span className="text-xs font-racing font-bold text-white">
+                              {radio.title}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-white/10">
+                              {radio.gpName} ({radio.year})
+                            </span>
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500/30">
+                              {radio.categoryLabel}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Transcripts */}
+                        <div className="space-y-1.5 p-3 rounded-xl bg-black/40 border border-white/5 font-mono">
+                          <div className="text-xs text-sky-200 italic">
+                            &ldquo;{radio.transcriptEn}&rdquo;
+                          </div>
+                          <div className="text-xs text-slate-200 font-sans">
+                            {radio.transcriptJa}
+                          </div>
+                        </div>
+
+                        {/* Context with Citations */}
+                        <div className="text-[11px] text-slate-300 leading-relaxed font-sans">
+                          {renderTextWithCitations(radio.contextJa)}
+                        </div>
+
+                        {/* Actions: Audio Player & Official Clip */}
+                        <div className="flex items-center gap-2 pt-1 flex-wrap">
+                          {radio.audioUrl && (
+                            <button
+                              onClick={() => handlePlayRadio(radio)}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer ${
+                                activeRadioId === radio.id && isRadioPlaying
+                                  ? 'bg-rose-600 text-white animate-pulse'
+                                  : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/10'
+                              }`}
+                            >
+                              <span>{activeRadioId === radio.id && isRadioPlaying ? '⏸️ 停止' : '▶️ 実況音声を再生'}</span>
+                            </button>
+                          )}
+                          {radio.officialClipUrl && (
+                            <a
+                              href={radio.officialClipUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1.5 rounded-xl text-xs font-racing font-bold bg-slate-800/80 hover:bg-slate-700 text-rose-300 hover:text-white border border-rose-500/20 hover:border-rose-500/40 flex items-center gap-1.5 transition-all"
+                            >
+                              <span>🎬 公式ハイライト映像</span>
+                              <span className="text-[9px]">↗</span>
+                            </a>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -1185,9 +1305,9 @@ export default function DriverDetailModal({
                   <span>🌿</span>
                   <span>レース外の素顔・ライフスタイル</span>
                 </h4>
-                <p className="text-xs text-slate-200 leading-relaxed">
-                  {driver.biography.offTrack}
-                </p>
+                <div className="text-xs text-slate-200 leading-relaxed">
+                  {renderTextWithCitations(driver.biography.offTrack)}
+                </div>
               </div>
 
               {/* Official Social Links Banner */}

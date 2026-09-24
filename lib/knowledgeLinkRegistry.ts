@@ -104,6 +104,35 @@ const RULE_KEYWORD_MAP: { keyword: string; url: string; title: string }[] = [
   { keyword: '技術規則', url: '/knowledge/rules', title: 'FIA F1 公式技術規則（Technical Regulations）' },
 ];
 
+// ── Key Personnel & Team Principal Mapping ──────────────────────────────────
+const PERSONNEL_KEYWORD_MAP: { keyword: string; url: string; title: string }[] = [
+  { keyword: 'エイドリアン・ニューウェイ', url: '/knowledge/teams/aston-martin', title: 'アストンマーティン マネージング・テクニカル・パートナー: エイドリアン・ニューウェイ' },
+  { keyword: 'ニューウェイ', url: '/knowledge/teams/aston-martin', title: '天才空力設計者: エイドリアン・ニューウェイ (アストンマーティン)' },
+  { keyword: '小松礼雄', url: '/knowledge/teams/haas', title: 'ハースF1チーム チーム代表: 小松礼雄' },
+  { keyword: 'マッティア・ビノット', url: '/knowledge/teams/audi', title: 'アウディF1 最高執行責任者/最高技術責任者: マッティア・ビノット' },
+  { keyword: 'トト・ウォルフ', url: '/knowledge/teams/mercedes', title: 'メルセデス-AMG チーム代表 & CEO: トト・ウォルフ' },
+  { keyword: 'クリスチャン・ホーナー', url: '/knowledge/teams/red-bull', title: 'レッドブル・レーシング チーム代表 & CEO: クリスチャン・ホーナー' },
+  { keyword: 'フレデリック・バスール', url: '/knowledge/teams/ferrari', title: 'スクーデリア・フェラーリ チーム代表: フレデリック・バスール' },
+  { keyword: 'ジェームズ・ボウルズ', url: '/knowledge/teams/williams', title: 'ウィリアムズ・レーシング チーム代表: ジェームズ・ボウルズ' },
+];
+
+// ── Iconic Circuits Mapping ──────────────────────────────────────────────────
+const CIRCUIT_KEYWORD_MAP: { keyword: string; id: string; name: string }[] = [
+  { keyword: '鈴鹿サーキット', id: 'suzuka', name: '鈴鹿サーキット (日本GP)' },
+  { keyword: '鈴鹿', id: 'suzuka', name: '鈴鹿サーキット (日本GP)' },
+  { keyword: 'モンツァ・サーキット', id: 'monza', name: 'モンツァ・サーキット (イタリアGP)' },
+  { keyword: 'モンツァ', id: 'monza', name: 'モンツァ・サーキット (イタリアGP)' },
+  { keyword: 'シルバーストン・サーキット', id: 'silverstone', name: 'シルバーストン・サーキット (イギリスGP)' },
+  { keyword: 'シルバーストン', id: 'silverstone', name: 'シルバーストン・サーキット (イギリスGP)' },
+  { keyword: 'スパ・フランコルシャン', id: 'spa', name: 'スパ・フランコルシャン (ベルギーGP)' },
+  { keyword: 'スパ', id: 'spa', name: 'スパ・フランコルシャン (ベルギーGP)' },
+  { keyword: 'モンテカルロ市街地コース', id: 'monaco', name: 'モンテカルロ市街地コース (モナコGP)' },
+  { keyword: 'モナコ市街地コース', id: 'monaco', name: 'モンテカルロ市街地コース (モナコGP)' },
+  { keyword: 'マドリング', id: 'madrid', name: 'マドリング IFEMA市街地コース (マドリードGP)' },
+  { keyword: 'インテルラゴス', id: 'interlagos', name: 'インテルラゴス・サーキット (サンパウロGP)' },
+  { keyword: 'アルバート・パーク', id: 'albert-park', name: 'アルバート・パーク・サーキット (オーストラリアGP)' },
+];
+
 // ── Build Full Keyword Registry ──────────────────────────────────────────────
 export function getKnowledgeLinkRegistry(): KnowledgeLinkEntry[] {
   const entries: KnowledgeLinkEntry[] = [];
@@ -164,6 +193,48 @@ export function getKnowledgeLinkRegistry(): KnowledgeLinkEntry[] {
       entries.push({ keyword: 'セーフティカー', url: '/knowledge/glossary/safety-car', category: 'glossary', title: '用語解説「セーフティカー」を別タブで開く' });
     } else if (term.id === 'track-limits') {
       entries.push({ keyword: 'トラックリミット', url: '/knowledge/glossary/track-limits', category: 'glossary', title: '用語解説「トラックリミット」を別タブで開く' });
+    } else if (term.id === 'active-aero') {
+      entries.push({ keyword: 'アクティブエアロ', url: '/knowledge/glossary/active-aero', category: 'glossary', title: '用語解説「アクティブ・エアロダイナミクス」を別タブで開く' });
+      entries.push({ keyword: 'Active Aero', url: '/knowledge/glossary/active-aero', category: 'glossary', title: '用語解説「アクティブ・エアロダイナミクス」を別タブで開く' });
+      entries.push({ keyword: 'Xモード', url: '/knowledge/glossary/active-aero', category: 'glossary', title: '用語解説「Xモード (低ドラッグモード)」を別タブで開く' });
+      entries.push({ keyword: 'Zモード', url: '/knowledge/glossary/active-aero', category: 'glossary', title: '用語解説「Zモード (高ダウンフォースモード)」を別タブで開く' });
+    } else if (term.id === 'manual-override') {
+      entries.push({ keyword: 'マニュアルオーバーライド', url: '/knowledge/glossary/manual-override', category: 'glossary', title: '用語解説「マニュアル・オーバーライド・モード」を別タブで開く' });
+      entries.push({ keyword: 'マニュアル・オーバーライド', url: '/knowledge/glossary/manual-override', category: 'glossary', title: '用語解説「マニュアル・オーバーライド・モード」を別タブで開く' });
+      entries.push({ keyword: 'MOM', url: '/knowledge/glossary/manual-override', category: 'glossary', title: '用語解説「マニュアル・オーバーライド・モード」を別タブで開く' });
+    } else if (term.id === 'mgu-h') {
+      entries.push({ keyword: 'MGU-H', url: '/knowledge/glossary/mgu-h', category: 'glossary', title: '用語解説「MGU-H」を別タブで開く' });
+    } else if (term.id === 'sustainable-fuel') {
+      entries.push({ keyword: '持続可能燃料', url: '/knowledge/glossary/sustainable-fuel', category: 'glossary', title: '用語解説「100% 持続可能合成燃料」を別タブで開く' });
+      entries.push({ keyword: 'E-Fuel', url: '/knowledge/glossary/sustainable-fuel', category: 'glossary', title: '用語解説「E-Fuel」を別タブで開く' });
+      entries.push({ keyword: 'E-fuel', url: '/knowledge/glossary/sustainable-fuel', category: 'glossary', title: '用語解説「E-Fuel」を別タブで開く' });
+    } else if (term.id === 'vsc') {
+      entries.push({ keyword: 'VSC', url: '/knowledge/glossary/vsc', category: 'glossary', title: '用語解説「VSC (バーチャルセーフティカー)」を別タブで開く' });
+      entries.push({ keyword: 'バーチャルセーフティカー', url: '/knowledge/glossary/vsc', category: 'glossary', title: '用語解説「バーチャルセーフティカー」を別タブで開く' });
+    } else if (term.id === 'steward') {
+      entries.push({ keyword: 'スチュワード', url: '/knowledge/glossary/steward', category: 'glossary', title: '用語解説「FIA スチュワード」を別タブで開く' });
+    } else if (term.id === 'cost-cap') {
+      entries.push({ keyword: 'コストキャップ', url: '/knowledge/glossary/cost-cap', category: 'glossary', title: '用語解説「コストキャップ」を別タブで開く' });
+    } else if (term.id === 'atr') {
+      entries.push({ keyword: 'ATR', url: '/knowledge/glossary/atr', category: 'glossary', title: '用語解説「ATR (空力テスト制限)」を別タブで開く' });
+      entries.push({ keyword: '空力テスト制限', url: '/knowledge/glossary/atr', category: 'glossary', title: '用語解説「空力テスト制限 (ATR)」を別タブで開く' });
+    } else if (term.id === 'understeer') {
+      entries.push({ keyword: 'アンダーステア', url: '/knowledge/glossary/understeer', category: 'glossary', title: '用語解説「アンダーステア」を別タブで開く' });
+    } else if (term.id === 'oversteer') {
+      entries.push({ keyword: 'オーバーステア', url: '/knowledge/glossary/oversteer', category: 'glossary', title: '用語解説「オーバーステア」を別タブで開く' });
+    } else if (term.id === 'blistering') {
+      entries.push({ keyword: 'ブリスタリング', url: '/knowledge/glossary/blistering', category: 'glossary', title: '用語解説「ブリスタリング」を別タブで開く' });
+      entries.push({ keyword: 'ブリスター', url: '/knowledge/glossary/blistering', category: 'glossary', title: '用語解説「ブリスタリング」を別タブで開く' });
+    } else if (term.id === 'graining') {
+      entries.push({ keyword: 'グレイニング', url: '/knowledge/glossary/graining', category: 'glossary', title: '用語解説「グレイニング」を別タブで開く' });
+    } else if (term.id === 'pit-window') {
+      entries.push({ keyword: 'ピットウィンドウ', url: '/knowledge/glossary/pit-window', category: 'glossary', title: '用語解説「ピットウィンドウ」を別タブで開く' });
+    } else if (term.id === 'outlap-inlap') {
+      entries.push({ keyword: 'アウトラップ', url: '/knowledge/glossary/outlap-inlap', category: 'glossary', title: '用語解説「アウトラップ ＆ インラップ」を別タブで開く' });
+      entries.push({ keyword: 'インラップ', url: '/knowledge/glossary/outlap-inlap', category: 'glossary', title: '用語解説「アウトラップ ＆ インラップ」を別タブで開く' });
+    } else if (term.id === 'flying-lap') {
+      entries.push({ keyword: 'フライングラップ', url: '/knowledge/glossary/flying-lap', category: 'glossary', title: '用語解説「フライングラップ」を別タブで開く' });
+      entries.push({ keyword: 'ホットラップ', url: '/knowledge/glossary/flying-lap', category: 'glossary', title: '用語解説「フライングラップ」を別タブで開く' });
     }
   });
 
@@ -194,6 +265,26 @@ export function getKnowledgeLinkRegistry(): KnowledgeLinkEntry[] {
       url: r.url,
       category: 'rule',
       title: r.title,
+    });
+  });
+
+  // 5. Personnel Mapping
+  PERSONNEL_KEYWORD_MAP.forEach((p) => {
+    entries.push({
+      keyword: p.keyword,
+      url: p.url,
+      category: 'team',
+      title: p.title,
+    });
+  });
+
+  // 6. Circuit Mapping
+  CIRCUIT_KEYWORD_MAP.forEach((c) => {
+    entries.push({
+      keyword: c.keyword,
+      url: `/?hub=knowledge&subTab=circuits&circuitId=${c.id}`,
+      category: 'circuit',
+      title: `サーキット解説「${c.name}」を開く`,
     });
   });
 

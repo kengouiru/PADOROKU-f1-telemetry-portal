@@ -18,6 +18,8 @@ import {
   type PaddockRelationship,
 } from '@/data/f1DramaData';
 import TeamRadioVaultView from '@/components/radio/TeamRadioVaultView';
+import SmartWikiText from '@/components/common/SmartWikiText';
+import { VAULT_TEAM_RADIOS } from '@/data/f1RadioVaultData';
 
 export type DramaTab = 'storylines' | 'moments' | 'rivalries' | 'paddock' | 'radios';
 
@@ -160,7 +162,7 @@ export default function F1DramaHub({ initialTab = 'storylines' }: F1DramaHubProp
             }`}
           >
             <span>🎙️</span>
-            <span>伝説の無線 (16選)</span>
+            <span>伝説の無線 ({VAULT_TEAM_RADIOS.length}選)</span>
           </button>
         </div>
       </div>
@@ -213,9 +215,9 @@ export default function F1DramaHub({ initialTab = 'storylines' }: F1DramaHubProp
             <p className="text-xs text-rose-200/90 font-medium italic mt-1 mb-4">
               &ldquo;{selectedSeason.tagline}&rdquo;
             </p>
-            <p className="text-xs text-slate-300 leading-relaxed max-w-4xl bg-slate-950/60 p-4 rounded-xl border border-white/5">
-              {selectedSeason.overview}
-            </p>
+            <div className="text-xs text-slate-300 leading-relaxed max-w-4xl bg-slate-950/60 p-4 rounded-xl border border-white/5 font-sans">
+              <SmartWikiText text={selectedSeason.overview} />
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 text-xs">
               <div className="bg-slate-950/80 p-3 rounded-lg border border-white/5 flex items-center gap-2">
@@ -288,16 +290,18 @@ export default function F1DramaHub({ initialTab = 'storylines' }: F1DramaHubProp
                       </h3>
                     </div>
 
-                    <p className="text-sm text-slate-200 leading-relaxed bg-slate-950/50 p-4 rounded-xl border border-white/5">
-                      {currentChapter.story}
-                    </p>
+                    <div className="text-sm text-slate-200 leading-relaxed bg-slate-950/50 p-4 rounded-xl border border-white/5 font-sans">
+                      <SmartWikiText text={currentChapter.story} />
+                    </div>
 
                     <div className="bg-slate-950/80 p-3.5 rounded-xl border border-rose-500/20 flex flex-col gap-1 text-xs">
                       <div className="text-rose-400 font-racing font-bold flex items-center gap-1.5">
                         <span>⚡</span>
                         <span>決定打となった瞬間 (Pivotal Moment):</span>
                       </div>
-                      <p className="text-slate-300 leading-relaxed">{currentChapter.pivotalMoment}</p>
+                      <div className="text-slate-300 leading-relaxed font-sans">
+                        <SmartWikiText text={currentChapter.pivotalMoment} />
+                      </div>
                     </div>
 
                     {currentChapter.radioOrQuote && (
@@ -413,9 +417,9 @@ export default function F1DramaHub({ initialTab = 'storylines' }: F1DramaHubProp
               <h4 className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider mb-2">
                 奇跡と熱狂の背景ストーリー
               </h4>
-              <p className="text-sm text-slate-200 leading-relaxed whitespace-pre-line">
-                {selectedMoment.story}
-              </p>
+              <div className="text-sm text-slate-200 leading-relaxed whitespace-pre-line font-sans">
+                <SmartWikiText text={selectedMoment.story} />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -423,13 +427,17 @@ export default function F1DramaHub({ initialTab = 'storylines' }: F1DramaHubProp
                 <span className="text-[10px] font-racing font-bold text-emerald-400 uppercase tracking-wider block mb-1">
                   レース結果と劇的結末
                 </span>
-                <p className="text-xs text-slate-300 leading-relaxed">{selectedMoment.outcome}</p>
+                <div className="text-xs text-slate-300 leading-relaxed font-sans">
+                  <SmartWikiText text={selectedMoment.outcome} />
+                </div>
               </div>
               <div className="bg-slate-950/80 p-4 rounded-xl border border-white/5">
                 <span className="text-[10px] font-racing font-bold text-sky-400 uppercase tracking-wider block mb-1">
                   その後のモータースポーツへの影響
                 </span>
-                <p className="text-xs text-slate-300 leading-relaxed">{selectedMoment.aftermath}</p>
+                <div className="text-xs text-slate-300 leading-relaxed font-sans">
+                  <SmartWikiText text={selectedMoment.aftermath} />
+                </div>
               </div>
             </div>
           </div>
@@ -533,7 +541,9 @@ export default function F1DramaHub({ initialTab = 'storylines' }: F1DramaHubProp
               <span className="text-[10px] font-racing font-bold text-purple-400 uppercase tracking-wider">
                 対決の力学と本質
               </span>
-              <p className="text-xs text-slate-200 leading-relaxed">{selectedRivalry.nature}</p>
+              <div className="text-xs text-slate-200 leading-relaxed font-sans">
+                <SmartWikiText text={selectedRivalry.nature} />
+              </div>
             </div>
 
             {/* Defining Moment */}
@@ -541,7 +551,9 @@ export default function F1DramaHub({ initialTab = 'storylines' }: F1DramaHubProp
               <span className="text-[10px] font-racing font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1">
                 <span>💥</span> 決定的な激突シーン
               </span>
-              <p className="text-xs text-slate-300 leading-relaxed">{selectedRivalry.definingMoment}</p>
+              <div className="text-xs text-slate-300 leading-relaxed font-sans">
+                <SmartWikiText text={selectedRivalry.definingMoment} />
+              </div>
             </div>
 
             {/* Quote */}

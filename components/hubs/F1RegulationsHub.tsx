@@ -283,7 +283,7 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                     <div className="bg-slate-900/90 rounded-xl p-4 border border-white/5">
                       <div className="text-xs font-mono text-slate-400 mb-1 font-bold">📋 概要と骨子</div>
                       <p className="text-slate-200 text-xs md:text-sm leading-relaxed">
-                        {art.summary}
+                        <SmartWikiText text={art.summary} />
                       </p>
                     </div>
 
