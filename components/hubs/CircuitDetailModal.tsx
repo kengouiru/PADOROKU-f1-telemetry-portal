@@ -457,58 +457,61 @@ export default function CircuitDetailModal({
                 </div>
               </div>
 
-              {/* Geometry Specs Badges (5-Grid) */}
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-                <div className="bg-slate-900/80 border border-white/10 p-3 rounded-xl text-center">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
-                    📏 全長
-                  </span>
-                  <span className="text-lg font-bold font-mono text-white mt-0.5 block">
-                    {circuit.lengthKm}
-                  </span>
-                  <span className="text-[9px] text-slate-500">km</span>
+              {/* Geometry Specs Telemetry HUD Strip (High-density, space-efficient) */}
+              <div className="bg-slate-950/80 border border-white/10 rounded-xl py-2.5 px-3 sm:px-4 shadow-sm grid grid-cols-2 sm:grid-cols-5 divide-y sm:divide-y-0 sm:divide-x divide-white/10 font-mono gap-y-2 sm:gap-y-0">
+                <div className="text-center px-1">
+                  <span className="text-[10px] text-slate-400 block tracking-wider font-sans">📏 コース全長</span>
+                  <div className="flex items-baseline justify-center gap-0.5 mt-0.5">
+                    <span className="text-sm sm:text-base font-bold text-white tabular-nums">{circuit.lengthKm}</span>
+                    <span className="text-[10px] text-slate-500 font-sans">km</span>
+                  </div>
                 </div>
 
-                <div className="bg-slate-900/80 border border-white/10 p-3 rounded-xl text-center">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
-                    🏔️ 最大高低差
-                  </span>
-                  <span className="text-lg font-bold font-mono text-amber-400 mt-0.5 block">
-                    {circuit.trackGeometry ? `${circuit.trackGeometry.elevationChangeMeters}m` : '--'}
-                  </span>
-                  <span className="text-[9px] text-slate-500">エレベーション</span>
+                <div className="text-center px-1">
+                  <span className="text-[10px] text-slate-400 block tracking-wider font-sans">🏔️ 最大高低差</span>
+                  <div className="flex items-baseline justify-center gap-0.5 mt-0.5">
+                    <span className="text-sm sm:text-base font-bold text-amber-400 tabular-nums">
+                      {circuit.trackGeometry ? circuit.trackGeometry.elevationChangeMeters : '--'}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-sans">m</span>
+                  </div>
                 </div>
 
-                <div className="bg-slate-900/80 border border-white/10 p-3 rounded-xl text-center">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
-                    🚀 最長ストレート
-                  </span>
-                  <span className="text-lg font-bold font-mono text-emerald-400 mt-0.5 block">
-                    {circuit.trackGeometry ? `${circuit.trackGeometry.longestStraightMeters}m` : '--'}
-                  </span>
-                  <span className="text-[9px] text-slate-500">全開区間</span>
+                <div className="text-center px-1">
+                  <span className="text-[10px] text-slate-400 block tracking-wider font-sans">🚀 最長直線</span>
+                  <div className="flex items-baseline justify-center gap-0.5 mt-0.5">
+                    <span className="text-sm sm:text-base font-bold text-emerald-400 tabular-nums">
+                      {circuit.trackGeometry ? circuit.trackGeometry.longestStraightMeters : '--'}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-sans">m</span>
+                  </div>
                 </div>
 
-                <div className="bg-slate-900/80 border border-white/10 p-3 rounded-xl text-center">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
-                    ⚡ 最大G負荷
-                  </span>
-                  <span className="text-lg font-bold font-mono text-purple-400 mt-0.5 block">
-                    {circuit.trackGeometry ? `${circuit.trackGeometry.gForceMax.lateral}G` : '--'}
-                  </span>
-                  <span className="text-[9px] text-slate-500">
-                    横G (減速 {circuit.trackGeometry?.gForceMax.longitudinal}G)
-                  </span>
+                <div className="text-center px-1">
+                  <span className="text-[10px] text-slate-400 block tracking-wider font-sans">⚡ 最大G負荷</span>
+                  <div className="flex items-baseline justify-center gap-0.5 mt-0.5">
+                    <span className="text-sm sm:text-base font-bold text-purple-400 tabular-nums">
+                      {circuit.trackGeometry ? `${circuit.trackGeometry.gForceMax.lateral}G` : '--'}
+                    </span>
+                    {circuit.trackGeometry && (
+                      <span className="text-[9px] text-slate-500 font-sans hidden md:inline ml-1">
+                        (減速 {circuit.trackGeometry.gForceMax.longitudinal}G)
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                <div className="bg-slate-900/80 border border-white/10 p-3 rounded-xl text-center col-span-2 sm:col-span-1">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">
-                    🔄 ターン / DRS
-                  </span>
-                  <span className="text-lg font-bold font-mono text-sky-400 mt-0.5 block">
-                    {circuit.turns}T / {circuit.drsZones}本
-                  </span>
-                  <span className="text-[9px] text-slate-500">DRSゾーン</span>
+                <div className="text-center px-1 col-span-2 sm:col-span-1">
+                  <span className="text-[10px] text-slate-400 block tracking-wider font-sans">🔄 コーナー / DRS</span>
+                  <div className="flex items-baseline justify-center gap-0.5 mt-0.5">
+                    <span className="text-sm sm:text-base font-bold text-sky-400 tabular-nums">
+                      {circuit.turns}T
+                    </span>
+                    <span className="text-slate-600 mx-1">/</span>
+                    <span className="text-sm sm:text-base font-bold text-sky-300 tabular-nums">
+                      {circuit.drsZones}区間
+                    </span>
+                  </div>
                 </div>
               </div>
 
