@@ -139,22 +139,22 @@ export default function PhotoGalleryCarousel({
             return (
               <div
                 key={idx}
-                className={`w-[85%] sm:w-[75%] md:w-[72%] h-44 sm:h-56 flex-shrink-0 snap-center rounded-2xl overflow-hidden bg-slate-950 border transition-all duration-300 relative shadow-lg ${
+                className={`w-[72%] sm:w-[50%] md:w-[38%] h-24 sm:h-28 flex-shrink-0 snap-center rounded-xl overflow-hidden bg-slate-950 border transition-all duration-300 relative shadow-md ${
                   isCurrent
                     ? 'ring-1'
                     : 'border-white/10 opacity-75 hover:opacity-95'
                 }`}
                 style={{
                   borderColor: isCurrent ? activeColor : 'rgba(255, 255, 255, 0.1)',
-                  boxShadow: isCurrent ? `0 0 15px ${activeColor}30` : undefined,
+                  boxShadow: isCurrent ? `0 0 12px ${activeColor}25` : undefined,
                 }}
               >
                 {/* Skeleton Loader */}
                 {!isLoaded && !isError && (
                   <div className="absolute inset-0 bg-slate-900 animate-pulse flex items-center justify-center">
-                    <div className="flex flex-col items-center gap-2 text-slate-600 text-xs font-mono">
+                    <div className="flex items-center gap-1.5 text-slate-600 text-[10px] font-mono">
                       <span>🖼️</span>
-                      <span>Loading photo...</span>
+                      <span>Loading...</span>
                     </div>
                   </div>
                 )}
@@ -174,20 +174,20 @@ export default function PhotoGalleryCarousel({
                     } group-hover:scale-105`}
                   />
                 ) : (
-                  <div className="w-full h-full bg-slate-900 flex flex-col items-center justify-center text-slate-500 text-xs font-mono p-4 text-center">
-                    <span className="text-2xl mb-1">📷</span>
+                  <div className="w-full h-full bg-slate-900 flex flex-col items-center justify-center text-slate-500 text-[10px] font-mono p-2 text-center">
+                    <span className="text-base mb-0.5">📷</span>
                     <span>写真の読み込みに失敗しました</span>
                   </div>
                 )}
 
                 {/* Dark Gradient Overlay for Readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent pointer-events-none" />
 
                 {/* Top Tag Badge */}
                 {item.tag && (
-                  <div className="absolute top-2.5 left-2.5">
+                  <div className="absolute top-1.5 left-1.5">
                     <span
-                      className="px-2.5 py-0.5 rounded-full text-[10px] font-racing font-bold tracking-wider uppercase backdrop-blur-md shadow-md border"
+                      className="px-1.5 py-0.5 rounded text-[8.5px] font-racing font-bold tracking-wider uppercase backdrop-blur-md shadow-sm border"
                       style={{
                         backgroundColor: 'rgba(15, 23, 42, 0.85)',
                         borderColor: activeColor,
@@ -200,19 +200,19 @@ export default function PhotoGalleryCarousel({
                 )}
 
                 {/* Bottom Metadata: Caption & Attribution */}
-                <div className="absolute bottom-0 inset-x-0 p-3 flex flex-col gap-1">
-                  <p className="text-xs sm:text-sm font-bold text-white leading-snug drop-shadow-md line-clamp-2">
+                <div className="absolute bottom-0 inset-x-0 p-2 flex flex-col gap-0.5">
+                  <p className="text-[11px] sm:text-xs font-bold text-white leading-tight drop-shadow-md truncate">
                     {item.caption}
                   </p>
-                  <div className="flex items-center justify-between text-[10px] text-slate-300 font-mono">
-                    <span className="truncate max-w-[200px] text-slate-400">
+                  <div className="flex items-center justify-between text-[8.5px] sm:text-[9px] text-slate-300 font-mono">
+                    <span className="truncate max-w-[140px] text-slate-400">
                       {item.license}
                     </span>
                     <a
                       href={item.sourceUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-sky-300 text-slate-300 flex items-center gap-1 transition-colors bg-black/50 px-1.5 py-0.5 rounded border border-white/10"
+                      className="hover:text-sky-300 text-slate-300 flex items-center gap-0.5 transition-colors bg-black/60 px-1 py-0.5 rounded border border-white/10"
                     >
                       <span>Photo: {item.credit}</span>
                       <span>↗</span>
@@ -225,15 +225,15 @@ export default function PhotoGalleryCarousel({
         </div>
 
         {/* Dot Indicators */}
-        <div className="flex items-center justify-center gap-1.5 pt-1.5">
+        <div className="flex items-center justify-center gap-1 pt-1">
           {items.map((_, idx) => (
             <button
               key={idx}
               onClick={() => scrollToSlide(idx)}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
+              className={`h-1 rounded-full transition-all duration-300 ${
                 activeIndex === idx
-                  ? 'w-6'
-                  : 'w-1.5 bg-slate-700 hover:bg-slate-500'
+                  ? 'w-5'
+                  : 'w-1 bg-slate-700 hover:bg-slate-500'
               }`}
               style={{
                 backgroundColor: activeIndex === idx ? activeColor : undefined,

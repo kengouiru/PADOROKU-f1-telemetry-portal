@@ -707,37 +707,42 @@ export default function CircuitDetailModal({
                   <span>🛞</span>
                   <span>戦略指標 & タイヤ力学</span>
                 </h4>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="bg-slate-900/80 p-3 rounded-xl text-center border border-white/5">
-                    <span className="text-[10px] text-slate-400 font-mono block">タイヤ負荷</span>
-                    <strong className="text-base text-amber-400 font-mono mt-0.5 block">
-                      {circuit.tyreStress}
-                    </strong>
-                    <span className="text-[9px] text-slate-500">デグラデーション注意</span>
+                <div className="bg-slate-900/80 border border-white/5 rounded-xl py-2 px-3 sm:px-4 shadow-sm grid grid-cols-2 sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-white/10 font-mono gap-y-2 sm:gap-y-0">
+                  <div className="text-center px-1">
+                    <span className="text-[10px] text-slate-400 block font-sans">🛞 タイヤ負荷</span>
+                    <div className="flex items-baseline justify-center gap-0.5 mt-0.5">
+                      <strong className="text-sm sm:text-base text-amber-400 tabular-nums">
+                        {circuit.tyreStress}
+                      </strong>
+                    </div>
                   </div>
 
-                  <div className="bg-slate-900/80 p-3 rounded-xl text-center border border-white/5">
-                    <span className="text-[10px] text-slate-400 font-mono block">標準ピットロス</span>
-                    <strong className="text-base text-white font-mono mt-0.5 block">
-                      約{circuit.typicalPitLossSec}秒
-                    </strong>
-                    <span className="text-[9px] text-slate-500">ストップ＆GO損失</span>
+                  <div className="text-center px-1">
+                    <span className="text-[10px] text-slate-400 block font-sans">⏱️ 標準ピットロス</span>
+                    <div className="flex items-baseline justify-center gap-0.5 mt-0.5">
+                      <strong className="text-sm sm:text-base text-white tabular-nums">
+                        約{circuit.typicalPitLossSec}
+                      </strong>
+                      <span className="text-[10px] text-slate-500 font-sans">秒</span>
+                    </div>
                   </div>
 
-                  <div className="bg-slate-900/80 p-3 rounded-xl text-center border border-white/5">
-                    <span className="text-[10px] text-slate-400 font-mono block">アンダーカット感度</span>
-                    <strong className="text-base text-sky-400 font-mono mt-0.5 block">
-                      {circuit.undercutImpact ? circuit.undercutImpact.split('（')[0] : '有効'}
-                    </strong>
-                    <span className="text-[9px] text-slate-500">新タイヤゲイン</span>
+                  <div className="text-center px-1">
+                    <span className="text-[10px] text-slate-400 block font-sans">⚡ アンダーカット感度</span>
+                    <div className="flex items-baseline justify-center gap-0.5 mt-0.5">
+                      <strong className="text-sm sm:text-base text-sky-400 truncate">
+                        {circuit.undercutImpact ? circuit.undercutImpact.split('（')[0] : '有効'}
+                      </strong>
+                    </div>
                   </div>
 
-                  <div className="bg-slate-900/80 p-3 rounded-xl text-center border border-white/5">
-                    <span className="text-[10px] text-slate-400 font-mono block">セーフティカー確率</span>
-                    <strong className="text-base text-red-400 font-mono mt-0.5 block">
-                      {circuit.safetyCarProbability ? circuit.safetyCarProbability.split(' ')[0] : '50%'}
-                    </strong>
-                    <span className="text-[9px] text-slate-500">荒れる展開の警戒度</span>
+                  <div className="text-center px-1">
+                    <span className="text-[10px] text-slate-400 block font-sans">⚠️ セーフティカー確率</span>
+                    <div className="flex items-baseline justify-center gap-0.5 mt-0.5">
+                      <strong className="text-sm sm:text-base text-red-400 tabular-nums">
+                        {circuit.safetyCarProbability ? circuit.safetyCarProbability.split(' ')[0] : '50%'}
+                      </strong>
+                    </div>
                   </div>
                 </div>
 

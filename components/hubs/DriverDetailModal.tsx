@@ -135,6 +135,24 @@ export default function DriverDetailModal({
     );
   };
 
+  // Helper for structured multi-chapter encyclopedic paragraphs
+  const renderParagraphsWithCitations = (text: string) => {
+    if (!text) return null;
+    const paragraphs = text.split('\n\n').map((p) => p.trim()).filter(Boolean);
+    if (paragraphs.length <= 1) {
+      return renderTextWithCitations(text);
+    }
+    return (
+      <div className="space-y-2.5">
+        {paragraphs.map((p, idx) => (
+          <p key={idx} className="leading-relaxed">
+            {renderTextWithCitations(p)}
+          </p>
+        ))}
+      </div>
+    );
+  };
+
   const getInstagramHandle = (url?: string) => {
     if (!url) return null;
     const match = url.match(/instagram\.com\/([^/?#]+)/);
@@ -495,39 +513,37 @@ export default function DriverDetailModal({
           {/* TAB 1: OVERVIEW & CAREER STATS */}
           {activeTab === 'overview' && (
             <div className="space-y-5 animate-fade-in">
-              {/* Photo Gallery Carousel (3-5 Photos with Sneak Peek) */}
-              {(driver.visualGallery && driver.visualGallery.length > 0) ? (
-                <PhotoGalleryCarousel
-                  items={driver.visualGallery}
-                  title="📸 DRIVER PHOTO & ACTION GALLERY / ギャラリー"
-                  themeColor={themeColor}
-                />
-              ) : driver.visualAsset ? (
-                <PhotoGalleryCarousel
-                  items={[
-                    {
-                      imageUrl: driver.visualAsset.imageUrl,
-                      caption: driver.visualAsset.caption,
-                      tag: 'Portrait',
-                      credit: driver.visualAsset.credit,
-                      license: driver.visualAsset.license,
-                      sourceUrl: driver.visualAsset.sourceUrl,
-                    },
-                  ]}
-                  title="📸 DRIVER PHOTO / ポートレート"
-                  themeColor={themeColor}
-                />
-              ) : null}
+              {/* Photo Gallery Carousel (Filtered for relevant driver action/paddock photos only) */}
+              {(() => {
+                const cleanGallery = (driver.visualGallery || []).filter((item) => {
+                  // Exclude exact duplicate of header portrait
+                  if (driver.visualAsset?.imageUrl && item.imageUrl === driver.visualAsset.imageUrl) return false;
+                  // Exclude generic factory buildings or circuit grandstands erroneously placed in driver profile
+                  if (item.tag === 'Factory' || item.tag === 'Circuit') return false;
+                  if (item.imageUrl.includes('factory') || item.imageUrl.includes('circuit_')) return false;
+                  return true;
+                });
+
+                if (cleanGallery.length === 0) return null;
+
+                return (
+                  <PhotoGalleryCarousel
+                    items={cleanGallery}
+                    title="📸 DRIVER PHOTO & ACTION GALLERY / ギャラリー"
+                    themeColor={themeColor}
+                  />
+                );
+              })()}
 
               {/* Detailed Career Biography Narrative */}
-              <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-2">
+              <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-2.5">
                 <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
                   <span>📜</span>
                   <span>キャリア総括 ＆ レース人生の軌跡</span>
                 </h4>
-                <p className="text-xs text-slate-200 leading-relaxed">
-                  {renderTextWithCitations(driver.careerSummary)}
-                </p>
+                <div className="text-xs text-slate-200 leading-relaxed">
+                  {renderParagraphsWithCitations(driver.careerSummary)}
+                </div>
               </div>
 
 
@@ -822,9 +838,9 @@ export default function DriverDetailModal({
                 <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider">
                   🏁 操縦特性サマリー
                 </h4>
-                <p className="text-xs text-slate-200 leading-relaxed">
-                  <SmartWikiText text={driver.drivingStyle.summary} excludeUrl={`/knowledge/drivers/${driver.code}`} />
-                </p>
+                <div className="text-xs text-slate-200 leading-relaxed">
+                  {renderParagraphsWithCitations(driver.drivingStyle.summary)}
+                </div>
               </div>
 
               {/* Key Traits Badges */}
@@ -881,9 +897,9 @@ export default function DriverDetailModal({
                   <span>📈</span>
                   <span>テレメトリー工学解析・ステアリング＆ペダル波形特性</span>
                 </h4>
-                <p className="text-xs text-slate-200 leading-relaxed font-mono text-[11px]">
-                  <SmartWikiText text={driver.drivingStyle.telemetrySignature} excludeUrl={`/knowledge/drivers/${driver.code}`} />
-                </p>
+                <div className="text-xs text-slate-200 leading-relaxed font-mono text-[11px]">
+                  {renderParagraphsWithCitations(driver.drivingStyle.telemetrySignature)}
+                </div>
 
                 {onNavigateToTelemetry && (
                   <button
@@ -925,9 +941,9 @@ export default function DriverDetailModal({
                     <span>🛑</span>
                     <span>進入制動・ブレーキング技術</span>
                   </span>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    {renderTextWithCitations(driver.drivingStyle.brakingTechnique)}
-                  </p>
+                  <div className="text-xs text-slate-300 leading-relaxed">
+                    {renderParagraphsWithCitations(driver.drivingStyle.brakingTechnique)}
+                  </div>
                 </div>
 
                 <div className="bg-slate-950/60 border border-white/5 p-4 rounded-2xl space-y-1.5">
@@ -935,9 +951,9 @@ export default function DriverDetailModal({
                     <span>🛞</span>
                     <span>タイヤライフ・熱管理</span>
                   </span>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    {renderTextWithCitations(driver.drivingStyle.tyreManagement)}
-                  </p>
+                  <div className="text-xs text-slate-300 leading-relaxed">
+                    {renderParagraphsWithCitations(driver.drivingStyle.tyreManagement)}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1210,7 +1226,7 @@ export default function DriverDetailModal({
                   <span>人物像・レースでの振る舞い</span>
                 </h4>
                 <div className="text-xs text-slate-200 leading-relaxed">
-                  {renderTextWithCitations(driver.biography.personality)}
+                  {renderParagraphsWithCitations(driver.biography.personality)}
                 </div>
               </div>
 
@@ -1221,7 +1237,7 @@ export default function DriverDetailModal({
                   <span>ライバル関係史・パドックの人間模様</span>
                 </h4>
                 <div className="text-xs text-slate-200 leading-relaxed">
-                  {renderTextWithCitations(driver.biography.rivalries)}
+                  {renderParagraphsWithCitations(driver.biography.rivalries)}
                 </div>
               </div>
 
@@ -1247,11 +1263,11 @@ export default function DriverDetailModal({
                           </span>
                         </div>
                         <div className="text-xs text-slate-300 leading-relaxed font-sans">
-                          {renderTextWithCitations(race.description)}
+                          {renderParagraphsWithCitations(race.description)}
                         </div>
                         <div className="bg-slate-950/70 border border-white/5 p-2.5 rounded-xl text-[11px] text-slate-300 flex items-start gap-1.5 font-sans">
                           <span className="text-amber-400 font-bold shrink-0">⚡ 戦術的決定打:</span>
-                          <span className="text-slate-300">{renderTextWithCitations(race.tacticalMasterclass)}</span>
+                          <span className="text-slate-300">{renderParagraphsWithCitations(race.tacticalMasterclass)}</span>
                         </div>
                       </div>
                     ))}
