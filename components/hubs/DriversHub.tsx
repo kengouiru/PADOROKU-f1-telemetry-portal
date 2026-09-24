@@ -57,6 +57,39 @@ const HISTORICAL_TEAM_ID_MAP: Record<string, string[]> = {
   cadillac: ['cadillac'],
 };
 
+export const DRIVER_PORTRAITS: Record<string, string> = {
+  VER: '/images/drivers/portraits/max-verstappen.jpg',
+  HAM: '/images/drivers/portraits/lewis-hamilton.jpg',
+  RUS: '/images/drivers/portraits/george-russell.jpg',
+  LEC: '/images/drivers/portraits/charles-leclerc.jpg',
+  NOR: '/images/drivers/portraits/lando-norris.jpg',
+  PIA: '/images/drivers/portraits/oscar-piastri.jpg',
+  ALO: '/images/drivers/portraits/fernando-alonso.jpg',
+  SAI: '/images/drivers/portraits/carlos-sainz.jpg',
+  TSU: '/images/drivers/portraits/yuki-tsunoda.jpg',
+  ALB: '/images/drivers/portraits/alexander-albon.jpg',
+  GAS: '/images/drivers/portraits/pierre-gasly.jpg',
+  OCO: '/images/drivers/portraits/esteban-ocon.jpg',
+  HUL: '/images/drivers/portraits/nico-hulkenberg.jpg',
+  BOT: '/images/drivers/portraits/valtteri-bottas.jpg',
+  PER: '/images/drivers/portraits/sergio-perez.jpg',
+  LAW: '/images/drivers/portraits/liam-lawson.jpg',
+  ANT: '/images/drivers/portraits/andrea-kimi-antonelli.jpg',
+  HAD: '/images/drivers/portraits/isack-hadjar.jpg',
+  BOR: '/images/drivers/portraits/gabriel-bortoleto.jpg',
+  BEA: '/images/drivers/portraits/oliver-bearman.jpg',
+  DOO: '/images/drivers/portraits/jack-doohan.jpg',
+  COL: '/images/drivers/portraits/franco-colapinto.jpg',
+  STR: '/images/drivers/portraits/lance-stroll.jpg',
+  MAG: '/images/drivers/portraits/kevin-magnussen.jpg',
+  ZHO: '/images/drivers/portraits/zhou-guanyu.jpg',
+  RIC: '/images/drivers/portraits/daniel-ricciardo.jpg',
+  SEN: '/images/drivers/portraits/ayrton-senna.jpg',
+  MSC: '/images/drivers/portraits/michael-schumacher.jpg',
+  PRO: '/images/drivers/portraits/alain-prost.jpg',
+  LAU: '/images/drivers/portraits/niki-lauda.jpg',
+};
+
 export default function DriversHub({
   searchQuery = '',
   onClearSearch,
@@ -126,6 +159,13 @@ export default function DriversHub({
       f1Debut: `${selectedYear}年`,
       driverType: drv.role === 'Reserve' ? 'リザーブ＆シミュレータ開発' : 'レギュラードライバー',
       numberOrigin: drv.number ? `カーナンバー #${drv.number}` : 'ゼッケン未定',
+      visualAsset: {
+        imageUrl: DRIVER_PORTRAITS[drv.code] || `/images/drivers/portraits/${drv.name.toLowerCase().replace(/\s+/g, '-')}.jpg`,
+        caption: `${drv.name} (${team.teamName})`,
+        credit: 'Formula 1 Paddock Archive / CC-BY-SA',
+        license: 'CC BY-SA 4.0',
+        sourceUrl: 'https://www.formula1.com',
+      },
       careerSummary: drv.note
         ? `${selectedYear}年のF1世界選手権において、${team.fullName}より${drv.role === 'Reserve' ? '公式リザーブドライバー' : 'レギュラードライバー'}としてエントリー [1]。「${drv.note}」の記録を残す [2]。`
         : `${selectedYear}年のF1世界選手権において、${team.fullName}より${drv.role === 'Reserve' ? '公式リザーブドライバー' : 'レギュラードライバー'}として参戦 [1]。`,
@@ -312,125 +352,108 @@ export default function DriversHub({
 
   // Reusable Single Driver Card Component
   const renderDriverCard = (driver: DriverProfile) => {
+    const portraitUrl = DRIVER_PORTRAITS[driver.code] || driver.visualAsset?.imageUrl;
+    const isLegend = driver.status === 'Legend';
+    const accentColor = isLegend ? '#D4AF37' : driver.teamColor;
+
     return (
       <div
         key={driver.id}
         onClick={() => setSelectedDriverDetail(driver)}
-        className="glass-card-premium p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 border-l-4 cursor-pointer hover:border-sky-400 hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 shadow-md group relative overflow-hidden rounded-xl h-full"
-        style={{ borderLeftColor: driver.teamColor }}
+        className="bg-slate-900/90 hover:bg-slate-850 p-3 sm:p-3.5 flex flex-col justify-between gap-3 border border-white/10 hover:border-slate-400/50 cursor-pointer shadow-lg hover:shadow-xl transition-all duration-200 group relative overflow-hidden rounded-2xl h-full"
+        style={{ borderLeftColor: accentColor, borderLeftWidth: '4px' }}
       >
-        <div className="space-y-2">
-          {/* Card Top: Number, Code, Country, Title Badge */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span
-                className="text-xs font-racing font-black px-2.5 py-0.5 rounded-md border f1-badge-chamfer shadow-sm"
-                style={{
-                  color: driver.teamColor,
-                  borderColor: `${driver.teamColor}60`,
-                  backgroundColor: `${driver.teamColor}15`,
-                }}
-              >
-                #{driver.number} {driver.code}
+        {/* Card Top: Number, Code, Country, Title Badge */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span
+              className="text-xs font-racing font-black px-2 py-0.5 rounded-md border shadow-sm shrink-0"
+              style={{
+                color: accentColor,
+                borderColor: `${accentColor}60`,
+                backgroundColor: `${accentColor}18`,
+              }}
+            >
+              #{driver.number} {driver.code}
+            </span>
+            <span className="text-xs text-slate-400 font-mono truncate">{driver.country}</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            {isLegend ? (
+              <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono flex items-center gap-1 shadow-sm">
+                <span>👑</span>
+                <span>{driver.championships}冠</span>
               </span>
-              <span className="text-xs text-slate-400 font-mono">{driver.country}</span>
-            </div>
+            ) : driver.championships > 0 ? (
+              <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono flex items-center gap-1">
+                <span>🏆</span>
+                <span>{driver.championships}冠</span>
+              </span>
+            ) : null}
 
-            <div className="flex items-center gap-1.5">
-              {driver.status === 'Legend' ? (
-                <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono flex items-center gap-1 shadow-sm">
-                  <span>👑</span>
-                  <span>殿堂入り ({driver.championships}冠)</span>
-                </span>
-              ) : driver.championships > 0 ? (
-                <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono flex items-center gap-1">
-                  <span>🏆</span>
-                  <span>{driver.championships}冠</span>
-                </span>
-              ) : null}
-
-              {/* Star Favorite Bookmark Button */}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleDriver(driver.code);
-                }}
-                className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all cursor-pointer ${
-                  isFavoriteDriver(driver.code)
-                    ? 'bg-amber-400/20 border-amber-400/60 text-amber-300 hover:bg-amber-400/30 shadow-sm'
-                    : 'bg-slate-900/60 border-white/10 text-slate-500 hover:text-amber-300 hover:border-amber-400/40'
-                }`}
-                title={isFavoriteDriver(driver.code) ? '推しから外す' : '推し選手 (お気に入り) に登録'}
-              >
-                <span className="text-xs">{isFavoriteDriver(driver.code) ? '★' : '☆'}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Driver Name, Team & Portrait Photo */}
-          <div className="flex items-center justify-between gap-2.5">
-            <div className="min-w-0 flex-1">
-              <h3 className="text-sm sm:text-base font-bold text-white leading-tight group-hover:text-sky-300 transition-colors flex items-center gap-1.5">
-                <span className="truncate">{driver.fullName}</span>
-                {driver.status === 'Legend' && <span className="text-amber-400 text-xs">👑</span>}
-              </h3>
-              <p className="text-xs text-slate-400 mt-0.5 truncate">{driver.team}</p>
-            </div>
-            {driver.visualAsset?.imageUrl && (
-              <div className="w-10 h-10 rounded-lg overflow-hidden border border-white/10 shrink-0 bg-slate-800 shadow-md group-hover:border-sky-400/50 transition-colors">
-                <img
-                  src={driver.visualAsset.imageUrl}
-                  alt={driver.fullName}
-                  className="w-full h-full object-cover object-top"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Driver Type Tag */}
-          <div className="bg-slate-950/60 px-2.5 py-1 rounded-lg border border-white/5 text-[11px] text-sky-200/90 truncate">
-            🏷️ {driver.driverType}
-          </div>
-        </div>
-
-        {/* Card Bottom: Standardized Stats Grid (Fixed 3-Column Uniform Width & Height) */}
-        <div className="space-y-2 pt-1 border-t border-white/5">
-          <div className="grid grid-cols-3 gap-1 py-1 px-1.5 rounded-lg bg-slate-950/70 border border-white/5 text-center text-[10px] font-mono whitespace-nowrap">
-            <div className="flex items-center justify-center gap-1">
-              <span className="text-slate-500">勝</span>
-              <strong className="text-amber-400 font-bold tabular-nums">{driver.wins}</strong>
-            </div>
-            <div className="flex items-center justify-center gap-1 border-x border-white/10">
-              <span className="text-slate-500">登壇</span>
-              <strong className="text-sky-400 font-bold tabular-nums">{driver.podiums}</strong>
-            </div>
-            <div className="flex items-center justify-center gap-1">
-              <span className="text-slate-500">PP</span>
-              <strong className="text-purple-400 font-bold tabular-nums">{driver.polePositions}</strong>
-            </div>
-          </div>
-
-          {/* Action Row: Unified Height & No-Wrap Buttons */}
-          <div className="flex items-center justify-between text-xs">
+            {/* Star Favorite Bookmark Button */}
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                setCompareDriver1(driver.code);
-                setViewMode('compare');
+                toggleDriver(driver.code);
               }}
-              className="h-6 px-2.5 rounded-md text-[10px] font-racing font-bold text-purple-300 hover:text-white bg-purple-950/50 hover:bg-purple-900/70 border border-purple-500/40 transition-all shadow-sm flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer"
-              title="この選手を直接比較ツールに送る"
+              className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all cursor-pointer ${
+                isFavoriteDriver(driver.code)
+                  ? 'bg-amber-400/20 border-amber-400/60 text-amber-300 hover:bg-amber-400/30 shadow-sm'
+                  : 'bg-slate-900/60 border-white/10 text-slate-500 hover:text-amber-300 hover:border-amber-400/40'
+              }`}
+              title={isFavoriteDriver(driver.code) ? '推しから外す' : '推し選手 (お気に入り) に登録'}
             >
-              <span>⚔️ 比較</span>
+              <span className="text-xs">{isFavoriteDriver(driver.code) ? '★' : '☆'}</span>
             </button>
-            <span className="text-sky-400 group-hover:translate-x-0.5 transition-transform font-bold text-xs flex items-center gap-0.5 whitespace-nowrap shrink-0">
-              <span>詳細</span>
-              <span>➔</span>
-            </span>
+          </div>
+        </div>
+
+        {/* Driver Name, Team & Portrait Photo */}
+        <div className="flex items-center gap-3">
+          <div className="relative w-14 h-18 sm:w-16 sm:h-20 rounded-xl overflow-hidden shrink-0 bg-slate-800 border border-white/10 group-hover:border-white/25 transition-colors">
+            {portraitUrl ? (
+              <img
+                src={portraitUrl}
+                alt={driver.fullName}
+                className="w-full h-full object-cover object-top filter brightness-95 group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center font-racing font-bold text-slate-500 text-xs">
+                #{driver.number}
+              </div>
+            )}
+          </div>
+
+          <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+            <h3 className="text-sm sm:text-base font-bold text-white leading-snug group-hover:text-sky-300 transition-colors break-words">
+              {driver.fullName}
+            </h3>
+            <p className="text-xs text-slate-400 font-medium">
+              {driver.team}
+            </p>
+            <div className="text-[10.5px] text-slate-400 font-mono line-clamp-1">
+              🏷️ {driver.driverType}
+            </div>
+          </div>
+        </div>
+
+        {/* Card Bottom: Standardized Stats Grid */}
+        <div className="grid grid-cols-3 gap-1 py-1.5 px-2 rounded-xl bg-slate-950/70 border border-white/5 text-center text-[10px] font-mono whitespace-nowrap">
+          <div className="flex items-center justify-center gap-1">
+            <span className="text-slate-500">勝</span>
+            <strong className="text-amber-400 font-bold tabular-nums">{driver.wins}</strong>
+          </div>
+          <div className="flex items-center justify-center gap-1 border-x border-white/10">
+            <span className="text-slate-500">登壇</span>
+            <strong className="text-sky-400 font-bold tabular-nums">{driver.podiums}</strong>
+          </div>
+          <div className="flex items-center justify-center gap-1">
+            <span className="text-slate-500">PP</span>
+            <strong className="text-purple-400 font-bold tabular-nums">{driver.polePositions}</strong>
           </div>
         </div>
       </div>
@@ -496,7 +519,7 @@ export default function DriversHub({
               onClick={() => setViewMode('seasonGrid')}
               className={`px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === 'seasonGrid' || viewMode === 'grid2026' || viewMode === 'grid2025'
-                  ? 'bg-red-600 text-white shadow-md shadow-red-500/30 ring-1 ring-red-400/50'
+                  ? 'bg-red-600 text-white shadow-md shadow-red-950/50 border border-red-500/40'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
               }`}
             >
@@ -511,7 +534,7 @@ export default function DriversHub({
               onClick={() => setViewMode('grouped')}
               className={`px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === 'grouped'
-                  ? 'bg-blue-600 text-white shadow-md shadow-blue-500/30 ring-1 ring-blue-400/50'
+                  ? 'bg-red-600 text-white shadow-md shadow-red-950/50 border border-red-500/40'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
               }`}
             >
@@ -523,7 +546,7 @@ export default function DriversHub({
               onClick={() => setViewMode('flat')}
               className={`px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === 'flat'
-                  ? 'bg-sky-600 text-white shadow-md shadow-sky-500/30 ring-1 ring-sky-400/50'
+                  ? 'bg-red-600 text-white shadow-md shadow-red-950/50 border border-red-500/40'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
               }`}
             >
@@ -535,7 +558,7 @@ export default function DriversHub({
               onClick={() => setViewMode('legends')}
               className={`px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === 'legends'
-                  ? 'bg-amber-600 text-white shadow-md shadow-amber-500/30 ring-1 ring-amber-400/50'
+                  ? 'bg-red-600 text-white shadow-md shadow-red-950/50 border border-red-500/40'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
               }`}
             >
@@ -547,7 +570,7 @@ export default function DriversHub({
               onClick={() => setViewMode('compare')}
               className={`px-2.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === 'compare'
-                  ? 'bg-purple-600 text-white shadow-md shadow-purple-500/30 ring-1 ring-purple-400/50'
+                  ? 'bg-red-600 text-white shadow-md shadow-red-950/50 border border-red-500/40'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'
               }`}
             >
@@ -1039,18 +1062,18 @@ export default function DriversHub({
           </div>
 
           {/* Teams Grid for the Selected Year */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 sm:gap-5 items-stretch">
             {currentSeasonGrid.teams.map((team) => (
               <div
                 key={team.teamId}
-                className="glass-card rounded-2xl p-3.5 sm:p-4 border shadow-lg transition-all flex flex-col justify-between gap-3"
-                style={{ borderLeftColor: team.teamColor, borderLeftWidth: '5px' }}
+                className="bg-slate-900/90 border border-white/10 rounded-2xl p-4 shadow-xl transition-all flex flex-col justify-between gap-3.5"
+                style={{ borderLeftColor: team.teamColor, borderLeftWidth: '4px' }}
               >
                 {/* Team Info Bar Header */}
-                <div className="flex flex-wrap items-center justify-between gap-2 pb-2 mb-1 border-b border-white/10">
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-white/10">
                   <div className="flex items-center gap-2 min-w-0">
                     <span
-                      className="w-2.5 h-4 rounded-full shrink-0 shadow-sm"
+                      className="w-2.5 h-4.5 rounded-full shrink-0 shadow-sm"
                       style={{ backgroundColor: team.teamColor }}
                     />
                     {team.finalRank && (
@@ -1064,23 +1087,23 @@ export default function DriversHub({
                       className="group/team flex items-center gap-1.5 hover:text-sky-300 transition-colors cursor-pointer text-left min-w-0"
                       title={`${team.teamName} のチーム詳細・スペック・系譜を見る`}
                     >
-                      <h3 className="text-sm sm:text-base font-racing font-bold text-white group-hover/team:text-sky-300 leading-tight truncate">
+                      <h3 className="text-sm sm:text-base font-racing font-bold text-white group-hover/team:text-sky-300 leading-tight">
                         {team.teamName}
                       </h3>
                       <span className="text-xs text-sky-400 opacity-60 group-hover/team:opacity-100 group-hover/team:translate-x-0.5 transition-all">➔</span>
                     </button>
-                    <span className="text-[11px] text-slate-400 truncate hidden sm:inline">
+                    <span className="text-[11px] text-slate-400 hidden xl:inline truncate max-w-[180px]">
                       {team.fullName}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 text-xs font-mono shrink-0">
+                  <div className="flex items-center gap-2 text-xs font-mono shrink-0">
                     {team.teamPrincipal && (
-                      <span className="bg-slate-900/90 border border-white/5 px-2 py-0.5 rounded-md text-slate-400 text-[10px] hidden md:inline">
+                      <span className="bg-slate-950/80 border border-white/5 px-2 py-0.5 rounded-md text-slate-400 text-[10px] hidden md:inline">
                         👔 {team.teamPrincipal}
                       </span>
                     )}
-                    <span className="bg-slate-900/90 border border-white/5 px-2 py-0.5 rounded-lg text-slate-300 text-[10px] whitespace-nowrap">
+                    <span className="bg-slate-950/80 border border-white/5 px-2 py-0.5 rounded-lg text-slate-300 text-[10px] whitespace-nowrap">
                       ⚡ <strong className="text-sky-300">{team.powerUnit}</strong>
                     </span>
                     {team.points !== undefined && (
@@ -1091,128 +1114,101 @@ export default function DriversHub({
                   </div>
                 </div>
 
-                {/* Regular Drivers Columns (2 Primary Seats) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {/* Regular Drivers Columns (2 Primary Seats with authentic portrait photos, full names, no button clutter) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {team.drivers.map((drv) => {
                     const profile = driverMap.get(drv.code);
+                    const portraitUrl = DRIVER_PORTRAITS[drv.code] || profile?.visualAsset?.imageUrl;
                     return (
                       <div
                         key={drv.code}
                         onClick={() => handleHistoricalDriverClick(drv, team)}
-                        className="bg-slate-900/80 hover:bg-slate-850 p-3 rounded-xl border border-white/5 hover:border-white/20 transition-all flex flex-col justify-between gap-2 shadow-sm group h-full cursor-pointer"
+                        className="group relative bg-slate-950/70 hover:bg-slate-850 p-2.5 sm:p-3 rounded-xl border border-white/10 hover:border-slate-400/40 transition-all duration-200 cursor-pointer flex items-center gap-3 shadow-sm hover:shadow-md"
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <span
-                              className="text-xs font-racing font-black px-2 py-0.5 rounded-lg border shrink-0"
-                              style={{
-                                color: team.teamColor,
-                                borderColor: `${team.teamColor}60`,
-                                backgroundColor: `${team.teamColor}15`,
-                              }}
-                            >
-                              {drv.number ? `#${drv.number}` : ''} {drv.code}
-                            </span>
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-sm font-bold text-white truncate">{drv.name}</span>
-                                <span className="text-xs shrink-0">{drv.flag}</span>
-                              </div>
-                              <span className="text-[11px] text-slate-400 font-mono truncate">{drv.country}</span>
+                        {/* Driver Portrait Photo with Number Badge */}
+                        <div className="relative w-14 h-18 sm:w-16 sm:h-20 rounded-lg overflow-hidden shrink-0 bg-slate-800 border border-white/10 group-hover:border-white/25 transition-colors">
+                          {portraitUrl ? (
+                            <img
+                              src={portraitUrl}
+                              alt={drv.name}
+                              className="w-full h-full object-cover object-top filter brightness-95 group-hover:scale-105 transition-transform duration-300"
+                              loading="lazy"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center font-racing font-bold text-slate-500 text-xs">
+                              #{drv.number}
                             </div>
-                          </div>
-
-                          {/* Rookie / Transfer / Special Badges */}
-                          <div className="flex items-center gap-1">
-                            {drv.isTransfer && (
-                              <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold font-mono">
-                                ⚡ 移籍
-                              </span>
-                            )}
-                            {drv.isRookie && (
-                              <span className="px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/40 text-[10px] font-bold font-mono">
-                                🌟 ルーキー
-                              </span>
-                            )}
-                            {drv.code === 'TSU' && (
-                              <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/40 text-[10px] font-bold font-mono">
-                                🇯🇵 日本
-                              </span>
-                            )}
+                          )}
+                          <div
+                            className="absolute bottom-0 inset-x-0 py-0.5 text-center text-[10px] font-racing font-black bg-black/85 backdrop-blur-sm border-t border-white/10"
+                            style={{ color: team.teamColor }}
+                          >
+                            #{drv.number || drv.code}
                           </div>
                         </div>
 
-                        {/* Note Highlight */}
-                        {drv.note && (
-                          <div className="p-2 rounded-lg bg-white/[0.03] border border-white/5 text-[11px] text-slate-300 leading-relaxed">
-                            <span>💡 </span>
-                            <span className="text-slate-200">{drv.note}</span>
+                        {/* Driver Identity */}
+                        <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+                          <div className="flex items-center gap-1.5 text-xs">
+                            <span className="text-xs shrink-0">{drv.flag}</span>
+                            <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">{drv.country}</span>
+                            <span className="text-[10px] font-mono font-bold text-slate-500 ml-auto shrink-0">{drv.code}</span>
                           </div>
-                        )}
 
-                        {/* Actions Row */}
-                        <div className="flex items-center justify-between pt-1 border-t border-white/5 text-xs">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setCompareDriver1(drv.code);
-                              setViewMode('compare');
-                            }}
-                            className="h-6 px-2.5 rounded-md text-[10px] font-racing font-bold text-purple-300 hover:text-white bg-purple-950/50 hover:bg-purple-900/70 border border-purple-500/40 transition-all shadow-sm flex items-center gap-1 whitespace-nowrap shrink-0 cursor-pointer"
-                            title="この選手を直接比較ツールに送る"
-                          >
-                            <span>⚔️ 比較</span>
-                          </button>
+                          {/* Full Name - Break Words, Never Truncate */}
+                          <h4 className="text-sm sm:text-base font-bold text-white group-hover:text-sky-300 transition-colors leading-snug break-words">
+                            {drv.name}
+                          </h4>
 
-                          <span className="text-sky-400 group-hover:translate-x-0.5 transition-transform text-xs font-bold flex items-center gap-0.5 whitespace-nowrap shrink-0">
-                            <span>詳細</span>
-                            <span>➔</span>
-                          </span>
+                          {/* Badges & Clean Status Note */}
+                          <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                            {drv.isTransfer && (
+                              <span className="px-1.5 py-0.2 rounded text-[9.5px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                                移籍
+                              </span>
+                            )}
+                            {drv.isRookie && (
+                              <span className="px-1.5 py-0.2 rounded text-[9.5px] font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40">
+                                ルーキー
+                              </span>
+                            )}
+                            {profile && profile.championships > 0 && (
+                              <span className="px-1.5 py-0.2 rounded text-[9.5px] font-mono font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                                🏆 {profile.championships}冠
+                              </span>
+                            )}
+                            {drv.note && (
+                              <span className="text-[10.5px] text-slate-400 line-clamp-1" title={drv.note}>
+                                {drv.note}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     );
                   })}
                 </div>
 
-                {/* Reserve & Test Drivers Section (控え選手・テストドライバー) */}
+                {/* Reserve & Test Drivers Section (Clean Horizontal Strip with Full Names) */}
                 {team.reserves && team.reserves.length > 0 && (
-                  <div className="mt-2 pt-2.5 border-t border-white/10 bg-slate-950/50 rounded-xl p-2.5">
-                    <div className="flex items-center gap-1.5 mb-2 text-[11px] font-racing font-bold text-amber-300/90">
+                  <div className="pt-2.5 border-t border-white/10 flex flex-wrap items-center gap-2 text-xs">
+                    <span className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
                       <span>🛡️</span>
-                      <span>公式リザーブ ＆ テスト開発ドライバー ({team.reserves.length}名)</span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <span>リザーブ ＆ テスト:</span>
+                    </span>
+                    <div className="flex flex-wrap items-center gap-1.5">
                       {team.reserves.map((res) => (
-                        <div
+                        <button
                           key={res.code}
+                          type="button"
                           onClick={() => handleHistoricalDriverClick(res, team)}
-                          className="bg-slate-900/90 hover:bg-slate-800 border border-white/10 hover:border-amber-400/50 p-2 rounded-lg flex items-center justify-between gap-2 transition-all cursor-pointer group shadow-sm"
+                          className="px-2.5 py-1 rounded-lg bg-slate-950/80 hover:bg-slate-800 border border-white/10 hover:border-slate-500 text-slate-300 hover:text-white text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+                          title={`${res.name} の選手詳細を見る`}
                         >
-                          <div className="flex items-center gap-2 min-w-0">
-                            <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 shrink-0">
-                              {res.role === 'Reserve' ? '🛡️ リザーブ' : '🔬 テスト'}
-                            </span>
-                            <div className="min-w-0">
-                              <div className="flex items-center gap-1">
-                                <span className="text-xs font-bold text-slate-200 group-hover:text-amber-200 truncate">
-                                  {res.name}
-                                </span>
-                                <span className="text-[11px] shrink-0">{res.flag}</span>
-                              </div>
-                              {res.note && (
-                                <p className="text-[10px] text-slate-400 truncate max-w-[200px]">
-                                  {res.note}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-
-                          <span className="text-[10px] font-mono text-slate-500 group-hover:text-sky-300 shrink-0">
-                            詳細 ➔
-                          </span>
-                        </div>
+                          <span>{res.flag}</span>
+                          <span className="font-bold">{res.name}</span>
+                          <span className="text-[10px] font-mono text-slate-500">({res.code})</span>
+                        </button>
                       ))}
                     </div>
                   </div>

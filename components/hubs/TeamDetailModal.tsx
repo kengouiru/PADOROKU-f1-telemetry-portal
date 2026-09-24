@@ -292,7 +292,7 @@ export default function TeamDetailModal({
                   )}
                 </div>
 
-                <h2 className="text-lg sm:text-2xl font-black text-white leading-tight truncate">
+                <h2 className="text-lg sm:text-2xl font-black text-white leading-tight break-words">
                   {team.fullName}
                 </h2>
 

@@ -357,16 +357,16 @@ export default function DriverDetailModal({
                   >
                     {isLegend ? '👑 殿堂入り F1 LEGEND' : '🏁 現役ドライバー'}
                   </span>
-                  <span className="bg-slate-800/90 text-slate-300 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-medium border border-white/10 truncate">
+                  <span className="bg-slate-800/90 text-slate-300 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-medium border border-white/10 whitespace-nowrap">
                     {driver.driverType}
                   </span>
                 </div>
 
-                <h2 className="text-lg sm:text-2xl font-black text-white leading-tight flex items-center gap-2 truncate">
-                  <span className="truncate">{driver.fullName}</span>
+                <h2 className="text-lg sm:text-2xl font-black text-white leading-tight flex items-center gap-2 flex-wrap">
+                  <span className="break-words">{driver.fullName}</span>
                   {isLegend && <span className="text-amber-400 text-sm sm:text-lg">👑</span>}
                 </h2>
-                <div className="text-xs text-slate-400 truncate flex items-center gap-1.5 pt-0.5">
+                <div className="text-xs text-slate-400 flex items-center gap-1.5 pt-0.5 flex-wrap">
                   <span className="text-slate-500 font-mono text-[11px]">所属:</span>
                   {onSelectTeamDetail ? (
                     <button
@@ -833,8 +833,8 @@ export default function DriverDetailModal({
               )}
 
               {/* Telemetry Engineering Signature (Deep Dive) */}
-              <div className="bg-gradient-to-r from-blue-950/40 via-purple-950/30 to-slate-900/60 border border-sky-500/30 p-4 rounded-2xl space-y-2 shadow-inner">
-                <h4 className="text-xs font-racing font-bold text-sky-300 uppercase tracking-wider flex items-center gap-1.5">
+              <div className="bg-slate-900/90 border border-white/10 p-4 rounded-2xl space-y-2.5 shadow-md">
+                <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
                   <span>📈</span>
                   <span>テレメトリー工学解析・ステアリング＆ペダル波形特性</span>
                 </h4>
@@ -848,7 +848,7 @@ export default function DriverDetailModal({
                       onClose();
                       onNavigateToTelemetry({ year: 2024, targetDriver: String(driver.number) });
                     }}
-                    className="w-full mt-2 py-2 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-500 hover:to-sky-500 text-white font-racing font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
+                    className="w-full mt-2 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 hover:text-white font-racing font-bold text-xs flex items-center justify-center gap-2 border border-white/10 transition-all cursor-pointer shadow-sm active:scale-95"
                   >
                     <span>📊</span>
                     <span>このドライバーの車速・ペダル重ね合わせテレメトリーを見る ➔</span>
@@ -1152,7 +1152,7 @@ export default function DriverDetailModal({
                   {driver.biography.quotes.map((quote, idx) => (
                     <div
                       key={idx}
-                      className="bg-gradient-to-r from-blue-950/40 to-slate-900/60 border border-blue-500/20 p-3.5 rounded-xl text-xs font-serif italic text-sky-100 shadow-sm"
+                      className="bg-slate-900/90 border-l-2 border-l-sky-400 border border-white/10 p-3.5 rounded-r-xl text-xs font-serif italic text-slate-200 shadow-sm"
                     >
                       {quote}
                     </div>
@@ -1162,7 +1162,7 @@ export default function DriverDetailModal({
 
               {/* Personality & Character */}
               <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-1.5">
-                <h4 className="text-xs font-racing font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
                   <span>👤</span>
                   <span>人物像・レースでの振る舞い</span>
                 </h4>
@@ -1193,21 +1193,21 @@ export default function DriverDetailModal({
                     {driver.biography.iconicRaces.map((race, idx) => (
                       <div
                         key={idx}
-                        className="bg-slate-950/70 border border-white/10 rounded-2xl p-4 space-y-2 hover:border-sky-500/30 transition-all"
+                        className="bg-slate-900/90 border border-white/10 rounded-2xl p-4 space-y-2 hover:border-slate-500/40 transition-all"
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-bold text-white font-racing">
                             {race.gp} ({race.year})
                           </span>
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-900/40 text-blue-300 border border-blue-500/30">
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-sky-300 border border-white/10">
                             MASTERCLASS #{idx + 1}
                           </span>
                         </div>
                         <div className="text-xs text-slate-300 leading-relaxed font-sans">
                           {renderTextWithCitations(race.description)}
                         </div>
-                        <div className="bg-purple-950/30 border border-purple-500/20 p-2.5 rounded-xl text-[11px] text-purple-200 flex items-start gap-1.5 font-sans">
-                          <span className="text-purple-400 font-bold shrink-0">⚡ 戦術的決定打:</span>
+                        <div className="bg-slate-950/70 border border-white/5 p-2.5 rounded-xl text-[11px] text-slate-300 flex items-start gap-1.5 font-sans">
+                          <span className="text-amber-400 font-bold shrink-0">⚡ 戦術的決定打:</span>
                           <span className="text-slate-300">{renderTextWithCitations(race.tacticalMasterclass)}</span>
                         </div>
                       </div>
@@ -1220,7 +1220,7 @@ export default function DriverDetailModal({
               {driverRadios.length > 0 && (
                 <div className="space-y-3 pt-1">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-racing font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
                       <span>📻</span>
                       <span>伝説のチーム無線アーカイブ ({driverRadios.length}件)</span>
                     </h4>
@@ -1233,7 +1233,7 @@ export default function DriverDetailModal({
                     {driverRadios.map((radio) => (
                       <div
                         key={radio.id}
-                        className="p-4 rounded-2xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border border-rose-500/25 space-y-2.5 shadow-md hover:border-rose-500/40 transition-all"
+                        className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 space-y-2.5 shadow-md hover:border-slate-600 transition-all"
                       >
                         <div className="flex items-center justify-between flex-wrap gap-2">
                           <div className="flex items-center gap-2">
@@ -1246,7 +1246,7 @@ export default function DriverDetailModal({
                             <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-white/10">
                               {radio.gpName} ({radio.year})
                             </span>
-                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-950 text-rose-300 border border-rose-500/30">
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-sky-300 border border-white/10">
                               {radio.categoryLabel}
                             </span>
                           </div>
@@ -1286,7 +1286,7 @@ export default function DriverDetailModal({
                               href={radio.officialClipUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="px-3 py-1.5 rounded-xl text-xs font-racing font-bold bg-slate-800/80 hover:bg-slate-700 text-rose-300 hover:text-white border border-rose-500/20 hover:border-rose-500/40 flex items-center gap-1.5 transition-all"
+                              className="px-3 py-1.5 rounded-xl text-xs font-racing font-bold bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-white/10 flex items-center gap-1.5 transition-all"
                             >
                               <span>🎬 公式ハイライト映像</span>
                               <span className="text-[9px]">↗</span>
@@ -1301,7 +1301,7 @@ export default function DriverDetailModal({
 
               {/* Off-Track Passions */}
               <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-1.5">
-                <h4 className="text-xs font-racing font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                <h4 className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                   <span>🌿</span>
                   <span>レース外の素顔・ライフスタイル</span>
                 </h4>
@@ -1312,8 +1312,8 @@ export default function DriverDetailModal({
 
               {/* Official Social Links Banner */}
               {driver.socialLinks && (
-                <div className="bg-gradient-to-r from-pink-950/20 via-slate-900/80 to-purple-950/20 border border-pink-500/20 p-4 rounded-2xl space-y-2.5 shadow-sm">
-                  <h4 className="text-xs font-racing font-bold text-pink-300 uppercase tracking-wider flex items-center gap-1.5">
+                <div className="bg-slate-900/90 border border-white/10 p-4 rounded-2xl space-y-2.5 shadow-sm">
+                  <h4 className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                     <span>📱</span>
                     <span>公式SNS & オフィシャルWebサイト</span>
                   </h4>
@@ -1323,13 +1323,13 @@ export default function DriverDetailModal({
                         href={driver.socialLinks.instagram}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-pink-500/40 text-xs font-medium text-slate-200 hover:text-white hover:border-pink-400 hover:bg-gradient-to-r hover:from-[#f09433]/25 hover:via-[#dc2743]/25 hover:to-[#bc1888]/25 transition-all shadow-sm group"
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-xs font-medium text-slate-200 hover:text-white transition-all shadow-sm group"
                       >
                         <svg className="w-4 h-4 text-pink-400 group-hover:scale-110 transition-transform flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                         </svg>
                         <span className="font-mono">{getInstagramHandle(driver.socialLinks.instagram)}</span>
-                        <span className="text-[10px] text-pink-400 group-hover:text-pink-300">↗</span>
+                        <span className="text-[10px] text-slate-400 group-hover:text-slate-200">↗</span>
                       </a>
                     )}
                     {driver.socialLinks.xTwitter && (
@@ -1337,7 +1337,7 @@ export default function DriverDetailModal({
                         href={driver.socialLinks.xTwitter}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-white/10 text-xs font-medium text-slate-300 hover:text-white hover:border-white/30 transition-all shadow-sm"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-xs font-medium text-slate-300 hover:text-white transition-all shadow-sm"
                       >
                         <span className="font-bold">𝕏 (Twitter)</span>
                         <span className="text-[10px] text-slate-400">↗</span>
@@ -1348,7 +1348,7 @@ export default function DriverDetailModal({
                         href={driver.socialLinks.website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 border border-white/10 text-xs font-medium text-slate-300 hover:text-sky-200 hover:border-sky-500/40 transition-all shadow-sm"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-xs font-medium text-slate-300 hover:text-white transition-all shadow-sm"
                       >
                         <span>🌐 公式Webサイト</span>
                         <span className="text-[10px] text-slate-400">↗</span>

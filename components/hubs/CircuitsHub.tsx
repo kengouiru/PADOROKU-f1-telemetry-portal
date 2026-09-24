@@ -240,7 +240,7 @@ export default function CircuitsHub({
       <div className="glass-card-premium rounded-xl p-2.5 sm:p-3 shadow-md flex flex-wrap items-center justify-between gap-2.5 border border-white/10">
         {/* Left: Circuit Count Badge & Inline Quick Search */}
         <div className="flex items-center gap-2.5 flex-1 min-w-[240px]">
-          <span className="text-xs font-mono font-bold bg-slate-900/90 px-2.5 py-1.5 rounded-lg border border-white/10 text-sky-400 shrink-0">
+          <span className="text-xs font-mono font-bold bg-slate-900/90 px-2.5 py-1.5 rounded-lg border border-white/10 text-red-400 shrink-0">
             表示中: <strong className="text-white text-sm">{filteredCircuits.length}</strong> / {KNOWLEDGE_CIRCUITS.length} 件
           </span>
 
@@ -253,7 +253,7 @@ export default function CircuitsHub({
               placeholder="コース名・国名・特性で検索..."
               value={effectiveSearch}
               onChange={handleSearchInputChange}
-              className="w-full bg-slate-900/80 border border-white/10 rounded-lg pl-7 pr-7 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
+              className="w-full bg-slate-900/80 border border-white/10 rounded-lg pl-7 pr-7 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-500/50 transition-colors"
             />
             {effectiveSearch && (
               <button
@@ -291,9 +291,9 @@ export default function CircuitsHub({
             onClick={() => setIsFilterOpen((prev) => !prev)}
             className={`text-xs font-racing font-bold px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 shadow-sm cursor-pointer ${
               isFilterOpen
-                ? 'bg-blue-600 text-white border-blue-400 shadow-blue-500/30 ring-1 ring-blue-400/50'
+                ? 'bg-red-600 text-white border-red-500/50 shadow-md shadow-red-950/40 ring-1 ring-red-400/40'
                 : activeFilterCount > 0
-                ? 'bg-blue-950/80 border-blue-500/50 text-blue-300 hover:bg-blue-900/80'
+                ? 'bg-red-950/70 border-red-500/40 text-red-200 hover:bg-red-900/70'
                 : 'bg-slate-900/80 border-white/10 text-slate-300 hover:text-white hover:bg-slate-800'
             }`}
             title="詳細フィルター（地域・コース特性）の開閉"
@@ -301,7 +301,7 @@ export default function CircuitsHub({
             <span>⚙️</span>
             <span>絞り込み</span>
             {activeFilterCount > 0 && (
-              <span className="w-4 h-4 rounded-full bg-blue-500 text-white text-[10px] font-mono flex items-center justify-center font-bold">
+              <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[10px] font-mono flex items-center justify-center font-bold">
                 {activeFilterCount}
               </span>
             )}
@@ -325,7 +325,7 @@ export default function CircuitsHub({
 
       {/* ── 2. Collapsible Filter Tray (On-demand) ── */}
       {isFilterOpen && (
-        <div className="glass-card-premium rounded-xl p-3 sm:p-4 border border-blue-500/30 shadow-xl flex flex-col gap-3 animate-fade-in">
+        <div className="glass-card-premium rounded-xl p-3 sm:p-4 border border-red-500/30 shadow-xl shadow-red-950/20 flex flex-col gap-3 animate-fade-in">
           <div className="flex items-center justify-between pb-2 border-b border-white/10 text-xs">
             <span className="font-racing font-bold text-slate-300 flex items-center gap-1.5">
               <span>⚙️</span>
@@ -356,7 +356,7 @@ export default function CircuitsHub({
                     onClick={() => setRegionFilter(opt.key)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1 border shadow-sm cursor-pointer ${
                       active
-                        ? 'bg-blue-600 text-white border-blue-400 shadow-blue-500/20 ring-1 ring-blue-400/40'
+                        ? 'bg-red-600 text-white border-red-500/50 shadow-md shadow-red-950/40 ring-1 ring-red-400/40'
                         : 'bg-slate-900/80 text-slate-400 border-white/5 hover:border-white/20 hover:text-white hover:bg-slate-800'
                     }`}
                   >
@@ -384,7 +384,7 @@ export default function CircuitsHub({
                     onClick={() => setCharacteristicFilter(opt.key)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1 border shadow-sm cursor-pointer ${
                       active
-                        ? 'bg-purple-600 text-white border-purple-400 shadow-purple-500/20 ring-1 ring-purple-400/40'
+                        ? 'bg-red-600 text-white border-red-500/50 shadow-md shadow-red-950/40 ring-1 ring-red-400/40'
                         : 'bg-slate-900/80 text-slate-400 border-white/5 hover:border-white/20 hover:text-white hover:bg-slate-800'
                     }`}
                   >
@@ -406,13 +406,13 @@ export default function CircuitsHub({
             <span>絞り込み中:</span>
           </span>
           {regionFilter !== 'ALL' && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-950/80 border border-blue-500/40 text-blue-200 text-[11px] font-mono">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-red-950/70 border border-red-500/40 text-red-200 text-[11px] font-mono">
               <span>{REGION_OPTIONS.find((r) => r.key === regionFilter)?.icon}</span>
               <span>{REGION_OPTIONS.find((r) => r.key === regionFilter)?.label}</span>
               <button
                 type="button"
                 onClick={() => setRegionFilter('ALL')}
-                className="hover:text-white text-blue-400 hover:bg-blue-800/50 rounded px-1 ml-0.5 cursor-pointer"
+                className="hover:text-white text-red-400 hover:bg-red-800/50 rounded px-1 ml-0.5 cursor-pointer"
                 title="地域フィルター解除"
               >
                 ✕
@@ -420,13 +420,13 @@ export default function CircuitsHub({
             </span>
           )}
           {characteristicFilter !== 'ALL' && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-purple-950/80 border border-purple-500/40 text-purple-200 text-[11px] font-mono">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-red-950/70 border border-red-500/40 text-red-200 text-[11px] font-mono">
               <span>{CHARACTERISTIC_OPTIONS.find((c) => c.key === characteristicFilter)?.icon}</span>
               <span>{CHARACTERISTIC_OPTIONS.find((c) => c.key === characteristicFilter)?.label}</span>
               <button
                 type="button"
                 onClick={() => setCharacteristicFilter('ALL')}
-                className="hover:text-white text-purple-400 hover:bg-purple-800/50 rounded px-1 ml-0.5 cursor-pointer"
+                className="hover:text-white text-red-400 hover:bg-red-800/50 rounded px-1 ml-0.5 cursor-pointer"
                 title="コース特性フィルター解除"
               >
                 ✕
@@ -447,12 +447,12 @@ export default function CircuitsHub({
             </span>
           )}
           {effectiveSearch.trim() && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-950/80 border border-sky-500/40 text-sky-200 text-[11px] font-mono">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-800/90 border border-white/20 text-slate-200 text-[11px] font-mono">
               <span>&quot;{effectiveSearch}&quot;</span>
               <button
                 type="button"
                 onClick={handleClearLocalSearch}
-                className="hover:text-white text-sky-400 hover:bg-sky-800/50 rounded px-1 ml-0.5 cursor-pointer"
+                className="hover:text-white text-slate-400 hover:bg-white/10 rounded px-1 ml-0.5 cursor-pointer"
                 title="検索キーワード解除"
               >
                 ✕
@@ -481,7 +481,7 @@ export default function CircuitsHub({
           </p>
           <button
             onClick={handleResetFilters}
-            className="mt-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-racing font-bold transition-all shadow-md cursor-pointer"
+            className="mt-2 px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-racing font-bold transition-all shadow-md cursor-pointer"
           >
             フィルターをリセットする
           </button>
@@ -499,14 +499,14 @@ export default function CircuitsHub({
             <div
               key={circuit.id}
               onClick={() => setSelectedCircuitDetail(circuit)}
-              className="glass-card-premium p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 border-l-4 border-l-sky-500 cursor-pointer hover:border-sky-400 hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5 group relative overflow-hidden rounded-xl"
+              className="glass-card-premium p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 border border-white/10 hover:border-red-500/40 hover:shadow-lg hover:shadow-red-950/20 cursor-pointer transition-all duration-200 hover:-translate-y-0.5 group relative overflow-hidden rounded-xl"
             >
               <div className="space-y-2.5">
                 {/* Card Header: Country, Name, Length */}
                 <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] text-slate-400 font-mono block truncate">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[10px] text-slate-400 font-mono block">
                         {circuit.country}
                       </span>
                       <span className="text-[9px] font-mono px-1.5 py-0.2 bg-slate-800/80 text-slate-400 rounded border border-white/5">
@@ -516,12 +516,12 @@ export default function CircuitsHub({
                         {region === 'OCEANIA' && '🦘 大洋州'}
                       </span>
                     </div>
-                    <h3 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors leading-tight mt-0.5 truncate">
+                    <h3 className="text-sm font-bold text-white group-hover:text-red-400 transition-colors leading-tight mt-0.5 break-words">
                       {circuit.name}
                     </h3>
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <span className="text-[11px] font-mono font-bold text-sky-400 bg-sky-950/60 border border-sky-500/30 px-2 py-0.5 rounded-md">
+                    <span className="text-[11px] font-mono font-bold text-slate-300 bg-white/5 border border-white/10 px-2 py-0.5 rounded-md">
                       {circuit.lengthKm} km
                     </span>
                     {/* Favorite Star Button */}
@@ -547,7 +547,7 @@ export default function CircuitsHub({
                 <div className="grid grid-cols-3 gap-1.5 bg-slate-950/50 p-2 rounded-xl border border-white/5 text-center text-[10px] font-mono">
                   <div>
                     <span className="text-slate-500 block text-[9px]">DF要求</span>
-                    <strong className="text-sky-300">{circuit.downforceLevel}</strong>
+                    <strong className="text-slate-200">{circuit.downforceLevel}</strong>
                   </div>
                   <div>
                     <span className="text-slate-500 block text-[9px]">タイヤ負荷</span>
@@ -562,17 +562,17 @@ export default function CircuitsHub({
                 {/* Characteristics Tag Pills */}
                 <div className="flex flex-wrap items-center gap-1">
                   {chars.includes('POWER') && (
-                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
                       ⚡ 超高速
                     </span>
                   )}
                   {chars.includes('STREET') && (
-                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-300 border border-purple-500/30">
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
                       🏙️ 市街地
                     </span>
                   )}
                   {chars.includes('TECHNICAL') && (
-                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
                       🌀 高DF技術
                     </span>
                   )}
@@ -600,7 +600,7 @@ export default function CircuitsHub({
                 {/* Lap Record Snippet */}
                 <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between gap-1">
                   <span className="whitespace-nowrap shrink-0">⏱️ レコード:</span>
-                  <span className="text-slate-200 font-bold truncate text-right">
+                  <span className="text-slate-200 font-bold text-right text-[10px] break-words">
                     {circuit.lapRecord.time} ({circuit.lapRecord.driver})
                   </span>
                 </div>
@@ -611,7 +611,7 @@ export default function CircuitsHub({
                 <span className="text-[10px] text-slate-500 whitespace-nowrap">
                   {circuit.turns} ターン / DRS {circuit.drsZones}
                 </span>
-                <span className="text-sky-400 group-hover:underline flex items-center gap-0.5 font-bold whitespace-nowrap shrink-0">
+                <span className="text-red-400 group-hover:underline flex items-center gap-0.5 font-bold whitespace-nowrap shrink-0">
                   <span>詳細解説を見る</span>
                   <span>➔</span>
                 </span>

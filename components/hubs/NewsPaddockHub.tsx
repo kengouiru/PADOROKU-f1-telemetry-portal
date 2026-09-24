@@ -344,7 +344,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
               最新ニュース ＆ パドックインテリジェンス
             </h2>
           </div>
-          <span className="text-xs font-mono font-bold bg-slate-900/90 px-2.5 py-1 rounded-lg border border-white/10 text-sky-400">
+          <span className="text-xs font-mono font-bold bg-slate-900/90 px-2.5 py-1 rounded-lg border border-white/10 text-red-400">
             表示中: <strong className="text-white text-sm">{filteredNews.length}</strong> / {articles.length} 件
           </span>
         </div>
@@ -361,7 +361,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
               placeholder="キーワード・選手名..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-900/80 border border-white/10 rounded-lg pl-7 pr-6 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
+              className="w-full bg-slate-900/80 border border-white/10 rounded-lg pl-7 pr-6 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-500/50 transition-colors"
             />
             {searchQuery && (
               <button
@@ -380,9 +380,9 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
             onClick={() => setIsFilterOpen((prev) => !prev)}
             className={`text-xs font-racing font-bold px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 shadow-sm cursor-pointer ${
               isFilterOpen
-                ? 'bg-sky-600 text-white border-sky-400 shadow-sky-500/30 ring-1 ring-sky-400/50'
+                ? 'bg-red-600 text-white border-red-500/50 shadow-md shadow-red-950/40 ring-1 ring-red-400/40'
                 : activeFilterCount > 0
-                ? 'bg-sky-950/80 border-sky-500/50 text-sky-300 hover:bg-sky-900/80'
+                ? 'bg-red-950/70 border-red-500/40 text-red-200 hover:bg-red-900/70'
                 : 'bg-slate-900/80 border-white/10 text-slate-300 hover:text-white hover:bg-slate-800'
             }`}
             title="格付け・トピック絞り込みの開閉"
@@ -390,7 +390,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
             <span>⚙️</span>
             <span>絞り込み</span>
             {activeFilterCount > 0 && (
-              <span className="w-4 h-4 rounded-full bg-sky-500 text-white text-[10px] font-mono flex items-center justify-center font-bold">
+              <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[10px] font-mono flex items-center justify-center font-bold">
                 {activeFilterCount}
               </span>
             )}
@@ -412,7 +412,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
             <button
               type="button"
               onClick={handleResetFilters}
-              className="text-xs font-mono font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 px-2 py-1.5 rounded-lg transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
+              className="text-xs font-mono font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
               title="すべての絞り込み条件をリセット"
             >
               <span>✕</span>
@@ -424,7 +424,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
 
       {/* ── Collapsible Filter Tray (On-demand) ── */}
       {isFilterOpen && (
-        <div className="glass-card-premium rounded-xl p-3 sm:p-4 border border-sky-500/30 shadow-xl flex flex-col gap-3 animate-fade-in">
+        <div className="glass-card-premium rounded-xl p-3 sm:p-4 border border-red-500/30 shadow-xl shadow-red-950/20 flex flex-col gap-3 animate-fade-in">
           <div className="flex items-center justify-between pb-2 border-b border-white/10 text-xs">
             <span className="font-racing font-bold text-slate-300 flex items-center gap-1.5">
               <span>⚙️</span>
@@ -451,7 +451,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                 onClick={() => setSelectedAuthority('ALL')}
                 className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold transition-all cursor-pointer ${
                   selectedAuthority === 'ALL'
-                    ? 'bg-sky-600 text-white shadow-sm'
+                    ? 'bg-red-600 text-white border border-red-500/50 shadow-md shadow-red-950/40 ring-1 ring-red-400/40'
                     : 'bg-slate-900/80 text-slate-400 hover:text-white border border-white/5'
                 }`}
               >
@@ -467,7 +467,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                     onClick={() => setSelectedAuthority(isSel ? 'ALL' : level)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all flex items-center gap-1 border cursor-pointer ${
                       isSel
-                        ? 'bg-slate-800 text-white border-sky-400 shadow-sm font-bold ring-1 ring-sky-400/40'
+                        ? 'bg-red-950/70 text-red-200 border-red-500/50 shadow-sm font-bold ring-1 ring-red-400/40'
                         : 'bg-slate-900/60 border-white/5 text-slate-400 hover:text-white hover:bg-slate-800'
                     }`}
                   >
@@ -491,7 +491,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                 onClick={() => setSelectedTopic('ALL')}
                 className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold transition-all cursor-pointer ${
                   selectedTopic === 'ALL'
-                    ? 'bg-sky-600 text-white shadow-sm'
+                    ? 'bg-red-600 text-white border border-red-500/50 shadow-md shadow-red-950/40 ring-1 ring-red-400/40'
                     : 'bg-slate-900/80 text-slate-400 hover:text-white border border-white/5'
                 }`}
               >
@@ -507,7 +507,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                     onClick={() => setSelectedTopic(isSel ? 'ALL' : tag)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all border cursor-pointer flex items-center gap-1 ${
                       isSel
-                        ? 'bg-slate-800 text-sky-300 border-sky-400 font-bold ring-1 ring-sky-400/40'
+                        ? 'bg-red-950/70 text-red-200 border-red-500/50 font-bold ring-1 ring-red-400/40'
                         : 'bg-slate-900/60 border-white/5 text-slate-400 hover:text-white hover:bg-slate-800'
                     }`}
                   >
@@ -529,13 +529,13 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
             <span>絞り込み中:</span>
           </span>
           {selectedAuthority !== 'ALL' && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-950/80 border border-blue-500/40 text-blue-200 text-[11px] font-mono">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-red-950/70 border border-red-500/40 text-red-200 text-[11px] font-mono">
               <span>{AUTHORITY_CONFIG[selectedAuthority as NewsAuthorityLevel]?.icon}</span>
               <span>{AUTHORITY_CONFIG[selectedAuthority as NewsAuthorityLevel]?.label}</span>
               <button
                 type="button"
                 onClick={() => setSelectedAuthority('ALL')}
-                className="hover:text-white text-blue-400 hover:bg-blue-800/50 rounded px-1 ml-0.5 cursor-pointer"
+                className="hover:text-white text-red-400 hover:bg-red-800/50 rounded px-1 ml-0.5 cursor-pointer"
                 title="格付け解除"
               >
                 ✕
@@ -543,12 +543,12 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
             </span>
           )}
           {selectedTopic !== 'ALL' && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-950/80 border border-sky-500/40 text-sky-200 text-[11px] font-mono">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-800/90 border border-white/20 text-slate-200 text-[11px] font-mono">
               <span>{TOPIC_ICONS[selectedTopic as TopicTag]?.icon} {TOPIC_ICONS[selectedTopic as TopicTag]?.label}</span>
               <button
                 type="button"
                 onClick={() => setSelectedTopic('ALL')}
-                className="hover:text-white text-sky-400 hover:bg-sky-800/50 rounded px-1 ml-0.5 cursor-pointer"
+                className="hover:text-white text-slate-400 hover:bg-white/10 rounded px-1 ml-0.5 cursor-pointer"
                 title="トピック解除"
               >
                 ✕
@@ -569,7 +569,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
             </span>
           )}
           {selectedDriver !== 'ALL' && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-800 border border-sky-500/30 text-sky-300 text-[11px] font-mono font-bold">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-800 border border-white/20 text-slate-200 text-[11px] font-mono font-bold">
               <span>👤 {selectedDriver}</span>
               <button
                 type="button"
@@ -582,12 +582,12 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
             </span>
           )}
           {searchQuery && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-950/80 border border-sky-500/40 text-sky-200 text-[11px] font-mono">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-800/90 border border-white/20 text-slate-200 text-[11px] font-mono">
               <span>&quot;{searchQuery}&quot;</span>
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="hover:text-white text-sky-400 hover:bg-sky-800/50 rounded px-1 ml-0.5 cursor-pointer"
+                className="hover:text-white text-slate-400 hover:bg-white/10 rounded px-1 ml-0.5 cursor-pointer"
                 title="検索解除"
               >
                 ✕
@@ -673,7 +673,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                     </div>
 
                     {/* Title & Summary */}
-                    <h3 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors leading-snug">
+                    <h3 className="text-sm font-bold text-white group-hover:text-red-400 transition-colors leading-snug">
                       {item.title}
                     </h3>
                     <p className="text-xs text-slate-400 leading-relaxed">
@@ -691,9 +691,9 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                             key={topic}
                             type="button"
                             onClick={() => setSelectedTopic(isActive ? 'ALL' : topic)}
-                            className={`px-2 py-0.5 rounded-md text-[10px] font-medium border transition-all flex items-center gap-1 ${
+                            className={`px-2 py-0.5 rounded-md text-[10px] font-medium border transition-all flex items-center gap-1 cursor-pointer ${
                               isActive
-                                ? 'bg-sky-500/30 text-sky-200 border-sky-400 font-bold'
+                                ? 'bg-red-950/70 text-red-200 border-red-500/40 font-bold'
                                 : 'bg-slate-900/80 text-slate-300 border-white/10 hover:border-white/30'
                             }`}
                             title={`${info.label} で絞り込み`}
@@ -712,7 +712,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                             key={team.name}
                             type="button"
                             onClick={() => setSelectedTeam(isActive ? 'ALL' : team.name)}
-                            className={`px-2 py-0.5 rounded-md text-[10px] font-bold border transition-all ${
+                            className={`px-2 py-0.5 rounded-md text-[10px] font-bold border transition-all cursor-pointer ${
                               isActive ? 'ring-1 ring-white' : 'hover:opacity-90'
                             }`}
                             style={{
@@ -735,10 +735,10 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                             key={drv}
                             type="button"
                             onClick={() => setSelectedDriver(isActive ? 'ALL' : drv)}
-                            className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold border transition-all ${
+                            className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold border transition-all cursor-pointer ${
                               isActive
-                                ? 'bg-sky-500/40 text-white border-sky-300 ring-1 ring-sky-400'
-                                : 'bg-slate-900/90 text-sky-300 border-sky-500/30 hover:bg-slate-800'
+                                ? 'bg-red-950/70 text-white border-red-400 ring-1 ring-red-400/50'
+                                : 'bg-slate-900/90 text-slate-300 border-white/10 hover:bg-slate-800'
                             }`}
                             title={`ドライバー: ${drv} で絞り込み`}
                           >
@@ -799,7 +799,7 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                       href={item.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sky-400 hover:text-sky-300 text-xs font-medium flex items-center gap-1 group-hover:translate-x-0.5 transition-transform ml-auto whitespace-nowrap shrink-0"
+                      className="text-red-400 hover:text-red-300 text-xs font-medium flex items-center gap-1 group-hover:translate-x-0.5 transition-transform ml-auto whitespace-nowrap shrink-0"
                     >
                       <span>元記事を読む</span>
                       <span>↗</span>

@@ -586,7 +586,7 @@ export default function KnowledgeHistoryHub({
 
         {/* Dropdown Instant Search Matches & Popular Topics when Focused */}
         {searchFocused && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-slate-950/95 border border-sky-500/40 rounded-2xl shadow-2xl backdrop-blur-xl p-2.5 max-h-96 overflow-y-auto z-50 animate-fade-in divide-y divide-white/5">
+          <div className="absolute top-full left-0 right-0 mt-2 bg-slate-950/95 border border-white/10 rounded-2xl shadow-2xl backdrop-blur-xl p-2.5 max-h-96 overflow-y-auto z-50 animate-fade-in divide-y divide-white/5">
             {universalQuery.trim().length === 0 ? (
               <div className="p-2 space-y-2">
                 <div className="text-[11px] font-racing font-bold text-slate-300 flex items-center gap-1.5 px-1">
@@ -605,7 +605,7 @@ export default function KnowledgeHistoryHub({
                         setUniversalQuery('');
                         setSearchFocused(false);
                       }}
-                      className="px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-sky-300 border border-white/10 hover:border-sky-500/40 text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5"
+                      className="px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-red-400 border border-white/10 hover:border-red-500/40 text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5"
                     >
                       <span className="text-red-400">#</span>
                       <span>{topic.label}</span>
@@ -637,7 +637,7 @@ export default function KnowledgeHistoryHub({
                           {item.categoryBadge}
                         </span>
                         <div className="min-w-0">
-                          <div className="text-xs font-bold text-white group-hover:text-sky-300 transition-colors truncate">
+                          <div className="text-xs font-bold text-white group-hover:text-red-400 transition-colors truncate">
                             {item.title}
                           </div>
                           <div className="text-[11px] text-slate-400 truncate">
@@ -645,7 +645,7 @@ export default function KnowledgeHistoryHub({
                           </div>
                         </div>
                       </div>
-                      <span className="text-xs text-slate-500 group-hover:text-sky-400 transition-colors shrink-0">
+                      <span className="text-xs text-slate-500 group-hover:text-red-400 transition-colors shrink-0">
                         ➔
                       </span>
                     </button>
@@ -709,7 +709,7 @@ export default function KnowledgeHistoryHub({
                 <span>🏎️</span>
                 <span>F1チーム名鑑</span>
               </h2>
-              <span className="text-xs font-mono font-bold bg-slate-900/90 px-2.5 py-1 rounded-lg border border-white/10 text-sky-400">
+              <span className="text-xs font-mono font-bold bg-slate-900/90 px-2.5 py-1 rounded-lg border border-white/10 text-red-400">
                 表示中: <strong className="text-white text-sm">{filteredTeams.length}</strong> / {KNOWLEDGE_TEAMS.length} チーム
               </span>
               {searchQuery && (
@@ -740,9 +740,9 @@ export default function KnowledgeHistoryHub({
                 onClick={() => setIsPuFilterOpen((prev) => !prev)}
                 className={`text-xs font-racing font-bold px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 shadow-sm cursor-pointer ${
                   isPuFilterOpen
-                    ? 'bg-red-600 text-white border-red-400 shadow-red-500/30 ring-1 ring-red-400/50'
+                    ? 'bg-red-600 text-white border-red-500/50 shadow-md shadow-red-950/40 ring-1 ring-red-400/40'
                     : puFilter !== 'ALL'
-                    ? 'bg-red-950/80 border-red-500/50 text-red-300 hover:bg-red-900/80'
+                    ? 'bg-red-950/70 border-red-500/40 text-red-200 hover:bg-red-900/70'
                     : 'bg-slate-900/80 border-white/10 text-slate-300 hover:text-white hover:bg-slate-800'
                 }`}
                 title="PU供給元フィルターの開閉"
@@ -750,7 +750,7 @@ export default function KnowledgeHistoryHub({
                 <span>⚡</span>
                 <span>PU供給元</span>
                 {puFilter !== 'ALL' && (
-                  <span className="w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-mono flex items-center justify-center font-bold">
+                  <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[10px] font-mono flex items-center justify-center font-bold">
                     1
                   </span>
                 )}
@@ -777,7 +777,7 @@ export default function KnowledgeHistoryHub({
 
           {/* Collapsible PU Filter Tray */}
           {isPuFilterOpen && (
-            <div className="glass-card-premium rounded-xl p-3 sm:p-3.5 border border-red-500/30 shadow-xl flex flex-col gap-2.5 animate-fade-in">
+            <div className="glass-card-premium rounded-xl p-3 sm:p-3.5 border border-red-500/30 shadow-xl shadow-red-950/20 flex flex-col gap-2.5 animate-fade-in">
               <div className="flex items-center justify-between pb-1.5 border-b border-white/10 text-xs">
                 <span className="font-racing font-bold text-slate-300 flex items-center gap-1.5">
                   <span>⚡</span>
@@ -850,12 +850,12 @@ export default function KnowledgeHistoryHub({
                 </span>
               )}
               {searchQuery && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-950/80 border border-sky-500/40 text-sky-200 text-[11px] font-mono">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-800/90 border border-white/20 text-slate-200 text-[11px] font-mono">
                   <span>&quot;{searchQuery}&quot;</span>
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    className="hover:text-white text-sky-400 hover:bg-sky-800/50 rounded px-1 ml-0.5 cursor-pointer"
+                    className="hover:text-white text-slate-400 hover:bg-white/10 rounded px-1 ml-0.5 cursor-pointer"
                     title="検索解除"
                   >
                     ✕
@@ -884,7 +884,7 @@ export default function KnowledgeHistoryHub({
                 <div
                   key={team.id}
                   onClick={() => setSelectedTeamDetail(team)}
-                  className="glass-card-premium p-3.5 sm:p-4 rounded-xl flex flex-col justify-between gap-3 border-l-4 cursor-pointer hover:border-sky-400 hover:bg-slate-900/95 transition-all hover:scale-[1.01] shadow-lg group relative overflow-hidden"
+                  className="glass-card-premium p-3.5 sm:p-4 rounded-xl flex flex-col justify-between gap-3 border-l-4 cursor-pointer hover:border-red-500/40 hover:bg-slate-900/95 transition-all hover:scale-[1.01] shadow-lg group relative overflow-hidden"
                   style={{ borderLeftColor: team.color }}
                 >
                   <div className="space-y-2.5">
@@ -905,7 +905,7 @@ export default function KnowledgeHistoryHub({
                           <span className="text-[10px] text-slate-400 font-mono block">
                             📍 {team.base.split(',')[0]}
                           </span>
-                          <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-sky-300 transition-colors leading-tight">
+                          <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-red-400 transition-colors leading-tight">
                             {team.name}
                           </h3>
                         </div>
@@ -963,7 +963,7 @@ export default function KnowledgeHistoryHub({
                     {/* Engineering & Philosophy Highlights */}
                     <div className="space-y-1 bg-slate-950/60 p-2.5 rounded-xl border border-white/5 text-[11px]">
                       <div className="flex items-start gap-1.5 text-slate-300">
-                        <span className="text-sky-400 shrink-0 font-bold">🌪️ 空力:</span>
+                        <span className="text-red-400 shrink-0 font-bold">🌪️ 空力:</span>
                         <span className="text-slate-200 line-clamp-1">{team.philosophy.aeroFocus}</span>
                       </div>
                       <div className="flex items-start gap-1.5 text-slate-300">
@@ -978,7 +978,7 @@ export default function KnowledgeHistoryHub({
                     <span className="text-[10px] text-slate-500 whitespace-nowrap">
                       📚 一次出典: {team.references.length}件
                     </span>
-                    <span className="text-sky-400 group-hover:underline flex items-center gap-1 font-bold text-xs whitespace-nowrap shrink-0">
+                    <span className="text-red-400 group-hover:underline flex items-center gap-1 font-bold text-xs whitespace-nowrap shrink-0">
                       <span>詳細スペック・歴史を見る</span>
                       <span className="transition-transform group-hover:translate-x-0.5">➔</span>
                     </span>
