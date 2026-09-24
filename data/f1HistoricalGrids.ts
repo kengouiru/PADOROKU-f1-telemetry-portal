@@ -137,7 +137,7 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         ],
         reserves: [
           { code: 'OWA', name: 'パト・オワード', number: 29, country: 'メキシコ', flag: '🇲🇽', role: 'Reserve', note: 'インディカー界のエース、公式リザーブ' },
-          { code: 'HIR', name: '平川 亮 (Ryo Hirakawa)', country: '日本', flag: '🇯🇵', role: 'Test', note: 'WEC世界王者、シミュレータ＆テスト開発' },
+          { code: 'HIR', name: '平川 亮', country: '日本', flag: '🇯🇵', role: 'Test', note: 'WEC世界王者、シミュレータ＆テスト開発' },
         ],
       },
       {
@@ -153,7 +153,7 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
           { code: 'HAD', name: 'イサック・ハジャー', number: 6, country: 'フランス', flag: '🇫🇷', role: 'Regular', isTransfer: true, note: 'レッドブル昇格を果たしたアグレッシブな新鋭' },
         ],
         reserves: [
-          { code: 'IWA', name: '岩佐 歩夢 (Ayumu Iwasa)', number: 36, country: '日本', flag: '🇯🇵', role: 'Reserve', note: 'スーパーフォーミュラ＆F1公式リザーブ' },
+          { code: 'IWA', name: '岩佐 歩夢', number: 36, country: '日本', flag: '🇯🇵', role: 'Reserve', note: 'スーパーフォーミュラ＆F1公式リザーブ' },
           { code: 'LIN', name: 'アービッド・リンドブラッド', country: '英国', flag: '🇬🇧', role: 'Test', note: 'レッドブル育成の注目ルーキー' },
         ],
       },
@@ -170,7 +170,7 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
           { code: 'LAW', name: 'リアム・ローソン', number: 30, country: 'NZ', flag: '🇳🇿', role: 'Regular', note: '粘り強い走りで入賞を積み重ねる' },
         ],
         reserves: [
-          { code: 'IWA', name: '岩佐 歩夢 (Ayumu Iwasa)', number: 36, country: '日本', flag: '🇯🇵', role: 'Reserve', note: 'RB公式リザーブ兼務' },
+          { code: 'IWA', name: '岩佐 歩夢', number: 36, country: '日本', flag: '🇯🇵', role: 'Reserve', note: 'RB公式リザーブ兼務' },
         ],
       },
       {
@@ -657,7 +657,7 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         points: 4,
         drivers: [
           { code: 'BOT', name: 'バルテリ・ボッタス', number: 77, country: 'フィンランド', flag: '🇫🇮', role: 'Regular' },
-          { code: 'ZHO', name: '周 冠宇 (Guanyu Zhou)', number: 24, country: '中国', flag: '🇨🇳', role: 'Regular', note: 'カタールGPで殊勲の8位入賞' },
+          { code: 'ZHO', name: '周 冠宇', number: 24, country: '中国', flag: '🇨🇳', role: 'Regular', note: 'カタールGPで殊勲の8位入賞' },
         ],
         reserves: [
           { code: 'POU', name: 'テオ・プルシェール', country: 'フランス', flag: '🇫🇷', role: 'Reserve' },
@@ -1588,7 +1588,7 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
           { code: 'GAS', name: 'ピエール・ガスリー', number: 10, country: 'フランス', flag: '🇫🇷', role: 'Regular', note: 'ブラジルGPでハミルトンとドラッグレースを制し2位表彰台' },
         ],
         reserves: [
-          { code: 'YAM', name: '山本 尚貴 (Naoki Yamamoto)', country: '日本', flag: '🇯🇵', role: 'Test', note: '日本GP鈴鹿FP1出走' },
+          { code: 'YAM', name: '山本 尚貴', country: '日本', flag: '🇯🇵', role: 'Test', note: '日本GP鈴鹿FP1出走' },
         ],
       },
       {
@@ -2188,7 +2188,7 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         ],
         reserves: [
           { code: 'VAN', name: 'ストフェル・ヴァンドーン', country: 'ベルギー', flag: '🇧🇪', role: 'Reserve' },
-          { code: 'MAT', name: '松下 信治 (Nobuharu Matsushita)', country: '日本', flag: '🇯🇵', role: 'Test', note: 'マクラーレン・ホンダ開発テストドライバー' },
+          { code: 'MAT', name: '松下 信治', country: '日本', flag: '🇯🇵', role: 'Test', note: 'マクラーレン・ホンダ開発テストドライバー' },
         ],
       },
       {

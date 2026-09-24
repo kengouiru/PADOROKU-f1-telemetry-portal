@@ -405,7 +405,7 @@ export default function DriverComparisonTool({
             </thead>
             <tbody className="divide-y divide-white/5 font-mono">
               {[
-                { label: '🏆 ワールドチャンピオン', v1: driver1.championships, v2: driver2.championships, suffix: '回' },
+                { label: '🏆 ワールドチャンピオン', v1: driver1.championships, v2: driver2.championships, suffix: '冠' },
                 { label: '🏁 通算グランプリ出走', v1: driver1.entries, v2: driver2.entries, suffix: '戦' },
                 { label: '🥇 通算勝利数', v1: driver1.wins, v2: driver2.wins, suffix: '勝' },
                 { label: '🥈 通算表彰台', v1: driver1.podiums, v2: driver2.podiums, suffix: '回' },

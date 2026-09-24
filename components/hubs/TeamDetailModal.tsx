@@ -326,7 +326,7 @@ export default function TeamDetailModal({
                     CONSTRUCTOR CHAMPION
                   </span>
                   <span className="text-xs sm:text-base font-black text-white font-mono">
-                    {team.constructorTitles}回 制覇
+                    {team.constructorTitles}冠 制覇
                   </span>
                 </div>
               </div>
@@ -387,12 +387,12 @@ export default function TeamDetailModal({
                       <div className="flex items-center gap-3 bg-slate-950/60 px-3.5 py-2 rounded-xl border border-white/10 shrink-0">
                         <div className="text-center">
                           <span className="text-[10px] text-amber-400 font-racing font-bold block">WCC王座</span>
-                          <span className="text-base font-black text-white font-mono">{lineageRecord.allTimeTitles.constructors}回</span>
+                          <span className="text-base font-black text-white font-mono">{lineageRecord.allTimeTitles.constructors}冠</span>
                         </div>
                         <div className="w-px h-6 bg-white/10" />
                         <div className="text-center">
                           <span className="text-[10px] text-yellow-400 font-racing font-bold block">WDC王座</span>
-                          <span className="text-base font-black text-white font-mono">{lineageRecord.allTimeTitles.drivers}回</span>
+                          <span className="text-base font-black text-white font-mono">{lineageRecord.allTimeTitles.drivers}冠</span>
                         </div>
                       </div>
                     </div>
@@ -494,10 +494,10 @@ export default function TeamDetailModal({
                                   <span className="text-amber-400 font-bold">🏆 この時代の王座実績:</span>
                                   <div className="flex items-center gap-3 font-mono font-bold text-amber-300">
                                     {node.championships.constructors > 0 && (
-                                      <span>コンストラクターズ: {node.championships.constructors}回</span>
+                                      <span>コンストラクターズ: {node.championships.constructors}冠</span>
                                     )}
                                     {node.championships.drivers > 0 && (
-                                      <span>ドライバーズ: {node.championships.drivers}回</span>
+                                      <span>ドライバーズ: {node.championships.drivers}冠</span>
                                     )}
                                   </div>
                                 </div>

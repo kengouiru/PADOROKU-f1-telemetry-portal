@@ -452,7 +452,7 @@ export default function DriverDetailModal({
                       {isLegend ? 'LEGEND' : 'WORLD CHAMPION'}
                     </span>
                     <span className="text-xs sm:text-base font-black text-white font-mono">
-                      {driver.championships}回 王座
+                      {driver.championships}冠 達成
                     </span>
                   </div>
                   {driver.championshipYears && (
@@ -531,49 +531,92 @@ export default function DriverDetailModal({
               </div>
 
 
-              {/* Stats 4-Grid: Compact 4-col on mobile, spacious cards on desktop */}
-              <div className="grid grid-cols-4 gap-1.5 sm:gap-3">
-                <div className="bg-slate-900/80 border border-white/10 p-2 sm:p-3 rounded-xl sm:rounded-2xl text-center flex flex-col justify-center">
-                  <span className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase tracking-wider block truncate">
-                    🏁 参戦数
+              {/* Career Stats Telemetry HUD Strip (High-density, space-efficient, professional) */}
+              <div className="bg-slate-950/80 border border-white/10 rounded-xl py-2 px-3 sm:px-4 shadow-sm flex items-center justify-between divide-x divide-white/10 font-mono">
+                {/* 参戦数 */}
+                <div className="flex-1 text-center px-1">
+                  <span className="text-[10px] sm:text-[11px] text-slate-400 block tracking-wider font-sans">
+                    🏁 出走数
                   </span>
-                  <span className="text-base sm:text-xl font-bold font-mono text-white mt-0.5 block leading-tight">
-                    {driver.entries}
-                  </span>
-                  <span className="text-[8px] sm:text-[9px] text-slate-500 block truncate">グランプリ</span>
+                  <div className="flex items-baseline justify-center gap-0.5 mt-0.5">
+                    <span className="text-base sm:text-lg font-bold text-white tabular-nums">
+                      {driver.entries}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-sans">戦</span>
+                  </div>
                 </div>
-                <div className="bg-slate-900/80 border border-white/10 p-2 sm:p-3 rounded-xl sm:rounded-2xl text-center flex flex-col justify-center">
-                  <span className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase tracking-wider block truncate">
-                    🥇 優勝数
+
+                {/* 勝利数 */}
+                <div className="flex-1 text-center px-1">
+                  <span className="text-[10px] sm:text-[11px] text-slate-400 block tracking-wider font-sans">
+                    🥇 勝利数
                   </span>
-                  <span
-                    className="text-base sm:text-xl font-bold font-mono mt-0.5 block leading-tight"
-                    style={{ color: themeColor }}
-                  >
-                    {driver.wins}
-                  </span>
-                  <span className="text-[8px] sm:text-[9px] text-slate-500 block truncate">
-                    勝率 {((driver.wins / driver.entries) * 100).toFixed(1)}%
-                  </span>
+                  <div className="flex items-baseline justify-center gap-0.5 mt-0.5">
+                    <span
+                      className={`text-base sm:text-lg font-bold tabular-nums ${
+                        driver.wins > 0 ? 'text-amber-400' : 'text-slate-500'
+                      }`}
+                      style={driver.wins > 0 ? { color: themeColor } : undefined}
+                    >
+                      {driver.wins}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-sans">勝</span>
+                    {driver.wins > 0 && driver.entries > 0 && (
+                      <span className="text-[9px] text-slate-400 ml-1 hidden md:inline">
+                        ({((driver.wins / driver.entries) * 100).toFixed(1)}%)
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="bg-slate-900/80 border border-white/10 p-2 sm:p-3 rounded-xl sm:rounded-2xl text-center flex flex-col justify-center">
-                  <span className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase tracking-wider block truncate">
+
+                {/* 表彰台 */}
+                <div className="flex-1 text-center px-1">
+                  <span className="text-[10px] sm:text-[11px] text-slate-400 block tracking-wider font-sans">
                     🍾 表彰台
                   </span>
-                  <span className="text-base sm:text-xl font-bold font-mono text-sky-400 mt-0.5 block leading-tight">
-                    {driver.podiums}
-                  </span>
-                  <span className="text-[8px] sm:text-[9px] text-slate-500 block truncate">回獲得</span>
+                  <div className="flex items-baseline justify-center gap-0.5 mt-0.5">
+                    <span
+                      className={`text-base sm:text-lg font-bold tabular-nums ${
+                        driver.podiums > 0 ? 'text-sky-400' : 'text-slate-500'
+                      }`}
+                    >
+                      {driver.podiums}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-sans">回</span>
+                  </div>
                 </div>
-                <div className="bg-slate-900/80 border border-white/10 p-2 sm:p-3 rounded-xl sm:rounded-2xl text-center flex flex-col justify-center">
-                  <span className="text-[9px] sm:text-[10px] font-mono text-slate-400 uppercase tracking-wider block truncate">
+
+                {/* PP */}
+                <div className="flex-1 text-center px-1">
+                  <span className="text-[10px] sm:text-[11px] text-slate-400 block tracking-wider font-sans">
                     ⏱️ PP
                   </span>
-                  <span className="text-base sm:text-xl font-bold font-mono text-purple-400 mt-0.5 block leading-tight">
-                    {driver.polePositions}
-                  </span>
-                  <span className="text-[8px] sm:text-[9px] text-slate-500 block truncate">回獲得</span>
+                  <div className="flex items-baseline justify-center gap-0.5 mt-0.5">
+                    <span
+                      className={`text-base sm:text-lg font-bold tabular-nums ${
+                        driver.polePositions > 0 ? 'text-purple-400' : 'text-slate-500'
+                      }`}
+                    >
+                      {driver.polePositions}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-sans">回</span>
+                  </div>
                 </div>
+
+                {/* 王座 (if championships > 0) */}
+                {driver.championships > 0 && (
+                  <div className="flex-1 text-center px-1">
+                    <span className="text-[10px] sm:text-[11px] text-amber-400 block tracking-wider font-sans">
+                      👑 王座
+                    </span>
+                    <div className="flex items-baseline justify-center gap-0.5 mt-0.5">
+                      <span className="text-base sm:text-lg font-black text-amber-300 tabular-nums">
+                        {driver.championships}
+                      </span>
+                      <span className="text-[10px] text-amber-400/80 font-sans">冠</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Bio Meta Grid with Number Origin */}

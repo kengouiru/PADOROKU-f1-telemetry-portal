@@ -90,6 +90,45 @@ export const DRIVER_PORTRAITS: Record<string, string> = {
   LAU: '/images/drivers/portraits/niki-lauda.jpg',
 };
 
+/**
+ * Adaptive typography helper for season grid driver cards.
+ * Scales font size based on name length to maintain a uniform vertical rhythm and avoid layout shift.
+ */
+export const getGridDriverNameClass = (name: string): string => {
+  const len = name.length;
+  if (len >= 13) {
+    // 13+ chars (e.g. マックス・フェルスタッペン, アンドレア・キミ・アントネッリ)
+    return 'text-[11px] sm:text-xs tracking-tight';
+  }
+  if (len >= 10) {
+    // 10-12 chars (e.g. シャルル・ルクレール, ニコ・ヒュルケンベルグ, アレクサンダー・アルボン, フェルナンド・アロンソ)
+    return 'text-xs sm:text-[13px] tracking-tight';
+  }
+  if (len >= 8) {
+    // 8-9 chars (e.g. ジョージ・ラッセル, ルイス・ハミルトン, カルロス・サインツ, ピエール・ガスリー)
+    return 'text-xs sm:text-sm';
+  }
+  // <= 7 chars (e.g. 角田 裕毅, ランド・ノリス)
+  return 'text-xs sm:text-sm';
+};
+
+/**
+ * Adaptive typography helper for full driver profile cards (grouped/flat/legends view).
+ */
+export const getCardDriverNameClass = (name: string): string => {
+  const len = name.length;
+  if (len >= 13) {
+    return 'text-xs sm:text-[13px] tracking-tight';
+  }
+  if (len >= 10) {
+    return 'text-xs sm:text-sm tracking-tight';
+  }
+  if (len >= 8) {
+    return 'text-sm sm:text-[15px]';
+  }
+  return 'text-sm sm:text-base';
+};
+
 export default function DriversHub({
   searchQuery = '',
   onClearSearch,
@@ -429,10 +468,12 @@ export default function DriversHub({
           </div>
 
           <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-            <h3 className="text-sm sm:text-base font-bold text-white leading-snug group-hover:text-sky-300 transition-colors break-words">
-              {driver.fullName}
-            </h3>
-            <p className="text-xs text-slate-400 font-medium">
+            <div className="h-9 sm:h-10 flex items-center">
+              <h3 className={`font-bold text-white leading-snug group-hover:text-sky-300 transition-colors break-words ${getCardDriverNameClass(driver.fullName)}`}>
+                {driver.fullName}
+              </h3>
+            </div>
+            <p className="text-xs text-slate-400 font-medium truncate">
               {driver.team}
             </p>
             <div className="text-[10.5px] text-slate-400 font-mono line-clamp-1">
@@ -951,7 +992,7 @@ export default function DriversHub({
                   </div>
                 </div>
                 <div className="text-xs font-mono text-amber-300/90 bg-slate-950/80 px-3 py-1.5 rounded-lg border border-amber-500/30 self-end sm:self-auto">
-                  合計 {totalLegendTitles}回 のドライバーズタイトル
+                  殿堂ドライバーズタイトル計 {totalLegendTitles}冠
                 </div>
               </div>
 
@@ -1062,49 +1103,49 @@ export default function DriversHub({
           </div>
 
           {/* Teams Grid for the Selected Year */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 sm:gap-5 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3.5 sm:gap-4 items-stretch">
             {currentSeasonGrid.teams.map((team) => (
               <div
                 key={team.teamId}
-                className="bg-slate-900/90 border border-white/10 rounded-2xl p-4 shadow-xl transition-all flex flex-col justify-between gap-3.5"
+                className="bg-slate-900/90 border border-white/10 hover:border-red-500/30 rounded-2xl p-3 sm:p-3.5 shadow-xl transition-all flex flex-col gap-2.5"
                 style={{ borderLeftColor: team.teamColor, borderLeftWidth: '4px' }}
               >
                 {/* Team Info Bar Header */}
-                <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-white/10">
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
                   <div className="flex items-center gap-2 min-w-0">
                     <span
-                      className="w-2.5 h-4.5 rounded-full shrink-0 shadow-sm"
+                      className="w-2 h-4 rounded-full shrink-0 shadow-sm"
                       style={{ backgroundColor: team.teamColor }}
                     />
                     {team.finalRank && (
-                      <span className="bg-white/10 text-white font-mono text-[10px] font-bold px-1.5 py-0.5 rounded">
+                      <span className="bg-white/10 text-white font-mono text-[10px] font-bold px-1.5 py-0.2 rounded">
                         #{team.finalRank}
                       </span>
                     )}
                     <button
                       type="button"
                       onClick={() => handleOpenTeamDetail(team.teamId)}
-                      className="group/team flex items-center gap-1.5 hover:text-sky-300 transition-colors cursor-pointer text-left min-w-0"
+                      className="group/team flex items-center gap-1.5 hover:text-red-400 transition-colors cursor-pointer text-left min-w-0"
                       title={`${team.teamName} のチーム詳細・スペック・系譜を見る`}
                     >
-                      <h3 className="text-sm sm:text-base font-racing font-bold text-white group-hover/team:text-sky-300 leading-tight">
+                      <h3 className="text-sm sm:text-base font-racing font-bold text-white group-hover/team:text-red-400 leading-tight">
                         {team.teamName}
                       </h3>
-                      <span className="text-xs text-sky-400 opacity-60 group-hover/team:opacity-100 group-hover/team:translate-x-0.5 transition-all">➔</span>
+                      <span className="text-xs text-red-400 opacity-60 group-hover/team:opacity-100 group-hover/team:translate-x-0.5 transition-all">➔</span>
                     </button>
-                    <span className="text-[11px] text-slate-400 hidden xl:inline truncate max-w-[180px]">
+                    <span className="text-[11px] text-slate-400 hidden xl:inline truncate max-w-[170px]">
                       {team.fullName}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 text-xs font-mono shrink-0">
+                  <div className="flex items-center gap-1.5 text-xs font-mono shrink-0">
                     {team.teamPrincipal && (
                       <span className="bg-slate-950/80 border border-white/5 px-2 py-0.5 rounded-md text-slate-400 text-[10px] hidden md:inline">
                         👔 {team.teamPrincipal}
                       </span>
                     )}
                     <span className="bg-slate-950/80 border border-white/5 px-2 py-0.5 rounded-lg text-slate-300 text-[10px] whitespace-nowrap">
-                      ⚡ <strong className="text-sky-300">{team.powerUnit}</strong>
+                      ⚡ <strong className="text-slate-200">{team.powerUnit}</strong>
                     </span>
                     {team.points !== undefined && (
                       <span className="bg-amber-400/10 border border-amber-400/20 text-amber-300 font-mono text-[10px] px-2 py-0.5 rounded-md font-bold">
@@ -1115,7 +1156,7 @@ export default function DriversHub({
                 </div>
 
                 {/* Regular Drivers Columns (2 Primary Seats with authentic portrait photos, full names, no button clutter) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 flex-1">
                   {team.drivers.map((drv) => {
                     const profile = driverMap.get(drv.code);
                     const portraitUrl = DRIVER_PORTRAITS[drv.code] || profile?.visualAsset?.imageUrl;
@@ -1123,10 +1164,10 @@ export default function DriversHub({
                       <div
                         key={drv.code}
                         onClick={() => handleHistoricalDriverClick(drv, team)}
-                        className="group relative bg-slate-950/70 hover:bg-slate-850 p-2.5 sm:p-3 rounded-xl border border-white/10 hover:border-slate-400/40 transition-all duration-200 cursor-pointer flex items-center gap-3 shadow-sm hover:shadow-md"
+                        className="group relative bg-slate-950/70 hover:bg-slate-850 p-2 sm:p-2.5 rounded-xl border border-white/10 hover:border-red-500/40 transition-all duration-200 cursor-pointer flex items-center gap-2.5 shadow-sm hover:shadow-md flex-1"
                       >
                         {/* Driver Portrait Photo with Number Badge */}
-                        <div className="relative w-14 h-18 sm:w-16 sm:h-20 rounded-lg overflow-hidden shrink-0 bg-slate-800 border border-white/10 group-hover:border-white/25 transition-colors">
+                        <div className="relative w-12 h-16 sm:w-14 sm:h-18 rounded-lg overflow-hidden shrink-0 bg-slate-800 border border-white/10 group-hover:border-red-500/40 transition-colors">
                           {portraitUrl ? (
                             <img
                               src={portraitUrl}
@@ -1148,37 +1189,43 @@ export default function DriversHub({
                         </div>
 
                         {/* Driver Identity */}
-                        <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+                        <div className="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
                           <div className="flex items-center gap-1.5 text-xs">
                             <span className="text-xs shrink-0">{drv.flag}</span>
-                            <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">{drv.country}</span>
+                            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">{drv.country}</span>
                             <span className="text-[10px] font-mono font-bold text-slate-500 ml-auto shrink-0">{drv.code}</span>
                           </div>
 
-                          {/* Full Name - Break Words, Never Truncate */}
-                          <h4 className="text-sm sm:text-base font-bold text-white group-hover:text-sky-300 transition-colors leading-snug break-words">
-                            {drv.name}
-                          </h4>
+                          {/* Full Name Container - Fixed Height for Uniform Rhythm */}
+                          <div className="h-8 sm:h-9 flex items-center">
+                            <h4
+                              className={`font-bold text-white group-hover:text-red-400 transition-colors leading-tight break-words ${getGridDriverNameClass(
+                                drv.name
+                              )}`}
+                            >
+                              {drv.name}
+                            </h4>
+                          </div>
 
-                          {/* Badges & Clean Status Note */}
-                          <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                          {/* Badges & Clean Status Note - Unified 1-Line Strip */}
+                          <div className="flex items-center gap-1 min-h-[18px] text-[10px] overflow-hidden whitespace-nowrap pt-0.5">
                             {drv.isTransfer && (
-                              <span className="px-1.5 py-0.2 rounded text-[9.5px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
                                 移籍
                               </span>
                             )}
                             {drv.isRookie && (
-                              <span className="px-1.5 py-0.2 rounded text-[9.5px] font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40">
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40 shrink-0">
                                 ルーキー
                               </span>
                             )}
                             {profile && profile.championships > 0 && (
-                              <span className="px-1.5 py-0.2 rounded text-[9.5px] font-mono font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 shrink-0">
                                 🏆 {profile.championships}冠
                               </span>
                             )}
                             {drv.note && (
-                              <span className="text-[10.5px] text-slate-400 line-clamp-1" title={drv.note}>
+                              <span className="text-[10px] text-slate-400 truncate" title={drv.note}>
                                 {drv.note}
                               </span>
                             )}
@@ -1189,30 +1236,40 @@ export default function DriversHub({
                   })}
                 </div>
 
-                {/* Reserve & Test Drivers Section (Clean Horizontal Strip with Full Names) */}
-                {team.reserves && team.reserves.length > 0 && (
-                  <div className="pt-2.5 border-t border-white/10 flex flex-wrap items-center gap-2 text-xs">
-                    <span className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
-                      <span>🛡️</span>
-                      <span>リザーブ ＆ テスト:</span>
-                    </span>
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      {team.reserves.map((res) => (
-                        <button
-                          key={res.code}
-                          type="button"
-                          onClick={() => handleHistoricalDriverClick(res, team)}
-                          className="px-2.5 py-1 rounded-lg bg-slate-950/80 hover:bg-slate-800 border border-white/10 hover:border-slate-500 text-slate-300 hover:text-white text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
-                          title={`${res.name} の選手詳細を見る`}
-                        >
-                          <span>{res.flag}</span>
-                          <span className="font-bold">{res.name}</span>
-                          <span className="text-[10px] font-mono text-slate-500">({res.code})</span>
-                        </button>
-                      ))}
-                    </div>
+                {/* Reserve & Test Drivers Section (Unified Single-Line Horizontal Strip) */}
+                <div className="pt-2 mt-auto border-t border-white/10 flex items-center justify-between gap-2 text-xs min-h-[30px]">
+                  <div className="flex items-center gap-1.5 shrink-0 text-slate-400 font-mono text-[10px]">
+                    <span className="text-[11px]">🛡️</span>
+                    <span className="font-racing font-bold tracking-wider text-slate-400 uppercase">RESERVE:</span>
                   </div>
-                )}
+
+                  <div className="flex items-center gap-1.5 flex-1 min-w-0 justify-end overflow-x-auto no-scrollbar">
+                    {team.reserves && team.reserves.length > 0 ? (
+                      team.reserves.map((res) => {
+                        const cleanName = res.name.replace(/\s*\([^)]*\)/g, '');
+                        return (
+                          <button
+                            key={res.code}
+                            type="button"
+                            onClick={() => handleHistoricalDriverClick(res, team)}
+                            className="group/res inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-950/80 hover:bg-slate-800 border border-white/10 hover:border-red-500/40 text-slate-300 hover:text-white text-[11px] font-medium transition-all shrink-0 cursor-pointer shadow-xs max-w-[170px]"
+                            title={`${res.name} の選手詳細を見る`}
+                          >
+                            <span className="text-[10px] shrink-0">{res.flag}</span>
+                            <span className="font-mono text-slate-200 group-hover/res:text-red-400 transition-colors truncate">
+                              {cleanName}
+                            </span>
+                            <span className="text-[9px] font-mono text-slate-500 shrink-0">
+                              #{res.number || res.code}
+                            </span>
+                          </button>
+                        );
+                      })
+                    ) : (
+                      <span className="text-[10px] font-mono text-slate-600">未登録</span>
+                    )}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
