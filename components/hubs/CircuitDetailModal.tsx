@@ -650,30 +650,34 @@ export default function CircuitDetailModal({
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    <div className="bg-slate-900/90 border border-white/5 p-3 rounded-xl text-center">
-                      <span className="text-[10px] text-slate-400 font-mono block">気温 / 天候</span>
-                      <span className="text-base font-bold text-white font-mono mt-0.5 block">
-                        {weather.weatherIcon} {weather.airTempC}℃
-                      </span>
+                  <div className="bg-slate-900/90 border border-white/5 rounded-xl py-2 px-3 sm:px-4 shadow-sm grid grid-cols-2 sm:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-white/10 font-mono gap-y-2 sm:gap-y-0">
+                    <div className="text-center px-1">
+                      <span className="text-[10px] text-slate-400 block font-sans">気温 / 天候</span>
+                      <div className="flex items-baseline justify-center gap-1 mt-0.5">
+                        <span>{weather.weatherIcon}</span>
+                        <span className="text-sm sm:text-base font-bold text-white tabular-nums">{weather.airTempC}℃</span>
+                      </div>
                     </div>
-                    <div className="bg-slate-900/90 border border-white/5 p-3 rounded-xl text-center">
-                      <span className="text-[10px] text-slate-400 font-mono block">路面温度 (Track)</span>
-                      <span className="text-base font-bold text-amber-400 font-mono mt-0.5 block">
-                        🔥 {weather.trackTempC}℃
-                      </span>
+                    <div className="text-center px-1">
+                      <span className="text-[10px] text-slate-400 block font-sans">路面温度 (Track)</span>
+                      <div className="flex items-baseline justify-center gap-1 mt-0.5">
+                        <span>🔥</span>
+                        <span className="text-sm sm:text-base font-bold text-amber-400 tabular-nums">{weather.trackTempC}℃</span>
+                      </div>
                     </div>
-                    <div className="bg-slate-900/90 border border-white/5 p-3 rounded-xl text-center">
-                      <span className="text-[10px] text-slate-400 font-mono block">湿度 / 降水リスク</span>
-                      <span className="text-base font-bold text-sky-300 font-mono mt-0.5 block">
-                        💧 {weather.humidity}% / {weather.rainProb}%
-                      </span>
+                    <div className="text-center px-1">
+                      <span className="text-[10px] text-slate-400 block font-sans">湿度 / 降水リスク</span>
+                      <div className="flex items-baseline justify-center gap-1 mt-0.5">
+                        <span>💧</span>
+                        <span className="text-sm sm:text-base font-bold text-sky-300 tabular-nums">{weather.humidity}% / {weather.rainProb}%</span>
+                      </div>
                     </div>
-                    <div className="bg-slate-900/90 border border-white/5 p-3 rounded-xl text-center">
-                      <span className="text-[10px] text-slate-400 font-mono block">風速 & 風向</span>
-                      <span className="text-xs font-bold text-emerald-300 font-mono mt-1 block truncate" title={weather.windDirection}>
-                        💨 {weather.windSpeedKmh}km/h
-                      </span>
+                    <div className="text-center px-1">
+                      <span className="text-[10px] text-slate-400 block font-sans">風速 & 風向</span>
+                      <div className="flex items-baseline justify-center gap-1 mt-0.5">
+                        <span>💨</span>
+                        <span className="text-xs sm:text-sm font-bold text-emerald-300 tabular-nums">{weather.windSpeedKmh}km/h</span>
+                      </div>
                     </div>
                   </div>
 
