@@ -20,6 +20,7 @@ import {
 import TeamRadioVaultView from '@/components/radio/TeamRadioVaultView';
 import SmartWikiText from '@/components/common/SmartWikiText';
 import { VAULT_TEAM_RADIOS } from '@/data/f1RadioVaultData';
+import DramaDetailModal from './DramaDetailModal';
 
 export type DramaTab = 'storylines' | 'moments' | 'rivalries' | 'paddock' | 'radios';
 
@@ -33,6 +34,10 @@ export default function F1DramaHub({ initialTab = 'storylines' }: F1DramaHubProp
   React.useEffect(() => {
     if (initialTab) setActiveTab(initialTab);
   }, [initialTab]);
+
+  // Modal state
+  const [modalMoment, setModalMoment] = useState<DramaticMoment | null>(null);
+  const [modalStoryline, setModalStoryline] = useState<SeasonStoryline | null>(null);
 
   // Storyline state
   const [selectedSeasonId, setSelectedSeasonId] = useState<string>(SEASON_STORYLINES[0].id);
@@ -235,6 +240,18 @@ export default function F1DramaHub({ initialTab = 'storylines' }: F1DramaHubProp
                 </div>
               </div>
             </div>
+
+            {/* Open Full Storyline Modal */}
+            <div className="mt-4 pt-3 border-t border-white/10 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setModalStoryline(selectedSeason)}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-racing font-bold text-xs flex items-center gap-2 shadow-lg shadow-rose-950/40 transition-all hover:scale-[1.01] cursor-pointer"
+              >
+                <span>🎬</span>
+                <span>大画面シアターモーダルでシーズン全編を読む ➔</span>
+              </button>
+            </div>
           </div>
 
           {/* Chapters Timeline & Viewer */}
@@ -349,11 +366,14 @@ export default function F1DramaHub({ initialTab = 'storylines' }: F1DramaHubProp
               return (
                 <button
                   key={moment.id}
-                  onClick={() => setSelectedMomentId(moment.id)}
-                  className={`p-4 rounded-2xl border text-left transition-all flex flex-col justify-between h-36 ${
+                  onClick={() => {
+                    setSelectedMomentId(moment.id);
+                    setModalMoment(moment);
+                  }}
+                  className={`p-4 rounded-2xl border text-left transition-all flex flex-col justify-between h-36 cursor-pointer group ${
                     isSelected
                       ? 'bg-amber-950/40 border-amber-500 shadow-lg shadow-amber-950/40 scale-[1.02]'
-                      : 'bg-slate-900/50 border-white/10 hover:border-white/20 hover:bg-slate-800/40'
+                      : 'bg-slate-900/50 border-white/10 hover:border-amber-400/40 hover:bg-slate-800/60'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -364,14 +384,14 @@ export default function F1DramaHub({ initialTab = 'storylines' }: F1DramaHubProp
                   </div>
 
                   <div>
-                    <h4 className="font-racing font-bold text-xs text-white line-clamp-2">
+                    <h4 className="font-racing font-bold text-xs text-white line-clamp-2 group-hover:text-amber-300 transition-colors">
                       {moment.title}
                     </h4>
                     <p className="text-[10px] text-slate-400 mt-1">{moment.hero}</p>
                   </div>
 
-                  <div className="text-[10px] text-amber-400 font-bold flex items-center gap-1">
-                    <span>詳細を見る</span>
+                  <div className="text-[10px] text-amber-400 font-bold flex items-center gap-1 group-hover:underline">
+                    <span>🎬 シアター鑑賞</span>
                     <span>➔</span>
                   </div>
                 </button>
@@ -439,6 +459,18 @@ export default function F1DramaHub({ initialTab = 'storylines' }: F1DramaHubProp
                   <SmartWikiText text={selectedMoment.aftermath} />
                 </div>
               </div>
+            </div>
+
+            {/* Open Theater Modal CTA */}
+            <div className="pt-3 border-t border-white/10 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setModalMoment(selectedMoment)}
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-racing font-bold text-xs flex items-center gap-2 shadow-lg shadow-amber-950/40 transition-all hover:scale-[1.01] cursor-pointer"
+              >
+                <span>🎬</span>
+                <span>大画面シアターモーダルで没入鑑賞する ➔</span>
+              </button>
             </div>
           </div>
         </div>
@@ -637,6 +669,20 @@ export default function F1DramaHub({ initialTab = 'storylines' }: F1DramaHubProp
         <div className="animate-fade-in">
           <TeamRadioVaultView />
         </div>
+      )}
+
+      {/* ── Drama Detail Modal (Moment / Storyline) ── */}
+      {(modalMoment || modalStoryline) && (
+        <DramaDetailModal
+          moment={modalMoment || undefined}
+          allMoments={DRAMATIC_MOMENTS}
+          onSelectMoment={(m) => setModalMoment(m)}
+          storyline={modalStoryline || undefined}
+          onClose={() => {
+            setModalMoment(null);
+            setModalStoryline(null);
+          }}
+        />
       )}
     </div>
   );

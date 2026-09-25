@@ -24,6 +24,8 @@ import { GLOSSARY_TERMS } from '@/data/f1GlossaryData';
 import { TYRE_COMPOUNDS } from '@/data/tyreEncyclopediaData';
 import { getProxiedAudioUrl } from '@/lib/telemetryUtils';
 import TeamDetailModal from './TeamDetailModal';
+import StrategyDetailModal from './StrategyDetailModal';
+import HistoryDetailModal from './HistoryDetailModal';
 import DriversHub from './DriversHub';
 import CircuitsHub from './CircuitsHub';
 import TyreEncyclopediaHub from './TyreEncyclopediaHub';
@@ -221,6 +223,8 @@ export default function KnowledgeHistoryHub({
   const [searchFocused, setSearchFocused] = useState<boolean>(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const [selectedTeamDetail, setSelectedTeamDetail] = useState<TeamProfile | null>(null);
+  const [selectedStrategyDetail, setSelectedStrategyDetail] = useState<StrategyConcept | null>(null);
+  const [selectedHistoryDetail, setSelectedHistoryDetail] = useState<HistoryArchive | null>(null);
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
 
@@ -1070,17 +1074,33 @@ export default function KnowledgeHistoryHub({
             ).map((strat) => (
               <div
                 key={strat.id}
-                className="glass-card-premium p-4 sm:p-5 rounded-2xl flex flex-col justify-between gap-3.5 shadow-xl h-full border border-white/10"
+                onClick={() => setSelectedStrategyDetail(strat)}
+                className="glass-card-premium p-4 sm:p-5 rounded-2xl flex flex-col justify-between gap-3.5 shadow-xl h-full border border-white/10 hover:border-sky-500/40 cursor-pointer transition-all duration-200 group"
               >
                 <div className="flex flex-col gap-3">
-                  <div>
-                    <span className="text-[10px] font-racing font-bold text-sky-400 uppercase tracking-widest bg-sky-950/60 px-2 py-0.5 rounded-full border border-sky-500/30">
-                      {strat.category}
-                    </span>
-                    <h3 className="text-base sm:text-lg font-bold text-white leading-tight mt-1.5">
-                      {strat.title}
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">{strat.subtitle}</p>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <span className="text-[10px] font-racing font-bold text-sky-400 uppercase tracking-widest bg-sky-950/60 px-2 py-0.5 rounded-full border border-sky-500/30">
+                        {strat.category}
+                      </span>
+                      <h3 className="text-base sm:text-lg font-bold text-white leading-tight mt-1.5 group-hover:text-sky-300 transition-colors">
+                        {strat.title}
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-0.5">{strat.subtitle}</p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedStrategyDetail(strat);
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-sky-600/20 hover:bg-sky-600/40 text-sky-300 border border-sky-500/30 text-xs font-racing font-bold flex items-center gap-1 transition-all cursor-pointer shadow-sm shrink-0"
+                      title="詳細公理・数理モーダルを開く"
+                    >
+                      <span>📐</span>
+                      <span>全解剖</span>
+                    </button>
                   </div>
 
                   <p className="text-xs text-slate-200 leading-relaxed bg-slate-950/60 p-3 rounded-xl border border-white/5">
@@ -1192,10 +1212,11 @@ export default function KnowledgeHistoryHub({
             ).map((item) => (
               <div
                 key={item.id}
-                className="glass-card-premium p-4 sm:p-5 rounded-2xl flex flex-col justify-between gap-3.5 shadow-xl h-full border border-white/10"
+                onClick={() => setSelectedHistoryDetail(item)}
+                className="glass-card-premium p-4 sm:p-5 rounded-2xl flex flex-col justify-between gap-3.5 shadow-xl h-full border border-white/10 hover:border-amber-500/40 cursor-pointer transition-all duration-200 group"
               >
                 <div className="flex flex-col gap-3">
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold">
@@ -1205,11 +1226,24 @@ export default function KnowledgeHistoryHub({
                           {item.grandPrix}
                         </span>
                       </div>
-                      <h3 className="text-base sm:text-lg font-bold text-white leading-tight mt-1.5">
+                      <h3 className="text-base sm:text-lg font-bold text-white leading-tight mt-1.5 group-hover:text-amber-300 transition-colors">
                         {item.title}
                       </h3>
                       <p className="text-xs text-slate-400 mt-0.5">{item.subtitle}</p>
                     </div>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedHistoryDetail(item);
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-amber-600/20 hover:bg-amber-600/40 text-amber-300 border border-amber-500/30 text-xs font-racing font-bold flex items-center gap-1 transition-all cursor-pointer shadow-sm shrink-0"
+                      title="名勝負全解剖モーダルを開く"
+                    >
+                      <span>🏛️</span>
+                      <span>全解剖</span>
+                    </button>
                   </div>
 
                   <p className="text-xs text-slate-200 leading-relaxed bg-slate-950/60 p-3 rounded-xl border border-white/5">
@@ -1272,6 +1306,28 @@ export default function KnowledgeHistoryHub({
             ))}
           </div>
         </div>
+      )}
+
+      {/* ── Strategy Detail Modal ── */}
+      {selectedStrategyDetail && (
+        <StrategyDetailModal
+          strategy={selectedStrategyDetail}
+          allStrategies={KNOWLEDGE_STRATEGIES}
+          onSelectStrategy={(strat) => setSelectedStrategyDetail(strat)}
+          onNavigateToTelemetry={onNavigateToTelemetry}
+          onClose={() => setSelectedStrategyDetail(null)}
+        />
+      )}
+
+      {/* ── History Detail Modal ── */}
+      {selectedHistoryDetail && (
+        <HistoryDetailModal
+          historyItem={selectedHistoryDetail}
+          allHistory={KNOWLEDGE_HISTORY}
+          onSelectHistory={(item) => setSelectedHistoryDetail(item)}
+          onNavigateToTelemetry={onNavigateToTelemetry}
+          onClose={() => setSelectedHistoryDetail(null)}
+        />
       )}
     </div>
   );

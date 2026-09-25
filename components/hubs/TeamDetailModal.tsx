@@ -148,6 +148,24 @@ export default function TeamDetailModal({
     });
   };
 
+  // Helper for structured multi-chapter encyclopedic paragraphs
+  const renderParagraphsWithCitations = (text: string) => {
+    if (!text) return null;
+    const paragraphs = text.split('\n\n').map((p) => p.trim()).filter(Boolean);
+    if (paragraphs.length <= 1) {
+      return renderTextWithCitations(text);
+    }
+    return (
+      <div className="space-y-2.5">
+        {paragraphs.map((p, idx) => (
+          <p key={idx} className="leading-relaxed">
+            {renderTextWithCitations(p)}
+          </p>
+        ))}
+      </div>
+    );
+  };
+
   if (!mounted) return null;
 
   return (
@@ -731,9 +749,9 @@ export default function TeamDetailModal({
                     <span>📐</span>
                     <span>開発哲学サマリー</span>
                   </h4>
-                  <p className="text-xs text-slate-200 leading-relaxed font-sans">
-                    {renderTextWithCitations(team.philosophy.description)}
-                  </p>
+                  <div className="text-xs text-slate-200 leading-relaxed font-sans">
+                    {renderParagraphsWithCitations(team.philosophy.description)}
+                  </div>
                 </div>
 
                 {/* Aero vs Mechanical Grid */}
@@ -743,9 +761,9 @@ export default function TeamDetailModal({
                       <span>💨</span>
                       <span>空力コンセプト & フロア負圧</span>
                     </h4>
-                    <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                      {renderTextWithCitations(team.philosophy.aeroFocus)}
-                    </p>
+                    <div className="text-xs text-slate-300 leading-relaxed font-sans">
+                      {renderParagraphsWithCitations(team.philosophy.aeroFocus)}
+                    </div>
                   </div>
 
                   <div className="bg-slate-950/80 border border-amber-500/30 p-4 rounded-2xl space-y-2">
@@ -753,9 +771,9 @@ export default function TeamDetailModal({
                       <span>⚙️</span>
                       <span>サスペンション & メカニカル接地力</span>
                     </h4>
-                    <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                      {renderTextWithCitations(team.philosophy.mechanicalFocus)}
-                    </p>
+                    <div className="text-xs text-slate-300 leading-relaxed font-sans">
+                      {renderParagraphsWithCitations(team.philosophy.mechanicalFocus)}
+                    </div>
                   </div>
                 </div>
               </div>

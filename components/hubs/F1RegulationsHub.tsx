@@ -21,6 +21,7 @@ import {
   type RegulationArticle,
 } from '@/data/f1RegulationsData';
 import SmartWikiText from '@/components/common/SmartWikiText';
+import RegulationDetailModal from './RegulationDetailModal';
 
 interface F1RegulationsHubProps {
   onNavigateToTab?: (tab: string) => void;
@@ -30,6 +31,7 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
   const [selectedCategory, setSelectedCategory] = useState<RegulationCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedArticleId, setExpandedArticleId] = useState<string | null>(REGULATION_ARTICLES[0].id);
+  const [selectedModalArticle, setSelectedModalArticle] = useState<RegulationArticle | null>(null);
   const [show2026Simulator, setShow2026Simulator] = useState<boolean>(true);
 
   // Filtered Articles
@@ -262,9 +264,21 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedModalArticle(art);
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 text-xs font-racing font-bold flex items-center gap-1 transition-all cursor-pointer shadow-sm"
+                      title="大百科モーダルで開く"
+                    >
+                      <span>📖</span>
+                      <span>全解剖</span>
+                    </button>
                     <span className="text-xs font-mono text-slate-400 hidden sm:inline-block">
-                      {isExpanded ? '閉じる' : '詳細を解剖'}
+                      {isExpanded ? '閉じる' : '展開'}
                     </span>
                     <span
                       className={`w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center text-xs text-slate-300 transition-transform duration-200 ${
@@ -384,6 +398,16 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                         </div>
                       </div>
                     )}
+
+                    {/* Open Full Modal CTA Banner */}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedModalArticle(art)}
+                      className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-red-600/30 via-slate-800 to-red-600/30 hover:from-red-600/50 hover:to-red-600/50 border border-red-500/40 text-white font-racing font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all hover:scale-[1.01] cursor-pointer"
+                    >
+                      <span>📖</span>
+                      <span>大百科モーダルで条文・工学・判例を横断全画面閲覧する ➔</span>
+                    </button>
                   </div>
                 )}
               </div>
@@ -391,6 +415,16 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
           })
         )}
       </div>
+
+      {/* ── Regulation Detail Modal ── */}
+      {selectedModalArticle && (
+        <RegulationDetailModal
+          article={selectedModalArticle}
+          allArticles={REGULATION_ARTICLES}
+          onSelectArticle={(a) => setSelectedModalArticle(a)}
+          onClose={() => setSelectedModalArticle(null)}
+        />
+      )}
     </div>
   );
 }

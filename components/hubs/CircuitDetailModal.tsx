@@ -119,6 +119,24 @@ export default function CircuitDetailModal({
     });
   };
 
+  // Helper for structured multi-chapter encyclopedic paragraphs
+  const renderParagraphsWithCitations = (text: string) => {
+    if (!text) return null;
+    const paragraphs = text.split('\n\n').map((p) => p.trim()).filter(Boolean);
+    if (paragraphs.length <= 1) {
+      return renderTextWithCitations(text);
+    }
+    return (
+      <div className="space-y-2.5">
+        {paragraphs.map((p, idx) => (
+          <p key={idx} className="leading-relaxed">
+            {renderTextWithCitations(p)}
+          </p>
+        ))}
+      </div>
+    );
+  };
+
   // Vector Track Map data from CIRCUIT_TRACK_MAPS
   const trackMapData = CIRCUIT_TRACK_MAPS[circuit.id] || CIRCUIT_TRACK_MAPS['suzuka'];
 
@@ -514,6 +532,19 @@ export default function CircuitDetailModal({
                   </div>
                 </div>
               </div>
+
+              {/* Circuit Characteristics & Engineering Profile */}
+              {circuit.characteristics && (
+                <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-2.5">
+                  <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>🏎️</span>
+                    <span>サーキット特性 & 空力・タイヤ工学サマリー</span>
+                  </h4>
+                  <div className="text-xs text-slate-200 leading-relaxed font-sans">
+                    {renderParagraphsWithCitations(circuit.characteristics)}
+                  </div>
+                </div>
+              )}
 
               {/* Complete Turn-by-Turn Corner Guide Table */}
               <div className="bg-slate-950/70 border border-white/10 p-4 rounded-2xl space-y-3">

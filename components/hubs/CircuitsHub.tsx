@@ -141,6 +141,57 @@ export function getCircuitCharacteristics(circuit: CircuitProfile): CircuitChara
   return res;
 }
 
+export const CIRCUIT_REAL_IMAGES: Record<string, string> = {
+  'bahrain-international': '/images/circuits/circuit_bahrain_real.jpg',
+  'suzuka': '/images/circuits/circuit_suzuka_real.jpg',
+  'monza': '/images/circuits/circuit_monza_real.jpg',
+  'spa-francorchamps': '/images/circuits/circuit_spa_real.jpg',
+  'circuit-de-monaco': '/images/circuits/circuit_monaco_real.jpg',
+  'silverstone': '/images/circuits/circuit_silverstone_real.jpg',
+  'albert-park': '/images/circuits/circuit_albert_park_real.jpg',
+  'shanghai': '/images/circuits/circuit_shanghai_real.jpg',
+  'miami': '/images/circuits/circuit_miami_real.jpg',
+  'imola': '/images/circuits/circuit_imola_real.jpg',
+  'villeneuve': '/images/circuits/circuit_villeneuve_real.jpg',
+  'catalunya': '/images/circuits/circuit_catalunya.jpg',
+  'madrid': '/images/circuits/circuit_catalunya.jpg',
+  'redbull-ring': '/images/circuits/circuit_redbull_ring_real.jpg',
+  'hungaroring': '/images/circuits/circuit_hungaroring.jpg',
+  'zandvoort': '/images/circuits/circuit_zandvoort.jpg',
+  'baku': '/images/circuits/circuit_baku_real.jpg',
+  'singapore': '/images/circuits/circuit_singapore_real.jpg',
+  'cota': '/images/circuits/circuit_cota_real.jpg',
+  'mexico': '/images/circuits/circuit_mexico_real.jpg',
+  'interlagos': '/images/circuits/circuit_interlagos_real.jpg',
+  'las-vegas': '/images/circuits/circuit_las_vegas_real.jpg',
+  'losail': '/images/circuits/circuit_losail_real.jpg',
+  'yas-marina': '/images/circuits/circuit_yas_marina_real.jpg',
+  'jeddah': '/images/circuits/circuit_jeddah_real.jpg',
+};
+
+export function getCircuitImage(circuit: CircuitProfile): string {
+  if (CIRCUIT_REAL_IMAGES[circuit.id]) return CIRCUIT_REAL_IMAGES[circuit.id];
+  if (circuit.visualMap?.imageUrl) return circuit.visualMap.imageUrl;
+  return '/images/circuits/circuit_asset_1.png';
+}
+
+export function getCircuitDirection(circuitId: string): { label: string; icon: string } {
+  const antiClockwise = [
+    'baku',
+    'cota',
+    'interlagos',
+    'yas-marina',
+    'singapore',
+    'jeddah',
+    'miami',
+    'las-vegas',
+    'imola',
+  ];
+  if (circuitId === 'suzuka') return { label: '8の字立体交差', icon: '♾️' };
+  if (antiClockwise.includes(circuitId)) return { label: '反時計回り', icon: '↺' };
+  return { label: '時計回り', icon: '🔄' };
+}
+
 export default function CircuitsHub({
   searchQuery = '',
   initialCircuitId,
@@ -494,34 +545,42 @@ export default function CircuitsHub({
           const chars = getCircuitCharacteristics(circuit);
           const region = getCircuitRegion(circuit.id);
           const weather = getCircuitWeather(circuit.id);
+          const imageUrl = getCircuitImage(circuit);
+          const direction = getCircuitDirection(circuit.id);
+          const elevation = circuit.trackGeometry?.elevationChangeMeters;
 
           return (
             <div
               key={circuit.id}
               onClick={() => setSelectedCircuitDetail(circuit)}
-              className="glass-card-premium p-3 sm:p-3.5 flex flex-col justify-between gap-2.5 border border-white/10 hover:border-red-500/40 hover:shadow-lg hover:shadow-red-950/20 cursor-pointer transition-all duration-200 hover:-translate-y-0.5 group relative overflow-hidden rounded-xl"
+              className="glass-card-premium flex flex-col justify-between border border-white/10 hover:border-red-500/40 hover:shadow-xl hover:shadow-red-950/20 cursor-pointer transition-all duration-200 hover:-translate-y-1 group relative overflow-hidden rounded-2xl h-full"
             >
-              <div className="space-y-2.5">
-                {/* Card Header: Country, Name, Length */}
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[10px] text-slate-400 font-mono block">
-                        {circuit.country}
-                      </span>
-                      <span className="text-[9px] font-mono px-1.5 py-0.2 bg-slate-800/80 text-slate-400 rounded border border-white/5">
-                        {region === 'EUROPE' && '🇪🇺 欧州'}
-                        {region === 'ASIA_ME' && '🌏 アジア中東'}
-                        {region === 'AMERICAS' && '🌎 米州'}
-                        {region === 'OCEANIA' && '🦘 大洋州'}
-                      </span>
-                    </div>
-                    <h3 className="text-sm font-bold text-white group-hover:text-red-400 transition-colors leading-tight mt-0.5 break-words">
-                      {circuit.name}
-                    </h3>
+              {/* Top Banner Image with Aspect Ratio & Overlays */}
+              <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-900">
+                <img
+                  src={imageUrl}
+                  alt={circuit.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90 group-hover:brightness-100"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-black/50" />
+
+                {/* Floating Top Bar on Image */}
+                <div className="absolute top-2.5 inset-x-2.5 flex items-center justify-between gap-1.5 z-10">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] font-mono px-2 py-0.5 bg-black/60 backdrop-blur-md text-white rounded-md border border-white/10 font-bold">
+                      {circuit.country}
+                    </span>
+                    <span className="text-[9px] font-mono px-1.5 py-0.5 bg-slate-900/80 backdrop-blur-md text-slate-300 rounded border border-white/10">
+                      {region === 'EUROPE' && '🇪🇺 欧州'}
+                      {region === 'ASIA_ME' && '🌏 アジア中東'}
+                      {region === 'AMERICAS' && '🌎 米州'}
+                      {region === 'OCEANIA' && '🦘 大洋州'}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <span className="text-[11px] font-mono font-bold text-slate-300 bg-white/5 border border-white/10 px-2 py-0.5 rounded-md">
+
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-mono font-bold text-white bg-black/70 backdrop-blur-md border border-white/10 px-2 py-0.5 rounded-md">
                       {circuit.lengthKm} km
                     </span>
                     {/* Favorite Star Button */}
@@ -531,10 +590,10 @@ export default function CircuitsHub({
                         e.stopPropagation();
                         toggleCircuit(circuit.id);
                       }}
-                      className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all cursor-pointer ${
+                      className={`w-7 h-7 rounded-lg flex items-center justify-center border backdrop-blur-md transition-all cursor-pointer ${
                         isFavoriteCircuit(circuit.id)
-                          ? 'bg-amber-400/20 border-amber-400/60 text-amber-300 hover:bg-amber-400/30 shadow-sm'
-                          : 'bg-slate-900/60 border-white/10 text-slate-500 hover:text-amber-300 hover:border-amber-400/40'
+                          ? 'bg-amber-400/30 border-amber-400/70 text-amber-300 hover:bg-amber-400/40 shadow-sm'
+                          : 'bg-black/60 border-white/15 text-slate-400 hover:text-amber-300 hover:border-amber-400/50'
                       }`}
                       title={isFavoriteCircuit(circuit.id) ? '推しコースから外す' : '推しコース (マイパドック) に登録'}
                     >
@@ -543,78 +602,131 @@ export default function CircuitsHub({
                   </div>
                 </div>
 
-                {/* Circuit Specs Badges */}
-                <div className="grid grid-cols-3 gap-1.5 bg-slate-950/50 p-2 rounded-xl border border-white/5 text-center text-[10px] font-mono">
-                  <div>
-                    <span className="text-slate-500 block text-[9px]">DF要求</span>
-                    <strong className="text-slate-200">{circuit.downforceLevel}</strong>
+                {/* Floating Bottom Bar on Image (Direction, Elevation, DRS) */}
+                <div className="absolute bottom-2 inset-x-2.5 flex items-center justify-between text-[9.5px] font-mono text-slate-300 z-10">
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md border border-white/10 flex items-center gap-1">
+                      <span>{direction.icon}</span>
+                      <span>{direction.label}</span>
+                    </span>
+                    {elevation !== undefined && (
+                      <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md border border-white/10 text-sky-300">
+                        ⛰️ 高低差 {elevation}m
+                      </span>
+                    )}
                   </div>
-                  <div>
-                    <span className="text-slate-500 block text-[9px]">タイヤ負荷</span>
-                    <strong className="text-amber-400">{circuit.tyreStress}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-500 block text-[9px]">ピットロス</span>
-                    <strong className="text-slate-200">約{circuit.typicalPitLossSec}s</strong>
-                  </div>
-                </div>
-
-                {/* Characteristics Tag Pills */}
-                <div className="flex flex-wrap items-center gap-1">
-                  {chars.includes('POWER') && (
-                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                      ⚡ 超高速
-                    </span>
-                  )}
-                  {chars.includes('STREET') && (
-                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                      🏙️ 市街地
-                    </span>
-                  )}
-                  {chars.includes('TECHNICAL') && (
-                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                      🌀 高DF技術
-                    </span>
-                  )}
-                </div>
-
-                {/* Characteristics snippet */}
-                <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed bg-slate-900/40 p-2 rounded-lg border border-white/5">
-                  {circuit.characteristics.replace(/\[\d+\]/g, '')}
-                </p>
-
-                {/* Weather Pill */}
-                {weather && (
-                  <div className="flex items-center justify-between text-[10px] font-mono text-slate-300 bg-white/[0.03] px-2 py-1 rounded-lg border border-white/5">
-                    <span className="flex items-center gap-1">
-                      <span>{weather.weatherIcon}</span>
-                      <span>{weather.airTempC}℃</span>
-                      <span className="text-amber-400">/ 路面{weather.trackTempC}℃</span>
-                    </span>
-                    <span className={weather.rainProb > 30 ? 'text-sky-400 font-bold' : 'text-slate-400'}>
-                      ☔ {weather.rainProb}%
-                    </span>
-                  </div>
-                )}
-
-                {/* Lap Record Snippet */}
-                <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between gap-1">
-                  <span className="whitespace-nowrap shrink-0">⏱️ レコード:</span>
-                  <span className="text-slate-200 font-bold text-right text-[10px] break-words">
-                    {circuit.lapRecord.time} ({circuit.lapRecord.driver})
+                  <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md border border-white/10 text-purple-300 font-bold">
+                    DRS {circuit.drsZones}区間
                   </span>
                 </div>
               </div>
 
-              {/* Card Footer */}
-              <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[11px] font-mono text-slate-400">
-                <span className="text-[10px] text-slate-500 whitespace-nowrap">
-                  {circuit.turns} ターン / DRS {circuit.drsZones}
-                </span>
-                <span className="text-red-400 group-hover:underline flex items-center gap-0.5 font-bold whitespace-nowrap shrink-0">
-                  <span>詳細解説を見る</span>
-                  <span>➔</span>
-                </span>
+              {/* Card Body */}
+              <div className="p-3.5 flex flex-col justify-between flex-1 gap-2.5">
+                <div className="space-y-2">
+                  <div>
+                    <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-red-400 transition-colors leading-snug">
+                      {circuit.name}
+                    </h3>
+                    <p className="text-[10px] text-slate-400 font-mono truncate mt-0.5">
+                      {circuit.officialName}
+                    </p>
+                  </div>
+
+                  {/* Circuit Specs Badges */}
+                  <div className="grid grid-cols-3 gap-1.5 bg-slate-950/60 p-2 rounded-xl border border-white/5 text-center text-[10px] font-mono">
+                    <div>
+                      <span className="text-slate-500 block text-[9px]">DF要求</span>
+                      <strong className="text-slate-200">{circuit.downforceLevel}</strong>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block text-[9px]">タイヤ負荷</span>
+                      <strong className="text-amber-400">{circuit.tyreStress}</strong>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block text-[9px]">ピットロス</span>
+                      <strong className="text-slate-200">約{circuit.typicalPitLossSec}s</strong>
+                    </div>
+                  </div>
+
+                  {/* Characteristics Tag Pills */}
+                  <div className="flex flex-wrap items-center gap-1">
+                    {chars.includes('POWER') && (
+                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                        ⚡ 超高速パワー
+                      </span>
+                    )}
+                    {chars.includes('STREET') && (
+                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                        🏙️ 市街地ストリート
+                      </span>
+                    )}
+                    {chars.includes('TECHNICAL') && (
+                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                        🌀 高DFテクニカル
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Characteristics snippet */}
+                  <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed bg-slate-900/50 p-2 rounded-lg border border-white/5">
+                    {circuit.characteristics.replace(/\[\d+\]/g, '').replace(/\\n/g, ' ')}
+                  </p>
+
+                  {/* Weather Pill */}
+                  {weather && (
+                    <div className="flex items-center justify-between text-[10px] font-mono text-slate-300 bg-white/[0.03] px-2 py-1 rounded-lg border border-white/5">
+                      <span className="flex items-center gap-1">
+                        <span>{weather.weatherIcon}</span>
+                        <span>{weather.airTempC}℃</span>
+                        <span className="text-amber-400">/ 路面{weather.trackTempC}℃</span>
+                      </span>
+                      <span className={weather.rainProb > 30 ? 'text-sky-400 font-bold' : 'text-slate-400'}>
+                        ☔ {weather.rainProb}%
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Lap Record Snippet */}
+                  <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between gap-1 bg-slate-950/40 px-2 py-1 rounded-lg border border-white/5">
+                    <span className="whitespace-nowrap shrink-0">⏱️ レコード:</span>
+                    <span className="text-amber-300 font-bold text-right text-[10.5px] truncate">
+                      {circuit.lapRecord.time} <span className="text-slate-400 font-normal">({circuit.lapRecord.driver})</span>
+                    </span>
+                  </div>
+                </div>
+
+                {/* Card Footer with Quick Telemetry CTA + Details */}
+                <div className="flex items-center justify-between pt-2.5 border-t border-white/5 text-[11px] font-mono text-slate-400 gap-2">
+                  <span className="text-[10px] text-slate-400 shrink-0 font-bold">
+                    {circuit.turns} ターン
+                  </span>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {onNavigateToTelemetry && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (circuit.telemetrySession) {
+                            onNavigateToTelemetry(circuit.telemetrySession);
+                          } else {
+                            onNavigateToTelemetry({ year: 2024, meetingName: circuit.name });
+                          }
+                        }}
+                        className="px-2 py-1 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 text-[10px] font-racing font-bold flex items-center gap-1 transition-all cursor-pointer"
+                        title="テレメトリーへジャンプ"
+                      >
+                        <span>📊</span>
+                        <span>テレメトリー</span>
+                      </button>
+                    )}
+                    <span className="text-red-400 group-hover:underline flex items-center gap-0.5 font-bold text-[11px] shrink-0">
+                      <span>詳細</span>
+                      <span>➔</span>
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           );

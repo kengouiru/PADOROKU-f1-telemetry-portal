@@ -58,6 +58,7 @@ const HISTORICAL_TEAM_ID_MAP: Record<string, string[]> = {
 };
 
 export const DRIVER_PORTRAITS: Record<string, string> = {
+  // Current Grid (2024-2026)
   VER: '/images/drivers/portraits/max-verstappen.jpg',
   HAM: '/images/drivers/portraits/lewis-hamilton.jpg',
   RUS: '/images/drivers/portraits/george-russell.jpg',
@@ -84,11 +85,52 @@ export const DRIVER_PORTRAITS: Record<string, string> = {
   MAG: '/images/drivers/portraits/kevin-magnussen.jpg',
   ZHO: '/images/drivers/portraits/zhou-guanyu.jpg',
   RIC: '/images/drivers/portraits/daniel-ricciardo.jpg',
+
+  // F1 Legends & World Champions
   SEN: '/images/drivers/portraits/ayrton-senna.jpg',
   MSC: '/images/drivers/portraits/michael-schumacher.jpg',
   PRO: '/images/drivers/portraits/alain-prost.jpg',
   LAU: '/images/drivers/portraits/niki-lauda.jpg',
+  VET: '/images/drivers/portraits/sebastian-vettel.jpg',
+  RAI: '/images/drivers/portraits/kimi-raikkonen.jpg',
+  MAN: '/images/drivers/portraits/nigel-mansell.jpg',
+  HAK: '/images/drivers/portraits/mika-hakkinen.jpg',
+  BUT: '/images/drivers/portraits/jenson-button.jpg',
+  ROS: '/images/drivers/portraits/nico-rosberg.jpg',
+
+  // Historical Turbo-Hybrid Era Race Drivers
+  MAS: '/images/drivers/portraits/felipe-massa.jpg',
+  GRO: '/images/drivers/portraits/romain-grosjean.jpg',
+  KVY: '/images/drivers/portraits/daniil-kvyat.jpg',
+  SAR: '/images/drivers/portraits/logan-sargeant.jpg',
+  KUB: '/images/drivers/portraits/robert-kubica.jpg',
+  GIO: '/images/drivers/portraits/antonio-giovinazzi.jpg',
+  LAT: '/images/drivers/portraits/nicholas-latifi.jpg',
+  DEV: '/images/drivers/portraits/nyck-de-vries.jpg',
+  ERI: '/images/drivers/portraits/marcus-ericsson.jpg',
+  WEH: '/images/drivers/portraits/pascal-wehrlein.jpg',
+  NAS: '/images/drivers/portraits/felipe-nasr.jpg',
+  MAL: '/images/drivers/portraits/pastor-maldonado.jpg',
+  PAL: '/images/drivers/portraits/jolyon-palmer.jpg',
+  VAN: '/images/drivers/portraits/stoffel-vandoorne.jpg',
+  HAR: '/images/drivers/portraits/brendon-hartley.jpg',
+  GUT: '/images/drivers/portraits/esteban-gutierrez.jpg',
+  SIR: '/images/drivers/portraits/sergey-sirotkin.jpg',
+  MAZ: '/images/drivers/portraits/nikita-mazepin.jpg',
+  FIT: '/images/drivers/portraits/pietro-fittipaldi.jpg',
+  AIT: '/images/drivers/portraits/jack-aitken.jpg',
 };
+
+/**
+ * Resolves driver portrait image, disambiguating names where needed (e.g. Mick Schumacher vs Michael Schumacher).
+ */
+export const getDriverPortrait = (code: string, name?: string): string | undefined => {
+  if (name && (name.includes('ミック') || name.toLowerCase().includes('mick'))) {
+    return '/images/drivers/portraits/mick-schumacher.jpg';
+  }
+  return DRIVER_PORTRAITS[code];
+};
+
 
 /**
  * Adaptive typography helper for season grid driver cards.
@@ -199,7 +241,7 @@ export default function DriversHub({
       driverType: drv.role === 'Reserve' ? 'リザーブ＆シミュレータ開発' : 'レギュラードライバー',
       numberOrigin: drv.number ? `カーナンバー #${drv.number}` : 'ゼッケン未定',
       visualAsset: {
-        imageUrl: DRIVER_PORTRAITS[drv.code] || `/images/drivers/portraits/${drv.name.toLowerCase().replace(/\s+/g, '-')}.jpg`,
+        imageUrl: getDriverPortrait(drv.code, drv.name) || `/images/drivers/portraits/${drv.name.toLowerCase().replace(/\s+/g, '-')}.jpg`,
         caption: `${drv.name} (${team.teamName})`,
         credit: 'Formula 1 Paddock Archive / CC-BY-SA',
         license: 'CC BY-SA 4.0',
@@ -391,7 +433,7 @@ export default function DriversHub({
 
   // Reusable Single Driver Card Component
   const renderDriverCard = (driver: DriverProfile) => {
-    const portraitUrl = DRIVER_PORTRAITS[driver.code] || driver.visualAsset?.imageUrl;
+    const portraitUrl = getDriverPortrait(driver.code, driver.fullName) || driver.visualAsset?.imageUrl;
     const isLegend = driver.status === 'Legend';
     const accentColor = isLegend ? '#D4AF37' : driver.teamColor;
 
@@ -1159,7 +1201,7 @@ export default function DriversHub({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 flex-1">
                   {team.drivers.map((drv) => {
                     const profile = driverMap.get(drv.code);
-                    const portraitUrl = DRIVER_PORTRAITS[drv.code] || profile?.visualAsset?.imageUrl;
+                    const portraitUrl = getDriverPortrait(drv.code, drv.name) || profile?.visualAsset?.imageUrl;
                     return (
                       <div
                         key={drv.code}
