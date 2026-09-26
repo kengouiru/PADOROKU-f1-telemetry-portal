@@ -36,6 +36,7 @@ import RulesGlossaryHub from './RulesGlossaryHub';
 import VirtualPitwallWarRoom from '@/components/strategy/VirtualPitwallWarRoom';
 import { useUserPreferences } from '@/lib/userPreferences';
 import { type InAppLink } from '@/data/f1GlossaryData';
+import AdSlot from '@/components/ads/AdSlot';
 
 export type SubTab = 'drivers' | 'teams' | 'circuits' | 'tyres' | 'rules' | 'glossary' | 'drama' | 'regulations' | 'strategy' | 'history';
 
@@ -50,6 +51,8 @@ export interface KnowledgeHistoryHubProps {
   initialDramaTab?: 'storylines' | 'moments' | 'rivalries' | 'paddock' | 'radios';
   initialGlossaryTermId?: string | null;
   onNavigateToApp?: (action: InAppLink['action']) => void;
+  isPro?: boolean;
+  onOpenUpgradeModal?: () => void;
 }
 
 /** Individual Team Radio Audio Player with Play/Pause and Seek Bar */
@@ -200,6 +203,8 @@ export default function KnowledgeHistoryHub({
   initialDramaTab,
   initialGlossaryTermId,
   onNavigateToApp,
+  isPro = false,
+  onOpenUpgradeModal,
 }: KnowledgeHistoryHubProps) {
   const [internalSubTab, setInternalSubTab] = useState<SubTab>(initialSubTab);
   const activeSubTab = controlledSubTab ?? internalSubTab;
@@ -992,6 +997,14 @@ export default function KnowledgeHistoryHub({
           </div>
         </div>
       )}
+
+      {/* ── Official Merchandise & Gear Partner Slot ── */}
+      <AdSlot
+        position="library_gear"
+        isPro={isPro}
+        onUpgradeClick={onOpenUpgradeModal}
+        className="mt-6"
+      />
 
       {/* ── Strategy Detail Modal ── */}
       {selectedStrategyDetail && (

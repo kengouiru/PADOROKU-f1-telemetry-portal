@@ -75,6 +75,7 @@ import { useCurrentJstClock } from '@/lib/systemClock';
 import AuthButton from '@/components/auth/AuthButton';
 import AuthModal from '@/components/auth/AuthModal';
 import PitwallProModal from '@/components/subscription/PitwallProModal';
+import InterstitialAdModal from '@/components/ads/InterstitialAdModal';
 import { usePlanTier } from '@/lib/tierService';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 
@@ -209,6 +210,7 @@ export default function DashboardPage() {
   const [detailedTelemetryTab, setDetailedTelemetryTab] = useState<'charts' | 'delta_matrix'>('charts');
   const [pitStrategyViewMode, setPitStrategyViewMode] = useState<'basic' | 'war_room' | 'virtual_gp'>('basic');
   const [proModalOpen, setProModalOpen] = useState(false);
+  const [interstitialOpen, setInterstitialOpen] = useState(false);
   const { isPro } = usePlanTier();
   const [mobileTab, setMobileTab] = useState<MobileTab>('telemetry');
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>('ai');
@@ -414,6 +416,27 @@ export default function DashboardPage() {
       setRightPanelTab('ai');
     }
   }, []);
+
+  const launchPitwallWindow = useCallback(() => {
+    const screenW = typeof window !== 'undefined' ? window.screen.availWidth || 1920 : 1920;
+    const screenH = typeof window !== 'undefined' ? window.screen.availHeight || 1080 : 1080;
+    const win = window.open(
+      '/pitwall',
+      'F1PitwallGame',
+      `width=${screenW},height=${screenH},left=0,top=0,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes`
+    );
+    if (!win || win.closed || typeof win.closed === 'undefined') {
+      window.open('/pitwall', '_blank');
+    }
+  }, []);
+
+  const handleLaunchPitwall = useCallback(() => {
+    if (isPro) {
+      launchPitwallWindow();
+    } else {
+      setInterstitialOpen(true);
+    }
+  }, [isPro, launchPitwallWindow]);
 
   // Clean up any legacy localStorage Gemini key (now handled server-side)
   useEffect(() => {
@@ -983,6 +1006,8 @@ export default function DashboardPage() {
       onDriverToggle={handleDriverToggle}
       isDemoMode={state.isDemoMode}
       isLoading={state.isLoading}
+      isPro={isPro}
+      onOpenUpgradeModal={() => setProModalOpen(true)}
     />
   );
 
@@ -1472,6 +1497,14 @@ export default function DashboardPage() {
               desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
               mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
             }}
+            isPro={isPro}
+            onOpenUpgradeModal={() => setProModalOpen(true)}
+            selectedSeasonProp={state.selectedYear as any}
+            onSeasonChangeProp={(year) => {
+              if (year !== state.selectedYear) {
+                handleYearChange(year);
+              }
+            }}
           />
         </ErrorBoundary>
       )}
@@ -1492,7 +1525,14 @@ export default function DashboardPage() {
           />
         </ErrorBoundary>
       )}
-      {activeHub === 'news' && <ErrorBoundary sectionName="ニュースパドック"><NewsPaddockHub /></ErrorBoundary>}
+      {activeHub === 'news' && (
+        <ErrorBoundary sectionName="ニュースパドック">
+          <NewsPaddockHub
+            isPro={isPro}
+            onOpenUpgradeModal={() => setProModalOpen(true)}
+          />
+        </ErrorBoundary>
+      )}
       {activeHub === 'knowledge' && (
         <ErrorBoundary sectionName="ナレッジ＆ヒストリー">
           <KnowledgeHistoryHub
@@ -1503,6 +1543,8 @@ export default function DashboardPage() {
             targetTeamId={targetTeamId}
             initialDramaTab={targetDramaTab}
             initialGlossaryTermId={targetGlossaryTermId}
+            isPro={isPro}
+            onOpenUpgradeModal={() => setProModalOpen(true)}
             onNavigateToApp={(action) => {
               if (action.appMode) setAppMode(action.appMode);
               if (action.hub) {
@@ -1663,7 +1705,7 @@ export default function DashboardPage() {
           {/* Center-Right: Live JST Telemetry Clock (Compact single-line) */}
           {jstClock.formatted && (
             <div
-              className="hidden lg:flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-slate-900/90 border border-white/10 text-slate-300 font-mono text-[10px] shadow-sm select-none whitespace-nowrap shrink-0"
+              className="hidden xl:flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-slate-900/90 border border-white/10 text-slate-300 font-mono text-[10px] shadow-sm select-none whitespace-nowrap shrink-0"
               title="FIA公式タイムテーブル基準 日本標準時 (JST)"
             >
               <Clock className="w-3 h-3 text-red-400 shrink-0" />
@@ -1679,18 +1721,7 @@ export default function DashboardPage() {
             {/* Special Standalone PITWALL Game Launcher (特別独立起動ボタン) */}
             <button
               type="button"
-              onClick={() => {
-                const screenW = typeof window !== 'undefined' ? window.screen.availWidth || 1920 : 1920;
-                const screenH = typeof window !== 'undefined' ? window.screen.availHeight || 1080 : 1080;
-                const win = window.open(
-                  '/pitwall',
-                  'F1PitwallGame',
-                  `width=${screenW},height=${screenH},left=0,top=0,menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes`
-                );
-                if (!win || win.closed || typeof win.closed === 'undefined') {
-                  window.open('/pitwall', '_blank');
-                }
-              }}
+              onClick={handleLaunchPitwall}
               className="btn-console relative px-3 py-1.5 rounded-xl font-racing font-bold text-xs bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white border border-red-400/60 hover:border-white shadow-lg shadow-red-950/80 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shrink-0 group"
               title="F1 PITWALL 司令塔ゲームを別画面・全画面で起動"
             >
@@ -1711,7 +1742,7 @@ export default function DashboardPage() {
             >
               <Search className="w-3.5 h-3.5 text-sky-400 shrink-0" />
               <span className="hidden sm:inline">検索</span>
-              <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.2 rounded bg-black/40 text-[9px] text-slate-400 font-mono border border-white/10 ml-0.5">
+              <kbd className="hidden xl:inline-flex items-center px-1.5 py-0.2 rounded bg-black/40 text-[9px] text-slate-400 font-mono border border-white/10 ml-0.5">
                 Ctrl K
               </kbd>
             </button>
@@ -2214,6 +2245,21 @@ export default function DashboardPage() {
       <PitwallProModal
         isOpen={proModalOpen}
         onClose={() => setProModalOpen(false)}
+      />
+
+      {/* ── Pitwall Game Interstitial Loading Ad ── */}
+      <InterstitialAdModal
+        isOpen={interstitialOpen}
+        onProceed={() => {
+          setInterstitialOpen(false);
+          launchPitwallWindow();
+        }}
+        onClose={() => setInterstitialOpen(false)}
+        onUpgradeClick={() => {
+          setInterstitialOpen(false);
+          setProModalOpen(true);
+        }}
+        isPro={isPro}
       />
     </div>
   );

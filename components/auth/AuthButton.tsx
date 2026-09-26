@@ -73,7 +73,7 @@ export default function AuthButton({ onOpenAuthModal, onOpenUpgradeModal }: Auth
 
   return (
     <>
-      <div className="relative" ref={dropdownRef}>
+      <div className="relative shrink-0" ref={dropdownRef}>
         <button
           onClick={() => setDropdownOpen((v) => !v)}
           className={`flex items-center gap-1.5 p-1 pl-1.5 pr-2 rounded-xl bg-slate-900/90 hover:bg-slate-850 border text-white transition-all shadow-md cursor-pointer group flex-shrink-0 ${
@@ -104,8 +104,8 @@ export default function AuthButton({ onOpenAuthModal, onOpenUpgradeModal }: Auth
           )}
 
           {/* User Name & Role Badge */}
-          <div className="flex items-center gap-1">
-            <span suppressHydrationWarning className="text-[11px] sm:text-xs font-racing font-bold max-w-[70px] sm:max-w-[120px] truncate hidden sm:inline">
+          <div className="flex items-center gap-1 shrink-0">
+            <span suppressHydrationWarning className="text-[11px] sm:text-xs font-racing font-bold max-w-[90px] sm:max-w-[120px] md:max-w-[150px] truncate hidden sm:inline">
               {activeDisplayName}
             </span>
             {isProUser ? (

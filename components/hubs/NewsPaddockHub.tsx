@@ -12,9 +12,12 @@ import type { F1NewsArticle, TeamTag, TopicTag, NewsAuthorityLevel } from '@/app
 import { SEASON_2026_CALENDAR, getNextUpcomingRound, type RaceWeekendSchedule } from '@/data/f1SeasonData';
 import { getGeminiAuthHeaders } from '@/lib/apiKeyService';
 import SmartWikiText from '@/components/common/SmartWikiText';
+import AdSlot from '@/components/ads/AdSlot';
 
 interface NewsPaddockHubProps {
   geminiApiKey?: string;
+  isPro?: boolean;
+  onOpenUpgradeModal?: () => void;
 }
 
 const TOPIC_ICONS: Record<TopicTag, { label: string; icon: string }> = {
@@ -110,7 +113,11 @@ const AUTHORITY_CONFIG: Record<
   },
 };
 
-export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProps) {
+export default function NewsPaddockHub({
+  geminiApiKey = '',
+  isPro = false,
+  onOpenUpgradeModal,
+}: NewsPaddockHubProps) {
   const [articles, setArticles] = useState<F1NewsArticle[]>([]);
   const [isLoadingNews, setIsLoadingNews] = useState<boolean>(true);
 
@@ -691,15 +698,15 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
               </button>
             </div>
           ) : (
-            filteredNews.map((item) => {
+            filteredNews.map((item, idx) => {
               const auth = item.authorityLevel || 'PADDOCK_INTEL';
               const authConfig = AUTHORITY_CONFIG[auth] || AUTHORITY_CONFIG.PADDOCK_INTEL;
 
               return (
-                <div
-                  key={item.id}
-                  className="glass-card-premium p-3.5 sm:p-4 rounded-xl flex flex-col justify-between gap-2.5 hover:border-white/20 transition-all group relative overflow-hidden"
-                >
+                <React.Fragment key={item.id}>
+                  <div
+                    className="glass-card-premium p-3.5 sm:p-4 rounded-xl flex flex-col justify-between gap-2.5 hover:border-white/20 transition-all group relative overflow-hidden"
+                  >
                   <div className="flex flex-col gap-2">
                     {/* Source Authority & Category Header */}
                     <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -940,6 +947,14 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                     </div>
                   </div>
                 </div>
+                  {idx === 1 && (
+                    <AdSlot
+                      position="news_infeed"
+                      isPro={isPro}
+                      onUpgradeClick={onOpenUpgradeModal}
+                    />
+                  )}
+                </React.Fragment>
               );
             })
           )}

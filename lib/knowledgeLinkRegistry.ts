@@ -224,6 +224,8 @@ export function getKnowledgeLinkRegistry(): KnowledgeLinkEntry[] {
       entries.push({ keyword: 'MGU-K', url: '/knowledge/glossary/mgu-k', category: 'glossary', title: '用語解説「MGU-K」を別タブで開く' });
     } else if (term.id === 'safety-car') {
       entries.push({ keyword: 'セーフティカー', url: '/knowledge/glossary/safety-car', category: 'glossary', title: '用語解説「セーフティカー」を別タブで開く' });
+      entries.push({ keyword: 'SCとVSCの違い', url: '/knowledge/glossary/safety-car', category: 'glossary', title: '用語解説「セーフティカー (SC) と VSCの違い」を別タブで開く' });
+      entries.push({ keyword: 'SCとVSC', url: '/knowledge/glossary/safety-car', category: 'glossary', title: '用語解説「セーフティカー (SC) と VSCの違い」を別タブで開く' });
     } else if (term.id === 'track-limits') {
       entries.push({ keyword: 'トラックリミット', url: '/knowledge/glossary/track-limits', category: 'glossary', title: '用語解説「トラックリミット」を別タブで開く' });
     } else if (term.id === 'active-aero') {
@@ -276,9 +278,7 @@ export function getKnowledgeLinkRegistry(): KnowledgeLinkEntry[] {
       entries.push({ keyword: 'ロックアップ', url: '/knowledge/glossary/lockup', category: 'glossary', title: '用語解説「ロックアップ (タイヤ回転停止)」を別タブで開く' });
       entries.push({ keyword: 'タイヤロック', url: '/knowledge/glossary/lockup', category: 'glossary', title: '用語解説「ロックアップ (タイヤ回転停止)」を別タブで開く' });
       entries.push({ keyword: 'フラットスポット', url: '/knowledge/glossary/lockup', category: 'glossary', title: '用語解説「ロックアップ＆フラットスポット」を別タブで開く' });
-    } else if (term.id === 'sc-vs-vsc') {
-      entries.push({ keyword: 'SCとVSCの違い', url: '/knowledge/glossary/sc-vs-vsc', category: 'glossary', title: '用語解説「SCとVSCの違い」を別タブで開く' });
-      entries.push({ keyword: 'SCとVSC', url: '/knowledge/glossary/sc-vs-vsc', category: 'glossary', title: '用語解説「SCとVSCの違い」を別タブで開く' });
+
     } else if (term.id === 'ers') {
       entries.push({ keyword: 'ERS', url: '/knowledge/glossary/ers', category: 'glossary', title: '用語解説「ERS (エネルギー回生システム)」を別タブで開く' });
       entries.push({ keyword: 'エネルギー回生システム', url: '/knowledge/glossary/ers', category: 'glossary', title: '用語解説「ERS (エネルギー回生システム)」を別タブで開く' });

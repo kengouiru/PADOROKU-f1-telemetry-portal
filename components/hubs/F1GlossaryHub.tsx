@@ -11,7 +11,7 @@
  */
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, X, BookOpen, ChevronRight, Star } from 'lucide-react';
+import { Search, X, BookOpen, ChevronRight, Star, LayoutGrid, List } from 'lucide-react';
 import {
   GLOSSARY_TERMS,
   type GlossaryTerm,
@@ -33,6 +33,7 @@ export default function F1GlossaryHub({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedLevel, setSelectedLevel] = useState<number | 'all'>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [activeModalTerm, setActiveModalTerm] = useState<GlossaryTerm | null>(null);
 
   const categories: { id: string; label: string }[] = [
@@ -181,72 +182,169 @@ export default function F1GlossaryHub({
         </div>
       </div>
 
-      {/* ── Terms Count & Quick Stats ── */}
-      <div className="flex items-center justify-between text-xs text-slate-400 px-1 font-mono">
-        <span>
-          該当する用語: <strong className="text-white">{filteredTerms.length}</strong> 件
-          （クリックで専用の解説・ビジュアル図解が開きます）
-        </span>
-        {searchQuery && (
-          <span className="text-emerald-400">
-            &ldquo;{searchQuery}&rdquo; の検索結果
+      {/* ── Terms Count & View Switcher ── */}
+      <div className="flex items-center justify-between text-xs text-slate-400 px-1 font-mono flex-wrap gap-2">
+        <div className="flex items-center gap-2">
+          <span>
+            該当する用語: <strong className="text-white font-bold">{filteredTerms.length}</strong> 件
+            （クリックで専用の解説・ビジュアル図解が開きます）
           </span>
-        )}
+          {searchQuery && (
+            <span className="text-emerald-400">
+              &ldquo;{searchQuery}&rdquo; の検索結果
+            </span>
+          )}
+        </div>
+
+        {/* View Mode Toggle: Grid (Default) vs Compact List */}
+        <div className="flex items-center gap-1 bg-slate-900/80 p-0.5 rounded-xl border border-white/10">
+          <button
+            type="button"
+            onClick={() => setViewMode('grid')}
+            className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              viewMode === 'grid'
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-950/40 border border-emerald-400/40'
+                : 'text-slate-400 hover:text-white'
+            }`}
+            title="グリッド表示 (カード型・横幅活用)"
+          >
+            <LayoutGrid className="w-3.5 h-3.5" />
+            <span className="text-[11px] hidden sm:inline">グリッド</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('list')}
+            className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              viewMode === 'list'
+                ? 'bg-emerald-600 text-white shadow-md shadow-emerald-950/40 border border-emerald-400/40'
+                : 'text-slate-400 hover:text-white'
+            }`}
+            title="リスト表示"
+          >
+            <List className="w-3.5 h-3.5" />
+            <span className="text-[11px] hidden sm:inline">リスト</span>
+          </button>
+        </div>
       </div>
 
-      {/* ── Scannable Index List (羅列レイアウト) ── */}
-      <div className="flex flex-col gap-2">
-        {filteredTerms.map((term: GlossaryTerm) => (
-          <div
-            key={term.id}
-            onClick={() => {
-              setActiveModalTerm(term);
-              onSelectTerm?.(term);
-            }}
-            className="group p-3.5 sm:p-4 rounded-2xl bg-slate-900/50 hover:bg-slate-800/80 border border-white/10 hover:border-emerald-500/50 shadow-sm transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-          >
-            {/* Left: Term Name & Category */}
-            <div className="flex items-start sm:items-center gap-3 sm:w-72 flex-shrink-0">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[10px] font-racing font-bold px-2 py-0.5 rounded-full bg-slate-950 text-slate-300 border border-white/10">
-                  {term.categoryLabel}
-                </span>
-                <span className="text-[10px] font-mono text-amber-400">
-                  {'★'.repeat(term.level)}
-                </span>
-              </div>
+      {/* ── Responsive Multi-Column Grid Cards (Wide-Screen Optimized) ── */}
+      {viewMode === 'grid' ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5">
+          {filteredTerms.map((term: GlossaryTerm) => (
+            <div
+              key={term.id}
+              onClick={() => {
+                setActiveModalTerm(term);
+                onSelectTerm?.(term);
+              }}
+              className="group relative flex flex-col justify-between p-4 rounded-2xl bg-gradient-to-br from-slate-900/90 via-slate-900/60 to-slate-950/90 hover:from-slate-850 hover:to-slate-900 border border-white/10 hover:border-emerald-500/50 shadow-md hover:shadow-xl hover:shadow-emerald-950/25 transition-all duration-200 cursor-pointer hover:-translate-y-0.5"
+            >
               <div>
-                <h4 className="font-racing font-bold text-sm text-white group-hover:text-emerald-300 transition-colors">
+                {/* Top Badges Strip */}
+                <div className="flex items-center justify-between gap-2 mb-2.5">
+                  <span className="text-[10px] font-racing font-bold px-2.5 py-0.5 rounded-full bg-slate-950/90 text-slate-300 border border-white/10 group-hover:border-emerald-500/30 transition-colors">
+                    {term.categoryLabel}
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    {term.visualType && term.visualType !== 'default' && (
+                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                        図解あり
+                      </span>
+                    )}
+                    <span className="text-[10px] font-mono text-amber-400 tracking-tight">
+                      {'★'.repeat(term.level)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Term Name & English Term */}
+                <h4 className="font-racing font-bold text-sm text-white group-hover:text-emerald-300 transition-colors leading-snug line-clamp-1 mb-0.5">
                   {term.term}
                 </h4>
-                <div className="text-[10px] font-mono text-slate-400">
+                <div className="text-[10px] font-mono text-slate-400 mb-2 truncate">
                   {term.englishTerm}
                 </div>
+
+                {/* Summary Description (3 lines clamp) */}
+                <p className="text-xs text-slate-300/90 leading-relaxed font-sans line-clamp-3">
+                  {term.summary}
+                </p>
+              </div>
+
+              {/* Bottom Action Strip */}
+              <div className="mt-3.5 pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-racing font-bold text-slate-400 group-hover:text-emerald-400 transition-colors">
+                <span className="text-[10px] font-mono text-slate-500 group-hover:text-slate-400">
+                  {term.relatedTerms && term.relatedTerms.length > 0 ? `#${term.relatedTerms[0]}` : '詳細解説・実例'}
+                </span>
+                <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                  <span>詳細・図解</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </span>
               </div>
             </div>
+          ))}
 
-            {/* Middle: 30-word Punchy Summary */}
-            <div className="flex-1 text-xs text-slate-300 leading-relaxed sm:px-2 font-sans">
-              <span className="text-emerald-400 font-bold mr-1.5 sm:hidden">要約:</span>
-              {term.summary}
+          {filteredTerms.length === 0 && (
+            <div className="col-span-full p-8 text-center bg-slate-900/40 rounded-2xl border border-white/10 text-slate-400 text-xs">
+              「{searchQuery}」に一致する用語は見つかりませんでした。別のキーワードでお試しください。
             </div>
+          )}
+        </div>
+      ) : (
+        /* Scannable Compact List View */
+        <div className="flex flex-col gap-2">
+          {filteredTerms.map((term: GlossaryTerm) => (
+            <div
+              key={term.id}
+              onClick={() => {
+                setActiveModalTerm(term);
+                onSelectTerm?.(term);
+              }}
+              className="group p-3 sm:p-3.5 rounded-2xl bg-slate-900/50 hover:bg-slate-800/80 border border-white/10 hover:border-emerald-500/50 shadow-sm transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+            >
+              {/* Left: Term Name & Category */}
+              <div className="flex items-start sm:items-center gap-3 sm:w-72 flex-shrink-0">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-[10px] font-racing font-bold px-2 py-0.5 rounded-full bg-slate-950 text-slate-300 border border-white/10">
+                    {term.categoryLabel}
+                  </span>
+                  <span className="text-[10px] font-mono text-amber-400">
+                    {'★'.repeat(term.level)}
+                  </span>
+                </div>
+                <div>
+                  <h4 className="font-racing font-bold text-sm text-white group-hover:text-emerald-300 transition-colors">
+                    {term.term}
+                  </h4>
+                  <div className="text-[10px] font-mono text-slate-400">
+                    {term.englishTerm}
+                  </div>
+                </div>
+              </div>
 
-            {/* Right: Action Button */}
-            <div className="flex items-center justify-end gap-2 sm:w-28 flex-shrink-0">
-              <span className="text-[11px] font-racing font-bold text-slate-400 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all flex items-center gap-1">
-                <span>詳細・図解</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </span>
+              {/* Middle: 30-word Punchy Summary */}
+              <div className="flex-1 text-xs text-slate-300 leading-relaxed sm:px-2 font-sans">
+                <span className="text-emerald-400 font-bold mr-1.5 sm:hidden">要約:</span>
+                {term.summary}
+              </div>
+
+              {/* Right: Action Button */}
+              <div className="flex items-center justify-end gap-2 sm:w-28 flex-shrink-0">
+                <span className="text-[11px] font-racing font-bold text-slate-400 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all flex items-center gap-1">
+                  <span>詳細・図解</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </span>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-        {filteredTerms.length === 0 && (
-          <div className="p-8 text-center bg-slate-900/40 rounded-2xl border border-white/10 text-slate-400 text-xs">
-            「{searchQuery}」に一致する用語は見つかりませんでした。別のキーワードでお試しください。
-          </div>
-        )}
-      </div>
+          {filteredTerms.length === 0 && (
+            <div className="p-8 text-center bg-slate-900/40 rounded-2xl border border-white/10 text-slate-400 text-xs">
+              「{searchQuery}」に一致する用語は見つかりませんでした。別のキーワードでお試しください。
+            </div>
+          )}
+        </div>
+      )}
 
     </div>
   );

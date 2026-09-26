@@ -38,6 +38,7 @@ import { getBroadcastTrackData } from '@/data/f1BroadcastTrackData';
 import { CIRCUIT_TRACK_MAPS, GENERIC_TRACK, interpolateTrackCoords } from '@/components/telemetry/TelemetryTrackMap';
 import { Map, ExternalLink, X, Maximize2, Compass } from 'lucide-react';
 import SessionResultsModal from './SessionResultsModal';
+import AdSlot from '@/components/ads/AdSlot';
 
 interface SeasonHubProps {
   onNavigateToTelemetry?: (gpName?: string) => void;
@@ -47,6 +48,10 @@ interface SeasonHubProps {
   onNavigateToCircuit?: (circuitId: string) => void;
   onNavigateToDriver?: (driverCode: string) => void;
   onNavigateToTeam?: (teamId: string) => void;
+  isPro?: boolean;
+  onOpenUpgradeModal?: () => void;
+  selectedSeasonProp?: SeasonYear;
+  onSeasonChangeProp?: (year: SeasonYear) => void;
 }
 
 export function getCircuitIdForRace(race: RaceWeekendSchedule): string {
@@ -600,13 +605,25 @@ export default function SeasonHub({
   onNavigateToCircuit,
   onNavigateToDriver,
   onNavigateToTeam,
+  isPro = false,
+  onOpenUpgradeModal,
+  selectedSeasonProp,
+  onSeasonChangeProp,
 }: SeasonHubProps) {
   // Live JST Clock (Telemetry System Reference)
   const jstClock = useCurrentJstClock();
 
-  // Season State: Defaults to current active season (2026)
-  const [selectedSeason, setSelectedSeason] = useState<SeasonYear>(() => getActiveSeasonYear());
-  const [activeTab, setActiveTab] = useState<MainTab>('calendar');
+  // Season State: Defaults to current active season (2026), synced with prop if provided
+  const [selectedSeasonInternal, setSelectedSeasonInternal] = useState<SeasonYear>(() => selectedSeasonProp || getActiveSeasonYear());
+  const selectedSeason = selectedSeasonProp || selectedSeasonInternal;
+
+  useEffect(() => {
+    if (selectedSeasonProp && selectedSeasonProp !== selectedSeasonInternal) {
+      setSelectedSeasonInternal(selectedSeasonProp);
+    }
+  }, [selectedSeasonProp, selectedSeasonInternal]);
+
+  const [activeTab, setActiveTab] = useState<MainTab>('track_analysis');
   const [calendarFilter, setCalendarFilter] = useState<'all' | 'sprint'>('all');
   const [showSeasonInfo, setShowSeasonInfo] = useState<boolean>(false);
   const [heroSubView, setHeroSubView] = useState<'schedule' | 'weather'>('schedule');
@@ -688,7 +705,8 @@ export default function SeasonHub({
 
   // Handle Season Switching
   const handleSeasonChange = (year: SeasonYear) => {
-    setSelectedSeason(year);
+    setSelectedSeasonInternal(year);
+    onSeasonChangeProp?.(year);
     userHasSelectedRoundRef.current = false;
     const cal = getSeasonCalendar(year);
     // When switching season, set focus to next upcoming round or Round 1
@@ -1138,8 +1156,8 @@ export default function SeasonHub({
             </div>
           </div>
 
-          {/* Right Column: Track Map, Countdown Cockpit & Action Suite */}
-          <div className="flex flex-col justify-between gap-3 w-full lg:w-[330px] xl:w-[360px] shrink-0">
+          {/* Right Column: Track Map & Countdown Cockpit */}
+          <div className="flex flex-col gap-3 w-full lg:w-[330px] xl:w-[360px] shrink-0">
             {/* 1. Circuit Layout Track Map Card (Always visible track layout) */}
             <HeroTrackMapCard
               circuitId={selectedCircuitId}
@@ -1197,72 +1215,24 @@ export default function SeasonHub({
               </div>
             )}
 
-            {/* Quick Actions Grid (2x2 Balanced Suite) */}
-            <div className="grid grid-cols-2 gap-2 w-full">
-              {onNavigateToTelemetry && (
-                <button
-                  type="button"
-                  onClick={() => onNavigateToTelemetry(selectedRace.gpName)}
-                  className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-racing font-bold text-xs shadow-md shadow-red-950/40 transition-all cursor-pointer group"
-                  title="テレメトリー分析を開く"
-                >
-                  <span className="group-hover:scale-110 transition-transform">🏎️</span>
-                  <span>テレメトリー</span>
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => setIs3dModalOpen(true)}
-                className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-white border border-white/10 hover:border-sky-500/40 font-racing font-bold text-xs transition-all cursor-pointer group shadow-sm"
-                title="3Dコース標高図・戦術プロファイルを見る"
-              >
-                <span className="group-hover:scale-110 transition-transform">🏁</span>
-                <span>コース詳細 (3D)</span>
-              </button>
-              {onNavigateToCircuit && (
-                <button
-                  type="button"
-                  onClick={() => onNavigateToCircuit(selectedCircuitId)}
-                  className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-white border border-white/10 hover:border-amber-500/40 font-racing font-bold text-xs transition-all cursor-pointer group shadow-sm"
-                  title="大百科のサーキット完全解剖・名鑑を開く"
-                >
-                  <span className="group-hover:scale-110 transition-transform">📚</span>
-                  <span>大百科解剖</span>
-                </button>
-              )}
-              {onNavigateToTyres && (
-                <button
-                  type="button"
-                  onClick={onNavigateToTyres}
-                  className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-white border border-white/10 hover:border-white/20 font-racing font-bold text-xs transition-all cursor-pointer group shadow-sm"
-                  title="タイヤ戦略・コンパウンド解説を見る"
-                >
-                  <span className="group-hover:scale-110 transition-transform">🛞</span>
-                  <span>タイヤ戦略</span>
-                </button>
-              )}
-            </div>
           </div>
         </div>
       </div>
 
+      {/* ── Official Broadcast Partner (FOD) Slot ── */}
+      {selectedSeason === '2026' && (
+        <AdSlot
+          position="season_banner"
+          isPro={isPro}
+          onUpgradeClick={onOpenUpgradeModal}
+        />
+      )}
+
       {/* ─────────────────────────────────────────────────────────────
-          2. NAVIGATION TABS (CALENDAR / TRACK / STANDINGS / GRID)
+          2. NAVIGATION TABS (TRACK / CALENDAR / STANDINGS / GRID)
           ───────────────────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-3">
         <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/80 border border-white/10 overflow-x-auto no-scrollbar">
-          <button
-            type="button"
-            onClick={() => setActiveTab('calendar')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer ${
-              activeTab === 'calendar'
-                ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950/40 border border-red-500/40'
-                : 'text-slate-400 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            <span>📅</span>
-            <span>カレンダー (全{activeCalendar.length}戦)</span>
-          </button>
           <button
             type="button"
             onClick={() => setActiveTab('track_analysis')}
@@ -1274,6 +1244,18 @@ export default function SeasonHub({
           >
             <span>🏁</span>
             <span>コース・戦術解析</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('calendar')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 whitespace-nowrap cursor-pointer ${
+              activeTab === 'calendar'
+                ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950/40 border border-red-500/40'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            <span>📅</span>
+            <span>カレンダー (全{activeCalendar.length}戦)</span>
           </button>
           <button
             type="button"

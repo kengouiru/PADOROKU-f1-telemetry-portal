@@ -81,6 +81,7 @@ export const TIER_FEATURE_COMPARISON: TierFeatureComparison[] = [
 
 const STORAGE_TIER_KEY = 'f1_padoroku_user_tier';
 const STORAGE_AI_QUOTA_KEY_PREFIX = 'f1_padoroku_ai_quota_';
+const STORAGE_AI_BONUS_KEY_PREFIX = 'f1_padoroku_ai_bonus_';
 export const FREE_DAILY_AI_LIMIT = 3;
 
 function getTodayDateString(): string {
@@ -109,28 +110,48 @@ export function setUserTier(tier: PlanTier): void {
   }
 }
 
-export function getDailyAiUsage(): { used: number; max: number; remaining: number; isUnlimited: boolean } {
+export function getDailyAiUsage(): { used: number; max: number; remaining: number; bonus: number; isUnlimited: boolean } {
   const tier = getUserTier();
   if (tier === 'pro') {
-    return { used: 0, max: Infinity, remaining: Infinity, isUnlimited: true };
+    return { used: 0, max: Infinity, remaining: Infinity, bonus: 0, isUnlimited: true };
   }
 
   if (typeof window === 'undefined') {
-    return { used: 0, max: FREE_DAILY_AI_LIMIT, remaining: FREE_DAILY_AI_LIMIT, isUnlimited: false };
+    return { used: 0, max: FREE_DAILY_AI_LIMIT, remaining: FREE_DAILY_AI_LIMIT, bonus: 0, isUnlimited: false };
   }
 
   try {
-    const key = `${STORAGE_AI_QUOTA_KEY_PREFIX}${getTodayDateString()}`;
-    const used = parseInt(localStorage.getItem(key) || '0', 10);
-    const remaining = Math.max(0, FREE_DAILY_AI_LIMIT - used);
+    const todayStr = getTodayDateString();
+    const quotaKey = `${STORAGE_AI_QUOTA_KEY_PREFIX}${todayStr}`;
+    const bonusKey = `${STORAGE_AI_BONUS_KEY_PREFIX}${todayStr}`;
+    const used = parseInt(localStorage.getItem(quotaKey) || '0', 10);
+    const bonus = parseInt(localStorage.getItem(bonusKey) || '0', 10);
+    const effectiveMax = FREE_DAILY_AI_LIMIT + bonus;
+    const remaining = Math.max(0, effectiveMax - used);
     return {
       used,
-      max: FREE_DAILY_AI_LIMIT,
+      max: effectiveMax,
       remaining,
+      bonus,
       isUnlimited: false,
     };
   } catch {
-    return { used: 0, max: FREE_DAILY_AI_LIMIT, remaining: FREE_DAILY_AI_LIMIT, isUnlimited: false };
+    return { used: 0, max: FREE_DAILY_AI_LIMIT, remaining: FREE_DAILY_AI_LIMIT, bonus: 0, isUnlimited: false };
+  }
+}
+
+export function addAiRewardBonus(count: number = 2): number {
+  if (typeof window === 'undefined') return FREE_DAILY_AI_LIMIT;
+  try {
+    const bonusKey = `${STORAGE_AI_BONUS_KEY_PREFIX}${getTodayDateString()}`;
+    const currentBonus = parseInt(localStorage.getItem(bonusKey) || '0', 10);
+    const newBonus = currentBonus + count;
+    localStorage.setItem(bonusKey, String(newBonus));
+    window.dispatchEvent(new CustomEvent('f1_ai_quota_updated', { detail: { bonus: newBonus } }));
+    return newBonus;
+  } catch (e) {
+    console.error('[TierService] Failed to add bonus:', e);
+    return 0;
   }
 }
 
@@ -141,12 +162,16 @@ export function consumeAiQuery(): boolean {
   if (typeof window === 'undefined') return true;
 
   try {
-    const key = `${STORAGE_AI_QUOTA_KEY_PREFIX}${getTodayDateString()}`;
-    const current = parseInt(localStorage.getItem(key) || '0', 10);
-    if (current >= FREE_DAILY_AI_LIMIT) {
+    const todayStr = getTodayDateString();
+    const quotaKey = `${STORAGE_AI_QUOTA_KEY_PREFIX}${todayStr}`;
+    const bonusKey = `${STORAGE_AI_BONUS_KEY_PREFIX}${todayStr}`;
+    const current = parseInt(localStorage.getItem(quotaKey) || '0', 10);
+    const bonus = parseInt(localStorage.getItem(bonusKey) || '0', 10);
+    const effectiveMax = FREE_DAILY_AI_LIMIT + bonus;
+    if (current >= effectiveMax) {
       return false;
     }
-    localStorage.setItem(key, String(current + 1));
+    localStorage.setItem(quotaKey, String(current + 1));
     window.dispatchEvent(new CustomEvent('f1_ai_quota_updated', { detail: { used: current + 1 } }));
     return true;
   } catch {
@@ -157,9 +182,10 @@ export function consumeAiQuery(): boolean {
 export function resetDailyAiUsage(): void {
   if (typeof window === 'undefined') return;
   try {
-    const key = `${STORAGE_AI_QUOTA_KEY_PREFIX}${getTodayDateString()}`;
-    localStorage.removeItem(key);
-    window.dispatchEvent(new CustomEvent('f1_ai_quota_updated', { detail: { used: 0 } }));
+    const todayStr = getTodayDateString();
+    localStorage.removeItem(`${STORAGE_AI_QUOTA_KEY_PREFIX}${todayStr}`);
+    localStorage.removeItem(`${STORAGE_AI_BONUS_KEY_PREFIX}${todayStr}`);
+    window.dispatchEvent(new CustomEvent('f1_ai_quota_updated', { detail: { used: 0, bonus: 0 } }));
   } catch (e) {
     console.error('[TierService] Reset failed:', e);
   }
@@ -229,6 +255,7 @@ export function usePlanTier() {
     aiUsage,
     changeTier,
     consumeAi: consumeAiQuery,
+    addBonus: addAiRewardBonus,
     isFeatureAllowed,
   };
 }

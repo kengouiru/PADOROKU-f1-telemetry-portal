@@ -8,6 +8,7 @@
 import React, { useMemo, useState } from 'react';
 import type { Session, Driver } from '@/lib/types';
 import { formatColor } from '@/lib/telemetryUtils';
+import AdSlot from '@/components/ads/AdSlot';
 
 // Minimal unique meeting shape for dropdown
 interface UniqueMeeting {
@@ -32,6 +33,8 @@ interface SidebarProps {
   // Status
   isDemoMode: boolean;
   isLoading: boolean;
+  isPro?: boolean;
+  onOpenUpgradeModal?: () => void;
 }
 
 const AVAILABLE_YEARS = ['2026', '2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018'];
@@ -72,6 +75,8 @@ export default function Sidebar({
   onDriverToggle,
   isDemoMode,
   isLoading,
+  isPro = false,
+  onOpenUpgradeModal,
 }: SidebarProps) {
   const meetings = useMemo(() => buildUniqueMeetings(sessions), [sessions]);
 
@@ -214,6 +219,13 @@ export default function Sidebar({
           </div>
         )}
       </section>
+
+      {/* ── Contextual Official Partner Slot ── */}
+      <AdSlot
+        position="sidebar"
+        isPro={isPro}
+        onUpgradeClick={onOpenUpgradeModal}
+      />
 
     </aside>
   );

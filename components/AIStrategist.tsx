@@ -20,6 +20,7 @@ import { playRadioSpeech, stopRadioSpeech } from '@/lib/radioAudioEffect';
 
 import { usePlanTier } from '@/lib/tierService';
 import { useGeminiApiKey } from '@/lib/apiKeyService';
+import RewardAdModal from '@/components/ads/RewardAdModal';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -178,7 +179,8 @@ export default function AIStrategist({
   onOpenUpgradeModal,
 }: AIStrategistProps) {
   const { data: authSession } = useSession();
-  const { isPro, aiUsage, consumeAi } = usePlanTier();
+  const { isPro, aiUsage, consumeAi, addBonus } = usePlanTier();
+  const [showRewardModal, setShowRewardModal] = useState<boolean>(false);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
 
@@ -276,7 +278,7 @@ export default function AIStrategist({
         {
           id: aiMsgId,
           role: 'model',
-          content: '💎 **本日の無料AI戦略相談枠（3回）の上限に達しました**\n\nAIストラテジストを回数無制限で活用するには、**「Pitwall Pro」**へアップグレードしてください。',
+          content: '💎 **本日のAI戦略相談枠（無料分）の上限に達しました**\n\nヘッダーの「🎬 +2回」ボタンから公式スポンサー案内を視聴すると質問枠を即座に回復できます。\nまた、回数無制限で活用するには**「Pitwall Pro」**へアップグレードしてください。',
           isStreaming: false,
         },
       ]);
@@ -403,15 +405,25 @@ export default function AIStrategist({
                 <span>PRO</span>
               </span>
             ) : (
-              <button
-                type="button"
-                onClick={onOpenUpgradeModal}
-                className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 font-mono flex items-center gap-1 cursor-pointer transition-colors"
-                title="無料プランの本日残り利用回数（クリックでPro詳細）"
-              >
-                <span>⚡ {aiUsage.remaining}/3回</span>
-                <span className="text-amber-400 font-bold">UPGRADE</span>
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={onOpenUpgradeModal}
+                  className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 font-mono flex items-center gap-1 cursor-pointer transition-colors"
+                  title="無料プランの本日残り利用回数（クリックでPro詳細）"
+                >
+                  <span>⚡ {aiUsage.remaining}/{aiUsage.max}回</span>
+                  <span className="text-amber-400 font-bold">PRO</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowRewardModal(true)}
+                  className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                  title="公式スポンサー案内を見て質問回数を+2回回復する"
+                >
+                  <span>🎬 +2回</span>
+                </button>
+              </div>
             )}
 
             <button
@@ -659,6 +671,16 @@ export default function AIStrategist({
           </div>
         </div>
       )}
+
+      {/* ── Rewarded Ad Modal for Quota Recovery ── */}
+      <RewardAdModal
+        isOpen={showRewardModal}
+        onClose={() => setShowRewardModal(false)}
+        onRewardGranted={(bonus) => {
+          addBonus(bonus);
+        }}
+        onUpgradeClick={onOpenUpgradeModal}
+      />
     </div>
   );
 }
