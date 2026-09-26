@@ -4,7 +4,7 @@
  * Provides Japanese-localized race data with cancellation status.
  */
 
-import { type RaceWeekendSchedule, SEASON_2026_CALENDAR } from '@/data/f1SeasonData';
+import type { RaceWeekendSchedule } from '@/data/f1SeasonData';
 
 // ─── Jolpica API Types ───────────────────────────────────────
 
@@ -242,19 +242,6 @@ export async function fetchOfficialCalendar(year: number): Promise<OfficialRaceS
         cancelledCircuits.add(s.circuit_short_name.toLowerCase());
       }
     }
-  }
-
-  // For 2026, SEASON_2026_CALENDAR contains verified authoritative schedules & compounds.
-  // Jolpica has preliminary stubs (e.g. Baku Thursday FP1).
-  if (year === 2026) {
-    return SEASON_2026_CALENDAR.map((race) => ({
-      ...race,
-      isCancelled:
-        cancelledCircuits.has(race.city.toLowerCase()) ||
-        cancelledCircuits.has(race.country.toLowerCase()) ||
-        race.isCancelled ||
-        false,
-    }));
   }
 
   // --- Transform to app format ---

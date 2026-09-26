@@ -30,6 +30,7 @@ import { getGrandPrixReportByRound, getGrandPrixReportByCircuitId } from '@/data
 import F1BroadcastTrackGuide from '@/components/circuits/F1BroadcastTrackGuide';
 import { useCountdown } from '@/lib/useCountdown';
 import { getCircuitTimezoneInfo, formatDualSessionTime } from '@/lib/circuitTimezones';
+import SessionResultsModal from './SessionResultsModal';
 
 interface SeasonHubProps {
   onNavigateToTelemetry?: (gpName?: string) => void;
@@ -235,6 +236,8 @@ export default function SeasonHub({
   const [calendarFilter, setCalendarFilter] = useState<'all' | 'sprint'>('all');
   const [showSeasonInfo, setShowSeasonInfo] = useState<boolean>(false);
   const [heroSubView, setHeroSubView] = useState<'schedule' | 'weather'>('schedule');
+  const [sessionModalOpen, setSessionModalOpen] = useState<boolean>(false);
+  const [selectedSessionForModal, setSelectedSessionForModal] = useState<string>('FP1');
 
   // Active season calendar & grid — starts with local data, upgradeable via API
   const localCalendar = useMemo(() => getSeasonCalendar(selectedSeason), [selectedSeason]);
@@ -262,13 +265,17 @@ export default function SeasonHub({
 
         const apiRaces: RaceWeekendSchedule[] = data.races;
 
-        // Ground truth: localCalendar has verified Sunday race dates, local schedules & circuits.
-        // Supplement with API dynamic data (e.g. isCancelled status from OpenF1)
+        // Official FIA API data (apiRaces) provides verified live schedule, dates, and targetDateUtc.
+        // Local calendar supplies circuit specifications (compounds, laps, track length).
         const merged = localCalendar.map((localRace) => {
           const apiMatch = apiRaces.find((l) => l.round === localRace.round);
+          if (!apiMatch) return localRace;
           return {
             ...localRace,
-            isCancelled: apiMatch?.isCancelled ?? localRace.isCancelled ?? false,
+            dates: apiMatch.dates || localRace.dates,
+            targetDateUtc: apiMatch.targetDateUtc || localRace.targetDateUtc,
+            scheduleJst: apiMatch.scheduleJst && apiMatch.scheduleJst.length > 0 ? apiMatch.scheduleJst : localRace.scheduleJst,
+            isCancelled: apiMatch.isCancelled ?? localRace.isCancelled ?? false,
           };
         });
 
@@ -590,42 +597,56 @@ export default function SeasonHub({
                 ) : null}
               </div>
 
-              {/* View 1: Professional Dual-Time Session Timetable Cards */}
+              {/* View 1: Professional Dual-Time Session Timetable Cards (Click to reveal results with spoiler shield) */}
               {heroSubView === 'schedule' && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 animate-fadeIn">
                   {selectedRace.scheduleJst.map((s) => {
                     const dual = formatDualSessionTime(s.session, s.dayTime, currentTzInfo);
                     return (
-                      <div
+                      <button
                         key={s.session}
-                        className={`flex flex-col justify-between p-2.5 sm:p-3 rounded-xl border transition-all ${
+                        type="button"
+                        onClick={() => {
+                          setSelectedSessionForModal(s.session);
+                          setSessionModalOpen(true);
+                        }}
+                        className={`text-left flex flex-col justify-between p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer group hover:scale-[1.02] active:scale-[0.99] ${
                           dual.isFinalRace
-                            ? 'bg-gradient-to-b from-red-950/35 via-slate-900/90 to-slate-950 border-red-500/40 shadow-md shadow-red-950/20 ring-1 ring-red-500/20'
-                            : 'bg-slate-900/80 hover:bg-slate-850 border-white/[0.08] hover:border-white/20'
+                            ? 'bg-gradient-to-b from-red-950/35 via-slate-900/90 to-slate-950 border-red-500/40 hover:border-red-400 shadow-md shadow-red-950/20 ring-1 ring-red-500/20 hover:shadow-red-900/30'
+                            : 'bg-slate-900/80 hover:bg-slate-850 border-white/[0.08] hover:border-sky-500/40'
                         }`}
+                        title={`クリックして${s.session}の結果詳細を表示`}
                       >
                         {/* Session Card Header */}
-                        <div className="flex items-center justify-between gap-1 pb-1.5 border-b border-white/[0.06]">
-                          <span
-                            className={`text-xs font-mono font-bold tracking-wider uppercase truncate ${
-                              dual.isFinalRace ? 'text-red-400' : 'text-slate-300'
-                            }`}
-                          >
-                            {dual.isFinalRace ? '🏁 決勝' : s.session}
+                        <div className="flex items-center justify-between gap-1.5 pb-1.5 border-b border-white/[0.06] w-full">
+                          <div className="flex items-center gap-1.5 truncate">
+                            <span
+                              className={`text-xs font-mono font-bold tracking-wider uppercase truncate ${
+                                dual.isFinalRace ? 'text-red-400' : 'text-slate-200'
+                              }`}
+                            >
+                              {dual.isFinalRace ? '🏁 決勝' : s.session}
+                            </span>
+                            {dual.isFinalRace ? (
+                              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-red-600 text-white font-bold tracking-wider shrink-0">
+                                FINAL
+                              </span>
+                            ) : s.session.includes('予選') ? (
+                              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-white/10 text-slate-300 font-medium shrink-0">
+                                QUALI
+                              </span>
+                            ) : null}
+                          </div>
+
+                          {/* 結果詳細ボタン (見出し横配置) */}
+                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.06] group-hover:bg-red-500/25 group-hover:text-white text-slate-300 font-semibold flex items-center gap-0.5 shrink-0 transition-all border border-white/[0.08] group-hover:border-red-500/40 shadow-sm">
+                            <span>結果詳細</span>
+                            <span className="group-hover:translate-x-0.5 transition-transform text-red-400 group-hover:text-white text-[11px]">↗</span>
                           </span>
-                          {dual.isFinalRace ? (
-                            <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-red-600 text-white font-bold tracking-wider shrink-0">
-                              FINAL
-                            </span>
-                          ) : s.session.includes('予選') ? (
-                            <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-white/10 text-slate-300 font-medium shrink-0">
-                              QUALI
-                            </span>
-                          ) : null}
                         </div>
 
                         {/* JST (日本時間 - Primary) */}
-                        <div className="py-2">
+                        <div className="py-2 w-full">
                           <div className="flex items-center gap-1 text-[10px] font-mono text-slate-400 mb-0.5">
                             <span className="px-1 py-0.2 rounded bg-red-500/20 text-red-300 font-bold text-[9px]">JST</span>
                             <span>日本時間</span>
@@ -637,7 +658,7 @@ export default function SeasonHub({
                         </div>
 
                         {/* Local Track Time (現地時間 - Secondary) */}
-                        <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono">
+                        <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono w-full">
                           <div className="flex items-center gap-1 text-slate-400 truncate">
                             <span className="text-[9px] px-1 py-0.2 rounded bg-sky-950/60 text-sky-400 border border-sky-500/20 shrink-0">
                               現地
@@ -648,7 +669,7 @@ export default function SeasonHub({
                             {dual.tzAbbr}
                           </span>
                         </div>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
@@ -1529,6 +1550,18 @@ export default function SeasonHub({
           </div>
         </div>
       )}
+
+      {/* Session Results & Timing Classification Modal with Spoiler Shield */}
+      <SessionResultsModal
+        isOpen={sessionModalOpen}
+        onClose={() => setSessionModalOpen(false)}
+        race={selectedRace}
+        circuitId={selectedCircuitId}
+        initialSessionName={selectedSessionForModal}
+        seasonYear={selectedSeason}
+        onNavigateToTelemetry={onNavigateToTelemetry}
+        onNavigateToDriver={onNavigateToDriver}
+      />
     </div>
   );
 }

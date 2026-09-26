@@ -592,8 +592,8 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "flag": "🇦🇿",
     "circuitName": "バクー市街地コース",
     "city": "バクー",
-    "dates": "2026年 9月25日 - 9月27日",
-    "targetDateUtc": "2026-09-27T11:00:00Z",
+    "dates": "2026年 9月24日 - 9月26日",
+    "targetDateUtc": "2026-09-26T11:00:00Z",
     "isSprint": false,
     "lengthKm": 6.003,
     "laps": 51,
@@ -601,23 +601,23 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "scheduleJst": [
       {
         "session": "FP1",
-        "dayTime": "9/25 (金) 18:30"
+        "dayTime": "9/24 (木) 17:30"
       },
       {
         "session": "FP2",
-        "dayTime": "9/25 (金) 22:00"
+        "dayTime": "9/24 (木) 21:00"
       },
       {
         "session": "FP3",
-        "dayTime": "9/26 (土) 18:30"
+        "dayTime": "9/25 (金) 17:30"
       },
       {
         "session": "予選",
-        "dayTime": "9/26 (土) 22:00"
+        "dayTime": "9/25 (金) 21:00"
       },
       {
         "session": "決勝",
-        "dayTime": "9/27 (日) 20:00 スタート"
+        "dayTime": "9/26 (土) 20:00 スタート"
       }
     ]
   },
