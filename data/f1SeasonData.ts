@@ -1,5 +1,3 @@
-'use client';
-
 /**
  * data/f1SeasonData.ts
  * Formula 1 Season Calendar, Session Timings (JST), Standings Data, and Grid Roster.
@@ -199,7 +197,7 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "circuitName": "マイアミ・インターナショナル・オートドローム",
     "city": "マイアミ",
     "dates": "2026年 5月1日 - 5月3日",
-    "targetDateUtc": "2026-05-03T20:00:00Z",
+    "targetDateUtc": "2026-05-03T18:00:00Z",
     "isSprint": true,
     "lengthKm": 5.412,
     "laps": 57,
@@ -235,7 +233,7 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "circuitName": "ジル・ヴィルヌーヴ・サーキット",
     "city": "モントリオール",
     "dates": "2026年 5月22日 - 5月24日",
-    "targetDateUtc": "2026-05-24T20:00:00Z",
+    "targetDateUtc": "2026-05-24T18:00:00Z",
     "isSprint": true,
     "lengthKm": 4.361,
     "laps": 70,
@@ -595,7 +593,7 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "circuitName": "バクー市街地コース",
     "city": "バクー",
     "dates": "2026年 9月25日 - 9月27日",
-    "targetDateUtc": "2026-09-26T11:00:00Z",
+    "targetDateUtc": "2026-09-27T11:00:00Z",
     "isSprint": false,
     "lengthKm": 6.003,
     "laps": 51,
@@ -703,7 +701,7 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "circuitName": "サーキット・オブ・ジ・アメリカズ (COTA)",
     "city": "オースティン",
     "dates": "2026年 10月23日 - 10月25日",
-    "targetDateUtc": "2026-10-25T20:00:00Z",
+    "targetDateUtc": "2026-10-25T19:00:00Z",
     "isSprint": false,
     "lengthKm": 5.513,
     "laps": 56,
@@ -811,7 +809,7 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "circuitName": "ラスベガス・ストリップ・サーキット",
     "city": "ラスベガス",
     "dates": "2026年 11月20日 - 11月22日",
-    "targetDateUtc": "2026-11-22T04:00:00Z",
+    "targetDateUtc": "2026-11-22T06:00:00Z",
     "isSprint": false,
     "lengthKm": 6.201,
     "laps": 50,
@@ -847,7 +845,7 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "circuitName": "ルサイル・インターナショナル・サーキット",
     "city": "ルサイル",
     "dates": "2026年 11月27日 - 11月29日",
-    "targetDateUtc": "2026-11-29T16:00:00Z",
+    "targetDateUtc": "2026-11-29T14:00:00Z",
     "isSprint": false,
     "lengthKm": 5.419,
     "laps": 57,

@@ -531,6 +531,8 @@ export default function DriverDetailModal({
                     items={cleanGallery}
                     title="📸 DRIVER PHOTO & ACTION GALLERY / ギャラリー"
                     themeColor={themeColor}
+                    size="sm"
+                    aspectRatio="16/10"
                   />
                 );
               })()}

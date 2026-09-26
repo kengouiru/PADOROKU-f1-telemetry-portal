@@ -154,7 +154,7 @@ export const CIRCUIT_REAL_IMAGES: Record<string, string> = {
   'imola': '/images/circuits/circuit_imola_real.jpg',
   'villeneuve': '/images/circuits/circuit_villeneuve_real.jpg',
   'catalunya': '/images/circuits/circuit_catalunya.jpg',
-  'madrid': '/images/circuits/circuit_catalunya.jpg',
+  'madrid': '/images/circuits/circuit_madrid.jpg',
   'redbull-ring': '/images/circuits/circuit_redbull_ring_real.jpg',
   'hungaroring': '/images/circuits/circuit_hungaroring.jpg',
   'zandvoort': '/images/circuits/circuit_zandvoort.jpg',
@@ -207,12 +207,23 @@ export default function CircuitsHub({
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedCircuitDetail, setSelectedCircuitDetail] = useState<CircuitProfile | null>(null);
 
-  // Automatically select & open modal when initialCircuitId is supplied
+  // Automatically select & open modal when initialCircuitId is supplied or from URL query param ?circuit=<id>
   useEffect(() => {
     if (initialCircuitId) {
       const found = KNOWLEDGE_CIRCUITS.find((c) => c.id === initialCircuitId);
       if (found) {
         setSelectedCircuitDetail(found);
+        return;
+      }
+    }
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const circuitParam = params.get('circuit');
+      if (circuitParam) {
+        const found = KNOWLEDGE_CIRCUITS.find((c) => c.id === circuitParam);
+        if (found) {
+          setSelectedCircuitDetail(found);
+        }
       }
     }
   }, [initialCircuitId]);
@@ -284,6 +295,26 @@ export default function CircuitsHub({
       onClearSearch();
     }
   };
+
+  // If a circuit detail is selected, render CircuitDetailModal as a Dedicated Full-Page View (matching DriverDetailModal and TeamDetailModal)
+  if (selectedCircuitDetail) {
+    return (
+      <CircuitDetailModal
+        circuit={selectedCircuitDetail}
+        allCircuits={KNOWLEDGE_CIRCUITS}
+        onSelectCircuit={(c) => setSelectedCircuitDetail(c)}
+        onNavigateToTelemetry={onNavigateToTelemetry}
+        onClose={() => {
+          setSelectedCircuitDetail(null);
+          if (typeof window !== 'undefined') {
+            const cleanupUrl = new URL(window.location.href);
+            cleanupUrl.searchParams.delete('circuit');
+            window.history.replaceState(null, '', cleanupUrl.toString());
+          }
+        }}
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col gap-3 sm:gap-4 max-w-7xl mx-auto animate-fade-in pb-6 sm:pb-2">
@@ -696,11 +727,40 @@ export default function CircuitsHub({
                   </div>
                 </div>
 
-                {/* Card Footer with Quick Telemetry CTA + Details */}
+                {/* Card Footer with Quick Links + Telemetry CTA + Details */}
                 <div className="flex items-center justify-between pt-2.5 border-t border-white/5 text-[11px] font-mono text-slate-400 gap-2">
-                  <span className="text-[10px] text-slate-400 shrink-0 font-bold">
-                    {circuit.turns} ターン
-                  </span>
+                  <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                    <span className="text-[10px] text-slate-400 shrink-0 font-bold">
+                      {circuit.turns} ターン
+                    </span>
+                    {circuit.officialLinks?.website && (
+                      <a
+                        href={circuit.officialLinks.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-sky-300 border border-white/10 text-[9.5px] font-mono transition-all"
+                        title={`${circuit.name} 公式Webサイト`}
+                      >
+                        <span>🌐</span>
+                        <span>公式</span>
+                        <span className="text-[8px]">↗</span>
+                      </a>
+                    )}
+                    {circuit.officialLinks?.f1Official && (
+                      <a
+                        href={circuit.officialLinks.f1Official}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-red-300 border border-white/10 text-[9.5px] font-mono transition-all"
+                        title={`${circuit.name} F1.com公式ガイド`}
+                      >
+                        <span className="text-red-500 font-bold text-[8.5px]">F1</span>
+                        <span className="text-[8px]">↗</span>
+                      </a>
+                    )}
+                  </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
                     {onNavigateToTelemetry && (
@@ -733,16 +793,6 @@ export default function CircuitsHub({
         })}
       </div>
 
-      {/* Circuit Detail Modal */}
-      {selectedCircuitDetail && (
-        <CircuitDetailModal
-          circuit={selectedCircuitDetail}
-          allCircuits={KNOWLEDGE_CIRCUITS}
-          onSelectCircuit={(c) => setSelectedCircuitDetail(c)}
-          onNavigateToTelemetry={onNavigateToTelemetry}
-          onClose={() => setSelectedCircuitDetail(null)}
-        />
-      )}
     </div>
   );
 }

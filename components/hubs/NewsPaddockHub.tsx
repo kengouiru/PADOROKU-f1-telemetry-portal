@@ -11,6 +11,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import type { F1NewsArticle, TeamTag, TopicTag, NewsAuthorityLevel } from '@/app/api/f1-news/route';
 import { SEASON_2026_CALENDAR, getNextUpcomingRound, type RaceWeekendSchedule } from '@/data/f1SeasonData';
 import { getGeminiAuthHeaders } from '@/lib/apiKeyService';
+import SmartWikiText from '@/components/common/SmartWikiText';
 
 interface NewsPaddockHubProps {
   geminiApiKey?: string;
@@ -24,6 +25,60 @@ const TOPIC_ICONS: Record<TopicTag, { label: string; icon: string }> = {
   Contract: { label: '移籍/契約 (Contract)', icon: '🔄' },
   FIA: { label: 'FIA公式 (FIA)', icon: '⚖️' },
 };
+
+const TEAM_KNOWLEDGE_SLUGS: Record<string, string> = {
+  'Red Bull': 'red-bull',
+  'Ferrari': 'ferrari',
+  'McLaren': 'mclaren',
+  'Mercedes': 'mercedes',
+  'Aston Martin': 'aston-martin',
+  'RB': 'rb',
+  'Alpine': 'alpine',
+  'Williams': 'williams',
+  'Audi': 'audi',
+  'Haas': 'haas',
+  'Cadillac': 'cadillac',
+};
+
+const TOPIC_KNOWLEDGE_MAP: Record<TopicTag, { label: string; url: string }> = {
+  Aero: { label: '空力・規定', url: '/knowledge/rules' },
+  PU: { label: 'パワーユニット', url: '/knowledge/glossary/power-unit' },
+  Tyre: { label: 'タイヤ工学', url: '/knowledge/glossary/degradation' },
+  Strategy: { label: 'ピット戦略', url: '/knowledge/glossary/undercut' },
+  Contract: { label: 'レギュレーション', url: '/knowledge/rules' },
+  FIA: { label: 'FIA公式規則', url: '/knowledge/rules' },
+};
+
+function getTeamKnowledgeSlug(teamName: string): string {
+  if (TEAM_KNOWLEDGE_SLUGS[teamName]) return TEAM_KNOWLEDGE_SLUGS[teamName];
+  const lower = teamName.toLowerCase();
+  if (lower.includes('red bull')) return 'red-bull';
+  if (lower.includes('ferrari')) return 'ferrari';
+  if (lower.includes('mclaren')) return 'mclaren';
+  if (lower.includes('mercedes')) return 'mercedes';
+  if (lower.includes('aston')) return 'aston-martin';
+  if (lower.includes('rb') || lower.includes('racing bulls')) return 'rb';
+  if (lower.includes('alpine')) return 'alpine';
+  if (lower.includes('williams')) return 'williams';
+  if (lower.includes('audi') || lower.includes('sauber')) return 'audi';
+  if (lower.includes('haas')) return 'haas';
+  if (lower.includes('cadillac')) return 'cadillac';
+  return 'red-bull';
+}
+
+function getPrimaryKnowledgeUrl(item: F1NewsArticle): string {
+  if (item.teams && item.teams.length > 0) {
+    return `/knowledge/teams/${getTeamKnowledgeSlug(item.teams[0].name)}`;
+  }
+  if (item.drivers && item.drivers.length > 0) {
+    return `/knowledge/drivers/${item.drivers[0]}`;
+  }
+  if (item.topics && item.topics.length > 0) {
+    const topic = item.topics[0];
+    if (TOPIC_KNOWLEDGE_MAP[topic]) return TOPIC_KNOWLEDGE_MAP[topic].url;
+  }
+  return '/knowledge/rules';
+}
 
 const AUTHORITY_CONFIG: Record<
   NewsAuthorityLevel,
@@ -676,9 +731,9 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                     <h3 className="text-sm font-bold text-white group-hover:text-red-400 transition-colors leading-snug">
                       {item.title}
                     </h3>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                      {item.summary}
-                    </p>
+                    <div className="text-xs text-slate-300 leading-relaxed font-sans">
+                      <SmartWikiText text={item.summary} />
+                    </div>
 
                     {/* Multi-Tags Row (Topics + Team Badges + Driver Badges) */}
                     <div className="flex flex-wrap items-center gap-1.5 pt-1">
@@ -748,6 +803,71 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                       })}
                     </div>
 
+                    {/* Knowledge Base (大百科) Quick Navigation Tag Strip */}
+                    {((item.teams && item.teams.length > 0) || (item.drivers && item.drivers.length > 0) || (item.topics && item.topics.length > 0)) && (
+                      <div className="flex flex-wrap items-center gap-1.5 pt-1.5 pb-0.5 border-t border-white/5">
+                        <span className="text-[10px] text-sky-400 font-semibold flex items-center gap-1 shrink-0">
+                          <span>📚</span>
+                          <span>大百科連携:</span>
+                        </span>
+
+                        {/* Team Knowledge Links */}
+                        {item.teams?.map((team) => {
+                          const slug = getTeamKnowledgeSlug(team.name);
+                          return (
+                            <a
+                              key={`wiki-team-${team.name}`}
+                              href={`/knowledge/teams/${slug}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-2 py-0.5 rounded text-[10px] font-medium bg-sky-950/40 hover:bg-sky-900/60 text-sky-300 hover:text-white border border-sky-500/30 hover:border-sky-400/60 transition-all flex items-center gap-1 cursor-pointer"
+                              title={`${team.name}の諸元・歴史を大百科で調べる`}
+                            >
+                              <span>🏎️</span>
+                              <span>{team.name}</span>
+                              <span className="text-[9px] opacity-70">↗</span>
+                            </a>
+                          );
+                        })}
+
+                        {/* Driver Knowledge Links */}
+                        {item.drivers?.map((drv) => (
+                          <a
+                            key={`wiki-driver-${drv}`}
+                            href={`/knowledge/drivers/${drv}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-sky-950/40 hover:bg-sky-900/60 text-sky-300 hover:text-white border border-sky-500/30 hover:border-sky-400/60 transition-all flex items-center gap-1 cursor-pointer"
+                            title={`${drv}の戦績・キャリアを大百科で調べる`}
+                          >
+                            <span>👤</span>
+                            <span>{drv}</span>
+                            <span className="text-[9px] opacity-70">↗</span>
+                          </a>
+                        ))}
+
+                        {/* Topic/Rule Knowledge Links */}
+                        {item.topics?.map((topic) => {
+                          const info = TOPIC_KNOWLEDGE_MAP[topic];
+                          if (!info) return null;
+                          return (
+                            <a
+                              key={`wiki-topic-${topic}`}
+                              href={info.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-white/10 hover:border-sky-400/40 transition-all flex items-center gap-1 cursor-pointer"
+                              title={`${info.label}を大百科で調べる`}
+                            >
+                              <span>{TOPIC_ICONS[topic]?.icon || '📖'}</span>
+                              <span>{info.label}</span>
+                              <span className="text-[9px] opacity-70">↗</span>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    )}
+
                     {/* AI 3-Line Smart Summary Block (if generated) */}
                     {aiSummaries[item.id] && (
                       <div className="bg-purple-950/40 border border-purple-500/30 rounded-xl p-3 text-xs text-purple-200 mt-1.5 animate-fade-in flex flex-col gap-1.5 shadow-inner">
@@ -759,14 +879,14 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                           <span className="text-[9px] text-purple-400/80 font-mono">Gemini 3.5</span>
                         </div>
                         <div className="space-y-1 text-[11px] text-slate-200 leading-relaxed whitespace-pre-wrap font-sans">
-                          {aiSummaries[item.id]}
+                          <SmartWikiText text={aiSummaries[item.id]} />
                         </div>
                       </div>
                     )}
                   </div>
 
                   {/* Card Action Buttons */}
-                  <div className="flex items-center justify-between pt-3 border-t border-white/5 text-xs">
+                  <div className="flex items-center justify-between pt-3 border-t border-white/5 text-xs gap-2 flex-wrap">
                     {/* AI Summarize Button */}
                     {!aiSummaries[item.id] ? (
                       <button
@@ -794,16 +914,30 @@ export default function NewsPaddockHub({ geminiApiKey = '' }: NewsPaddockHubProp
                       </span>
                     )}
 
-                    {/* External Read Original Article Link */}
-                    <a
-                      href={item.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-red-400 hover:text-red-300 text-xs font-medium flex items-center gap-1 group-hover:translate-x-0.5 transition-transform ml-auto whitespace-nowrap shrink-0"
-                    >
-                      <span>元記事を読む</span>
-                      <span>↗</span>
-                    </a>
+                    <div className="flex items-center gap-3 ml-auto whitespace-nowrap shrink-0">
+                      {/* Knowledge Quick Link */}
+                      <a
+                        href={getPrimaryKnowledgeUrl(item)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sky-400 hover:text-sky-300 text-xs font-medium flex items-center gap-1 hover:translate-x-0.5 transition-transform"
+                        title="F1大百科で関連知識・スペックを調べる"
+                      >
+                        <span>📚 大百科で調べる</span>
+                        <span>↗</span>
+                      </a>
+
+                      {/* External Read Original Article Link */}
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-red-400 hover:text-red-300 text-xs font-medium flex items-center gap-1 group-hover:translate-x-0.5 transition-transform"
+                      >
+                        <span>元記事を読む</span>
+                        <span>↗</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
               );

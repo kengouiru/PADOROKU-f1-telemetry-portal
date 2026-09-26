@@ -9,7 +9,7 @@
  * Includes Free-word Search (AND search), Live Counter, Condition Reset, and DriverDetailModal.
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   KNOWLEDGE_TEAMS,
   KNOWLEDGE_DRIVERS,
@@ -37,6 +37,7 @@ export type DriverStatusFilter = 'ALL' | 'Current' | 'Legend' | 'Favorites';
 
 export interface DriversHubProps {
   searchQuery?: string;
+  initialDriverCode?: string;
   onClearSearch?: () => void;
   onSearchChange?: (q: string) => void;
   onNavigateToTelemetry?: (target?: TelemetryTarget) => void;
@@ -173,6 +174,7 @@ export const getCardDriverNameClass = (name: string): string => {
 
 export default function DriversHub({
   searchQuery = '',
+  initialDriverCode,
   onClearSearch,
   onSearchChange,
   onNavigateToTelemetry,
@@ -188,6 +190,18 @@ export default function DriversHub({
   const [localSearch, setLocalSearch] = useState<string>('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [selectedDriverDetail, setSelectedDriverDetail] = useState<DriverProfile | null>(null);
+
+  // Sync initialDriverCode to open DriverDetailModal if provided
+  useEffect(() => {
+    if (initialDriverCode) {
+      const match = KNOWLEDGE_DRIVERS.find(
+        (d) => d.code.toUpperCase() === initialDriverCode.toUpperCase()
+      );
+      if (match) {
+        setSelectedDriverDetail(match);
+      }
+    }
+  }, [initialDriverCode]);
   const [selectedTeamDetail, setSelectedTeamDetail] = useState<TeamProfile | null>(null);
   const [compareDriver1, setCompareDriver1] = useState<string>('VER');
   const [compareDriver2, setCompareDriver2] = useState<string>('NOR');
@@ -1096,26 +1110,40 @@ export default function DriversHub({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-white/10 text-xs">
               {currentSeasonGrid.isOngoing ? (
                 <>
-                  <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-lg text-emerald-200">
-                    <span className="text-base">📊</span>
-                    <span className="font-bold font-mono">ポイント首位 (Leader):</span>
-                    <span className="text-white font-bold truncate">
-                      {currentSeasonGrid.leaderDriver?.name || 'ジョージ・ラッセル'}
-                    </span>
-                    <span className="text-[11px] font-mono text-emerald-400/90 ml-auto shrink-0">
-                      {currentSeasonGrid.leaderDriver?.wins || 6}勝 / {currentSeasonGrid.leaderDriver?.points || 285}点
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 bg-sky-500/10 border border-sky-500/30 px-3 py-1.5 rounded-lg text-sky-200">
-                    <span className="text-base">🏁</span>
-                    <span className="font-bold font-mono">チーム首位 (Leader):</span>
-                    <span className="text-white font-bold truncate">
-                      {currentSeasonGrid.leaderConstructor?.name || 'Mercedes-AMG'}
-                    </span>
-                    <span className="text-[11px] font-mono text-sky-400/90 ml-auto shrink-0">
-                      {currentSeasonGrid.ongoingStatusText || '2026シーズン進行中 (未確定)'}
+                  <div className="flex items-center gap-2.5 bg-amber-500/10 border border-amber-500/30 px-3.5 py-2 rounded-xl text-amber-200 shadow-sm">
+                    <span className="text-base shrink-0">🏆</span>
+                    <div className="min-w-0">
+                      <span className="font-bold font-mono text-[10px] text-amber-400 block uppercase tracking-wider">
+                        世界王者 (World Champion Status)
+                      </span>
+                      <span className="text-white font-bold text-xs truncate">
+                        未確定（2026シーズン未終了・全23戦予定）
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-500/30 ml-auto shrink-0 font-bold">
+                      タイトル未確定
                     </span>
                   </div>
+                  <div className="flex items-center gap-2.5 bg-sky-500/10 border border-sky-500/30 px-3.5 py-2 rounded-xl text-sky-200 shadow-sm">
+                    <span className="text-base shrink-0">🛡️</span>
+                    <div className="min-w-0">
+                      <span className="font-bold font-mono text-[10px] text-sky-400 block uppercase tracking-wider">
+                        情報の出所 / 一次出典 (Official Sources)
+                      </span>
+                      <span className="text-white font-bold text-xs truncate">
+                        {currentSeasonGrid.sourceNotice || 'FIA公式レギュレーション ＆ 各チーム参戦発表'}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-950/80 text-sky-300 border border-sky-500/30 ml-auto shrink-0 font-bold">
+                      全11チーム・22名体制
+                    </span>
+                  </div>
+                  {currentSeasonGrid.statusNotice && (
+                    <div className="sm:col-span-2 px-3.5 py-2 rounded-xl bg-slate-950/80 border border-white/10 text-[11px] text-slate-300 flex items-start gap-2 shadow-sm">
+                      <span className="text-sky-400 text-sm shrink-0 mt-0.5">ℹ️</span>
+                      <span className="leading-relaxed">{currentSeasonGrid.statusNotice}</span>
+                    </div>
+                  )}
                 </>
               ) : currentSeasonGrid.championDriver && currentSeasonGrid.championConstructor ? (
                 <>
@@ -1159,7 +1187,7 @@ export default function DriversHub({
                       className="w-2 h-4 rounded-full shrink-0 shadow-sm"
                       style={{ backgroundColor: team.teamColor }}
                     />
-                    {team.finalRank && (
+                    {!currentSeasonGrid.isOngoing && team.finalRank && (
                       <span className="bg-white/10 text-white font-mono text-[10px] font-bold px-1.5 py-0.2 rounded">
                         #{team.finalRank}
                       </span>

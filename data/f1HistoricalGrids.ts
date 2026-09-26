@@ -35,6 +35,8 @@ export interface SeasonGridInfo {
   seasonSummary: string;
   isOngoing?: boolean;
   ongoingStatusText?: string;
+  statusNotice?: string;
+  sourceNotice?: string;
   championDriver?: {
     code: string;
     name: string;
@@ -73,21 +75,9 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
     eraName: '持続可能燃料 ＆ 350kW電動MGU-K 新レギュレーション時代',
     seasonSummary: 'MGU-H撤廃と電動出力3倍化の新PU規定が導入。新規ワークスのアウディと第11チームのキャデラックが参戦し、11チーム・22台体制へ拡大。アストンマーティンはホンダの完全ワークスPU体制へ移行。',
     isOngoing: true,
-    ongoingStatusText: '2026シーズン進行中 (第16戦モンツァ終了時点 - タイトル未確定)',
-    leaderDriver: {
-      code: 'RUS',
-      name: 'ジョージ・ラッセル',
-      team: 'Mercedes-AMG',
-      carNumber: 63,
-      points: 285,
-      wins: 6,
-    },
-    leaderConstructor: {
-      name: 'Mercedes-AMG PETRONAS F1 Team',
-      powerUnit: 'Mercedes M17 Works',
-      points: 495,
-      wins: 11,
-    },
+    ongoingStatusText: '2026年シーズン未終了・タイトル未確定 (全23戦開催予定)',
+    statusNotice: '2026年シーズンは未終了のため、世界王者（ドライバーズ／コンストラクターズ）および勝敗・ポイント獲得数は未確定です。本一覧はFIA公式競技規則・技術規則および各チーム公式発表に基づく参戦体制（全11チーム・22名）を表示しています。',
+    sourceNotice: 'FIA（国際自動車連盟）公式レギュレーション ＆ 各コンストラクター公式参戦リリース',
     teams: [
       {
         teamId: 'mercedes',
@@ -96,10 +86,9 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         teamColor: '#27F4D2',
         powerUnit: 'Mercedes M17 Works',
         teamPrincipal: 'Toto Wolff',
-        finalRank: 1,
         drivers: [
           { code: 'RUS', name: 'ジョージ・ラッセル', number: 63, country: '英国', flag: '🇬🇧', role: 'Regular', note: 'チームを牽引する大黒柱' },
-          { code: 'ANT', name: 'アンドレア・キミ・アントネッリ', number: 12, country: 'イタリア', flag: '🇮🇹', role: 'Regular', isRookie: false, note: 'モンツァで19番手から歴史的勝利を飾った新星' },
+          { code: 'ANT', name: 'アンドレア・キミ・アントネッリ', number: 12, country: 'イタリア', flag: '🇮🇹', role: 'Regular', isRookie: false, note: 'メルセデスの英才教育を受け18歳で昇格した超新星' },
         ],
         reserves: [
           { code: 'MSC', name: 'ミック・シューマッハ', number: 47, country: 'ドイツ', flag: '🇩🇪', role: 'Reserve', note: 'WECアルピーヌと兼務する実力派リザーブ' },
@@ -113,7 +102,6 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         teamColor: '#E80020',
         powerUnit: 'Ferrari 067/3 Works',
         teamPrincipal: 'Frédéric Vasseur',
-        finalRank: 2,
         drivers: [
           { code: 'LEC', name: 'シャルル・ルクレール', number: 16, country: 'モナコ', flag: '🇲🇨', role: 'Regular', note: 'ティフォシの寵児、マラネロの支柱' },
           { code: 'HAM', name: 'ルイス・ハミルトン', number: 44, country: '英国', flag: '🇬🇧', role: 'Regular', note: '跳ね馬での2年目、通算8度目の王座を目指す' },
@@ -130,7 +118,6 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         teamColor: '#FF8000',
         powerUnit: 'Mercedes M17 Customer',
         teamPrincipal: 'Andrea Stella',
-        finalRank: 3,
         drivers: [
           { code: 'NOR', name: 'ランド・ノリス', number: 1, country: '英国', flag: '🇬🇧', role: 'Regular', note: '2025年王者、カーナンバー1を背負う' },
           { code: 'PIA', name: 'オスカー・ピアストリ', number: 81, country: '豪州', flag: '🇦🇺', role: 'Regular', note: '驚異的な安定感を誇る若きクールマスター' },
@@ -147,7 +134,6 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         teamColor: '#3671C6',
         powerUnit: 'Red Bull Ford Powertrains',
         teamPrincipal: 'Laurent Mekies',
-        finalRank: 4,
         drivers: [
           { code: 'VER', name: 'マックス・フェルスタッペン', number: 3, country: 'オランダ', flag: '🇳🇱', role: 'Regular', note: 'フォード新PU時代でも勝利をもぎ取る絶対王者' },
           { code: 'HAD', name: 'イサック・ハジャー', number: 6, country: 'フランス', flag: '🇫🇷', role: 'Regular', isTransfer: true, note: 'レッドブル昇格を果たしたアグレッシブな新鋭' },
@@ -164,7 +150,6 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         teamColor: '#6692FF',
         powerUnit: 'Red Bull Ford Powertrains',
         teamPrincipal: 'Alan Permane',
-        finalRank: 5,
         drivers: [
           { code: 'TSU', name: '角田 裕毅', number: 22, country: '日本', flag: '🇯🇵', role: 'Regular', note: 'F1参戦6年目、リーダーとしてチームを牽引' },
           { code: 'LAW', name: 'リアム・ローソン', number: 30, country: 'NZ', flag: '🇳🇿', role: 'Regular', note: '粘り強い走りで入賞を積み重ねる' },
@@ -180,7 +165,6 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         teamColor: '#00A0DE',
         powerUnit: 'Mercedes M17',
         teamPrincipal: 'James Vowles',
-        finalRank: 6,
         drivers: [
           { code: 'ALB', name: 'アレクサンダー・アルボン', number: 23, country: 'タイ', flag: '🇹🇭', role: 'Regular', note: 'ウィリアムズ躍進の立役者' },
           { code: 'SAI', name: 'カルロス・サインツ', number: 55, country: 'スペイン', flag: '🇪🇸', role: 'Regular', note: '高い知性と開発力でマシンを進化させる' },
@@ -196,7 +180,6 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         teamColor: '#0093CC',
         powerUnit: 'Mercedes M17 (新換装)',
         teamPrincipal: 'Flavio Briatore / Steve Nielsen',
-        finalRank: 7,
         drivers: [
           { code: 'GAS', name: 'ピエール・ガスリー', number: 10, country: 'フランス', flag: '🇫🇷', role: 'Regular', note: 'メルセデスPUへ換装しリーダーシップを発揮' },
           { code: 'COL', name: 'フランコ・コラピント', number: 43, country: 'アルゼンチン', flag: '🇦🇷', role: 'Regular', note: '熱狂的な母国の期待を背負う若き天才' },
@@ -213,7 +196,6 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         teamColor: '#229971',
         powerUnit: 'Honda Works PU (RA626H)',
         teamPrincipal: 'Adrian Newey',
-        finalRank: 8,
         drivers: [
           { code: 'ALO', name: 'フェルナンド・アロンソ', number: 14, country: 'スペイン', flag: '🇪🇸', role: 'Regular', note: 'ホンダ新ワークスPUとともに悲願の33勝目を狙う' },
           { code: 'STR', name: 'ランス・ストロール', number: 18, country: 'カナダ', flag: '🇨🇦', role: 'Regular', note: 'ニューウェイ設計の最新鋭マシンを駆る' },
@@ -230,7 +212,6 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         teamColor: '#B6BABD',
         powerUnit: 'Ferrari Works',
         teamPrincipal: 'Ayao Komatsu (小松礼雄)',
-        finalRank: 9,
         drivers: [
           { code: 'OCO', name: 'エステバン・オコン', number: 31, country: 'フランス', flag: '🇫🇷', role: 'Regular', note: '小松代表のもとで強固なレースクラフトを展開' },
           { code: 'BEA', name: 'オリバー・ベアマン', number: 87, country: '英国', flag: '🇬🇧', role: 'Regular', note: 'フェラーリ育成の大器、確固たる正ドライバーへ' },
@@ -246,7 +227,6 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         teamColor: '#E0001A',
         powerUnit: 'Audi Works E-Performance',
         teamPrincipal: 'Mattia Binotto',
-        finalRank: 10,
         drivers: [
           { code: 'HUL', name: 'ニコ・ヒュルケンベルグ', number: 27, country: 'ドイツ', flag: '🇩🇪', role: 'Regular', isTransfer: true, note: 'ドイツ名門アウディ初代ワークスエース' },
           { code: 'BOR', name: 'ガブリエル・ボルトレート', number: 5, country: 'ブラジル', flag: '🇧🇷', role: 'Regular', note: 'F3・F2ルーキー制覇の大型新鋭' },
@@ -262,7 +242,6 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         teamColor: '#D4AF37',
         powerUnit: 'Ferrari Works Power Unit',
         teamPrincipal: 'Marcin Budkowski',
-        finalRank: 11,
         drivers: [
           { code: 'PER', name: 'セルジオ・ペレス', number: 11, country: 'メキシコ', flag: '🇲🇽', role: 'Regular', isTransfer: true, note: '第11の米新規参戦チーム初代エース' },
           { code: 'BOT', name: 'バルテリ・ボッタス', number: 77, country: 'フィンランド', flag: '🇫🇮', role: 'Regular', isTransfer: true, note: '通算10勝の経験で新設チームの基盤を構築' },

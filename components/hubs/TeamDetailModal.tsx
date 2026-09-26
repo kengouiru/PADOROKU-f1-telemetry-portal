@@ -126,26 +126,15 @@ export default function TeamDetailModal({
     }, 100);
   };
 
-  // Helper to parse "[1]", "[2]" into clickable citation badges
+  // Helper to parse keywords and "[1]", "[2]" into clickable links and citation badges
   const renderTextWithCitations = (text: string) => {
-    const parts = text.split(/(\[\d+\])/g);
-    return parts.map((part, idx) => {
-      const match = part.match(/\[(\d+)\]/);
-      if (match) {
-        const refId = parseInt(match[1], 10);
-        return (
-          <button
-            key={idx}
-            onClick={() => handleCitationClick(refId)}
-            className="inline-flex items-center px-1 mx-0.5 text-[10px] font-mono font-bold text-sky-400 bg-sky-950/60 hover:bg-sky-800/80 border border-sky-500/40 rounded transition-all cursor-pointer hover:scale-110"
-            title={`参考文献 [${refId}] を確認`}
-          >
-            [{refId}]
-          </button>
-        );
-      }
-      return <span key={idx}>{part}</span>;
-    });
+    return (
+      <SmartWikiText
+        text={text}
+        excludeUrl={`/knowledge/teams/${team.id}`}
+        onCitationClick={handleCitationClick}
+      />
+    );
   };
 
   // Helper for structured multi-chapter encyclopedic paragraphs
@@ -880,8 +869,10 @@ export default function TeamDetailModal({
                 {team.visualGallery && team.visualGallery.length > 0 && (
                   <PhotoGalleryCarousel
                     items={team.visualGallery}
-                    title="📸 HISTORIC CARS & FACTORY GALLERY"
+                    title="📸 TEAM FACTORY & HISTORIC CAR GALLERY / チームギャラリー"
                     themeColor={themeColor}
+                    size="sm"
+                    aspectRatio="16/10"
                   />
                 )}
 
@@ -901,6 +892,16 @@ export default function TeamDetailModal({
             {/* ── TAB 4: FACTORY & STRUCTURE ── */}
             {activeTab === 'factory' && (
               <div className="space-y-4 animate-fade-in">
+                {team.visualGallery && team.visualGallery.length > 0 && (
+                  <PhotoGalleryCarousel
+                    items={team.visualGallery}
+                    title="📸 TEAM FACTORY & HISTORIC CAR GALLERY / チームギャラリー"
+                    themeColor={themeColor}
+                    size="sm"
+                    aspectRatio="16/10"
+                  />
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                   <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-2">
                     <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">

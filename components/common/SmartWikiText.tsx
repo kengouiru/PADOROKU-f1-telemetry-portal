@@ -44,7 +44,7 @@ export default function SmartWikiText({
               href={token.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline text-inherit border-b border-dotted border-current/40 hover:border-current/90 cursor-pointer transition-colors pb-[1px]"
+              className="inline text-sky-300 hover:text-white font-medium border-b border-dotted border-sky-400/70 hover:border-sky-200 hover:bg-sky-500/20 px-0.5 rounded transition-all cursor-pointer decoration-clone"
               title={token.title}
             >
               {token.content}

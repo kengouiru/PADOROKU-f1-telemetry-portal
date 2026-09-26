@@ -45,6 +45,8 @@ export interface DetailedTelemetryChartProps {
   initialDriver1Code?: string;
   initialDriver2Code?: string;
   initialTab?: 'charts' | 'delta_matrix';
+  onNavigateToCircuit?: (circuitId: string) => void;
+  onNavigateToGlossary?: (termId: string) => void;
   className?: string;
 }
 
@@ -53,6 +55,8 @@ export default function DetailedTelemetryChart({
   initialDriver1Code = 'VER',
   initialDriver2Code = 'NOR',
   initialTab,
+  onNavigateToCircuit,
+  onNavigateToGlossary,
   className = '',
 }: DetailedTelemetryChartProps) {
   const [selectedCircuit, setSelectedCircuit] = useState(initialCircuitId);
@@ -116,6 +120,28 @@ export default function DetailedTelemetryChart({
   }, [selectedCircuit, d1, d2]);
 
   const { points, insights, circuitName, circuitLengthM } = telemetryData;
+
+  // Match circuit from KNOWLEDGE_CIRCUITS for deep encyclopedic navigation
+  const matchedKnowledgeCircuit = useMemo(() => {
+    return (
+      KNOWLEDGE_CIRCUITS.find(
+        (c) =>
+          c.id === selectedCircuit ||
+          c.id.includes(selectedCircuit) ||
+          selectedCircuit.includes(c.id) ||
+          c.name.includes(circuitName)
+      ) || KNOWLEDGE_CIRCUITS[0]
+    );
+  }, [selectedCircuit, circuitName]);
+
+  const TELEMETRY_ENGINEERING_TERMS = useMemo(() => [
+    { id: 'trail-braking', label: 'トレイルブレーキング', icon: '📉', desc: '進入減速＆荷重移動' },
+    { id: 'apex', label: 'エイペックス (頂点)', icon: '📐', desc: 'クリッピングライン' },
+    { id: 'bottom-speed', label: 'ボトムスピード', icon: '⚡', desc: '最低旋回速度' },
+    { id: 'delta-time', label: 'デルタタイム (Δt)', icon: '⏱️', desc: '区間累積タイム差' },
+    { id: 'drs', label: 'DRS / Xモード', icon: '💨', desc: '低ドラッグ直線加速' },
+    { id: 'degradation', label: 'デグラデーション', icon: '🛞', desc: 'タイヤ熱ダレ・摩耗' },
+  ], []);
 
   // Key corner points for reference lines
   const cornerMarkers = useMemo(() => {
@@ -471,6 +497,69 @@ export default function DetailedTelemetryChart({
               ))}
             </select>
           </div>
+        </div>
+      </div>
+
+      {/* ── F1 Knowledge Base & Engineering Anatomy Quick-Strip ── */}
+      <div className="glass-card-premium p-2.5 sm:p-3 rounded-xl border border-white/10 flex flex-col md:flex-row md:items-center justify-between gap-2.5 shadow-md">
+        {/* Left: Circuit Deep Anatomy Link */}
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-sm shrink-0">
+            📚
+          </div>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono font-bold uppercase text-emerald-400 tracking-wider">
+                F1 大百科・コース解剖連携
+              </span>
+              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/30">
+                2026工学解説
+              </span>
+            </div>
+            <p className="text-xs text-white font-racing font-bold truncate">
+              {circuitName}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              if (onNavigateToCircuit) {
+                onNavigateToCircuit(matchedKnowledgeCircuit.id);
+              } else {
+                window.open(`/knowledge/circuits/${matchedKnowledgeCircuit.id}`, '_blank');
+              }
+            }}
+            className="ml-auto md:ml-2 px-3 py-1.5 rounded-lg bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-200 hover:text-white border border-emerald-500/40 text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer shrink-0 hover:scale-105"
+            title={`${circuitName} の大百科コース解剖・工学ガイドを開く`}
+          >
+            <span>コース解剖・工学ガイド ↗</span>
+          </button>
+        </div>
+
+        {/* Right: Telemetry Engineering Quick Term Chips */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+          <span className="text-[10px] font-mono text-slate-400 shrink-0 flex items-center gap-1">
+            <span>🔧</span>
+            <span>テレメ工学用語:</span>
+          </span>
+          {TELEMETRY_ENGINEERING_TERMS.map((term) => (
+            <button
+              key={term.id}
+              type="button"
+              onClick={() => {
+                if (onNavigateToGlossary) {
+                  onNavigateToGlossary(term.id);
+                } else {
+                  window.open(`/knowledge/glossary/${term.id}`, '_blank');
+                }
+              }}
+              className="px-2.5 py-1 rounded-lg bg-slate-900/90 hover:bg-sky-950/80 border border-white/10 hover:border-sky-500/40 text-slate-300 hover:text-sky-300 text-[11px] font-mono transition-all flex items-center gap-1 shrink-0 cursor-pointer hover:scale-105"
+              title={`${term.label}: ${term.desc}（クリックで解説を開く）`}
+            >
+              <span>{term.icon}</span>
+              <span className="font-bold">{term.label}</span>
+            </button>
+          ))}
         </div>
       </div>
 

@@ -46,6 +46,8 @@ export interface KnowledgeHistoryHubProps {
   activeSubTab?: SubTab;
   onSubTabChange?: (tab: SubTab) => void;
   targetCircuitId?: string;
+  targetDriverCode?: string;
+  targetTeamId?: string;
   initialDramaTab?: 'storylines' | 'moments' | 'rivalries' | 'paddock' | 'radios';
   initialGlossaryTermId?: string | null;
   onNavigateToApp?: (action: InAppLink['action']) => void;
@@ -204,6 +206,8 @@ export default function KnowledgeHistoryHub({
   activeSubTab: controlledSubTab,
   onSubTabChange,
   targetCircuitId,
+  targetDriverCode,
+  targetTeamId,
   initialDramaTab,
   initialGlossaryTermId,
   onNavigateToApp,
@@ -227,6 +231,19 @@ export default function KnowledgeHistoryHub({
   const [selectedHistoryDetail, setSelectedHistoryDetail] = useState<HistoryArchive | null>(null);
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
+
+  // Sync targetTeamId to open TeamDetailModal and switch to teams tab
+  useEffect(() => {
+    if (targetTeamId) {
+      const match = KNOWLEDGE_TEAMS.find(
+        (t) => t.id === targetTeamId || t.name.toLowerCase().includes(targetTeamId.toLowerCase())
+      );
+      if (match) {
+        setSelectedTeamDetail(match);
+        setActiveSubTab('teams');
+      }
+    }
+  }, [targetTeamId]);
 
   // Close search dropdown on click outside
   useEffect(() => {
@@ -1000,6 +1017,7 @@ export default function KnowledgeHistoryHub({
       {activeSubTab === 'drivers' && (
         <DriversHub
           searchQuery={searchQuery}
+          initialDriverCode={targetDriverCode}
           onClearSearch={() => setSearchQuery('')}
           onNavigateToTelemetry={onNavigateToTelemetry}
           onNavigateToDrama={() => setActiveSubTab('drama')}

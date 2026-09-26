@@ -11,12 +11,13 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import type { CircuitProfile, Reference, TelemetryTarget } from '@/data/f1KnowledgeData';
 import { CIRCUIT_TRACK_MAPS } from '@/components/telemetry/TelemetryTrackMap';
 import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
+import SmartWikiText from '@/components/common/SmartWikiText';
 import { useUserPreferences } from '@/lib/userPreferences';
 import { getCircuitWeather } from '@/data/f1WeatherData';
+import { CIRCUIT_REAL_IMAGES } from './CircuitsHub';
 
 interface CircuitDetailModalProps {
   circuit: CircuitProfile;
@@ -44,8 +45,37 @@ export default function CircuitDetailModal({
   const [atmosphereLoaded, setAtmosphereLoaded] = useState<boolean>(false);
   const [atmosphereError, setAtmosphereError] = useState<boolean>(false);
   const [activeCornerHover, setActiveCornerHover] = useState<string | null>(null);
+  const [copiedUrl, setCopiedUrl] = useState<boolean>(false);
   const modalContentRef = useRef<HTMLDivElement>(null);
   const weather = getCircuitWeather(circuit.id);
+
+  // Sync URL search params with ?circuit=<circuitId>
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('circuit', circuit.id);
+      window.history.replaceState(null, '', url.toString());
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        const cleanupUrl = new URL(window.location.href);
+        cleanupUrl.searchParams.delete('circuit');
+        window.history.replaceState(null, '', cleanupUrl.toString());
+      }
+    };
+  }, [circuit.id]);
+
+  const handleCopyShareUrl = () => {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('circuit', circuit.id);
+      navigator.clipboard.writeText(url.toString()).then(() => {
+        setCopiedUrl(true);
+        setTimeout(() => setCopiedUrl(false), 2000);
+      });
+    }
+  };
 
   // Reset image states on circuit change
   useEffect(() => {
@@ -97,29 +127,20 @@ export default function CircuitDetailModal({
     }
   };
 
-  // Helper to parse "[1]", "[2]" into clickable citation badges
+  // Helper to parse "[1]", "[2]" and F1 technical/proper noun keywords into clickable links & citation badges
   const renderTextWithCitations = (text: string) => {
-    const parts = text.split(/(\[\d+\])/g);
-    return parts.map((part, idx) => {
-      const match = part.match(/\[(\d+)\]/);
-      if (match) {
-        const refId = parseInt(match[1], 10);
-        return (
-          <button
-            key={idx}
-            onClick={() => handleCitationClick(refId)}
-            className="inline-flex items-center px-1 mx-0.5 text-[10px] font-mono font-bold text-sky-400 bg-sky-950/60 hover:bg-sky-800/80 border border-sky-500/40 rounded transition-all cursor-pointer hover:scale-110"
-            title={`参考文献 [${refId}] を確認`}
-          >
-            [{refId}]
-          </button>
-        );
-      }
-      return <span key={idx}>{part}</span>;
-    });
+    if (!text) return null;
+    return (
+      <SmartWikiText
+        text={text}
+        excludeUrl={`/knowledge/circuits/${circuit.id}`}
+        maxLinksPerTerm={1}
+        onCitationClick={handleCitationClick}
+      />
+    );
   };
 
-  // Helper for structured multi-chapter encyclopedic paragraphs
+  // Helper for structured multi-chapter encyclopedic paragraphs with SmartWiki auto-linking
   const renderParagraphsWithCitations = (text: string) => {
     if (!text) return null;
     const paragraphs = text.split('\n\n').map((p) => p.trim()).filter(Boolean);
@@ -127,7 +148,7 @@ export default function CircuitDetailModal({
       return renderTextWithCitations(text);
     }
     return (
-      <div className="space-y-2.5">
+      <div className="space-y-3">
         {paragraphs.map((p, idx) => (
           <p key={idx} className="leading-relaxed">
             {renderTextWithCitations(p)}
@@ -140,84 +161,149 @@ export default function CircuitDetailModal({
   // Vector Track Map data from CIRCUIT_TRACK_MAPS
   const trackMapData = CIRCUIT_TRACK_MAPS[circuit.id] || CIRCUIT_TRACK_MAPS['suzuka'];
 
-  // Atmosphere photo resolution: Check atmosphereImage, visualGallery, or visualMap
+  // Atmosphere photo resolution: Prioritize verified authentic track photo from CIRCUIT_REAL_IMAGES
+  const realTrackPhoto = CIRCUIT_REAL_IMAGES[circuit.id];
   const atmosphereAsset =
     circuit.visualAssets?.atmosphereImage ||
     circuit.visualGallery?.find((g) => g.tag === 'Atmosphere' || g.tag === 'Panoramic') ||
     circuit.visualGallery?.[0] ||
     circuit.visualMap;
 
-  const proxiedAtmosphereUrl = atmosphereAsset?.imageUrl
-    ? atmosphereAsset.imageUrl.startsWith('/')
-      ? atmosphereAsset.imageUrl
-      : `/api/image-proxy?url=${encodeURIComponent(atmosphereAsset.imageUrl)}`
+  const rawAtmosphereUrl = realTrackPhoto || atmosphereAsset?.imageUrl;
+
+  const proxiedAtmosphereUrl = rawAtmosphereUrl
+    ? rawAtmosphereUrl.startsWith('/')
+      ? rawAtmosphereUrl
+      : `/api/image-proxy?url=${encodeURIComponent(rawAtmosphereUrl)}`
     : null;
 
   const atmosphereCaption: string = (atmosphereAsset && 'caption' in atmosphereAsset && typeof atmosphereAsset.caption === 'string') ? atmosphereAsset.caption : circuit.name;
 
-  if (!mounted) return null;
+  return (
+    <div className="w-full max-w-[1800px] mx-auto animate-fade-in pb-16">
+      {/* ── Solid Flush Sticky Top Navigation Bar: Compact Single-Row, Opaque bg-slate-950 ── */}
+      <div className="sticky top-0 z-50 bg-slate-950 border-b border-white/15 px-3 sm:px-6 py-2.5 shadow-2xl flex items-center justify-between gap-3 mb-4 rounded-b-2xl">
+        {/* Left: Return Button & Breadcrumbs */}
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+          <button
+            onClick={onClose}
+            className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-racing font-bold text-xs sm:text-sm flex items-center gap-1.5 border border-white/10 transition-all cursor-pointer shadow hover:scale-105 shrink-0"
+            title="一覧に戻る (ESC)"
+          >
+            <span>◀</span>
+            <span className="whitespace-nowrap">一覧に戻る</span>
+          </button>
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 font-mono truncate">
+            <span>F1 百科事典</span>
+            <span>&gt;</span>
+            <span>サーキット名鑑</span>
+            <span>&gt;</span>
+            <span className="text-white font-bold truncate">{circuit.name}</span>
+            <span className="text-slate-500 font-mono">({circuit.country})</span>
+          </div>
+        </div>
 
-  return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/85 backdrop-blur-md animate-fade-in">
-      {/* Modal Card */}
-      <div
-        ref={modalContentRef}
-        className="glass-card bg-slate-950/95 border border-white/15 w-full max-w-5xl max-h-[92vh] flex flex-col rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden relative"
-        style={{ borderTopColor: '#38bdf8', borderTopWidth: 4 }}
-      >
-        {/* Top Navigation Bar: Prev / Next & Close */}
-        <div className="p-2.5 sm:px-6 bg-slate-900/90 border-b border-white/10 flex items-center justify-between gap-2 flex-shrink-0">
-          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+        {/* Right: Prev / Next Switcher & Compact Action Buttons (Single Row) */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Quick Prev / Next Switcher */}
+          <div className="flex items-center bg-slate-900 border border-white/10 rounded-xl p-0.5">
             <button
               onClick={() => prevCircuit && onSelectCircuit(prevCircuit)}
-              className="px-2 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer max-w-[130px] sm:max-w-none"
+              className="px-2 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer border border-white/5"
               title="前のサーキット (←キー)"
             >
               <span>◀</span>
-              <span className="font-mono font-bold truncate">{prevCircuit?.name}</span>
+              <span className="font-mono font-bold truncate max-w-[80px] sm:max-w-none">{prevCircuit?.name}</span>
             </button>
+            <div className="w-px h-3.5 bg-white/15" />
             <button
               onClick={() => nextCircuit && onSelectCircuit(nextCircuit)}
-              className="px-2 py-1 sm:px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer max-w-[130px] sm:max-w-none"
+              className="px-2 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer border border-white/5"
               title="次のサーキット (→キー)"
             >
-              <span className="font-mono font-bold truncate">{nextCircuit?.name}</span>
+              <span className="font-mono font-bold truncate max-w-[80px] sm:max-w-none">{nextCircuit?.name}</span>
               <span>▶</span>
             </button>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-            {/* Star Favorite Button */}
-            <button
-              onClick={() => toggleCircuit(circuit.id)}
-              className={`px-2.5 py-1 rounded-xl text-xs font-racing flex items-center gap-1.5 transition-all cursor-pointer shadow-sm border ${
-                isFavoriteCircuit(circuit.id)
-                  ? 'bg-amber-400/25 border-amber-400/70 text-amber-300 hover:bg-amber-400/35'
-                  : 'bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-300 border-white/10'
-              }`}
-              title={isFavoriteCircuit(circuit.id) ? 'お気に入りから外す' : 'お気に入り (マイパドック) に登録'}
-            >
-              <span>{isFavoriteCircuit(circuit.id) ? '★' : '☆'}</span>
-              <span className="hidden sm:inline">
-                {isFavoriteCircuit(circuit.id) ? '推しコース登録中' : '推しコース登録'}
-              </span>
-            </button>
+          {/* Popout Separate Window Button */}
+          <button
+            type="button"
+            onClick={() => {
+              window.open(`/knowledge/circuits/${circuit.id}`, '_blank', 'width=1280,height=900,menubar=no,toolbar=no');
+            }}
+            className="px-2.5 py-1 rounded-xl bg-sky-950/80 hover:bg-sky-900 border border-sky-500/40 text-sky-300 hover:text-white text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:scale-105"
+            title="このサーキットを別ウィンドウで開く"
+          >
+            <span>別ウィンドウで開く</span>
+            <span>↗</span>
+          </button>
 
-            <span className="text-[10px] text-slate-500 font-mono hidden md:inline">
-              キーボード [←] [→] でサーキット切り替え / [ESC] で閉じる
+          {/* Copy Share URL Button */}
+          <button
+            onClick={handleCopyShareUrl}
+            className={`px-2.5 py-1 rounded-xl text-xs font-racing flex items-center gap-1.5 transition-all cursor-pointer shadow-sm border ${
+              copiedUrl
+                ? 'bg-emerald-500/25 border-emerald-400/70 text-emerald-300'
+                : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border-white/10'
+            }`}
+            title="このサーキットの共有URLをコピー"
+          >
+            <span>{copiedUrl ? '✅' : '🔗'}</span>
+            <span className="hidden sm:inline">
+              {copiedUrl ? 'URLコピー完了' : '共有URL'}
             </span>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-all text-sm font-bold cursor-pointer"
-              title="閉じる (ESC)"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
+          </button>
 
-        {/* Scrollable Modal Container: Wraps Header, Sticky Sub-Tabs & Content */}
-        <div className="overflow-y-auto flex-1 flex flex-col min-h-0">
+          {/* Star Favorite Button */}
+          <button
+            onClick={() => toggleCircuit(circuit.id)}
+            className={`px-2.5 py-1 rounded-xl text-xs font-racing flex items-center gap-1.5 transition-all cursor-pointer shadow-sm border ${
+              isFavoriteCircuit(circuit.id)
+                ? 'bg-amber-400/25 border-amber-400/70 text-amber-300 hover:bg-amber-400/35'
+                : 'bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-300 border-white/10'
+            }`}
+            title={isFavoriteCircuit(circuit.id) ? 'お気に入りから外す' : 'お気に入り (マイパドック) に登録'}
+          >
+            <span>{isFavoriteCircuit(circuit.id) ? '★' : '☆'}</span>
+            <span className="hidden md:inline">
+              {isFavoriteCircuit(circuit.id) ? '推しコース登録中' : '推しコース登録'}
+            </span>
+          </button>
+
+          {onNavigateToTelemetry && (
+            <button
+              onClick={() => {
+                if (circuit.telemetrySession) {
+                  onNavigateToTelemetry(circuit.telemetrySession);
+                } else {
+                  onNavigateToTelemetry({ year: 2024, meetingName: circuit.name });
+                }
+              }}
+              className="px-2.5 py-1 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:scale-105"
+              title="このサーキットの実走テレメトリーを開く"
+            >
+              <span>📊</span>
+              <span className="hidden md:inline">テレメトリー</span>
+            </button>
+          )}
+
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-all text-sm font-bold cursor-pointer"
+            title="一覧に戻る (ESC)"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      {/* Main Full-Page Circuit Detail Card */}
+      <div
+        ref={modalContentRef}
+        className="glass-card bg-slate-950/95 border border-white/15 w-full rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden relative"
+        style={{ borderTopColor: '#38bdf8', borderTopWidth: 4 }}
+      >
           {/* Modal Header: Circuit Name, Country, Specs Badge Bar */}
           <div className="p-3.5 sm:px-6 pb-3 border-b border-white/10 bg-slate-900/60 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 flex-shrink-0">
             <div className="space-y-1">
@@ -234,6 +320,81 @@ export default function CircuitDetailModal({
                 {circuit.name}
               </h2>
               <p className="text-xs text-slate-400 font-mono">{circuit.officialName}</p>
+
+              {/* Official External Links (Official Web / F1.com / Google Maps / X / Instagram) */}
+              {circuit.officialLinks && (
+                <div className="flex items-center gap-1.5 pt-1.5 flex-wrap">
+                  {circuit.officialLinks.website && (
+                    <a
+                      href={circuit.officialLinks.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium text-slate-200 bg-slate-800/90 border border-white/10 hover:border-sky-400/50 hover:bg-sky-950/40 hover:text-sky-200 transition-all shadow-sm group"
+                      title={`${circuit.name} 公式Webサイトを開く`}
+                    >
+                      <span>🌐</span>
+                      <span>公式Webサイト</span>
+                      <span className="text-[10px] text-slate-400 group-hover:text-sky-300">↗</span>
+                    </a>
+                  )}
+
+                  {circuit.officialLinks.f1Official && (
+                    <a
+                      href={circuit.officialLinks.f1Official}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium text-slate-200 bg-slate-800/90 border border-white/10 hover:border-red-500/50 hover:bg-red-950/40 hover:text-red-200 transition-all shadow-sm group"
+                      title={`${circuit.name} F1.com 公式サーキットガイドを開く`}
+                    >
+                      <span className="font-racing font-bold text-red-500">F1</span>
+                      <span>公式ガイド</span>
+                      <span className="text-[10px] text-slate-400 group-hover:text-red-300">↗</span>
+                    </a>
+                  )}
+
+                  {circuit.officialLinks.googleMaps && (
+                    <a
+                      href={circuit.officialLinks.googleMaps}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium text-slate-200 bg-slate-800/90 border border-white/10 hover:border-emerald-500/50 hover:bg-emerald-950/40 hover:text-emerald-200 transition-all shadow-sm group"
+                      title={`${circuit.name} Googleマップで現地を確認`}
+                    >
+                      <span>📍</span>
+                      <span>Googleマップ</span>
+                      <span className="text-[10px] text-slate-400 group-hover:text-emerald-300">↗</span>
+                    </a>
+                  )}
+
+                  {circuit.officialLinks.xTwitter && (
+                    <a
+                      href={circuit.officialLinks.xTwitter}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium text-slate-300 bg-slate-800/90 border border-white/10 hover:border-white/30 hover:bg-slate-700/80 hover:text-white transition-all shadow-sm"
+                      title={`${circuit.name} 公式X (Twitter) を開く`}
+                    >
+                      <span className="font-bold">𝕏</span>
+                      <span className="text-[10px] text-slate-400">↗</span>
+                    </a>
+                  )}
+
+                  {circuit.officialLinks.instagram && (
+                    <a
+                      href={circuit.officialLinks.instagram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium text-slate-300 bg-slate-800/90 border border-white/10 hover:border-pink-500/50 hover:bg-gradient-to-r hover:from-[#f09433]/20 hover:via-[#dc2743]/20 hover:to-[#bc1888]/20 hover:text-white transition-all shadow-sm group"
+                      title={`${circuit.name} 公式Instagramを開く`}
+                    >
+                      <svg className="w-3 h-3 text-pink-400 group-hover:scale-110 transition-transform flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                      </svg>
+                      <span className="text-[10px] text-slate-400 group-hover:text-pink-300">↗</span>
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Quick Stats Badges */}
@@ -293,20 +454,22 @@ export default function CircuitDetailModal({
           ════════════════════════════════════════════════════════════ */}
           {activeTab === 'map' && (
             <div className="space-y-5 animate-fade-in">
-              {/* Photo Gallery Carousel (Layout, Atmosphere, Action, Historic) */}
+              {/* Photo Gallery Carousel (Layout, Atmosphere, Action, Historic) - Compact & Elegant */}
               {circuit.visualGallery && circuit.visualGallery.length > 0 && (
                 <PhotoGalleryCarousel
                   items={circuit.visualGallery}
                   title="📸 CIRCUIT PHOTO & MAP GALLERY / コースギャラリー"
                   themeColor="#38bdf8"
+                  size="sm"
+                  aspectRatio="16/10"
                 />
               )}
 
               {/* Dual Visual Section: Interactive Vector SVG Track Map + Authentic Scenery Photo */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                 {/* 1. High-Precision Vector SVG Track Map */}
-                <div className="bg-slate-950/90 border border-sky-500/30 rounded-2xl p-4 flex flex-col justify-between relative shadow-inner overflow-hidden group">
-                  <div className="flex items-center justify-between mb-2">
+                <div className="bg-slate-950/90 border border-sky-500/30 rounded-xl sm:rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between relative shadow-inner overflow-hidden group">
+                  <div className="flex items-center justify-between mb-1.5">
                     <span className="text-[10px] font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
                       <span>🗺️</span>
                       <span>公式コースレイアウト図 (GPS準拠ベクター)</span>
@@ -328,8 +491,8 @@ export default function CircuitDetailModal({
                     </div>
                   </div>
 
-                  {/* Vector SVG Canvas */}
-                  <div className="w-full h-48 sm:h-52 relative flex items-center justify-center bg-slate-900/70 rounded-xl border border-white/5 p-2 overflow-hidden">
+                  {/* Vector SVG Canvas - Compact height with pristine aspect ratio */}
+                  <div className="w-full h-36 sm:h-40 md:h-44 relative flex items-center justify-center bg-slate-900/70 rounded-xl border border-white/5 p-2 overflow-hidden">
                     <svg
                       viewBox="0 0 400 300"
                       className="w-full h-full filter drop-shadow-[0_0_12px_rgba(56,189,248,0.3)] select-none"
@@ -408,7 +571,7 @@ export default function CircuitDetailModal({
                   </div>
 
                   {/* Map Footer: Legend & Jump Tip */}
-                  <div className="w-full flex items-center justify-between text-[10px] text-slate-400 font-mono mt-2 pt-2 border-t border-white/5">
+                  <div className="w-full flex items-center justify-between text-[10px] text-slate-400 font-mono mt-1.5 pt-1.5 border-t border-white/5">
                     <span className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
                       <span>S/F ライン</span>
@@ -422,13 +585,13 @@ export default function CircuitDetailModal({
                 </div>
 
                 {/* 2. Authentic Atmosphere Scene Photo */}
-                <div className="bg-slate-950/90 border border-white/10 rounded-2xl p-4 flex flex-col justify-between relative shadow-inner overflow-hidden">
-                  <span className="text-[10px] font-racing font-bold text-amber-400 uppercase tracking-wider self-start mb-2 flex items-center gap-1">
+                <div className="bg-slate-950/90 border border-white/10 rounded-xl sm:rounded-2xl p-3 sm:p-3.5 flex flex-col justify-between relative shadow-inner overflow-hidden">
+                  <span className="text-[10px] font-racing font-bold text-amber-400 uppercase tracking-wider self-start mb-1.5 flex items-center gap-1">
                     <span>📸</span>
                     <span>サーキット景観 & 現場フォト</span>
                   </span>
 
-                  <div className="w-full h-48 sm:h-52 relative rounded-xl overflow-hidden bg-slate-900 flex items-center justify-center">
+                  <div className="w-full h-36 sm:h-40 md:h-44 relative rounded-xl overflow-hidden bg-slate-900 flex items-center justify-center">
                     {!atmosphereLoaded && !atmosphereError && (
                       <div className="text-xs font-mono text-slate-500 animate-pulse">
                         風景写真ロード中...
@@ -458,7 +621,7 @@ export default function CircuitDetailModal({
                   </div>
 
                   {atmosphereAsset && (
-                    <div className="w-full flex flex-col gap-0.5 text-[10px] text-slate-400 font-mono mt-2 pt-2 border-t border-white/5">
+                    <div className="w-full flex flex-col gap-0.5 text-[10px] text-slate-400 font-mono mt-1.5 pt-1.5 border-t border-white/5">
                       <span className="text-slate-200 font-semibold truncate">
                         {atmosphereCaption}
                       </span>
@@ -597,7 +760,7 @@ export default function CircuitDetailModal({
                           </div>
 
                           <p className="text-slate-300 text-[11px] leading-relaxed flex-1 sm:pl-3 sm:border-l border-white/5">
-                            {corner.engineeringTip}
+                            {renderTextWithCitations(corner.engineeringTip)}
                           </p>
                         </div>
                       );
@@ -615,7 +778,7 @@ export default function CircuitDetailModal({
                           <span className="font-bold text-white text-xs">{corner.name}</span>
                         </div>
                         <p className="text-slate-300 text-[11px] leading-relaxed flex-1 sm:pl-3 sm:border-l border-white/5">
-                          {corner.characteristic}
+                          {renderTextWithCitations(corner.characteristic)}
                         </p>
                       </div>
                     ))
@@ -643,7 +806,7 @@ export default function CircuitDetailModal({
                         💨 空力トレードオフ (Downforce)
                       </span>
                       <p className="text-slate-300 text-xs leading-relaxed">
-                        {circuit.setupNotes.aeroTradeoff}
+                        {renderTextWithCitations(circuit.setupNotes.aeroTradeoff)}
                       </p>
                     </div>
 
@@ -652,7 +815,7 @@ export default function CircuitDetailModal({
                         ⚙️ 縁石・車高アプローチ
                       </span>
                       <p className="text-slate-300 text-xs leading-relaxed">
-                        {circuit.setupNotes.kerbUsage}
+                        {renderTextWithCitations(circuit.setupNotes.kerbUsage)}
                       </p>
                     </div>
 
@@ -661,7 +824,7 @@ export default function CircuitDetailModal({
                         🛑 ブレーキ負荷 & 冷却
                       </span>
                       <p className="text-slate-300 text-xs leading-relaxed">
-                        {circuit.setupNotes.brakeDemands}
+                        {renderTextWithCitations(circuit.setupNotes.brakeDemands)}
                       </p>
                     </div>
                   </div>
@@ -715,17 +878,17 @@ export default function CircuitDetailModal({
                   <div className="space-y-2 pt-1">
                     <div className="p-3 rounded-xl bg-slate-900/90 border border-sky-500/20 text-xs text-slate-300 leading-relaxed">
                       <strong className="text-sky-300 font-racing mr-1 block sm:inline">🏎️ レースエンジニア戦術分析:</strong>
-                      <span>{weather.tacticalImpact}</span>
+                      <span>{renderTextWithCitations(weather.tacticalImpact)}</span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                       <div className="p-2.5 rounded-xl bg-amber-950/20 border border-amber-500/20 text-slate-300">
                         <strong className="text-amber-300 font-mono block text-[11px] mb-0.5">🛞 タイヤ作動・温度管理指針:</strong>
-                        <span>{weather.tyreOperatingNote}</span>
+                        <span>{renderTextWithCitations(weather.tyreOperatingNote)}</span>
                       </div>
                       <div className="p-2.5 rounded-xl bg-purple-950/20 border border-purple-500/20 text-slate-300">
                         <strong className="text-purple-300 font-mono block text-[11px] mb-0.5">🌧️ 過去の雨天・波乱レース記録:</strong>
-                        <span>{weather.historicalRainRaces}</span>
+                        <span>{renderTextWithCitations(weather.historicalRainRaces)}</span>
                       </div>
                     </div>
                   </div>
@@ -902,7 +1065,7 @@ export default function CircuitDetailModal({
                         <div className="bg-amber-950/20 border border-amber-500/20 p-2.5 rounded-xl text-xs text-amber-200 flex items-start gap-1.5">
                           <span className="font-bold text-amber-400">⚡ 歴史的意義:</span>
                           <span className="text-slate-300 leading-snug">
-                            {moment.significance || moment.historicalImpact}
+                            {renderTextWithCitations(moment.significance || moment.historicalImpact || '')}
                           </span>
                         </div>
                       </div>
@@ -965,12 +1128,83 @@ export default function CircuitDetailModal({
                   </div>
                 </div>
               )}
+
+              {/* Official Links Banner */}
+              {circuit.officialLinks && (
+                <div className="mt-4 bg-slate-900/90 border border-white/10 p-4 rounded-2xl space-y-2.5 shadow-sm">
+                  <h4 className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>🌐</span>
+                    <span>公式サーキットWebサイト & F1公式ガイド & 所在地</span>
+                  </h4>
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    {circuit.officialLinks.website && (
+                      <a
+                        href={circuit.officialLinks.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-xs font-medium text-slate-200 hover:text-white transition-all shadow-sm"
+                      >
+                        <span>🌐 公式Webサイト</span>
+                        <span className="text-[10px] text-slate-400">↗</span>
+                      </a>
+                    )}
+                    {circuit.officialLinks.f1Official && (
+                      <a
+                        href={circuit.officialLinks.f1Official}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-xs font-medium text-slate-200 hover:text-white transition-all shadow-sm"
+                      >
+                        <span className="font-racing font-bold text-red-500">F1</span>
+                        <span>公式サーキットガイド</span>
+                        <span className="text-[10px] text-slate-400">↗</span>
+                      </a>
+                    )}
+                    {circuit.officialLinks.googleMaps && (
+                      <a
+                        href={circuit.officialLinks.googleMaps}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-xs font-medium text-slate-200 hover:text-white transition-all shadow-sm"
+                      >
+                        <span>📍 Googleマップ</span>
+                        <span className="text-[10px] text-slate-400">↗</span>
+                      </a>
+                    )}
+                    {circuit.officialLinks.xTwitter && (
+                      <a
+                        href={circuit.officialLinks.xTwitter}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-xs font-medium text-slate-300 hover:text-white transition-all shadow-sm"
+                      >
+                        <span className="font-bold">𝕏 (Twitter)</span>
+                        <span className="text-[10px] text-slate-400">↗</span>
+                      </a>
+                    )}
+                    {circuit.officialLinks.instagram && (
+                      <a
+                        href={circuit.officialLinks.instagram}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-xs font-medium text-slate-300 hover:text-white transition-all shadow-sm group"
+                      >
+                        <svg className="w-3.5 h-3.5 text-pink-400 group-hover:scale-110 transition-transform flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                        <span>Instagram</span>
+                        <span className="text-[10px] text-slate-400">↗</span>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
-        </div>
       </div>
-    </div>,
-    document.body
+    </div>
   );
 }
+
+export { CircuitDetailModal as CircuitDetailView };

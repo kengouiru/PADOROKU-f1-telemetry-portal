@@ -4,7 +4,7 @@
  * Provides Japanese-localized race data with cancellation status.
  */
 
-import type { RaceWeekendSchedule } from '@/data/f1SeasonData';
+import { type RaceWeekendSchedule, SEASON_2026_CALENDAR } from '@/data/f1SeasonData';
 
 // ─── Jolpica API Types ───────────────────────────────────────
 
@@ -118,15 +118,24 @@ const CIRCUIT_JP_NAMES: Record<string, CircuitJpInfo> = {
 // ─── Helpers ─────────────────────────────────────────────────
 
 function utcToJstString(dateStr: string, timeStr: string): string {
-  const utc = new Date(`${dateStr}T${timeStr}`);
-  const jst = new Date(utc.getTime() + 9 * 60 * 60 * 1000);
-  const m = jst.getMonth() + 1;
-  const d = jst.getDate();
-  const days = ['日', '月', '火', '水', '木', '金', '土'];
-  const day = days[jst.getDay()];
-  const hh = String(jst.getHours()).padStart(2, '0');
-  const mm = String(jst.getMinutes()).padStart(2, '0');
-  return `${m}/${d} (${day}) ${hh}:${mm}`;
+  const isoStr = timeStr.endsWith('Z') ? `${dateStr}T${timeStr}` : `${dateStr}T${timeStr}Z`;
+  const d = new Date(isoStr);
+  const formatter = new Intl.DateTimeFormat('ja-JP', {
+    timeZone: 'Asia/Tokyo',
+    month: 'numeric',
+    day: 'numeric',
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+  const parts = formatter.formatToParts(d);
+  const m = parts.find((p) => p.type === 'month')?.value || '';
+  const day = parts.find((p) => p.type === 'day')?.value || '';
+  const weekday = parts.find((p) => p.type === 'weekday')?.value || '';
+  const hour = parts.find((p) => p.type === 'hour')?.value || '00';
+  const minute = parts.find((p) => p.type === 'minute')?.value || '00';
+  return `${m}/${day} (${weekday}) ${hour}:${minute}`;
 }
 
 function formatDateRange(race: JolpicaRace): string {
@@ -233,6 +242,19 @@ export async function fetchOfficialCalendar(year: number): Promise<OfficialRaceS
         cancelledCircuits.add(s.circuit_short_name.toLowerCase());
       }
     }
+  }
+
+  // For 2026, SEASON_2026_CALENDAR contains verified authoritative schedules & compounds.
+  // Jolpica has preliminary stubs (e.g. Baku Thursday FP1).
+  if (year === 2026) {
+    return SEASON_2026_CALENDAR.map((race) => ({
+      ...race,
+      isCancelled:
+        cancelledCircuits.has(race.city.toLowerCase()) ||
+        cancelledCircuits.has(race.country.toLowerCase()) ||
+        race.isCancelled ||
+        false,
+    }));
   }
 
   // --- Transform to app format ---

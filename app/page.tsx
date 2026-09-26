@@ -225,6 +225,8 @@ export default function DashboardPage() {
     driver2: 'ANT',
   });
   const [targetCircuitId, setTargetCircuitId] = useState<string | undefined>(undefined);
+  const [targetDriverCode, setTargetDriverCode] = useState<string | undefined>(undefined);
+  const [targetTeamId, setTargetTeamId] = useState<string | undefined>(undefined);
   const [targetGlossaryTermId, setTargetGlossaryTermId] = useState<string | null>(null);
   const [activeAiGuidance, setActiveAiGuidance] = useState<{
     title: string;
@@ -1175,6 +1177,22 @@ export default function DashboardPage() {
               initialDriver1Code={detailedTelemetryParams.driver1}
               initialDriver2Code={detailedTelemetryParams.driver2}
               initialTab={detailedTelemetryTab}
+              onNavigateToCircuit={(circId) => {
+                setTargetCircuitId(circId);
+                setAppMode('library');
+                setLibrarySubTab('circuits');
+                setActiveHub('knowledge');
+                desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              onNavigateToGlossary={(termId) => {
+                setTargetGlossaryTermId(termId);
+                setAppMode('library');
+                setLibrarySubTab('rules');
+                setActiveHub('knowledge');
+                desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
             />
           </section>
         </div>
@@ -1431,6 +1449,24 @@ export default function DashboardPage() {
               setAppMode('library');
               setLibrarySubTab('circuits');
               setActiveHub('knowledge');
+              desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+              mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onNavigateToDriver={(driverCode) => {
+              setTargetDriverCode(driverCode);
+              setAppMode('library');
+              setLibrarySubTab('drivers');
+              setActiveHub('knowledge');
+              desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+              mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onNavigateToTeam={(teamId) => {
+              setTargetTeamId(teamId);
+              setAppMode('library');
+              setLibrarySubTab('teams');
+              setActiveHub('knowledge');
+              desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+              mobileScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           />
         </ErrorBoundary>
@@ -1459,6 +1495,8 @@ export default function DashboardPage() {
             activeSubTab={librarySubTab}
             onSubTabChange={setLibrarySubTab}
             targetCircuitId={targetCircuitId}
+            targetDriverCode={targetDriverCode}
+            targetTeamId={targetTeamId}
             initialDramaTab={targetDramaTab}
             initialGlossaryTermId={targetGlossaryTermId}
             onNavigateToApp={(action) => {

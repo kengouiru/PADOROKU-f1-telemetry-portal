@@ -243,6 +243,14 @@ export interface CircuitHistoricalMoment {
   momentImage?: CircuitVisualAsset;
 }
 
+export interface CircuitOfficialLinks {
+  website?: string;     // 公式サーキットWebサイト
+  f1Official?: string;  // Formula1.com 公式サーキットガイド
+  googleMaps?: string;  // Googleマップ 所在地
+  xTwitter?: string;    // 公式X (旧Twitter)
+  instagram?: string;   // 公式Instagram
+}
+
 export interface CircuitVisualMap {
   imageUrl: string;
   credit: string;
@@ -269,6 +277,7 @@ export interface CircuitProfile {
     year: number;
   };
   characteristics: string;
+  officialLinks?: CircuitOfficialLinks;
   visualMap?: CircuitVisualMap;
   visualAssets?: {
     trackMap: CircuitVisualAsset;
@@ -7174,6 +7183,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2005
     },
     "characteristics": "【第1章：砂漠の夜を切り裂く高負荷ストップ＆ゴー】\\nサヒールの砂漠地帯に位置し、F1プレシーズンテストの舞台としても馴染み深い近代サーキットの模範 [1][5]。4本のロングストレートとヘビーブレーキングゾーンが組み合わされ、強烈な縦方向の加減速（トラクションとストッピングパワー）がマシンの骨格を試す [1][2]。砂漠から吹き込む細かい砂がアスファルトに付着し、セッション序盤の路面ミュー（摩擦係数）の急変や、突風による空力バランスの乱れがドライバーを悩ませる [2][4]。\\n\\n【第2章：過酷な路面アブレシブ性と魔のターン10】\\n花崗岩を多く含んだ特殊舗装はF1カレンダー屈指のタイヤ攻撃性（アブレシブ性）を誇り、リアタイヤの熱劣化（サーマルデグラデーション）管理が戦略の成否を分ける [3][6]。特に下り勾配で左に回り込みながら減速する「ターン10」は、左フロントの内輪側が激しくリフトしてロックアップを誘発しやすい最難関コーナーとして知られる [2][3][5]。",
+    "officialLinks": {
+          "website": "https://www.bahraingp.com/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/bahrain.html",
+          "googleMaps": "https://maps.google.com/?q=Bahrain+International+Circuit",
+          "xTwitter": "https://x.com/BAH_Int_Circuit",
+          "instagram": "https://www.instagram.com/bah_int_circuit/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_asset_1.png",
       "credit": "Will_Scalise",
@@ -7400,7 +7416,14 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "driver": "Lewis Hamilton (Mercedes)",
       "year": 2019
     },
-    "characteristics": "【第1章：世界唯一の立体交差とセクター1の連続高Gコーナー】\\n世界で唯一「8の字立体交差（Figure-Eight Layout）」を持つ世界的名コース [1]。オランダ人設計者ジョン・フーゲンホルツの構想により1962年に誕生して以来、ドライバーの技量とマシンの総合戦闘力を極限まで試す「ドライバーズ・サーキット」として世界中から絶賛される [1][5]。セクター1のターン2からターン7にかけて連続する「S字コーナー（Esses）」および「逆バンク（Reverse Bank）」は、時速220〜250km/hの高速域で左右へ4G以上の強烈な横加速度が交互にかかり続け、ミリ単位のステアリング舵角とアクセル開度の調和が求められる [2][3]。\\n\\n【第2章：タイヤ熱力学とデグナー・スプーン・130Rの空力試練】\\nターン8〜9の「デグナーカーブ」は、アウト側縁石のわずかな乗り上げでフロア負圧が失われ大クラッシュにつながる精密な進入が要求される [2][4]。バックストレート手前の「スプーンカーブ（Turns 13-14）」は下り勾配と複合半径が重なり、フロントタイヤのアンダーステアとリアタイヤの熱タレが最も顕著に現れる難所 [3][4]。そして時速310km/hで全開突入する名物超高速左コーナー「130R（Turn 15）」は、マシンのグラウンドエフェクトダウンフォースの信頼性が試される [1][3]。アスファルト表面の粗粒度が高く、ピレリタイヤのトレッド摩耗と内部温度上昇が極めて激しいため、2ストップ戦略が基本となる [2][6]。",
+    "characteristics": "【第1章：世界唯一の立体交差とセクター1の幾何学的キネマティクス】\\n世界で唯一の「8の字立体交差（Figure-Eight Layout）」を持ち、高低差52mの起伏に富む鈴鹿サーキット [1]。1962年に本田宗一郎の命によりジョン・フーゲンホルツが設計して以来、現代F1において最もマシンの純粋な空力性能とメカニカルシシー剛性が試される「ドライバーズ・サーキット」の最高峰として君臨する [1][5]。特にセクター1のターン2からターン7（S字〜逆バンク）は、時速220〜255km/hの超高速領域で左右へ最大4.8Gもの激しい横加速度が交互にマシンを襲う [2][3]。マックス・フェルスタッペンや角田裕毅らのテレメトリーデータによれば、わずか0.1度のステアリング舵角の遅れやマイクロミリ秒単位のスロットルオフが荷重移動の遅れを招き、次コーナーでの致命的なアンダーステアやオーバーステアを誘発する極限のバランスが要求される [2][3][4]。\\n\\n【第2章：2026年アクティブエアロ（X/Zモード）と350kW MGU-K回生配分】\\n2026年新レギュレーション導入に伴い、鈴鹿の攻略法は劇的な進化を遂げた [1][4]。西ストレート（スプーン脱出〜130R手前）およびメインストレートでは低ドラッグの「Xモード」が展開され時速328km/hに到達する一方、ターン1への飛び込みや日立Astemoシケイン進入では高ダウンフォースの「Zモード」へと瞬時に復帰し、最大-5.2Gの激しい制動減速を行う [2][4]。さらに出力が350kWへと倍増したMGU-Kにより、ヘアピンやシケインでの強力な運動エネルギー回生と、セクター1連続コーナーでのトルクフィルが極めて重要となる [1][3]。直線エンドでのスーパー・クリッピング（電力枯渇による最高速頭打ち）を防ぐため、ドライバーはリフト＆コーストを緻密に駆使し、Manual Override Mode（オーバーテイク用ブースト）を130Rやスプーン後の攻防に温存するパワーマネジメントが不可欠である [3][5]。\\n\\n【第3章：ピレリ玄武岩アスファルト摩耗と2ストップ・アンダーカット戦術】\\n鈴鹿の路面は粗粒度の高い玄武岩（Basalt）含有アスファルトで構成されており、連続する高G旋回によって左フロントタイヤに強烈なサーマルデグラデーションとブリスターのリスクが集中する [2][6]。特にピレリの最も硬いコンパウンドレンジ（C1・C2・C3）が投入されるが、アウトラップでのタイヤウォーマー非使用環境下（または低温運用）ではグリップ発動に繊細な荷重コントロールが求められる [2][3]。デグラデーションの進行が1周あたり約0.12秒に達するため、クリーンエアを得られる絶好のタイミングでピットストップを行うアンダーカットが極めて強力であり、新品タイヤの初期トラクションを活かして1周で最大1.8秒ものマージンを稼ぎ出す戦略的駆け引きが勝敗を左右する [1][6]。",
+    "officialLinks": {
+          "website": "https://www.suzukacircuit.jp/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/japan.html",
+          "googleMaps": "https://maps.google.com/?q=Suzuka+Circuit",
+          "xTwitter": "https://x.com/suzuka_event",
+          "instagram": "https://www.instagram.com/suzukacircuit_official/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_asset_4.jpg",
       "credit": "Will_Scalise",
@@ -7640,9 +7663,9 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       }
     ],
     "setupNotes": {
-      "aeroTradeoff": "S字区間やスプーンでの高速安定性を保つためハイダウンフォースが必須。西ストレートの最高速を犠牲にしてもコーナー重視のセッティングが有利。",
-      "kerbUsage": "デグナー2やシケインでの縁石アタックは不可欠だが、硬すぎるサスペンションはマシンを弾き飛ばすためメカニカルコンプライアンスが要求される。",
-      "brakeDemands": "シケインとヘアピン以外に激しい減速ゾーンは少ないが、高速域からの繊細なトレイルブレーキングがフロントタイヤの熱管理を決定づける。"
+      "aeroTradeoff": "XモードとZモードのアクティブエアロ切り替えを前提とし、セクター1のS字や130Rでの高速安定性を死守するためZモード時は最大級のハイダウンフォースに設定。西ストレートの最高速はXモードによるドラッグ低減に委ね、コーナー脱出トラクションとフロント回頭性を最優先する。",
+      "kerbUsage": "デグナー2（T9）および日立Astemoシケイン（T16-17）での縁石（ケルブ）への乗り上げはラップタイム短縮に直結する。ただし硬すぎるサスペンションはマシンを跳ね上げてフロア負圧を喪失させるため、ダンパーの低速・高速バンプ減衰力の精密なセッティングが必須。",
+      "brakeDemands": "日立Astemoシケインとヘアピン（T11）以外は強烈なフルブレーキング箇所が少ない。しかし350kWへと増大したMGU-Kのブレーキバイアス協調回生が不可欠であり、トレイルブレーキング時のリアスタビリティとタイヤ表面温度の適正管理が勝負を分ける。"
     },
     "references": [
       {
@@ -7679,7 +7702,14 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "driver": "Rubens Barrichello (Ferrari)",
       "year": 2004
     },
-    "characteristics": "【第1章：スクーデリアの聖地と時速350km/hを超える最高速の神殿】\\n1922年に建設され、F1発足以来ほぼ毎年イタリアGPを開催し続ける世界最古級の歴史的サーキット [1][5]。超高速ストレートを「バリアンテ・デル・レティフィーロ（第1シケイン）」や「アスカリ・シケイン」で結ぶレイアウトであり、スリップストリームとDRSを駆使した時速355km/h超の猛烈なトップスピードバトルが展開される [1][2]。熱狂的なフェラーリファン「ティフォシ（Tifosi）」の歓声が表彰台を真紅に染めるパドック屈指の感情的ステージ [1][5]。\\n\\n【第2章：極小ウィング角（スプーンウィング）とシケイン制動の極限】\\n直線の空気抵抗（ドラッグ）を極限まで削ぎ落とすため、各チームはモンツァ専用の「ほぼ水平に寝かせた極薄リアウィング」を投入 [3][4]。ダウンフォースが極端に削られた状態で時速350km/hから時速70km/hまで急減速する第1シケイン進入は、タイヤがロックアップしやすく、ミリ単位の制動コントロールと縁石ホッピングの衝撃吸収性が試される [2][4][6]。タイヤのトレッド摩耗よりも直線走行による遠心力とブレーキ熱が課題となり、1ストップか2ストップかの戦略選択が勝負を分ける [2][3][6]。",
+    "characteristics": "【第1章：世界最古のスピードの神殿とティフォシの真紅の熱狂】\\n1922年に建設され、F1発祥の1950年から今日まで（1980年イモラ開催を除く）欠かさずイタリアGPを開催し続ける世界最古級の超高速サーキット、モンツァ・サーキット [1][5]。全周の約78%をフルスロットルで駆け抜けるこの「神殿（Temple of Speed）」は、スクーデリア・フェラーリの聖地として知られ、表彰台直下に集まる熱狂的なファン「ティフォシ」の地鳴りのような大歓声がパドックを揺るがす [1][5]。ルイス・ハミルトン、シャルル・ルクレールらが歴史的な勝利を挙げたメインストレートは、ドライバーにとっても特別な感情が宿る歴史的舞台である [1][2]。\\n\\n【第2章：360km/hのXモード極薄空力とバリアンテ・デル・レティフィーロの-5.4G制動】\\n直線の最高速をミリ単位で削り出すため、各チームはモンツァ専用の「スプーンウィング」と呼ばれるほぼ水平に寝かせた極薄リアウィングと超低ドラッグパッケージを投入する [3][4]。2026年規定の「アクティブエアロ（Xモード）」作動時には時速360km/hという驚異的なトップスピードに達する [2][4]。しかし、その直後に待ち受ける第1シケイン「バリアンテ・デル・レティフィーロ（Turn 1-2）」では、時速360km/hから一気に時速72km/hまでわずか2.2秒で急減速。ダウンフォースが最小化された状態から高ダウンフォースの「Zモード」へとアクティブ変形しながら、-5.4Gもの極限の減速Gとカーボンブレーキにかかる1,000℃超の熱負荷に耐えなければならず、タイヤのロックアップが最も頻発する [2][3][6]。\\n\\n【第3章：350kW MGU-K回生配分と縁石ホッピングによる1ストップ戦略】\\n超高速直線が続くモンツァでは、回生可能なブレーキングポイントが3箇所のシケイン（レティフィーロ、ロッジア、アスカリ）に限られるため、350kW MGU-Kのバッテリー充電状態（SoC）のマネジメントが死活問題となる [1][3]。直線後半でのパワーユニット電力枯渇（クリッピング）を防ぐためのフューエルセーブとリフト＆コーストが不可欠である [3][4]。また、アスカリ・シケイン等の縁石（ケルブ）を直線的に跨いでショートカットラインを取るためのサスペンションのしなやかさがトラクションを決定づける。タイヤの横方向デグラデーションは比較的低いため、ピットストップ時間を最小化する1ストップ戦略が主流であり、スリップストリームとDRSを併用したオーバーテイク合戦が展開される [1][2][6]。",
+    "officialLinks": {
+          "website": "https://www.monzanet.it/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/italy.html",
+          "googleMaps": "https://maps.google.com/?q=Autodromo+Nazionale+Monza",
+          "xTwitter": "https://x.com/Autodromo_Monza",
+          "instagram": "https://www.instagram.com/autodromonazionale_monza/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_asset_6.jpg",
       "credit": "Will_Scalise",
@@ -7844,9 +7874,9 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       }
     ],
     "setupNotes": {
-      "aeroTradeoff": "極小アングルのスキンウィングを採用。ダウンフォースを削ぎ落としドラッグを極限まで低減させる特殊モンツァ・パッケージ。",
-      "kerbUsage": "シケイン（レティフィーロ、ロッジア、アスカリ）を最短距離で抜けるため、縁石を乗り越えるしなやかなダンパーセッティングが必須。",
-      "brakeDemands": "高速ストレート直後のフル制動によりブレーキ温度が限界に達する。長時間のクーリング区間があるため温度ドロップ対策も必要。"
+      "aeroTradeoff": "モンツァ専用の超極小ウィング角を採用。ダウンフォースを削ぎ落とし、直線でのXモードによるドラッグ低減を極限まで追求。セクター2のレズモやアスカリでのメカニカルグリップを確保しつつ最高速360km/hにフォーカスする。",
+      "kerbUsage": "レティフィーロ、ロッジア、アスカリの3大シケインを直線的に駆け抜けるため、縁石（ケルブ）の激しい乗り越え（ホッピング）に対応するしなやかなサスペンション減衰力セッティングが不可欠。",
+      "brakeDemands": "時速360km/hからの-5.4G急制動によりブレーキディスク温度は瞬時に1,000℃を超える。MGU-Kの回生ブレーキと油圧ブレーキバイアスの正確な電子制御（Brake-by-Wire）がリアの安定性を支配する。"
     },
     "references": [
       {
@@ -7883,7 +7913,14 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "driver": "Valtteri Bottas (Mercedes)",
       "year": 2018
     },
-    "characteristics": "【第1章：アルデンヌの森の雄大なる高低差とオールージュの絶壁】\\n全長7.004kmと現代F1カレンダーで最長を誇り、最大高低差102.2メートルという圧倒的な起伏を持つベルギーの聖地 [1]。名物コーナー「オールージュ〜ラディオン（Eau Rouge - Raidillon: Turns 2-4）」は、下り坂から時速305km/hで急降下した直後に18%の急勾配を一気に駆け上がり、垂直方向に最大4.5Gの強烈な圧縮G（コンプレッション）がマシンとドライバーを押し潰す世界屈指の難所 [1][3]。\\n\\n【第2章：ケメルストレート最高速と「スパ・ウェザー」の局地雨戦術】\\nラディオンを抜けた後の「ケメルストレート」では時速340km/hを超える超高速に達するため、セクター2のテクニカルコーナー（プーオン、スタヴロ等）で必要なハイダウンフォースと、セクター1・3の超高速直線で必要なロードラッグの妥協点を見出す「空力セットアップのジレンマ」がエンジニアを悩ませる [2][4]。さらに広大な山岳地帯に位置するため、「コースの半分は大雨、残りの半分は完全なドライ路面」という名物「スパ・ウェザー」が頻発し、ピット戦略とドライバーの即時判断力が勝敗を分ける [1][2][6]。",
+    "characteristics": "【第1章：アルデンヌの森の102m高低差とオールージュの圧縮G】\\n全長7.004kmと現代F1カレンダーで最長を誇り、最大高低差102.2mという雄大な起伏を持つベルギーの聖地スパ・フランコルシャン [1][5]。伝説的コーナー「オールージュ〜ラディオン（Eau Rouge - Raidillon: Turns 2-4）」は、下り坂から時速305km/hで急降下した直後に18%の急勾配を一気に駆け上がり、垂直方向に最大4.5Gの強烈な圧縮G（コンプレッション）がマシンとドライバーを押し潰す世界屈指のスペクタクル [1][3]。フロアのスキッドブロックが路面と擦れ合い火花を散らす中、ドライバーはステアリングをミリ単位で保持し、ブラインドの頂点へと全開で飛び込んでいく [2][3]。\\n\\n【第2章：ケメルストレートXモードとプーオン4.6G Zモードの空力トレードオフ】\\nラディオンを抜けた後の「ケメルストレート」では2026年規定の「アクティブエアロ（Xモード）」によって時速345km/hに到達し、最大のオーバーテイクポイントとなる [2][4]。一方で、セクター2に位置する超高速下り左コーナー「プーオン（Turn 12: Pouhon）」では時速285km/h・横加速度4.6Gの極限旋回が要求され、高ダウンフォースの「Zモード」が不可欠となる [1][3]。ストレートでのトップスピードを優先してウィングを寝かせすぎるとセクター2でタイムを失いアンダーステアに苦しみ、逆にダウンフォースを増やしすぎると直線で格好の餌食となるという「空力セットアップの究極のジレンマ」が立ちはだかる [2][4][6]。\\n\\n【第3章：350kW MGU-K電力マネジメントと「スパ・ウェザー」の局地雨戦術】\\n7kmの長大なコーススケールゆえに、350kW MGU-Kのエネルギー配分がラップタイムを大きく左右する [1][3]。ケメルストレートでの電力ブーストを確保しつつ、後半のバスストップ・シケインでのブレーキングで確実なエネルギー回生を行う繊細なエネルギーマネジメントが要求される [3][4]。さらにアルデンヌ特有の「コースの半分は大雨、残りの半分は完全なドライ路面」という名物「スパ・ウェザー」が頻発する [1][2]。全長が長いためピットストップの判断が1周遅れるだけで30秒以上のタイムを失うリスクがあり、チームのテレメトリー気象レーダー解析とドライバーの路面グリップ察知能力が勝敗を決定づける [1][6]。",
+    "officialLinks": {
+          "website": "https://www.spa-francorchamps.be/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/belgium.html",
+          "googleMaps": "https://maps.google.com/?q=Circuit+de+Spa-Francorchamps",
+          "xTwitter": "https://x.com/circuitspa",
+          "instagram": "https://www.instagram.com/circuit_spa_francorchamps/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_asset_12.jpg",
       "credit": "Will_Scalise",
@@ -8104,9 +8141,9 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       }
     ],
     "setupNotes": {
-      "aeroTradeoff": "セクター1と3の長いストレートと、セクター2のツイスティな山岳区間の両立。ミディアム〜ミディアムハイの翼端セッティングが標準。",
-      "kerbUsage": "バスストップやレ・コームでの縁石アタックは不可欠だが、ラディオンでの車高底打ちは大クラッシュに繋がるためライドハイト管理が極めてシビア。",
-      "brakeDemands": "バスストップとレ・コーム以外は減速機会が少なく、ロングストレートでブレーキが冷え切るためグレージング（炭化）に警戒が必要。"
+      "aeroTradeoff": "セクター1・3の超高速直線（ケメル、ブランシモン）でのXモード低ドラッグと、セクター2（プーオン、スタヴロ）でのZモード高ダウンフォースのバランス。中翼角パッケージで高速コーナーの横Gに耐えうるスタビリティを確保する。",
+      "kerbUsage": "ラディオン出口やバスストップ・シケインの縁石（ケルブ）はアグレッシブに攻める必要があるが、濡れた路面では一瞬でスピンを誘発するため、天候に応じた車高とアンチロールバーの柔軟な調整が求められる。",
+      "brakeDemands": "ラ・ソース（T1）とバスストップ・シケイン（T18-19）が主たる激しい減速ゾーン。350kW MGU-Kの協調回生を最大限に活用し、エネルギーマネジメントとリアブレーキ温度の維持を両立させる。"
     },
     "references": [
       {
@@ -8143,7 +8180,14 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "driver": "Lewis Hamilton (Mercedes)",
       "year": 2021
     },
-    "characteristics": "【第1章：地中海のリビエラを疾走する世界で最も狭く過酷な市街地コース】\\n1929年に初開催され、インディ500、ル・マン24時間と並ぶ「世界三大レース（モータースポーツ・トリプルクラウン）」の一角を占めるモナコGP [1][3]。全長わずか3.337kmの公道は、ガードレールと建壁がコース全周を隙間なく囲み、時速280km/h超の超高速から時速50km/hの極低速ヘアピンまでが目まぐるしく展開する [1][2]。ドライバーは78周のレース中に約4,000回ものギアチェンジを行い、ステアリングのミリ単位の修正ミスが即座にリタイアへ直結する極限の集中力を要求される [2][5]。\\n\\n【第2章：予選が勝敗の95%を決める聖地とトラクション工学】\\nコース幅が極めて狭く抜き所が存在しないため、土曜日の予選アタックがシーズンのどのグランプリよりも重要視される [1][2]。名物「ロウズ（フェアモント）ヘアピン（Turn 6）」を曲がるために、各チームはこのレース専用にステアリング切れ角を拡大した特製ラックとフロントサスペンションを持ち込む [3][4]。海沿いのトンネルを抜けた直後の急減速シケイン「ヌーベルシケイン」、そしてプールサイドを時速200km/h超で駆け抜ける「スイミングプール・セクション（Turns 13-16）」など、マシンの最大ダウンフォースと低速トラクションが支配する究極のドライバーズステージ [2][3][6]。",
+    "characteristics": "【第1章：世界三大レースの頂点と地中海のガードレール迷宮】\\n1929年に初開催され、インディ500、ル・マン24時間と並ぶモータースポーツ・トリプルクラウンの一角を占めるモナコGP（モンテカルロ市街地コース） [1][3]。全長わずか3.337kmの公道は、ガードレールと建壁がコース全周を隙間なく囲み、エスケープゾーンがほぼ皆無の「ミリ単位の精密走行」が求められる [1][2]。ドライバーは78周のレース中に約4,000回ものギアチェンジを行い、心拍数は平均170bpmを超え続ける。アイルトン・セナが6勝を挙げたこの聖地では、わずか数センチのラインの狂いが即座にサスペンション破損やクラッシュへと直結する [2][5]。\\n\\n【第2章：特製ステアリングラックと最大ダウンフォースの幾何学】\\n名物「フェアモント・ヘアピン（旧ロウズヘアピン: Turn 6）」はF1で最も車速が落ちる時速48km/hの超低速コーナーであり、各チームはこのコーナーを曲がり切るためにステアリング切れ角を大幅に拡大した「モナコ専用特製ステアリングラック」とフロントウィッシュボーンを投入する [3][4]。空気抵抗（ドラッグ）の影響が小さいため、マシンには年間で最も巨大なウィングが装着され、低速域でも地面に張り付くような最大ダウンフォースが要求される [2][3]。トンネルセクションを時速280km/hで駆け抜けた直後の「ヌーベルシケイン（Turns 10-11）」での急減速や、プールサイドを時速200km/h超でかすめる「スイミングプール（Turns 13-16）」の切り返しなど、マシンの俊敏な回頭性と低速トラクションがタイムを決定づける [2][4][6]。\\n\\n【第3章：予選が勝敗の95%を決める聖地とオーバーカット戦術】\\nコース幅が極めて狭く現代のワイドなF1マシンでのオーバーテイクは統計上ほぼ不可能なため、土曜日の予選でのポールポジション獲得が決勝の勝敗を95%決定づける [1][2]。決勝ではタイヤのサーマルデグラデーションがカレンダー中で最も低く、ピットストップ回数は最小限の1ストップとなる [2][6]。前走者のペースが遅い場合、あえて先にピットインせずクリアラップでハイペースを刻んで逆転を狙うオーバーカット戦略や、85%という極めて高いセーフティカー出動確率を見越したピットウィンドウの遅延戦術が勝負の鍵を握る [1][6]。",
+    "officialLinks": {
+          "website": "https://acm.mc/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/monaco.html",
+          "googleMaps": "https://maps.google.com/?q=Circuit+de+Monaco",
+          "xTwitter": "https://x.com/ACM_Media",
+          "instagram": "https://www.instagram.com/automobileclubmonaco/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_monaco.png",
       "credit": "Will_Scalise",
@@ -8364,9 +8408,9 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       }
     ],
     "setupNotes": {
-      "aeroTradeoff": "最大ウイング角によるマックス・ダウンフォース。ストレート速度を一切気にする必要がなく、低速でのグリップ最大化が至上命題。",
-      "kerbUsage": "プールサイドやヌーベルシケインの縁石を大胆に跨ぐため、ソフトなスプリングと十分なサスペンショントラベルが必要。",
-      "brakeDemands": "時速300km/h超からの減速はないが、減速と加速の連続でブレーキキャリパーの冷却風量が不足しやすい。"
+      "aeroTradeoff": "直線の最高速を完全に無視した最大級のハイダウンフォースセッティング。アクティブエアロも常に高グリップ側を意識し、低速・中速コーナーでの車体安定性と鋭い回頭性を最優先する。",
+      "kerbUsage": "スイミングプール・シケインのソーセージ縁石（ケルブ）を跳ね飛ばすようにインを突くため、ソフトなスプリングと長いサスペンションストロークを確保し、着地時のメカニカルグリップを維持する。",
+      "brakeDemands": "減速ゾーンは多いが直線が短いためブレーキ冷却用のダクト開口部を最大化。低速からの立ち上がりでリアタイヤが空転しないよう、トラクションコントロールに近い繊細なデフセッティングとブレーキバイアス調整が要求される。"
     },
     "references": [
       {
@@ -8403,22 +8447,29 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "driver": "Max Verstappen (Red Bull)",
       "year": 2020
     },
-    "characteristics": "【第1章：F1世界選手権発祥の地と超高速S字コンプレックス】\\n1950年5月13日にF1史上初の公式世界選手権レースが開催されたモータースポーツの聖地シルバーストン [1][5]。旧飛行場の滑走路跡地を利用した広大で平坦なレイアウトに、時速260〜290km/hで駆け抜ける世界最高峰の超高速S字セクション「マゴッツ〜ベケッツ〜チャペル（Maggots - Becketts - Chapel: Turns 10-14）」が鎮座する [1][2]。\\n\\n【第2章：タイヤにかかる世界最大の横方向エネルギーと英国の気候】\\nマゴッツ〜ベケッツ区間では、ステアリングを切るたびに5Gを超える横加速度が連続してタイヤにかかり、左フロントおよび左リアタイヤの内部ベルトに世界最大の剪断ストレスが加わる [2][3]。ピレリは毎年このサーキットに最高強度の専用構造タイヤを供給する [3][6]。風を遮る障害物がないため、突風や横風によってフロア負圧が乱されやすく、ドライバーは風向の変化を敏感に察知して進入アプローチを微調整する卓越したマシンスensingを要求される [2][4]。",
+    "characteristics": "【第1章：F1世界選手権発祥の聖地と伝説の超高速S字複合】\\n1950年5月13日にF1史上初の公式世界選手権レースが開催されたモータースポーツの揺り籠、シルバーストン・サーキット [1][5]。旧第二次世界大戦時の英空軍飛行場跡地を利用した広大で平坦なレイアウトに、時速260〜295km/hで連続して駆け抜ける世界屈指の超高速S字セクション「マゴッツ〜ベケッツ〜チャペル（Maggots - Becketts - Chapel: Turns 10-14）」が鎮座する [1][2]。ルイス・ハミルトン、ランド・ノリス、ジョージ・ラッセルら英国勢の母国グランプリとして熱狂的なファンが集う伝統の舞台である [1][5]。\\n\\n【第2章：5.2G横加速度とピレリ最強構造タイヤへの剪断ストレス】\\nマゴッツ〜ベケッツ区間では、ステアリングを左・右・左と切り返すたびに最大5.2Gを超える激烈な横加速度が連続してマシンを襲う [2][3]。この極限の高速旋回により、グラウンドエフェクトフロアとウィングが発生する巨大なダウンフォースがタイヤを路面に押し付け、左フロントおよび左リアタイヤの内部カーカスベルトに世界最大の剪断ストレス（Shear Stress）が加わる [2][3]。ピレリは毎年このサーキットに最高強度の専用構造タイヤを供給するが、サーマルデグラデーションの進行は極めて早く、ブリスター防止のためのタイヤマネジメントが不可欠となる [3][6]。\\n\\n【第3章：ハンガーストレートXモードと2ストップ・アンダーカット決戦】\\nチャペルを全開で立ち上がった後の「ハンガーストレート」では、2026年規定の「アクティブエアロ（Xモード）」が作動し時速335km/hに到達 [2][4]。直後のストウ（Turn 15: Stowe）では時速180km/hの「Zモード」へと高速移行し、ストレートエンドでの激しいオーバーテイクバトルが繰り広げられる [2][4]。さらに広大な吹き抜けの地形ゆえに突風や横風がフロア負圧を急激に乱すため、ドライバーは卓越したマシンバランスのセンシングが求められる [2][4]。タイヤ摩耗の激しさから2ストップ戦略が基本であり、フレッシュタイヤの強烈なグリップを活かしたアンダーカットが勝負を決する決定打となる [1][6]。",
+    "officialLinks": {
+          "website": "https://www.silverstone.co.uk/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/great-britain.html",
+          "googleMaps": "https://maps.google.com/?q=Silverstone+Circuit",
+          "xTwitter": "https://x.com/SilverstoneUK",
+          "instagram": "https://www.instagram.com/silverstonecircuit/"
+    },
     "visualMap": {
-      "imageUrl": "/images/circuits/circuit_asset_10.png",
+      "imageUrl": "/images/circuits/circuit_silverstone_real.jpg",
       "credit": "Will_Scalise",
       "license": "CC BY-SA 3.0",
       "sourceUrl": "https://commons.wikimedia.org/wiki/File:Silverstone_Circuit_2011.svg"
     },
     "visualAssets": {
       "trackMap": {
-        "imageUrl": "/images/circuits/circuit_asset_10.png",
+        "imageUrl": "/images/circuits/circuit_silverstone_real.jpg",
         "credit": "Will_Scalise",
         "license": "CC BY-SA 3.0",
         "sourceUrl": "https://commons.wikimedia.org/wiki/File:Silverstone_Circuit_2011.svg"
       },
       "atmosphereImage": {
-        "imageUrl": "/images/circuits/circuit_asset_10.png",
+        "imageUrl": "/images/circuits/circuit_silverstone_real.jpg",
         "caption": "英国モータースポーツの殿堂シルバーストンの最新ピットビル「Wing」",
         "credit": "Chesapeakedave",
         "license": "CC BY-SA 3.0",
@@ -8427,7 +8478,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
     },
     "visualGallery": [
       {
-        "imageUrl": "/images/circuits/circuit_asset_10.png",
+        "imageUrl": "/images/circuits/circuit_silverstone_real.jpg",
         "caption": "英国モータースポーツの殿堂シルバーストンの最新ピットビル「Wing」",
         "tag": "Atmosphere",
         "credit": "Chesapeakedave",
@@ -8622,9 +8673,9 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       }
     ],
     "setupNotes": {
-      "aeroTradeoff": "マゴッツ〜ベケッツでの横Gに耐えるためミディアムハイのダウンフォースが要求されるが、ウェリントンやハンガーでのDRS最高速も無視できない。",
-      "kerbUsage": "高速コーナーが多いため縁石で姿勢を乱すと大事故に繋がる。足回りはしなやかかつロール剛性の高いセッティングが求められる。",
-      "brakeDemands": "ビレッジ、ブルックランズ、ベイル以外に激しい減速帯はなく、ブレーキ負荷は低〜中程度。"
+      "aeroTradeoff": "マゴッツ・ベケッツやコプス（T9）、ストウ（T15）での5G超の横Gに耐えるハイダウンフォースと、ウェリントンおよびハンガーストレートでのXモード低ドラッグの協調設計。高速旋回でのアンダーステアを排除するフロントグリップを重視。",
+      "kerbUsage": "コプス出口やベケッツの縁石（ケルブ）をタイヤ半分乗せるアグレッシブなライン取りが必須。フロア端部のベンチュリトンネルシールを破損しないよう、適切なライドハイトとバンプストップの調整が求められる。",
+      "brakeDemands": "ブルックランズ（T6）、クラブ（T18）、ストウ（T15）での減速が主たるブレーキングポイント。高速からの急減速に伴う荷重移動を安定させ、350kW MGU-Kの回生エネルギーを効率よく蓄電する。"
     },
     "references": [
       {
@@ -8662,6 +8713,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2024
     },
     "characteristics": "【第1章：緑豊かな人工湖畔を周回する伝統のセミストリート】\\nオーストラリア・メルボルンのアルバート・パーク湖を取り囲む公道区間を利用したハイスピードコース [1][5]。普段は一般公道であるため、週末の初日はグリップが極端に低く、セッションを重ねるごとにラバーが乗ってラップタイムが秒単位で向上する「トラックエボリューション」が最も顕著に現れる [1][2]。美しい公園の景観とは裏腹に、ランオフエリアが狭く一瞬のミスが即座にクラッシュへと直結する [2][4]。\\n\\n【第2章：改修後の超高速シケインと4箇所のDRSゾーン】\\n2022年の大幅改修により低速シケインが撤去され、ターン8からターン9へ向かうセクター2が時速320km/h超の全開フラットアウト区間へと生まれ変わった [1][3]。カレンダー最多となる4つのDRSゾーンが設定され、ターン9-10の超高速S字切り返しではドライバーに強烈な横Gと度胸が試される [2][3][6]。フロントの回頭性と中高速のダウンフォース安定性がラップタイムの鍵を握る [3][4]。",
+    "officialLinks": {
+          "website": "https://www.grandprix.com.au/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/australia.html",
+          "googleMaps": "https://maps.google.com/?q=Albert+Park+Circuit",
+          "xTwitter": "https://x.com/ausgrandprix",
+          "instagram": "https://www.instagram.com/ausgp/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_albert_park.jpg",
       "credit": "Ozzmosis",
@@ -8882,6 +8940,11 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2004
     },
     "characteristics": "【第1章：「上」の字を象った広大なスケールと名物カタツムリコーナー】\\n上海市嘉定区の湿地帯に建設され、漢字の「上」をモチーフにした独創的レイアウト [1][5]。メインストレートから進入するターン1〜4は、半径が徐々に小さくなりながら270度旋回し、さらに左へと切り返す世界でも唯一無二の「カタツムリコーナー（Snail Turn）」[1][2]。前輪、特に左フロントタイヤに長時間の巨大な横荷重と縦荷重が加わり続けるため、フロントタイヤのグレイニング（毛羽立ち摩耗）克服がセットアップの生命線となる [2][3]。\\n\\n【第2章：1.2kmの超長大バックストレートとタイトヘアピン】\\nセクター3にはF1最長クラスとなる1,170mのバックストレートが横たわり、時速340km/h超から時速60km/hのタイトヘアピン（ターン14）へと一気に減速する [1][3]。激しいブレーキングバトルが展開される絶好のオーバーテイクポイントであり、ストレート最高速と低中速コーナーでのメカニカルグリップを高次元で両立する空力妥協が求められる [2][4][6]。",
+    "officialLinks": {
+          "website": "https://www.shanghaicircuit.com/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/china.html",
+          "googleMaps": "https://maps.google.com/?q=Shanghai+International+Circuit"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_shanghai.jpg",
       "credit": "Yue Zhang",
@@ -9116,6 +9179,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2023
     },
     "characteristics": "【第1章：NFLスタジアムを取り囲む華やかなマイアミの祭典】\\nNFLマイアミ・ドルフィンズの本拠地ハードロック・スタジアムの敷地内に建設されたモダンストリートコース [1][5]。巨大スタジアムの周囲を縫うようにレイアウトされ、高速スウィーパーが連続するセクター1と、高架道路（フロリダ・ターンパイク）の支柱下をすり抜ける極低速テクニカルセクションの対比が鮮烈な特徴 [1][2]。フロリダ特有の強烈な日差しにより路面温度は容易に55℃を超え、冷却パッケージとタイヤ熱管理が極限に達する [2][4]。\\n\\n【第2章：高架下の急勾配シケイン（Turns 14-15）の難所】\\n時速340km/hを超える超長大バックストレートへ突入する直前のターン14-15は、登り勾配から縁石を跳ね越えながら下るブラインドの超タイトシケイン [1][3]。グラウンドエフェクトカーの硬いサスペンションでは縁石に乗った瞬間にフロアのダウンフォースが抜けやすく、ドライバーはミリ単位のスロットル・ステアリング操作を強いられる [2][3][6]。",
+    "officialLinks": {
+          "website": "https://www.f1miamigp.com/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/miami.html",
+          "googleMaps": "https://maps.google.com/?q=Miami+International+Autodrome",
+          "xTwitter": "https://x.com/f1miami",
+          "instagram": "https://www.instagram.com/f1miami/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_miami.jpg",
       "credit": "Apex Circuit Design",
@@ -9371,6 +9441,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2020
     },
     "characteristics": "【第1章：アペニン山脈の丘陵に刻まれた歴史と栄光、そして祈りの地】\\nフェラーリの創業者エンツォとその息子の名を冠し、サンテルノ川沿いの自然な起伏に沿って広がる反時計回りの名門クラシックサーキット [1][5]。1994年のアイルトン・セナとローランド・ラッツェンバーガーの悲劇を経て安全改修を重ねながらも、タンブレロ、トサ、ピラテッラ、アクエ・ミネラリといった伝説的コーナーの挑戦的キャラクターは脈々と受け継がれている [1][3]。\\n\\n【第2章：強烈な縁石アタックとセッティングのジレンマ】\\n高低差が激しく、ドライバーは縁石を大胆に跨ぎながら最短ラインをトレースするアグレッシブな走りを要求される [2][4]。車高を下げてダウンフォースを稼ぎたいグラウンドエフェクトカーにとって、縁石でのボトミング（底打ち）による跳ねをいかにサスペンションのしなやかさでいなすかが最大の技術課題 [2][4][6]。コース幅が狭くオーバーテイクが極めて困難なため、予選の1発アタックが決勝順位を大きく決定づける [1][3]。",
+    "officialLinks": {
+          "website": "https://www.autodromoimola.it/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/emilia-romagna.html",
+          "googleMaps": "https://maps.google.com/?q=Autodromo+Enzo+e+Dino+Ferrari",
+          "xTwitter": "https://x.com/autodromoimola",
+          "instagram": "https://www.instagram.com/autodromoimola/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_imola.jpg",
       "credit": "LutzWeidner",
@@ -9626,6 +9703,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2019
     },
     "characteristics": "【第1章：セントローレンス川に浮かぶ人工島の超高速ストップ＆ゴー】\\nノートルダム島の万国博覧会跡地公道を利用したセミストリートサーキット [1][5]。長いストレートを急減速シケインとヘアピンで結ぶレイアウトであり、F1カレンダー屈指の「ブレーキ破壊サーキット」として知られる [1][2]。カーボンブレーキディスクの温度は1,000℃を超え、ブレーキ冷却ダクト設計とペダルマネジメントが完走の絶対条件となる [2][4]。\\n\\n【第2章：名物「チャンピオンの壁」と激しい縁石ホッピング】\\n最終シケイン（Turns 13-14）の出口外側にそびえるコンクリートウォールは、1999年に当時の世界王者3名（シューマッハ、ヒル、ヴィルヌーヴ）が相次いでクラッシュしたことから「ウォール・オブ・チャンピオンズ（Wall of Champions）」と恐れられる [1][3]。ドライバーは時速240km/h超で縁石を跳ね飛びながらミリ単位でウォールをかすめる度胸のアタックを繰り広げる [2][3][6]。",
+    "officialLinks": {
+          "website": "https://www.gpcanada.ca/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/canada.html",
+          "googleMaps": "https://maps.google.com/?q=Circuit+Gilles+Villeneuve",
+          "xTwitter": "https://x.com/F1GPCanada",
+          "instagram": "https://www.instagram.com/f1gpcanada/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_villeneuve.jpg",
       "credit": "Alexandre_Prévot",
@@ -9846,6 +9930,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2023
     },
     "characteristics": "【第1章：空力ベンチマークの殿堂と超高速ターン3】\\n長年F1の公式合同テストとスペインGPを開催し、「このコースで速いマシンは世界中のどこでも速い」と称される空力効率の絶対的リファレンス [1][5]。低速・中速・高速コーナー、そして1kmのストレートが理想的な比率で配置されている [1][2]。特に上り勾配の超高速ロング右コーナー「ターン3」は、首と外側タイヤに強大な遠心力Gが加わり続け、マシンのフロントグリップと空力スタビリティを過酷なまでに暴き出す [2][3]。\\n\\n【第2章：シケイン撤去による本来の超高速最終セクター復活】\\n2023年より最終セクターの低速シケインが撤去され、かつての高速スウィーパー2連続（ターン13-14）へと原点回帰 [1][3]。時速250km/h超で最終コーナーを駆け抜けメインストレートへ飛び出すレイアウトとなったことで、スリップストリームとDRSの効きが劇的に向上 [2][4]。タイヤの左フロントおよび左リアにかかる熱的ストレスが極めて高く、複数回ピットストップ戦略の知略戦が繰り広げられる [3][6]。",
+    "officialLinks": {
+          "website": "https://www.circuitcat.com/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/spain.html",
+          "googleMaps": "https://maps.google.com/?q=Circuit+de+Barcelona-Catalunya",
+          "xTwitter": "https://x.com/Circuitcat_eng",
+          "instagram": "https://www.instagram.com/circuitdebcncat/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_catalunya.jpg",
       "credit": "LutzWeidner",
@@ -10070,7 +10161,14 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "driver": "2026年 FIA F1公式シミュレーション基準値",
       "year": 2026
     },
-    "characteristics": "【第1章：2026年新時代を象徴する首都ハイブリッド・ストリート】\\nスペインの首都マドリードのIFEMA展示会場とバルデベバス地区を結び、2026年よりカレンダーに加わった新世代の半公道サーキット [1][5]。国際展示場の敷地内と市街地公道、そして起伏に富んだ専用設計セクションが有機的に融合 [1][2]。F1の脱炭素・持続可能性目標に合致した完全公共交通アクセス型グランプリとして世界の注目を集める [2][5]。\\n\\n【第2章：展示館アンダーパスとバンク角のついた超高速ベンド】\\nコース最大の見所は、巨大な展示ホール間を潜り抜けるトンネルセクションと、最大傾斜角を持つダイナミックなバンク付き高速コーナー [1][3]。2026年の新アクティブエアロ（Zモード/Xモード）と倍増したMGU-Kパワーの回生・展開戦略が直接勝敗を分ける舞台として設計されており、市街地特有のタイトブレーキングと超高速ストレートがスリリングなドラマを演出する [2][4][6]。",
+    "characteristics": "【第1章：2026年新時代を象徴する首都ハイブリッド・ストリート】\\nスペインの首都マドリードのIFEMA展示会場とバルデベバス地区を結び、2026年よりカレンダーに加わった新世代の半公道サーキット、マドリング（IFEMAマドリード市街地コース） [1][5]。国際展示場の敷地内と市街地公道、そして起伏に富んだ専用設計セクションが有機的に融合 [1][2]。F1の脱炭素・持続可能性目標に合致した完全公共交通アクセス型グランプリとして世界の注目を集める最新鋭のレースウェイである [2][5]。\\n\\n【第2章：パビリオン・アンダーパスとバンク角10度の超高速ベンド】\\nコース最大の見所は、巨大なIFEMA展示ホール間を潜り抜ける特設トンネルセクションと、最大傾斜角10度を誇るダイナミックなバンク付き高速コーナー（Turns 7-9） [1][3]。時速260km/h超でバンクを駆け抜ける際には遠心力と下向きの重力加速度が重なり合い、マシンのサスペンションが限界まで沈み込む（ボトミング） [2][3]。2026年の新アクティブエアロ（低ドラッグのXモードと高ダウンフォースのZモード）の切り替えが随所で要求され、市街地特有のタイトブレーキングと超高速セクションが共存する [2][4][6]。\\n\\n【第3章：350kW MGU-K回生配分と路面グレイニングのアンダーカット戦術】\\n新設サーキット特有の「グリーンなアスファルト（未成熟な路面）」はタイヤの滑りを誘発しやすく、局所的な温度上昇による表面剥離（グレイニング）とサーマルデグラデーションが頻発する [2][6]。特にタイトな市街地シケインでのブレーキングで350kW MGU-Kのエネルギーを急速回生し、トンネル直後のロングストレートでManual Override Modeを展開するオーバーテイク戦略が極めて有効 [3][4]。デグラデーションの進行が早いため、1周あたり約1.7秒ものタイム短縮をもたらすアグレッシブなアンダーカットが勝敗を分ける [1][6]。",
+    "officialLinks": {
+          "website": "https://www.ifema.es/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/madrid.html",
+          "googleMaps": "https://maps.google.com/?q=IFEMA+Madrid",
+          "xTwitter": "https://x.com/IFEMA",
+          "instagram": "https://www.instagram.com/feria_madrid/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_madrid.jpg",
       "credit": "F1 / IFEMA Madrid Official",
@@ -10176,6 +10274,11 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         "engineeringTip": "メインストレートへの脱出速度を最大化するため、イン側の縁石をミリ単位でクリップ。"
       }
     ],
+    "setupNotes": {
+      "aeroTradeoff": "IFEMAロングストレートでのXモード低ドラッグと、市街地ツイスティ区間およびバンクコーナーでのZモード高ダウンフォースの両立。ストリートコースとしては比較的中〜高速寄りのエアロパッケージが要求される。",
+      "kerbUsage": "市街地セクションの特設縁石（ケルブ）は段差が鋭いため、サスペンションが弾かれてウォールに接触するリスクがある。しなやかなコンプライアンスを持たせつつ、バンクでのボトミングを防ぐプログレッシブなバンプラバー設定が重要。",
+      "brakeDemands": "ターン1（IFEMA Gateway）の時速330km/hからのヘビーブレーキングが最大の減速ポイント。コンクリートウォールが迫る中での急制動となるため、ブレーキバイアスを最適化してリアの唐突なオーバーステアを抑制する。"
+    },
     "references": [
       {
         "id": 1,
@@ -10212,6 +10315,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2020
     },
     "characteristics": "【第1章：シュタイヤーマルクのアルプスに抱かれた電光石火のショートトラック】\\nオーストリア・シュピールベルクの美しいアルプス山麓に位置し、1周わずか約1分05秒前後で駆け抜けるカレンダー最短クラスの電撃サーキット [1][5]。高低差65メートルの山肌を登り降りするドラマティックなレイアウトであり、ターン1からターン3へ向かう強烈な登り坂ストレートは、エンジンパワーと高地でのターボチャージャー効率を厳しく試す [1][2]。\\n\\n【第2章：ソーセージ縁石の洗礼とトラックリミットの死闘】\\n3箇所のDRSゾーンにより毎周のようにオーバーテイクが頻発する一方、ターン9〜10の最終高速コーナーでは外側の白線ミリ単位を攻める「トラックリミット違反」が頻発する [2][3]。また、コーナー出口に設置された硬質な縁石はフロントウィングやサスペンション、フロアに甚大なダメージを与える「カーブ・ディストラクター（縁石の破壊者）」として恐れられる [2][4][6]。",
+    "officialLinks": {
+          "website": "https://www.redbullring.com/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/austria.html",
+          "googleMaps": "https://maps.google.com/?q=Red+Bull+Ring",
+          "xTwitter": "https://x.com/redbullring",
+          "instagram": "https://www.instagram.com/redbullring/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_redbull_ring.jpg",
       "credit": "LutzWeidner",
@@ -10404,6 +10514,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2020
     },
     "characteristics": "【第1章：「壁のないモナコ」と呼ばれる灼熱のワインディングロード】\\nハンガリー・ブダペスト郊外の天然すり鉢状の谷あいに位置する超テクニカルサーキット [1][5]。ストレートが極端に短く、14のコーナーが息つく暇もなく連続するため「壁のないモナコ（Monaco without walls）」の異名をとる [1][2]。毎年7月下旬の酷暑期に開催されるため、路面温度は60℃近くまで跳ね上がり、コクピット内のドライバーにサウナ状態の肉体的持久戦を強いる [2][4]。\\n\\n【第2章：最大ダウンフォースセッティングと予選グリッドの重み】\\nコース全周にわたり高速全開区間がほとんど存在しないため、各チームは空力抵抗（ドラッグ）を犠牲にしてでも最大ダウンフォース仕様のウィングを投入する [3][4]。抜きどころがターン1進入のブレーキングポイントに事実上限定されるため、土曜予選でのポールポジション獲得が決勝での勝利に直結する戦略的サーキット [1][3][6]。",
+    "officialLinks": {
+          "website": "https://hungaroring.hu/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/hungary.html",
+          "googleMaps": "https://maps.google.com/?q=Hungaroring",
+          "xTwitter": "https://x.com/HungaroringF1",
+          "instagram": "https://www.instagram.com/hungaroring_official/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_hungaroring.jpg",
       "credit": "LutzWeidner",
@@ -10624,6 +10741,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2021
     },
     "characteristics": "【第1章：北海の砂丘を縫う伝説のバンクコーナー】\\n1952年にF1を初開催し、2021年に大改修を経て復活したオランダのクラシックサーキット [1][5]。設計会社アペックス・サーキット・デザインが導入したターン3（フーゲンホルツ）の18度（32%勾配）バンク、そして最終ターン14（オーリー・ボスコ）の急傾斜バンクは、インディアナポリス（9度）の2倍の傾斜角を誇る [1][3]。\\n\\n【第2章：3次元コーナリングGと砂丘の突風】\\nバンクコーナーでは、通常の横Gに加えて垂直方向の圧縮Gがタイヤにかかるため、ピレリは専用の強化構造タイヤを供給 [3][6]。北海からの強風がコース上に海砂を吹き飛ばし、グリップレベルが周回ごとに激変するトラックエボリューションへの適応力が勝負を分ける [2][4]。",
+    "officialLinks": {
+          "website": "https://www.circuitzandvoort.nl/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/netherlands.html",
+          "googleMaps": "https://maps.google.com/?q=Circuit+Zandvoort",
+          "xTwitter": "https://x.com/circuitzandvoor",
+          "instagram": "https://www.instagram.com/circuitzandvoort/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_zandvoort.jpg",
       "credit": "LutzWeidner",
@@ -10844,6 +10968,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2019
     },
     "characteristics": "【第1章：世界遺産の古城と2.2kmの超長大メインストリート】\\nカスピ海の港町バクーの市街地を走る超高速ストリートコース [1][5]。コース幅がわずか7.6メートルしかなく、世界遺産の城壁すれすれを抜ける「キャッスル・セクション（Turns 8-10）」という極低速区間を持つ一方、カスピ海沿岸のメインストレートはF1カレンダー最長の2.2kmに達し、時速355km/hを超える超高速バトルが展開される [1][2]。\\n\\n【第2章：相反する空力セッティングとスリップストリームの狂詩曲】\\nストレート最高速を稼ぐための超低ダウンフォースウィングと、低速シケインを曲がるためのメカニカルグリップという極端な妥協点を探るセットアップ [2][4]。ターン1進入での強烈なスリップストリーム合戦や、ブレーキロックによるエスケープゾーン飛び込み、そしてセーフティカーリスタートでの大波乱が毎年の名物となっている [1][2][6]。",
+    "officialLinks": {
+          "website": "https://www.bakucitycircuit.com/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/azerbaijan.html",
+          "googleMaps": "https://maps.google.com/?q=Baku+City+Circuit",
+          "xTwitter": "https://x.com/BakuCityCircuit",
+          "instagram": "https://www.instagram.com/bakucitycircuit/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_baku.jpg",
       "credit": "LutzWeidner",
@@ -11106,6 +11237,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2024
     },
     "characteristics": "【第1章：赤道直下の熱帯夜を照らす世界初のF1ナイトレース】\\nマリーナベイの摩天楼をバックに強力な照明灯の下で開催されるストリートレース [1][5]。気温30℃超、湿度80%以上という過酷な気候条件の中、2時間ルールぎりぎりまで続く70周のレースは、ドライバーの心拍数が平均170bpmを超え、体重が3kg以上減少する「年間で最も肉体的に過酷なグランプリ」と称される [1][2]。\\n\\n【第2章：19のコーナーと100%のセーフティカー確率】\\n低速コーナーが連続するため最大ダウンフォースセッティングが必須 [3][4]。市街地の舗装ギャップや橋の通過部（アンダーソン・ブリッジ）での底打ちショックを吸収するしなやかなサスペンションセッティングが要求される [2][4]。コース全周がコンクリートウォールに囲まれているため、2008年初開催以来セーフティカー出動率100%という驚異的な記録を保持している [1][2][6]。",
+    "officialLinks": {
+          "website": "https://singaporegp.sg/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/singapore.html",
+          "googleMaps": "https://maps.google.com/?q=Marina+Bay+Street+Circuit",
+          "xTwitter": "https://x.com/F1NightRace",
+          "instagram": "https://www.instagram.com/f1nightrace/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_singapore.jpg",
       "credit": "LutzWeidner",
@@ -11361,6 +11499,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2019
     },
     "characteristics": "【第1章：高低差41mの急坂クライムと世界のアイコニックコーナー融合】\\nヘルマン・ティルケが設計し、2012年に誕生したアメリカ・モータースポーツの近代の殿堂 [1][5]。ホームストレートエンドに待ち構える「高低差41メートルの急勾配を駆け上がるブラインドのターン1ヘアピン」は、進入時の視野が完全に遮られるスリリングなパッシングステージ [1][2]。\\n\\n【第2章：シルバーストンとホッケンハイムのオマージュ】\\nセクター1のターン3からターン6はシルバーストンのマゴッツ〜ベケッツ、セクター3はホッケンハイムのスタジアムセクションを再現した複合テクニカルレイアウト [2][3]。テキサスの粘土質土壌による路面のバンプ（起伏・段差）が激しく、グラウンドエフェクトカーのスキッドブロック摩耗やフロア損傷を防ぐライドハイト管理が極めてシビアとなる [2][4][6]。",
+    "officialLinks": {
+          "website": "https://circuitoftheamericas.com/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/united-states.html",
+          "googleMaps": "https://maps.google.com/?q=Circuit+of+the+Americas",
+          "xTwitter": "https://x.com/COTA",
+          "instagram": "https://www.instagram.com/cota_official/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_cota.jpg",
       "credit": "LutzWeidner",
@@ -11623,6 +11768,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2021
     },
     "characteristics": "【第1章：標高2,285mの希薄な大気と最高速360km/hのパラドックス】\\nメキシコシティの海抜2,285メートルという高地に位置し、大気圧が平地の約78%（0.78気圧）しかないF1唯一無二のウルトラハイアルティチュードサーキット [1][5]。空気が極端に薄いため、各チームはモナコ並みの最大ダウンフォースウィングを装着しても、空気抵抗はモンツァ並みに低減し、メインストレートでは時速360km/hに迫る超高トップスピードを記録する [1][2]。\\n\\n【第2章：冷却不足の危機と熱狂の野球場「フォロ・ソル」】\\n希薄な大気はエンジン、ターボ、ブレーキの冷却効率を著しく低下させ、オーバーヒート対策が最大のエンジニアリング課題となる [2][4]。終盤のセクター3には、かつての野球スタジアムのグランドをコースが貫通する名物「フォロ・ソル（Foro Sol）」セクションがあり、3万人を超える大観衆の熱狂的な歓声に包まれながら低速シケインを駆け抜ける世界屈指のスペクタクルを誇る [1][3][6]。",
+    "officialLinks": {
+          "website": "https://www.mexicogp.mx/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/mexico.html",
+          "googleMaps": "https://maps.google.com/?q=Autodromo+Hermanos+Rodriguez",
+          "xTwitter": "https://x.com/mexicogp",
+          "instagram": "https://www.instagram.com/mexicogp/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_mexico.png",
       "credit": "LutzWeidner",
@@ -11864,6 +12016,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2018
     },
     "characteristics": "【第1章：反時計回りの起伏とアイルトン・セナの魂が宿る聖地】\\nブラジル・サンパウロのすり鉢状の天然盆地に位置し、海抜約800メートルの高地を反時計回り（反時計回りコースは首の筋肉への負担が極端に高い）に疾走する伝統のインテルラゴス [1][5]。名物コーナー「エス・ド・セナ（Senna S: Turns 1-2）」は、下り勾配でブラインドとなる右から左への切り返しであり、激しいブレーキングバトルが展開される世界屈指のパッシングポイント [1][2]。\\n\\n【第2章：急変する天候とドラマティックな最終セクター】\\n熱帯特有のスコールが突如襲来し、数分でドライから豪雨へと急変する気象ドラマが数々のタイトル決定戦（2008年ハミルトン最終周逆転戴冠、2012年ベッテル最後尾からの3冠戴冠など）を生んできた [1][3]。セクター2の低速テクニカル区間でのトラクションと、ターン12（フンサオ）から登り坂を駆け上がる超高速全開セクター3での最高速という相反する空力セッティングの妥協が鍵となる [2][4][6]。",
+    "officialLinks": {
+          "website": "https://f1saopaulo.com.br/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/brazil.html",
+          "googleMaps": "https://maps.google.com/?q=Autodromo+Jose+Carlos+Pace",
+          "xTwitter": "https://x.com/f1saopaulo",
+          "instagram": "https://www.instagram.com/f1saopaulo/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_interlagos.png",
       "credit": "LutzWeidner",
@@ -12091,6 +12250,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2023
     },
     "characteristics": "【第1章：夜のラスベガス・ストリップを350km/hで疾走する究極の非日常】\\n世界最大のエンターテインメント都市ラスベガスの大通り（ストリップ）を完全封鎖して開催される土曜深夜の超高速ナイトレース [1][5]。ベラージオの噴水やシーザーズ・パレス、巨大球体スクリーン「スフィア」の極彩色のネオンを背景に、全長1.9kmに及ぶストレートを時速350km/h超でマシンが駆け抜ける [1][2]。\\n\\n【第2章：気温10℃前後の極冷路面とタイヤウォームアップの極限】\\n砂漠気候の11月深夜に開催されるため、路面温度が15℃以下、時にはシングルデジットまで冷え込む [1][3]。超低ダウンフォースウィングでストレートを疾走した直後のターン14ハードブレーキングでは、冷え切ったタイヤの表面が摩擦熱を持たずに破断する「コールド・グレイニング」が多発 [2][4]。タイヤをいかに作動温度領域（ウインドウ）に留め続けるかが勝負の絶対条件となる [2][3][6]。",
+    "officialLinks": {
+          "website": "https://www.f1lasvegasgp.com/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/las-vegas.html",
+          "googleMaps": "https://maps.google.com/?q=Las+Vegas+Strip+Circuit",
+          "xTwitter": "https://x.com/F1LasVegas",
+          "instagram": "https://www.instagram.com/f1lasvegas/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_las_vegas.png",
       "credit": "Formula 1",
@@ -12332,6 +12498,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2023
     },
     "characteristics": "【第1章：MotoGP譲りの流麗な中高速コーナーと息もつかせぬ横G】\\nカタール・ドーハ近郊の砂漠に広がる完全照明のナイトレースサーキット [1][5]。元来2輪ロードレースの聖地として設計されたため、ストップ＆ゴーの急減速コーナーがほとんどなく、流れるような中高速コーナー（ターン12〜14の3連続スウィーパー）が延々と続く [1][2]。休む場所が一切ないレイアウトにより、ドライバーには連続して4Gから5Gに達する強烈な横Gが加わり続ける [2][4]。\\n\\n【第2章：ピレリタイヤへの最大級負荷と強制スティント制限の衝撃】\\n高速コーナーで縁石に乗る際の高周波振動と巨大なダウンフォース荷重により、2023年にはタイヤ内部構造剥離の懸念から「1セット最大18周」というF1史上異例の強制周回数制限がFIAから発令された [1][3]。マシンには完璧な高ダウンフォースバランスと、ドライバーには過酷な高温多湿に耐え抜く強靭なフィジカルが要求される [2][3][6]。",
+    "officialLinks": {
+          "website": "https://www.lcsc.qa/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/qatar.html",
+          "googleMaps": "https://maps.google.com/?q=Lusail+International+Circuit",
+          "xTwitter": "https://x.com/lusailcircuit",
+          "instagram": "https://www.instagram.com/lusailcircuit/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_losail.jpg",
       "credit": "LutzWeidner",
@@ -12566,6 +12739,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2021
     },
     "characteristics": "【第1章：夕暮れから満天の夜空へ移ろう豪華絢爛のシーズンフィナーレ】\\nアラブ首長国連邦アブダビの人工島ヤス島に建設され、伝統的にF1シーズンの最終戦を飾るトワイライトレースの舞台 [1][5]。夕暮れの太陽光の下でスタートし、夜間照明へと徐々に光の条件が変化する中、気温と路面温度がセッション中に10℃以上急降下するため、マシンの前後バランスが激変する [1][2]。\\n\\n【第2章：改修された高速バンクとマリーナホテルの下を抜ける華麗なセクター】\\n2021年の大改修により、旧来のストップ＆ゴーからターン5のバンク付きヘアピン、ターン9の雄大な高速バンクコーナーへと刷新され、パッシング機会とレースペースが飛躍的に向上 [1][3]。セクター3では、色鮮やかに発光する五星ホテル「Wアブダビ」の直下を潜り抜けるテクニカル区間が待ち受け、トラクションと低速メカニカルグリップがタイヤのオーバーヒートを防ぐ鍵となる [2][4][6]。",
+    "officialLinks": {
+          "website": "https://www.yasmarinacircuit.com/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/abu-dhabi.html",
+          "googleMaps": "https://maps.google.com/?q=Yas+Marina+Circuit",
+          "xTwitter": "https://x.com/ymcofficial",
+          "instagram": "https://www.instagram.com/ymcofficial/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_yas_marina.jpg",
       "credit": "LutzWeidner",
@@ -12800,6 +12980,13 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "year": 2021
     },
     "characteristics": "【第1章：紅海沿岸を時速250km/hで駆け抜ける「世界最速の市街地サーキット」】\\nサウジアラビアの港町ジェッダの海岸線に建設された超高速ストリートサーキット [1][5]。全27のコーナーを持ちながら、平均時速はモンツァに次ぐ250km/h以上に達し、市街地レースの常識を根底から覆す異次元のハイスピードコース [1][2]。ブラインドの高速コーナーがコンクリートウォールに囲まれて延々と続き、わずか数センチのラインのズレが大惨事につながる極限の緊張感が支配する [2][3]。\\n\\n【第2章：12度のバンク角を持つターン13と赤旗セーフティカーの高確率】\\nターン13は12度の傾斜を持つバンク付きヘアピンであり、外側ラインから高いコーナリングスピードを維持して立ち上がるアグレッシブなライン取りが可能 [1][3]。超高速かつランオフエリアが皆無であるため、ひとたびクラッシュが発生すれば即座にセーフティカー出動や赤旗中断へと発展し、ピット戦略の瞬時の判断力が波乱のレースを制する鍵となる [2][4][6]。",
+    "officialLinks": {
+          "website": "https://saudiarabiangp.com/",
+          "f1Official": "https://www.formula1.com/en/racing/2026/saudi-arabia.html",
+          "googleMaps": "https://maps.google.com/?q=Jeddah+Corniche+Circuit",
+          "xTwitter": "https://x.com/SaudiArabianGP",
+          "instagram": "https://www.instagram.com/saudiarabiangp/"
+    },
     "visualMap": {
       "imageUrl": "/images/circuits/circuit_jeddah.png",
       "credit": "Formula 1",

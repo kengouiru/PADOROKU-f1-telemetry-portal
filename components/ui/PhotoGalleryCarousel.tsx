@@ -15,6 +15,7 @@ interface PhotoGalleryCarouselProps {
   badgeColor?: string;
   themeColor?: string;
   aspectRatio?: '16/10' | '16/9' | '4/3' | '3/2';
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
@@ -24,6 +25,7 @@ export default function PhotoGalleryCarousel({
   badgeColor,
   themeColor,
   aspectRatio = '16/10',
+  size = 'md',
   className = '',
 }: PhotoGalleryCarouselProps) {
   const activeColor = themeColor || badgeColor || '#38bdf8';
@@ -42,6 +44,34 @@ export default function PhotoGalleryCarousel({
       : aspectRatio === '3/2'
       ? 'aspect-[3/2]'
       : 'aspect-[16/10]';
+
+  // Size styling configuration (strictly preserving aspect ratio while controlling scale)
+  const sizeConfig = {
+    sm: {
+      card: 'w-[64%] sm:w-[38%] md:w-[28%] lg:w-[22%] min-h-[130px] sm:min-h-[145px] md:min-h-[160px] max-h-[180px] rounded-xl',
+      pad: 'p-2 sm:p-2.5',
+      caption: 'text-[11px] sm:text-xs font-bold text-white leading-snug drop-shadow-md line-clamp-1 group-hover/card:line-clamp-2',
+      meta: 'text-[8.5px] sm:text-[9.5px]',
+      tag: 'text-[8.5px] sm:text-[9px] px-1.5 py-0.5',
+      badge: 'text-[9px] px-1.5 py-0.5',
+    },
+    md: {
+      card: 'w-[75%] sm:w-[48%] md:w-[36%] min-h-[170px] sm:min-h-[190px] md:min-h-[210px] rounded-2xl',
+      pad: 'p-3 sm:p-3.5',
+      caption: 'text-xs sm:text-[13px] font-bold text-white leading-snug drop-shadow-md line-clamp-2',
+      meta: 'text-[9px] sm:text-[10px]',
+      tag: 'text-[9px] sm:text-[10px] px-2 py-0.5',
+      badge: 'text-[10px] px-2 py-0.5',
+    },
+    lg: {
+      card: 'w-[85%] sm:w-[58%] md:w-[48%] min-h-[200px] sm:min-h-[230px] md:min-h-[250px] rounded-2xl',
+      pad: 'p-3 sm:p-3.5',
+      caption: 'text-xs sm:text-[13px] font-bold text-white leading-snug drop-shadow-md line-clamp-2',
+      meta: 'text-[9px] sm:text-[10px]',
+      tag: 'text-[9px] sm:text-[10px] px-2 py-0.5',
+      badge: 'text-[10px] px-2 py-0.5',
+    },
+  }[size];
 
   // Keyboard navigation for Lightbox
   useEffect(() => {
@@ -158,7 +188,7 @@ export default function PhotoGalleryCarousel({
                 <div
                   key={idx}
                   onClick={() => setLightboxIndex(idx)}
-                  className={`w-[85%] sm:w-[58%] md:w-[48%] ${aspectClass} min-h-[200px] sm:min-h-[230px] md:min-h-[250px] flex-shrink-0 snap-center rounded-2xl overflow-hidden bg-slate-950 border transition-all duration-300 relative shadow-lg cursor-pointer group/card ${
+                  className={`${sizeConfig.card} ${aspectClass} flex-shrink-0 snap-center overflow-hidden bg-slate-950 border transition-all duration-300 relative shadow-lg cursor-pointer group/card ${
                     isCurrent
                       ? 'ring-1'
                       : 'border-white/10 opacity-90 hover:opacity-100'
@@ -206,9 +236,9 @@ export default function PhotoGalleryCarousel({
 
                   {/* Top-Left Tag Badge */}
                   {item.tag && (
-                    <div className="absolute top-2.5 left-2.5 z-10">
+                    <div className="absolute top-2 left-2 z-10">
                       <span
-                        className="px-2 py-0.5 rounded-md text-[9px] sm:text-[10px] font-racing font-bold tracking-wider uppercase backdrop-blur-md shadow-sm border"
+                        className={`${sizeConfig.tag} rounded-md font-racing font-bold tracking-wider uppercase backdrop-blur-md shadow-sm border`}
                         style={{
                           backgroundColor: 'rgba(15, 23, 42, 0.88)',
                           borderColor: activeColor,
@@ -221,20 +251,20 @@ export default function PhotoGalleryCarousel({
                   )}
 
                   {/* Top-Right Lightbox Expand Hint */}
-                  <div className="absolute top-2.5 right-2.5 z-10 opacity-70 group-hover/card:opacity-100 transition-opacity">
-                    <span className="px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-md text-white/90 text-[10px] font-mono border border-white/20 flex items-center gap-1 shadow">
+                  <div className="absolute top-2 right-2 z-10 opacity-70 group-hover/card:opacity-100 transition-opacity">
+                    <span className={`${sizeConfig.badge} rounded-md bg-black/70 backdrop-blur-md text-white/90 font-mono border border-white/20 flex items-center gap-1 shadow`}>
                       <span>🔍</span>
                       <span className="hidden sm:inline">拡大</span>
                     </span>
                   </div>
 
                   {/* Bottom Metadata: Caption & Attribution */}
-                  <div className="absolute bottom-0 inset-x-0 p-3 sm:p-3.5 flex flex-col gap-1 z-10">
-                    <p className="text-xs sm:text-[13px] font-bold text-white leading-snug drop-shadow-md line-clamp-2">
+                  <div className={`absolute bottom-0 inset-x-0 ${sizeConfig.pad} flex flex-col gap-0.5 sm:gap-1 z-10`}>
+                    <p className={sizeConfig.caption}>
                       {item.caption}
                     </p>
-                    <div className="flex items-center justify-between text-[9px] sm:text-[10px] text-slate-300 font-mono pt-0.5">
-                      <span className="truncate max-w-[150px] text-slate-400">
+                    <div className={`flex items-center justify-between ${sizeConfig.meta} text-slate-300 font-mono pt-0.5`}>
+                      <span className="truncate max-w-[140px] text-slate-400">
                         {item.license}
                       </span>
                       <a
@@ -242,7 +272,7 @@ export default function PhotoGalleryCarousel({
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="hover:text-white text-slate-300 flex items-center gap-1 transition-colors bg-black/60 hover:bg-black/80 px-2 py-0.5 rounded border border-white/15"
+                        className="hover:text-white text-slate-300 flex items-center gap-1 transition-colors bg-black/60 hover:bg-black/80 px-1.5 py-0.5 rounded border border-white/15"
                       >
                         <span>Photo: {item.credit}</span>
                         <span>↗</span>

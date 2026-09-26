@@ -73,14 +73,14 @@ const DRIVER_KEYWORD_MAP: { keyword: string; code: string; name: string }[] = [
 
 // ── Built-in Team Keyword Mapping ────────────────────────────────────────────
 const TEAM_KEYWORD_MAP: { keyword: string; id: string; name: string }[] = [
-  { keyword: 'レッドブル・レーシング', id: 'redbull', name: 'Red Bull Racing' },
-  { keyword: 'レッドブル', id: 'redbull', name: 'Red Bull Racing' },
+  { keyword: 'レッドブル・レーシング', id: 'red-bull', name: 'Red Bull Racing' },
+  { keyword: 'レッドブル', id: 'red-bull', name: 'Red Bull Racing' },
   { keyword: 'スクーデリア・フェラーリ', id: 'ferrari', name: 'Ferrari' },
   { keyword: 'フェラーリ', id: 'ferrari', name: 'Ferrari' },
   { keyword: 'メルセデス-AMG', id: 'mercedes', name: 'Mercedes-AMG' },
   { keyword: 'メルセデス', id: 'mercedes', name: 'Mercedes-AMG' },
   { keyword: 'マクラーレン', id: 'mclaren', name: 'McLaren' },
-  { keyword: 'アストンマーティン', id: 'astonmartin', name: 'Aston Martin' },
+  { keyword: 'アストンマーティン', id: 'aston-martin', name: 'Aston Martin' },
   { keyword: 'アルピーヌ', id: 'alpine', name: 'Alpine' },
   { keyword: 'ウィリアムズ・レーシング', id: 'williams', name: 'Williams Racing' },
   { keyword: 'ウィリアムズ', id: 'williams', name: 'Williams Racing' },
@@ -90,7 +90,9 @@ const TEAM_KEYWORD_MAP: { keyword: string; id: string; name: string }[] = [
   { keyword: 'ハース', id: 'haas', name: 'Haas F1 Team' },
   { keyword: 'キャデラックF1', id: 'cadillac', name: 'Cadillac F1 Team' },
   { keyword: 'キャデラック', id: 'cadillac', name: 'Cadillac F1 Team' },
-  { keyword: 'レーシング・ブルズ', id: 'rb', name: 'Racing Bulls' },
+  { keyword: 'レーシング・ブルズ', id: 'racing-bulls', name: 'Racing Bulls' },
+  { keyword: 'ホンダF1', id: 'aston-martin', name: 'Honda Works (Aston Martin)' },
+  { keyword: 'ホンダ', id: 'aston-martin', name: 'Honda Works (Aston Martin)' },
 ];
 
 // ── Rule & Technical Keyword Mapping ─────────────────────────────────────────
@@ -124,13 +126,44 @@ const CIRCUIT_KEYWORD_MAP: { keyword: string; id: string; name: string }[] = [
   { keyword: 'モンツァ', id: 'monza', name: 'モンツァ・サーキット (イタリアGP)' },
   { keyword: 'シルバーストン・サーキット', id: 'silverstone', name: 'シルバーストン・サーキット (イギリスGP)' },
   { keyword: 'シルバーストン', id: 'silverstone', name: 'シルバーストン・サーキット (イギリスGP)' },
-  { keyword: 'スパ・フランコルシャン', id: 'spa', name: 'スパ・フランコルシャン (ベルギーGP)' },
-  { keyword: 'スパ', id: 'spa', name: 'スパ・フランコルシャン (ベルギーGP)' },
-  { keyword: 'モンテカルロ市街地コース', id: 'monaco', name: 'モンテカルロ市街地コース (モナコGP)' },
-  { keyword: 'モナコ市街地コース', id: 'monaco', name: 'モンテカルロ市街地コース (モナコGP)' },
+  { keyword: 'スパ・フランコルシャン', id: 'spa-francorchamps', name: 'スパ・フランコルシャン (ベルギーGP)' },
+  { keyword: 'スパ', id: 'spa-francorchamps', name: 'スパ・フランコルシャン (ベルギーGP)' },
+  { keyword: 'モンテカルロ市街地コース', id: 'circuit-de-monaco', name: 'モンテカルロ市街地コース (モナコGP)' },
+  { keyword: 'モナコ市街地コース', id: 'circuit-de-monaco', name: 'モンテカルロ市街地コース (モナコGP)' },
+  { keyword: 'モナコ', id: 'circuit-de-monaco', name: 'モンテカルロ市街地コース (モナコGP)' },
+  { keyword: 'IFEMAマドリード市街地コース', id: 'madrid', name: 'マドリング IFEMA市街地コース (マドリードGP)' },
+  { keyword: 'マドリード市街地コース', id: 'madrid', name: 'マドリング IFEMA市街地コース (マドリードGP)' },
   { keyword: 'マドリング', id: 'madrid', name: 'マドリング IFEMA市街地コース (マドリードGP)' },
+  { keyword: 'マドリード', id: 'madrid', name: 'マドリング IFEMA市街地コース (マドリードGP)' },
   { keyword: 'インテルラゴス', id: 'interlagos', name: 'インテルラゴス・サーキット (サンパウロGP)' },
   { keyword: 'アルバート・パーク', id: 'albert-park', name: 'アルバート・パーク・サーキット (オーストラリアGP)' },
+  { keyword: 'バクー市街地コース', id: 'baku', name: 'バクー市街地コース (アゼルバイジャンGP)' },
+  { keyword: 'バクー', id: 'baku', name: 'バクー市街地コース (アゼルバイジャンGP)' },
+  { keyword: 'マリーナベイ・ストリート・サーキット', id: 'singapore', name: 'マリーナベイ・ストリート・サーキット (シンガポールGP)' },
+  { keyword: 'マリーナベイ', id: 'singapore', name: 'マリーナベイ・ストリート・サーキット (シンガポールGP)' },
+  { keyword: 'ラスベガス・ストリップ・サーキット', id: 'las-vegas', name: 'ラスベガス・ストリップ・サーキット (ラスベガスGP)' },
+  { keyword: 'ラスベガス', id: 'las-vegas', name: 'ラスベガス・ストリップ・サーキット (ラスベガスGP)' },
+  { keyword: 'カタロニア・サーキット', id: 'catalunya', name: 'カタロニア・サーキット (スペインGP)' },
+  { keyword: 'カタロニア', id: 'catalunya', name: 'カタロニア・サーキット (スペインGP)' },
+  { keyword: 'ジル・ヴィルヌーヴ・サーキット', id: 'villeneuve', name: 'ジル・ヴィルヌーヴ・サーキット (カナダGP)' },
+  { keyword: 'レッドブル・リンク', id: 'redbull-ring', name: 'レッドブル・リンク (オーストリアGP)' },
+  { keyword: 'ハンガロリンク', id: 'hungaroring', name: 'ハンガロリンク (ハンガリーGP)' },
+  { keyword: 'ザントフォールト', id: 'zandvoort', name: 'ザントフォールト・サーキット (オランダGP)' },
+  { keyword: 'バーレーン・インターナショナル・サーキット', id: 'bahrain-international', name: 'バーレーン・インターナショナル・サーキット (バーレーンGP)' },
+  { keyword: 'バーレーン', id: 'bahrain-international', name: 'バーレーン・インターナショナル・サーキット (バーレーンGP)' },
+  { keyword: 'ジェッダ・コーニッシュ・サーキット', id: 'jeddah', name: 'ジェッダ・コーニッシュ・サーキット (サウジアラビアGP)' },
+  { keyword: 'ジェッダ', id: 'jeddah', name: 'ジェッダ・コーニッシュ・サーキット (サウジアラビアGP)' },
+  { keyword: '上海インターナショナル・サーキット', id: 'shanghai', name: '上海インターナショナル・サーキット (中国GP)' },
+  { keyword: '上海', id: 'shanghai', name: '上海インターナショナル・サーキット (中国GP)' },
+  { keyword: 'マイアミ・インターナショナル・オートドローム', id: 'miami', name: 'マイアミ・インターナショナル・オートドローム (マイアミGP)' },
+  { keyword: 'マイアミ', id: 'miami', name: 'マイアミ・インターナショナル・オートドローム (マイアミGP)' },
+  { keyword: 'サーキット・オブ・ジ・アメリカズ', id: 'cota', name: 'サーキット・オブ・ジ・アメリカズ (アメリカGP)' },
+  { keyword: 'COTA', id: 'cota', name: 'サーキット・オブ・ジ・アメリカズ (アメリカGP)' },
+  { keyword: 'エルマノス・ロドリゲス・サーキット', id: 'mexico', name: 'エルマノス・ロドリゲス・サーキット (メキシコGP)' },
+  { keyword: 'ルサイル・インターナショナル・サーキット', id: 'losail', name: 'ルサイル・インターナショナル・サーキット (カタールGP)' },
+  { keyword: 'ルサイル', id: 'losail', name: 'ルサイル・インターナショナル・サーキット (カタールGP)' },
+  { keyword: 'ヤス・マリーナ・サーキット', id: 'yas-marina', name: 'ヤス・マリーナ・サーキット (アブダビGP)' },
+  { keyword: 'ヤス・マリーナ', id: 'yas-marina', name: 'ヤス・マリーナ・サーキット (アブダビGP)' },
 ];
 
 // ── Build Full Keyword Registry ──────────────────────────────────────────────
@@ -238,6 +271,27 @@ export function getKnowledgeLinkRegistry(): KnowledgeLinkEntry[] {
     }
   });
 
+  // Additional technical terms & aliases
+  entries.push({ keyword: 'アペックス', url: '/knowledge/glossary/apex', category: 'glossary', title: '用語解説「エイペックス (クリッピングポイント)」を別タブで開く' });
+  entries.push({ keyword: '縁石', url: '/knowledge/glossary/apex', category: 'glossary', title: '用語解説「縁石 (ケルブ / トラックリミット)」を別タブで開く' });
+  entries.push({ keyword: 'ケルブ', url: '/knowledge/glossary/apex', category: 'glossary', title: '用語解説「ケルブ (縁石)」を別タブで開く' });
+  entries.push({ keyword: 'パワーユニット', url: '/knowledge/glossary/power-unit', category: 'glossary', title: '用語解説「パワーユニット (PU)」を別タブで開く' });
+  entries.push({ keyword: 'ピットストップ', url: '/knowledge/glossary/undercut', category: 'glossary', title: '用語解説「ピットストップ戦略」を別タブで開く' });
+  entries.push({ keyword: 'オーバーテイク', url: '/knowledge/glossary/slipstream', category: 'glossary', title: '用語解説「スリップストリーム＆オーバーテイク」を別タブで開く' });
+  entries.push({ keyword: 'ブレーキバイアス', url: '/knowledge/glossary/trail-braking', category: 'glossary', title: '用語解説「ブレーキバランス＆バイアス配分」を別タブで開く' });
+  entries.push({ keyword: 'トラクション', url: '/knowledge/glossary/apex', category: 'glossary', title: '用語解説「トラクション＆コーナー脱出」を別タブで開く' });
+  entries.push({ keyword: 'ポールポジション', url: '/knowledge/glossary/pole-position', category: 'glossary', title: '用語解説「ポールポジション」を別タブで開く' });
+  entries.push({ keyword: 'ファステストラップ', url: '/knowledge/glossary/fastest-lap', category: 'glossary', title: '用語解説「ファステストラップ」を別タブで開く' });
+  entries.push({ keyword: 'チームオーダー', url: '/knowledge/glossary/team-order', category: 'glossary', title: '用語解説「チームオーダー」を別タブで開く' });
+  entries.push({ keyword: 'ダブルスタック', url: '/knowledge/glossary/double-stack', category: 'glossary', title: '用語解説「ダブルスタック・ピットストップ」を別タブで開く' });
+  entries.push({ keyword: 'タイヤウォーマー', url: '/knowledge/glossary/outlap-inlap', category: 'glossary', title: '用語解説「タイヤブランケット・熱入れ」を別タブで開く' });
+  entries.push({ keyword: 'リフト＆コースト', url: '/knowledge/glossary/telemetry', category: 'glossary', title: '用語解説「リフト＆コースト (燃費・熱管理走法)」を別タブで開く' });
+  entries.push({ keyword: 'フューエルセーブ', url: '/knowledge/glossary/telemetry', category: 'glossary', title: '用語解説「フューエルセーブ (燃料セーブ走法)」を別タブで開く' });
+  entries.push({ keyword: 'サーマルデグラデーション', url: '/knowledge/glossary/degradation', category: 'glossary', title: '用語解説「サーマルデグラデーション (熱タレ)」を別タブで開く' });
+  entries.push({ keyword: 'ドラッグ', url: '/knowledge/glossary/drs', category: 'glossary', title: '用語解説「空気抵抗 (ドラッグ)」を別タブで開く' });
+  entries.push({ keyword: 'ボトミング', url: '/knowledge/glossary/porpoising', category: 'glossary', title: '用語解説「車高底付き (ボトミング)」を別タブで開く' });
+  entries.push({ keyword: 'Manual Override Mode', url: '/knowledge/glossary/manual-override', category: 'glossary', title: '用語解説「マニュアル・オーバーライド・モード」を別タブで開く' });
+
   // 2. Driver Mapping
   DRIVER_KEYWORD_MAP.forEach((d) => {
     entries.push({
@@ -282,9 +336,9 @@ export function getKnowledgeLinkRegistry(): KnowledgeLinkEntry[] {
   CIRCUIT_KEYWORD_MAP.forEach((c) => {
     entries.push({
       keyword: c.keyword,
-      url: `/?hub=knowledge&subTab=circuits&circuitId=${c.id}`,
+      url: `/knowledge/circuits/${c.id}`,
       category: 'circuit',
-      title: `サーキット解説「${c.name}」を開く`,
+      title: `サーキット解説「${c.name}」を別タブで開く`,
     });
   });
 
