@@ -69,7 +69,7 @@ import type { TelemetryTarget } from '@/data/f1KnowledgeData';
 import { GLOSSARY_TERMS } from '@/data/f1GlossaryData';
 import type { NavAction } from '@/components/AIStrategist';
 import AITelemetryInspectorModal from '@/components/telemetry/AITelemetryInspectorModal';
-import { Flag, Activity, Newspaper, BookOpen, Gamepad2, Clock } from 'lucide-react';
+import { Flag, Activity, Newspaper, BookOpen, Gamepad2, Clock, Search, Trophy } from 'lucide-react';
 import { useCurrentJstClock } from '@/lib/systemClock';
 
 import AuthButton from '@/components/auth/AuthButton';
@@ -1660,19 +1660,21 @@ export default function DashboardPage() {
             </button>
           </nav>
 
-          {/* Center-Right: Live JST Telemetry Clock */}
+          {/* Center-Right: Live JST Telemetry Clock (Compact single-line) */}
           {jstClock.formatted && (
             <div
-              className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900/90 border border-white/10 text-slate-300 font-mono text-[11px] shadow-sm select-none"
+              className="hidden lg:flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-slate-900/90 border border-white/10 text-slate-300 font-mono text-[10px] shadow-sm select-none whitespace-nowrap shrink-0"
               title="FIA公式タイムテーブル基準 日本標準時 (JST)"
             >
-              <Clock className="w-3.5 h-3.5 text-red-400 animate-pulse shrink-0" />
-              <span className="text-slate-400 text-[10px] font-bold">JST</span>
-              <span className="text-white font-medium">{jstClock.formatted}</span>
+              <Clock className="w-3 h-3 text-red-400 shrink-0" />
+              <span className="text-slate-400 text-[9px] font-bold">JST</span>
+              <span className="text-slate-200 font-medium tracking-tight">
+                {jstClock.formattedCompactSeconds || jstClock.formatted}
+              </span>
             </div>
           )}
 
-          {/* Right: Quick Tools (Search, Quiz, AI, Auth + Dedicated PITWALL Game Launcher) */}
+          {/* Right: Quick Tools (Search, Quiz, Auth + Dedicated PITWALL Game Launcher) */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Special Standalone PITWALL Game Launcher (特別独立起動ボタン) */}
             <button
@@ -1704,10 +1706,10 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setGlobalSearchOpen(true)}
-              className="btn-console"
+              className="btn-console flex items-center gap-1.5 shrink-0"
               title="選手・チーム・コース・タイヤ・用語の横断検索 (Ctrl+K)"
             >
-              <span className="text-xs text-sky-400">🔍</span>
+              <Search className="w-3.5 h-3.5 text-sky-400 shrink-0" />
               <span className="hidden sm:inline">検索</span>
               <kbd className="hidden lg:inline-flex items-center px-1.5 py-0.2 rounded bg-black/40 text-[9px] text-slate-400 font-mono border border-white/10 ml-0.5">
                 Ctrl K
@@ -1718,26 +1720,11 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setQuizModalOpen(true)}
-              className="btn-console"
+              className="btn-console flex items-center gap-1.5 shrink-0"
               title="対話型F1クイズ＆トリビア検定"
             >
-              <span className="text-amber-400">🏆</span>
+              <Trophy className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span className="hidden sm:inline">クイズ</span>
-            </button>
-
-            {/* AI Strategist Toggle Button (Desktop & Tablet) */}
-            <button
-              type="button"
-              onClick={() => setAiDrawerOpen((v) => !v)}
-              className={`hidden md:inline-flex btn-console shrink-0 ${
-                aiDrawerOpen
-                  ? 'bg-red-600/20 text-white border-red-500/50 shadow-sm'
-                  : ''
-              }`}
-              title="AIチーフレースストラテジスト"
-            >
-              <span className={aiDrawerOpen ? 'text-red-400' : 'text-slate-400'}>🤖</span>
-              <span className="hidden lg:inline">AI</span>
             </button>
 
             {/* Auth Button */}

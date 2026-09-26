@@ -29,6 +29,9 @@ export function formatJstClock(date: Date = new Date(), options?: { compact?: bo
   const seconds = String(d.getSeconds()).padStart(2, '0');
 
   if (options?.compact) {
+    if (options?.includeSeconds) {
+      return `${month}/${day}(${w}) ${hours}:${minutes}:${seconds}`;
+    }
     return `${month}/${day} (${w}) ${hours}:${minutes}`;
   }
 
@@ -90,6 +93,7 @@ export function useCurrentJstClock(intervalMs: number = 1000) {
     isMounted: now !== null,
     formatted: now ? formatJstClock(now) : '',
     formattedCompact: now ? formatJstClock(now, { compact: true }) : '',
+    formattedCompactSeconds: now ? formatJstClock(now, { compact: true, includeSeconds: true }) : '',
     formattedNoSeconds: now ? formatJstClock(now, { includeSeconds: false }) : '',
   };
 }

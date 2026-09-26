@@ -2,6 +2,30 @@
 
 本プロジェクト「PADOROKU - F1 Telemetry Intelligence Portal」の全アップデート履歴を記録します。
 
+## [v2.8.0] - 2026-09-26
+### Changed
+- **コース解説（Circuits）の全面解体・再構築（破壊と再構築） (`components/hubs/CircuitDetailModal.tsx`, `components/hubs/CircuitsHub.tsx`)**:
+  - **極端な横長余白の根絶と2カラム・レスポンシブマガジンレイアウトの導入**:
+    - デスクトップ表示（`lg`〜`xl`）において、横一面にテキストが伸びていたコース特性・ターン別攻略・セットアップ工学・歴代名勝負を「左列（7〜8カラム）：深い分析解説・ターン別攻略名鑑・歴史ストーリー（最大読書行幅 `max-w-3xl` / 約75chに制限）」と「右列（4〜5カラム・Sticky固定）：GPS準拠ベクターSVGマップ・現場写真・テレメトリーHUD・公式リンク」に分割。
+  - **絵文字ノイズ（Emoji Clutter）の全廃とLucide SVGアイコンへの昇格**:
+    - `🗺️`, `📸`, `📏`, `🏔️`, `🚀`, `⚡`, `🔄`, `🏎️`, `🎯`, `⚙️`, `💨`, `🔧`, `🛑`, `🌤️`, `🔥`, `💧`, `🛞`, `⏱️`, `⚠️`, `💡`, `📊`, `🏆`, `📖`, `📚`, `🌐` などの漫画調絵文字を全廃。
+    - ピットウォールUIトーンに合致した精密Lucide SVGアイコン（`Map`, `Camera`, `Ruler`, `Mountain`, `Zap`, `Gauge`, `Flag`, `Wrench`, `ShieldAlert`, `Sun`, `Flame`, `Droplets`, `Timer`, `Trophy`, `BookOpen`, `Globe`, `Activity`, `ChevronRight`, `ChevronLeft`, `Crosshair`, `Lightbulb`, `Compass`, `ExternalLink`）へ統一。
+    - ターン別攻略における「⚙️ 3速」「💨 145km/h」表記を、先鋭的なテレメトリーバッジ（`GEAR 3`, `145 KM/H` font-mono）へ刷新。
+  - **サーキット一覧カード（`CircuitsHub.tsx`）のノイズ除去**:
+    - 地域・コース特性フィルターピルから派手な絵文字を撤廃し、クリーンなタイポグラフィとLucide SVGアイコンへ統一。
+    - サーキットカード内のお気に入りスターをLucide `Star`、高低差・天候・レコード表記を洗練されたミニバッジへ刷新。
+
+- **規定用語集（Regulations & Glossary）の全面解体・再構築 (`components/glossary/GlossaryDetailView.tsx`, `components/hubs/RegulationDetailModal.tsx`, `components/hubs/RulesGlossaryHub.tsx`, `components/hubs/F1GlossaryHub.tsx`)**:
+  - **用語大図解（`GlossaryDetailView.tsx`）の1800px全幅引き伸ばしの撤廃と2カラム化**:
+    - 全画面1800pxに引き伸ばされていた解説文を、「左列（7〜8カラム）：30文字要約カード・メカニズム深掘り解説（`max-w-3xl`制限）・実戦無線中継引用・関連用語クラウド」と「右列（4〜5カラム・Sticky固定）：インタラクティブSVG図解アニメーション・アプリ内体験ランチャー・難易度＆カテゴリーメタデータ」に再編。
+  - **FIA公式規則モーダル（`RegulationDetailModal.tsx`）の2カラム・エディトリアル化**:
+    - 規則条文（左列）とスチュワード罰則マトリクス表（右列・Sticky固定）、工学解析（左列）とFIA標準規格センサー測定プロトコルHUD（右列・Sticky固定）を2カラム並列配置。
+    - 判例タブでは事件の経緯・裁定録と、対象GPや現代規則への影響度サマリーを整然と整理。
+  - **絵文字の完全追放とLucide SVGアイコン化**:
+    - `🧠`, `📜`, `🌟`, `🏎️`, `🛞`, `⛽`, `🏁`, `📏`, `🔧`, `💡`, `🎙️`, `🔗`, `➔` などの絵文字をすべて追放し、Lucide SVGアイコン（`BookOpen`, `Scale`, `FileText`, `Wrench`, `Sparkles`, `Radio`, `Search`, `X`, `ChevronRight`, `Star`）へ完全統一。
+
+---
+
 ## [v2.7.0] - 2026-09-26
 ### Changed
 - **チーム詳細モーダルの全面解体・再構築（破壊と再構築） (`components/hubs/TeamDetailModal.tsx`)**:

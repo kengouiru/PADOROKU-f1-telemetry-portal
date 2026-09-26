@@ -4,12 +4,12 @@
  * components/hubs/TeamDetailModal.tsx
  * Comprehensive Detailed Modal for F1 Constructors/Teams.
  * Enhanced in Step 2 with:
- * - 🌿 チーム系統樹 & 系譜 (Full historical lineage tree from origin to current era)
- * - 📐 2026マシン諸元 & PU工学スペック (Chassis code, 350kW MGU-K, Active Aero Z/X mode, Weight 768kg)
- * - 🏆 歴代変遷 (2016-2026) ＆ リザーブ枠 (Season-by-season table linking to DriverDetailModal)
- * - 📊 チーム内テレメトリー直接比較 (Deep telemetry launch comparing Driver 1 vs Driver 2)
- * - 🏭 ファクトリー & 組織体系
- * - 📚 一次出典・公式技術リリース
+ * - チーム系統樹 & 系譜 (Full historical lineage tree from origin to current era)
+ * - 2026マシン諸元 & PU工学スペック (Chassis code, 350kW MGU-K, Active Aero Z/X mode, Weight 768kg)
+ * - 歴代変遷 (2016-2026) ＆ リザーブ枠 (Season-by-season table linking to DriverDetailModal)
+ * - チーム内テレメトリー直接比較 (Deep telemetry launch comparing Driver 1 vs Driver 2)
+ * - ファクトリー & 組織体系
+ * - 一次出典・公式技術リリース
  */
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
@@ -26,6 +26,8 @@ import {
   Award,
   Trophy,
   ChevronRight,
+  ChevronLeft,
+  ArrowRight,
   History,
   GitBranch,
   BookOpen,
@@ -34,6 +36,16 @@ import {
   Layers,
   MapPin,
   Flag,
+  Activity,
+  Star,
+  X,
+  ExternalLink,
+  BatteryCharging,
+  Scale,
+  Droplets,
+  Cog,
+  Flame,
+  Zap,
 } from 'lucide-react';
 
 export interface TeamDetailModalProps {
@@ -179,7 +191,7 @@ export default function TeamDetailModal({
       return (
         <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-2">
           <h4 className="text-xs font-racing font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: themeColor }}>
-            <span>📐</span>
+            <Cpu className="w-3.5 h-3.5 shrink-0" style={{ color: themeColor }} />
             <span>開発哲学サマリー</span>
           </h4>
           <div className="text-xs text-slate-200 leading-relaxed font-sans max-w-4xl">
@@ -193,7 +205,7 @@ export default function TeamDetailModal({
       <div className="space-y-2.5">
         <div className="flex items-center justify-between">
           <h4 className="text-xs font-racing font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: themeColor }}>
-            <span>📐</span>
+            <Cpu className="w-3.5 h-3.5 shrink-0" style={{ color: themeColor }} />
             <span>開発哲学サマリー (Engineering Philosophy)</span>
           </h4>
           <span className="text-[10px] font-mono text-slate-400">2章構成・テクニカル解析</span>
@@ -239,7 +251,7 @@ export default function TeamDetailModal({
             className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-racing font-bold text-xs sm:text-sm flex items-center gap-1.5 border border-white/10 transition-all cursor-pointer shadow hover:scale-105 shrink-0"
             title="一覧に戻る (ESC)"
           >
-            <span>◀</span>
+            <ChevronLeft className="w-4 h-4" />
             <span className="whitespace-nowrap">一覧に戻る</span>
           </button>
           <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 font-mono truncate">
@@ -260,7 +272,7 @@ export default function TeamDetailModal({
               className="px-2 py-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 text-xs font-racing flex items-center gap-1 transition-all cursor-pointer border border-white/5"
               title="前のチーム (←キー)"
             >
-              <span>◀</span>
+              <ChevronLeft className="w-3.5 h-3.5" />
               <span className="font-mono font-bold truncate max-w-[80px] sm:max-w-none">{prevTeam?.name}</span>
             </button>
             <div className="w-px h-3.5 bg-white/15" />
@@ -270,7 +282,7 @@ export default function TeamDetailModal({
               title="次のチーム (→キー)"
             >
               <span className="font-mono font-bold truncate max-w-[80px] sm:max-w-none">{nextTeam?.name}</span>
-              <span>▶</span>
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
@@ -280,11 +292,11 @@ export default function TeamDetailModal({
             onClick={() => {
               window.open(`/knowledge/teams/${team.id}`, '_blank', 'width=1280,height=900,menubar=no,toolbar=no');
             }}
-            className="px-2.5 py-1 rounded-xl bg-sky-950/80 hover:bg-sky-900 border border-sky-500/40 text-sky-300 hover:text-white text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:scale-105"
+            className="px-2.5 py-1 rounded-xl bg-sky-950/80 hover:bg-sky-900 border border-sky-500/40 text-sky-300 hover:text-white text-xs font-racing flex items-center gap-1.5 transition-all cursor-pointer shadow-sm hover:scale-105"
             title="このチームを別ウィンドウで開く"
           >
             <span>別ウィンドウで開く</span>
-            <span>↗</span>
+            <ExternalLink className="w-3 h-3 text-sky-400" />
           </button>
 
           {/* Quick Telemetry Compare Action Button */}
@@ -301,7 +313,7 @@ export default function TeamDetailModal({
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-racing font-bold bg-blue-600/90 hover:bg-blue-500 text-white shadow-sm border border-blue-400/40 transition-all hover:scale-105 cursor-pointer"
               title={`${team.drivers[0]} と ${team.drivers[1]} のテレメトリー直接比較画面を開く`}
             >
-              <span>📊</span>
+              <Activity className="w-3.5 h-3.5 text-white" />
               <span className="hidden md:inline">テレメトリー比較</span>
             </button>
           )}
@@ -309,14 +321,14 @@ export default function TeamDetailModal({
           {/* Star Favorite Button */}
           <button
             onClick={() => toggleTeam(team.id)}
-            className={`px-2.5 py-1 rounded-xl text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm border ${
+            className={`px-2.5 py-1 rounded-xl text-xs font-racing flex items-center gap-1.5 transition-all cursor-pointer shadow-sm border ${
               isFavoriteTeam(team.id)
                 ? 'bg-amber-400/25 border-amber-400/70 text-amber-300 hover:bg-amber-400/35'
                 : 'bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-amber-300 border-white/10'
             }`}
             title={isFavoriteTeam(team.id) ? '推しチームから外す' : '推しチーム (マイパドック) に登録'}
           >
-            <span>{isFavoriteTeam(team.id) ? '★' : '☆'}</span>
+            <Star className={`w-3.5 h-3.5 ${isFavoriteTeam(team.id) ? 'fill-amber-400 text-amber-400' : 'text-slate-400'}`} />
             <span className="hidden md:inline">
               {isFavoriteTeam(team.id) ? '推し' : '推し登録'}
             </span>
@@ -327,7 +339,7 @@ export default function TeamDetailModal({
             className="w-7 h-7 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-xs font-bold transition-all cursor-pointer border border-white/10 shrink-0"
             title="一覧へ戻る (ESC)"
           >
-            ✕
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
@@ -355,24 +367,37 @@ export default function TeamDetailModal({
               </div>
 
               <div className="space-y-1 min-w-0">
-                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                  <span className="text-[11px] sm:text-xs text-slate-400 font-mono">{team.base}</span>
-                  <span className="bg-slate-800/90 text-slate-300 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold font-mono border border-white/10">
-                    ⚡ {team.powerUnit}
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap text-slate-400">
+                  <span className="text-[11px] sm:text-xs font-mono flex items-center gap-1">
+                    <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                    {team.base}
                   </span>
-                  <span className="bg-blue-950/60 text-sky-300 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono border border-sky-500/30">
+                  <span className="bg-blue-950/60 text-sky-300 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono border border-sky-500/30 flex items-center gap-1">
+                    <Users className="w-2.5 h-2.5 text-sky-400 shrink-0" />
                     代表: {team.teamPrincipal}
                   </span>
                   {lineageRecord && (
-                    <span className="bg-emerald-950/60 text-emerald-300 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono border border-emerald-500/30">
+                    <span className="bg-emerald-950/60 text-emerald-300 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-mono border border-emerald-500/30 flex items-center gap-1">
+                      <GitBranch className="w-2.5 h-2.5 text-emerald-400 shrink-0" />
                       ルーツ: {lineageRecord.originYear}年〜
                     </span>
                   )}
                 </div>
 
-                <h2 className="text-lg sm:text-2xl font-black text-white leading-tight break-words">
-                  {team.fullName}
-                </h2>
+                <div className="flex flex-wrap items-baseline gap-2 sm:gap-2.5">
+                  <h2 className="text-lg sm:text-2xl font-black text-white leading-tight">
+                    {team.fullName}
+                  </h2>
+                  {team.powerUnit && (
+                    <span
+                      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/[0.06] border border-white/10 text-[10px] sm:text-[11px] font-mono text-slate-300 shrink-0"
+                      title={`パワーユニット: ${team.powerUnit}`}
+                    >
+                      <span className="text-[9px] font-bold tracking-wider text-slate-400 font-racing">PU</span>
+                      <span className="text-slate-200 font-semibold">{team.powerUnit}</span>
+                    </span>
+                  )}
+                </div>
 
                 <div className="flex items-center gap-1.5 pt-0.5 flex-wrap">
                   <span className="text-[10px] sm:text-[11px] text-slate-400 font-mono">2026 DRIVERS:</span>
@@ -380,7 +405,7 @@ export default function TeamDetailModal({
                     <button
                       key={d}
                       onClick={() => onSelectDriverDetail && onSelectDriverDetail(d)}
-                      className="px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-mono font-bold border transition-all hover:scale-105 cursor-pointer"
+                      className="px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-mono font-bold border transition-all hover:scale-105 cursor-pointer inline-flex items-center gap-1"
                       style={{
                         color: themeColor,
                         borderColor: `${themeColor}50`,
@@ -388,7 +413,8 @@ export default function TeamDetailModal({
                       }}
                       title={`${d} のドライバー詳細を開く`}
                     >
-                      {d} ➔
+                      <span>{d}</span>
+                      <ArrowRight className="w-2.5 h-2.5 opacity-70" />
                     </button>
                   ))}
                 </div>
@@ -398,7 +424,7 @@ export default function TeamDetailModal({
             {/* Constructor Titles Banner */}
             {team.constructorTitles > 0 ? (
               <div className="rounded-xl sm:rounded-2xl p-2.5 sm:p-3 px-3.5 sm:px-4 flex items-center gap-2.5 sm:gap-3 self-start sm:self-auto flex-shrink-0 border shadow-md bg-amber-500/10 border-amber-500/30">
-                <span className="text-2xl sm:text-3xl">🏆</span>
+                <Trophy className="w-6 h-6 sm:w-7 sm:h-7 text-amber-400 shrink-0" />
                 <div>
                   <span className="text-[10px] sm:text-xs font-racing font-bold uppercase tracking-widest text-amber-400 block">
                     CONSTRUCTOR CHAMPION
@@ -410,7 +436,7 @@ export default function TeamDetailModal({
               </div>
             ) : (
               <div className="rounded-xl sm:rounded-2xl p-2.5 sm:p-3 px-3.5 sm:px-4 flex items-center gap-2 self-start sm:self-auto flex-shrink-0 bg-slate-900/60 border border-white/10 text-[11px] sm:text-xs text-slate-400 font-mono">
-                <span>🏁</span>
+                <Flag className="w-4 h-4 text-slate-400 shrink-0" />
                 <span>コンストラクターズ参戦中</span>
               </div>
             )}
@@ -638,7 +664,7 @@ export default function TeamDetailModal({
                         <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-3.5 shadow-xl space-y-2">
                           <PhotoGalleryCarousel
                             items={team.visualGallery}
-                            title="📸 歴代名車 & ファクトリーギャラリー"
+                            title="歴代名車 & ファクトリーギャラリー"
                             themeColor={themeColor}
                             size="sm"
                             aspectRatio="16/10"
@@ -715,7 +741,7 @@ export default function TeamDetailModal({
                                   {n.teamName}
                                 </span>
                                 {nIdx < lineageRecord.lineageChain.length - 1 && (
-                                  <span className="text-slate-600 text-[10px]">➔</span>
+                                  <ArrowRight className="w-2.5 h-2.5 text-slate-600 shrink-0" />
                                 )}
                               </React.Fragment>
                             ))}
@@ -744,7 +770,7 @@ export default function TeamDetailModal({
                           2026 FIA REGULATION TECHNICAL DATA SHEET
                         </span>
                         <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                          <span>🏎️</span>
+                          <Cpu className="w-4 h-4 text-sky-400 shrink-0" />
                           <span>{carSpecs.chassisCode} — シャシー ＆ パワーユニット工学諸元</span>
                         </h3>
                       </div>
@@ -756,19 +782,28 @@ export default function TeamDetailModal({
                     {/* 6-Grid Technical Specs */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       <div className="p-3 rounded-xl bg-slate-950/70 border border-white/10 space-y-1">
-                        <span className="text-[10px] font-racing text-slate-400 block">⚡ POWER UNIT 型式</span>
+                        <span className="text-[10px] font-racing text-slate-400 flex items-center gap-1">
+                          <Cpu className="w-3 h-3 text-slate-400 shrink-0" />
+                          <span>POWER UNIT 型式</span>
+                        </span>
                         <span className="text-xs font-bold text-white font-mono block leading-tight">{carSpecs.powerUnitName}</span>
                         <span className="text-[10px] text-slate-400 font-sans block">{carSpecs.iceSpecs}</span>
                       </div>
 
                       <div className="p-3 rounded-xl bg-slate-950/70 border border-white/10 space-y-1">
-                        <span className="text-[10px] font-racing text-sky-400 block">🔋 HYBRID ERS 出力</span>
+                        <span className="text-[10px] font-racing text-sky-400 flex items-center gap-1">
+                          <BatteryCharging className="w-3 h-3 text-sky-400 shrink-0" />
+                          <span>HYBRID ERS 出力</span>
+                        </span>
                         <span className="text-xs font-bold text-sky-300 font-mono block">350 kW ({carSpecs.ersPowerKw} kW / 476 hp)</span>
                         <span className="text-[10px] text-slate-400 font-sans block">合算総出力: {carSpecs.totalHorsepower}</span>
                       </div>
 
                       <div className="p-3 rounded-xl bg-slate-950/70 border border-white/10 space-y-1">
-                        <span className="text-[10px] font-racing text-amber-400 block">🌪️ ACTIVE AERODYNAMICS</span>
+                        <span className="text-[10px] font-racing text-amber-400 flex items-center gap-1">
+                          <Wind className="w-3 h-3 text-amber-400 shrink-0" />
+                          <span>ACTIVE AERODYNAMICS</span>
+                        </span>
                         <span className="text-xs font-bold text-amber-300 font-sans block leading-tight">Z-mode (高DF) / X-mode (低ドラッグ)</span>
                         <span className="text-[10px] text-slate-400 font-sans block">
                           <SmartWikiText text={carSpecs.activeAero} excludeUrl={`/knowledge/teams/${team.id}`} />
@@ -776,13 +811,19 @@ export default function TeamDetailModal({
                       </div>
 
                       <div className="p-3 rounded-xl bg-slate-950/70 border border-white/10 space-y-1">
-                        <span className="text-[10px] font-racing text-slate-400 block">⚖️ 最低重量 ＆ 寸法</span>
+                        <span className="text-[10px] font-racing text-slate-400 flex items-center gap-1">
+                          <Scale className="w-3 h-3 text-slate-400 shrink-0" />
+                          <span>最低重量 ＆ 寸法</span>
+                        </span>
                         <span className="text-xs font-bold text-white font-mono block">{carSpecs.weightKg} kg (30kg軽量化)</span>
                         <span className="text-[10px] text-slate-400 font-mono block">WB {carSpecs.wheelbaseMm}mm / 全幅 {carSpecs.widthMm}mm</span>
                       </div>
 
                       <div className="p-3 rounded-xl bg-slate-950/70 border border-white/10 space-y-1">
-                        <span className="text-[10px] font-racing text-emerald-400 block">🌱 持続可能燃料 ＆ 流量規定</span>
+                        <span className="text-[10px] font-racing text-emerald-400 flex items-center gap-1">
+                          <Droplets className="w-3 h-3 text-emerald-400 shrink-0" />
+                          <span>持続可能燃料 ＆ 流量規定</span>
+                        </span>
                         <span className="text-xs font-bold text-emerald-300 font-sans block">100% アドバンスド持続可能燃料</span>
                         <span className="text-[10px] text-slate-400 font-mono block">
                           <SmartWikiText text={carSpecs.fuelRegulation} excludeUrl={`/knowledge/teams/${team.id}`} />
@@ -790,7 +831,10 @@ export default function TeamDetailModal({
                       </div>
 
                       <div className="p-3 rounded-xl bg-slate-950/70 border border-white/10 space-y-1">
-                        <span className="text-[10px] font-racing text-purple-400 block">⚙️ トランスミッション ＆ ブレーキ</span>
+                        <span className="text-[10px] font-racing text-purple-400 flex items-center gap-1">
+                          <Cog className="w-3 h-3 text-purple-400 shrink-0" />
+                          <span>トランスミッション ＆ ブレーキ</span>
+                        </span>
                         <span className="text-xs font-bold text-purple-300 font-sans block">{carSpecs.gearbox}</span>
                         <span className="text-[10px] text-slate-400 font-sans block">{carSpecs.brakes}</span>
                       </div>
@@ -800,7 +844,7 @@ export default function TeamDetailModal({
                     <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-950/40 border border-white/10 space-y-3.5">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
                         <div className="flex items-center gap-2">
-                          <span className="text-base">⚡</span>
+                          <Activity className="w-4 h-4 text-cyan-400 shrink-0" />
                           <h4 className="text-xs font-racing font-bold text-white uppercase tracking-wider">
                             2026 パワーユニット 50:50 出力配分 ＆ エネルギー回生構造
                           </h4>
@@ -813,11 +857,13 @@ export default function TeamDetailModal({
                       {/* Visual Dual Power Split Bar */}
                       <div className="space-y-1.5">
                         <div className="flex items-center justify-between text-[11px] font-mono">
-                          <span className="text-orange-400 font-bold flex items-center gap-1">
-                            <span>🔥</span> 1.6L V6 ICE内燃機関 (~400 kW / 53%)
+                          <span className="text-orange-400 font-bold flex items-center gap-1.5">
+                            <Flame className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                            <span>1.6L V6 ICE内燃機関 (~400 kW / 53%)</span>
                           </span>
-                          <span className="text-cyan-300 font-bold flex items-center gap-1">
-                            MGU-K 電動モーター (350 kW / 47%) <span>⚡</span>
+                          <span className="text-cyan-300 font-bold flex items-center gap-1.5">
+                            <span>MGU-K 電動モーター (350 kW / 47%)</span>
+                            <Zap className="w-3.5 h-3.5 text-cyan-300 shrink-0" />
                           </span>
                         </div>
                         <div className="h-4 w-full bg-slate-800 rounded-full overflow-hidden flex border border-white/10 p-0.5">
@@ -844,8 +890,9 @@ export default function TeamDetailModal({
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
                         {/* Active Aero Modes */}
                         <div className="p-3 rounded-xl bg-slate-950/70 border border-white/5 space-y-2">
-                          <span className="text-[10px] font-racing text-amber-300 block font-bold">
-                            🌪️ 空力モード切替 ＆ MOM (Manual Override)
+                          <span className="text-[10px] font-racing text-amber-300 flex items-center gap-1.5 font-bold">
+                            <Wind className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                            <span>空力モード切替 ＆ MOM (Manual Override)</span>
                           </span>
                           <div className="grid grid-cols-2 gap-2 text-[11px]">
                             <div className="p-2 rounded-lg bg-slate-900/90 border border-amber-500/20">
@@ -860,7 +907,7 @@ export default function TeamDetailModal({
                             </div>
                           </div>
                           <div className="text-[10px] text-slate-300 bg-purple-950/40 border border-purple-500/20 p-2 rounded-lg">
-                            <span className="font-bold text-purple-300">⚡ MOM (マニュアル・オーバーライド): </span>
+                            <span className="font-bold text-purple-300 font-racing">MOM (マニュアル・オーバーライド): </span>
                             前方車両と1秒以内で電気ブーストが起動。337km/hまでフルパワー供給を維持しオーバーテイクを演出。
                           </div>
                         </div>
@@ -869,8 +916,9 @@ export default function TeamDetailModal({
                         {fuelPartner && (
                           <div className="p-3 rounded-xl bg-slate-950/70 border border-emerald-500/20 space-y-2">
                             <div className="flex items-center justify-between">
-                              <span className="text-[10px] font-racing text-emerald-400 block font-bold">
-                                🌱 公式持続可能燃料パートナー
+                              <span className="text-[10px] font-racing text-emerald-400 flex items-center gap-1.5 font-bold">
+                                <Droplets className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                <span>公式持続可能燃料パートナー</span>
                               </span>
                               <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30">
                                 100% E-Fuel
@@ -902,7 +950,7 @@ export default function TeamDetailModal({
                   >
                     <div className="space-y-1">
                       <h4 className="text-xs sm:text-sm font-racing font-bold text-white flex items-center gap-2">
-                        <span>📊</span>
+                        <Activity className="w-4 h-4 text-sky-400 shrink-0" />
                         <span>チーム内テレメトリー直接比較 ({team.drivers[0]} vs {team.drivers[1]})</span>
                       </h4>
                       <p className="text-[11px] text-slate-300">
@@ -924,8 +972,9 @@ export default function TeamDetailModal({
                         color: '#ffffff',
                       }}
                     >
-                      <span>🏎️ 2台のテレメトリーを比較</span>
-                      <span>➔</span>
+                      <Activity className="w-3.5 h-3.5" />
+                      <span>2台のテレメトリーを比較</span>
+                      <ArrowRight className="w-3 h-3" />
                     </button>
                   </div>
                 )}
@@ -937,7 +986,7 @@ export default function TeamDetailModal({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                   <div className="bg-slate-950/80 border border-sky-500/30 p-4 rounded-2xl space-y-2">
                     <h4 className="text-xs font-racing font-bold text-sky-300 uppercase tracking-wider flex items-center gap-1.5">
-                      <span>💨</span>
+                      <Wind className="w-3.5 h-3.5 text-sky-400 shrink-0" />
                       <span>空力コンセプト & フロア負圧</span>
                     </h4>
                     <div className="text-xs text-slate-300 leading-relaxed font-sans">
@@ -947,7 +996,7 @@ export default function TeamDetailModal({
 
                   <div className="bg-slate-950/80 border border-amber-500/30 p-4 rounded-2xl space-y-2">
                     <h4 className="text-xs font-racing font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-                      <span>⚙️</span>
+                      <Cog className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                       <span>サスペンション & メカニカル接地力</span>
                     </h4>
                     <div className="text-xs text-slate-300 leading-relaxed font-sans">
@@ -1028,8 +1077,9 @@ export default function TeamDetailModal({
                         }}
                         className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-racing font-bold text-xs shadow-md transition-all flex items-center gap-1.5 self-start sm:self-auto cursor-pointer hover:scale-105"
                       >
-                        <span>📊 2台のテレメトリー直接比較</span>
-                        <span>➔</span>
+                        <Activity className="w-3.5 h-3.5 text-white" />
+                        <span>2台のテレメトリー直接比較</span>
+                        <ArrowRight className="w-3 h-3" />
                       </button>
                     )}
                   </div>
@@ -1223,7 +1273,7 @@ export default function TeamDetailModal({
               <div className="space-y-3 animate-fade-in">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <span>📚</span>
+                    <BookOpen className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     <span>一次出典・公式技術リリース</span>
                   </h4>
                   <span className="text-[10px] font-mono text-slate-500">Academic Verified</span>
@@ -1264,7 +1314,7 @@ export default function TeamDetailModal({
                           className="text-sky-400 hover:text-sky-300 text-xs font-medium flex items-center gap-1 flex-shrink-0 self-end sm:self-center bg-slate-800/80 px-2.5 py-1 rounded-lg border border-white/5 hover:border-sky-500/40"
                         >
                           <span>公式ドキュメントを開く</span>
-                          <span>↗</span>
+                          <ExternalLink className="w-2.5 h-2.5" />
                         </a>
                       </div>
                     );

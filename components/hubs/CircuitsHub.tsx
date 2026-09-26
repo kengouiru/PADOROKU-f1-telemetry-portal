@@ -8,6 +8,16 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import {
+  Star,
+  Search,
+  X,
+  SlidersHorizontal,
+  RotateCcw,
+  Globe,
+  Gauge,
+  Zap,
+} from 'lucide-react';
+import {
   KNOWLEDGE_CIRCUITS,
   type CircuitProfile,
   type TelemetryTarget,
@@ -27,19 +37,19 @@ export interface CircuitsHubProps {
   onNavigateToTelemetry?: (target?: TelemetryTarget) => void;
 }
 
-const REGION_OPTIONS: { key: CircuitRegion; label: string; icon: string }[] = [
-  { key: 'ALL', label: 'すべて', icon: '🌐' },
-  { key: 'EUROPE', label: 'ヨーロッパ', icon: '🇪🇺' },
-  { key: 'ASIA_ME', label: 'アジア・中東', icon: '🌏' },
-  { key: 'AMERICAS', label: '南北アメリカ', icon: '🌎' },
-  { key: 'OCEANIA', label: 'オセアニア', icon: '🦘' },
+const REGION_OPTIONS: { key: CircuitRegion; label: string }[] = [
+  { key: 'ALL', label: 'すべて' },
+  { key: 'EUROPE', label: 'ヨーロッパ' },
+  { key: 'ASIA_ME', label: 'アジア・中東' },
+  { key: 'AMERICAS', label: '南北アメリカ' },
+  { key: 'OCEANIA', label: 'オセアニア' },
 ];
 
-const CHARACTERISTIC_OPTIONS: { key: CircuitCharacteristic; label: string; icon: string }[] = [
-  { key: 'ALL', label: 'すべて', icon: '🏎️' },
-  { key: 'POWER', label: '超高速・パワー', icon: '⚡' },
-  { key: 'STREET', label: '市街地ストリート', icon: '🏙️' },
-  { key: 'TECHNICAL', label: 'テクニカル・高DF', icon: '🌀' },
+const CHARACTERISTIC_OPTIONS: { key: CircuitCharacteristic; label: string }[] = [
+  { key: 'ALL', label: 'すべて' },
+  { key: 'POWER', label: '超高速・パワー' },
+  { key: 'STREET', label: '市街地ストリート' },
+  { key: 'TECHNICAL', label: 'テクニカル・高DF' },
 ];
 
 export function getCircuitRegion(circuitId: string): CircuitRegion {
@@ -410,22 +420,23 @@ export default function CircuitsHub({
         <div className="glass-card-premium rounded-xl p-3 sm:p-4 border border-red-500/30 shadow-xl shadow-red-950/20 flex flex-col gap-3 animate-fade-in">
           <div className="flex items-center justify-between pb-2 border-b border-white/10 text-xs">
             <span className="font-racing font-bold text-slate-300 flex items-center gap-1.5">
-              <span>⚙️</span>
+              <SlidersHorizontal className="w-3.5 h-3.5 text-red-500" />
               <span>サーキット絞り込み条件設定</span>
             </span>
             <button
               type="button"
               onClick={() => setIsFilterOpen(false)}
-              className="text-slate-400 hover:text-white text-xs px-2 py-0.5 rounded hover:bg-white/10 transition-colors cursor-pointer"
+              className="text-slate-400 hover:text-white text-xs px-2 py-0.5 rounded hover:bg-white/10 transition-colors cursor-pointer flex items-center gap-1"
             >
-              閉じる ✕
+              <span>閉じる</span>
+              <X className="w-3 h-3" />
             </button>
           </div>
 
           {/* Region Section */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
             <span className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider min-w-[70px] flex items-center gap-1">
-              <span>🌐</span>
+              <Globe className="w-3 h-3 text-slate-400" />
               <span>開催地域:</span>
             </span>
             <div className="flex flex-wrap items-center gap-1.5">
@@ -442,7 +453,6 @@ export default function CircuitsHub({
                         : 'bg-slate-900/80 text-slate-400 border-white/5 hover:border-white/20 hover:text-white hover:bg-slate-800'
                     }`}
                   >
-                    <span>{opt.icon}</span>
                     <span>{opt.label}</span>
                   </button>
                 );
@@ -453,7 +463,7 @@ export default function CircuitsHub({
           {/* Characteristics Section */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-2 border-t border-white/5">
             <span className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider min-w-[70px] flex items-center gap-1">
-              <span>🏎️</span>
+              <Gauge className="w-3 h-3 text-slate-400" />
               <span>コース特性:</span>
             </span>
             <div className="flex flex-wrap items-center gap-1.5">
@@ -470,7 +480,6 @@ export default function CircuitsHub({
                         : 'bg-slate-900/80 text-slate-400 border-white/5 hover:border-white/20 hover:text-white hover:bg-slate-800'
                     }`}
                   >
-                    <span>{opt.icon}</span>
                     <span>{opt.label}</span>
                   </button>
                 );
@@ -484,12 +493,11 @@ export default function CircuitsHub({
       {(regionFilter !== 'ALL' || characteristicFilter !== 'ALL' || onlyFavorites || effectiveSearch.trim()) && (
         <div className="flex flex-wrap items-center gap-1.5 px-1 text-xs">
           <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1 mr-1">
-            <span>🎯</span>
+            <SlidersHorizontal className="w-3 h-3 text-red-400" />
             <span>絞り込み中:</span>
           </span>
           {regionFilter !== 'ALL' && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-red-950/70 border border-red-500/40 text-red-200 text-[11px] font-mono">
-              <span>{REGION_OPTIONS.find((r) => r.key === regionFilter)?.icon}</span>
               <span>{REGION_OPTIONS.find((r) => r.key === regionFilter)?.label}</span>
               <button
                 type="button"
@@ -503,7 +511,6 @@ export default function CircuitsHub({
           )}
           {characteristicFilter !== 'ALL' && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-red-950/70 border border-red-500/40 text-red-200 text-[11px] font-mono">
-              <span>{CHARACTERISTIC_OPTIONS.find((c) => c.key === characteristicFilter)?.icon}</span>
               <span>{CHARACTERISTIC_OPTIONS.find((c) => c.key === characteristicFilter)?.label}</span>
               <button
                 type="button"
@@ -516,8 +523,9 @@ export default function CircuitsHub({
             </span>
           )}
           {onlyFavorites && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-950/80 border border-amber-500/40 text-amber-200 text-[11px] font-mono">
-              <span>★ 推しコースのみ</span>
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-950/80 border border-amber-500/40 text-amber-200 text-[11px] font-mono">
+              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+              <span>推しコースのみ</span>
               <button
                 type="button"
                 onClick={() => setOnlyFavorites(false)}
@@ -603,10 +611,10 @@ export default function CircuitsHub({
                       {circuit.country}
                     </span>
                     <span className="text-[9px] font-mono px-1.5 py-0.5 bg-slate-900/80 backdrop-blur-md text-slate-300 rounded border border-white/10">
-                      {region === 'EUROPE' && '🇪🇺 欧州'}
-                      {region === 'ASIA_ME' && '🌏 アジア中東'}
-                      {region === 'AMERICAS' && '🌎 米州'}
-                      {region === 'OCEANIA' && '🦘 大洋州'}
+                      {region === 'EUROPE' && '欧州'}
+                      {region === 'ASIA_ME' && 'アジア中東'}
+                      {region === 'AMERICAS' && '米州'}
+                      {region === 'OCEANIA' && '大洋州'}
                     </span>
                   </div>
 
@@ -628,7 +636,7 @@ export default function CircuitsHub({
                       }`}
                       title={isFavoriteCircuit(circuit.id) ? '推しコースから外す' : '推しコース (マイパドック) に登録'}
                     >
-                      <span className="text-xs">{isFavoriteCircuit(circuit.id) ? '★' : '☆'}</span>
+                      <Star className={`w-3.5 h-3.5 ${isFavoriteCircuit(circuit.id) ? 'fill-amber-400 text-amber-400' : 'text-slate-400'}`} />
                     </button>
                   </div>
                 </div>
@@ -642,7 +650,7 @@ export default function CircuitsHub({
                     </span>
                     {elevation !== undefined && (
                       <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md border border-white/10 text-sky-300">
-                        ⛰️ 高低差 {elevation}m
+                        高低差 {elevation}m
                       </span>
                     )}
                   </div>
@@ -684,23 +692,23 @@ export default function CircuitsHub({
                   <div className="flex flex-wrap items-center gap-1">
                     {chars.includes('POWER') && (
                       <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                        ⚡ 超高速パワー
+                        超高速パワー
                       </span>
                     )}
                     {chars.includes('STREET') && (
                       <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                        🏙️ 市街地ストリート
+                        市街地ストリート
                       </span>
                     )}
                     {chars.includes('TECHNICAL') && (
                       <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                        🌀 高DFテクニカル
+                        高DFテクニカル
                       </span>
                     )}
                   </div>
 
                   {/* Characteristics snippet */}
-                  <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed bg-slate-900/50 p-2 rounded-lg border border-white/5">
+                  <p className="text-[11px] text-slate-300 line-clamp-2 leading-relaxed bg-slate-900/50 p-2 rounded-lg border border-white/5 font-sans">
                     {circuit.characteristics.replace(/\[\d+\]/g, '').replace(/\\n/g, ' ')}
                   </p>
 
@@ -713,14 +721,14 @@ export default function CircuitsHub({
                         <span className="text-amber-400">/ 路面{weather.trackTempC}℃</span>
                       </span>
                       <span className={weather.rainProb > 30 ? 'text-sky-400 font-bold' : 'text-slate-400'}>
-                        ☔ {weather.rainProb}%
+                        降水 {weather.rainProb}%
                       </span>
                     </div>
                   )}
 
                   {/* Lap Record Snippet */}
                   <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between gap-1 bg-slate-950/40 px-2 py-1 rounded-lg border border-white/5">
-                    <span className="whitespace-nowrap shrink-0">⏱️ レコード:</span>
+                    <span className="whitespace-nowrap shrink-0">レコード:</span>
                     <span className="text-amber-300 font-bold text-right text-[10.5px] truncate">
                       {circuit.lapRecord.time} <span className="text-slate-400 font-normal">({circuit.lapRecord.driver})</span>
                     </span>

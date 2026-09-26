@@ -5,12 +5,13 @@
  * F1 Complete Glossary Hub (F1用語大辞典)
  * Redesigned with:
  * 1. Clean Scannable Index List (羅列レイアウト)
- * 2. Dedicated Detail Modal with Visual Diagrams (ビジュアル図解)
+ * 2. Dedicated Full-Page View with Interactive SVG Diagrams
  * 3. In-App Navigation Links (ピットシミュレーター、テレメトリー、タイヤ大百科等)
- * 4. Deep-link auto-open via `initialTermId` (e.g. from AI Strategist)
+ * 4. Zero emoji clutter - Precision typography and Lucide SVG icons
  */
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { Search, X, BookOpen, ChevronRight, Star } from 'lucide-react';
 import {
   GLOSSARY_TERMS,
   type GlossaryTerm,
@@ -35,13 +36,13 @@ export default function F1GlossaryHub({
   const [activeModalTerm, setActiveModalTerm] = useState<GlossaryTerm | null>(null);
 
   const categories: { id: string; label: string }[] = [
-    { id: 'all', label: '🌟 全カテゴリー' },
-    { id: 'car', label: '🏎️ マシン' },
-    { id: 'tyre', label: '🛞 タイヤ' },
-    { id: 'strategy', label: '⛽ 戦略' },
-    { id: 'race', label: '🏁 レース' },
-    { id: 'rule', label: '📏 規則・ペナルティ' },
-    { id: 'engineering', label: '🔧 工学・PU' },
+    { id: 'all', label: '全カテゴリー' },
+    { id: 'car', label: 'マシン・車体' },
+    { id: 'tyre', label: 'タイヤ・グリップ' },
+    { id: 'strategy', label: '戦略・ピット' },
+    { id: 'race', label: 'レース・フラッグ' },
+    { id: 'rule', label: '規則・ペナルティ' },
+    { id: 'engineering', label: '工学・パワーユニット' },
   ];
 
   // Auto-open target term if initialTermId is provided (e.g. from AI navigation)
@@ -77,15 +78,6 @@ export default function F1GlossaryHub({
     });
   }, [searchQuery, selectedCategory, selectedLevel]);
 
-  // Navigate to previous/next term in modal
-  const handleStepTerm = (delta: number) => {
-    if (!activeModalTerm) return;
-    const currentIndex = GLOSSARY_TERMS.findIndex((t) => t.id === activeModalTerm.id);
-    if (currentIndex === -1) return;
-    const nextIndex = (currentIndex + delta + GLOSSARY_TERMS.length) % GLOSSARY_TERMS.length;
-    setActiveModalTerm(GLOSSARY_TERMS[nextIndex]);
-  };
-
   // Dedicated Full-Page View for Active Term (Eliminating Modal Overlay)
   if (activeModalTerm) {
     return (
@@ -108,12 +100,13 @@ export default function F1GlossaryHub({
               <span className="text-[10px] font-racing font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                 F1 INTELLIGENCE GLOSSARY
               </span>
-              <span className="text-[10px] text-slate-400">BEGINNER TO EXPERT</span>
+              <span className="text-[10px] text-slate-400 font-mono">BEGINNER TO EXPERT</span>
             </div>
             <h3 className="text-xl font-racing font-black tracking-wide text-white flex items-center gap-2">
-              <span>🧠</span> F1用語大辞典 (初級〜上級・図解＆実例付き)
+              <BookOpen className="w-5 h-5 text-emerald-400" />
+              <span>F1用語大辞典 (初級〜上級・図解＆実例付き)</span>
             </h3>
-            <p className="text-xs text-slate-400 mt-1 max-w-2xl">
+            <p className="text-xs text-slate-400 mt-1 max-w-2xl font-sans">
               「アンダーカット」「DRS」「ポーパシング」など気になる用語をクリックすると、専用の図解・解説・アプリ連携画面が展開されます。
             </p>
           </div>
@@ -121,21 +114,21 @@ export default function F1GlossaryHub({
           {/* Search Bar */}
           <div className="w-full md:w-72">
             <div className="relative">
-              <span className="absolute left-3.5 top-2.5 text-slate-400 text-xs">🔍</span>
+              <Search className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400" />
               <input
                 type="text"
                 placeholder="用語を検索 (例: アンダーカット, DRS)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-950/80 border border-white/15 rounded-xl pl-9 pr-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400 transition-colors"
+                className="w-full bg-slate-950/80 border border-white/15 rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-400 transition-colors"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-2.5 text-slate-400 hover:text-white text-xs cursor-pointer"
+                  className="absolute right-2.5 top-2.5 text-slate-400 hover:text-white cursor-pointer"
                 >
-                  ✕
+                  <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
@@ -189,7 +182,7 @@ export default function F1GlossaryHub({
       </div>
 
       {/* ── Terms Count & Quick Stats ── */}
-      <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+      <div className="flex items-center justify-between text-xs text-slate-400 px-1 font-mono">
         <span>
           該当する用語: <strong className="text-white">{filteredTerms.length}</strong> 件
           （クリックで専用の解説・ビジュアル図解が開きます）
@@ -233,7 +226,7 @@ export default function F1GlossaryHub({
             </div>
 
             {/* Middle: 30-word Punchy Summary */}
-            <div className="flex-1 text-xs text-slate-300 leading-relaxed sm:px-2">
+            <div className="flex-1 text-xs text-slate-300 leading-relaxed sm:px-2 font-sans">
               <span className="text-emerald-400 font-bold mr-1.5 sm:hidden">要約:</span>
               {term.summary}
             </div>
@@ -242,7 +235,7 @@ export default function F1GlossaryHub({
             <div className="flex items-center justify-end gap-2 sm:w-28 flex-shrink-0">
               <span className="text-[11px] font-racing font-bold text-slate-400 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all flex items-center gap-1">
                 <span>詳細・図解</span>
-                <span>➔</span>
+                <ChevronRight className="w-3.5 h-3.5" />
               </span>
             </div>
           </div>
@@ -258,5 +251,3 @@ export default function F1GlossaryHub({
     </div>
   );
 }
-
-

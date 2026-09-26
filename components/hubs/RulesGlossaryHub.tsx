@@ -4,11 +4,12 @@
  * components/hubs/RulesGlossaryHub.tsx
  * Unified Hub for F1 Regulations & Racing Glossary (規定・用語集)
  * Provides seamless 2-mode switching:
- *  - 🧠 用語辞典 (F1 Glossary: Scannable index list, SVG diagrams, term modals)
- *  - 📜 規定・ルール (FIA Regulations: Sporting/Technical rules, penalty guides, 2026 regs)
+ *  - 用語辞典 (F1 Glossary: Scannable index list, SVG diagrams, term modals)
+ *  - 規定・ルール (FIA Regulations: Sporting/Technical rules, penalty guides, 2026 regs)
  */
 
 import React, { useState, useEffect } from 'react';
+import { BookOpen, Scale } from 'lucide-react';
 import F1GlossaryHub from './F1GlossaryHub';
 import F1RegulationsHub from './F1RegulationsHub';
 import { type InAppLink, type GlossaryTerm } from '@/data/f1GlossaryData';
@@ -55,7 +56,11 @@ export default function RulesGlossaryHub({
       <div className="bg-slate-900/90 border border-white/10 rounded-2xl p-2.5 sm:p-3 shadow-xl backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center text-base shadow-inner">
-            {activeMode === 'glossary' ? '🧠' : '📜'}
+            {activeMode === 'glossary' ? (
+              <BookOpen className="w-4 h-4 text-emerald-400" />
+            ) : (
+              <Scale className="w-4 h-4 text-purple-400" />
+            )}
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -85,7 +90,7 @@ export default function RulesGlossaryHub({
                 : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
             }`}
           >
-            <span>🧠</span>
+            <BookOpen className="w-3.5 h-3.5" />
             <span>用語辞典 (辞書・図解)</span>
           </button>
 
@@ -98,7 +103,7 @@ export default function RulesGlossaryHub({
                 : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
             }`}
           >
-            <span>📜</span>
+            <Scale className="w-3.5 h-3.5" />
             <span>規定・ルール (FIA公式)</span>
           </button>
         </div>
