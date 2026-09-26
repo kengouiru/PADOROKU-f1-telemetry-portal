@@ -33,7 +33,6 @@ import F1DramaHub from './F1DramaHub';
 import F1GlossaryHub from './F1GlossaryHub';
 import F1RegulationsHub from './F1RegulationsHub';
 import RulesGlossaryHub from './RulesGlossaryHub';
-import DataSourceVerificationModal from './DataSourceVerificationModal';
 import VirtualPitwallWarRoom from '@/components/strategy/VirtualPitwallWarRoom';
 import { useUserPreferences } from '@/lib/userPreferences';
 import { type InAppLink } from '@/data/f1GlossaryData';
@@ -181,16 +180,6 @@ export const PU_OPTIONS: { key: PuFilter; label: string; count: number; badgeCol
   { key: 'Audi', label: 'Audi Works', count: 1, badgeColor: 'border-amber-500/40 text-amber-300', pillColor: 'bg-amber-500/20' },
 ];
 
-export const POPULAR_TOPICS: { label: string; subTab: SubTab; q: string }[] = [
-  { label: 'アンダーカット', subTab: 'strategy', q: 'アンダーカット' },
-  { label: '2026年新PU規定', subTab: 'rules', q: '2026' },
-  { label: '角田裕毅', subTab: 'drivers', q: '角田' },
-  { label: 'ホンダWorks', subTab: 'teams', q: 'honda' },
-  { label: '鈴鹿サーキット', subTab: 'circuits', q: 'suzuka' },
-  { label: 'タイヤ熱入れ', subTab: 'tyres', q: '熱入れ' },
-  { label: 'アブダビ2021最終周', subTab: 'history', q: '2021' },
-];
-
 export function getPuBadgeInfo(pu: string) {
   const p = pu.toLowerCase();
   if (p.includes('honda')) return { label: 'Honda Works (HRC)', color: 'bg-rose-950/70 border-rose-500/40 text-rose-300' };
@@ -223,14 +212,10 @@ export default function KnowledgeHistoryHub({
   const [puFilter, setPuFilter] = useState<'ALL' | 'Ferrari' | 'Mercedes' | 'RedBullFord' | 'Honda' | 'Audi'>('ALL');
   const [isPuFilterOpen, setIsPuFilterOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [universalQuery, setUniversalQuery] = useState<string>('');
-  const [searchFocused, setSearchFocused] = useState<boolean>(false);
-  const searchContainerRef = useRef<HTMLDivElement>(null);
   const [selectedTeamDetail, setSelectedTeamDetail] = useState<TeamProfile | null>(null);
   const [selectedStrategyDetail, setSelectedStrategyDetail] = useState<StrategyConcept | null>(null);
   const [selectedHistoryDetail, setSelectedHistoryDetail] = useState<HistoryArchive | null>(null);
   const [highlightedRef, setHighlightedRef] = useState<string | null>(null);
-  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
 
   // Sync targetTeamId to open TeamDetailModal and switch to teams tab
   useEffect(() => {
@@ -245,200 +230,6 @@ export default function KnowledgeHistoryHub({
     }
   }, [targetTeamId]);
 
-  // Close search dropdown on click outside
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
-        setSearchFocused(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Universal Cross-Encyclopedia Search Index
-  const searchResults = useMemo(() => {
-    if (!universalQuery.trim()) return [];
-    const q = universalQuery.toLowerCase().trim();
-    const results: {
-      id: string;
-      categoryBadge: string;
-      categoryBadgeColor: string;
-      title: string;
-      subtitle: string;
-      onSelect: () => void;
-    }[] = [];
-
-    // 1. Drivers
-    KNOWLEDGE_DRIVERS.forEach((d) => {
-      if (
-        d.fullName.toLowerCase().includes(q) ||
-        d.code.toLowerCase().includes(q) ||
-        d.team.toLowerCase().includes(q) ||
-        (d.nickname && d.nickname.toLowerCase().includes(q))
-      ) {
-        results.push({
-          id: `driver-${d.code}`,
-          categoryBadge: '👤 選手',
-          categoryBadgeColor: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
-          title: `${d.fullName} (${d.code})`,
-          subtitle: `${d.team} • #${d.number}`,
-          onSelect: () => {
-            setActiveSubTab('drivers');
-            setSearchQuery(d.fullName);
-            setUniversalQuery('');
-            setSearchFocused(false);
-          },
-        });
-      }
-    });
-
-    // 2. Teams
-    KNOWLEDGE_TEAMS.forEach((t) => {
-      if (
-        t.name.toLowerCase().includes(q) ||
-        t.fullName.toLowerCase().includes(q) ||
-        t.powerUnit.toLowerCase().includes(q) ||
-        t.base.toLowerCase().includes(q)
-      ) {
-        results.push({
-          id: `team-${t.id}`,
-          categoryBadge: '🏎️ チーム',
-          categoryBadgeColor: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
-          title: t.name,
-          subtitle: `PU: ${t.powerUnit} • 代表: ${t.teamPrincipal}`,
-          onSelect: () => {
-            setSelectedTeamDetail(t);
-            setActiveSubTab('teams');
-            setUniversalQuery('');
-            setSearchFocused(false);
-          },
-        });
-      }
-    });
-
-    // 3. Circuits
-    KNOWLEDGE_CIRCUITS.forEach((c) => {
-      if (
-        c.name.toLowerCase().includes(q) ||
-        c.officialName.toLowerCase().includes(q) ||
-        c.country.toLowerCase().includes(q) ||
-        c.characteristics.toLowerCase().includes(q)
-      ) {
-        results.push({
-          id: `circuit-${c.id}`,
-          categoryBadge: '🏁 コース',
-          categoryBadgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-          title: c.name,
-          subtitle: `${c.country} • 全長 ${(c.lengthKm).toFixed(3)}km • ${c.characteristics}`,
-          onSelect: () => {
-            setActiveSubTab('circuits');
-            setSearchQuery(c.name);
-            setUniversalQuery('');
-            setSearchFocused(false);
-          },
-        });
-      }
-    });
-
-    // 4. Tyres
-    TYRE_COMPOUNDS.forEach((t) => {
-      if (
-        t.name.toLowerCase().includes(q) ||
-        t.code.toLowerCase().includes(q) ||
-        t.description.toLowerCase().includes(q) ||
-        t.idealConditions.toLowerCase().includes(q)
-      ) {
-        results.push({
-          id: `tyre-${t.id}`,
-          categoryBadge: '🛞 タイヤ',
-          categoryBadgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-          title: t.name,
-          subtitle: `${t.workingRange} • ${t.idealConditions}`,
-          onSelect: () => {
-            setActiveSubTab('tyres');
-            setUniversalQuery('');
-            setSearchFocused(false);
-          },
-        });
-      }
-    });
-
-    // 5. Strategy
-    KNOWLEDGE_STRATEGIES.forEach((s) => {
-      if (
-        s.title.toLowerCase().includes(q) ||
-        s.subtitle.toLowerCase().includes(q) ||
-        s.description.toLowerCase().includes(q)
-      ) {
-        results.push({
-          id: `strat-${s.id}`,
-          categoryBadge: '⏱️ 作戦室',
-          categoryBadgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-          title: s.title,
-          subtitle: s.subtitle,
-          onSelect: () => {
-            setActiveSubTab('strategy');
-            setSearchQuery(s.title);
-            setUniversalQuery('');
-            setSearchFocused(false);
-          },
-        });
-      }
-    });
-
-    // 6. Glossary & Rules
-    GLOSSARY_TERMS.forEach((g) => {
-      if (
-        g.term.toLowerCase().includes(q) ||
-        g.englishTerm.toLowerCase().includes(q) ||
-        g.summary.toLowerCase().includes(q) ||
-        g.description.toLowerCase().includes(q)
-      ) {
-        results.push({
-          id: `glossary-${g.id}`,
-          categoryBadge: '⚖️ 用語',
-          categoryBadgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-          title: `${g.term} (${g.englishTerm})`,
-          subtitle: g.summary,
-          onSelect: () => {
-            setActiveSubTab('rules');
-            if (onNavigateToApp) {
-              onNavigateToApp({ hub: 'knowledge', subTab: 'glossary' });
-            }
-            setUniversalQuery('');
-            setSearchFocused(false);
-          },
-        });
-      }
-    });
-
-    // 7. History
-    KNOWLEDGE_HISTORY.forEach((h) => {
-      if (
-        h.title.toLowerCase().includes(q) ||
-        h.grandPrix.toLowerCase().includes(q) ||
-        h.strategicNarrative.toLowerCase().includes(q)
-      ) {
-        results.push({
-          id: `hist-${h.id}`,
-          categoryBadge: '🏛️ 歴史',
-          categoryBadgeColor: 'bg-amber-600/20 text-amber-200 border-amber-500/30',
-          title: `${h.year} ${h.grandPrix}`,
-          subtitle: h.title,
-          onSelect: () => {
-            setActiveSubTab('history');
-            setSearchQuery(h.title);
-            setUniversalQuery('');
-            setSearchFocused(false);
-          },
-        });
-      }
-    });
-
-    return results.slice(0, 10);
-  }, [universalQuery, onNavigateToApp]);
-
   // Filtered Teams with PU Supplier Filter & Starred Filter
   const filteredTeams = useMemo(() => {
     return KNOWLEDGE_TEAMS.filter((t) => {
@@ -450,7 +241,7 @@ export default function KnowledgeHistoryHub({
       if (puFilter === 'Honda' && !t.powerUnit.toLowerCase().includes('honda')) return false;
       if (puFilter === 'Audi' && !t.powerUnit.toLowerCase().includes('audi')) return false;
 
-      const q = (universalQuery || searchQuery).toLowerCase().trim();
+      const q = searchQuery.toLowerCase().trim();
       if (q) {
         return (
           t.name.toLowerCase().includes(q) ||
@@ -463,7 +254,7 @@ export default function KnowledgeHistoryHub({
       }
       return true;
     });
-  }, [teamsFilterStarred, puFilter, universalQuery, searchQuery, isFavoriteTeam]);
+  }, [teamsFilterStarred, puFilter, searchQuery, isFavoriteTeam]);
 
   // Jump to Reference list & highlight target reference
   const handleCitationClick = (cardId: string, refId: number) => {
@@ -559,130 +350,6 @@ export default function KnowledgeHistoryHub({
 
   return (
     <div className="flex flex-col gap-3 sm:gap-4 w-full max-w-[1800px] mx-auto pb-6 sm:pb-2 px-2 sm:px-4 lg:px-6">
-      {/* ── Prominent Universal Library Command Bar ── */}
-      <div ref={searchContainerRef} className="relative z-30">
-        <div className="glass-card-premium p-2.5 sm:p-3 rounded-2xl flex items-center gap-3 border border-white/10 shadow-xl backdrop-blur-md">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-red-600/30 to-rose-600/30 border border-red-500/40 flex items-center justify-center text-sm shrink-0 shadow-inner">
-            🔍
-          </div>
-          <input
-            type="text"
-            value={universalQuery}
-            onChange={(e) => {
-              setUniversalQuery(e.target.value);
-              setSearchFocused(true);
-            }}
-            onFocus={() => setSearchFocused(true)}
-            placeholder="F1大百科 全横断検索 (選手 / チーム / PU / コース / タイヤ / 戦略 / 用語 / 歴史)..."
-            className="flex-1 bg-transparent text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none font-mono"
-          />
-          {universalQuery && (
-            <button
-              type="button"
-              onClick={() => {
-                setUniversalQuery('');
-                setSearchQuery('');
-              }}
-              className="w-6 h-6 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center text-xs cursor-pointer transition-colors"
-              title="検索クリア"
-            >
-              ✕
-            </button>
-          )}
-          <div className="hidden md:flex items-center gap-2 border-l border-white/10 pl-3">
-            <span className="text-[10px] text-slate-400 font-mono flex items-center gap-1">
-              <span>🛡️</span>
-              <span>FIA・FOM公式準拠</span>
-            </span>
-            <button
-              type="button"
-              onClick={() => setIsVerificationModalOpen(true)}
-              className="btn-console text-[10px] py-1 px-2.5 text-emerald-300 border-emerald-500/30 hover:border-emerald-400 cursor-pointer flex items-center gap-1.5"
-            >
-              <span>出典検証</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            </button>
-          </div>
-        </div>
-
-        {/* Dropdown Instant Search Matches & Popular Topics when Focused */}
-        {searchFocused && (
-          <div className="absolute top-full left-0 right-0 mt-2 bg-slate-950/95 border border-white/10 rounded-2xl shadow-2xl backdrop-blur-xl p-2.5 max-h-96 overflow-y-auto z-50 animate-fade-in divide-y divide-white/5">
-            {universalQuery.trim().length === 0 ? (
-              <div className="p-2 space-y-2">
-                <div className="text-[11px] font-racing font-bold text-slate-300 flex items-center gap-1.5 px-1">
-                  <span>🔥</span>
-                  <span>注目トピック (ワンクリックで即座にジャンプ)</span>
-                </div>
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {POPULAR_TOPICS.map((topic) => (
-                    <button
-                      key={topic.label}
-                      type="button"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => {
-                        setActiveSubTab(topic.subTab);
-                        setSearchQuery(topic.q);
-                        setUniversalQuery('');
-                        setSearchFocused(false);
-                      }}
-                      className="px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-red-400 border border-white/10 hover:border-red-500/40 text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5"
-                    >
-                      <span className="text-red-400">#</span>
-                      <span>{topic.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="text-[10px] font-mono font-bold text-slate-400 px-2.5 py-1.5 flex items-center justify-between">
-                  <span>検索結果 ({searchResults.length}件)</span>
-                  <span>クリックで直接ジャンプ</span>
-                </div>
-                {searchResults.length === 0 ? (
-                  <div className="p-4 text-center text-xs text-slate-400">
-                    該当する情報が見つかりませんでした。別のキーワード（例: 角田, アンダーカット, 鈴鹿）をお試しください。
-                  </div>
-                ) : (
-                  searchResults.map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={item.onSelect}
-                      className="w-full p-2.5 rounded-xl hover:bg-white/5 flex items-center justify-between gap-3 text-left transition-colors cursor-pointer group"
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border shrink-0 ${item.categoryBadgeColor}`}>
-                          {item.categoryBadge}
-                        </span>
-                        <div className="min-w-0">
-                          <div className="text-xs font-bold text-white group-hover:text-red-400 transition-colors truncate">
-                            {item.title}
-                          </div>
-                          <div className="text-[11px] text-slate-400 truncate">
-                            {item.subtitle}
-                          </div>
-                        </div>
-                      </div>
-                      <span className="text-xs text-slate-500 group-hover:text-red-400 transition-colors shrink-0">
-                        ➔
-                      </span>
-                    </button>
-                  ))
-                )}
-              </>
-            )}
-          </div>
-        )}
-      </div>
-
-      <DataSourceVerificationModal
-        isOpen={isVerificationModalOpen}
-        onClose={() => setIsVerificationModalOpen(false)}
-      />
-
       {/* ── Sub-Tab: TYRES ENCYCLOPEDIA ── */}
       {activeSubTab === 'tyres' && <TyreEncyclopediaHub onNavigateToTelemetry={onNavigateToTelemetry} />}
 

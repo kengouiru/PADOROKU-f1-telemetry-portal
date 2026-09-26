@@ -34,6 +34,9 @@ import { getCircuitTimezoneInfo, formatDualSessionTime } from '@/lib/circuitTime
 import { useCurrentJstClock, isWeekendInProgress } from '@/lib/systemClock';
 import { getSessionClassification } from '@/lib/sessionResultsService';
 import { getHistoricalArchive } from '@/data/f1HistoricalArchivesData';
+import { getBroadcastTrackData } from '@/data/f1BroadcastTrackData';
+import { CIRCUIT_TRACK_MAPS, GENERIC_TRACK, interpolateTrackCoords } from '@/components/telemetry/TelemetryTrackMap';
+import { Map, ExternalLink, X, Maximize2, Compass } from 'lucide-react';
 import SessionResultsModal from './SessionResultsModal';
 
 interface SeasonHubProps {
@@ -130,6 +133,323 @@ export function getTeamIdFromName(name: string): string {
 }
 
 
+interface HeroTrackMapCardProps {
+  circuitId: string;
+  race: RaceWeekendSchedule;
+  onOpenAnalysis: () => void;
+  onOpenEncyclopedia?: () => void;
+  onOpen3dModal?: () => void;
+}
+
+const HeroTrackMapCard = React.memo(function HeroTrackMapCard({
+  circuitId,
+  race,
+  onOpenAnalysis,
+  onOpenEncyclopedia,
+  onOpen3dModal,
+}: HeroTrackMapCardProps) {
+  const trackData = useMemo(() => {
+    return CIRCUIT_TRACK_MAPS[circuitId] || GENERIC_TRACK;
+  }, [circuitId]);
+
+  const trackInfo = useMemo(() => {
+    return getBroadcastTrackData(circuitId);
+  }, [circuitId]);
+
+  const handleCardClick = () => {
+    if (onOpen3dModal) {
+      onOpen3dModal();
+    } else {
+      onOpenAnalysis();
+    }
+  };
+
+  return (
+    <div
+      onClick={handleCardClick}
+      className="w-full bg-slate-950/95 hover:bg-slate-900/95 rounded-2xl border border-sky-500/40 hover:border-sky-400 p-3 sm:p-3.5 shadow-xl relative overflow-hidden group cursor-pointer transition-all hover:shadow-sky-950/60 backdrop-blur-md"
+      title="クリックして3Dコース標高図・戦術プロファイルをインタラクティブ操作"
+    >
+      {/* Background subtle neon glow */}
+      <div className="absolute -top-12 -right-12 w-36 h-36 bg-sky-500/15 rounded-full blur-2xl pointer-events-none group-hover:bg-sky-400/25 transition-all" />
+
+      {/* Top Header Row */}
+      <div className="flex items-center justify-between gap-2 mb-1.5 relative z-10">
+        <span className="text-[10px] font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+          <Map className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+          <span className="truncate">コースレイアウト (TRACK MAP)</span>
+        </span>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {onOpenEncyclopedia && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenEncyclopedia();
+              }}
+              className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-white/5 hover:bg-amber-500/20 text-slate-300 hover:text-amber-300 border border-white/10 hover:border-amber-500/30 transition-all flex items-center gap-1 cursor-pointer"
+              title="大百科でサーキット完全解剖を見る"
+            >
+              <span>大百科 ↗</span>
+            </button>
+          )}
+          <span className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-sky-500/25 text-sky-300 border border-sky-400/40 font-bold group-hover:bg-sky-500/40 transition-colors flex items-center gap-1 shadow-sm">
+            <span>3D起動</span>
+            <ExternalLink className="w-2.5 h-2.5" />
+          </span>
+        </div>
+      </div>
+
+      {/* Track SVG Map Canvas */}
+      <div className="relative w-full h-40 sm:h-48 flex items-center justify-center py-1">
+        <svg
+          viewBox="0 0 400 300"
+          className="w-full h-full filter drop-shadow-[0_0_12px_rgba(56,189,248,0.25)] group-hover:drop-shadow-[0_0_20px_rgba(56,189,248,0.5)] transition-all group-hover:scale-[1.01]"
+        >
+          <defs>
+            <filter id="hero-track-glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <linearGradient id="hero-track-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#38bdf8" />
+              <stop offset="50%" stopColor="#00f0ff" />
+              <stop offset="100%" stopColor="#818cf8" />
+            </linearGradient>
+          </defs>
+
+          {/* Heavy Asphalt Track Foundation */}
+          <path
+            d={trackData.svgPath}
+            fill="none"
+            stroke="#0f172a"
+            strokeWidth="11"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d={trackData.svgPath}
+            fill="none"
+            stroke="#1e293b"
+            strokeWidth="8.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+
+          {/* Glowing Track Atmosphere Outer Line */}
+          <path
+            d={trackData.svgPath}
+            fill="none"
+            stroke="#00f0ff"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity="0.35"
+            filter="url(#hero-track-glow)"
+          />
+
+          {/* High-Contrast Centerline */}
+          <path
+            d={trackData.svgPath}
+            fill="none"
+            stroke="url(#hero-track-grad)"
+            strokeWidth="3.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+
+          {/* ⚡ OVR / OverRide Acceleration Zone Overlays */}
+          {trackInfo.overtakeCheckpoints && trackInfo.overtakeCheckpoints.map((cp) => {
+            const detCoord = interpolateTrackCoords(trackData.waypoints, cp.detectionPct);
+            const actCoord = interpolateTrackCoords(trackData.waypoints, cp.activationPct);
+            return (
+              <g key={`ovr-zone-${cp.id}`} className="select-none pointer-events-none">
+                {/* Detection Point Indicator */}
+                <g transform={`translate(${detCoord.x}, ${detCoord.y})`}>
+                  <circle r="4" fill="#a855f7" stroke="#ffffff" strokeWidth="1.2" filter="drop-shadow(0 0 5px rgba(168,85,247,0.9))" />
+                  <g transform="translate(0, -10)">
+                    <rect
+                      x="-22"
+                      y="-7"
+                      width="44"
+                      height="13"
+                      rx="3.5"
+                      fill="#3b0764"
+                      stroke="#d8b4fe"
+                      strokeWidth="1.2"
+                      filter="drop-shadow(0 2px 4px rgba(0,0,0,0.9))"
+                    />
+                    <text
+                      x="0"
+                      y="2.5"
+                      fontSize="6.5"
+                      fontFamily="monospace"
+                      fontWeight="bold"
+                      fill="#f3e8ff"
+                      textAnchor="middle"
+                    >
+                      🟣 OVR検知
+                    </text>
+                  </g>
+                </g>
+
+                {/* Activation Start Point Indicator */}
+                <g transform={`translate(${actCoord.x}, ${actCoord.y})`}>
+                  <circle r="4.5" fill="#ec4899" stroke="#ffffff" strokeWidth="1.2" filter="drop-shadow(0 0 5px rgba(236,72,153,0.9))" />
+                  <g transform="translate(0, 12)">
+                    <rect
+                      x="-17"
+                      y="-6"
+                      width="34"
+                      height="12"
+                      rx="3"
+                      fill="#500724"
+                      stroke="#f472b6"
+                      strokeWidth="1.2"
+                      filter="drop-shadow(0 2px 4px rgba(0,0,0,0.9))"
+                    />
+                    <text
+                      x="0"
+                      y="2.5"
+                      fontSize="6.5"
+                      fontFamily="monospace"
+                      fontWeight="bold"
+                      fill="#fce7f3"
+                      textAnchor="middle"
+                    >
+                      ⚡ OVR
+                    </text>
+                  </g>
+                </g>
+              </g>
+            );
+          })}
+
+          {/* 🏁 Start / Finish Line Indicator */}
+          {trackData.startFinish && (
+            <g transform={`translate(${trackData.startFinish.x}, ${trackData.startFinish.y})`} className="select-none pointer-events-none">
+              {/* Green Glow Pulse */}
+              <circle r="10" fill="#10b981" fillOpacity="0.3" className="animate-ping" style={{ animationDuration: '3s' }} />
+              <circle r="6" fill="#064e3b" stroke="#10b981" strokeWidth="2" filter="drop-shadow(0 0 6px rgba(16,185,129,0.9))" />
+              <circle r="2.5" fill="#ffffff" />
+              
+              {/* S/F Badge with High Contrast */}
+              <g transform="translate(0, -13)">
+                <rect
+                  x="-23"
+                  y="-7"
+                  width="46"
+                  height="14"
+                  rx="3.5"
+                  fill="#022c22"
+                  stroke="#34d399"
+                  strokeWidth="1.3"
+                  filter="drop-shadow(0 2px 4px rgba(0,0,0,0.95))"
+                />
+                <text
+                  x="0"
+                  y="2.8"
+                  fontSize="7.5"
+                  fontFamily="monospace"
+                  fontWeight="900"
+                  fill="#34d399"
+                  textAnchor="middle"
+                >
+                  🏁 START
+                </text>
+              </g>
+            </g>
+          )}
+
+          {/* 🟡 High-Contrast Turn Number Badges (All Corners Displayed Clearly) */}
+          {trackData.cornerPins &&
+            trackData.cornerPins.map((pin) => {
+              const isWide = pin.number.length > 2;
+              const width = isWide ? 26 : 19;
+              return (
+                <g
+                  key={pin.number}
+                  transform={`translate(${pin.x}, ${pin.y})`}
+                  className="select-none pointer-events-none"
+                >
+                  <rect
+                    x={-width / 2}
+                    y="-8"
+                    width={width}
+                    height="16"
+                    rx="4"
+                    fill="#020617"
+                    stroke="#f59e0b"
+                    strokeWidth="1.5"
+                    filter="drop-shadow(0 2px 5px rgba(0,0,0,0.95))"
+                  />
+                  <text
+                    x="0"
+                    y="3"
+                    fontSize="8"
+                    fontFamily="JetBrains Mono, monospace"
+                    fontWeight="900"
+                    fill="#ffffff"
+                    textAnchor="middle"
+                  >
+                    {pin.number}
+                  </text>
+                </g>
+              );
+            })}
+        </svg>
+
+        {/* Hover Hint Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-slate-950/50 backdrop-blur-[2px] pointer-events-none rounded-xl">
+          <span className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-sky-600 to-cyan-500 text-white text-xs font-racing font-bold tracking-wide flex items-center gap-1.5 shadow-xl border border-sky-300/40 animate-pulse">
+            <span>🏎️ クリックして3D標高モデルを展開</span>
+          </span>
+        </div>
+      </div>
+
+      {/* Legend & Circuit Specs Bar */}
+      <div className="mt-1 pt-2 border-t border-white/[0.08] space-y-1.5">
+        <div className="flex items-center justify-between text-[10px] font-mono text-slate-300">
+          <span className="truncate max-w-[160px] text-slate-400 font-bold">
+            📍 {race.circuitName}
+          </span>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-sky-300 font-bold">{race.lengthKm.toFixed(3)} km</span>
+            <span className="text-slate-500">|</span>
+            <span className="text-slate-300 font-semibold">{trackInfo.turnCount} Turns</span>
+            <span className="text-slate-500">|</span>
+            <span className="text-slate-300">{race.laps} 周</span>
+          </div>
+        </div>
+
+        {/* Quick Legend Pill Strip */}
+        <div className="flex items-center justify-between text-[9px] font-mono px-2 py-1 bg-slate-900/90 rounded-lg border border-white/[0.06] text-slate-300">
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span className="text-emerald-300 font-semibold">🏁 START</span>
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-fuchsia-400" />
+              <span className="text-fuchsia-300 font-semibold">🟣 OVR区間</span>
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+              <span className="text-amber-300 font-semibold">🟡 Turn番号</span>
+            </span>
+          </div>
+          <span className="text-sky-400 font-semibold">
+            3D解析対応 ↗
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+});
+
 interface RaceCountdownCardProps {
   targetDateUtc: string;
   dates: string;
@@ -137,6 +457,7 @@ interface RaceCountdownCardProps {
   country?: string;
   city?: string;
   gpName?: string;
+  winnerNote?: string;
 }
 
 const RaceCountdownCard = React.memo(function RaceCountdownCard({
@@ -146,6 +467,7 @@ const RaceCountdownCard = React.memo(function RaceCountdownCard({
   country,
   city,
   gpName,
+  winnerNote,
 }: RaceCountdownCardProps) {
   const timeLeft = useCountdown(targetDateUtc);
 
@@ -175,6 +497,20 @@ const RaceCountdownCard = React.memo(function RaceCountdownCard({
       return dates;
     }
   }, [targetDateUtc, circuitId, country, city, dates]);
+
+  // レース開始後はカウントダウン不要のため非表示（Live表示は上部バッジに集約）
+  const isTargetPast = useMemo(() => {
+    if (!targetDateUtc) return true;
+    try {
+      return new Date(targetDateUtc).getTime() <= Date.now();
+    } catch {
+      return false;
+    }
+  }, [targetDateUtc]);
+
+  if (isTargetPast || (timeLeft.mounted && timeLeft.isPast)) {
+    return null;
+  }
 
   if (!timeLeft.mounted) {
     return (
@@ -211,50 +547,33 @@ const RaceCountdownCard = React.memo(function RaceCountdownCard({
 
   return (
     <div className="w-full bg-slate-950/90 p-3 sm:p-3.5 rounded-2xl border border-white/10 text-center shadow-lg relative overflow-hidden backdrop-blur-md">
-      {timeLeft.isPast ? (
-        <div className="space-y-2 py-1.5">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-xs font-racing font-bold">
-            <span>🏁</span>
-            <span>レース完走 / リザルト確定</span>
-          </div>
-          <div className="text-xs text-slate-300 font-medium">
-            公式決勝レース終了・アーカイブ保管済み
-          </div>
-          <div className="text-[11px] text-slate-400 font-mono">
-            開催日程: {dates}
-          </div>
+      <div className="text-[10px] font-mono font-bold text-slate-400 mb-2 flex items-center justify-center gap-1.5 uppercase tracking-wider">
+        <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+        <span>決勝スタートまで (Race Countdown)</span>
+      </div>
+      <div className="grid grid-cols-4 gap-1.5 font-mono text-center">
+        <div className="p-2 rounded-xl bg-slate-900/90 border border-white/[0.08] shadow-inner">
+          <div className="font-mono font-black text-xl sm:text-2xl text-white" suppressHydrationWarning>{timeLeft.days}</div>
+          <div className="text-[9px] font-mono font-bold text-slate-500 uppercase tracking-widest mt-0.5">DAYS</div>
         </div>
-      ) : (
-        <>
-          <div className="text-[10px] font-mono font-bold text-slate-400 mb-2 flex items-center justify-center gap-1.5 uppercase tracking-wider">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-            <span>決勝スタートまで (Race Countdown)</span>
-          </div>
-          <div className="grid grid-cols-4 gap-1.5 font-mono text-center">
-            <div className="p-2 rounded-xl bg-slate-900/90 border border-white/[0.08] shadow-inner">
-              <div className="font-mono font-black text-xl sm:text-2xl text-white" suppressHydrationWarning>{timeLeft.days}</div>
-              <div className="text-[9px] font-mono font-bold text-slate-500 uppercase tracking-widest mt-0.5">DAYS</div>
-            </div>
-            <div className="p-2 rounded-xl bg-slate-900/90 border border-white/[0.08] shadow-inner">
-              <div className="font-mono font-black text-xl sm:text-2xl text-white" suppressHydrationWarning>{timeLeft.hours}</div>
-              <div className="text-[9px] font-mono font-bold text-slate-500 uppercase tracking-widest mt-0.5">HOURS</div>
-            </div>
-            <div className="p-2 rounded-xl bg-slate-900/90 border border-white/[0.08] shadow-inner">
-              <div className="font-mono font-black text-xl sm:text-2xl text-white" suppressHydrationWarning>{timeLeft.minutes}</div>
-              <div className="text-[9px] font-mono font-bold text-slate-500 uppercase tracking-widest mt-0.5">MIN</div>
-            </div>
-            <div className="p-2 rounded-xl bg-slate-900/90 border border-white/[0.08] shadow-inner">
-              <div className="font-mono font-black text-xl sm:text-2xl text-red-500 animate-pulse" suppressHydrationWarning>{timeLeft.seconds}</div>
-              <div className="text-[9px] font-mono font-bold text-slate-500 uppercase tracking-widest mt-0.5">SEC</div>
-            </div>
-          </div>
-          <div className="mt-2.5 pt-2 border-t border-white/[0.06] text-[11px] text-slate-300 font-mono flex items-center justify-center gap-1.5 truncate">
-            <span className="text-red-400">🎯</span>
-            <span className="text-slate-400 font-sans">決勝:</span>
-            <span className="text-white font-bold truncate">{targetFormatted}</span>
-          </div>
-        </>
-      )}
+        <div className="p-2 rounded-xl bg-slate-900/90 border border-white/[0.08] shadow-inner">
+          <div className="font-mono font-black text-xl sm:text-2xl text-white" suppressHydrationWarning>{timeLeft.hours}</div>
+          <div className="text-[9px] font-mono font-bold text-slate-500 uppercase tracking-widest mt-0.5">HOURS</div>
+        </div>
+        <div className="p-2 rounded-xl bg-slate-900/90 border border-white/[0.08] shadow-inner">
+          <div className="font-mono font-black text-xl sm:text-2xl text-white" suppressHydrationWarning>{timeLeft.minutes}</div>
+          <div className="text-[9px] font-mono font-bold text-slate-500 uppercase tracking-widest mt-0.5">MIN</div>
+        </div>
+        <div className="p-2 rounded-xl bg-slate-900/90 border border-white/[0.08] shadow-inner">
+          <div className="font-mono font-black text-xl sm:text-2xl text-red-500 animate-pulse" suppressHydrationWarning>{timeLeft.seconds}</div>
+          <div className="text-[9px] font-mono font-bold text-slate-500 uppercase tracking-widest mt-0.5">SEC</div>
+        </div>
+      </div>
+      <div className="mt-2.5 pt-2 border-t border-white/[0.06] text-[11px] text-slate-300 font-mono flex items-center justify-center gap-1.5 truncate">
+        <span className="text-red-400">🎯</span>
+        <span className="text-slate-400 font-sans">決勝:</span>
+        <span className="text-white font-bold truncate">{targetFormatted}</span>
+      </div>
     </div>
   );
 });
@@ -293,6 +612,7 @@ export default function SeasonHub({
   const [heroSubView, setHeroSubView] = useState<'schedule' | 'weather'>('schedule');
   const [sessionModalOpen, setSessionModalOpen] = useState<boolean>(false);
   const [selectedSessionForModal, setSelectedSessionForModal] = useState<string>('FP1');
+  const [is3dModalOpen, setIs3dModalOpen] = useState<boolean>(false);
 
   // Active season calendar & grid — starts with local data, upgradeable via API
   const localCalendar = useMemo(() => getSeasonCalendar(selectedSeason), [selectedSeason]);
@@ -408,6 +728,16 @@ export default function SeasonHub({
     const res = getSessionClassification('2026', selectedRace.round, '予選', 101.5, selectedCircuitId);
     return res.status === 'completed' && res.results.length > 0 ? res : null;
   }, [selectedSeason, selectedRace.round, selectedCircuitId]);
+
+  // Live race in-progress status (race started but winner not yet determined, within 6 hours)
+  const isRaceLive = useMemo(() => {
+    if (selectedSeason !== '2026' || !selectedRace?.targetDateUtc) return false;
+    const now = Date.now();
+    const startTime = new Date(selectedRace.targetDateUtc).getTime();
+    if (isNaN(startTime)) return false;
+    const LIVE_GRACE_MS = 6 * 60 * 60 * 1000; // 6 hours
+    return now >= startTime && (now - startTime) < LIVE_GRACE_MS && !selectedRace.winnerNote;
+  }, [selectedSeason, selectedRace]);
 
   // Filtered calendar
   const filteredCalendar = useMemo(() => {
@@ -568,6 +898,12 @@ export default function SeasonHub({
           <div className="space-y-3.5 flex-1 min-w-0">
             {/* Top row: Status Badges Strip */}
             <div className="flex flex-wrap items-center gap-2">
+              {isRaceLive && (
+                <span className="px-3 py-1 rounded-full text-xs font-racing font-bold tracking-wider uppercase bg-red-600/20 text-red-400 border border-red-500/40 shadow-sm flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse inline-block" />
+                  <span>LIVE RACING IN PROGRESS</span>
+                </span>
+              )}
               <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold tracking-wider uppercase bg-red-500/15 text-red-400 border border-red-500/30 shadow-sm flex items-center gap-1.5">
                 <span>🏁</span>
                 <span>{selectedSeason}年 第{selectedRace.round}戦 / 全{activeCalendar.length}戦</span>
@@ -621,6 +957,15 @@ export default function SeasonHub({
                 <span>🛞</span>
                 <span>タイヤ割当: <strong className="text-slate-100 font-sans font-semibold">{selectedRace.pirelliCompounds}</strong></span>
               </span>
+              <button
+                type="button"
+                onClick={() => setIs3dModalOpen(true)}
+                className="px-2.5 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 hover:text-white flex items-center gap-1.5 shadow-sm transition-all cursor-pointer font-bold group"
+                title="コース図・3D標高モデルを起動"
+              >
+                <Map className="w-3.5 h-3.5 text-sky-400 group-hover:scale-110 transition-transform" />
+                <span>3Dコース解析 ↗</span>
+              </button>
             </div>
 
             {/* Sub-view switcher: Dual Timetable vs Weather */}
@@ -793,8 +1138,23 @@ export default function SeasonHub({
             </div>
           </div>
 
-          {/* Right Column: Countdown Cockpit & Action Suite */}
-          <div className="flex flex-col justify-between gap-3 w-full lg:w-[320px] shrink-0">
+          {/* Right Column: Track Map, Countdown Cockpit & Action Suite */}
+          <div className="flex flex-col justify-between gap-3 w-full lg:w-[330px] xl:w-[360px] shrink-0">
+            {/* 1. Circuit Layout Track Map Card (Always visible track layout) */}
+            <HeroTrackMapCard
+              circuitId={selectedCircuitId}
+              race={selectedRace}
+              onOpenAnalysis={() => {
+                setActiveTab('track_analysis');
+                setTimeout(() => {
+                  document.getElementById('track-analysis-section')?.scrollIntoView({ behavior: 'smooth' });
+                }, 100);
+              }}
+              onOpenEncyclopedia={onNavigateToCircuit ? () => onNavigateToCircuit(selectedCircuitId) : undefined}
+              onOpen3dModal={() => setIs3dModalOpen(true)}
+            />
+
+            {/* 2. Race Countdown or Archive Card */}
             {selectedSeason === '2026' ? (
               <RaceCountdownCard
                 targetDateUtc={selectedRace.targetDateUtc}
@@ -803,6 +1163,7 @@ export default function SeasonHub({
                 country={selectedRace.country}
                 city={selectedRace.city}
                 gpName={selectedRace.gpName}
+                winnerNote={selectedRace.winnerNote}
               />
             ) : (
               <div className="w-full bg-slate-950/90 p-4 rounded-2xl border border-white/10 shadow-lg relative overflow-hidden backdrop-blur-md flex flex-col justify-between min-h-[170px]">
@@ -851,12 +1212,12 @@ export default function SeasonHub({
               )}
               <button
                 type="button"
-                onClick={() => setActiveTab('track_analysis')}
+                onClick={() => setIs3dModalOpen(true)}
                 className="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-white border border-white/10 hover:border-sky-500/40 font-racing font-bold text-xs transition-all cursor-pointer group shadow-sm"
                 title="3Dコース標高図・戦術プロファイルを見る"
               >
                 <span className="group-hover:scale-110 transition-transform">🏁</span>
-                <span>コース詳細</span>
+                <span>コース詳細 (3D)</span>
               </button>
               {onNavigateToCircuit && (
                 <button
@@ -1107,7 +1468,7 @@ export default function SeasonHub({
           TAB CONTENT: 1.5 TRACK & TACTICAL ANALYSIS
           ───────────────────────────────────────────────────────────── */}
       {activeTab === 'track_analysis' && (
-        <div className="space-y-6 animate-fade-in">
+        <div id="track-analysis-section" className="space-y-6 animate-fade-in scroll-mt-6">
           {/* Header Bar for selected round */}
           <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl bg-gradient-to-r from-slate-900/90 to-slate-950/90 border border-white/10 shadow-lg">
             <div className="flex items-center gap-2.5">
@@ -1772,6 +2133,68 @@ export default function SeasonHub({
         onNavigateToTelemetry={onNavigateToTelemetry}
         onNavigateToDriver={onNavigateToDriver}
       />
+
+      {/* 3D Track Elevation & Tactical Guide Modal */}
+      {is3dModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md animate-fadeIn"
+          onClick={() => setIs3dModalOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-5xl bg-slate-950 border border-sky-500/40 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-white/10 bg-slate-900/90">
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="text-2xl sm:text-3xl shrink-0 drop-shadow-md">{selectedRace.flag}</span>
+                <div className="min-w-0">
+                  <h2 className="text-sm sm:text-lg font-racing font-bold text-white flex items-center gap-2 truncate">
+                    <span>{toJapaneseGpName(selectedRace.gpName)} : 3D標高＆戦術ガイド</span>
+                    <span className="text-xs font-mono text-sky-400 font-normal truncate hidden sm:inline">({selectedRace.circuitName})</span>
+                  </h2>
+                  <p className="text-[10px] sm:text-xs font-mono text-slate-400 truncate">
+                    🖱️ マウスドラッグ / 📱 タッチで360度3D回転・標高ウォール・2026年OVR（オーバーライド）区間を完全再現
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIs3dModalOpen(false);
+                    setActiveTab('track_analysis');
+                    setTimeout(() => {
+                      document.getElementById('track-analysis-section')?.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                  }}
+                  className="px-2.5 py-1.5 rounded-xl bg-white/10 hover:bg-sky-500/20 text-xs font-mono text-slate-200 hover:text-sky-300 border border-white/10 transition-colors hidden sm:flex items-center gap-1 cursor-pointer"
+                  title="ページ下の詳細解析タブへ移動"
+                >
+                  <span>詳細解析へ ↘</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIs3dModalOpen(false)}
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-red-500/80 text-white flex items-center justify-center text-sm font-bold transition-colors cursor-pointer"
+                  title="閉じる"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Body: F1BroadcastTrackGuide */}
+            <div className="flex-1 overflow-y-auto p-3 sm:p-5 space-y-4">
+              <F1BroadcastTrackGuide
+                circuitId={selectedCircuitId}
+                gpName={selectedRace.gpName}
+                round={selectedRace.round}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

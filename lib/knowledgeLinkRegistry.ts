@@ -268,6 +268,24 @@ export function getKnowledgeLinkRegistry(): KnowledgeLinkEntry[] {
     } else if (term.id === 'flying-lap') {
       entries.push({ keyword: 'フライングラップ', url: '/knowledge/glossary/flying-lap', category: 'glossary', title: '用語解説「フライングラップ」を別タブで開く' });
       entries.push({ keyword: 'ホットラップ', url: '/knowledge/glossary/flying-lap', category: 'glossary', title: '用語解説「フライングラップ」を別タブで開く' });
+    } else if (term.id === 'sector') {
+      entries.push({ keyword: 'セクター', url: '/knowledge/glossary/sector', category: 'glossary', title: '用語解説「セクター (コース区間)」を別タブで開く' });
+      entries.push({ keyword: 'セクタータイム', url: '/knowledge/glossary/sector', category: 'glossary', title: '用語解説「セクター (コース区間)」を別タブで開く' });
+      entries.push({ keyword: 'パープルセクター', url: '/knowledge/glossary/sector', category: 'glossary', title: '用語解説「セクター (コース区間)」を別タブで開く' });
+    } else if (term.id === 'lockup') {
+      entries.push({ keyword: 'ロックアップ', url: '/knowledge/glossary/lockup', category: 'glossary', title: '用語解説「ロックアップ (タイヤ回転停止)」を別タブで開く' });
+      entries.push({ keyword: 'タイヤロック', url: '/knowledge/glossary/lockup', category: 'glossary', title: '用語解説「ロックアップ (タイヤ回転停止)」を別タブで開く' });
+      entries.push({ keyword: 'フラットスポット', url: '/knowledge/glossary/lockup', category: 'glossary', title: '用語解説「ロックアップ＆フラットスポット」を別タブで開く' });
+    } else if (term.id === 'sc-vs-vsc') {
+      entries.push({ keyword: 'SCとVSCの違い', url: '/knowledge/glossary/sc-vs-vsc', category: 'glossary', title: '用語解説「SCとVSCの違い」を別タブで開く' });
+      entries.push({ keyword: 'SCとVSC', url: '/knowledge/glossary/sc-vs-vsc', category: 'glossary', title: '用語解説「SCとVSCの違い」を別タブで開く' });
+    } else if (term.id === 'ers') {
+      entries.push({ keyword: 'ERS', url: '/knowledge/glossary/ers', category: 'glossary', title: '用語解説「ERS (エネルギー回生システム)」を別タブで開く' });
+      entries.push({ keyword: 'エネルギー回生システム', url: '/knowledge/glossary/ers', category: 'glossary', title: '用語解説「ERS (エネルギー回生システム)」を別タブで開く' });
+    } else if (term.id === 'tow') {
+      entries.push({ keyword: 'トー', url: '/knowledge/glossary/tow', category: 'glossary', title: '用語解説「トー / トゥ (牽引効果)」を別タブで開く' });
+      entries.push({ keyword: 'トゥ', url: '/knowledge/glossary/tow', category: 'glossary', title: '用語解説「トー / トゥ (牽引効果)」を別タブで開く' });
+      entries.push({ keyword: 'トウ', url: '/knowledge/glossary/tow', category: 'glossary', title: '用語解説「トー / トゥ (牽引効果)」を別タブで開く' });
     }
   });
 

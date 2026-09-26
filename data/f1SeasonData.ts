@@ -1852,22 +1852,58 @@ export function getConstructorStandings(year: SeasonYear): ConstructorStanding[]
 }
 
 /**
- * Determine the next upcoming round in a given season calendar.
- * Finds the earliest race where targetDateUtc is still in the future.
- * If all races have concluded, returns the final round (Round 24) or Round 1.
+ * Determine the active / next upcoming round in a given season calendar.
+ * Considers a round active if:
+ * 1. The race start time is still in the future, OR
+ * 2. The race has started but official results/classification are not yet finalized:
+ *    - In-race & post-race grace period (up to 6 hours after race start covers race runtime + steward deliberations)
+ *    - No official winner/result recorded yet (up to 24 hours after race start)
+ * Does NOT advance to the next round until the current round's race is truly concluded and official results are in.
  */
 export function getNextUpcomingRound(calendar: RaceWeekendSchedule[]): number {
   const now = new Date().getTime();
-  const upcoming = calendar.find((r) => new Date(r.targetDateUtc).getTime() > now);
-  if (upcoming) return upcoming.round;
+  const MAX_RESULT_PENDING_MS = 24 * 60 * 60 * 1000; // Up to 24 hours while waiting for official classification
+
+  const activeOrUpcoming = calendar.find((r) => {
+    // Skip cancelled races that have no replacement
+    if (r.isCancelled && !r.replacementNote) return false;
+
+    const startTime = new Date(r.targetDateUtc).getTime();
+    if (isNaN(startTime)) return false;
+
+    // 1. Race is in the future
+    if (startTime > now) return true;
+
+    // If official result/winner is already recorded, this round is concluded
+    if (r.winnerNote) return false;
+
+    // 2. Race has started, but official results/rankings are not yet obtained (up to 24 hours)
+    const elapsedSinceStart = now - startTime;
+    if (elapsedSinceStart >= 0 && elapsedSinceStart < MAX_RESULT_PENDING_MS) {
+      return true;
+    }
+
+    return false;
+  });
+
+  if (activeOrUpcoming) return activeOrUpcoming.round;
   return calendar[calendar.length - 1]?.round || 1;
 }
 
 /**
- * Check if an entire season has ended (all rounds completed in the past).
+ * Check if an entire season has ended (all rounds completed in the past and concluded).
  */
 export function isSeasonConcluded(calendar: RaceWeekendSchedule[]): boolean {
   const now = new Date().getTime();
-  return calendar.every((r) => new Date(r.targetDateUtc).getTime() <= now);
+  const POST_RACE_GRACE_MS = 6 * 60 * 60 * 1000;
+  return calendar.every((r) => {
+    const startTime = new Date(r.targetDateUtc).getTime();
+    if (isNaN(startTime)) return true;
+    // If future or within grace period without winner, season is not concluded
+    if (startTime > now) return false;
+    if (now - startTime < POST_RACE_GRACE_MS) return false;
+    return true;
+  });
 }
+
 
