@@ -24,6 +24,7 @@ export interface RaceWeekendSchedule {
   }[];
   isCancelled?: boolean;       // From OpenF1 API — race was cancelled
   replacementNote?: string;    // e.g. "マレーシア(セパン)で代替開催"
+  winnerNote?: string;         // e.g. "🏆 優勝: M.フェルスタッペン (Red Bull)"
 }
 
 export interface DriverStanding {
@@ -1075,7 +1076,7 @@ export const SEASON_2025_CALENDAR: RaceWeekendSchedule[] = [
     city: 'シュピールベルク',
     dates: '2025年 6月27日 - 6月29日',
     targetDateUtc: '2025-06-29T13:00:00Z',
-    isSprint: true,
+    isSprint: false,
     lengthKm: 4.318,
     laps: 71,
     pirelliCompounds: 'C3 / C4 / C5',
@@ -1279,49 +1280,47 @@ export const SEASON_2025_CALENDAR: RaceWeekendSchedule[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────
-// 3. 2026 STANDINGS (OFFICIAL STANDINGS THROUGH ROUND 15 MONZA)
+// 3. 2026 STANDINGS (OFFICIAL GROUND TRUTH THROUGH ROUND 14 MADRID)
 // ─────────────────────────────────────────────────────────────
 
 export const DRIVER_STANDINGS_2026: DriverStanding[] = [
-  { position: 1, driverCode: 'ANT', driverName: 'アンドレア・キミ・アントネッリ', team: 'Mercedes-AMG', teamColor: '#27F4D2', points: 267, wins: 6, podiums: 11 },
-  { position: 2, driverCode: 'RUS', driverName: 'ジョージ・ラッセル', team: 'Mercedes-AMG', teamColor: '#27F4D2', points: 201, wins: 3, podiums: 9 },
-  { position: 3, driverCode: 'HAM', driverName: 'ルイス・ハミルトン', team: 'Scuderia Ferrari', teamColor: '#E80020', points: 191, wins: 2, podiums: 8 },
-  { position: 4, driverCode: 'NOR', driverName: 'ランド・ノリス', team: 'McLaren', teamColor: '#FF8000', points: 171, wins: 2, podiums: 7 },
-  { position: 5, driverCode: 'LEC', driverName: 'シャルル・ルクレール', team: 'Scuderia Ferrari', teamColor: '#E80020', points: 155, wins: 1, podiums: 6 },
-  { position: 6, driverCode: 'VER', driverName: 'マックス・フェルスタッペン', team: 'Oracle Red Bull Racing', teamColor: '#3671C6', points: 127, wins: 1, podiums: 5 },
-  { position: 7, driverCode: 'PIA', driverName: 'オスカー・ピアストリ', team: 'McLaren', teamColor: '#FF8000', points: 116, wins: 0, podiums: 4 },
-  { position: 8, driverCode: 'HAD', driverName: 'イサック・ハジャー', team: 'Oracle Red Bull Racing', teamColor: '#3671C6', points: 71, wins: 0, podiums: 1 },
-  { position: 9, driverCode: 'LAW', driverName: 'リアム・ローソン', team: 'Visa Cash App RB', teamColor: '#6692FF', points: 51, wins: 0, podiums: 0 },
-  { position: 10, driverCode: 'GAS', driverName: 'ピエール・ガスリー', team: 'Alpine', teamColor: '#0093cc', points: 41, wins: 0, podiums: 0 },
-  { position: 11, driverCode: 'ALO', driverName: 'フェルナンド・アロンソ', team: 'Aston Martin Honda', teamColor: '#229971', points: 38, wins: 0, podiums: 0 },
-  { position: 12, driverCode: 'TSU', driverName: '角田裕毅', team: 'Visa Cash App RB', teamColor: '#6692FF', points: 34, wins: 0, podiums: 0 },
-  { position: 13, driverCode: 'SAI', driverName: 'カルロス・サインツ', team: 'Williams', teamColor: '#00A0DE', points: 32, wins: 0, podiums: 0 },
-  { position: 14, driverCode: 'ALB', driverName: 'アレクサンダー・アルボン', team: 'Williams', teamColor: '#00A0DE', points: 26, wins: 0, podiums: 0 },
-  { position: 15, driverCode: 'HUL', driverName: 'ニコ・ヒュルケンベルグ', team: 'Audi F1 Team', teamColor: '#e0001a', points: 22, wins: 0, podiums: 0 },
-  { position: 16, driverCode: 'OCO', driverName: 'エステバン・オコン', team: 'Haas F1 Team', teamColor: '#B6BABD', points: 18, wins: 0, podiums: 0 },
-  { position: 17, driverCode: 'BEA', driverName: 'オリバー・ベアマン', team: 'Haas F1 Team', teamColor: '#B6BABD', points: 14, wins: 0, podiums: 0 },
-  { position: 18, driverCode: 'COL', driverName: 'フランコ・コラピント', team: 'Alpine', teamColor: '#0093cc', points: 10, wins: 0, podiums: 0 },
-  { position: 19, driverCode: 'BOR', driverName: 'ガブリエル・ボルトレート', team: 'Audi F1 Team', teamColor: '#e0001a', points: 6, wins: 0, podiums: 0 },
-  { position: 20, driverCode: 'STR', driverName: 'ランス・ストロール', team: 'Aston Martin Honda', teamColor: '#229971', points: 5, wins: 0, podiums: 0 },
-  { position: 21, driverCode: 'PER', driverName: 'セルジオ・ペレス', team: 'Cadillac Formula 1 Team', teamColor: '#D4AF37', points: 4, wins: 0, podiums: 0 },
-  { position: 22, driverCode: 'BOT', driverName: 'バルテリ・ボッタス', team: 'Cadillac Formula 1 Team', teamColor: '#D4AF37', points: 1, wins: 0, podiums: 0 },
+  { position: 1, driverCode: 'ANT', driverName: 'アンドレア・キミ・アントネッリ', team: 'Mercedes', teamColor: '#27F4D2', points: 292, wins: 8, podiums: 12 },
+  { position: 2, driverCode: 'RUS', driverName: 'ジョージ・ラッセル', team: 'Mercedes', teamColor: '#27F4D2', points: 211, wins: 2, podiums: 7 },
+  { position: 3, driverCode: 'HAM', driverName: 'ルイス・ハミルトン', team: 'Ferrari', teamColor: '#E80020', points: 191, wins: 1, podiums: 5 },
+  { position: 4, driverCode: 'NOR', driverName: 'ランド・ノリス', team: 'McLaren', teamColor: '#FF8000', points: 186, wins: 2, podiums: 5 },
+  { position: 5, driverCode: 'LEC', driverName: 'シャルル・ルクレール', team: 'Ferrari', teamColor: '#E80020', points: 167, wins: 1, podiums: 4 },
+  { position: 6, driverCode: 'VER', driverName: 'マックス・フェルスタッペン', team: 'Red Bull', teamColor: '#3671C6', points: 145, wins: 0, podiums: 6 },
+  { position: 7, driverCode: 'PIA', driverName: 'オスカー・ピアストリ', team: 'McLaren', teamColor: '#FF8000', points: 120, wins: 0, podiums: 2 },
+  { position: 8, driverCode: 'HAD', driverName: 'イサック・ハジャー', team: 'Red Bull', teamColor: '#3671C6', points: 71, wins: 0, podiums: 1 },
+  { position: 9, driverCode: 'LAW', driverName: 'リアム・ローソン', team: 'RB F1 Team', teamColor: '#6692FF', points: 59, wins: 0, podiums: 0 },
+  { position: 10, driverCode: 'GAS', driverName: 'ピエール・ガスリー', team: 'Alpine F1 Team', teamColor: '#0093cc', points: 41, wins: 0, podiums: 0 },
+  { position: 11, driverCode: 'LIN', driverName: 'アービッド・リンドブラッド', team: 'RB F1 Team', teamColor: '#6692FF', points: 31, wins: 0, podiums: 0 },
+  { position: 12, driverCode: 'COL', driverName: 'フランコ・コラピント', team: 'Alpine F1 Team', teamColor: '#0093cc', points: 27, wins: 0, podiums: 0 },
+  { position: 13, driverCode: 'BEA', driverName: 'オリバー・ベアマン', team: 'Haas F1 Team', teamColor: '#B6BABD', points: 18, wins: 0, podiums: 0 },
+  { position: 14, driverCode: 'BOR', driverName: 'ガブリエル・ボルトレート', team: 'Audi', teamColor: '#e0001a', points: 10, wins: 0, podiums: 0 },
+  { position: 15, driverCode: 'HUL', driverName: 'ニコ・ヒュルケンベルグ', team: 'Audi', teamColor: '#e0001a', points: 7, wins: 0, podiums: 0 },
+  { position: 16, driverCode: 'SAI', driverName: 'カルロス・サインツ', team: 'Williams', teamColor: '#00A0DE', points: 6, wins: 0, podiums: 0 },
+  { position: 17, driverCode: 'ALB', driverName: 'アレクサンダー・アルボン', team: 'Williams', teamColor: '#00A0DE', points: 5, wins: 0, podiums: 0 },
+  { position: 18, driverCode: 'OCO', driverName: 'エステバン・オコン', team: 'Haas F1 Team', teamColor: '#B6BABD', points: 3, wins: 0, podiums: 0 },
+  { position: 19, driverCode: 'ALO', driverName: 'フェルナンド・アロンソ', team: 'Aston Martin', teamColor: '#229971', points: 3, wins: 0, podiums: 0 },
+  { position: 20, driverCode: 'TSU', driverName: '角田裕毅', team: 'RB F1 Team', teamColor: '#6692FF', points: 1, wins: 0, podiums: 0 },
+  { position: 21, driverCode: 'STR', driverName: 'ランス・ストロール', team: 'Aston Martin', teamColor: '#229971', points: 0, wins: 0, podiums: 0 },
+  { position: 22, driverCode: 'BOT', driverName: 'バルテリ・ボッタス', team: 'Cadillac F1 Team', teamColor: '#D4AF37', points: 0, wins: 0, podiums: 0 },
+  { position: 23, driverCode: 'PER', driverName: 'セルジオ・ペレス', team: 'Cadillac F1 Team', teamColor: '#D4AF37', points: 0, wins: 0, podiums: 0 },
 ];
 
 export const CONSTRUCTOR_STANDINGS_2026: ConstructorStanding[] = [
-  { position: 1, teamName: 'Mercedes-AMG', teamColor: '#27F4D2', powerUnit: 'Mercedes', points: 468, wins: 9 },
-  { position: 2, teamName: 'Scuderia Ferrari', teamColor: '#E80020', powerUnit: 'Ferrari', points: 346, wins: 3 },
-  { position: 3, teamName: 'McLaren', teamColor: '#FF8000', powerUnit: 'Mercedes',
-    teamPrincipal: 'Andrea Stella', points: 287, wins: 2 },
-  { position: 4, teamName: 'Oracle Red Bull Racing', teamColor: '#3671C6', powerUnit: 'Red Bull Ford', points: 204, wins: 1 },
-  { position: 5, teamName: 'Visa Cash App RB', teamColor: '#6692FF', powerUnit: 'Red Bull Ford', points: 85, wins: 0 },
-  { position: 6, teamName: 'Williams', teamColor: '#00A0DE', powerUnit: 'Mercedes',
-    teamPrincipal: 'James Vowles', points: 58, wins: 0 },
-  { position: 7, teamName: 'BWT Alpine', teamColor: '#0093cc', powerUnit: 'Mercedes', points: 51, wins: 0 },
-  { position: 8, teamName: 'Aston Martin Aramco', teamColor: '#229971', powerUnit: 'Honda Works', points: 43, wins: 0 },
-  { position: 9, teamName: 'Haas F1 Team', teamColor: '#B6BABD', powerUnit: 'Ferrari', points: 32, wins: 0 },
-  { position: 10, teamName: 'Audi F1 Team', teamColor: '#e0001a', powerUnit: 'Audi Works',
-    teamPrincipal: 'Mattia Binotto', points: 28, wins: 0 },
-  { position: 11, teamName: 'Cadillac Formula 1 Team', teamColor: '#D4AF37', powerUnit: 'Ferrari', points: 5, wins: 0 },
+  { position: 1, teamName: 'Mercedes', teamColor: '#27F4D2', powerUnit: 'Mercedes', teamPrincipal: 'Toto Wolff', points: 503, wins: 10 },
+  { position: 2, teamName: 'Ferrari', teamColor: '#E80020', powerUnit: 'Ferrari', teamPrincipal: 'Frédéric Vasseur', points: 358, wins: 2 },
+  { position: 3, teamName: 'McLaren', teamColor: '#FF8000', powerUnit: 'Mercedes', teamPrincipal: 'Andrea Stella', points: 306, wins: 2 },
+  { position: 4, teamName: 'Red Bull', teamColor: '#3671C6', powerUnit: 'Red Bull Ford', teamPrincipal: 'Christian Horner', points: 230, wins: 0 },
+  { position: 5, teamName: 'RB F1 Team', teamColor: '#6692FF', powerUnit: 'Red Bull Ford', teamPrincipal: 'Laurent Mekies', points: 77, wins: 0 },
+  { position: 6, teamName: 'Alpine F1 Team', teamColor: '#0093cc', powerUnit: 'Mercedes', teamPrincipal: 'Oliver Oakes', points: 68, wins: 0 },
+  { position: 7, teamName: 'Haas F1 Team', teamColor: '#B6BABD', powerUnit: 'Ferrari', teamPrincipal: 'Ayao Komatsu', points: 21, wins: 0 },
+  { position: 8, teamName: 'Audi', teamColor: '#e0001a', powerUnit: 'Audi Works', teamPrincipal: 'Mattia Binotto', points: 17, wins: 0 },
+  { position: 9, teamName: 'Williams', teamColor: '#00A0DE', powerUnit: 'Mercedes', teamPrincipal: 'James Vowles', points: 11, wins: 0 },
+  { position: 10, teamName: 'Aston Martin', teamColor: '#229971', powerUnit: 'Honda Works', teamPrincipal: 'Mike Krack', points: 3, wins: 0 },
+  { position: 11, teamName: 'Cadillac F1 Team', teamColor: '#D4AF37', powerUnit: 'Ferrari', teamPrincipal: 'Mario Andretti', points: 0, wins: 0 },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -1463,8 +1462,9 @@ export const GRID_2026_TEAMS: GridTeam[] = [
     powerUnit: 'Red Bull Ford Powertrains',
     teamPrincipal: 'Alan Permane',
     drivers: [
-      { number: 22, code: 'TSU', name: '角田裕毅', country: '日本', flag: '🇯🇵', note: 'F1参戦6年目、成熟したドライビングでチームを牽引' },
-      { number: 30, code: 'LAW', name: 'リアム・ローソン', country: 'NZ', flag: '🇳🇿', note: '着実にポイントを積み上げるニュージーランドの星' },
+      { number: 22, code: 'TSU', name: '角田裕毅', country: '日本', flag: '🇯🇵', note: '第12戦より出走。成熟したドライビングでモンツァ10位入賞' },
+      { number: 41, code: 'LIN', name: 'アービッド・リンドブラッド', country: '英国', flag: '🇬🇧', isRookie: true, note: 'レッドブル育成の超新星ルーキー。今季31pt獲得' },
+      { number: 30, code: 'LAW', name: 'リアム・ローソン', country: 'NZ', flag: '🇳🇿', isTransfer: true, note: '前半戦RBで好走し第12戦よりレッドブル本隊へ昇格' },
     ],
   },
   {
@@ -1650,7 +1650,40 @@ export const GRID_2025_TEAMS: GridTeam[] = [
 // 7. SEASON TRANSITION & DYNAMIC RESOLUTION HELPERS
 // ─────────────────────────────────────────────────────────────
 
-export type SeasonYear = '2026' | '2025';
+export type SeasonYear = '2026' | '2025' | '2024' | '2023' | '2022' | '2021' | '2020' | '2019' | '2018';
+
+import { getHistoricalArchive } from './f1HistoricalArchivesData';
+
+const HISTORICAL_TEAM_COLORS: Record<string, string> = {
+  'Red Bull': '#3671C6',
+  'Red Bull Racing': '#3671C6',
+  'Mercedes': '#27F4D2',
+  'Mercedes-AMG': '#27F4D2',
+  'Ferrari': '#E80020',
+  'Scuderia Ferrari': '#E80020',
+  'McLaren': '#FF8000',
+  'Alpine': '#0093cc',
+  'Alpine F1 Team': '#0093cc',
+  'Aston Martin': '#229971',
+  'Williams': '#00A0DE',
+  'Haas': '#B6BABD',
+  'Haas F1 Team': '#B6BABD',
+  'AlphaTauri': '#5E8FAA',
+  'RB': '#6692FF',
+  'RB F1 Team': '#6692FF',
+  'Alfa Romeo': '#900000',
+  'Kick Sauber': '#52e252',
+  'Audi': '#e0001a',
+  'Cadillac': '#D4AF37',
+  'Cadillac F1 Team': '#D4AF37',
+};
+
+function resolveHistoricalTeamColor(teamName: string): string {
+  for (const [key, color] of Object.entries(HISTORICAL_TEAM_COLORS)) {
+    if (teamName.toLowerCase().includes(key.toLowerCase())) return color;
+  }
+  return '#94A3B8';
+}
 
 /**
  * Automatically determine which season should be actively displayed by default.
@@ -1662,20 +1695,160 @@ export function getActiveSeasonYear(): SeasonYear {
   return '2025';
 }
 
+const JAPANESE_GP_NAMES_MAP: Record<string, string> = {
+  'australian grand prix': 'オーストラリアGP',
+  'bahrain grand prix': 'バーレーンGP',
+  'chinese grand prix': '中国GP',
+  'azerbaijan grand prix': 'アゼルバイジャンGP',
+  'spanish grand prix': 'スペインGP',
+  'monaco grand prix': 'モナコGP',
+  'canadian grand prix': 'カナダGP',
+  'french grand prix': 'フランスGP',
+  'austrian grand prix': 'オーストリアGP',
+  'british grand prix': 'イギリスGP',
+  'german grand prix': 'ドイツGP',
+  'hungarian grand prix': 'ハンガリーGP',
+  'belgian grand prix': 'ベルギーGP',
+  'italian grand prix': 'イタリアGP',
+  'singapore grand prix': 'シンガポールGP',
+  'russian grand prix': 'ロシアGP',
+  'japanese grand prix': '日本GP (鈴鹿)',
+  'united states grand prix': 'アメリカGP (COTA)',
+  'mexican grand prix': 'メキシコGP',
+  'mexico city grand prix': 'メキシコシティGP',
+  'brazilian grand prix': 'ブラジルGP',
+  'são paulo grand prix': 'サンパウロGP',
+  'sao paulo grand prix': 'サンパウロGP',
+  'abu dhabi grand prix': 'アブダビGP',
+  'saudi arabian grand prix': 'サウジアラビアGP',
+  'miami grand prix': 'マイアミGP',
+  'emilia romagna grand prix': 'エミリア・ロマーニャGP (イモラ)',
+  'dutch grand prix': 'オランダGP',
+  'qatar grand prix': 'カタールGP',
+  'las vegas grand prix': 'ラスベガスGP',
+  'portuguese grand prix': 'ポルトガルGP',
+  'turkish grand prix': 'トルコGP',
+  'styrian grand prix': 'シュタイアーマルクGP',
+  '70th anniversary grand prix': '70周年記念GP',
+  'tuscan grand prix': 'トスカーナGP',
+  'eifel grand prix': 'アイフェルGP',
+  'sakhir grand prix': 'サヒールGP',
+  'madrid grand prix': 'マドリードGP',
+  'malaysian grand prix': 'マレーシアGP',
+};
+
+export function toJapaneseGpName(name: string): string {
+  if (!name) return '';
+  const lower = name.trim().toLowerCase();
+  if (JAPANESE_GP_NAMES_MAP[lower]) return JAPANESE_GP_NAMES_MAP[lower];
+  return name.replace(/\s+Grand\s+Prix/i, 'GP');
+}
+
+export function formatArchiveDates(isoDate: string): string {
+  const m = isoDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return isoDate;
+  const [, y, mo, d] = m;
+  return `${y}年 ${parseInt(mo, 10)}月${parseInt(d, 10)}日`;
+}
+
+/**
+ * Official F1 Sprint Rounds by Season (Ground Truth via FIA & Ergast/Jolpica)
+ * - 2018-2020: 0 Sprints (Sprint format introduced in 2021)
+ * - 2021: 3 Sprints (R10 Silverstone, R14 Monza, R19 Interlagos)
+ * - 2022: 3 Sprints (R4 Imola, R11 Red Bull Ring, R21 Interlagos)
+ * - 2023: 6 Sprints (R4 Baku, R9 Red Bull Ring, R12 Spa, R17 Lusail, R18 COTA, R20 Interlagos)
+ * - 2024: 6 Sprints (R5 Shanghai, R6 Miami, R11 Red Bull Ring, R19 COTA, R21 Interlagos, R23 Lusail)
+ * - 2025: 6 Sprints (R2 Shanghai, R6 Miami, R13 Spa, R19 COTA, R21 Interlagos, R23 Lusail)
+ * - 2026: 6 Sprints (R2 Shanghai, R4 Miami, R5 Montreal, R9 Silverstone, R12 Zandvoort, R17 Marina Bay)
+ */
+export const HISTORICAL_SPRINT_ROUNDS: Record<number, number[]> = {
+  2021: [10, 14, 19],
+  2022: [4, 11, 21],
+  2023: [4, 9, 12, 17, 18, 20],
+  2024: [5, 6, 11, 19, 21, 23],
+  2025: [2, 6, 13, 19, 21, 23],
+  2026: [2, 4, 5, 9, 12, 17],
+};
+
 export function getSeasonCalendar(year: SeasonYear): RaceWeekendSchedule[] {
-  return year === '2026' ? SEASON_2026_CALENDAR : SEASON_2025_CALENDAR;
+  if (year === '2026') return SEASON_2026_CALENDAR;
+  if (year === '2025') return SEASON_2025_CALENDAR;
+  const numYear = parseInt(year, 10);
+  const sprintRounds = HISTORICAL_SPRINT_ROUNDS[numYear] || [];
+  const archive = getHistoricalArchive(numYear);
+  if (archive) {
+    return archive.calendar.map((c) => {
+      const isSprint = sprintRounds.includes(c.round);
+      return {
+        round: c.round,
+        gpName: toJapaneseGpName(c.raceName),
+        country: c.country,
+        flag: c.flag,
+        circuitName: c.circuitName,
+        city: c.city,
+        dates: formatArchiveDates(c.date),
+        targetDateUtc: `${c.date}T12:00:00Z`,
+        isSprint,
+        lengthKm: 5.0,
+        laps: 50,
+        pirelliCompounds: 'Pirelli F1 Archive',
+        scheduleJst: isSprint ? [
+          { session: 'スプリント予選', dayTime: `${c.date} (公式スプリント予選)` },
+          { session: 'スプリント決勝', dayTime: `${c.date} (公式スプリント)` },
+          { session: '本選予選', dayTime: `${c.date} (公式予選)` },
+          { session: '決勝', dayTime: `${c.date} (公式決勝)` },
+        ] : [
+          { session: '予選', dayTime: `${c.date} (公式予選)` },
+          { session: '決勝', dayTime: `${c.date} (公式決勝)` },
+        ],
+        winnerNote: c.winner ? `🏆 優勝: ${c.winner.driverName} (${c.winner.constructorName})` : undefined,
+      };
+    });
+  }
+  return SEASON_2025_CALENDAR;
 }
 
 export function getSeasonGrid(year: SeasonYear): GridTeam[] {
-  return year === '2026' ? GRID_2026_TEAMS : GRID_2025_TEAMS;
+  if (year === '2026') return GRID_2026_TEAMS;
+  return GRID_2025_TEAMS;
 }
 
 export function getDriverStandings(year: SeasonYear): DriverStanding[] {
-  return year === '2026' ? DRIVER_STANDINGS_2026 : DRIVER_STANDINGS_2025;
+  if (year === '2026') return DRIVER_STANDINGS_2026;
+  if (year === '2025') return DRIVER_STANDINGS_2025;
+  if (year === '2024') return DRIVER_STANDINGS_2024;
+  const archive = getHistoricalArchive(parseInt(year, 10));
+  if (archive) {
+    return archive.driverStandings.map((d) => ({
+      position: d.position,
+      driverCode: d.driverCode,
+      driverName: d.driverName,
+      team: d.team,
+      teamColor: resolveHistoricalTeamColor(d.team),
+      points: d.points,
+      wins: d.wins,
+      podiums: 0,
+    }));
+  }
+  return DRIVER_STANDINGS_2025;
 }
 
 export function getConstructorStandings(year: SeasonYear): ConstructorStanding[] {
-  return year === '2026' ? CONSTRUCTOR_STANDINGS_2026 : CONSTRUCTOR_STANDINGS_2025;
+  if (year === '2026') return CONSTRUCTOR_STANDINGS_2026;
+  if (year === '2025') return CONSTRUCTOR_STANDINGS_2025;
+  if (year === '2024') return CONSTRUCTOR_STANDINGS_2024;
+  const archive = getHistoricalArchive(parseInt(year, 10));
+  if (archive) {
+    return archive.constructorStandings.map((c) => ({
+      position: c.position,
+      teamName: c.teamName,
+      teamColor: resolveHistoricalTeamColor(c.teamName),
+      powerUnit: 'Historical PU',
+      points: c.points,
+      wins: c.wins,
+    }));
+  }
+  return CONSTRUCTOR_STANDINGS_2025;
 }
 
 /**
@@ -1697,3 +1870,4 @@ export function isSeasonConcluded(calendar: RaceWeekendSchedule[]): boolean {
   const now = new Date().getTime();
   return calendar.every((r) => new Date(r.targetDateUtc).getTime() <= now);
 }
+

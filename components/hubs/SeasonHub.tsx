@@ -24,12 +24,16 @@ import {
   getNextUpcomingRound,
   isSeasonConcluded,
   type RaceWeekendSchedule,
+  toJapaneseGpName,
 } from '@/data/f1SeasonData';
 import { getWeatherByRound, getCircuitWeather } from '@/data/f1WeatherData';
 import { getGrandPrixReportByRound, getGrandPrixReportByCircuitId } from '@/data/f1GrandPrixReportsData';
 import F1BroadcastTrackGuide from '@/components/circuits/F1BroadcastTrackGuide';
 import { useCountdown } from '@/lib/useCountdown';
 import { getCircuitTimezoneInfo, formatDualSessionTime } from '@/lib/circuitTimezones';
+import { useCurrentJstClock, isWeekendInProgress } from '@/lib/systemClock';
+import { getSessionClassification } from '@/lib/sessionResultsService';
+import { getHistoricalArchive } from '@/data/f1HistoricalArchivesData';
 import SessionResultsModal from './SessionResultsModal';
 
 interface SeasonHubProps {
@@ -71,6 +75,42 @@ export function getCircuitIdForRace(race: RaceWeekendSchedule): string {
   if (name.includes('アブダビ') || name.includes('ヤス') || name.includes('yas')) return 'yas-marina';
   if (name.includes('セパン') || name.includes('sepang') || name.includes('マレーシア')) return 'sepang';
   return 'suzuka';
+}
+
+export const ENGLISH_CIRCUITS_MAP: Record<string, string> = {
+  'albert-park': 'Albert Park Circuit',
+  'shanghai': 'Shanghai International Circuit',
+  'suzuka': 'Suzuka International Racing Course',
+  'bahrain-international': 'Bahrain International Circuit',
+  'jeddah': 'Jeddah Corniche Circuit',
+  'miami': 'Miami International Autodrome',
+  'imola': 'Autodromo Enzo e Dino Ferrari',
+  'circuit-de-monaco': 'Circuit de Monaco',
+  'catalunya': 'Circuit de Barcelona-Catalunya',
+  'villeneuve': 'Circuit Gilles-Villeneuve',
+  'redbull-ring': 'Red Bull Ring',
+  'silverstone': 'Silverstone Circuit',
+  'spa-francorchamps': 'Circuit de Spa-Francorchamps',
+  'hungaroring': 'Hungaroring',
+  'zandvoort': 'Circuit Zandvoort',
+  'monza': 'Autodromo Nazionale Monza',
+  'baku': 'Baku City Circuit',
+  'singapore': 'Marina Bay Street Circuit',
+  'cota': 'Circuit of the Americas',
+  'mexico': 'Autódromo Hermanos Rodríguez',
+  'interlagos': 'Autódromo José Carlos Pace',
+  'las-vegas': 'Las Vegas Strip Circuit',
+  'losail': 'Lusail International Circuit',
+  'yas-marina': 'Yas Marina Circuit',
+  'madrid': 'Madring (IFEMA Madrid Circuit)',
+  'sepang': 'Sepang International Circuit',
+};
+
+export function getDisplayCircuitName(race: RaceWeekendSchedule): string {
+  const hasJapanese = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/.test(race.circuitName);
+  if (!hasJapanese) return race.circuitName;
+  const id = getCircuitIdForRace(race);
+  return ENGLISH_CIRCUITS_MAP[id] || race.circuitName;
 }
 
 export function getTeamIdFromName(name: string): string {
@@ -221,6 +261,18 @@ const RaceCountdownCard = React.memo(function RaceCountdownCard({
 
 type MainTab = 'calendar' | 'track_analysis' | 'standings' | 'grid';
 
+export const SEASON_OPTIONS: { value: SeasonYear; label: string }[] = [
+  { value: '2026', label: '2026年 (現行シーズン / 全23戦)' },
+  { value: '2025', label: '2025年 (🏆 L.ノリス / McLaren)' },
+  { value: '2024', label: '2024年 (🏆 M.フェルスタッペン / McLaren WCC)' },
+  { value: '2023', label: '2023年 (🏆 M.フェルスタッペン / Red Bull)' },
+  { value: '2022', label: '2022年 (🏆 M.フェルスタッペン / Red Bull)' },
+  { value: '2021', label: '2021年 (🏆 M.フェルスタッペン / Mercedes WCC)' },
+  { value: '2020', label: '2020年 (🏆 L.ハミルトン / Mercedes)' },
+  { value: '2019', label: '2019年 (🏆 L.ハミルトン / Mercedes)' },
+  { value: '2018', label: '2018年 (🏆 L.ハミルトン / Mercedes)' },
+];
+
 export default function SeasonHub({
   onNavigateToTelemetry,
   onNavigateToTyres,
@@ -230,6 +282,9 @@ export default function SeasonHub({
   onNavigateToDriver,
   onNavigateToTeam,
 }: SeasonHubProps) {
+  // Live JST Clock (Telemetry System Reference)
+  const jstClock = useCurrentJstClock();
+
   // Season State: Defaults to current active season (2026)
   const [selectedSeason, setSelectedSeason] = useState<SeasonYear>(() => getActiveSeasonYear());
   const [activeTab, setActiveTab] = useState<MainTab>('calendar');
@@ -276,6 +331,7 @@ export default function SeasonHub({
             targetDateUtc: apiMatch.targetDateUtc || localRace.targetDateUtc,
             scheduleJst: apiMatch.scheduleJst && apiMatch.scheduleJst.length > 0 ? apiMatch.scheduleJst : localRace.scheduleJst,
             isCancelled: apiMatch.isCancelled ?? localRace.isCancelled ?? false,
+            isSprint: apiMatch.isSprint ?? localRace.isSprint,
           };
         });
 
@@ -340,6 +396,19 @@ export default function SeasonHub({
     return getGrandPrixReportByCircuitId(selectedCircuitId) || getGrandPrixReportByRound(selectedRound);
   }, [selectedCircuitId, selectedRound]);
 
+  // Authentic 2026 Race & Quali Classifications
+  const raceClassification2026 = useMemo(() => {
+    if (selectedSeason !== '2026') return null;
+    const res = getSessionClassification('2026', selectedRace.round, '決勝', 101.5, selectedCircuitId);
+    return res.status === 'completed' && res.results.length > 0 ? res : null;
+  }, [selectedSeason, selectedRace.round, selectedCircuitId]);
+
+  const qualiClassification2026 = useMemo(() => {
+    if (selectedSeason !== '2026') return null;
+    const res = getSessionClassification('2026', selectedRace.round, '予選', 101.5, selectedCircuitId);
+    return res.status === 'completed' && res.results.length > 0 ? res : null;
+  }, [selectedSeason, selectedRace.round, selectedCircuitId]);
+
   // Filtered calendar
   const filteredCalendar = useMemo(() => {
     if (calendarFilter === 'sprint') {
@@ -358,58 +427,64 @@ export default function SeasonHub({
           ───────────────────────────────────────────────────────────── */}
       <div className="p-2.5 sm:p-3 rounded-2xl bg-gradient-to-r from-slate-900/95 via-slate-950/90 to-slate-900/95 border border-white/10 shadow-lg backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-2.5">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+          <div className="flex items-center gap-2.5">
+            <label htmlFor="season-select-dropdown" className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 cursor-pointer">
               <span>📅</span>
               <span>シーズン選択:</span>
-            </span>
-            <div className="inline-flex items-center p-1 bg-black/50 rounded-xl border border-white/10">
-              <button
-                type="button"
-                onClick={() => handleSeasonChange('2026')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-2 ${
-                  selectedSeason === '2026'
-                    ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
-                    : 'text-slate-400 hover:text-white'
-                }`}
+            </label>
+            <div className="relative inline-flex items-center">
+              <select
+                id="season-select-dropdown"
+                value={selectedSeason}
+                onChange={(e) => handleSeasonChange(e.target.value as SeasonYear)}
+                className="appearance-none bg-slate-900/90 hover:bg-slate-850 text-white font-racing font-bold text-xs sm:text-sm pl-3 pr-8 py-1.5 sm:py-2 rounded-xl border border-white/20 hover:border-red-500/60 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 focus:outline-none transition-all cursor-pointer shadow-md shadow-black/40"
               >
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
-                </span>
-                <span>2026年 (現行シーズン)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSeasonChange('2025')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 ${
-                  selectedSeason === '2025'
-                    ? 'bg-red-600 text-white shadow-md shadow-red-600/30'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <span>🏛️</span>
-                <span>2025年 (アーカイブ)</span>
-              </button>
+                {SEASON_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value} className="bg-slate-950 text-slate-200 py-1 font-mono">
+                    {opt.value === '2026' ? '🟢 ' : '🏛️ '}
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">
+                ▼
+              </div>
             </div>
+            {selectedSeason === '2026' ? (
+              <span className="relative flex h-2.5 w-2.5 ml-0.5" title="2026年シーズン進行中">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
+              </span>
+            ) : (
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 hidden sm:inline">
+                公式アーカイブ確定
+              </span>
+            )}
           </div>
         </div>
 
         {/* Dynamic Status & Info Trigger */}
         <div className="flex items-center gap-2 justify-between md:justify-end">
           {selectedSeason === '2026' ? (
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 font-mono text-[11px] shadow-sm">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-300 font-mono text-[11px] shadow-sm flex-wrap">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
               <span className="truncate">
                 {seasonEnded
-                  ? '2026シーズン全24戦終了 / 王者決定'
+                  ? '2026シーズン全23戦終了 / 王者決定'
                   : `第${selectedRace.round}戦 ${selectedRace.gpName} (${selectedRace.circuitName})`}
               </span>
+              {jstClock.formattedCompact && (
+                <span className="text-slate-400 border-l border-white/10 pl-2 text-[10px] hidden sm:inline">
+                  ⏱️ JST {jstClock.formattedCompact}
+                </span>
+              )}
             </div>
           ) : (
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 border border-white/10 text-slate-300 font-mono text-[11px]">
               <span>🏆</span>
-              <span>2025シーズン全24戦終了 / マクラーレン WCC制覇</span>
+              <span>
+                {selectedSeason}シーズン全{activeCalendar.length}戦終了 / {activeConstructorStandings[0]?.teamName} WCC制覇
+              </span>
             </div>
           )}
 
@@ -498,9 +573,9 @@ export default function SeasonHub({
                 <span>{selectedSeason}年 第{selectedRace.round}戦 / 全{activeCalendar.length}戦</span>
               </span>
               {selectedRace.isSprint && (
-                <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1">
-                  <span>⚡</span>
-                  <span>SPRINT WEEKEND</span>
+                <span className="px-2.5 py-1 rounded-full text-xs font-racing font-bold bg-gradient-to-r from-violet-950/80 via-slate-900 to-cyan-950/80 text-cyan-300 border border-cyan-400/50 shadow-md shadow-cyan-950/40 flex items-center gap-1.5">
+                  <span className="text-cyan-400 text-sm animate-pulse">⚡</span>
+                  <span className="tracking-wider">SPRINT WEEKEND</span>
                 </span>
               )}
               <span className="px-2.5 py-1 rounded-full text-xs font-mono text-slate-300 bg-white/5 border border-white/10 flex items-center gap-1.5">
@@ -519,10 +594,10 @@ export default function SeasonHub({
               <div className="min-w-0">
                 <div className="flex items-baseline gap-2.5 flex-wrap">
                   <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight leading-tight">
-                    {selectedRace.gpName}
+                    {toJapaneseGpName(selectedRace.gpName)}
                   </h1>
                   <span className="font-mono text-xs font-semibold text-slate-400 tracking-wider uppercase">
-                    {selectedRace.circuitName}
+                    {getDisplayCircuitName(selectedRace)}
                   </span>
                 </div>
               </div>
@@ -631,6 +706,10 @@ export default function SeasonHub({
                               <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-red-600 text-white font-bold tracking-wider shrink-0">
                                 FINAL
                               </span>
+                            ) : s.session.includes('スプリント') ? (
+                              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-gradient-to-r from-violet-900/60 to-cyan-900/60 text-cyan-300 border border-cyan-500/30 font-bold shrink-0">
+                                SPRINT
+                              </span>
                             ) : s.session.includes('予選') ? (
                               <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-white/10 text-slate-300 font-medium shrink-0">
                                 QUALI
@@ -716,14 +795,46 @@ export default function SeasonHub({
 
           {/* Right Column: Countdown Cockpit & Action Suite */}
           <div className="flex flex-col justify-between gap-3 w-full lg:w-[320px] shrink-0">
-            <RaceCountdownCard
-              targetDateUtc={selectedRace.targetDateUtc}
-              dates={selectedRace.dates}
-              circuitId={selectedCircuitId}
-              country={selectedRace.country}
-              city={selectedRace.city}
-              gpName={selectedRace.gpName}
-            />
+            {selectedSeason === '2026' ? (
+              <RaceCountdownCard
+                targetDateUtc={selectedRace.targetDateUtc}
+                dates={selectedRace.dates}
+                circuitId={selectedCircuitId}
+                country={selectedRace.country}
+                city={selectedRace.city}
+                gpName={selectedRace.gpName}
+              />
+            ) : (
+              <div className="w-full bg-slate-950/90 p-4 rounded-2xl border border-white/10 shadow-lg relative overflow-hidden backdrop-blur-md flex flex-col justify-between min-h-[170px]">
+                <div>
+                  <div className="text-[10px] font-mono font-bold text-amber-400 mb-2 flex items-center justify-between uppercase tracking-wider">
+                    <span className="flex items-center gap-1.5">
+                      <span>🏆</span>
+                      <span>{selectedSeason}年 第{selectedRace.round}戦 公式リザルト</span>
+                    </span>
+                    <span className="px-1.5 py-0.5 rounded text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                      アーカイブ確定
+                    </span>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-900/90 border border-white/[0.08] shadow-inner space-y-1.5">
+                    <div className="text-[10px] text-slate-400 font-sans font-semibold uppercase tracking-wider">
+                      決勝ウィナー (Race Winner)
+                    </div>
+                    <div className="text-sm sm:text-base font-black font-racing text-white flex items-center gap-2">
+                      <span className="text-base sm:text-lg">👑</span>
+                      <span className="truncate">{selectedRace.winnerNote || '公式アーカイブ'}</span>
+                    </div>
+                    <div className="text-[10px] font-mono text-slate-400">
+                      開催日: {selectedRace.dates} | {selectedRace.circuitName}
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-2.5 pt-2 border-t border-white/[0.06] text-[10px] text-slate-400 font-mono flex items-center justify-between">
+                  <span>🏛️ FIA Official Archive</span>
+                  <span className="text-emerald-400 font-bold">公式記録保存済</span>
+                </div>
+              </div>
+            )}
 
             {/* Quick Actions Grid (2x2 Balanced Suite) */}
             <div className="grid grid-cols-2 gap-2 w-full">
@@ -879,13 +990,13 @@ export default function SeasonHub({
               </button>
               <button
                 onClick={() => setCalendarFilter('sprint')}
-                className={`px-2.5 py-1 rounded-md text-xs flex items-center gap-1 ${
+                className={`px-2.5 py-1 rounded-md text-xs flex items-center gap-1 transition-all cursor-pointer ${
                   calendarFilter === 'sprint'
-                    ? 'bg-amber-600 text-white font-bold'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-gradient-to-r from-violet-600 via-indigo-600 to-cyan-500 text-white font-bold shadow-md shadow-cyan-950/50 border border-cyan-400/40'
+                    : 'text-slate-400 hover:text-cyan-300 hover:bg-cyan-950/20'
                 }`}
               >
-                <span>⚡</span>
+                <span className="text-cyan-400">⚡</span>
                 <span>スプリント戦のみ ({activeCalendar.filter(r => r.isSprint).length})</span>
               </button>
             </div>
@@ -894,7 +1005,9 @@ export default function SeasonHub({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5">
             {filteredCalendar.map((gp) => {
               const isSelected = gp.round === selectedRound;
-              const isGpPast = new Date(gp.targetDateUtc).getTime() <= new Date().getTime();
+              const refTime = jstClock.now?.getTime() ?? Date.now();
+              const isGpPast = new Date(gp.targetDateUtc).getTime() <= refTime;
+              const isGpInProgress = !gp.isCancelled && isWeekendInProgress(gp.targetDateUtc, refTime);
 
               return (
                 <div
@@ -919,6 +1032,10 @@ export default function SeasonHub({
                           <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-red-500/20 text-red-300 border border-red-500/30">
                             中止
                           </span>
+                        ) : isGpInProgress ? (
+                          <span suppressHydrationWarning className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse font-racing">
+                            進行中 (今夜決勝)
+                          </span>
                         ) : isGpPast ? (
                           <span suppressHydrationWarning className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-800 text-slate-400 border border-white/10">
                             終了
@@ -931,8 +1048,9 @@ export default function SeasonHub({
                       </div>
                       <div className="flex items-center gap-1">
                         {gp.isSprint && (
-                          <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 font-racing">
-                            ⚡ SPRINT
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-gradient-to-r from-violet-950/90 via-slate-900 to-cyan-950/90 text-cyan-300 border border-cyan-400/50 shadow-sm shadow-cyan-950/30 font-racing flex items-center gap-1 tracking-wider">
+                            <span className="text-[10px] text-cyan-400">⚡</span>
+                            <span>SPRINT</span>
                           </span>
                         )}
                         <span className="text-sm sm:text-base">{gp.flag}</span>
@@ -946,9 +1064,11 @@ export default function SeasonHub({
                           isSelected ? 'text-red-300' : 'text-white group-hover:text-red-300'
                         }`}
                       >
-                        {gp.gpName}
+                        {toJapaneseGpName(gp.gpName)}
                       </h3>
-                      <p className="text-[10px] sm:text-[11px] text-slate-400 truncate mt-0.5">{gp.circuitName}</p>
+                      <p className="text-[10px] sm:text-[11px] text-slate-400 font-mono truncate mt-0.5">
+                        {getDisplayCircuitName(gp)}
+                      </p>
                       {gp.replacementNote && (
                         <p className="text-[9px] text-amber-400 mt-0.5 truncate">{gp.replacementNote}</p>
                       )}
@@ -958,9 +1078,6 @@ export default function SeasonHub({
                   <div className="mt-2 pt-1.5 border-t border-white/5 flex items-center justify-between text-[11px] font-mono">
                     <span className="text-slate-400">{gp.dates.replace(/^202[0-9]年\s*/, '')}</span>
                     <div className="flex items-center gap-1.5">
-                      {gp.pirelliCompounds && (
-                        <span className="text-[10px] text-amber-400/90 font-semibold">{gp.pirelliCompounds}</span>
-                      )}
                       {onNavigateToCircuit && !gp.isCancelled && (
                         <button
                           type="button"
@@ -969,7 +1086,7 @@ export default function SeasonHub({
                             onNavigateToCircuit(getCircuitIdForRace(gp));
                           }}
                           className="px-1.5 py-0.5 rounded bg-sky-950/60 hover:bg-sky-900 border border-sky-500/30 text-sky-300 hover:text-white text-[10px] font-racing transition-colors cursor-pointer"
-                          title={`${gp.circuitName} の大百科コース解剖を開く`}
+                          title={`${getDisplayCircuitName(gp)} の大百科コース解剖を開く`}
                         >
                           🏁 解剖
                         </button>
@@ -997,7 +1114,7 @@ export default function SeasonHub({
               <span className="text-2xl">{selectedRace.flag}</span>
               <div>
                 <h3 className="font-racing font-bold text-sm sm:text-base text-white flex items-center gap-2">
-                  <span>第{selectedRace.round}戦 {selectedRace.gpName}</span>
+                  <span>第{selectedRace.round}戦 {toJapaneseGpName(selectedRace.gpName)}</span>
                   <span className="text-xs font-mono text-slate-400 font-normal">({selectedRace.circuitName})</span>
                 </h3>
                 <p className="text-xs text-slate-400 font-mono mt-0.5">
@@ -1029,7 +1146,7 @@ export default function SeasonHub({
                   <span className="text-xl">🏆</span>
                   <div>
                     <h3 className="text-base md:text-lg font-racing font-bold text-white tracking-wide">
-                      {selectedRace.gpName} : 戦術エンジニアリングプロファイル ＆ コースレコード
+                      {toJapaneseGpName(selectedRace.gpName)} : 戦術エンジニアリングプロファイル ＆ コースレコード
                     </h3>
                     <p className="text-xs text-slate-400">
                       勝敗を分けるピット戦略、公式コースレコード、および今季のタイヤ・セーフティカー戦術指標
@@ -1044,45 +1161,124 @@ export default function SeasonHub({
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
                 {/* 1. Track Record Podium Profile */}
                 <div className="space-y-3 bg-slate-950/60 p-4 rounded-xl border border-white/5">
-                  <div className="text-xs font-mono font-bold text-amber-400 flex items-center gap-1.5">
-                    <span>🥇</span>
-                    <span>直近表彰台データ &amp; 実績</span>
+                  <div className="text-xs font-mono font-bold text-amber-400 flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <span>🥇</span>
+                      <span>
+                        {raceClassification2026
+                          ? `2026年 公式決勝表彰台 (第${selectedRace.round}戦)`
+                          : selectedRace.round === 15 && selectedSeason === '2026'
+                          ? `2026年 予選結果 (今夜20:00決勝)`
+                          : `歴代実績 (2024年大会データ)`}
+                      </span>
+                    </span>
+                    {raceClassification2026 && (
+                      <span className="px-1.5 py-0.2 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        2026 VERIFIED
+                      </span>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    {selectedReport.result2024.podium.map((p, idx) => (
-                      <div
-                        key={p.code}
-                        className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.03] border border-white/5"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
-                            idx === 0 ? 'bg-amber-400 text-slate-950' : idx === 1 ? 'bg-slate-300 text-slate-950' : 'bg-amber-700 text-white'
-                          }`}>
-                            {idx + 1}
-                          </span>
-                          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.teamColor }} />
-                          <span className="font-racing font-bold text-white text-xs">{p.code}</span>
-                          <span className="text-xs text-slate-300">{p.name}</span>
+                    {raceClassification2026 ? (
+                      raceClassification2026.results.slice(0, 3).map((p, idx) => (
+                        <div
+                          key={p.driverCode}
+                          className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.03] border border-white/5"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                              idx === 0 ? 'bg-amber-400 text-slate-950' : idx === 1 ? 'bg-slate-300 text-slate-950' : 'bg-amber-700 text-white'
+                            }`}>
+                              {idx + 1}
+                            </span>
+                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.teamColor }} />
+                            <span className="font-racing font-bold text-white text-xs">{p.driverCode}</span>
+                            <span className="text-xs text-slate-300">{p.driverName.split(' ')[0]}</span>
+                          </div>
+                          <div className="text-right text-[10px] font-mono text-slate-400">
+                            <span>{p.teamName}</span>
+                            <span className="ml-2 text-emerald-400 font-bold">{p.gapToLeader}</span>
+                          </div>
                         </div>
-                        <div className="text-right text-[10px] font-mono text-slate-400">
-                          <span>{p.team}</span>
-                          <span className="ml-2 text-slate-500">P{p.grid}発 / {p.pitStops}停</span>
+                      ))
+                    ) : selectedRace.round === 15 && selectedSeason === '2026' && qualiClassification2026 ? (
+                      qualiClassification2026.results.slice(0, 3).map((p, idx) => (
+                        <div
+                          key={p.driverCode}
+                          className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.03] border border-white/5"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                              idx === 0 ? 'bg-amber-400 text-slate-950' : idx === 1 ? 'bg-slate-300 text-slate-950' : 'bg-amber-700 text-white'
+                            }`}>
+                              {idx === 0 ? 'P' : idx + 1}
+                            </span>
+                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.teamColor }} />
+                            <span className="font-racing font-bold text-white text-xs">{p.driverCode}</span>
+                            <span className="text-xs text-slate-300">{p.driverName.split(' ')[0]}</span>
+                          </div>
+                          <div className="text-right text-[10px] font-mono text-slate-400">
+                            <span>{p.teamName}</span>
+                            <span className="ml-2 text-amber-400 font-bold">{p.bestLapTime}</span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      selectedReport.result2024.podium.map((p, idx) => (
+                        <div
+                          key={p.code}
+                          className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.03] border border-white/5"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
+                              idx === 0 ? 'bg-amber-400 text-slate-950' : idx === 1 ? 'bg-slate-300 text-slate-950' : 'bg-amber-700 text-white'
+                            }`}>
+                              {idx + 1}
+                            </span>
+                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: p.teamColor }} />
+                            <span className="font-racing font-bold text-white text-xs">{p.code}</span>
+                            <span className="text-xs text-slate-300">{p.name}</span>
+                          </div>
+                          <div className="text-right text-[10px] font-mono text-slate-400">
+                            <span>{p.team}</span>
+                            <span className="ml-2 text-slate-500">P{p.grid}発 / {p.pitStops}停</span>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
 
                   {/* Pole & FL */}
                   <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/5 text-xs font-mono">
                     <div className="bg-slate-900/80 p-2 rounded-lg">
                       <div className="text-[10px] text-slate-400">⏱️ ポールポジション</div>
-                      <div className="font-bold text-white text-xs mt-0.5">{selectedReport.result2024.polePosition.code}</div>
-                      <div className="text-amber-400 text-[11px]">{selectedReport.result2024.polePosition.time}</div>
+                      <div className="font-bold text-white text-xs mt-0.5">
+                        {qualiClassification2026?.polePosition
+                          ? qualiClassification2026.polePosition.driverCode
+                          : selectedReport.result2024.polePosition.code}
+                      </div>
+                      <div className="text-amber-400 text-[11px]">
+                        {qualiClassification2026?.polePosition
+                          ? qualiClassification2026.polePosition.time
+                          : selectedReport.result2024.polePosition.time}
+                      </div>
                     </div>
                     <div className="bg-slate-900/80 p-2 rounded-lg">
                       <div className="text-[10px] text-slate-400">⚡ 最速ラップ (FL)</div>
-                      <div className="font-bold text-white text-xs mt-0.5">{selectedReport.result2024.fastestLap.code} (L{selectedReport.result2024.fastestLap.lap})</div>
-                      <div className="text-purple-400 text-[11px]">{selectedReport.result2024.fastestLap.time}</div>
+                      <div className="font-bold text-white text-xs mt-0.5">
+                        {raceClassification2026?.fastestLap
+                          ? `${raceClassification2026.fastestLap.driverCode} (L${raceClassification2026.fastestLap.lap})`
+                          : selectedRace.round === 15 && selectedSeason === '2026'
+                          ? '今夜決勝で決定'
+                          : `${selectedReport.result2024.fastestLap.code} (L${selectedReport.result2024.fastestLap.lap})`}
+                      </div>
+                      <div className="text-purple-400 text-[11px]">
+                        {raceClassification2026?.fastestLap
+                          ? raceClassification2026.fastestLap.time
+                          : selectedRace.round === 15 && selectedSeason === '2026'
+                          ? 'FP3: VER 1:43.922'
+                          : selectedReport.result2024.fastestLap.time}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1095,15 +1291,27 @@ export default function SeasonHub({
                       <span>勝敗を分けた決定的戦略 &amp; ターニングポイント</span>
                     </div>
                     <div className="bg-slate-900/80 p-3 rounded-lg border border-emerald-500/20">
-                      <div className="text-[10px] font-bold text-emerald-300 mb-1">勝者のピット戦略:</div>
+                      <div className="text-[10px] font-bold text-emerald-300 mb-1">
+                        {raceClassification2026 ? '公式ピット・タイヤ戦略:' : '戦略展望 &amp; ピット予測:'}
+                      </div>
                       <p className="text-xs text-slate-200 leading-relaxed">
-                        {selectedReport.result2024.winningStrategy}
+                        {raceClassification2026?.winningStrategy
+                          ? raceClassification2026.winningStrategy
+                          : selectedRace.round === 15 && selectedSeason === '2026'
+                          ? 'バクー市街地コース特有の長い全開ストレートと狭隘旧市街セクション。ポール獲得のラッセル（メルセデス）に対し、ルクレール（フェラーリ）とピアストリ（マクラーレン）が挑む今夜20:00の決勝レース。'
+                          : selectedReport.result2024.winningStrategy}
                       </p>
                     </div>
                     <div className="bg-slate-900/80 p-3 rounded-lg border border-red-500/20">
-                      <div className="text-[10px] font-bold text-red-300 mb-1">レースの決定的ドラマ:</div>
+                      <div className="text-[10px] font-bold text-red-300 mb-1">
+                        {raceClassification2026 ? '2026年レースの決定的ドラマ:' : 'コースの決定的ドラマ:'}
+                      </div>
                       <p className="text-xs text-slate-300 leading-relaxed">
-                        {selectedReport.result2024.strategicTurningPoint}
+                        {raceClassification2026
+                          ? `第${selectedRace.round}戦 ${selectedRace.gpName}。11チーム・22名体制の新PU規定バトル。勝者${raceClassification2026.results[0].driverName}が圧倒的な走りを披露。`
+                          : selectedRace.round === 15 && selectedSeason === '2026'
+                          ? '金曜予選Q3ラストアタックでジョージ・ラッセルが1分42秒526の驚異的タイムを叩き出しポールポジションを獲得。今夜の決勝はセーフティカー出動率も極めて高く大乱戦が予想されます。'
+                          : selectedReport.result2024.strategicTurningPoint}
                       </p>
                     </div>
                   </div>
@@ -1179,18 +1387,18 @@ export default function SeasonHub({
                 <span>🏆</span>
                 <span>
                   {selectedSeason === '2026'
-                    ? '2026シーズン 想定シミュレーション・暫定選手権 (※シーズン未終了・タイトル未確定)'
-                    : '2025シーズン 年間確定選手権ランキング (全24戦終了 / マクラーレンWCC)'}
+                    ? '2026シーズン 第14戦マドリード終了時点 公式ランキング (全23戦中14戦終了 / 第15戦バクー進行中)'
+                    : `${selectedSeason}シーズン 年間確定選手権ランキング (全${activeCalendar.length}戦終了 / ${getHistoricalArchive(selectedSeason)?.championConstructor.name || ''}WCC)`}
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 mt-0.5">
                 {selectedSeason === '2026'
-                  ? '新PU規定元年。2026年シーズンは未終了のため本ランキングはシミュレーション想定値です（全11チーム・22名体制）。世界王者は未確定です。'
-                  : 'ノリスが悲願の初戴冠、マクラーレンが1998年以来となるコンストラクターズタイトルを奪還'}
+                  ? '新PU規定元年。全11チーム・22名体制による2026年公式選手権ランキング（第14戦終了時点）。メルセデスのキミ・アントネッリが292ptで首位。'
+                  : getHistoricalArchive(selectedSeason)?.seasonSummary || `${selectedSeason}年公式年間アーカイブ`}
               </p>
             </div>
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-950/40 border border-red-500/30 text-red-300 font-mono text-[11px] self-start sm:self-auto shadow-sm">
-              <span>{selectedSeason === '2026' ? '🏁 2026シミュレーション (タイトル未確定)' : '🏁 2025確定 WDC ＆ WCC ダッシュボード'}</span>
+              <span>{selectedSeason === '2026' ? '🏁 2026 公式WDC ＆ WCC ランキング (第14戦終了時点)' : `🏛️ ${selectedSeason}年確定 WDC ＆ WCC アーカイブ`}</span>
             </div>
           </div>
 
@@ -1410,31 +1618,31 @@ export default function SeasonHub({
                       </h4>
                     </div>
                     <span className="text-[10px] font-mono text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
-                      {selectedSeason === '2026' ? '2026想定（タイトル未確定）' : '2025確定結果'}
+                      {selectedSeason === '2026' ? '2026 第14戦終了時点' : `${selectedSeason}年確定結果`}
                     </span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 text-xs font-mono">
                     <div className="p-2 rounded-lg bg-slate-950/60 border border-white/5 space-y-1">
                       <span className="text-[10px] text-slate-400 block font-sans">
-                        {selectedSeason === '2026' ? '🏎️ WDC 想定首位マージン' : '🏎️ 2025 WDC 王者'}
+                        {selectedSeason === '2026' ? '🏎️ WDC リードマージン' : `🏎️ ${selectedSeason} WDC 王者`}
                       </span>
                       <div className="font-bold text-white text-xs truncate">
                         {activeDriverStandings[0]?.driverName.split(' ')[0]}
                       </div>
                       <div className="text-emerald-400 text-[11px] font-bold">
-                        +{activeDriverStandings[0]?.points - (activeDriverStandings[1]?.points || 0)} pt <span className="text-[9px] text-slate-400 font-normal">{selectedSeason === '2026' ? 'リード (未確定)' : '差で戴冠'}</span>
+                        +{activeDriverStandings[0]?.points - (activeDriverStandings[1]?.points || 0)} pt <span className="text-[9px] text-slate-400 font-normal">{selectedSeason === '2026' ? 'リード' : '差で戴冠'}</span>
                       </div>
                     </div>
                     <div className="p-2 rounded-lg bg-slate-950/60 border border-white/5 space-y-1">
                       <span className="text-[10px] text-slate-400 block font-sans">
-                        {selectedSeason === '2026' ? '🏆 WCC 想定首位マージン' : '🏆 2025 WCC 王者'}
+                        {selectedSeason === '2026' ? '🏆 WCC リードマージン' : `🏆 ${selectedSeason} WCC 王者`}
                       </span>
                       <div className="font-bold text-white text-xs truncate">
                         {activeConstructorStandings[0]?.teamName.split(' ')[0]}
                       </div>
                       <div className="text-emerald-400 text-[11px] font-bold">
-                        +{activeConstructorStandings[0]?.points - (activeConstructorStandings[1]?.points || 0)} pt <span className="text-[9px] text-slate-400 font-normal">{selectedSeason === '2026' ? 'リード (未確定)' : '差で戴冠'}</span>
+                        +{activeConstructorStandings[0]?.points - (activeConstructorStandings[1]?.points || 0)} pt <span className="text-[9px] text-slate-400 font-normal">{selectedSeason === '2026' ? 'リード' : '差で戴冠'}</span>
                       </div>
                     </div>
                   </div>
@@ -1442,11 +1650,13 @@ export default function SeasonHub({
                   <div className="text-[11px] text-slate-300 bg-slate-950/40 p-2 rounded-lg border border-white/5 leading-relaxed">
                     {selectedSeason === '2026' ? (
                       <>
-                        💡 <strong className="text-sky-300 font-racing">2026シーズン展望 (シミュレーション):</strong> 2026年シーズンは現在未終了であり、全戦の公式結果・年間王者は未確定です。本数値はFIA公式参戦11チーム・22名に基づくプレシーズンシミュレーション想定です。
+                        📊 <strong className="text-sky-300 font-racing">2026シーズン戦況分析 (第14戦マドリード終了時点):</strong> 14戦を終えてメルセデスの新星キミ・アントネッリが8勝を挙げて選手権首位（292pt）。チームメイトのラッセル（211pt・2勝）、フェラーリのハミルトン（191pt・1勝）、マクラーレンのノリス（186pt・2勝）が追走。今夜開催の第15戦バクー決勝が後半戦の天王山となります。
                       </>
                     ) : (
                       <>
-                        💡 <strong className="text-sky-300 font-racing">2025シーズン総括:</strong> ランド・ノリスが自身初のドライバーズチャンピオンを獲得。マクラーレンが1998年以来となるコンストラクターズ選手権を制覇しました。
+                        🏛️ <strong className="text-amber-300 font-racing">{selectedSeason}年シーズン総括:</strong>{' '}
+                        {getHistoricalArchive(parseInt(selectedSeason, 10))?.seasonSummary ||
+                          `${selectedSeason}年シーズンの年間王者は ${activeDriverStandings[0]?.driverName}（${activeDriverStandings[0]?.team} / ${activeDriverStandings[0]?.points}pt）。コンストラクターズ選手権は ${activeConstructorStandings[0]?.teamName}（${activeConstructorStandings[0]?.points}pt）が制覇しました。`}
                       </>
                     )}
                   </div>
@@ -1468,7 +1678,7 @@ export default function SeasonHub({
               </span>
             ) : (
               <span>
-                <strong className="text-white">2025年 参戦体制アーカイブ:</strong> ルイス・ハミルトンの跳ね馬電撃移籍、カルロス・サインツのウィリアムズ加入、そしてアントネッリやベアマンら大型ルーキーの鮮烈な挑戦。
+                <strong className="text-white">{selectedSeason}年 参戦体制アーカイブ:</strong> {getHistoricalArchive(selectedSeason)?.seasonSummary || `${selectedSeason}年の各チームおよびドライバー布陣。`}
               </span>
             )}
           </div>

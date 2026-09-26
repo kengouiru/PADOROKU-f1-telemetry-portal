@@ -19,6 +19,22 @@ import { HISTORICAL_SEASONS_DATA, type HistoricalGridTeam, type HistoricalGridDr
 import PhotoGalleryCarousel from '@/components/ui/PhotoGalleryCarousel';
 import { useUserPreferences } from '@/lib/userPreferences';
 import SmartWikiText from '@/components/common/SmartWikiText';
+import {
+  Building2,
+  Cpu,
+  Users,
+  Award,
+  Trophy,
+  ChevronRight,
+  History,
+  GitBranch,
+  BookOpen,
+  Sparkles,
+  Wind,
+  Layers,
+  MapPin,
+  Flag,
+} from 'lucide-react';
 
 export interface TeamDetailModalProps {
   team: TeamProfile;
@@ -29,7 +45,7 @@ export interface TeamDetailModalProps {
   onClose: () => void;
 }
 
-type TeamTab = 'lineage' | 'engineering' | 'history' | 'factory' | 'references';
+type TeamTab = 'lineage' | 'engineering' | 'roster' | 'references';
 
 const HISTORICAL_TEAM_ID_MAP: Record<string, string[]> = {
   mercedes: ['mercedes'],
@@ -151,6 +167,61 @@ export default function TeamDetailModal({
             {renderTextWithCitations(p)}
           </p>
         ))}
+      </div>
+    );
+  };
+
+  // Helper for structured multi-chapter philosophy in 2-column magazine layout
+  const renderPhilosophyChapters = (descriptionText: string) => {
+    if (!descriptionText) return null;
+    const rawParts = descriptionText.split('\n\n').map((p) => p.trim()).filter(Boolean);
+    if (rawParts.length <= 1) {
+      return (
+        <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-2">
+          <h4 className="text-xs font-racing font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: themeColor }}>
+            <span>📐</span>
+            <span>開発哲学サマリー</span>
+          </h4>
+          <div className="text-xs text-slate-200 leading-relaxed font-sans max-w-4xl">
+            <SmartWikiText text={descriptionText} excludeUrl={`/knowledge/teams/${team.id}`} onCitationClick={handleCitationClick} />
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-2.5">
+        <div className="flex items-center justify-between">
+          <h4 className="text-xs font-racing font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: themeColor }}>
+            <span>📐</span>
+            <span>開発哲学サマリー (Engineering Philosophy)</span>
+          </h4>
+          <span className="text-[10px] font-mono text-slate-400">2章構成・テクニカル解析</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          {rawParts.map((part, idx) => {
+            const match = part.match(/^([【\[].+?[】\]])\s*([\s\S]*)$/);
+            const heading = match ? match[1] : `【第${idx + 1}章：テクニカル・フィロソフィー】`;
+            const body = match ? match[2] : part;
+            return (
+              <div
+                key={idx}
+                className="p-4 rounded-2xl bg-slate-900/80 border border-white/10 hover:border-white/20 transition-all space-y-2 flex flex-col justify-between shadow-md"
+                style={{ borderTopColor: themeColor, borderTopWidth: 3 }}
+              >
+                <div>
+                  <h5 className="text-xs font-racing font-bold text-white flex items-center gap-1.5 leading-snug">
+                    <span style={{ color: themeColor }}>§{idx + 1}</span>
+                    <span>{heading}</span>
+                  </h5>
+                  <div className="text-xs text-slate-300 leading-relaxed font-sans mt-2.5">
+                    <SmartWikiText text={body} excludeUrl={`/knowledge/teams/${team.id}`} onCitationClick={handleCitationClick} />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     );
   };
@@ -349,190 +420,310 @@ export default function TeamDetailModal({
           <div className="sticky top-[48px] z-40 flex items-center gap-2 px-3.5 sm:px-6 pt-2 sm:pt-2.5 border-b border-white/15 bg-slate-950 overflow-x-auto flex-shrink-0 shadow-md">
             {(
               [
-                ['lineage', '🌿 チーム系統樹 & 系譜'],
-                ['engineering', '📐 2026マシン諸元 & 空力哲学'],
-                ['history', '🏆 歴代変遷 (2016-2026) & 名車'],
-                ['factory', '🏭 ファクトリー & 組織体系'],
-                ['references', `📚 参考文献 (${team.references.length})`],
-              ] as [TeamTab, string][]
-            ).map(([tab, label]) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`pb-2 px-2.5 sm:px-3 text-xs font-racing font-bold transition-all border-b-2 flex-shrink-0 cursor-pointer ${
-                  activeTab === tab
-                    ? 'text-sky-400 border-sky-400 font-black'
-                    : 'text-slate-400 border-transparent hover:text-slate-200'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+                ['lineage', 'チーム系譜 & 歴代マシン', GitBranch],
+                ['engineering', '2026諸元 & 空力哲学', Cpu],
+                ['roster', '組織体制 & 歴代ドライバー (2016-2026)', Users],
+                ['references', `参考文献 (${team.references.length})`, BookOpen],
+              ] as [TeamTab, string, React.ComponentType<{ className?: string }>][]
+            ).map(([tab, label, IconComponent]) => {
+              const isActive = activeTab === tab;
+              return (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`pb-2 px-2.5 sm:px-3 text-xs font-racing font-bold transition-all border-b-2 flex items-center gap-1.5 flex-shrink-0 cursor-pointer ${
+                    isActive
+                      ? 'font-black'
+                      : 'text-slate-400 border-transparent hover:text-slate-200'
+                  }`}
+                  style={isActive ? {
+                    color: themeColor,
+                    borderColor: themeColor,
+                    textShadow: `0 0 16px ${themeColor}60`,
+                  } : undefined}
+                >
+                  <IconComponent className="w-3.5 h-3.5 shrink-0" />
+                  <span>{label}</span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Tab Content Body */}
           <div className="p-3.5 sm:p-6 flex-1 space-y-4 sm:space-y-5">
-            {/* ── TAB 1: TEAM LINEAGE (系統樹 & 歴史的ルーツ) ── */}
+            {/* ── TAB 1: TEAM LINEAGE (系統樹 & 歴代マシンギャラリー) ── */}
             {activeTab === 'lineage' && (
               <div className="space-y-5 animate-fade-in">
                 {lineageRecord ? (
-                  <>
-                    {/* Lineage Summary Banner */}
-                    <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-950 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">🌿</span>
-                          <h3 className="text-sm font-racing font-bold text-white tracking-wide">
-                            {lineageRecord.currentName} — 歴史的ルーツと継承
-                          </h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+                    {/* Left / Main Column: Era Timeline Tree (7 cols on lg, 8 cols on xl) */}
+                    <div className="lg:col-span-7 xl:col-span-8 space-y-4">
+                      {/* Lineage Summary Banner */}
+                      <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-950 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <GitBranch className="w-4 h-4 text-emerald-400 shrink-0" />
+                            <h3 className="text-sm font-racing font-bold text-white tracking-wide">
+                              {lineageRecord.currentName} — 歴史的ルーツと継承
+                            </h3>
+                          </div>
+                          <p className="text-xs text-slate-300">
+                            創始者: <strong className="text-white">{lineageRecord.founder}</strong> • 起源: <strong className="text-white">{lineageRecord.originYear}年</strong> • 本拠地: <span className="font-mono text-slate-300">{lineageRecord.headquarters}</span>
+                          </p>
                         </div>
-                        <p className="text-xs text-slate-300">
-                          創始者: <strong className="text-white">{lineageRecord.founder}</strong> • 起源: <strong className="text-white">{lineageRecord.originYear}年</strong> • 本拠地: <span className="font-mono text-slate-300">{lineageRecord.headquarters}</span>
-                        </p>
-                      </div>
 
-                      <div className="flex items-center gap-3 bg-slate-950/60 px-3.5 py-2 rounded-xl border border-white/10 shrink-0">
-                        <div className="text-center">
-                          <span className="text-[10px] text-amber-400 font-racing font-bold block">WCC王座</span>
-                          <span className="text-base font-black text-white font-mono">{lineageRecord.allTimeTitles.constructors}冠</span>
-                        </div>
-                        <div className="w-px h-6 bg-white/10" />
-                        <div className="text-center">
-                          <span className="text-[10px] text-yellow-400 font-racing font-bold block">WDC王座</span>
-                          <span className="text-base font-black text-white font-mono">{lineageRecord.allTimeTitles.drivers}冠</span>
+                        <div className="flex items-center gap-2 bg-slate-950/70 px-3 py-1.5 rounded-xl border border-white/10 shrink-0 text-xs font-mono">
+                          <span className="text-slate-400">系譜変遷:</span>
+                          <span className="font-bold text-white">{lineageRecord.lineageChain.length}世代</span>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Timeline Tree Nodes */}
-                    <div className="relative pl-6 sm:pl-8 space-y-6 before:absolute before:left-3 sm:before:left-4 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-sky-400 before:via-blue-500 before:to-emerald-400">
-                      {lineageRecord.lineageChain.map((node, idx) => {
-                        const isLatest = idx === lineageRecord.lineageChain.length - 1;
-                        return (
-                          <div key={idx} className="relative group">
-                            {/* Node Dot Marker */}
-                            <div
-                              className={`absolute -left-6 sm:-left-8 top-1.5 w-6 h-6 rounded-full border-2 flex items-center justify-center text-[10px] font-bold shadow-md transition-all group-hover:scale-125 ${
-                                isLatest
-                                  ? 'bg-sky-500 border-white text-white ring-4 ring-sky-500/20'
-                                  : 'bg-slate-900 border-sky-400 text-sky-400'
-                              }`}
-                            >
-                              {idx + 1}
-                            </div>
-
-                            {/* Node Card */}
-                            <div
-                              className={`p-4 rounded-2xl border transition-all ${
-                                isLatest
-                                  ? 'bg-slate-900/90 border-sky-500/40 shadow-xl'
-                                  : 'bg-slate-950/80 border-white/10 hover:border-white/20'
-                              }`}
-                            >
-                              {/* Node Header */}
-                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-white/5 pb-2.5">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="px-2.5 py-0.5 rounded-full text-xs font-racing font-bold bg-sky-950/80 text-sky-300 border border-sky-500/40 font-mono">
-                                    {node.period}
-                                  </span>
-                                  <span className="text-base font-black text-white flex items-center gap-1.5">
-                                    <span>{node.flag}</span>
-                                    <span>{node.teamName}</span>
-                                  </span>
-                                  <span className="text-xs text-slate-400 font-mono">({node.fullName})</span>
-                                </div>
-
-                                <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
-                                  <span>📍 {node.base}</span>
-                                </div>
+                      {/* Timeline Tree Nodes */}
+                      <div
+                        className="relative pl-6 sm:pl-8 space-y-5 before:absolute before:left-3 sm:before:left-4 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-sky-400 before:via-blue-500 before:to-emerald-400"
+                      >
+                        {lineageRecord.lineageChain.map((node, idx) => {
+                          const isLatest = idx === lineageRecord.lineageChain.length - 1;
+                          return (
+                            <div key={idx} className="relative group">
+                              {/* Node Dot Marker */}
+                              <div
+                                className={`absolute -left-6 sm:-left-8 top-2 w-6 h-6 rounded-full border-2 flex items-center justify-center text-[10px] font-bold shadow-md transition-all group-hover:scale-125`}
+                                style={isLatest ? {
+                                  backgroundColor: themeColor,
+                                  borderColor: '#ffffff',
+                                  color: '#ffffff',
+                                  boxShadow: `0 0 12px ${themeColor}80`,
+                                } : {
+                                  backgroundColor: '#020617',
+                                  borderColor: themeColor,
+                                  color: themeColor,
+                                }}
+                              >
+                                {idx + 1}
                               </div>
 
-                              {/* Node Technical & Personnel Details */}
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 text-xs">
+                              {/* Node Card */}
+                              <div
+                                className={`p-4 rounded-2xl border transition-all space-y-3 ${
+                                  isLatest
+                                    ? 'bg-slate-900/90 shadow-xl'
+                                    : 'bg-slate-950/80 border-white/10 hover:border-white/20'
+                                }`}
+                                style={isLatest ? { borderColor: `${themeColor}60` } : undefined}
+                              >
+                                {/* Node Header */}
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-white/5 pb-2.5">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span
+                                      className="px-2.5 py-0.5 rounded-full text-xs font-racing font-bold font-mono border"
+                                      style={{
+                                        color: themeColor,
+                                        borderColor: `${themeColor}40`,
+                                        backgroundColor: `${themeColor}15`,
+                                      }}
+                                    >
+                                      {node.period}
+                                    </span>
+                                    <span className="text-base font-black text-white flex items-center gap-1.5">
+                                      <span className="px-1.5 py-0.2 rounded bg-white/5 border border-white/10 text-xs font-mono">{node.flag}</span>
+                                      <span>{node.teamName}</span>
+                                    </span>
+                                    <span className="text-xs text-slate-400 font-mono">({node.fullName})</span>
+                                  </div>
+
+                                  <div className="flex items-center gap-1 text-xs font-mono text-slate-400">
+                                    <MapPin className="w-3 h-3 text-slate-500 shrink-0" />
+                                    <span>{node.base}</span>
+                                  </div>
+                                </div>
+
+                                {/* Node Technical & Personnel Details (2-col grid) */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                  <div className="space-y-1">
+                                    <span className="text-[11px] font-racing text-slate-400 flex items-center gap-1.5">
+                                      <Cpu className="w-3 h-3 text-slate-400 shrink-0" />
+                                      <span className="font-mono uppercase text-[10px]">PU / エンジン:</span>
+                                    </span>
+                                    <div className="flex flex-wrap gap-1">
+                                      {node.powerUnits.map((pu, puIdx) => (
+                                        <span
+                                          key={puIdx}
+                                          className="bg-slate-900 text-slate-200 px-2 py-0.5 rounded text-[11px] font-mono border border-white/10"
+                                        >
+                                          {pu}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+
+                                  <div className="space-y-1">
+                                    <span className="text-[11px] font-racing text-slate-400 flex items-center gap-1.5">
+                                      <Users className="w-3 h-3 text-slate-400 shrink-0" />
+                                      <span className="font-mono uppercase text-[10px]">主要キーパーソン:</span>
+                                    </span>
+                                    <p className="text-slate-200 font-sans text-[11px] leading-relaxed">
+                                      {node.keyPersonnel.join(', ')}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {/* Notable Drivers */}
                                 <div className="space-y-1">
-                                  <span className="text-[11px] font-racing text-slate-400 flex items-center gap-1">
-                                    <span>⚡</span>
-                                    <span>パワーユニット / エンジン:</span>
+                                  <span className="text-[11px] font-racing text-slate-400 flex items-center gap-1.5">
+                                    <Flag className="w-3 h-3 text-slate-400 shrink-0" />
+                                    <span className="font-mono uppercase text-[10px]">代表的ドライバー:</span>
                                   </span>
-                                  <div className="flex flex-wrap gap-1">
-                                    {node.powerUnits.map((pu, puIdx) => (
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {node.notableDrivers.map((drv, drvIdx) => (
                                       <span
-                                        key={puIdx}
-                                        className="bg-slate-900 text-slate-200 px-2 py-0.5 rounded text-[11px] font-mono border border-white/10"
+                                        key={drvIdx}
+                                        className="px-2 py-0.5 rounded-md text-[11px] font-sans font-medium bg-slate-900/90 text-slate-300 border border-white/10"
                                       >
-                                        {pu}
+                                        {drv}
                                       </span>
                                     ))}
                                   </div>
                                 </div>
 
-                                <div className="space-y-1">
-                                  <span className="text-[11px] font-racing text-slate-400 flex items-center gap-1">
-                                    <span>👥</span>
-                                    <span>主要キーパーソン:</span>
-                                  </span>
-                                  <p className="text-slate-200 font-sans text-[11px]">
-                                    {node.keyPersonnel.join(', ')}
-                                  </p>
-                                </div>
-                              </div>
-
-                              {/* Notable Drivers */}
-                              <div className="pt-2.5 space-y-1">
-                                <span className="text-[11px] font-racing text-slate-400 flex items-center gap-1">
-                                  <span>🏎️</span>
-                                  <span>代表的ドライバー:</span>
-                                </span>
-                                <div className="flex flex-wrap gap-1.5">
-                                  {node.notableDrivers.map((drv, drvIdx) => (
-                                    <span
-                                      key={drvIdx}
-                                      className="px-2 py-0.5 rounded-md text-[11px] font-sans font-medium bg-slate-900/90 text-slate-300 border border-white/10"
-                                    >
-                                      {drv}
+                                {/* Championships Won in this era (if any) */}
+                                {(node.championships.constructors > 0 || node.championships.drivers > 0) && (
+                                  <div className="p-2.5 px-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between text-xs flex-wrap gap-2">
+                                    <span className="text-amber-400 font-bold flex items-center gap-1.5">
+                                      <Trophy className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                                      <span>この時代の王座獲得実績:</span>
                                     </span>
-                                  ))}
+                                    <div className="flex items-center gap-3 font-mono font-bold text-amber-300">
+                                      {node.championships.constructors > 0 && (
+                                        <span>コンストラクターズ: {node.championships.constructors}冠</span>
+                                      )}
+                                      {node.championships.drivers > 0 && (
+                                        <span>ドライバーズ: {node.championships.drivers}冠</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Iconic Historic Car Showcase Card */}
+                                {node.iconicCar && (
+                                  <div
+                                    className="p-3 rounded-xl bg-slate-900/90 border text-xs space-y-1"
+                                    style={{ borderColor: `${themeColor}35` }}
+                                  >
+                                    <div className="font-racing font-bold text-xs flex items-center gap-1.5" style={{ color: themeColor }}>
+                                      <Sparkles className="w-3 h-3 shrink-0" />
+                                      <span>象徴的名車: {node.iconicCar.model}</span>
+                                    </div>
+                                    <p className="text-[11px] text-slate-300 leading-relaxed font-sans">
+                                      <SmartWikiText text={node.iconicCar.description} excludeUrl={`/knowledge/teams/${team.id}`} onCitationClick={handleCitationClick} />
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* Historical Summary (Bounded comfortable line length) */}
+                                <div className="pt-2 border-t border-white/5 text-xs text-slate-300 leading-relaxed font-sans">
+                                  <SmartWikiText text={node.summary} excludeUrl={`/knowledge/teams/${team.id}`} onCitationClick={handleCitationClick} />
                                 </div>
                               </div>
-
-                              {/* Championships (if any) */}
-                              {(node.championships.constructors > 0 || node.championships.drivers > 0) && (
-                                <div className="mt-2.5 p-2 px-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center gap-3 text-xs">
-                                  <span className="text-amber-400 font-bold">🏆 この時代の王座実績:</span>
-                                  <div className="flex items-center gap-3 font-mono font-bold text-amber-300">
-                                    {node.championships.constructors > 0 && (
-                                      <span>コンストラクターズ: {node.championships.constructors}冠</span>
-                                    )}
-                                    {node.championships.drivers > 0 && (
-                                      <span>ドライバーズ: {node.championships.drivers}冠</span>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Iconic Car Callout */}
-                              {node.iconicCar && (
-                                <div className="mt-2.5 p-2.5 rounded-xl bg-sky-950/40 border border-sky-500/20 text-xs space-y-0.5">
-                                  <div className="font-racing font-bold text-sky-400 flex items-center gap-1.5">
-                                    <span>🏎️</span>
-                                    <span>象徴的名車: {node.iconicCar.model}</span>
-                                  </div>
-                                  <p className="text-[11px] text-slate-300 leading-snug">
-                                    <SmartWikiText text={node.iconicCar.description} excludeUrl={`/knowledge/teams/${team.id}`} />
-                                  </p>
-                                </div>
-                              )}
-
-                              {/* Historical Summary */}
-                              <p className="text-xs text-slate-300 leading-relaxed mt-2.5 pt-2 border-t border-white/5 font-sans">
-                                <SmartWikiText text={node.summary} excludeUrl={`/knowledge/teams/${team.id}`} />
-                              </p>
                             </div>
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
-                  </>
+
+                    {/* Right Column: Photo Gallery Carousel & Hall of Fame Showcase (5 cols on lg, 4 cols on xl) */}
+                    <div className="lg:col-span-5 xl:col-span-4 space-y-4 lg:sticky lg:top-[100px]">
+                      {/* Photo Gallery Carousel */}
+                      {team.visualGallery && team.visualGallery.length > 0 && (
+                        <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-3.5 shadow-xl space-y-2">
+                          <PhotoGalleryCarousel
+                            items={team.visualGallery}
+                            title="📸 歴代名車 & ファクトリーギャラリー"
+                            themeColor={themeColor}
+                            size="sm"
+                            aspectRatio="16/10"
+                          />
+                        </div>
+                      )}
+
+                      {/* Championship Hall of Fame & Heritage Stats Card */}
+                      <div
+                        className="rounded-2xl border bg-gradient-to-br from-slate-900/90 via-slate-950 to-neutral-950 p-4 shadow-xl space-y-3.5"
+                        style={{ borderColor: `${themeColor}40` }}
+                      >
+                        <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                          <h4 className="text-xs font-racing font-bold text-white flex items-center gap-1.5 uppercase tracking-wider">
+                            <Award className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                            <span>栄光の殿堂 & チーム歴代記録</span>
+                          </h4>
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-white/10 text-slate-300">
+                            F1 HERITAGE
+                          </span>
+                        </div>
+
+                        {/* Title Badges */}
+                        <div className="grid grid-cols-2 gap-2 text-center">
+                          <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                            <span className="text-[10px] text-amber-400 font-racing font-bold block uppercase">
+                              CONSTRUCTORS
+                            </span>
+                            <span className="text-lg font-black text-white font-mono">
+                              {lineageRecord.allTimeTitles.constructors}冠
+                            </span>
+                          </div>
+                          <div className="p-2.5 rounded-xl bg-yellow-500/10 border border-yellow-500/30">
+                            <span className="text-[10px] text-yellow-400 font-racing font-bold block uppercase">
+                              DRIVERS
+                            </span>
+                            <span className="text-lg font-black text-white font-mono">
+                              {lineageRecord.allTimeTitles.drivers}冠
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Heritage Fast Facts */}
+                        <div className="space-y-2 text-xs font-mono">
+                          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-900/60 border border-white/5">
+                            <span className="text-slate-400">創設年 / 起源:</span>
+                            <span className="text-white font-bold">{lineageRecord.originYear}年 ({lineageRecord.founder.split(' ')[0]})</span>
+                          </div>
+                          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-900/60 border border-white/5">
+                            <span className="text-slate-400">開発拠点:</span>
+                            <span className="text-white font-bold truncate max-w-[180px]">{team.base}</span>
+                          </div>
+                          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-900/60 border border-white/5">
+                            <span className="text-slate-400">2026年 PU:</span>
+                            <span className="text-white font-bold truncate max-w-[180px]">{team.powerUnit}</span>
+                          </div>
+                          <div className="flex items-center justify-between p-2 rounded-lg bg-slate-900/60 border border-white/5">
+                            <span className="text-slate-400">チーム代表:</span>
+                            <span className="text-white font-bold">{team.teamPrincipal}</span>
+                          </div>
+                        </div>
+
+                        {/* Lineage Progression Mini-Pill */}
+                        <div className="pt-1 border-t border-white/5 space-y-1">
+                          <span className="text-[10px] text-slate-400 font-mono block">チーム変遷の歩み:</span>
+                          <div className="flex items-center gap-1.5 flex-wrap text-[11px] font-racing">
+                            {lineageRecord.lineageChain.map((n, nIdx) => (
+                              <React.Fragment key={nIdx}>
+                                <span className={`px-2 py-0.5 rounded text-[10px] border ${
+                                  nIdx === lineageRecord.lineageChain.length - 1
+                                    ? 'bg-white/10 text-white font-bold border-white/20'
+                                    : 'bg-slate-900 text-slate-400 border-white/5'
+                                }`}>
+                                  {n.teamName}
+                                </span>
+                                {nIdx < lineageRecord.lineageChain.length - 1 && (
+                                  <span className="text-slate-600 text-[10px]">➔</span>
+                                )}
+                              </React.Fragment>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 ) : (
                   <div className="p-6 text-center text-slate-400 bg-slate-900/40 rounded-2xl border border-white/10">
                     系統樹データを準備中です。
@@ -549,7 +740,7 @@ export default function TeamDetailModal({
                   <div className="bg-slate-900/80 border border-white/10 rounded-2xl p-4 sm:p-5 space-y-4 shadow-lg">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
                       <div>
-                        <span className="text-[10px] font-racing font-bold uppercase tracking-wider text-sky-400 block">
+                        <span className="text-[10px] font-racing font-bold uppercase tracking-wider text-sky-400 block" style={{ color: themeColor }}>
                           2026 FIA REGULATION TECHNICAL DATA SHEET
                         </span>
                         <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
@@ -705,9 +896,12 @@ export default function TeamDetailModal({
 
                 {/* Direct Telemetry Comparison CTA Banner */}
                 {onNavigateToTelemetry && team.drivers.length >= 2 && (
-                  <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-950/70 via-slate-900 to-indigo-950/70 border border-blue-500/40 flex flex-col sm:flex-row items-center justify-between gap-3.5 shadow-lg">
+                  <div
+                    className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 border flex flex-col sm:flex-row items-center justify-between gap-3.5 shadow-lg"
+                    style={{ borderColor: `${themeColor}40` }}
+                  >
                     <div className="space-y-1">
-                      <h4 className="text-xs sm:text-sm font-racing font-bold text-sky-300 flex items-center gap-2">
+                      <h4 className="text-xs sm:text-sm font-racing font-bold text-white flex items-center gap-2">
                         <span>📊</span>
                         <span>チーム内テレメトリー直接比較 ({team.drivers[0]} vs {team.drivers[1]})</span>
                       </h4>
@@ -724,7 +918,11 @@ export default function TeamDetailModal({
                         });
                         onClose();
                       }}
-                      className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-racing font-bold text-xs shadow-md transition-all flex items-center gap-1.5 shrink-0 hover:scale-105 cursor-pointer"
+                      className="px-4 py-2 rounded-xl text-white font-racing font-bold text-xs shadow-md transition-all flex items-center gap-1.5 shrink-0 hover:scale-105 cursor-pointer"
+                      style={{
+                        backgroundColor: themeColor,
+                        color: '#ffffff',
+                      }}
                     >
                       <span>🏎️ 2台のテレメトリーを比較</span>
                       <span>➔</span>
@@ -732,18 +930,10 @@ export default function TeamDetailModal({
                   </div>
                 )}
 
-                {/* Philosophy Overview */}
-                <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-2">
-                  <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <span>📐</span>
-                    <span>開発哲学サマリー</span>
-                  </h4>
-                  <div className="text-xs text-slate-200 leading-relaxed font-sans">
-                    {renderParagraphsWithCitations(team.philosophy.description)}
-                  </div>
-                </div>
+                {/* Structured 2-Column Editorial Philosophy Chapters (Eliminates full-width text wall) */}
+                {renderPhilosophyChapters(team.philosophy.description)}
 
-                {/* Aero vs Mechanical Grid */}
+                {/* Aero vs Mechanical Grid (2-Column) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                   <div className="bg-slate-950/80 border border-sky-500/30 p-4 rounded-2xl space-y-2">
                     <h4 className="text-xs font-racing font-bold text-sky-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -768,185 +958,260 @@ export default function TeamDetailModal({
               </div>
             )}
 
-            {/* ── TAB 3: 2016-2026 HISTORICAL SEASONS & ICONIC CARS ── */}
-            {activeTab === 'history' && (
+            {/* ── TAB 3: 組織体制 ＆ 歴代所属ドライバー (2016-2026) ── */}
+            {activeTab === 'roster' && (
               <div className="space-y-5 animate-fade-in">
-                {/* 2016-2026 Historical Roster Matrix */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-racing font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <span>🏆</span>
-                      <span>2016〜2026年 歴代シーズン体制 ＆ 所属ドライバー変遷</span>
-                    </h4>
-                    <span className="text-[10px] font-mono text-slate-400">計{matchingSeasons.length}シーズン記録</span>
-                  </div>
-
-                  <div className="space-y-2.5">
-                    {matchingSeasons.map(({ year, teamData, eraName }) => (
-                      <div
-                        key={year}
-                        className="p-3 sm:p-3.5 rounded-2xl bg-slate-900/80 border border-white/10 hover:border-white/20 transition-all space-y-2.5"
-                      >
-                        {/* Year Banner */}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-white/5 pb-2">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="px-2 py-0.5 rounded-lg text-xs font-black font-mono bg-sky-950 text-sky-300 border border-sky-500/40">
-                              {year}年
-                            </span>
-                            <span className="text-sm font-bold text-white font-racing">
-                              {teamData.fullName}
-                            </span>
-                            <span className="text-[11px] font-mono text-slate-400">
-                              ⚡ {teamData.powerUnit}
-                            </span>
-                          </div>
-
-                          <div className="flex items-center gap-2 text-xs font-mono text-slate-300">
-                            {teamData.finalRank ? (
-                              <span className="px-2 py-0.5 rounded bg-slate-800 border border-white/10">
-                                順位: <strong>{teamData.finalRank}位</strong> {teamData.points ? `(${teamData.points} pts)` : ''}
-                              </span>
-                            ) : (
-                              <span className="text-slate-400">参戦中</span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Drivers Roster */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          {teamData.drivers.map((drv, drvIdx) => (
-                            <div
-                              key={drvIdx}
-                              onClick={() => onSelectDriverDetail && onSelectDriverDetail(drv.code)}
-                              className="p-2 rounded-xl bg-slate-950/70 border border-white/5 hover:border-sky-500/40 transition-all flex items-center justify-between gap-2 cursor-pointer group"
-                              title={`${drv.name} のプロファイルを開く`}
-                            >
-                              <div className="flex items-center gap-2 min-w-0">
-                                <span className="text-base">{drv.flag}</span>
-                                <div className="min-w-0">
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="font-bold text-xs text-white group-hover:text-sky-300 transition-colors truncate">
-                                      {drv.name}
-                                    </span>
-                                    {drv.number && (
-                                      <span className="text-[10px] font-mono text-slate-400">#{drv.number}</span>
-                                    )}
-                                  </div>
-                                  {drv.note && (
-                                    <p className="text-[10px] text-slate-400 truncate">{drv.note}</p>
-                                  )}
-                                </div>
-                              </div>
-                              <span className="text-[10px] font-mono font-bold text-sky-400 group-hover:translate-x-0.5 transition-transform shrink-0">
-                                ➔
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Reserves Section (if any) */}
-                        {teamData.reserves && teamData.reserves.length > 0 && (
-                          <div className="pt-1 flex items-center gap-1.5 flex-wrap text-[11px]">
-                            <span className="text-[10px] font-racing text-slate-400">🛡️ リザーブ/開発:</span>
-                            {teamData.reserves.map((res, resIdx) => (
-                              <button
-                                key={resIdx}
-                                onClick={() => onSelectDriverDetail && onSelectDriverDetail(res.code)}
-                                className="px-2 py-0.5 rounded-lg text-[10px] font-mono bg-slate-950 text-slate-300 border border-white/10 hover:border-sky-400/40 hover:text-sky-300 transition-all cursor-pointer"
-                                title={`${res.name} の情報を見る`}
-                              >
-                                {res.flag} {res.name}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Photo Gallery Carousel (Historic Cars & Factory) */}
-                {team.visualGallery && team.visualGallery.length > 0 && (
-                  <PhotoGalleryCarousel
-                    items={team.visualGallery}
-                    title="📸 TEAM FACTORY & HISTORIC CAR GALLERY / チームギャラリー"
-                    themeColor={themeColor}
-                    size="sm"
-                    aspectRatio="16/10"
-                  />
-                )}
-
-                {/* Historic Milestones */}
-                <div className="bg-slate-950/60 border border-white/10 p-4 rounded-2xl space-y-2">
-                  <h4 className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <span>🏎️</span>
-                    <span>F1における歴史的マイルストーン</span>
-                  </h4>
-                  <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                    {team.name} は長年にわたりF1の技術革新をリードし、空力効率やサスペンション構造、パワーユニットの熱効率において数々のベンチマークを築いてきた。
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* ── TAB 4: FACTORY & STRUCTURE ── */}
-            {activeTab === 'factory' && (
-              <div className="space-y-4 animate-fade-in">
-                {team.visualGallery && team.visualGallery.length > 0 && (
-                  <PhotoGalleryCarousel
-                    items={team.visualGallery}
-                    title="📸 TEAM FACTORY & HISTORIC CAR GALLERY / チームギャラリー"
-                    themeColor={themeColor}
-                    size="sm"
-                    aspectRatio="16/10"
-                  />
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                {/* 1. Factory & Management Cockpit (3-Column Grid) */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
                   <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-2">
-                    <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <span>📍</span>
+                    <h4 className="text-xs font-racing font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: themeColor }}>
+                      <Building2 className="w-3.5 h-3.5 shrink-0" style={{ color: themeColor }} />
                       <span>本拠地ファクトリー & 開発拠点</span>
                     </h4>
-                    <p className="text-sm font-bold text-white">{team.base}</p>
+                    <p className="text-sm font-bold text-white font-mono">{team.base}</p>
                     <p className="text-xs text-slate-300 leading-relaxed font-sans">
                       最新鋭の風洞実験施設やドライバー・イン・ザ・ループ（DiL）シミュレータを備え、グランプリ週末もファクトリー側とリアルタイムでテレメトリを交信。
                     </p>
                   </div>
 
                   <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-2">
-                    <h4 className="text-xs font-racing font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <span>⚡</span>
-                      <span>パワーユニット & テクニカル体制</span>
+                    <h4 className="text-xs font-racing font-bold uppercase tracking-wider flex items-center gap-1.5 text-slate-300">
+                      <Cpu className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                      <span>パワーユニット & パートナー体制</span>
                     </h4>
-                    <p className="text-sm font-bold text-white">{team.powerUnit}</p>
+                    <p className="text-sm font-bold text-white font-mono">{team.powerUnit}</p>
                     <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                      チーム代表: <strong className="text-slate-100">{team.teamPrincipal}</strong>
+                      {fuelPartner ? (
+                        <span>{fuelPartner.partner} の100%持続可能燃料を採用。専用ラボで調合される高エネルギー密度E-Fuelと極限調和。</span>
+                      ) : (
+                        <span>ワークス体制による最新鋭パワーユニット供給と自社開発体制。</span>
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="bg-slate-900/80 border border-white/10 p-4 rounded-2xl space-y-2">
+                    <h4 className="text-xs font-racing font-bold uppercase tracking-wider flex items-center gap-1.5 text-slate-300">
+                      <Users className="w-3.5 h-3.5 shrink-0 text-slate-400" />
+                      <span>チーム首脳陣 & 指揮系統</span>
+                    </h4>
+                    <p className="text-sm font-bold text-white">代表: {team.teamPrincipal}</p>
+                    <p className="text-xs text-slate-300 leading-relaxed font-sans">
+                      レースオペレーション、トラックサイドストラテジー、チーフエンジニア陣を統括し、ピット戦略と車体開発を一貫指揮。
                     </p>
                   </div>
                 </div>
 
-                {/* Drivers Card Grid */}
-                <div className="bg-slate-950/70 border border-white/10 p-4 rounded-2xl space-y-2.5">
-                  <h4 className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <span>🏎️</span>
-                    <span>2026年 正式参戦ドライバー・ラインナップ</span>
-                  </h4>
-                  <div className="flex flex-wrap gap-2.5">
-                    {team.drivers.map((dCode) => (
+                {/* 2. 2026 Regular Drivers Spotlight */}
+                <div
+                  className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 border space-y-3.5 shadow-lg"
+                  style={{ borderColor: `${themeColor}40` }}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-white/10 pb-2.5">
+                    <div>
+                      <h4 className="text-xs font-racing font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                        <Users className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                        <span>2026年 正式参戦ドライバー・ラインナップ</span>
+                      </h4>
+                      <p className="text-[11px] text-slate-400 font-mono mt-0.5">
+                        現行シーズンを戦う2名のレギュラードライバー ＆ 開発・リザーブ陣
+                      </p>
+                    </div>
+                    {onNavigateToTelemetry && team.drivers.length >= 2 && (
                       <button
-                        key={dCode}
-                        onClick={() => onSelectDriverDetail && onSelectDriverDetail(dCode)}
-                        className="bg-slate-900 px-4 py-2.5 rounded-xl border border-white/10 hover:border-sky-500/40 flex items-center gap-2 shadow-sm transition-all hover:scale-105 cursor-pointer"
-                        title={`${dCode} の詳細を開く`}
+                        onClick={() => {
+                          onNavigateToTelemetry({
+                            year: 2026,
+                            targetDriver: team.drivers[0],
+                            targetDriver2: team.drivers[1],
+                          });
+                          onClose();
+                        }}
+                        className="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-racing font-bold text-xs shadow-md transition-all flex items-center gap-1.5 self-start sm:self-auto cursor-pointer hover:scale-105"
                       >
-                        <span
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: themeColor }}
-                        />
-                        <span className="font-racing font-bold text-sm text-white">{dCode}</span>
-                        <span className="text-xs text-sky-400">➔</span>
+                        <span>📊 2台のテレメトリー直接比較</span>
+                        <span>➔</span>
                       </button>
+                    )}
+                  </div>
+
+                  {/* Drivers Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {team.drivers.map((dCode) => {
+                      // Lookup driver details from matchingSeasons 2026 if available
+                      const latestSeason = matchingSeasons[0];
+                      const matchedDriver = latestSeason?.teamData?.drivers.find(d => d.code === dCode);
+                      return (
+                        <div
+                          key={dCode}
+                          onClick={() => onSelectDriverDetail && onSelectDriverDetail(dCode)}
+                          className="p-3.5 rounded-xl bg-slate-900/90 border border-white/10 hover:border-white/20 transition-all flex items-center justify-between gap-3 cursor-pointer group hover:scale-[1.01]"
+                          style={{ borderLeftColor: themeColor, borderLeftWidth: 4 }}
+                          title={`${matchedDriver?.name || dCode} のドライバー詳細を開く`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span className="px-2 py-1 rounded-lg bg-white/5 border border-white/10 font-mono text-xs text-slate-200 font-bold shrink-0">
+                              {matchedDriver?.flag || dCode}
+                            </span>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="font-racing font-black text-sm sm:text-base text-white group-hover:text-sky-300 transition-colors">
+                                  {matchedDriver?.name || dCode}
+                                </span>
+                                {matchedDriver?.number && (
+                                  <span className="px-1.5 py-0.2 rounded bg-white/10 text-white font-mono font-bold text-xs">
+                                    #{matchedDriver.number}
+                                  </span>
+                                )}
+                                <span className="px-1.5 py-0.2 rounded font-mono text-[10px] font-bold text-slate-300 border border-white/10">
+                                  {dCode}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-slate-400 font-sans truncate mt-0.5">
+                                {matchedDriver?.note || `${team.name} レギュラードライバー`}
+                              </p>
+                            </div>
+                          </div>
+
+                          <span className="text-xs font-mono font-bold text-sky-400 group-hover:translate-x-1 transition-transform shrink-0 flex items-center gap-0.5">
+                            <span>詳細</span>
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Reserves */}
+                  {matchingSeasons[0]?.teamData?.reserves && matchingSeasons[0].teamData.reserves.length > 0 && (
+                    <div className="pt-2 border-t border-white/5 flex items-center gap-2 flex-wrap text-xs">
+                      <span className="text-[11px] font-mono text-slate-400 font-semibold uppercase tracking-wider">
+                        RESERVE / 開発ドライバー:
+                      </span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {matchingSeasons[0].teamData.reserves.map((res, rIdx) => (
+                          <button
+                            key={rIdx}
+                            onClick={() => onSelectDriverDetail && onSelectDriverDetail(res.code)}
+                            className="px-2.5 py-1 rounded-lg text-xs font-mono bg-slate-950 text-slate-200 border border-white/10 hover:border-sky-400/40 hover:text-sky-300 transition-all cursor-pointer flex items-center gap-1.5"
+                            title={`${res.name} のドライバー詳細を開く`}
+                          >
+                            <span className="px-1 py-0.2 rounded bg-white/5 border border-white/5 text-[10px]">
+                              {res.flag}
+                            </span>
+                            <span>{res.name}</span>
+                            <span className="text-[10px] text-slate-400">({res.code})</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 3. 2016-2026 Historical Seasons Matrix (2-Column Responsive Grid) */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-racing font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <History className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <span>2016〜2026年 歴代シーズン体制 ＆ 成績変遷 (Season-by-Season)</span>
+                    </h4>
+                    <span className="text-[10px] font-mono text-slate-400">計{matchingSeasons.length}シーズン記録</span>
+                  </div>
+
+                  {/* 2-Column Responsive Grid: Eliminates horizontal void! */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    {matchingSeasons.map(({ year, teamData, eraName }) => (
+                      <div
+                        key={year}
+                        className="p-3.5 rounded-2xl bg-slate-900/80 border border-white/10 hover:border-white/20 transition-all space-y-2.5 flex flex-col justify-between"
+                      >
+                        {/* Year & Spec Header: Power Unit Inline (Compact & Refined, No Emoji) */}
+                        <div className="flex items-center justify-between gap-1.5 border-b border-white/5 pb-2">
+                          <div className="flex items-center gap-2 flex-wrap min-w-0">
+                            <span
+                              className="px-2 py-0.5 rounded-md text-xs font-black font-mono border shrink-0"
+                              style={{
+                                color: themeColor,
+                                borderColor: `${themeColor}40`,
+                                backgroundColor: `${themeColor}15`,
+                              }}
+                            >
+                              {year}年
+                            </span>
+                            <span className="text-xs font-bold text-white font-racing tracking-wide truncate max-w-[180px]" title={teamData.fullName}>
+                              {teamData.fullName}
+                            </span>
+                            <span
+                              className="text-[10px] font-mono text-slate-300 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 flex items-center gap-1 truncate max-w-[200px]"
+                              title={`パワーユニット: ${teamData.powerUnit}`}
+                            >
+                              <span className="text-slate-500 font-semibold font-racing text-[9px]">PU</span>
+                              <span className="truncate">{teamData.powerUnit}</span>
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 text-xs font-mono shrink-0">
+                            {teamData.finalRank ? (
+                              <span className="px-2 py-0.5 rounded bg-slate-800/90 border border-white/10 text-[11px] text-slate-300">
+                                順位: <strong className="text-white">{teamData.finalRank}位</strong> {teamData.points ? `(${teamData.points} pts)` : ''}
+                              </span>
+                            ) : (
+                              <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">
+                                参戦中
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Drivers Roster (Stacked or 2 Mini Cards) */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {teamData.drivers.map((drv, drvIdx) => (
+                            <div
+                              key={drvIdx}
+                              onClick={() => onSelectDriverDetail && onSelectDriverDetail(drv.code)}
+                              className="p-2 rounded-xl bg-slate-950/70 border border-white/5 hover:border-sky-500/40 transition-all flex items-center justify-between gap-1.5 cursor-pointer group"
+                              title={`${drv.name} のプロファイルを開く`}
+                            >
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[10px] font-mono text-slate-300 shrink-0 leading-none">
+                                  {drv.flag}
+                                </span>
+                                <div className="min-w-0">
+                                  <div className="flex items-center gap-1">
+                                    <span className="font-bold text-xs text-white group-hover:text-sky-300 transition-colors truncate">
+                                      {drv.name}
+                                    </span>
+                                    {drv.number && (
+                                      <span className="text-[9px] font-mono text-slate-400">#{drv.number}</span>
+                                    )}
+                                  </div>
+                                  {drv.note && (
+                                    <p className="text-[9px] text-slate-400 truncate">{drv.note}</p>
+                                  )}
+                                </div>
+                              </div>
+                              <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-sky-400 group-hover:translate-x-0.5 transition-all shrink-0" />
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Reserves Section (if any) */}
+                        {teamData.reserves && teamData.reserves.length > 0 && (
+                          <div className="pt-1 border-t border-white/5 flex items-center gap-1.5 flex-wrap text-[10px]">
+                            <span className="text-slate-400 font-mono text-[10px] uppercase font-semibold">RESERVE:</span>
+                            {teamData.reserves.map((res, resIdx) => (
+                              <button
+                                key={resIdx}
+                                onClick={() => onSelectDriverDetail && onSelectDriverDetail(res.code)}
+                                className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-slate-950 text-slate-300 border border-white/10 hover:border-sky-400/40 hover:text-sky-300 transition-all cursor-pointer flex items-center gap-1"
+                                title={`${res.name} の情報を見る`}
+                              >
+                                <span className="text-[9px]">{res.flag}</span>
+                                <span>{res.name}</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </div>

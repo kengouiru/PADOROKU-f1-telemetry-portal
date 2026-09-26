@@ -69,7 +69,8 @@ import type { TelemetryTarget } from '@/data/f1KnowledgeData';
 import { GLOSSARY_TERMS } from '@/data/f1GlossaryData';
 import type { NavAction } from '@/components/AIStrategist';
 import AITelemetryInspectorModal from '@/components/telemetry/AITelemetryInspectorModal';
-import { Flag, Activity, Newspaper, BookOpen, Gamepad2 } from 'lucide-react';
+import { Flag, Activity, Newspaper, BookOpen, Gamepad2, Clock } from 'lucide-react';
+import { useCurrentJstClock } from '@/lib/systemClock';
 
 import AuthButton from '@/components/auth/AuthButton';
 import AuthModal from '@/components/auth/AuthModal';
@@ -246,6 +247,9 @@ export default function DashboardPage() {
     driver1Code: 'VER',
     driver2Code: 'NOR',
   });
+
+  // Live System JST Clock
+  const jstClock = useCurrentJstClock();
 
   const timelineRef = useRef<TeamRadioTimelineHandle>(null);
   const notebookRef = useRef<RaceNotebookHandle>(null);
@@ -1655,6 +1659,18 @@ export default function DashboardPage() {
               <BookOpen className="w-3.5 h-3.5" /> LIBRARY
             </button>
           </nav>
+
+          {/* Center-Right: Live JST Telemetry Clock */}
+          {jstClock.formatted && (
+            <div
+              className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-900/90 border border-white/10 text-slate-300 font-mono text-[11px] shadow-sm select-none"
+              title="FIA公式タイムテーブル基準 日本標準時 (JST)"
+            >
+              <Clock className="w-3.5 h-3.5 text-red-400 animate-pulse shrink-0" />
+              <span className="text-slate-400 text-[10px] font-bold">JST</span>
+              <span className="text-white font-medium">{jstClock.formatted}</span>
+            </div>
+          )}
 
           {/* Right: Quick Tools (Search, Quiz, AI, Auth + Dedicated PITWALL Game Launcher) */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">

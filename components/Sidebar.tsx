@@ -34,7 +34,7 @@ interface SidebarProps {
   isLoading: boolean;
 }
 
-const AVAILABLE_YEARS = ['2026', '2025', '2024', '2023', '2022', '2021'];
+const AVAILABLE_YEARS = ['2026', '2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018'];
 
 function buildUniqueMeetings(sessions: Session[]): UniqueMeeting[] {
   const seen = new Set<number>();
