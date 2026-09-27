@@ -1127,18 +1127,19 @@ export default function SeasonHub({
           0. SEASON SWITCHER & SMART ROLLOVER STATUS BAR
           ───────────────────────────────────────────────────────────── */}
       <div className="p-2.5 sm:p-3 rounded-2xl bg-gradient-to-r from-slate-900/95 via-slate-950/90 to-slate-900/95 border border-white/10 shadow-lg backdrop-blur-md flex flex-col md:flex-row md:items-center justify-between gap-2.5">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2.5">
-            <label htmlFor="season-select-dropdown" className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 cursor-pointer">
+        <div className="flex items-center justify-between gap-2.5 w-full md:w-auto">
+          <div className="flex items-center gap-2 shrink-0">
+            <label htmlFor="season-select-dropdown" className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap">
               <span>📅</span>
-              <span>シーズン選択:</span>
+              <span className="hidden sm:inline">シーズン選択:</span>
+              <span className="sm:hidden">シーズン:</span>
             </label>
-            <div className="relative inline-flex items-center">
+            <div className="relative inline-flex items-center min-w-0">
               <select
                 id="season-select-dropdown"
                 value={selectedSeason}
                 onChange={(e) => handleSeasonChange(e.target.value as SeasonYear)}
-                className="appearance-none bg-slate-900/90 hover:bg-slate-850 text-white font-racing font-bold text-xs sm:text-sm pl-3 pr-8 py-1.5 sm:py-2 rounded-xl border border-white/20 hover:border-red-500/60 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 focus:outline-none transition-all cursor-pointer shadow-md shadow-black/40"
+                className="appearance-none bg-slate-900/90 hover:bg-slate-850 text-white font-racing font-bold text-xs sm:text-sm pl-2.5 sm:pl-3 pr-7 sm:pr-8 py-1.5 sm:py-2 rounded-xl border border-white/20 hover:border-red-500/60 focus:border-red-500 focus:ring-2 focus:ring-red-500/30 focus:outline-none transition-all cursor-pointer shadow-md shadow-black/40 truncate max-w-[210px] sm:max-w-none"
               >
                 {SEASON_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value} className="bg-slate-950 text-slate-200 py-1 font-mono">
@@ -1147,17 +1148,17 @@ export default function SeasonHub({
                   </option>
                 ))}
               </select>
-              <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">
+              <div className="pointer-events-none absolute right-2 sm:right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs">
                 ▼
               </div>
             </div>
             {selectedSeason === '2026' ? (
-              <span className="relative flex h-2.5 w-2.5 ml-0.5" title="2026年シーズン進行中">
+              <span className="relative flex h-2.5 w-2.5 ml-0.5 shrink-0" title="2026年シーズン進行中">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400" />
               </span>
             ) : (
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 hidden sm:inline">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 hidden sm:inline shrink-0">
                 公式アーカイブ確定
               </span>
             )}
@@ -1349,26 +1350,33 @@ export default function SeasonHub({
                   <button
                     type="button"
                     onClick={() => setHeroSubView('schedule')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                       heroSubView === 'schedule'
                         ? 'bg-red-600 text-white shadow-md shadow-red-950/50'
                         : 'text-slate-400 hover:text-white hover:bg-white/5'
                     }`}
                   >
                     <span>⏱️</span>
-                    <span>公式タイムテーブル ({selectedRace.scheduleJst.length}セッション)</span>
+                    <span>
+                      <span className="hidden sm:inline">公式タイムテーブル</span>
+                      <span className="sm:hidden">タイムテーブル</span> ({selectedRace.scheduleJst.length})
+                    </span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setHeroSubView('weather')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-[11px] sm:text-xs font-racing font-bold transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                       heroSubView === 'weather'
                         ? 'bg-sky-600 text-white shadow-md shadow-sky-950/50'
                         : 'text-slate-400 hover:text-white hover:bg-white/5'
                     }`}
                   >
                     <span>🌤️</span>
-                    <span>気象・路面予測 {selectedWeather ? `(${selectedWeather.airTempC}℃)` : ''}</span>
+                    <span>
+                      <span className="hidden sm:inline">気象・路面予測</span>
+                      <span className="sm:hidden">気象・路面</span>
+                      {selectedWeather ? ` (${selectedWeather.airTempC}℃)` : ''}
+                    </span>
                   </button>
                 </div>
 

@@ -377,7 +377,7 @@ export default function NewsPaddockHub({
                 key={idx}
                 className={`p-1.5 sm:p-2 rounded-lg border transition-colors ${
                   idx === upcomingRound.scheduleJst.length - 1
-                    ? 'bg-red-950/30 border-red-500/40 text-red-200 ring-1 ring-red-500/20'
+                    ? 'col-span-2 sm:col-span-1 bg-red-950/30 border-red-500/40 text-red-200 ring-1 ring-red-500/20'
                     : 'bg-slate-900/70 border-white/10 text-slate-200'
                 }`}
               >

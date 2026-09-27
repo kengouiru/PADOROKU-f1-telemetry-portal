@@ -391,7 +391,7 @@ export default function TelemetryChart({
         {isMounted ? (
           <ResponsiveContainer width="100%" height="100%">
             {chartMode === 'laps' ? (
-              <LineChart data={lapTimesData} margin={{ top: 12, right: 20, left: -10, bottom: 0 }}>
+              <LineChart data={lapTimesData} margin={{ top: 12, right: 15, left: 6, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.4} />
                 <XAxis
                   dataKey="lap"
@@ -403,6 +403,7 @@ export default function TelemetryChart({
                 <YAxis
                   stroke="#94a3b8"
                   fontSize={11}
+                  width={50}
                   domain={['auto', 'auto']}
                   tickFormatter={(v) => formatLapTime(v)}
                 />
@@ -531,7 +532,7 @@ export default function TelemetryChart({
                 ))}
               </LineChart>
             ) : chartMode === 'gap' ? (
-              <LineChart data={gapData} margin={{ top: 12, right: 20, left: -10, bottom: 0 }}>
+              <LineChart data={gapData} margin={{ top: 12, right: 15, left: 6, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.4} />
                 <XAxis
                   dataKey="lap"
@@ -543,6 +544,7 @@ export default function TelemetryChart({
                 <YAxis
                   stroke="#94a3b8"
                   fontSize={11}
+                  width={45}
                   domain={['auto', 'auto']}
                   tickFormatter={(v) => `${v > 0 ? '+' : ''}${v.toFixed(1)}s`}
                 />
@@ -599,7 +601,7 @@ export default function TelemetryChart({
                 ))}
               </LineChart>
             ) : (
-              <LineChart data={stintData} margin={{ top: 12, right: 20, left: -10, bottom: 0 }}>
+              <LineChart data={stintData} margin={{ top: 12, right: 15, left: 6, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.4} />
                 <XAxis
                   dataKey="tyreAge"
@@ -611,6 +613,7 @@ export default function TelemetryChart({
                 <YAxis
                   stroke="#94a3b8"
                   fontSize={11}
+                  width={50}
                   domain={['auto', 'auto']}
                   tickFormatter={(v) => formatLapTime(v)}
                 />

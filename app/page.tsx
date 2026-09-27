@@ -2075,26 +2075,18 @@ export default function DashboardPage() {
         </nav>
 
         {/* ── Mobile Floating AI Strategist FAB (親指ゾーン最適配置: 右下) ── */}
-        <button
-          type="button"
-          onClick={() => setAiDrawerOpen((prev) => !prev)}
-          className={`md:hidden fixed right-4 bottom-[calc(4.4rem+env(safe-area-inset-bottom))] z-40 w-12 h-12 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 cursor-pointer thumb-target active:scale-90 ${
-            aiDrawerOpen
-              ? 'bg-slate-800 text-white border border-white/30 rotate-90 shadow-black/80'
-              : 'bg-gradient-to-tr from-red-600 via-rose-600 to-amber-500 text-white border border-red-400/40 shadow-red-950/80 hover:scale-105'
-          }`}
-          aria-label={aiDrawerOpen ? 'AI Strategist を閉じる' : 'AI Strategist を起動'}
-          title="AI 戦略アナリスト（タップで開閉）"
-        >
-          {aiDrawerOpen ? (
-            <span className="text-lg font-bold">✕</span>
-          ) : (
-            <>
-              <span className="text-xl">🤖</span>
-              <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-400 border-2 border-slate-950 rounded-full animate-pulse" />
-            </>
-          )}
-        </button>
+        {!aiDrawerOpen && (
+          <button
+            type="button"
+            onClick={() => setAiDrawerOpen(true)}
+            className="md:hidden fixed right-3.5 bottom-[calc(4.9rem+env(safe-area-inset-bottom))] z-40 w-11 h-11 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 cursor-pointer thumb-target active:scale-90 bg-gradient-to-tr from-red-600 via-rose-600 to-amber-500 text-white border border-red-400/40 shadow-red-950/80 hover:scale-105"
+            aria-label="AI Strategist を起動"
+            title="AI 戦略アナリスト（タップで起動）"
+          >
+            <span className="text-lg">🤖</span>
+            <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 border-2 border-slate-950 rounded-full animate-pulse" />
+          </button>
+        )}
       </div>
 
       {/* ── Slide-over AI Strategist & Notebook Drawer (Desktop, Tablet & Mobile) ── */}
@@ -2106,8 +2098,8 @@ export default function DashboardPage() {
             onClick={() => setAiDrawerOpen(false)}
           />
 
-          {/* Drawer Panel */}
-          <div className="relative z-10 w-[88vw] max-w-[440px] sm:w-[420px] md:w-[460px] h-full bg-slate-900/95 border-l border-white/15 shadow-2xl flex flex-col overflow-hidden animate-slide-left">
+          {/* Drawer Panel (Mobile: Full Width for comfortable touch input & zero edge overflow) */}
+          <div className="relative z-10 w-full sm:w-[420px] md:w-[460px] h-full bg-slate-900/98 sm:bg-slate-900/95 border-l border-white/15 shadow-2xl flex flex-col overflow-hidden animate-slide-left">
             {/* Drawer Header & Tabs */}
             <div className="flex items-center justify-between px-4 pt-4 pb-2 border-b border-white/10 bg-slate-950/60 flex-shrink-0">
               {/* Tab switcher */}
