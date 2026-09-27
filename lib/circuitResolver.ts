@@ -361,3 +361,332 @@ export function resolveCircuitForSession(session: Session | null | undefined): C
 
   return CIRCUIT_BENCHMARKS['bahrain-international'];
 }
+
+export interface AtmospherePhoto {
+  url: string;
+  caption: string;
+  tag: string;
+}
+
+export function getCircuitAtmospherePhotos(circuitId: string, gpName: string = ''): [AtmospherePhoto, AtmospherePhoto] {
+  const photoMap: Record<string, [AtmospherePhoto, AtmospherePhoto]> = {
+    'suzuka': [
+      {
+        url: '/images/circuits/circuit_suzuka_real.jpg',
+        caption: '鈴鹿名物の大観覧車と超満員のグランドスタンド。世界屈指の熱気',
+        tag: 'グランドスタンド＆熱気'
+      },
+      {
+        url: '/images/circuits/circuit_suzuka.jpg',
+        caption: '名物S字カーブと逆バンク。200km/h超で駆け抜けるドライバーズサーキット',
+        tag: 'S字＆テクニカル区間'
+      }
+    ],
+    'circuit-de-monaco': [
+      {
+        url: '/images/circuits/circuit_monaco_real.jpg',
+        caption: 'モンテカルロ港の豪華ヨット群とカジノ広場。F1屈指の格式と歴史',
+        tag: 'ハーバー＆カジノ広場'
+      },
+      {
+        url: '/images/circuits/circuit_monaco.jpg',
+        caption: 'フェアモント・ヘアピン（旧ロウズ）とトンネル区間の超絶接近戦',
+        tag: '最遅ヘアピン＆トンネル'
+      }
+    ],
+    'spa-francorchamps': [
+      {
+        url: '/images/circuits/circuit_spa_real.jpg',
+        caption: 'アルデンヌの森に轟く轟音。名物オールージュ〜ラディオンの急勾配の絶景',
+        tag: 'オールージュ＆森林'
+      },
+      {
+        url: '/images/circuits/circuit_spa.jpg',
+        caption: 'ケメルストレートエンドのレ・コームとプーホンの超高速ダブルエイペックス',
+        tag: 'ケメル＆プーホン'
+      }
+    ],
+    'monza': [
+      {
+        url: '/images/circuits/circuit_monza_real.jpg',
+        caption: 'ティフォシの深紅の熱気と王立公園に響く超高回転サウンド。速度の神殿',
+        tag: 'ティフォシの熱気'
+      },
+      {
+        url: '/images/circuits/circuit_monza.jpg',
+        caption: '350km/h超からのフルブレーキング勝負・第1シケインと名物パラボリカ',
+        tag: '速度の神殿・シケイン'
+      }
+    ],
+    'silverstone': [
+      {
+        url: '/images/circuits/circuit_silverstone_real.jpg',
+        caption: 'モータースポーツ発祥の地。新ピット棟The Wingと熱狂のホームストレート',
+        tag: 'The Wing＆ホーム'
+      },
+      {
+        url: '/images/circuits/circuit_silverstone.jpg',
+        caption: 'マゴッツ・ベケッツ・チャペルの極限横G連続切り返しとコプスコーナー',
+        tag: 'マゴッツ＆ベケッツ'
+      }
+    ],
+    'albert-park': [
+      {
+        url: '/images/circuits/circuit_albert_park_real.jpg',
+        caption: 'メルボルンの湖畔公園に特設される美しい緑と高層ビル群のコントラスト',
+        tag: '湖畔公園＆開幕戦熱狂'
+      },
+      {
+        url: '/images/circuits/circuit_albert_park.jpg',
+        caption: '高速化したセクター2とターン9-10の超ハイスピードシケインアプローチ',
+        tag: '高速レイクサイド'
+      }
+    ],
+    'shanghai': [
+      {
+        url: '/images/circuits/circuit_shanghai_real.jpg',
+        caption: '漢字の「上」を象った巨大建築メインスタンドと未来的なパドック景観',
+        tag: '巨大スタンド＆パドック'
+      },
+      {
+        url: '/images/circuits/circuit_shanghai.jpg',
+        caption: 'ターン1-2の巻き込むような「かたつむりコーナー」と1.2kmロングストレート',
+        tag: 'ロングストレート'
+      }
+    ],
+    'bahrain-international': [
+      {
+        url: '/images/circuits/circuit_bahrain_real.jpg',
+        caption: '砂漠の夜空を白銀に照らす無数の投光器。ナイトレースの幻想的な輝き',
+        tag: '砂漠のナイトレース'
+      },
+      {
+        url: '/images/circuits/circuit_bahrain.jpg',
+        caption: 'オアシスタワーと花崗岩アスファルト。激しいタイヤ摩耗とターン10',
+        tag: 'オアシスタワー'
+      }
+    ],
+    'jeddah': [
+      {
+        url: '/images/circuits/circuit_jeddah_real.jpg',
+        caption: '紅海沿岸を平均時速250km/h超で駆け抜ける世界最速の市街地サーキット',
+        tag: '紅海コーストライン'
+      },
+      {
+        url: '/images/circuits/circuit_jeddah.jpg',
+        caption: 'バンク角12度のターン13と連続するブラインド高速コーナーの緊迫感',
+        tag: 'バンク＆ブラインドS字'
+      }
+    ],
+    'miami': [
+      {
+        url: '/images/circuits/circuit_miami_real.jpg',
+        caption: 'NFLハードロック・スタジアムを取り囲むアメリカンエンターテインメントの祭典',
+        tag: 'スタジアム＆キャンパス'
+      },
+      {
+        url: '/images/circuits/circuit_miami.jpg',
+        caption: '高速マリーナセクターとターン14-15の高架下タイトシケイン',
+        tag: '高架下シケイン'
+      }
+    ],
+    'imola': [
+      {
+        url: '/images/circuits/circuit_imola_real.jpg',
+        caption: 'サンテルモの丘とエンツォ・エ・ディーノ・フェラーリの歴史と情熱の聖地',
+        tag: '歴史の聖地＆丘陵'
+      },
+      {
+        url: '/images/circuits/circuit_imola.jpg',
+        caption: 'トサコーナーのすり鉢状バンクとアクエ・ミネラリの超難関ブレーキング',
+        tag: 'トサ＆アクエミネラリ'
+      }
+    ],
+    'catalunya': [
+      {
+        url: '/images/circuits/circuit_catalunya.jpg',
+        caption: 'マシンの総合空力性能が白日の下に晒されるバルセロナの名門コース',
+        tag: '名門カタロニア全景'
+      },
+      {
+        url: '/images/circuits/circuit_asset_12.jpg',
+        caption: '超ロングなターン3のロングスウィープとリニューアルされた最終高速ベンド',
+        tag: '高速ターン3'
+      }
+    ],
+    'villeneuve': [
+      {
+        url: '/images/circuits/circuit_villeneuve_real.jpg',
+        caption: 'セント・ローレンス川に浮かぶノートルダム島。緑豊かな万博跡地の特設コース',
+        tag: 'ノートルダム島＆水辺'
+      },
+      {
+        url: '/images/circuits/circuit_villeneuve.jpg',
+        caption: 'チャンピオンたちの挑戦を阻んできた最終シケイン「チャンピオンの壁」',
+        tag: 'チャンピオンの壁'
+      }
+    ],
+    'redbull-ring': [
+      {
+        url: '/images/circuits/circuit_redbull_ring_real.jpg',
+        caption: '雄大なシュタイアーマルク山脈のパノラマと巨大な雄牛モニュメント',
+        tag: 'アルプス山脈＆雄牛'
+      },
+      {
+        url: '/images/circuits/circuit_redbull_ring.jpg',
+        caption: '急勾配を駆け上がるターン1〜ターン3の強烈なオーバーテイク合戦',
+        tag: '急勾配アップヒル'
+      }
+    ],
+    'hungaroring': [
+      {
+        url: '/images/circuits/circuit_hungaroring.jpg',
+        caption: 'すり鉢状の天然スタンドからコースの大半が見渡せる夏の伝統グランプリ',
+        tag: '天然すり鉢スタンド'
+      },
+      {
+        url: '/images/circuits/circuit_asset_18.jpg',
+        caption: '「壁のないモナコ」と称される息つく暇もない中低速テクニカルコーナー群',
+        tag: 'ツイスティ・インフィールド'
+      }
+    ],
+    'zandvoort': [
+      {
+        url: '/images/circuits/circuit_zandvoort.jpg',
+        caption: '北海沿岸の砂丘地帯を縫うように走るオレンジアーミー歓喜のオランダGP',
+        tag: '砂丘＆オレンジアーミー'
+      },
+      {
+        url: '/images/circuits/circuit_asset_19.jpg',
+        caption: 'バンク角18度のターザンカーブとアリー・ルイエンダイク・バンクの迫力',
+        tag: '18度バンクコーナー'
+      }
+    ],
+    'baku': [
+      {
+        url: '/images/circuits/circuit_baku_real.jpg',
+        caption: '世界遺産の旧市街城壁と超近代的なカスピ海プロムナードの強烈な対比',
+        tag: '旧市街城壁＆超近代都市'
+      },
+      {
+        url: '/images/circuits/circuit_baku.jpg',
+        caption: '幅わずか7.6mの城壁セクションと時速350km/h超の2.2kmメイン直線',
+        tag: '城壁狭窄路＆最高速直線'
+      }
+    ],
+    'singapore': [
+      {
+        url: '/images/circuits/circuit_singapore_real.jpg',
+        caption: 'マリーナベイ・サンズを背景に熱帯の夜を疾走する世界初のF1ナイトレース',
+        tag: 'マリーナベイ夜景'
+      },
+      {
+        url: '/images/circuits/circuit_singapore.jpg',
+        caption: 'アンダーソン橋を渡る歴史的ストリートと湿度80%超の過酷なサバイバル戦',
+        tag: 'アンダーソン橋＆シティ'
+      }
+    ],
+    'cota': [
+      {
+        url: '/images/circuits/circuit_cota_real.jpg',
+        caption: '赤白青の星条旗カラーと高さ77mの展望タワーが象徴するテキサスの熱気',
+        tag: '展望タワー＆星条旗'
+      },
+      {
+        url: '/images/circuits/circuit_cota.jpg',
+        caption: '高低差41mを一気に駆け上がるブラインドの急勾配ターン1ブレーキング',
+        tag: '急坂ターン1アプローチ'
+      }
+    ],
+    'mexico': [
+      {
+        url: '/images/circuits/circuit_mexico_real.jpg',
+        caption: '旧野球場フォロ・ソルに作られたスタジアムセクション。4万人の大歓声',
+        tag: 'フォロ・ソル野球場'
+      },
+      {
+        url: '/images/circuits/circuit_mexico.jpg',
+        caption: '標高2,285mの希薄な空気。最高速350km/hと低下するダウンフォース',
+        tag: '高地2285mメイン直線'
+      }
+    ],
+    'interlagos': [
+      {
+        url: '/images/circuits/circuit_interlagos_real.jpg',
+        caption: 'サンパウロの熱狂的なサンバのリズムとセナの魂が宿る伝統のインテルラゴス',
+        tag: 'セナの聖地＆大観衆'
+      },
+      {
+        url: '/images/circuits/circuit_interlagos.jpg',
+        caption: '下りながら左右に切り返す名物エス・ド・セナと急坂を駆け上がる最終加速',
+        tag: 'エス・ド・セナ'
+      }
+    ],
+    'las-vegas': [
+      {
+        url: '/images/circuits/circuit_las_vegas_real.jpg',
+        caption: 'ラスベガス・ストリップ通りを封鎖し、ネオンと巨大Sphereが輝く土曜ナイトレース',
+        tag: 'ストリップ通り＆Sphere'
+      },
+      {
+        url: '/images/circuits/circuit_las_vegas.jpg',
+        caption: 'ベラージオの噴水前を時速350km/hで駆け抜ける約2kmの超高速ストレート',
+        tag: 'ベラージオ噴水前直線'
+      }
+    ],
+    'losail': [
+      {
+        url: '/images/circuits/circuit_losail_real.jpg',
+        caption: '最新鋭のピットビルディングと砂漠を照らすLED照明。中東カタールの豪華舞台',
+        tag: 'カタールLEDナイト'
+      },
+      {
+        url: '/images/circuits/circuit_losail.jpg',
+        caption: '流れるような中高速コーナーの連続とドライバーを極限まで追い詰める過酷な熱',
+        tag: '超高速フローセクション'
+      }
+    ],
+    'yas-marina': [
+      {
+        url: '/images/circuits/circuit_yas_marina_real.jpg',
+        caption: 'Wアブダビ・ホテルのイルミネーションと夕暮れから夜へ移ろうトワイライトレース',
+        tag: 'Wホテル＆トワイライト'
+      },
+      {
+        url: '/images/circuits/circuit_yas_marina.jpg',
+        caption: '改修された高速バンクコーナーとシーズンフィナーレの華やかな表彰台',
+        tag: 'グランドフィナーレ'
+      }
+    ],
+    'madrid': [
+      {
+        url: '/images/circuits/circuit_madrid.jpg',
+        caption: '2026年新設のIFEMAマドリード市街地コース。展示会場と公道が融合した新舞台',
+        tag: 'IFEMAマドリード新設'
+      },
+      {
+        url: '/images/circuits/circuit_asset_14.jpg',
+        caption: '高速立体交差と市街地ストリートセクションが織りなす次世代のレイアウト',
+        tag: '次世代ハイブリッド市街地'
+      }
+    ],
+  };
+
+  const cleanId = circuitId.toLowerCase().replace(/_/g, '-');
+  const match = photoMap[cleanId] || photoMap[circuitId];
+  if (match) return match;
+
+  const fallbackBase = cleanId.replace(/-/g, '_');
+  return [
+    {
+      url: `/images/circuits/circuit_${fallbackBase}_real.jpg`,
+      caption: `${gpName || 'グランプリ'} の熱狂に包まれるサーキット全景`,
+      tag: 'サーキット全景'
+    },
+    {
+      url: `/images/circuits/circuit_${fallbackBase}.jpg`,
+      caption: `${gpName || 'グランプリ'} の名所コーナーと白熱のコースセクター`,
+      tag: '名所コース'
+    }
+  ];
+}

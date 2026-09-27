@@ -43,6 +43,8 @@ body {
   overflow: hidden;
   background-color: #0b0c10;
   color: #ffffff;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
 }
 
 body {
@@ -53,6 +55,33 @@ body {
   height: 100vh;
   height: 100dvh;
   line-height: 1.5;
+  touch-action: manipulation;
+}
+
+/* Touch Ergonomics & Safe Area Utilities for Mobile */
+button, a, input, select {
+  touch-action: manipulation;
+}
+
+.thumb-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-bottom-nav {
+  padding-bottom: max(0.6rem, env(safe-area-inset-bottom, 0.6rem));
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Custom Scrollbars */

@@ -27,6 +27,9 @@ import {
   type QuestionFormat,
   type QuizQuestion,
 } from '@/data/f1QuizData';
+import { usePlanTier } from '@/lib/tierService';
+import { OFFICIAL_AFFILIATE_ITEMS } from '@/lib/monetizationConfig';
+import { ExternalLink, Sparkles, BookOpen, Tv } from 'lucide-react';
 // Real FOM Broadcast Audio: using HTML5 Audio element directly
 
 interface F1QuizModalProps {
@@ -46,6 +49,7 @@ export default function F1QuizModal({
   onClose,
   onNavigateToTab,
 }: F1QuizModalProps) {
+  const { isPro } = usePlanTier();
   const [mounted, setMounted] = useState(false);
   const [phase, setPhase] = useState<QuizPhase>('intro');
   const [gameMode, setGameMode] = useState<QuizGameMode>('standard');
@@ -1097,6 +1101,58 @@ export default function F1QuizModal({
                 {rankInfo.comment}
               </p>
             </div>
+
+            {/* Quiz Result Sponsor Recommendation (クイズ完走時スポンサー推奨枠) */}
+            {!isPro && (
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900/95 via-slate-850 to-slate-900 border border-amber-500/30 text-left shadow-lg">
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <span className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-amber-400">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>F1知識をさらに極める公式推奨ガイド</span>
+                  </span>
+                  <span className="text-[9px] text-slate-500 font-mono">PR / 公式パートナー</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-0.5">
+                  {/* Item 1: Books */}
+                  <a
+                    href={OFFICIAL_AFFILIATE_ITEMS.f1_magazine.affiliateUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-emerald-500/30 hover:border-emerald-500/50 transition-all flex items-center justify-between group"
+                  >
+                    <div className="space-y-0.5 min-w-0 pr-2">
+                      <div className="flex items-center gap-1 text-[10px] font-racing font-bold text-emerald-300">
+                        <BookOpen className="w-3 h-3 shrink-0" />
+                        <span className="truncate">F1速報 / 公式技術解説本</span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 truncate">
+                        2026新規定PU・空力革命の公式解説誌
+                      </p>
+                    </div>
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-300 shrink-0" />
+                  </a>
+
+                  {/* Item 2: F1 TV / FOD */}
+                  <a
+                    href={OFFICIAL_AFFILIATE_ITEMS.fod_broadcast.affiliateUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-red-500/30 hover:border-red-500/50 transition-all flex items-center justify-between group"
+                  >
+                    <div className="space-y-0.5 min-w-0 pr-2">
+                      <div className="flex items-center gap-1 text-[10px] font-racing font-bold text-red-300">
+                        <Tv className="w-3 h-3 shrink-0" />
+                        <span className="truncate">FOD ＆ F1 TV 公式中継</span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 truncate">
+                        全20台オンボード＆無線でレースを検証
+                      </p>
+                    </div>
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-red-300 shrink-0" />
+                  </a>
+                </div>
+              </div>
+            )}
 
             {/* Action Buttons: Retry, Change Filters, Share X */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">

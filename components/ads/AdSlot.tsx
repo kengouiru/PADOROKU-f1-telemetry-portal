@@ -195,30 +195,95 @@ export default function AdSlot({
     );
   }
 
-  // 4. Library Gear Variant (Product recommendation)
+  // 4. Library Gear Variant (Curated 4-Card Multi-Partner Showcase)
+  const libraryItems = [
+    {
+      ...OFFICIAL_AFFILIATE_ITEMS.f1_store_official,
+      badge: '🛍️ 公式チームギア',
+      themeBorder: 'border-blue-500/30 hover:border-blue-500/50',
+      badgeBg: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
+      buttonBg: 'bg-blue-500/15 hover:bg-blue-500/25 border-blue-500/30 text-blue-200',
+    },
+    {
+      ...OFFICIAL_AFFILIATE_ITEMS.fanatec_sim,
+      badge: '🏎️ プロ仕様SIMギア',
+      themeBorder: 'border-amber-500/30 hover:border-amber-500/50',
+      badgeBg: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+      buttonBg: 'bg-amber-500/15 hover:bg-amber-500/25 border-amber-500/30 text-amber-200',
+    },
+    {
+      ...OFFICIAL_AFFILIATE_ITEMS.f1_magazine,
+      badge: '📕 技術解説・専門誌',
+      themeBorder: 'border-emerald-500/30 hover:border-emerald-500/50',
+      badgeBg: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+      buttonBg: 'bg-emerald-500/15 hover:bg-emerald-500/25 border-emerald-500/30 text-emerald-200',
+    },
+    {
+      ...OFFICIAL_AFFILIATE_ITEMS.fod_broadcast,
+      badge: '📺 公式中継 ＆ F1 TV',
+      themeBorder: 'border-red-500/30 hover:border-red-500/50',
+      badgeBg: 'bg-red-500/15 text-red-300 border-red-500/30',
+      buttonBg: 'bg-red-500/15 hover:bg-red-500/25 border-red-500/30 text-red-200',
+    },
+  ];
+
   return (
-    <div className={`p-4 rounded-2xl bg-slate-900/80 border border-white/10 hover:border-white/20 transition-all ${className}`}>
-      <div className="flex items-center justify-between gap-2 mb-2">
-        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/15 text-blue-300 border border-blue-500/30 font-bold">
-          {item.badge}
-        </span>
-        <span className="text-[10px] text-slate-500 font-mono">公式ショップ推奨リンク</span>
+    <div className={`p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-slate-900/90 to-slate-950 border border-white/10 shadow-xl ${className}`}>
+      {/* Section Header */}
+      <div className="flex items-center justify-between gap-2 mb-3.5 pb-2.5 border-b border-white/10">
+        <div className="flex items-center gap-2">
+          <span className="w-1.5 h-3.5 bg-red-500 rounded-full" />
+          <h4 className="font-racing font-bold text-xs sm:text-sm text-white tracking-wide">
+            OFFICIAL PARTNERS & RECOMMENDED GEAR / 公式推奨パートナー＆ギア
+          </h4>
+          <span className="hidden md:inline-block text-[10px] text-slate-400 font-mono">
+            (大百科・ナレッジ連携)
+          </span>
+        </div>
+        {onUpgradeClick && (
+          <button
+            type="button"
+            onClick={onUpgradeClick}
+            className="text-[10px] text-slate-500 hover:text-slate-300 font-mono transition-colors shrink-0"
+          >
+            ⭐ Pitwall Proなら非表示
+          </button>
+        )}
       </div>
-      <h5 className="font-racing font-bold text-white text-xs mb-1">
-        {item.title}
-      </h5>
-      <p className="text-[11px] text-slate-400 leading-relaxed mb-3">
-        {item.description}
-      </p>
-      <a
-        href={item.affiliateUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-slate-200 text-xs font-mono transition-colors"
-      >
-        <span>{item.ctaText}</span>
-        <ExternalLink className="w-3.5 h-3.5" />
-      </a>
+
+      {/* 4-Card Responsive Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {libraryItems.map((gear) => (
+          <div
+            key={gear.id}
+            className={`p-3.5 rounded-xl bg-slate-900/80 border ${gear.themeBorder} transition-all duration-200 flex flex-col justify-between shadow-md group`}
+          >
+            <div>
+              <div className="flex items-center justify-between gap-1 mb-2">
+                <span className={`text-[10px] font-mono px-2 py-0.5 rounded border font-bold ${gear.badgeBg}`}>
+                  {gear.badge}
+                </span>
+                <span className="text-[9px] text-slate-500 font-mono">公式推奨</span>
+              </div>
+              <h5 className="font-racing font-bold text-white text-xs mb-1.5 group-hover:text-amber-300 transition-colors line-clamp-1">
+                {gear.title}
+              </h5>
+              <p className="text-[11px] text-slate-400 leading-relaxed mb-3 line-clamp-2">
+                {gear.description}
+              </p>
+            </div>
+            <a
+              href={gear.affiliateUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-lg border text-xs font-mono font-bold transition-all hover:scale-[1.02] ${gear.buttonBg}`}
+            >
+              <span>{gear.ctaText}</span>
+              <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

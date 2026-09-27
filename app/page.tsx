@@ -212,7 +212,7 @@ export default function DashboardPage() {
   const [proModalOpen, setProModalOpen] = useState(false);
   const [interstitialOpen, setInterstitialOpen] = useState(false);
   const { isPro } = usePlanTier();
-  const [mobileTab, setMobileTab] = useState<MobileTab>('telemetry');
+  const [mobileTab, setMobileTab] = useState<MobileTab>('season');
   const [rightPanelTab, setRightPanelTab] = useState<RightPanelTab>('ai');
   const [sidebarOpen, setSidebarOpen] = useState(false); // mobile sidebar drawer
   const [aiDrawerOpen, setAiDrawerOpen] = useState(false); // AI & Notebook slide drawer
@@ -1718,11 +1718,11 @@ export default function DashboardPage() {
 
           {/* Right: Quick Tools (Search, Quiz, Auth + Dedicated PITWALL Game Launcher) */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {/* Special Standalone PITWALL Game Launcher (特別独立起動ボタン) */}
+            {/* Special Standalone PITWALL Game Launcher (特別独立起動ボタン - スマホではボトムナビに専任) */}
             <button
               type="button"
               onClick={handleLaunchPitwall}
-              className="btn-console relative px-3 py-1.5 rounded-xl font-racing font-bold text-xs bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white border border-red-400/60 hover:border-white shadow-lg shadow-red-950/80 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center gap-1.5 shrink-0 group"
+              className="btn-console relative px-3 py-1.5 rounded-xl font-racing font-bold text-xs bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 text-white border border-red-400/60 hover:border-white shadow-lg shadow-red-950/80 hover:scale-105 active:scale-95 transition-all cursor-pointer hidden sm:flex items-center gap-1.5 shrink-0 group"
               title="F1 PITWALL 司令塔ゲームを別画面・全画面で起動"
             >
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
@@ -1737,8 +1737,9 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setGlobalSearchOpen(true)}
-              className="btn-console flex items-center gap-1.5 shrink-0"
+              className="btn-console p-2 sm:px-2.5 sm:py-1.5 flex items-center gap-1.5 shrink-0"
               title="選手・チーム・コース・タイヤ・用語の横断検索 (Ctrl+K)"
+              aria-label="検索"
             >
               <Search className="w-3.5 h-3.5 text-sky-400 shrink-0" />
               <span className="hidden sm:inline">検索</span>
@@ -1751,8 +1752,9 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setQuizModalOpen(true)}
-              className="btn-console flex items-center gap-1.5 shrink-0"
+              className="btn-console p-2 sm:px-2.5 sm:py-1.5 flex items-center gap-1.5 shrink-0"
               title="対話型F1クイズ＆トリビア検定"
+              aria-label="F1クイズ"
             >
               <Trophy className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span className="hidden sm:inline">クイズ</span>
@@ -1969,7 +1971,7 @@ export default function DashboardPage() {
         )}
 
         {/* Tab content (with generous bottom padding so fixed navigation doesn't hide content) */}
-        <div ref={mobileScrollRef} className="flex-1 min-h-0 overflow-y-auto p-4 pb-[calc(7.5rem+env(safe-area-inset-bottom))] md:pb-6">
+        <div ref={mobileScrollRef} className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-6">
           {mainHubContent}
 
           {/* Global App Footer with Legal Disclaimer & Quick Links */}
@@ -2011,86 +2013,88 @@ export default function DashboardPage() {
           </footer>
         </div>
 
-        {/* ── Fixed Mobile Bottom Navigation Bar (< md) ── */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-black/90 backdrop-blur-md border-t border-white/10 flex items-center justify-around safe-bottom shadow-[0_-4px_20px_rgba(0,0,0,0.5)] overflow-x-auto no-scrollbar">
-          {appMode === 'season' ? (
-            (
-              [
-                ['season',    <Flag key="s" className="w-5 h-5" />, 'SEASON'],
-                ['telemetry', <Activity key="t" className="w-5 h-5" />, 'TELEMETRY'],
-                ['simulator', <Gamepad2 key="sim" className="w-5 h-5" />, 'PITWALL'],
-                ['news',      <Newspaper key="n" className="w-5 h-5" />, 'NEWS'],
-                ['ai',        <span key="a" className="text-xl leading-none">🤖</span>, 'AI'],
-              ] as [string, React.ReactNode, string][]
-            ).map(([tab, icon, label]) => {
-              const isAiTab = tab === 'ai';
-              const isActive = isAiTab ? aiDrawerOpen : activeHub === tab && !aiDrawerOpen;
+        {/* ── Fixed Mobile Bottom Navigation Bar (< md) (常に安定した5大コアタブ) ── */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-xl border-t border-white/10 flex items-center justify-around safe-bottom-nav shadow-[0_-4px_24px_rgba(0,0,0,0.6)]">
+          {(
+            [
+              ['season',    <Flag key="s" className="w-5 h-5" />, 'SEASON', () => {
+                setAppMode('season');
+                setActiveHub('season');
+                setMobileTab('season');
+                if (aiDrawerOpen) setAiDrawerOpen(false);
+              }, appMode === 'season' && activeHub === 'season'],
 
-              return (
-                <button
-                  key={tab}
-                  onClick={() => {
-                    if (isAiTab) {
-                      setAiDrawerOpen((prev) => !prev);
-                    } else {
-                      setActiveHub(tab as ActiveHub);
-                      setMobileTab(tab as MobileTab);
-                      if (aiDrawerOpen) setAiDrawerOpen(false);
-                    }
-                  }}
-                  className={`flex-1 flex flex-col items-center py-2.5 px-1 gap-0.5 text-xs transition-all relative ${
-                    isActive
-                      ? 'text-red-400 font-bold'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <span className={`text-base transition-transform ${isActive ? 'scale-110' : ''}`}>{icon}</span>
-                  <span className="text-[10px] tracking-tight">{label}</span>
-                  {isActive && (
-                    <span className="absolute bottom-1 w-6 h-0.5 bg-red-500 rounded-full shadow-[0_0_8px_#ef4444]" />
-                  )}
-                </button>
-              );
-            })
-          ) : (
-            (
-              [
-                ['drivers',  '👤', '選手'],
-                ['teams',    '🏎️', 'チーム'],
-                ['circuits', '🏁', 'コース'],
-                ['tyres',    '🛞', 'タイヤ'],
-                ['strategy', '⏱️', '作戦室'],
-                ['rules',    '⚖️', '規定用語'],
-                ['drama',    '🎬', 'ドラマ'],
-                ['history',  '🏛️', '歴史'],
-              ] as [SubTab, string, string][]
-            ).map(([subTab, icon, label]) => {
-              const isActive = activeHub === 'knowledge' && (librarySubTab === subTab || (subTab === 'rules' && (librarySubTab === 'rules' || librarySubTab === 'glossary' || librarySubTab === 'regulations'))) && !aiDrawerOpen;
+              ['telemetry', <Activity key="t" className="w-5 h-5" />, 'TELEMETRY', () => {
+                setAppMode('season');
+                setActiveHub('telemetry');
+                setMobileTab('telemetry');
+                if (aiDrawerOpen) setAiDrawerOpen(false);
+              }, appMode === 'season' && activeHub === 'telemetry'],
 
-              return (
-                <button
-                  key={subTab}
-                  onClick={() => {
-                    setActiveHub('knowledge');
-                    setLibrarySubTab(subTab);
-                    if (aiDrawerOpen) setAiDrawerOpen(false);
-                  }}
-                  className={`flex-1 min-w-[50px] shrink-0 flex flex-col items-center py-2 px-1 gap-0.5 text-xs transition-all relative ${
-                    isActive
-                      ? 'text-sky-400 font-bold'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  <span className={`text-base transition-transform ${isActive ? 'scale-110' : ''}`}>{icon}</span>
-                  <span className="text-[9px] tracking-tight whitespace-nowrap">{label}</span>
-                  {isActive && (
-                    <span className="absolute bottom-1 w-6 h-0.5 bg-sky-500 rounded-full shadow-[0_0_8px_#38bdf8]" />
-                  )}
-                </button>
-              );
-            })
-          )}
+              ['pitwall',   <Gamepad2 key="sim" className="w-5 h-5" />, 'PITWALL', () => {
+                setAppMode('season');
+                setActiveHub('simulator');
+                setMobileTab('simulator');
+                if (aiDrawerOpen) setAiDrawerOpen(false);
+              }, activeHub === 'simulator'],
+
+              ['news',      <Newspaper key="n" className="w-5 h-5" />, 'NEWS', () => {
+                setAppMode('season');
+                setActiveHub('news');
+                setMobileTab('news');
+                if (aiDrawerOpen) setAiDrawerOpen(false);
+              }, appMode === 'season' && activeHub === 'news'],
+
+              ['library',   <BookOpen key="lib" className="w-5 h-5" />, 'LIBRARY', () => {
+                setAppMode('library');
+                setActiveHub('knowledge');
+                setMobileTab('knowledge');
+                if (aiDrawerOpen) setAiDrawerOpen(false);
+              }, appMode === 'library'],
+            ] as [string, React.ReactNode, string, () => void, boolean][]
+          ).map(([key, icon, label, onClick, isActive]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={onClick}
+              className={`flex-1 flex flex-col items-center justify-center py-2 px-1 gap-1 min-h-[48px] transition-all relative thumb-target select-none cursor-pointer active:scale-95 ${
+                isActive
+                  ? 'text-red-400 font-bold'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <span className={`transition-transform duration-200 ${isActive ? 'scale-110 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]' : ''}`}>
+                {icon}
+              </span>
+              <span className="text-[10px] font-racing tracking-tight">{label}</span>
+              {isActive && (
+                <span className="absolute bottom-1 w-7 h-0.5 bg-red-500 rounded-full shadow-[0_0_8px_#ef4444]" />
+              )}
+            </button>
+          ))}
         </nav>
+
+        {/* ── Mobile Floating AI Strategist FAB (親指ゾーン最適配置: 右下) ── */}
+        <button
+          type="button"
+          onClick={() => setAiDrawerOpen((prev) => !prev)}
+          className={`md:hidden fixed right-4 bottom-[calc(4.4rem+env(safe-area-inset-bottom))] z-40 w-12 h-12 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 cursor-pointer thumb-target active:scale-90 ${
+            aiDrawerOpen
+              ? 'bg-slate-800 text-white border border-white/30 rotate-90 shadow-black/80'
+              : 'bg-gradient-to-tr from-red-600 via-rose-600 to-amber-500 text-white border border-red-400/40 shadow-red-950/80 hover:scale-105'
+          }`}
+          aria-label={aiDrawerOpen ? 'AI Strategist を閉じる' : 'AI Strategist を起動'}
+          title="AI 戦略アナリスト（タップで開閉）"
+        >
+          {aiDrawerOpen ? (
+            <span className="text-lg font-bold">✕</span>
+          ) : (
+            <>
+              <span className="text-xl">🤖</span>
+              <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-emerald-400 border-2 border-slate-950 rounded-full animate-pulse" />
+            </>
+          )}
+        </button>
       </div>
 
       {/* ── Slide-over AI Strategist & Notebook Drawer (Desktop, Tablet & Mobile) ── */}

@@ -137,6 +137,332 @@ export function getTeamIdFromName(name: string): string {
   return 'ferrari';
 }
 
+export interface AtmospherePhoto {
+  url: string;
+  caption: string;
+  tag: string;
+}
+
+export function getCircuitAtmospherePhotos(circuitId: string, gpName: string): [AtmospherePhoto, AtmospherePhoto] {
+  const photoMap: Record<string, [AtmospherePhoto, AtmospherePhoto]> = {
+    'suzuka': [
+      {
+        url: '/images/circuits/circuit_suzuka_real.jpg',
+        caption: '鈴鹿名物の大観覧車と超満員のグランドスタンド。世界屈指の熱気',
+        tag: 'グランドスタンド＆熱気'
+      },
+      {
+        url: '/images/circuits/circuit_suzuka.jpg',
+        caption: '名物S字カーブと逆バンク。200km/h超で駆け抜けるドライバーズサーキット',
+        tag: 'S字＆テクニカル区間'
+      }
+    ],
+    'circuit-de-monaco': [
+      {
+        url: '/images/circuits/circuit_monaco_real.jpg',
+        caption: 'モンテカルロ港の豪華ヨット群とカジノ広場。F1屈指の格式と歴史',
+        tag: 'ハーバー＆カジノ広場'
+      },
+      {
+        url: '/images/circuits/circuit_monaco.jpg',
+        caption: 'フェアモント・ヘアピン（旧ロウズ）とトンネル区間の超絶接近戦',
+        tag: '最遅ヘアピン＆トンネル'
+      }
+    ],
+    'spa-francorchamps': [
+      {
+        url: '/images/circuits/circuit_spa_real.jpg',
+        caption: 'アルデンヌの森に轟く轟音。名物オールージュ〜ラディオンの急勾配の絶景',
+        tag: 'オールージュ＆森林'
+      },
+      {
+        url: '/images/circuits/circuit_spa.jpg',
+        caption: 'ケメルストレートエンドのレ・コームとプーホンの超高速ダブルエイペックス',
+        tag: 'ケメル＆プーホン'
+      }
+    ],
+    'monza': [
+      {
+        url: '/images/circuits/circuit_monza_real.jpg',
+        caption: 'ティフォシの深紅の熱気と王立公園に響く超高回転サウンド。速度の神殿',
+        tag: 'ティフォシの熱気'
+      },
+      {
+        url: '/images/circuits/circuit_monza.jpg',
+        caption: '350km/h超からのフルブレーキング勝負・第1シケインと名物パラボリカ',
+        tag: '速度の神殿・シケイン'
+      }
+    ],
+    'silverstone': [
+      {
+        url: '/images/circuits/circuit_silverstone_real.jpg',
+        caption: 'モータースポーツ発祥の地。新ピット棟The Wingと熱狂のホームストレート',
+        tag: 'The Wing＆ホーム'
+      },
+      {
+        url: '/images/circuits/circuit_silverstone.jpg',
+        caption: 'マゴッツ・ベケッツ・チャペルの極限横G連続切り返しとコプスコーナー',
+        tag: 'マゴッツ＆ベケッツ'
+      }
+    ],
+    'albert-park': [
+      {
+        url: '/images/circuits/circuit_albert_park_real.jpg',
+        caption: 'メルボルンの湖畔公園に特設される美しい緑と高層ビル群のコントラスト',
+        tag: '湖畔公園＆開幕戦熱狂'
+      },
+      {
+        url: '/images/circuits/circuit_albert_park.jpg',
+        caption: '高速化したセクター2とターン9-10の超ハイスピードシケインアプローチ',
+        tag: '高速レイクサイド'
+      }
+    ],
+    'shanghai': [
+      {
+        url: '/images/circuits/circuit_shanghai_real.jpg',
+        caption: '漢字の「上」を象った巨大建築メインスタンドと未来的なパドック景観',
+        tag: '巨大スタンド＆パドック'
+      },
+      {
+        url: '/images/circuits/circuit_shanghai.jpg',
+        caption: 'ターン1-2の巻き込むような「かたつむりコーナー」と1.2kmロングストレート',
+        tag: 'ロングストレート'
+      }
+    ],
+    'bahrain-international': [
+      {
+        url: '/images/circuits/circuit_bahrain_real.jpg',
+        caption: '砂漠の夜空を白銀に照らす無数の投光器。ナイトレースの幻想的な輝き',
+        tag: '砂漠のナイトレース'
+      },
+      {
+        url: '/images/circuits/circuit_bahrain.jpg',
+        caption: 'オアシスタワーと花崗岩アスファルト。激しいタイヤ摩耗とターン10',
+        tag: 'オアシスタワー'
+      }
+    ],
+    'jeddah': [
+      {
+        url: '/images/circuits/circuit_jeddah_real.jpg',
+        caption: '紅海沿岸を平均時速250km/h超で駆け抜ける世界最速の市街地サーキット',
+        tag: '紅海コーストライン'
+      },
+      {
+        url: '/images/circuits/circuit_jeddah.jpg',
+        caption: 'バンク角12度のターン13と連続するブラインド高速コーナーの緊迫感',
+        tag: 'バンク＆ブラインドS字'
+      }
+    ],
+    'miami': [
+      {
+        url: '/images/circuits/circuit_miami_real.jpg',
+        caption: 'NFLハードロック・スタジアムを取り囲むアメリカンエンターテインメントの祭典',
+        tag: 'スタジアム＆キャンパス'
+      },
+      {
+        url: '/images/circuits/circuit_miami.jpg',
+        caption: '高速マリーナセクターとターン14-15の高架下タイトシケイン',
+        tag: '高架下シケイン'
+      }
+    ],
+    'imola': [
+      {
+        url: '/images/circuits/circuit_imola_real.jpg',
+        caption: 'サンテルモの丘とエンツォ・エ・ディーノ・フェラーリの歴史と情熱の聖地',
+        tag: '歴史の聖地＆丘陵'
+      },
+      {
+        url: '/images/circuits/circuit_imola.jpg',
+        caption: 'トサコーナーのすり鉢状バンクとアクエ・ミネラリの超難関ブレーキング',
+        tag: 'トサ＆アクエミネラリ'
+      }
+    ],
+    'catalunya': [
+      {
+        url: '/images/circuits/circuit_catalunya.jpg',
+        caption: 'マシンの総合空力性能が白日の下に晒されるバルセロナの名門コース',
+        tag: '名門カタロニア全景'
+      },
+      {
+        url: '/images/circuits/circuit_asset_12.jpg',
+        caption: '超ロングなターン3のロングスウィープとリニューアルされた最終高速ベンド',
+        tag: '高速ターン3'
+      }
+    ],
+    'villeneuve': [
+      {
+        url: '/images/circuits/circuit_villeneuve_real.jpg',
+        caption: 'セント・ローレンス川に浮かぶノートルダム島。緑豊かな万博跡地の特設コース',
+        tag: 'ノートルダム島＆水辺'
+      },
+      {
+        url: '/images/circuits/circuit_villeneuve.jpg',
+        caption: 'チャンピオンたちの挑戦を阻んできた最終シケイン「チャンピオンの壁」',
+        tag: 'チャンピオンの壁'
+      }
+    ],
+    'redbull-ring': [
+      {
+        url: '/images/circuits/circuit_redbull_ring_real.jpg',
+        caption: '雄大なシュタイアーマルク山脈のパノラマと巨大な雄牛モニュメント',
+        tag: 'アルプス山脈＆雄牛'
+      },
+      {
+        url: '/images/circuits/circuit_redbull_ring.jpg',
+        caption: '急勾配を駆け上がるターン1〜ターン3の強烈なオーバーテイク合戦',
+        tag: '急勾配アップヒル'
+      }
+    ],
+    'hungaroring': [
+      {
+        url: '/images/circuits/circuit_hungaroring.jpg',
+        caption: 'すり鉢状の天然スタンドからコースの大半が見渡せる夏の伝統グランプリ',
+        tag: '天然すり鉢スタンド'
+      },
+      {
+        url: '/images/circuits/circuit_asset_18.jpg',
+        caption: '「壁のないモナコ」と称される息つく暇もない中低速テクニカルコーナー群',
+        tag: 'ツイスティ・インフィールド'
+      }
+    ],
+    'zandvoort': [
+      {
+        url: '/images/circuits/circuit_zandvoort.jpg',
+        caption: '北海沿岸の砂丘地帯を縫うように走るオレンジアーミー歓喜のオランダGP',
+        tag: '砂丘＆オレンジアーミー'
+      },
+      {
+        url: '/images/circuits/circuit_asset_19.jpg',
+        caption: 'バンク角18度のターザンカーブとアリー・ルイエンダイク・バンクの迫力',
+        tag: '18度バンクコーナー'
+      }
+    ],
+    'baku': [
+      {
+        url: '/images/circuits/circuit_baku_real.jpg',
+        caption: '世界遺産の旧市街城壁と超近代的なカスピ海プロムナードの強烈な対比',
+        tag: '旧市街城壁＆超近代都市'
+      },
+      {
+        url: '/images/circuits/circuit_baku.jpg',
+        caption: '幅わずか7.6mの城壁セクションと時速350km/h超の2.2kmメイン直線',
+        tag: '城壁狭窄路＆最高速直線'
+      }
+    ],
+    'singapore': [
+      {
+        url: '/images/circuits/circuit_singapore_real.jpg',
+        caption: 'マリーナベイ・サンズを背景に熱帯の夜を疾走する世界初のF1ナイトレース',
+        tag: 'マリーナベイ夜景'
+      },
+      {
+        url: '/images/circuits/circuit_singapore.jpg',
+        caption: 'アンダーソン橋を渡る歴史的ストリートと湿度80%超の過酷なサバイバル戦',
+        tag: 'アンダーソン橋＆シティ'
+      }
+    ],
+    'cota': [
+      {
+        url: '/images/circuits/circuit_cota_real.jpg',
+        caption: '赤白青の星条旗カラーと高さ77mの展望タワーが象徴するテキサスの熱気',
+        tag: '展望タワー＆星条旗'
+      },
+      {
+        url: '/images/circuits/circuit_cota.jpg',
+        caption: '高低差41mを一気に駆け上がるブラインドの急勾配ターン1ブレーキング',
+        tag: '急坂ターン1アプローチ'
+      }
+    ],
+    'mexico': [
+      {
+        url: '/images/circuits/circuit_mexico_real.jpg',
+        caption: '旧野球場フォロ・ソルに作られたスタジアムセクション。4万人の大歓声',
+        tag: 'フォロ・ソル野球場'
+      },
+      {
+        url: '/images/circuits/circuit_mexico.jpg',
+        caption: '標高2,285mの希薄な空気。最高速350km/hと低下するダウンフォース',
+        tag: '高地2285mメイン直線'
+      }
+    ],
+    'interlagos': [
+      {
+        url: '/images/circuits/circuit_interlagos_real.jpg',
+        caption: 'サンパウロの熱狂的なサンバのリズムとセナの魂が宿る伝統のインテルラゴス',
+        tag: 'セナの聖地＆大観衆'
+      },
+      {
+        url: '/images/circuits/circuit_interlagos.jpg',
+        caption: '下りながら左右に切り返す名物エス・ド・セナと急坂を駆け上がる最終加速',
+        tag: 'エス・ド・セナ'
+      }
+    ],
+    'las-vegas': [
+      {
+        url: '/images/circuits/circuit_las_vegas_real.jpg',
+        caption: 'ラスベガス・ストリップ通りを封鎖し、ネオンと巨大Sphereが輝く土曜ナイトレース',
+        tag: 'ストリップ通り＆Sphere'
+      },
+      {
+        url: '/images/circuits/circuit_las_vegas.jpg',
+        caption: 'ベラージオの噴水前を時速350km/hで駆け抜ける約2kmの超高速ストレート',
+        tag: 'ベラージオ噴水前直線'
+      }
+    ],
+    'losail': [
+      {
+        url: '/images/circuits/circuit_losail_real.jpg',
+        caption: '最新鋭のピットビルディングと砂漠を照らすLED照明。中東カタールの豪華舞台',
+        tag: 'カタールLEDナイト'
+      },
+      {
+        url: '/images/circuits/circuit_losail.jpg',
+        caption: '流れるような中高速コーナーの連続とドライバーを極限まで追い詰める過酷な熱',
+        tag: '超高速フローセクション'
+      }
+    ],
+    'yas-marina': [
+      {
+        url: '/images/circuits/circuit_yas_marina_real.jpg',
+        caption: 'Wアブダビ・ホテルのイルミネーションと夕暮れから夜へ移ろうトワイライトレース',
+        tag: 'Wホテル＆トワイライト'
+      },
+      {
+        url: '/images/circuits/circuit_yas_marina.jpg',
+        caption: '改修された高速バンクコーナーとシーズンフィナーレの華やかな表彰台',
+        tag: 'グランドフィナーレ'
+      }
+    ],
+    'madrid': [
+      {
+        url: '/images/circuits/circuit_madrid.jpg',
+        caption: '2026年新設のIFEMAマドリード市街地コース。展示会場と公道が融合した新舞台',
+        tag: 'IFEMAマドリード新設'
+      },
+      {
+        url: '/images/circuits/circuit_asset_14.jpg',
+        caption: '高速立体交差と市街地ストリートセクションが織りなす次世代のレイアウト',
+        tag: '次世代ハイブリッド市街地'
+      }
+    ],
+  };
+
+  const match = photoMap[circuitId];
+  if (match) return match;
+
+  return [
+    {
+      url: `/images/circuits/circuit_${circuitId.replace(/-/g, '_')}_real.jpg`,
+      caption: `${gpName} の熱狂に包まれるサーキット全景`,
+      tag: 'サーキット全景'
+    },
+    {
+      url: `/images/circuits/circuit_${circuitId.replace(/-/g, '_')}.jpg`,
+      caption: `${gpName} の名所コーナーと白熱のコースセクター`,
+      tag: '名所コース'
+    }
+  ];
+}
 
 interface HeroTrackMapCardProps {
   circuitId: string;
@@ -625,7 +951,17 @@ export default function SeasonHub({
 
   const [activeTab, setActiveTab] = useState<MainTab>('track_analysis');
   const [calendarFilter, setCalendarFilter] = useState<'all' | 'sprint'>('all');
-  const [showSeasonInfo, setShowSeasonInfo] = useState<boolean>(false);
+  const [standingsYear, setStandingsYear] = useState<SeasonYear>(() => selectedSeason);
+  const [atmosphereModalImage, setAtmosphereModalImage] = useState<{
+    url: string;
+    caption: string;
+    title: string;
+  } | null>(null);
+
+  useEffect(() => {
+    setStandingsYear(selectedSeason);
+  }, [selectedSeason]);
+
   const [heroSubView, setHeroSubView] = useState<'schedule' | 'weather'>('schedule');
   const [sessionModalOpen, setSessionModalOpen] = useState<boolean>(false);
   const [selectedSessionForModal, setSelectedSessionForModal] = useState<string>('FP1');
@@ -694,6 +1030,19 @@ export default function SeasonHub({
   const activeConstructorStandings = useMemo(() => getConstructorStandings(selectedSeason), [selectedSeason]);
   const seasonEnded = useMemo(() => isSeasonConcluded(activeCalendar), [activeCalendar]);
 
+  // Standings Tab Dynamic Archive Data (supports switching to 2026, 2025, 2024...)
+  const displayedDriverStandings = useMemo(() => getDriverStandings(standingsYear), [standingsYear]);
+  const displayedConstructorStandings = useMemo(() => getConstructorStandings(standingsYear), [standingsYear]);
+  const maxDisplayedDriverPoints = useMemo(() => {
+    return Math.max(1, ...(displayedDriverStandings.map((d) => d.points) || [1]));
+  }, [displayedDriverStandings]);
+  const maxDisplayedTeamPoints = useMemo(() => {
+    return Math.max(1, ...(displayedConstructorStandings.map((c) => c.points) || [1]));
+  }, [displayedConstructorStandings]);
+  const standingsArchive = useMemo(() => {
+    return standingsYear !== '2026' ? getHistoricalArchive(parseInt(standingsYear, 10)) : null;
+  }, [standingsYear]);
+
   const userHasSelectedRoundRef = React.useRef(false);
 
   // Selected Round: Auto-defaults to the next upcoming race of that season
@@ -733,6 +1082,10 @@ export default function SeasonHub({
   const selectedReport = useMemo(() => {
     return getGrandPrixReportByCircuitId(selectedCircuitId) || getGrandPrixReportByRound(selectedRound);
   }, [selectedCircuitId, selectedRound]);
+
+  const selectedAtmospherePhotos = useMemo(() => {
+    return getCircuitAtmospherePhotos(selectedCircuitId, selectedRace?.gpName || '');
+  }, [selectedCircuitId, selectedRace]);
 
   // Authentic 2026 Race & Quali Classifications
   const raceClassification2026 = useMemo(() => {
@@ -835,122 +1188,52 @@ export default function SeasonHub({
               </span>
             </div>
           )}
-
-          <button
-            type="button"
-            onClick={() => setShowSeasonInfo(!showSeasonInfo)}
-            className={`px-2.5 py-1.5 rounded-xl border text-xs font-racing font-bold transition-all flex items-center gap-1 shrink-0 ${
-              showSeasonInfo
-                ? 'bg-sky-600/30 border-sky-400/50 text-sky-200'
-                : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-400 hover:text-white'
-            }`}
-            title="シーズン自動移行の設計と仕組み"
-          >
-            <span>ℹ️</span>
-            <span className="hidden sm:inline">自動切替の仕組み</span>
-          </button>
         </div>
       </div>
-
-      {/* Season Rollover Architecture Explanation Card */}
-      {showSeasonInfo && (
-        <div className="p-4 rounded-2xl bg-sky-950/40 border border-sky-500/30 shadow-xl space-y-3 animate-fadeIn">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">🤖</span>
-              <h4 className="font-racing font-bold text-sm text-sky-200">
-                PADOROKU シーズン自動判定＆移行アーキテクチャ
-              </h4>
-            </div>
-            <button
-              onClick={() => setShowSeasonInfo(false)}
-              className="text-slate-400 hover:text-white text-xs font-mono"
-            >
-              ✕ 閉じる
-            </button>
-          </div>
-          <p className="text-xs text-slate-300 leading-relaxed">
-            本アプリは端末の現在日時（<span className="font-mono text-amber-300">new Date()</span>）とFIA公式グランプリ日程（targetDateUtc）をリアルタイムに照合し、以下のインテリジェントな自動化を行っています。
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 text-xs">
-            <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
-              <div className="font-racing font-bold text-emerald-400 flex items-center gap-1">
-                <span>⚡</span>
-                <span>1. 次戦自動フォーカス</span>
-              </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
-                現行シーズン中（3月〜11月）は、未完了の最初のレース（次回開催GP）を自動検出してトップ画面に表示し、秒刻みのカウントダウンを作動させます。
-              </p>
-            </div>
-            <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
-              <div className="font-racing font-bold text-amber-400 flex items-center gap-1">
-                <span>🏁</span>
-                <span>2. シーズン終了＆オフシーズン</span>
-              </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
-                第24戦アブダビGPが終了すると、自動的に「年間リザルト確定」モードへシフト。冬季オフシーズン中も年間王者や獲得ポイントを明瞭に表示します。
-              </p>
-            </div>
-            <div className="p-3 rounded-xl bg-black/40 border border-white/5 space-y-1">
-              <div className="font-racing font-bold text-sky-400 flex items-center gap-1">
-                <span>🔄</span>
-                <span>3. 年越し・新シーズン自動移行</span>
-              </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
-                新年の到来や新シーズン日程の登録に伴い、デフォルト画面が次年度へ自動移行。過去シーズンはワンタップでアーカイブとして常時アクセス可能です。
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ─────────────────────────────────────────────────────────────
           1. NEXT RACE HERO & DUAL-TIME SCHEDULE BANNER (Professional Cockpit Edition)
           ───────────────────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900/95 via-slate-950 to-neutral-950 p-4 sm:p-5 shadow-2xl">
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900/95 via-slate-950 to-neutral-950 p-3.5 sm:p-5 shadow-2xl">
         {/* Background subtle atmospheric red glow */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
 
-        <div className="relative z-10 flex flex-col lg:flex-row gap-5 items-stretch justify-between">
+        <div className="relative z-10 flex flex-col lg:flex-row gap-4 sm:gap-5 items-stretch justify-between">
           {/* Left Column: Race Header, Circuit Metadata, Dual-Time Schedule */}
-          <div className="space-y-3.5 flex-1 min-w-0">
+          <div className="space-y-3 sm:space-y-3.5 flex-1 min-w-0">
             {/* Top row: Status Badges Strip */}
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               {isRaceLive && (
-                <span className="px-3 py-1 rounded-full text-xs font-racing font-bold tracking-wider uppercase bg-red-600/20 text-red-400 border border-red-500/40 shadow-sm flex items-center gap-1.5">
+                <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-racing font-bold tracking-wider uppercase bg-red-600/20 text-red-400 border border-red-500/40 shadow-sm flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse inline-block" />
                   <span>LIVE RACING IN PROGRESS</span>
                 </span>
               )}
-              <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold tracking-wider uppercase bg-red-500/15 text-red-400 border border-red-500/30 shadow-sm flex items-center gap-1.5">
+              <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase bg-red-500/15 text-red-400 border border-red-500/30 shadow-sm flex items-center gap-1.5">
                 <span>🏁</span>
                 <span>{selectedSeason}年 第{selectedRace.round}戦 / 全{activeCalendar.length}戦</span>
               </span>
               {selectedRace.isSprint && (
-                <span className="px-2.5 py-1 rounded-full text-xs font-racing font-bold bg-gradient-to-r from-violet-950/80 via-slate-900 to-cyan-950/80 text-cyan-300 border border-cyan-400/50 shadow-md shadow-cyan-950/40 flex items-center gap-1.5">
-                  <span className="text-cyan-400 text-sm animate-pulse">⚡</span>
-                  <span className="tracking-wider">SPRINT WEEKEND</span>
+                <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-racing font-bold bg-gradient-to-r from-violet-950/80 via-slate-900 to-cyan-950/80 text-cyan-300 border border-cyan-400/50 shadow-md shadow-cyan-950/40 flex items-center gap-1.5">
+                  <span className="text-cyan-400 text-xs sm:text-sm animate-pulse">⚡</span>
+                  <span className="tracking-wider">SPRINT</span>
                 </span>
               )}
-              <span className="px-2.5 py-1 rounded-full text-xs font-mono text-slate-300 bg-white/5 border border-white/10 flex items-center gap-1.5">
+              <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-mono text-slate-300 bg-white/5 border border-white/10 flex items-center gap-1.5">
                 <span>📅</span>
                 <span>{selectedRace.dates}</span>
-              </span>
-              <span className="px-2.5 py-1 rounded-full text-xs font-mono text-sky-300 bg-sky-500/10 border border-sky-500/25 flex items-center gap-1.5">
-                <span>🌐</span>
-                <span>{currentTzInfo.tzAbbr} ({currentTzInfo.diffLabel})</span>
               </span>
             </div>
 
             {/* Main Title Row: Clean Flag + Authoritative Typography */}
-            <div className="flex items-center gap-3.5">
-              <span className="text-3xl sm:text-4xl shrink-0 drop-shadow-md">{selectedRace.flag}</span>
+            <div className="flex items-center gap-2.5 sm:gap-3.5">
+              <span className="text-2xl sm:text-3xl lg:text-4xl shrink-0 drop-shadow-md">{selectedRace.flag}</span>
               <div className="min-w-0">
-                <div className="flex items-baseline gap-2.5 flex-wrap">
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white tracking-tight leading-tight">
+                <div className="flex items-baseline gap-1.5 sm:gap-2.5 flex-wrap">
+                  <h1 className="text-lg sm:text-2xl lg:text-3xl font-black text-white tracking-tight leading-tight">
                     {toJapaneseGpName(selectedRace.gpName)}
                   </h1>
-                  <span className="font-mono text-xs font-semibold text-slate-400 tracking-wider uppercase">
+                  <span className="font-mono text-[11px] sm:text-xs font-semibold text-slate-400 tracking-wider uppercase truncate">
                     {getDisplayCircuitName(selectedRace)}
                   </span>
                 </div>
@@ -958,33 +1241,106 @@ export default function SeasonHub({
             </div>
 
             {/* Quick Specs Ribbon: Clean Structured Pills */}
-            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300 font-mono">
-              <span className="px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-200 font-medium flex items-center gap-1.5 shadow-sm">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-slate-300 font-mono">
+              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-200 font-medium flex items-center gap-1 shadow-sm">
                 <span>📍</span>
                 <span>{selectedRace.city}、{selectedRace.country}</span>
               </span>
-              <span className="px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-300 flex items-center gap-1.5 shadow-sm">
+              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-300 flex items-center gap-1 shadow-sm">
                 <span>🛣️</span>
-                <span>コース全長: <strong className="text-white font-bold">{selectedRace.lengthKm.toFixed(3)} km</strong></span>
+                <span>コース: <strong className="text-white font-bold">{selectedRace.lengthKm.toFixed(3)} km</strong></span>
               </span>
-              <span className="px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-300 flex items-center gap-1.5 shadow-sm">
+              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-300 flex items-center gap-1 shadow-sm">
                 <span>🔄</span>
-                <span>決勝ラップ数: <strong className="text-white font-bold">{selectedRace.laps} 周</strong></span>
+                <span>周回: <strong className="text-white font-bold">{selectedRace.laps} 周</strong></span>
               </span>
-              <span className="px-2.5 py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-300 flex items-center gap-1.5 shadow-sm">
+              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-300 flex items-center gap-1 shadow-sm">
                 <span>🛞</span>
-                <span>タイヤ割当: <strong className="text-slate-100 font-sans font-semibold">{selectedRace.pirelliCompounds}</strong></span>
+                <span>タイヤ: <strong className="text-slate-100 font-sans font-semibold">{selectedRace.pirelliCompounds}</strong></span>
               </span>
               <button
                 type="button"
                 onClick={() => setIs3dModalOpen(true)}
-                className="px-2.5 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 hover:text-white flex items-center gap-1.5 shadow-sm transition-all cursor-pointer font-bold group"
+                className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 hover:text-white flex items-center gap-1 shadow-sm transition-all cursor-pointer font-bold group"
                 title="コース図・3D標高モデルを起動"
               >
-                <Map className="w-3.5 h-3.5 text-sky-400 group-hover:scale-110 transition-transform" />
-                <span>3Dコース解析 ↗</span>
+                <Map className="w-3 h-3 text-sky-400 group-hover:scale-110 transition-transform" />
+                <span>3Dコース ↗</span>
               </button>
             </div>
+
+            {/* Grand Prix & Circuit Atmosphere: 2 Curated Authentic Photos (スマホでも2列横並びで高さを半減) */}
+            {selectedAtmospherePhotos && (
+              <div className="pt-0.5">
+                <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
+                  {/* Photo 1: Grandstand & Circuit Atmosphere */}
+                  <div
+                    onClick={() => setAtmosphereModalImage({
+                      url: selectedAtmospherePhotos[0].url,
+                      caption: selectedAtmospherePhotos[0].caption,
+                      title: `${toJapaneseGpName(selectedRace.gpName)} - ${selectedAtmospherePhotos[0].tag}`
+                    })}
+                    className="relative group rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 hover:border-amber-400/60 bg-slate-950/90 h-24 sm:h-32 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-amber-950/40"
+                    title="クリックして拡大表示"
+                  >
+                    <img
+                      src={selectedAtmospherePhotos[0].url}
+                      alt={`${selectedRace.gpName} 現地サーキット熱気`}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent pointer-events-none" />
+                    <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 z-10">
+                      <span className="px-1.5 sm:px-2 py-0.2 sm:py-0.5 rounded-md bg-black/80 backdrop-blur-md border border-amber-500/40 text-amber-300 text-[9px] sm:text-[10px] font-racing font-bold tracking-wider uppercase flex items-center gap-1 shadow-sm">
+                        <span>🏁</span>
+                        <span className="truncate max-w-[100px] sm:max-w-none">{selectedAtmospherePhotos[0].tag}</span>
+                      </span>
+                    </div>
+                    <div className="absolute bottom-1.5 sm:bottom-2 left-2 right-2 z-10 flex items-end justify-between gap-1">
+                      <p className="text-[10px] sm:text-[11px] text-slate-200 font-medium leading-tight line-clamp-1 sm:line-clamp-2 drop-shadow group-hover:text-white transition-colors">
+                        {selectedAtmospherePhotos[0].caption}
+                      </p>
+                      <span className="text-[9px] px-1 py-0.2 rounded bg-black/85 text-slate-300 border border-white/20 font-mono shrink-0 group-hover:text-amber-300 group-hover:border-amber-500/50 transition-colors hidden sm:inline">
+                        🔍 拡大
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Photo 2: Iconic Corner / Paddock View */}
+                  <div
+                    onClick={() => setAtmosphereModalImage({
+                      url: selectedAtmospherePhotos[1].url,
+                      caption: selectedAtmospherePhotos[1].caption,
+                      title: `${toJapaneseGpName(selectedRace.gpName)} - ${selectedAtmospherePhotos[1].tag}`
+                    })}
+                    className="relative group rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 hover:border-sky-400/60 bg-slate-950/90 h-24 sm:h-32 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-sky-950/40"
+                    title="クリックして拡大表示"
+                  >
+                    <img
+                      src={selectedAtmospherePhotos[1].url}
+                      alt={`${selectedRace.gpName} 名物コース景観`}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent pointer-events-none" />
+                    <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 z-10">
+                      <span className="px-1.5 sm:px-2 py-0.2 sm:py-0.5 rounded-md bg-black/80 backdrop-blur-md border border-sky-500/40 text-sky-300 text-[9px] sm:text-[10px] font-racing font-bold tracking-wider uppercase flex items-center gap-1 shadow-sm">
+                        <span>📸</span>
+                        <span className="truncate max-w-[100px] sm:max-w-none">{selectedAtmospherePhotos[1].tag}</span>
+                      </span>
+                    </div>
+                    <div className="absolute bottom-1.5 sm:bottom-2 left-2 right-2 z-10 flex items-end justify-between gap-1">
+                      <p className="text-[10px] sm:text-[11px] text-slate-200 font-medium leading-tight line-clamp-1 sm:line-clamp-2 drop-shadow group-hover:text-white transition-colors">
+                        {selectedAtmospherePhotos[1].caption}
+                      </p>
+                      <span className="text-[9px] px-1 py-0.2 rounded bg-black/85 text-slate-300 border border-white/20 font-mono shrink-0 group-hover:text-sky-300 group-hover:border-sky-500/50 transition-colors hidden sm:inline">
+                        🔍 拡大
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Sub-view switcher: Dual Timetable vs Weather */}
             <div className="pt-2.5 border-t border-white/10 space-y-2.5">
@@ -1048,9 +1404,9 @@ export default function SeasonHub({
                           setSelectedSessionForModal(s.session);
                           setSessionModalOpen(true);
                         }}
-                        className={`text-left flex flex-col justify-between p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer group hover:scale-[1.02] active:scale-[0.99] ${
+                        className={`text-left flex flex-col justify-between p-2 sm:p-2.5 md:p-3 rounded-xl border transition-all cursor-pointer group hover:scale-[1.02] active:scale-[0.98] ${
                           dual.isFinalRace
-                            ? 'bg-gradient-to-b from-red-950/35 via-slate-900/90 to-slate-950 border-red-500/40 hover:border-red-400 shadow-md shadow-red-950/20 ring-1 ring-red-500/20 hover:shadow-red-900/30'
+                            ? 'col-span-2 sm:col-span-1 bg-gradient-to-b from-red-950/35 via-slate-900/90 to-slate-950 border-red-500/40 hover:border-red-400 shadow-md shadow-red-950/20 ring-1 ring-red-500/20 hover:shadow-red-900/30'
                             : 'bg-slate-900/80 hover:bg-slate-850 border-white/[0.08] hover:border-sky-500/40'
                         }`}
                         title={`クリックして${s.session}の結果詳細を表示`}
@@ -1724,26 +2080,89 @@ export default function SeasonHub({
           ───────────────────────────────────────────────────────────── */}
       {activeTab === 'standings' && (
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-2.5">
-            <div>
-              <div className="text-xs font-bold text-white flex items-center gap-2">
-                <span>🏆</span>
-                <span>
-                  {selectedSeason === '2026'
-                    ? '2026シーズン 第14戦マドリード終了時点 公式ランキング (全23戦中14戦終了 / 第15戦バクー進行中)'
-                    : `${selectedSeason}シーズン 年間確定選手権ランキング (全${activeCalendar.length}戦終了 / ${getHistoricalArchive(selectedSeason)?.championConstructor.name || ''}WCC)`}
-                </span>
+          <div className="flex flex-col gap-3 border-b border-white/10 pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <div className="text-xs font-bold text-white flex items-center gap-2">
+                  <span>🏆</span>
+                  <span>
+                    {standingsYear === '2026'
+                      ? '2026シーズン 第14戦マドリード終了時点 公式ランキング (全23戦中14戦終了 / 第15戦バクー進行中)'
+                      : `${standingsYear}シーズン 年間確定選手権ランキング (全${getSeasonCalendar(standingsYear).length}戦終了 / ${standingsArchive?.championConstructor?.name || ''} WCC)`}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  {standingsYear === '2026'
+                    ? '新PU規定元年。全11チーム・22名体制による2026年公式選手権ランキング（第14戦終了時点）。メルセデスのキミ・アントネッリが292ptで首位。'
+                    : standingsArchive?.seasonSummary || `${standingsYear}年公式年間アーカイブ`}
+                </p>
               </div>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                {selectedSeason === '2026'
-                  ? '新PU規定元年。全11チーム・22名体制による2026年公式選手権ランキング（第14戦終了時点）。メルセデスのキミ・アントネッリが292ptで首位。'
-                  : getHistoricalArchive(selectedSeason)?.seasonSummary || `${selectedSeason}年公式年間アーカイブ`}
-              </p>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-950/40 border border-red-500/30 text-red-300 font-mono text-[11px] self-start sm:self-auto shadow-sm">
+                <span>{standingsYear === '2026' ? '🏁 2026 公式WDC ＆ WCC ランキング (第14戦終了時点)' : `🏛️ ${standingsYear}年確定 WDC ＆ WCC アーカイブ`}</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-950/40 border border-red-500/30 text-red-300 font-mono text-[11px] self-start sm:self-auto shadow-sm">
-              <span>{selectedSeason === '2026' ? '🏁 2026 公式WDC ＆ WCC ランキング (第14戦終了時点)' : `🏛️ ${selectedSeason}年確定 WDC ＆ WCC アーカイブ`}</span>
+
+            {/* Quick Season Year Switcher Pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar pt-1">
+              <span className="text-[10px] font-racing text-slate-400 uppercase tracking-wider shrink-0 mr-1 flex items-center gap-1">
+                <span>📅</span>
+                <span>年度切替:</span>
+              </span>
+              {SEASON_OPTIONS.map((opt) => {
+                const isSelected = standingsYear === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => setStandingsYear(opt.value)}
+                    className={`px-3 py-1.5 rounded-xl font-racing font-bold text-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+                      isSelected
+                        ? 'bg-red-600 text-white shadow-lg shadow-red-950/60 ring-1 ring-red-400'
+                        : 'bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-white border border-white/10'
+                    }`}
+                  >
+                    <span>{opt.value === '2026' ? '⚡' : '🏆'}</span>
+                    <span>{opt.value}年</span>
+                    {opt.value === '2026' ? (
+                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 font-mono">
+                        現行
+                      </span>
+                    ) : (
+                      <span className="text-[9px] text-slate-400 font-sans">
+                        確定
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
+
+          {/* Past Season Champion Banner (When viewing 2025, 2024, etc.) */}
+          {standingsYear !== '2026' && standingsArchive && (
+            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-amber-950/40 via-slate-900/90 to-slate-950 border border-amber-500/30 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fadeIn">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-xl shrink-0">
+                  🏆
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-racing font-bold text-amber-300 uppercase tracking-wider">
+                      {standingsYear}年 ワールドチャンピオン (WDC &amp; WCC)
+                    </span>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 border border-white/10 text-slate-300">
+                      全{standingsArchive.racesCount}戦 確定
+                    </span>
+                  </div>
+                  <div className="text-xs sm:text-sm font-bold text-white mt-0.5">
+                    ドライバー王者: <span className="text-amber-400">{standingsArchive.championDriver?.name || 'M.フェルスタッペン'}</span> ({standingsArchive.championDriver?.team || 'Red Bull'} / {standingsArchive.championDriver?.points || 0}pt)
+                    <span className="text-slate-500 mx-2">|</span>
+                    製造者王者: <span className="text-sky-300">{standingsArchive.championConstructor?.name || 'Red Bull'}</span> ({standingsArchive.championConstructor?.points || 0}pt)
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* ── DUAL PARALLEL DASHBOARD (WDC 7 cols + WCC 5 cols) ── */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 items-start animate-fade-in">
@@ -1752,7 +2171,7 @@ export default function SeasonHub({
                 <div className="flex items-center justify-between px-1">
                   <span className="font-racing font-bold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
                     <span>🏎️</span>
-                    <span>ドライバーズ選手権 (全{activeDriverStandings.length}名)</span>
+                    <span>ドライバーズ選手権 ({standingsYear}年 / 全{displayedDriverStandings.length}名)</span>
                   </span>
                   <span className="text-[10px] font-mono text-slate-400">P1-P10 入賞圏</span>
                 </div>
@@ -1770,8 +2189,8 @@ export default function SeasonHub({
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/5">
-                        {activeDriverStandings.map((d) => {
-                          const percentage = (d.points / maxDriverPoints) * 100;
+                        {displayedDriverStandings.map((d) => {
+                          const percentage = (d.points / maxDisplayedDriverPoints) * 100;
                           return (
                             <tr
                               key={d.position}
@@ -1861,7 +2280,7 @@ export default function SeasonHub({
                   <div className="flex items-center justify-between px-1">
                     <span className="font-racing font-bold text-xs text-white uppercase tracking-wider flex items-center gap-1.5">
                       <span>🏆</span>
-                      <span>コンストラクターズ (全{activeConstructorStandings.length}組)</span>
+                      <span>コンストラクターズ ({standingsYear}年 / 全{displayedConstructorStandings.length}組)</span>
                     </span>
                   </div>
                   <div className="rounded-xl border border-white/10 overflow-hidden bg-slate-900/70 shadow-md">
@@ -1877,8 +2296,8 @@ export default function SeasonHub({
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-white/5">
-                          {activeConstructorStandings.map((team) => {
-                            const percentage = (team.points / maxTeamPoints) * 100;
+                          {displayedConstructorStandings.map((team) => {
+                            const percentage = (team.points / maxDisplayedTeamPoints) * 100;
                             return (
                               <tr
                                 key={team.position}
@@ -1961,45 +2380,45 @@ export default function SeasonHub({
                       </h4>
                     </div>
                     <span className="text-[10px] font-mono text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
-                      {selectedSeason === '2026' ? '2026 第14戦終了時点' : `${selectedSeason}年確定結果`}
+                      {standingsYear === '2026' ? '2026 第14戦終了時点' : `${standingsYear}年確定結果`}
                     </span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 text-xs font-mono">
                     <div className="p-2 rounded-lg bg-slate-950/60 border border-white/5 space-y-1">
                       <span className="text-[10px] text-slate-400 block font-sans">
-                        {selectedSeason === '2026' ? '🏎️ WDC リードマージン' : `🏎️ ${selectedSeason} WDC 王者`}
+                        {standingsYear === '2026' ? '🏎️ WDC リードマージン' : `🏎️ ${standingsYear} WDC 王者`}
                       </span>
                       <div className="font-bold text-white text-xs truncate">
-                        {activeDriverStandings[0]?.driverName.split(' ')[0]}
+                        {displayedDriverStandings[0]?.driverName.split(' ')[0]}
                       </div>
                       <div className="text-emerald-400 text-[11px] font-bold">
-                        +{activeDriverStandings[0]?.points - (activeDriverStandings[1]?.points || 0)} pt <span className="text-[9px] text-slate-400 font-normal">{selectedSeason === '2026' ? 'リード' : '差で戴冠'}</span>
+                        +{displayedDriverStandings[0]?.points - (displayedDriverStandings[1]?.points || 0)} pt <span className="text-[9px] text-slate-400 font-normal">{standingsYear === '2026' ? 'リード' : '差で戴冠'}</span>
                       </div>
                     </div>
                     <div className="p-2 rounded-lg bg-slate-950/60 border border-white/5 space-y-1">
                       <span className="text-[10px] text-slate-400 block font-sans">
-                        {selectedSeason === '2026' ? '🏆 WCC リードマージン' : `🏆 ${selectedSeason} WCC 王者`}
+                        {standingsYear === '2026' ? '🏆 WCC リードマージン' : `🏆 ${standingsYear} WCC 王者`}
                       </span>
                       <div className="font-bold text-white text-xs truncate">
-                        {activeConstructorStandings[0]?.teamName.split(' ')[0]}
+                        {displayedConstructorStandings[0]?.teamName.split(' ')[0]}
                       </div>
                       <div className="text-emerald-400 text-[11px] font-bold">
-                        +{activeConstructorStandings[0]?.points - (activeConstructorStandings[1]?.points || 0)} pt <span className="text-[9px] text-slate-400 font-normal">{selectedSeason === '2026' ? 'リード' : '差で戴冠'}</span>
+                        +{displayedConstructorStandings[0]?.points - (displayedConstructorStandings[1]?.points || 0)} pt <span className="text-[9px] text-slate-400 font-normal">{standingsYear === '2026' ? 'リード' : '差で戴冠'}</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="text-[11px] text-slate-300 bg-slate-950/40 p-2 rounded-lg border border-white/5 leading-relaxed">
-                    {selectedSeason === '2026' ? (
+                    {standingsYear === '2026' ? (
                       <>
                         📊 <strong className="text-sky-300 font-racing">2026シーズン戦況分析 (第14戦マドリード終了時点):</strong> 14戦を終えてメルセデスの新星キミ・アントネッリが8勝を挙げて選手権首位（292pt）。チームメイトのラッセル（211pt・2勝）、フェラーリのハミルトン（191pt・1勝）、マクラーレンのノリス（186pt・2勝）が追走。今夜開催の第15戦バクー決勝が後半戦の天王山となります。
                       </>
                     ) : (
                       <>
-                        🏛️ <strong className="text-amber-300 font-racing">{selectedSeason}年シーズン総括:</strong>{' '}
-                        {getHistoricalArchive(parseInt(selectedSeason, 10))?.seasonSummary ||
-                          `${selectedSeason}年シーズンの年間王者は ${activeDriverStandings[0]?.driverName}（${activeDriverStandings[0]?.team} / ${activeDriverStandings[0]?.points}pt）。コンストラクターズ選手権は ${activeConstructorStandings[0]?.teamName}（${activeConstructorStandings[0]?.points}pt）が制覇しました。`}
+                        🏛️ <strong className="text-amber-300 font-racing">{standingsYear}年シーズン総括:</strong>{' '}
+                        {standingsArchive?.seasonSummary ||
+                          `${standingsYear}年シーズンの年間王者は ${displayedDriverStandings[0]?.driverName}（${displayedDriverStandings[0]?.team} / ${displayedDriverStandings[0]?.points}pt）。コンストラクターズ選手権は ${displayedConstructorStandings[0]?.teamName}（${displayedConstructorStandings[0]?.points}pt）が制覇しました。`}
                       </>
                     )}
                   </div>
@@ -2173,6 +2592,56 @@ export default function SeasonHub({
                 gpName={selectedRace.gpName}
                 round={selectedRace.round}
               />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Circuit Atmosphere Photo Fullscreen Lightbox Modal */}
+      {atmosphereModalImage && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-fadeIn"
+          onClick={() => setAtmosphereModalImage(null)}
+        >
+          <div
+            className="relative max-w-4xl w-full bg-slate-950 border border-white/15 rounded-3xl overflow-hidden shadow-2xl space-y-0"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 bg-slate-900/80">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-lg">📸</span>
+                <h3 className="font-racing font-bold text-sm sm:text-base text-white truncate">
+                  {atmosphereModalImage.title}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAtmosphereModalImage(null)}
+                className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white text-xs font-mono transition-colors cursor-pointer"
+              >
+                ✕ 閉じる
+              </button>
+            </div>
+            <div className="relative w-full max-h-[70vh] bg-black flex items-center justify-center overflow-hidden p-2">
+              <img
+                src={atmosphereModalImage.url}
+                alt={atmosphereModalImage.title}
+                className="w-full max-h-[68vh] object-contain rounded-xl"
+              />
+            </div>
+            <div className="p-4 bg-slate-950/95 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <p className="text-xs sm:text-sm text-slate-200 font-sans leading-relaxed">
+                {atmosphereModalImage.caption}
+              </p>
+              <button
+                type="button"
+                onClick={() => setAtmosphereModalImage(null)}
+                className="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-racing font-bold text-xs shrink-0 transition-colors shadow-md self-end sm:self-auto"
+              >
+                閉じる
+              </button>
             </div>
           </div>
         </div>

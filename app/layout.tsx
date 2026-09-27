@@ -18,10 +18,13 @@ const orbitron = Orbitron({
 });
 
 export const viewport: Viewport = {
-  themeColor: '#e10600',
+  themeColor: '#0b0c10',
+  colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
+  viewportFit: 'cover',
+  interactiveWidget: 'resizes-visual',
 };
 
 export const metadata: Metadata = {

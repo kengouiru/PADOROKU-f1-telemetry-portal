@@ -30,6 +30,27 @@ import {
   CIRCUIT_TRACK_MAPS,
   type CircuitTrackData
 } from '@/components/telemetry/TelemetryTrackMap';
+import { KNOWLEDGE_CIRCUITS, type CircuitCornerDetail } from '@/data/f1KnowledgeData';
+import { getCircuitAtmospherePhotos, type AtmospherePhoto } from '@/lib/circuitResolver';
+
+export interface TrackCornerViewItem {
+  index: number;
+  number: string;
+  name: string;
+  pct: number;
+  gearEstimated: string;
+  speedEstimated: string;
+  engineeringTip: string;
+  elevM: number;
+  gradientPct: number;
+  sector: 1 | 2 | 3;
+  gForceLat?: string;
+  hasActiveAero?: boolean;
+  hasOvertakePoint?: boolean;
+  photoUrl: string;
+  photoCaption: string;
+  photoTag: string;
+}
 
 interface F1BroadcastTrackGuideProps {
   circuitId: string;
@@ -124,12 +145,8 @@ export default function F1BroadcastTrackGuide({
     pct: number;
   } | null>(null);
 
-  // Live Run Simulation
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState<1 | 2>(1);
-  const [carProgress, setCarProgress] = useState<number>(0); // 0 ~ 100%
-  const animFrameRef = useRef<number | null>(null);
-  const lastTimeRef = useRef<number>(0);
+  // Selected Corner for Street View / Onboard Cockpit Perspective
+  const [selectedCornerId, setSelectedCornerId] = useState<string | null>(null);
 
   // Camera preset handlers
   const applyPreset = (mode: '2d' | '3d' | 'reset') => {
@@ -405,82 +422,114 @@ export default function F1BroadcastTrackGuide({
     };
   }, [mapData, trackInfo, rotX, rotZ, zoom, colorMode]);
 
-  // Car Position in 3D Space
-  const car3D = useMemo(() => {
-    if (!projected3D) return null;
-    const pts = projected3D.pts3D;
-    const p = ((carProgress % 100) + 100) % 100;
+  // Encyclopedic Circuit Profile Lookup
+  const circuitKnowledge = useMemo(() => {
+    const normId = circuitId.toLowerCase().replace(/_/g, '-');
+    return (
+      KNOWLEDGE_CIRCUITS.find(
+        (c) =>
+          c.id === normId ||
+          c.id.includes(normId) ||
+          normId.includes(c.id) ||
+          c.officialName.toLowerCase().includes(normId) ||
+          c.name.toLowerCase().includes(normId)
+      ) || null
+    );
+  }, [circuitId]);
 
-    let idx = pts.findIndex((pt) => pt.pct >= p);
-    if (idx <= 0) idx = 1;
-    const p1 = pts[idx - 1] || pts[0];
-    const p2 = pts[idx] || pts[pts.length - 1];
+  // Unified Track Corners List for Street View & Paddock Navigation
+  const trackCorners = useMemo<TrackCornerViewItem[]>(() => {
+    const rawAllCorners = circuitKnowledge?.allCorners || [];
+    const pins = mapData.cornerPins || [];
+    const totalTurns = trackInfo.turnCount || rawAllCorners.length || pins.length || 16;
+    const atmosPhotos = getCircuitAtmospherePhotos(circuitId, gpName || trackInfo.officialName);
 
-    const span = (p2.pct - p1.pct) || 1;
-    const t = Math.max(0, Math.min(1, (p - p1.pct) / span));
+    // If encyclopedic allCorners exists, prioritize it:
+    if (rawAllCorners.length > 0) {
+      return rawAllCorners.map((ac, idx) => {
+        // Find matching pin or estimate pct
+        const matchingPin = pins.find(
+          (p) => p.number.toLowerCase() === ac.number.toLowerCase()
+        );
+        const pct = matchingPin?.pct ?? Number((((idx + 1) / (rawAllCorners.length + 1)) * 100).toFixed(1));
+        const elevM = projected3D?.getElevAtPct(pct) ?? 30;
 
-    const sX = p1.sX + (p2.sX - p1.sX) * t;
-    const sY = p1.sY + (p2.sY - p1.sY) * t;
-    const elevM = p1.elevM + (p2.elevM - p1.elevM) * t;
+        // Calculate local gradient
+        const prevElev = projected3D?.getElevAtPct((pct - 1.5 + 100) % 100) ?? elevM;
+        const nextElev = projected3D?.getElevAtPct((pct + 1.5) % 100) ?? elevM;
+        const distDeltaM = (trackInfo.lengthKm * 1000) * 0.03;
+        const gradientPct = Number((((nextElev - prevElev) / Math.max(10, distDeltaM)) * 100).toFixed(1));
 
-    return { sX, sY, elevM, p };
-  }, [projected3D, carProgress]);
+        const sector: 1 | 2 | 3 = pct <= trackInfo.sectors.s1EndPct ? 1 : pct <= trackInfo.sectors.s2EndPct ? 2 : 3;
 
-  // Dynamic Car Aero Mode
-  const carAeroStatus = useMemo(() => {
-    const p = carProgress;
-    for (const zone of trackInfo.activeAeroZones) {
-      const match = zone.startPct < zone.endPct ? (p >= zone.startPct && p <= zone.endPct) : (p >= zone.startPct || p <= zone.endPct);
-      if (match) {
+        // Check if adjacent to aero zone or overtake checkpoint
+        const hasActiveAero = trackInfo.activeAeroZones.some((z) => Math.abs(z.startPct - pct) < 6 || Math.abs(z.endPct - pct) < 6);
+        const hasOvertakePoint = trackInfo.overtakeCheckpoints.some((cp) => Math.abs(cp.brakingZonePct - pct) < 5);
+
+        // Photo rotation
+        const photo = sector === 1 ? atmosPhotos[0] : atmosPhotos[1];
+
         return {
-          mode: 'X-MODE',
-          label: 'X-MODE 🚀 (Low Drag -55%)',
-          bg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50',
-          speedKmh: Math.round(318 + Math.sin(p * 0.1) * 20)
+          index: idx,
+          number: ac.number,
+          name: ac.name || `Turn ${idx + 1}`,
+          pct,
+          gearEstimated: ac.gearEstimated || '4th',
+          speedEstimated: ac.speedEstimated || '180 km/h',
+          engineeringTip: ac.engineeringTip || 'イン側のクリッピングポイントを的確に捉え、脱出トラクションを最大化。',
+          elevM,
+          gradientPct,
+          sector,
+          gForceLat: `${(3.6 + (idx % 5) * 0.3).toFixed(1)}G`,
+          hasActiveAero,
+          hasOvertakePoint,
+          photoUrl: photo.url,
+          photoCaption: photo.caption,
+          photoTag: photo.tag
         };
-      }
+      });
     }
-    for (const cp of trackInfo.overtakeCheckpoints) {
-      if (Math.abs(p - cp.brakingZonePct) < 3.0) {
-        return {
-          mode: 'BRAKE',
-          label: 'BRAKE 🛑 (Energy Regen)',
-          bg: 'bg-rose-500/20 text-rose-300 border-rose-500/50',
-          speedKmh: Math.round(108 + (p % 10) * 8)
-        };
-      }
+
+    // Fallback: build from mapData.cornerPins or default turns
+    const count = pins.length > 0 ? pins.length : totalTurns;
+    const items: TrackCornerViewItem[] = [];
+
+    for (let i = 0; i < count; i++) {
+      const pin = pins[i];
+      const turnNum = pin ? pin.number : `T${i + 1}`;
+      const pct = pin ? pin.pct : Number((((i + 1) / (count + 1)) * 100).toFixed(1));
+      const elevM = projected3D?.getElevAtPct(pct) ?? 30;
+      const sector: 1 | 2 | 3 = pct <= trackInfo.sectors.s1EndPct ? 1 : pct <= trackInfo.sectors.s2EndPct ? 2 : 3;
+      const photo = sector === 1 ? atmosPhotos[0] : atmosPhotos[1];
+
+      items.push({
+        index: i,
+        number: turnNum,
+        name: pin?.name || `コーナー ${i + 1}`,
+        pct,
+        gearEstimated: i % 3 === 0 ? '2nd' : i % 3 === 1 ? '4th' : '6th',
+        speedEstimated: i % 3 === 0 ? '95 km/h' : i % 3 === 1 ? '175 km/h' : '240 km/h',
+        engineeringTip: 'トレイルブレーキングで車首を旋回させ、エイペックスを踏み外さないライン取りが必須。',
+        elevM,
+        gradientPct: 1.2,
+        sector,
+        gForceLat: '4.2G',
+        hasActiveAero: false,
+        hasOvertakePoint: false,
+        photoUrl: photo.url,
+        photoCaption: photo.caption,
+        photoTag: photo.tag
+      });
     }
-    return {
-      mode: 'Z-MODE',
-      label: 'Z-MODE 🛡️ (High Downforce)',
-      bg: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50',
-      speedKmh: Math.round(210 + (p % 15) * 5)
-    };
-  }, [carProgress, trackInfo]);
 
-  // Live Run Animation Loop
-  useEffect(() => {
-    if (!isPlaying) {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-      return;
-    }
-    const step = (time: number) => {
-      if (!lastTimeRef.current) lastTimeRef.current = time;
-      const dt = (time - lastTimeRef.current) / 1000;
-      lastTimeRef.current = time;
+    return items;
+  }, [circuitKnowledge, mapData.cornerPins, trackInfo, projected3D, circuitId, gpName]);
 
-      const speedFactor = (100 / 16) * playbackSpeed;
-      setCarProgress((prev) => (prev + dt * speedFactor) % 100);
-
-      animFrameRef.current = requestAnimationFrame(step);
-    };
-
-    animFrameRef.current = requestAnimationFrame(step);
-    return () => {
-      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
-      lastTimeRef.current = 0;
-    };
-  }, [isPlaying, playbackSpeed]);
+  // Active Corner for Modal
+  const activeCornerForModal = useMemo(() => {
+    if (!selectedCornerId) return null;
+    return trackCorners.find((c) => c.number.toLowerCase() === selectedCornerId.toLowerCase()) || trackCorners[0] || null;
+  }, [selectedCornerId, trackCorners]);
 
   // Cleaned Elevation Profile Ribbon (De-cluttered)
   const elevationRibbon = useMemo(() => {
@@ -505,22 +554,8 @@ export default function F1BroadcastTrackGuide({
     const linePath = `M ${coords.map((c) => `${c.x.toFixed(1)},${c.y.toFixed(1)}`).join(' L ')}`;
     const areaPath = `${linePath} L ${w} ${h} L 0 ${h} Z`;
 
-    const carP = carProgress;
-    let carNormY = 0.5;
-    for (let i = 0; i < prof.length - 1; i++) {
-      if (carP >= prof[i].distPct && carP <= prof[i + 1].distPct) {
-        const segSpan = prof[i + 1].distPct - prof[i].distPct || 1;
-        const t = (carP - prof[i].distPct) / segSpan;
-        const elev = prof[i].elevationM + (prof[i + 1].elevationM - prof[i].elevationM) * t;
-        carNormY = (elev - minElev) / span;
-        break;
-      }
-    }
-    const carRibbonX = (carP / 100) * w;
-    const carRibbonY = h - padY - carNormY * (h - padY * 2);
-
-    return { coords, linePath, areaPath, carRibbonX, carRibbonY };
-  }, [trackInfo.elevation, carProgress]);
+    return { coords, linePath, areaPath };
+  }, [trackInfo.elevation]);
 
   return (
     <div
@@ -615,28 +650,19 @@ export default function F1BroadcastTrackGuide({
             </button>
           </div>
 
-          {/* Live Run Preview Button */}
+          {/* Street View Corner Intel Button */}
           <button
             type="button"
-            onClick={() => setIsPlaying(!isPlaying)}
-            className={`px-3.5 py-1.5 rounded-xl font-racing font-bold text-xs transition-all flex items-center gap-1.5 shadow-lg ${
-              isPlaying
-                ? 'bg-amber-500 text-black shadow-amber-500/30 animate-pulse'
-                : 'bg-white/10 hover:bg-white/20 border border-white/15 text-white'
-            }`}
+            onClick={() => {
+              const firstCorner = trackCorners[0]?.number || 'T1';
+              setSelectedCornerId(firstCorner);
+            }}
+            className="px-3.5 py-1.5 rounded-xl font-racing font-bold text-xs transition-all flex items-center gap-1.5 shadow-lg bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:brightness-110 text-white shadow-red-600/30 border border-red-500/40"
+            title="Google Street View風の全コーナー景色・オンボード視界を開く"
           >
-            <span>{isPlaying ? '⏸️ 一時停止' : '▶️ 走行プレビュー'}</span>
+            <span>🏙️</span>
+            <span>コーナー景色 (Street View)</span>
           </button>
-          {isPlaying && (
-            <button
-              type="button"
-              onClick={() => setPlaybackSpeed((s) => (s === 1 ? 2 : 1))}
-              className="px-2 py-1.5 rounded-xl bg-black/60 border border-white/10 text-amber-400 font-mono text-xs font-bold"
-              title="再生速度切替"
-            >
-              {playbackSpeed}x
-            </button>
-          )}
         </div>
       </div>
 
@@ -784,25 +810,13 @@ export default function F1BroadcastTrackGuide({
               </button>
             </div>
 
-            {/* Bottom-Left: Live Car Telemetry Status */}
-            {isPlaying && (
-              <div className="absolute bottom-3 left-3 z-20 pointer-events-none flex flex-col gap-1 animate-fade-in">
-                <div className={`px-2.5 py-1 rounded-lg border text-xs font-mono font-bold backdrop-blur-md ${carAeroStatus.bg}`}>
-                  {carAeroStatus.label}
-                </div>
-                <div className="px-2.5 py-0.5 rounded-lg bg-black/80 border border-white/10 text-[11px] font-mono text-white flex items-center gap-2">
-                  <span>🏎️ {carAeroStatus.speedKmh} km/h</span>
-                  <span className="text-slate-500">|</span>
-                  <span>LAP: {Math.round(carProgress)}%</span>
-                  {car3D && (
-                    <>
-                      <span className="text-slate-500">|</span>
-                      <span>標高: <span className="text-amber-300 font-bold">{car3D.elevM.toFixed(1)}m</span></span>
-                    </>
-                  )}
-                </div>
+            {/* Bottom-Left: Street View Hint */}
+            <div className="absolute bottom-3 left-3 z-20 pointer-events-none flex flex-col gap-1">
+              <div className="px-2.5 py-1 rounded-lg bg-black/80 backdrop-blur-md border border-white/10 text-[10px] font-mono text-slate-300 flex items-center gap-1.5 shadow-md">
+                <span className="text-amber-400">💡</span>
+                <span>Turn番号 (T1, T2...) を押すとリアルな景色を閲覧できます</span>
               </div>
-            )}
+            </div>
 
             {/* Hover Tooltip on 3D Track */}
             {hoveredPoint && (
@@ -997,11 +1011,12 @@ export default function F1BroadcastTrackGuide({
                         key={`corner-3d-${pin.number}`}
                         transform={`translate(${pin.sX}, ${pin.sY})`}
                         className="cursor-pointer group select-none"
+                        onClick={() => setSelectedCornerId(pin.number)}
                         onPointerEnter={() => {
                           setHoveredPoint({
                             x: pin.sX,
                             y: pin.sY,
-                            label: `${pin.number}: ${pin.name || 'コーナー'}`,
+                            label: `${pin.number}: ${pin.name || 'コーナー'} (クリックで景色を見る 👁️)`,
                             elevM: pin.elevM,
                             pct: pin.pct
                           });
@@ -1009,27 +1024,30 @@ export default function F1BroadcastTrackGuide({
                         onPointerLeave={() => setHoveredPoint(null)}
                       >
                         {/* Vertical Leader Needle to track surface */}
-                        <line x1="0" y1="0" x2="0" y2="-12" stroke="#eab308" strokeWidth="1.2" strokeDasharray="1.5 1.5" />
-                        <circle r="2" fill="#eab308" />
+                        <line x1="0" y1="0" x2="0" y2="-12" stroke={selectedCornerId === pin.number ? '#ef4444' : '#eab308'} strokeWidth="1.4" strokeDasharray="1.5 1.5" />
+                        <circle r="2.5" fill={selectedCornerId === pin.number ? '#ef4444' : '#eab308'} />
 
                         {/* Floating Turn Badge */}
-                        <g transform="translate(0, -20)">
+                        <g transform="translate(0, -20)" className="transition-transform group-hover:scale-125">
+                          {selectedCornerId === pin.number && (
+                            <circle r="14" fill="none" stroke="#ef4444" strokeWidth="2" className="animate-ping" opacity="0.75" />
+                          )}
                           <rect
                             x={-badgeWidth / 2}
                             y="-8"
                             width={badgeWidth}
                             height="16"
                             rx="8"
-                            fill="#090d16"
-                            stroke="#eab308"
-                            strokeWidth="1.4"
+                            fill={selectedCornerId === pin.number ? '#7f1d1d' : '#090d16'}
+                            stroke={selectedCornerId === pin.number ? '#f87171' : '#eab308'}
+                            strokeWidth={selectedCornerId === pin.number ? '2' : '1.4'}
                             className="shadow-md"
                           />
                           <text
                             x="0"
                             y="3"
                             textAnchor="middle"
-                            fill="#fef08a"
+                            fill={selectedCornerId === pin.number ? '#ffffff' : '#fef08a'}
                             fontSize="7"
                             fontFamily="monospace"
                             fontWeight="black"
@@ -1040,15 +1058,6 @@ export default function F1BroadcastTrackGuide({
                       </g>
                     );
                   })}
-
-                {/* 8. Animated Car Light Pulse in 3D */}
-                {isPlaying && car3D && (
-                  <g transform={`translate(${car3D.sX}, ${car3D.sY})`}>
-                    <circle r="12" fill={carAeroStatus.mode === 'X-MODE' ? '#22c55e' : '#ef4444'} opacity="0.35" className="animate-ping" />
-                    <circle r="6" fill={carAeroStatus.mode === 'X-MODE' ? '#4ade80' : '#f87171'} stroke="#ffffff" strokeWidth="1.5" />
-                    <circle r="2.5" fill="#ffffff" />
-                  </g>
-                )}
               </svg>
             )}
 
@@ -1083,6 +1092,48 @@ export default function F1BroadcastTrackGuide({
             {/* Bottom-Center: Zoom Gesture Hint */}
             <div className="hidden sm:block absolute bottom-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none px-2.5 py-0.5 rounded-full bg-black/75 border border-white/10 text-[9px] font-mono text-slate-300 shadow">
               🖱️ ホイールスクロール / ピンチで拡大縮小 (0.6x〜2.5x)
+            </div>
+          </div>
+
+          {/* 🏙️ Google Street View Turn Navigator Bar */}
+          <div className="p-3 rounded-2xl bg-gradient-to-r from-black/85 via-slate-900/95 to-black/85 border border-white/10 space-y-2 shadow-xl">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-base">🏙️</span>
+                <span className="font-racing font-bold text-xs text-white tracking-wide">
+                  各コーナーの景色・オンボード視界 (STREET VIEW)
+                </span>
+                <span className="text-[10px] text-amber-400 font-mono hidden sm:inline">
+                  • Turn番号を押すとリアルな景色・路面・攻略法が表示されます
+                </span>
+              </div>
+              <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2.5 py-0.5 rounded-full border border-white/10">
+                全 {trackCorners.length} コーナー
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
+              {trackCorners.map((c) => {
+                const isSelected = selectedCornerId === c.number;
+                return (
+                  <button
+                    key={`turn-selector-${c.number}`}
+                    type="button"
+                    onClick={() => setSelectedCornerId(c.number)}
+                    className={`px-2.5 py-1.5 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1.5 whitespace-nowrap border shrink-0 ${
+                      isSelected
+                        ? 'bg-red-600 text-white border-red-500 shadow-md shadow-red-600/40 ring-1 ring-white/50 scale-105'
+                        : 'bg-black/60 hover:bg-white/15 text-slate-300 border-white/10 hover:border-white/20'
+                    }`}
+                    title={`${c.number}: ${c.name} (推定速度: ${c.speedEstimated})`}
+                  >
+                    <span className="text-amber-300 font-black">{c.number}</span>
+                    <span className="text-[10px] font-sans font-normal opacity-80 max-w-[85px] truncate">
+                      {c.name}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -1296,14 +1347,6 @@ export default function F1BroadcastTrackGuide({
                   </g>
                 );
               })}
-
-              {/* Live Car Tracking Marker on Ribbon */}
-              {isPlaying && (
-                <g transform={`translate(${elevationRibbon.carRibbonX}, ${elevationRibbon.carRibbonY})`}>
-                  <circle r="5" fill="#ef4444" stroke="#ffffff" strokeWidth="1.5" className="animate-ping" />
-                  <circle r="3.5" fill="#ef4444" stroke="#ffffff" strokeWidth="1" />
-                </g>
-              )}
             </svg>
 
             {/* Bottom Axis Labels */}
@@ -1315,6 +1358,349 @@ export default function F1BroadcastTrackGuide({
             </div>
           </div>
         )}
+      </div>
+
+      {/* ─────────────────────────────────────────────────────────────
+          4. GOOGLE STREET VIEW / ONBOARD CORNER PERSPECTIVE MODAL
+          ───────────────────────────────────────────────────────────── */}
+      {activeCornerForModal && (
+        <CornerStreetViewModal
+          circuitId={circuitId}
+          circuitName={gpName || trackInfo.officialName}
+          country={trackInfo.country}
+          flag={trackInfo.flag}
+          corners={trackCorners}
+          activeCornerNumber={activeCornerForModal.number}
+          onSelectCorner={(num) => setSelectedCornerId(num)}
+          onClose={() => setSelectedCornerId(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+interface CornerStreetViewModalProps {
+  circuitId: string;
+  circuitName: string;
+  country: string;
+  flag: string;
+  corners: TrackCornerViewItem[];
+  activeCornerNumber: string;
+  onSelectCorner: (num: string) => void;
+  onClose: () => void;
+}
+
+function CornerStreetViewModal({
+  circuitId,
+  circuitName,
+  country,
+  flag,
+  corners,
+  activeCornerNumber,
+  onSelectCorner,
+  onClose
+}: CornerStreetViewModalProps) {
+  const [viewAngle, setViewAngle] = useState<'onboard' | 'trackside' | 'panoramic'>('onboard');
+
+  const currentIndex = corners.findIndex(
+    (c) => c.number.toLowerCase() === activeCornerNumber.toLowerCase()
+  );
+  const activeCorner = corners[currentIndex] || corners[0];
+  const prevCorner = corners[(currentIndex - 1 + corners.length) % corners.length];
+  const nextCorner = corners[(currentIndex + 1) % corners.length];
+
+  const photos = useMemo(() => getCircuitAtmospherePhotos(circuitId, circuitName), [circuitId, circuitName]);
+
+  // Current photo according to viewAngle
+  const currentPhoto = useMemo(() => {
+    if (viewAngle === 'onboard') {
+      return photos[1] || photos[0];
+    } else if (viewAngle === 'trackside') {
+      return photos[0];
+    } else {
+      const cleanId = circuitId.toLowerCase().replace(/_/g, '-');
+      return {
+        url: `/images/circuits/circuit_${cleanId.replace(/-/g, '_')}_real.jpg`,
+        caption: `${circuitName} のサーキット全景と雄大なロケーション`,
+        tag: 'パノラマ全景'
+      };
+    }
+  }, [viewAngle, photos, circuitId, circuitName]);
+
+  // Keyboard navigation (← / → to navigate, ESC to close)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        onSelectCorner(prevCorner.number);
+      } else if (e.key === 'ArrowRight') {
+        onSelectCorner(nextCorner.number);
+      } else if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [prevCorner, nextCorner, onSelectCorner, onClose]);
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 md:p-6 animate-fadeIn"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-5xl max-h-[95vh] bg-slate-950 rounded-2xl border border-white/20 shadow-2xl flex flex-col overflow-hidden text-white"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header Bar */}
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 border-b border-white/10 bg-black/60 backdrop-blur-sm">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">{flag}</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded bg-red-600 text-white font-racing font-bold text-[10px] tracking-wider uppercase shadow-sm">
+                  STREET VIEW 360°
+                </span>
+                <span className="text-xs text-slate-400 font-mono hidden sm:inline">
+                  {circuitName} • {country}
+                </span>
+              </div>
+              <h3 className="text-base sm:text-lg font-racing font-black text-white flex items-center gap-2 mt-0.5">
+                <span className="text-amber-400">{activeCorner.number}</span>
+                <span>{activeCorner.name}</span>
+              </h3>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono text-slate-400 hidden sm:inline">
+              [{currentIndex + 1} / {corners.length}]
+            </span>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition-all text-sm font-mono"
+              title="閉じる (ESC)"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        {/* Modal Scrollable Body */}
+        <div className="flex-1 overflow-y-auto space-y-4 p-3 sm:p-5">
+          {/* Main Visual Stage (Street View & Cockpit Camera Perspective) */}
+          <div className="relative w-full h-[320px] sm:h-[420px] md:h-[480px] rounded-2xl overflow-hidden border border-white/15 bg-black shadow-2xl select-none group">
+            {/* Real Photographic Background */}
+            <img
+              src={currentPhoto.url}
+              alt={`${activeCorner.number} ${activeCorner.name}`}
+              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            />
+
+            {/* Cinematic Vignette & Visor Tint Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/60 pointer-events-none" />
+
+            {/* Street View HUD Lines & Crosshair Overlays */}
+            <div className="absolute inset-0 pointer-events-none opacity-30">
+              {/* Center Horizon Line */}
+              <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-sky-400/40" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border border-sky-400/30" />
+            </div>
+
+            {/* Top-Left: Compass & Sector Marker */}
+            <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-black/80 backdrop-blur-md border border-white/15 text-xs font-mono">
+                <span className="text-amber-400 font-bold">🧭 STREET VIEW COMPASS</span>
+                <span className="text-slate-400">|</span>
+                <span className="text-white">SECTOR {activeCorner.sector}</span>
+                <span className="text-slate-400">|</span>
+                <span className="text-sky-300 font-bold">{activeCorner.pct.toFixed(1)}%</span>
+              </div>
+              <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-lg bg-black/70 backdrop-blur-md border border-white/10 text-[11px] font-mono">
+                <span>↕️ 標高 {activeCorner.elevM.toFixed(1)}m</span>
+                <span className="text-slate-500">•</span>
+                <span className={activeCorner.gradientPct >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                  勾配 {activeCorner.gradientPct >= 0 ? `+${activeCorner.gradientPct}%` : `${activeCorner.gradientPct}%`}
+                </span>
+              </div>
+            </div>
+
+            {/* Top-Right: Camera View Angle Switcher */}
+            <div className="absolute top-3 right-3 z-10 flex items-center gap-1 p-1 rounded-xl bg-black/80 backdrop-blur-md border border-white/15 text-xs font-racing font-bold">
+              <button
+                type="button"
+                onClick={() => setViewAngle('onboard')}
+                className={`px-2.5 py-1 rounded-lg transition-all ${
+                  viewAngle === 'onboard'
+                    ? 'bg-red-600 text-white shadow-md'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+                title="ドライバーの視界・エイペックス進入目線"
+              >
+                📸 オンボード目線
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewAngle('trackside')}
+                className={`px-2.5 py-1 rounded-lg transition-all ${
+                  viewAngle === 'trackside'
+                    ? 'bg-red-600 text-white shadow-md'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+                title="スタンド・路面サイドからのリアル景観"
+              >
+                🏟️ トラックサイド
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewAngle('panoramic')}
+                className={`px-2.5 py-1 rounded-lg transition-all ${
+                  viewAngle === 'panoramic'
+                    ? 'bg-red-600 text-white shadow-md'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+                title="サーキット全景・空撮視点"
+              >
+                🚁 全景
+              </button>
+            </div>
+
+            {/* Center Street View Left & Right Arrow Buttons */}
+            <button
+              type="button"
+              onClick={() => onSelectCorner(prevCorner.number)}
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-3 rounded-2xl bg-black/60 hover:bg-red-600 text-white backdrop-blur-md border border-white/20 hover:border-red-400 transition-all shadow-2xl flex items-center gap-2 group/btn"
+              title={`前のコーナー (${prevCorner.number})`}
+            >
+              <span className="text-lg font-bold group-hover/btn:-translate-x-0.5 transition-transform">◀</span>
+              <div className="text-left hidden md:block">
+                <span className="text-[10px] font-mono text-slate-300 block">PREV</span>
+                <span className="text-xs font-racing font-black text-amber-300">{prevCorner.number}</span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onSelectCorner(nextCorner.number)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 p-3 rounded-2xl bg-black/60 hover:bg-red-600 text-white backdrop-blur-md border border-white/20 hover:border-red-400 transition-all shadow-2xl flex items-center gap-2 group/btn"
+              title={`次のコーナー (${nextCorner.number})`}
+            >
+              <div className="text-right hidden md:block">
+                <span className="text-[10px] font-mono text-slate-300 block">NEXT</span>
+                <span className="text-xs font-racing font-black text-amber-300">{nextCorner.number}</span>
+              </div>
+              <span className="text-lg font-bold group-hover/btn:translate-x-0.5 transition-transform">▶</span>
+            </button>
+
+            {/* Bottom HUD Telemetry Ribbon Overlay */}
+            <div className="absolute bottom-3 left-3 right-3 z-10 p-3 rounded-xl bg-black/85 backdrop-blur-md border border-white/15 flex flex-wrap items-center justify-between gap-3 shadow-2xl font-mono">
+              <div className="flex items-center gap-4 text-xs">
+                <div>
+                  <span className="text-[10px] text-slate-400 block">推奨ギア</span>
+                  <span className="text-sm font-black text-amber-400">{activeCorner.gearEstimated}</span>
+                </div>
+                <div className="w-[1px] h-6 bg-white/15" />
+                <div>
+                  <span className="text-[10px] text-slate-400 block">推定通過速度</span>
+                  <span className="text-sm font-black text-emerald-400">{activeCorner.speedEstimated}</span>
+                </div>
+                <div className="w-[1px] h-6 bg-white/15" />
+                <div>
+                  <span className="text-[10px] text-slate-400 block">横方向負荷 (G)</span>
+                  <span className="text-sm font-black text-rose-400">{activeCorner.gForceLat || '4.2G'}</span>
+                </div>
+              </div>
+
+              {/* 2026 Aero / MOM Flag */}
+              <div className="flex items-center gap-2 text-[11px]">
+                {activeCorner.hasActiveAero && (
+                  <span className="px-2 py-0.5 rounded-lg bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 font-bold">
+                    🚀 X-Mode 直結ストレート
+                  </span>
+                )}
+                {activeCorner.hasOvertakePoint && (
+                  <span className="px-2 py-0.5 rounded-lg bg-amber-500/25 border border-amber-500/40 text-amber-300 font-bold">
+                    🎯 MOM 追い抜き激戦地
+                  </span>
+                )}
+                <span className="text-[10px] text-slate-400 hidden sm:inline">
+                  {currentPhoto.caption}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Tactical Engineering Tip & Paddock Intel */}
+          <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-neutral-900 to-black border border-white/10 space-y-2.5 shadow-xl">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">💡</span>
+                <h4 className="font-racing font-bold text-sm text-white">
+                  レーシングエンジニアの攻略指南 ＆ リアル路面特性
+                </h4>
+              </div>
+              <span className="text-[10px] font-mono text-amber-400 font-bold">
+                FIA RACING INTEL
+              </span>
+            </div>
+
+            <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">
+              {activeCorner.engineeringTip}
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 text-[11px] font-mono">
+              <div className="p-2 rounded-xl bg-black/50 border border-white/5">
+                <span className="text-[10px] text-slate-400 block">🛑 ブレーキング指標</span>
+                <span className="text-slate-200">
+                  {parseInt(activeCorner.speedEstimated) > 220
+                    ? '100m看板直前からのフル制動・トレイルブレーキ'
+                    : '短い踏力で素早くノーズをインに向ける姿勢作り'}
+                </span>
+              </div>
+              <div className="p-2 rounded-xl bg-black/50 border border-white/5">
+                <span className="text-[10px] text-slate-400 block">🏁 縁石（カーブ）の使い方</span>
+                <span className="text-slate-200">
+                  イン側縁石はフラットに乗せ、脱出時の外側ソーセージ縁石底付きを警戒。
+                </span>
+              </div>
+              <div className="p-2 rounded-xl bg-black/50 border border-white/5">
+                <span className="text-[10px] text-slate-400 block">⚡ 加速トラクション</span>
+                <span className="text-slate-200">
+                  ステアリングを素早く戻しながら350kW MGU-K出力をタイヤ限界まで注ぎ込む。
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Corner Quick Jumper Bar (All Turns) */}
+          <div className="space-y-1.5 pt-1">
+            <div className="flex items-center justify-between text-xs font-mono text-slate-400 px-1">
+              <span>🗺️ 全コーナーをジャンプ切替 (STREET VIEW JUMP):</span>
+              <span className="text-[10px] text-slate-500 hidden sm:inline">キーボード [←] [→] でコーナー移動 | [ESC] で閉じる</span>
+            </div>
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-thin">
+              {corners.map((c) => {
+                const isSelected = c.number === activeCorner.number;
+                return (
+                  <button
+                    key={`modal-jump-${c.number}`}
+                    type="button"
+                    onClick={() => onSelectCorner(c.number)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all border shrink-0 ${
+                      isSelected
+                        ? 'bg-red-600 text-white border-red-500 shadow-md shadow-red-600/40 ring-2 ring-white/60 scale-105'
+                        : 'bg-black/60 hover:bg-white/15 text-slate-300 border-white/10'
+                    }`}
+                  >
+                    <span>{c.number}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
