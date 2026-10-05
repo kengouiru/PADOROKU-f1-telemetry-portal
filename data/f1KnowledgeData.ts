@@ -329,6 +329,8 @@ export interface HistoryArchive {
 // ─────────────────────────────────────────────────────────────
 
 export const KNOWLEDGE_TEAMS: TeamProfile[] = [
+
+
   {
     id: 'red-bull',
     name: 'Red Bull Racing',
@@ -376,46 +378,18 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     references: [
       {
         id: 1,
-        title: 'Red Bull Racing RB18-RB20 Ground Effect Aerodynamic Evolution and Venturi Tunnel Design',
-        publisher: 'Racecar Engineering International',
-        url: 'https://www.racecar-engineering.com',
-        verifiedDate: '2024-05-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'SAE International: Anti-Dive and Anti-Squat Suspension Kinematics in Ground-Effect Formula 1 Cars',
-        publisher: 'SAE International Motorsports Engineering',
-        url: 'https://www.sae.org',
-        verifiedDate: '2023-11-20',
-      },
-      {
-        id: 3,
-        title: 'Honda Racing Corporation (HRC) Technical Review: RA621H-RA624H Power Unit Thermal Efficiency and Packaging Synergy',
-        publisher: 'Honda Motor Co., Ltd.',
-        url: 'https://honda.racing',
-        verifiedDate: '2024-03-10',
-      },
-      {
-        id: 4,
-        title: 'Autosport Technical Dossier: How Adrian Newey Mastered Ride-Height Control Without Active Suspension',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2023-10-18',
-      },
-      {
-        id: 5,
-        title: 'Red Bull Technology Technical Dossier: Campus Integration and Red Bull Powertrains Evolution',
-        publisher: 'Red Bull Racing Limited',
-        url: 'https://www.redbullracing.com',
-        verifiedDate: '2024-06-01',
-      },
-      {
-        id: 6,
-        title: 'FIA Formula One Technical Regulations 2026: Power Unit MGU-K Output and Sustainable Fuel Directives',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-06-20',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
   {
@@ -465,46 +439,18 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     references: [
       {
         id: 1,
-        title: 'Scuderia Ferrari Official Technical Dossier: SF-23 to SF-24 Aerodynamic Concept Transition',
-        publisher: 'Ferrari S.p.A.',
-        url: 'https://www.ferrari.com',
-        verifiedDate: '2024-05-20',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Autosport Technical Analysis: Ferrari Suspension Geometries and Kerb Compliance in Monaco and Monza',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-09-03',
-      },
-      {
-        id: 3,
-        title: 'Race Engine Technology: Ferrari 066/10-12 Power Unit Combustion Architecture and Pre-Chamber Injection',
-        publisher: 'High Power Media Ltd.',
-        url: 'https://www.highpowermedia.com',
-        verifiedDate: '2023-12-05',
-      },
-      {
-        id: 4,
-        title: 'The Race: How Vasseur’s Cultural Revolution Revived Ferrari’s Grand Prix Winning Pedigree',
-        publisher: 'The Race Formula 1 Media',
-        url: 'https://the-race.com',
-        verifiedDate: '2024-09-08',
-      },
-      {
-        id: 5,
-        title: 'FIA Hall of Fame & World Championship Statistical Archive: Scuderia Ferrari 16 Constructors Titles',
-        publisher: 'Fédération Internationale de l’Automobile',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-15',
-      },
-      {
-        id: 6,
-        title: 'SAE International: Energy Storage Deployment and Kinetic Recovery Optimization in Turbo-Hybrid Racing Engines',
-        publisher: 'SAE International',
-        url: 'https://www.sae.org',
-        verifiedDate: '2022-10-14',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
   {
@@ -554,39 +500,18 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     references: [
       {
         id: 1,
-        title: 'McLaren Racing Technical Dossier: MCL38 Aerodynamic Correlation and Woking Wind Tunnel Breakthrough',
-        publisher: 'McLaren Racing Limited',
-        url: 'https://www.mclaren.com/racing',
-        verifiedDate: '2024-09-01',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Autosport Grand Prix Technical Review: How McLaren Built the Most Complete All-Round Car on the 2024 Grid',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-09-22',
-      },
-      {
-        id: 3,
-        title: 'Racecar Engineering: The Science of McLaren’s Waterslide Sidepod Channels and Floor Edge Sealing',
-        publisher: 'Racecar Engineering International',
-        url: 'https://www.racecar-engineering.com',
-        verifiedDate: '2024-08-30',
-      },
-      {
-        id: 4,
-        title: 'The Race: Inside Andrea Stella’s Quiet Revolution at McLaren That Toppled Red Bull',
-        publisher: 'The Race Formula 1 Media',
-        url: 'https://the-race.com',
-        verifiedDate: '2024-09-25',
-      },
-      {
-        id: 5,
-        title: 'FIA Formula One World Championship 2024 Constructors Championship Official Classification',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-12-08',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
   {
@@ -628,39 +553,18 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     references: [
       {
         id: 1,
-        title: 'Mercedes-AMG F1 Technical Dossier: From W13 Porpoising Lessons to W15 Aerodynamic Platform Stability',
-        publisher: 'Mercedes-Benz Grand Prix Ltd.',
-        url: 'https://www.mercedesamgf1.com',
-        verifiedDate: '2024-07-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Autosport Technical Analysis: Inside Mercedes’ Resurgence: Front Wing Elasticity and Suspension Compliance',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-07-29',
-      },
-      {
-        id: 3,
-        title: 'High Performance Powertrains (HPP) Engineering Archive: M15 E Performance PU Thermal Efficiency and MGU-H Legacy',
-        publisher: 'Mercedes-AMG High Performance Powertrains Brixworth',
-        url: 'https://www.mercedesamgf1.com',
-        verifiedDate: '2024-01-20',
-      },
-      {
-        id: 4,
-        title: 'SAE International: Porpoising Mitigation and Heave Damper Response in Ground-Effect Formula 1 Vehicles',
-        publisher: 'SAE International',
-        url: 'https://www.sae.org',
-        verifiedDate: '2023-04-12',
-      },
-      {
-        id: 5,
-        title: 'FIA Official World Championship Statistics: Mercedes-AMG Petronas F1 Team 8 Consecutive Constructors Championships',
-        publisher: 'Fédération Internationale de l’Automobile',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-15',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
   {
@@ -702,39 +606,18 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     references: [
       {
         id: 1,
-        title: 'Aston Martin Aramco F1 Team Technical Dossier: AMR Technology Campus and In-House Wind Tunnel Capabilities',
-        publisher: 'AMR GP Limited',
-        url: 'https://www.astonmartinf1.com',
-        verifiedDate: '2024-09-01',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Autosport Technical Analysis: Aston Martin AMR23 to AMR24 Aerodynamic Evolution and Suspension Kinematics',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-05-18',
-      },
-      {
-        id: 3,
-        title: 'Honda Racing Corporation (HRC) Official Press Release: Aston Martin and Honda Works Partnership for 2026 and Beyond',
-        publisher: 'Honda Motor Co., Ltd.',
-        url: 'https://honda.racing',
-        verifiedDate: '2023-05-24',
-      },
-      {
-        id: 4,
-        title: 'The Race: Inside Adrian Newey’s Arrival at Aston Martin: A World Championship Blueprint',
-        publisher: 'The Race Formula 1 Media',
-        url: 'https://the-race.com',
-        verifiedDate: '2024-09-10',
-      },
-      {
-        id: 5,
-        title: 'FIA Formula One World Championship Technical Regulations 2026: Sustainable Fuels and Aerodynamic Mandates',
-        publisher: 'Fédération Internationale de l’Automobile',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-06-20',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
   {
@@ -776,39 +659,18 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     references: [
       {
         id: 1,
-        title: 'BWT Alpine F1 Team Technical Heritage: From Enstone Benetton-Renault to A524 Aerodynamics',
-        publisher: 'Alpine Racing Limited',
-        url: 'https://www.alpinef1team.com',
-        verifiedDate: '2024-08-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Autosport Technical Review: Alpine Chassis Evolution and Mechanical Grip Distribution',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-06-12',
-      },
-      {
-        id: 3,
-        title: 'Racecar Engineering: Aerodynamic Flow Separation Mitigation in Ground-Effect Underfloors',
-        publisher: 'Racecar Engineering International',
-        url: 'https://www.racecar-engineering.com',
-        verifiedDate: '2024-04-20',
-      },
-      {
-        id: 4,
-        title: 'The Race: Inside Flavio Briatore’s Ruthless Overhaul of Alpine for the 2026 F1 Era',
-        publisher: 'The Race Formula 1 Media',
-        url: 'https://the-race.com',
-        verifiedDate: '2024-09-12',
-      },
-      {
-        id: 5,
-        title: 'FIA Official History: Renault and Benetton World Championship Legacies',
-        publisher: 'Fédération Internationale de l’Automobile',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-15',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
   {
@@ -850,39 +712,18 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     references: [
       {
         id: 1,
-        title: 'Williams Grand Prix Engineering Official Heritage Dossier: 9 Constructors Titles and FW Series Legacy',
-        publisher: 'Williams Grand Prix Engineering Ltd.',
-        url: 'https://www.williamsf1.com',
-        verifiedDate: '2024-08-01',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Autosport Technical Analysis: Williams FW45-FW46 Aerodynamic Concept Transformation under Pat Fry',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-07-20',
-      },
-      {
-        id: 3,
-        title: 'The Race: How James Vowles Convinced Carlos Sainz to Believe in the Williams Revolution',
-        publisher: 'The Race Formula 1 Media',
-        url: 'https://the-race.com',
-        verifiedDate: '2024-07-30',
-      },
-      {
-        id: 4,
-        title: 'Race Engine Technology: Mercedes-AMG High Performance Powertrains Customer Integration at Grove',
-        publisher: 'High Power Media Ltd.',
-        url: 'https://www.highpowermedia.com',
-        verifiedDate: '2024-03-15',
-      },
-      {
-        id: 5,
-        title: 'FIA Official Archives: Sir Frank Williams and the Golden Era of Independent Grand Prix Racing',
-        publisher: 'Fédération Internationale de l’Automobile',
-        url: 'https://www.fia.com',
-        verifiedDate: '2023-11-28',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
   {
@@ -924,39 +765,18 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     references: [
       {
         id: 1,
-        title: 'Visa Cash App RB Formula One Team Technical Dossier: VCARB 01 Aerodynamic Platform and Faenza-Milton Keynes Synergy',
-        publisher: 'Racing Bulls S.p.A.',
-        url: 'https://www.visacashapprb.com',
-        verifiedDate: '2024-06-01',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Autosport Grand Prix Technical Review: Inside the Red Bull-VCARB Technical Alliance and Suspension Kinematics',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-05-10',
-      },
-      {
-        id: 3,
-        title: 'The Race: How Laurent Mekies and Peter Bayer Rebuilt RB into a Relentless Midfield Powerhouse',
-        publisher: 'The Race Formula 1 Media',
-        url: 'https://the-race.com',
-        verifiedDate: '2024-07-15',
-      },
-      {
-        id: 4,
-        title: 'Honda Racing Corporation (HRC) Technical Bulletin: RBPT Power Unit Packaging in the VCARB Chassis',
-        publisher: 'Honda Motor Co., Ltd.',
-        url: 'https://honda.racing',
-        verifiedDate: '2024-04-10',
-      },
-      {
-        id: 5,
-        title: 'FIA Formula One World Championship Constructor Standings: Scuderia Toro Rosso to Visa Cash App RB',
-        publisher: 'Fédération Internationale de l’Automobile',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-12-08',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
   {
@@ -998,39 +818,18 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     references: [
       {
         id: 1,
-        title: 'Audi Formula 1 Works Project: Neuburg an der Donau Powertrain Development and Hinwil Factory Full Acquisition',
-        publisher: 'Audi AG / Audi Motorsport Media',
-        url: 'https://www.audi-mediacenter.com',
-        verifiedDate: '2026-01-10',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'SAE Technical Paper: Boundary Layer Control and Active Aerodynamic Transition in the Hinwil Full-Scale Wind Tunnel',
-        publisher: 'Society of Automotive Engineers International',
-        url: 'https://www.sae.org',
-        verifiedDate: '2026-02-17',
-      },
-      {
-        id: 3,
-        title: 'Motorsport Magazine: Inside the Binotto-Wheatley Leadership Architecture at Audi F1 Team',
-        publisher: 'Motorsport Magazine UK',
-        url: 'https://www.motorsportmagazine.com',
-        verifiedDate: '2026-02-05',
-      },
-      {
-        id: 4,
-        title: 'Audi Works E-Performance 2026 Power Unit Technical Blueprint: 350kW MGU-K and Sustainable Fuel Combustion',
-        publisher: 'Audi Formula Racing GmbH',
-        url: 'https://www.audi.com/f1',
-        verifiedDate: '2025-11-20',
-      },
-      {
-        id: 5,
-        title: 'FIA Formula One World Championship Official Entry List and Works Manufacturer Recognition: Audi',
-        publisher: 'Fédération Internationale de l’Automobile',
-        url: 'https://www.fia.com',
-        verifiedDate: '2026-01-05',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
   {
@@ -1072,39 +871,18 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     references: [
       {
         id: 1,
-        title: 'Haas F1 Team Engineering Culture and Organizational Turnaround under Team Principal Ayao Komatsu',
-        publisher: 'Racecar Engineering Technical Review',
-        url: 'https://www.racecar-engineering.com',
-        verifiedDate: '2026-02-22',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Dallara Automobili & Haas F1 Partnership: Carbon Composite Chassis Architecture and Monocoque Integrity',
-        publisher: 'High Power Media Ltd.',
-        url: 'https://www.highpowermedia.com',
-        verifiedDate: '2025-10-18',
-      },
-      {
-        id: 3,
-        title: 'Toyota Gazoo Racing (TGR) & MoneyGram Haas F1 Team Official Technical Partnership Agreement Blueprint',
-        publisher: 'Toyota Motor Corporation / Haas F1 Team Joint Press Briefing',
-        url: 'https://toyotagazooracing.com',
-        verifiedDate: '2024-10-11',
-      },
-      {
-        id: 4,
-        title: 'Ferrari Customer Powertrain Integration and Suspension Kinematics: The Banbury-Kannapolis-Maranello Pipeline',
-        publisher: 'SAE International Motorsports Technical Series',
-        url: 'https://www.sae.org',
-        verifiedDate: '2026-01-28',
-      },
-      {
-        id: 5,
-        title: 'FIA Formula One World Championship Constructor Dossier: MoneyGram Haas F1 Team',
-        publisher: 'Fédération Internationale de l’Automobile',
-        url: 'https://www.fia.com',
-        verifiedDate: '2026-01-15',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
   {
@@ -1138,39 +916,18 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     references: [
       {
         id: 1,
-        title: 'General Motors Cadillac Formula 1 Entry and TWG Global Motorsport Architecture: Official WMSC Dossier',
-        publisher: 'Fédération Internationale de l’Automobile / Formula One Management',
-        url: 'https://www.fia.com',
-        verifiedDate: '2026-01-08',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'General Motors Performance and Racing Center: CFD Supercomputing, Active Aerodynamics, and Chassis Dynamics',
-        publisher: 'General Motors Media Center',
-        url: 'https://media.gm.com',
-        verifiedDate: '2026-01-25',
-      },
-      {
-        id: 3,
-        title: 'Autosport Technical Analysis: Inside Cadillac F1 Team Leadership under Marcin Budkowski and Silverstone Operations',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2026-02-12',
-      },
-      {
-        id: 4,
-        title: 'GM Powertrain Technical Roadmap: Transitioning from Ferrari Power Supply to 2028 Cadillac Proprietary Works F1 PU',
-        publisher: 'SAE Motorsports Engineering Conference',
-        url: 'https://www.sae.org',
-        verifiedDate: '2026-02-19',
-      },
-      {
-        id: 5,
-        title: 'Formula 1 Official Announcement: Cadillac Confirmed as 11th Team on the F1 Grid for the 2026 Season and Beyond',
-        publisher: 'Formula One World Championship Limited',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2026-01-02',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
 ];
@@ -1180,6 +937,8 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
 // ─────────────────────────────────────────────────────────────
 
 export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
+
+
   {
     id: 'max-verstappen',
     code: 'VER',
@@ -1319,74 +1078,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Formula One World Championship Official Classifications & Driver Super Licence Records',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-10',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official Timing & Telemetry Archives: Max Verstappen Career Statistics and Laps Led',
-        publisher: 'Formula One Management (FOM)',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-01-10',
-      },
-      {
-        id: 3,
-        title: 'Vehicle Dynamics and Yaw Acceleration Mastery: Technical Telemetry of Max Verstappen',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2023-12-05',
-      },
-      {
-        id: 4,
-        title: 'Racecar Engineering: Red Bull Racing RB19 Aerodynamic Sensitivity and Ground Effect Domination',
-        publisher: 'Chelsea Magazine Company',
-        url: 'https://www.racecar-engineering.com',
-        verifiedDate: '2024-02-18',
-      },
-      {
-        id: 5,
-        title: 'BBC Sport Formula 1: The Making of Max Verstappen: From Wet-Weather Kart Prodigy to 4-Time Champion',
-        publisher: 'BBC Sport',
-        url: 'https://www.bbc.com/sport/formula1',
-        verifiedDate: '2024-11-05',
-      },
-      {
-        id: 6,
-        title: 'SAE Technical Paper: Transient Steering Angle Correction and Trail Braking Mechanics in Modern F1',
-        publisher: 'SAE International',
-        url: 'https://www.sae.org',
-        verifiedDate: '2023-08-14',
-      },
-      {
-        id: 7,
-        title: 'The Race: The Lambiase-Verstappen Radio Dynamic and Why It Delivers Peak Performance',
-        publisher: 'The Race Formula 1 Media',
-        url: 'https://the-race.com',
-        verifiedDate: '2023-09-12',
-      },
-      {
-        id: 8,
-        title: 'Honda Racing Corporation (HRC): Special Tribute: Verstappen and Honda Turbo Hybrid Partnership History',
-        publisher: 'Honda Racing Corporation',
-        url: 'https://honda.racing',
-        verifiedDate: '2022-10-10',
-      },
-      {
-        id: 9,
-        title: 'Verstappen.com: Official Biography and Junior Racing Career Archives',
-        publisher: 'Verstappen Management',
-        url: 'https://www.verstappen.com',
-        verifiedDate: '2024-01-01',
-      },
-      {
-        id: 10,
-        title: 'Pirelli Motorsport: Tyre Degradation and Compound Management Dossier: Red Bull RB19 and RB20',
-        publisher: 'Pirelli Tyre S.p.A.',
-        url: 'https://press.pirelli.com',
-        verifiedDate: '2024-06-20',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
     seasonHistory: [
       { year: 2016, team: 'Toro Rosso / Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 33, finalPosition: 5, points: 204, wins: 1, podiums: 7, note: '第5戦スペインGPでレッドブル昇格・史上最年少初優勝(18歳228日)' },
@@ -1539,60 +1242,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Hall of Fame & Statistical Archives: Lewis Hamilton 100+ Pole Positions and Grand Prix Victories',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official Telemetry and Timing Archives: Career Records of Lewis Hamilton',
-        publisher: 'Formula One Management (FOM)',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-01-15',
-      },
-      {
-        id: 3,
-        title: 'Hamilton at 105: The Engineering Anatomy of His 2024 Silverstone Masterclass',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-07-10',
-      },
-      {
-        id: 4,
-        title: 'BBC Sport Formula 1: The Art of the Wet-Weather Maestro: Hamilton’s Greatest Wet Races Analyzed',
-        publisher: 'BBC Sport',
-        url: 'https://www.bbc.com/sport/formula1',
-        verifiedDate: '2024-07-08',
-      },
-      {
-        id: 5,
-        title: 'SAE International: Thermal Degradation Mitigation Through Geometric Steering Angle Optimization',
-        publisher: 'SAE International',
-        url: 'https://www.sae.org',
-        verifiedDate: '2022-09-18',
-      },
-      {
-        id: 6,
-        title: 'Scuderia Ferrari Official Press Release: Lewis Hamilton Joins Scuderia Ferrari for 2025 and Beyond',
-        publisher: 'Scuderia Ferrari Press Office',
-        url: 'https://www.ferrari.com',
-        verifiedDate: '2024-02-01',
-      },
-      {
-        id: 7,
-        title: 'The Race: How Lewis Hamilton Built the Most Complete Skillset in Formula 1 History',
-        publisher: 'The Race Formula 1 Media',
-        url: 'https://the-race.com',
-        verifiedDate: '2024-07-12',
-      },
-      {
-        id: 8,
-        title: 'Mercedes-AMG F1 Technical Archive: W11 EQ Performance and Power Unit M11 Dominance',
-        publisher: 'Mercedes-Benz Grand Prix Ltd.',
-        url: 'https://www.mercedesamgf1.com',
-        verifiedDate: '2021-01-15',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
     seasonHistory: [
       { year: 2016, team: 'Mercedes-AMG Petronas Motorsport', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 2, points: 380, wins: 10, podiums: 17, note: '年間最多10勝を挙げるも同僚ロズベルグと死闘の末2位' },
@@ -1754,60 +1415,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Official Results Archive & Super Licence Career Dossier: Lando Norris',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official Telemetry and Timing Archives: Lando Norris Race Statistics and Fastest Laps',
-        publisher: 'Formula One Management (FOM)',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-05-10',
-      },
-      {
-        id: 3,
-        title: 'Autosport Grand Prix Technical Analysis: Norris at Zandvoort: Aerodynamic Platform and Tyre Thermal Control in MCL38',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-08-27',
-      },
-      {
-        id: 4,
-        title: 'The Race: The Sochi Crucible: How 2021 Heartbreak Transformed Lando Norris into a Complete Winner',
-        publisher: 'The Race Formula 1 Media',
-        url: 'https://the-race.com',
-        verifiedDate: '2024-05-08',
-      },
-      {
-        id: 5,
-        title: 'McLaren Racing Official Heritage Dossier: The Resurgence of Woking and Lando Norris’s Era',
-        publisher: 'McLaren Racing Limited',
-        url: 'https://www.mclaren.com/racing',
-        verifiedDate: '2024-06-01',
-      },
-      {
-        id: 6,
-        title: 'Pirelli Motorsport Technical White Paper: Thermal Degradation Mitigation Through Smooth Steering Angle Modulation in 2024 Cars',
-        publisher: 'Pirelli Tyre S.p.A.',
-        url: 'https://press.pirelli.com',
-        verifiedDate: '2024-09-05',
-      },
-      {
-        id: 7,
-        title: 'BBC Sport Formula 1: How Lando Norris Emerged as McLaren’s Linchpin and a World Championship Heavyweight',
-        publisher: 'BBC Sport',
-        url: 'https://www.bbc.com/sport/formula1',
-        verifiedDate: '2024-08-28',
-      },
-      {
-        id: 8,
-        title: 'SAE International: Dynamic Yaw-Rate Response and Aerodynamic Sensitivity in Modern Ground-Effect Single-Seaters',
-        publisher: 'SAE International',
-        url: 'https://www.sae.org',
-        verifiedDate: '2023-11-15',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
     seasonHistory: [
       { year: 2017, team: 'McLaren Honda', teamId: 'mclaren', role: 'Test', note: 'マクラーレン・ヤングドライバー育成、ハンガロリンク合同テスト参加' },
@@ -1968,60 +1587,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Formula 2 & GP3 Championship Archive: Charles Leclerc Rookie Title Records and Super Licence Dossier',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official Telemetry and Historical Timing Archives: Charles Leclerc Career Pole Positions and Victories',
-        publisher: 'Formula One Management (FOM)',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-05-15',
-      },
-      {
-        id: 3,
-        title: 'Automobile Club de Monaco (ACM) Official Race Classification & Historical Archives: 81e Grand Prix de Monaco',
-        publisher: 'Automobile Club de Monaco',
-        url: 'https://acm.mc',
-        verifiedDate: '2024-05-27',
-      },
-      {
-        id: 4,
-        title: 'Autosport Technical Analysis: How Ferrari and Leclerc Executed the Miracle One-Stop Victory at Monza 2024',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-09-02',
-      },
-      {
-        id: 5,
-        title: 'Scuderia Ferrari Official Press Archive: Il Predestinato: Charles Leclerc and the Maranello Heritage',
-        publisher: 'Ferrari S.p.A.',
-        url: 'https://www.ferrari.com',
-        verifiedDate: '2024-06-01',
-      },
-      {
-        id: 6,
-        title: 'Pirelli Motorsport Technical Bulletin: Tyre Grain Recovery and Surface Thermal Dynamics: Italian Grand Prix 2024',
-        publisher: 'Pirelli Tyre S.p.A.',
-        url: 'https://press.pirelli.com',
-        verifiedDate: '2024-09-03',
-      },
-      {
-        id: 7,
-        title: 'The Race: Bozzi & Leclerc: How an Engineering Reset Delivered Ferrari’s Dream Double at Monaco and Monza',
-        publisher: 'The Race Formula 1 Media',
-        url: 'https://the-race.com',
-        verifiedDate: '2024-09-05',
-      },
-      {
-        id: 8,
-        title: 'SAE International: Transient Braking Yaw Dynamics and Aerodynamic Load Correlation in Formula 1 Vehicles',
-        publisher: 'SAE International',
-        url: 'https://www.sae.org',
-        verifiedDate: '2023-10-18',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
     seasonHistory: [
       { year: 2016, team: 'Haas F1 Team / Scuderia Ferrari', teamId: 'haas', role: 'Test', note: 'フェラーリ育成、HaasでFP1出走、GP3チャンピオン獲得' },
@@ -2173,53 +1750,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Formula 2, Formula 3 and Formula Renault Championship Official Archives: Oscar Piastri Super Licence Dossier',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official Telemetry and Timing Archives: Oscar Piastri Career Statistics',
-        publisher: 'Formula One Management (FOM)',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-05-15',
-      },
-      {
-        id: 3,
-        title: 'Autosport Grand Prix Technical Analysis: Piastri vs Leclerc: The Anatomy of the Baku Defensive Masterclass',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-09-16',
-      },
-      {
-        id: 4,
-        title: 'The Race: How Oscar Piastri’s Cold-Blooded Execution Won the 2024 Azerbaijan Grand Prix',
-        publisher: 'The Race Formula 1 Media',
-        url: 'https://the-race.com',
-        verifiedDate: '2024-09-17',
-      },
-      {
-        id: 5,
-        title: 'McLaren Racing Official Heritage Dossier: The Ascent of Oscar Piastri in Woking',
-        publisher: 'McLaren Racing Limited',
-        url: 'https://www.mclaren.com/racing',
-        verifiedDate: '2024-06-01',
-      },
-      {
-        id: 6,
-        title: 'Pirelli Motorsport Technical Bulletin: Lateral Load Distribution and Slip Ratio Stability on Street Circuits',
-        publisher: 'Pirelli Tyre S.p.A.',
-        url: 'https://press.pirelli.com',
-        verifiedDate: '2024-09-18',
-      },
-      {
-        id: 7,
-        title: 'BBC Sport Formula 1: Oscar Piastri: The Ice-Cold Prodigy Redefining Modern Formula 1 Racecraft',
-        publisher: 'BBC Sport',
-        url: 'https://www.bbc.com/sport/formula1',
-        verifiedDate: '2024-09-20',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
     seasonHistory: [
       { year: 2020, team: 'Prema Racing', teamId: 'junior', role: 'Junior', note: 'FIA-F3選手権ルーキーイヤーでドライバーズチャンピオン獲得' },
@@ -2368,53 +1910,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Formula One World Championship Official Results Archive: Carlos Sainz Jr. Career Statistics',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official Telemetry and Timing Archives: Carlos Sainz Pole Positions and Race Victories',
-        publisher: 'Formula One Management (FOM)',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-05-15',
-      },
-      {
-        id: 3,
-        title: 'Scuderia Ferrari Official Technical Dossier: Carlos Sainz: Strategic Masterclass and Telemetry Review',
-        publisher: 'Ferrari S.p.A.',
-        url: 'https://www.ferrari.com',
-        verifiedDate: '2024-06-01',
-      },
-      {
-        id: 4,
-        title: 'Autosport Grand Prix Technical Analysis: The DRS Train Masterclass: How Carlos Sainz Outsmarted Mercedes in Singapore',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2023-09-18',
-      },
-      {
-        id: 5,
-        title: 'The Race: Smooth Operator: Inside Carlos Sainz’s Evolution into Formula 1’s Sharpest Brain',
-        publisher: 'The Race Formula 1 Media',
-        url: 'https://the-race.com',
-        verifiedDate: '2024-04-02',
-      },
-      {
-        id: 6,
-        title: 'Pirelli Motorsport Technical White Paper: Tyre Surface Stress Modulation and Clean-Air Race Pace Consistency',
-        publisher: 'Pirelli Tyre S.p.A.',
-        url: 'https://press.pirelli.com',
-        verifiedDate: '2024-04-05',
-      },
-      {
-        id: 7,
-        title: 'BBC Sport Formula 1: Carlos Sainz: The Tactical Genius Who Conquered Singapore and Defied Biology in Melbourne',
-        publisher: 'BBC Sport',
-        url: 'https://www.bbc.com/sport/formula1',
-        verifiedDate: '2024-03-26',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
     seasonHistory: [
       { year: 2016, team: 'Scuderia Toro Rosso', teamId: 'rb', role: 'Regular', carNumber: 55, finalPosition: 12, points: 46, note: 'トロロッソの主軸として安定した入賞を継続' },
@@ -2566,46 +2073,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Formula 2 and GP3 Championship Official Archives: George Russell Super Licence Dossier',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official Telemetry and Timing Archives: George Russell Race Records and Pole Positions',
-        publisher: 'Formula One Management (FOM)',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-05-15',
-      },
-      {
-        id: 3,
-        title: 'Mercedes-AMG F1 Engineering Dossier: George Russell W13-W15 Aerodynamic Feedback and Telemetry Traces',
-        publisher: 'Mercedes-Benz Grand Prix Ltd.',
-        url: 'https://www.mercedesamgf1.com',
-        verifiedDate: '2024-07-01',
-      },
-      {
-        id: 4,
-        title: 'Autosport Technical Review: The High-Speed Kerb Dynamics and Steering Modulation of George Russell',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-07-05',
-      },
-      {
-        id: 5,
-        title: 'BBC Sport Formula 1: George Russell: From PowerPoint Presentations to Mercedes Team Leader',
-        publisher: 'BBC Sport',
-        url: 'https://www.bbc.com/sport/formula1',
-        verifiedDate: '2024-07-10',
-      },
-      {
-        id: 6,
-        title: 'Pirelli Motorsport Technical White Paper: Tyre Surface Temperature Cycling in Modern Ground-Effect Cars',
-        publisher: 'Pirelli Tyre S.p.A.',
-        url: 'https://press.pirelli.com',
-        verifiedDate: '2024-06-25',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
     seasonHistory: [
       { year: 2017, team: 'Mercedes-AMG Petronas Motorsport / Force India', teamId: 'mercedes', role: 'Test', note: 'メルセデス育成、フォース・インディアから金曜FP1出走、GP3王者' },
@@ -2725,46 +2204,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Official Classification: Sakhir Grand Prix 2020 Race Classification and Steward Records',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2020-12-06',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official AWS Insights: The Defensive Masterclass: Perez Telemetry vs Hamilton at Yas Marina 2021',
-        publisher: 'Formula One Management / AWS F1 Insights',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2021-12-15',
-      },
-      {
-        id: 3,
-        title: 'Pirelli Motorsport Technical Dossier: Sergio Perez Tyre Degradation Gradient Analysis in High-Energy Street Circuits',
-        publisher: 'Pirelli Motorsport Technical Archive',
-        url: 'https://www.pirelli.com',
-        verifiedDate: '2023-05-10',
-      },
-      {
-        id: 4,
-        title: 'Red Bull Racing Engineering Debrief: Monaco 2022 Crossover In-Lap Telemetry and Wet-to-Dry Transition',
-        publisher: 'Oracle Red Bull Racing Technical Reports',
-        url: 'https://www.redbullracing.com',
-        verifiedDate: '2022-06-01',
-      },
-      {
-        id: 5,
-        title: 'Cadillac Formula 1 Team Official Bulletin: Sergio Perez Signs as Inaugural Factory Works Driver',
-        publisher: 'Cadillac Formula 1 Team / General Motors Motorsport',
-        url: 'https://www.cadillac.com/f1',
-        verifiedDate: '2025-10-15',
-      },
-      {
-        id: 6,
-        title: 'BBC Sport Formula 1: King of the Streets: How Sergio Perez Conquered Baku, Monaco and Singapore',
-        publisher: 'BBC Sport Formula 1',
-        url: 'https://www.bbc.com/sport/formula1',
-        verifiedDate: '2023-05-02',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
     seasonHistory: [
       { year: 2016, team: 'Sahara Force India F1 Team', teamId: 'force-india', role: 'Regular', carNumber: 11, finalPosition: 7, points: 101, podiums: 2, note: 'モナコ＆バクーで表彰台、チーム初のランキング4位獲得に貢献' },
@@ -2927,53 +2378,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Official Hall of Fame and Historical Results Archive: Fernando Alonso',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official Telemetry and Timing Archives: Career Records of Fernando Alonso',
-        publisher: 'Formula One Management (FOM)',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-05-15',
-      },
-      {
-        id: 3,
-        title: 'Autosport Grand Prix Technical Dossier: The Enduring Mastery of Fernando Alonso in the AMR23',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2023-11-20',
-      },
-      {
-        id: 4,
-        title: 'The Race: Imola 2005 Revisited: How Alonso Stopped the Schumacher Juggernaut',
-        publisher: 'The Race Formula 1 Media',
-        url: 'https://the-race.com',
-        verifiedDate: '2020-04-24',
-      },
-      {
-        id: 5,
-        title: 'Automobile Club de l’Ouest (ACO) Official Le Mans 24 Hours Archives: Toyota Gazoo Racing Victories',
-        publisher: 'Automobile Club de l’Ouest',
-        url: 'https://www.24h-lemans.com',
-        verifiedDate: '2023-06-10',
-      },
-      {
-        id: 6,
-        title: 'Pirelli Motorsport Technical Archive: Tyre Scrub Dynamics and Lateral Contact Patch Temperature Management',
-        publisher: 'Pirelli Tyre S.p.A.',
-        url: 'https://press.pirelli.com',
-        verifiedDate: '2023-10-12',
-      },
-      {
-        id: 7,
-        title: 'BBC Sport Formula 1: Fernando Alonso at 400: The Ageless Gladiator of Grand Prix Racing',
-        publisher: 'BBC Sport',
-        url: 'https://www.bbc.com/sport/formula1',
-        verifiedDate: '2024-10-25',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
     seasonHistory: [
       { year: 2016, team: 'McLaren Honda', teamId: 'mclaren', role: 'Regular', carNumber: 14, finalPosition: 10, points: 54, note: '厳しいパッケージから随所で鬼神の走破を見せトップ10入り' },
@@ -3128,88 +2544,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Formula One World Championship Official Driver Classification & Super Licence Merit Archive',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-04-10',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official Timing & Telemetry Archives: 2021-2024 Grand Prix Classifications and Telemetry',
-        publisher: 'Formula One Management (FOM)',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-04-10',
-      },
-      {
-        id: 3,
-        title: 'Honda Racing Corporation (HRC) Technical Bulletin: Yuki Tsunoda Suzuka GP Energy Deployment and Chassis Telemetry',
-        publisher: 'Honda Racing Corporation',
-        url: 'https://honda.racing',
-        verifiedDate: '2024-04-09',
-      },
-      {
-        id: 4,
-        title: 'Formula 1 Official AWS Insights: Peak Deceleration G-Forces and Braking Micro-Adjustments: Tsunoda Dossier',
-        publisher: 'Formula One Management / AWS F1 Insights',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-05-15',
-      },
-      {
-        id: 5,
-        title: 'Pirelli Motorsport Official Press Release: Tyre Strategy and Stint Longevity Analysis: 2024 Japanese and Miami Grands Prix',
-        publisher: 'Pirelli Tyre S.p.A.',
-        url: 'https://press.pirelli.com',
-        verifiedDate: '2024-05-06',
-      },
-      {
-        id: 6,
-        title: '角田裕毅のレイトブレーキング工学と低速コーナー回頭性の徹底テレメトリー解析',
-        publisher: 'Auto Sport Japan (三栄書房)',
-        url: 'https://www.as-web.jp/f1',
-        verifiedDate: '2024-05-20',
-      },
-      {
-        id: 7,
-        title: 'The Race Formula 1: How Yuki Tsunoda Evolved into Red Bull’s Most Consistent Midfield Leader',
-        publisher: 'The Race Formula 1 Media',
-        url: 'https://the-race.com',
-        verifiedDate: '2024-06-12',
-      },
-      {
-        id: 8,
-        title: 'Autosport Grand Prix Technical Dossier: Tsunoda vs Midfield: Mid-Corner Throttle Application and Tyre Load',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-07-15',
-      },
-      {
-        id: 9,
-        title: 'BBC Sport Formula 1: Yuki Tsunoda: From Karting Prodigy to Formula 1 Team Leader',
-        publisher: 'BBC Sport',
-        url: 'https://www.bbc.com/sport/formula1',
-        verifiedDate: '2024-04-08',
-      },
-      {
-        id: 10,
-        title: 'FIA Formula 2 Championship Official Results and Anthoine Hubert Award Archive (2020)',
-        publisher: 'FIA Formula 2 Championship',
-        url: 'https://www.fiaformula2.com',
-        verifiedDate: '2024-01-15',
-      },
-      {
-        id: 11,
-        title: 'Visa Cash App RB F1 Team Official Technical Dossier and Engineering Debriefs',
-        publisher: 'Racing Bulls S.p.A.',
-        url: 'https://www.visacashapprb.com',
-        verifiedDate: '2024-06-01',
-      },
-      {
-        id: 12,
-        title: 'Motorsport.com: Technical Breakdown of VCARB 01 Aerodynamic Evolution and Driver Correlation',
-        publisher: 'Motorsport Network',
-        url: 'https://www.motorsport.com',
-        verifiedDate: '2024-05-10',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
     seasonHistory: [
       { year: 2016, team: 'Super-FJ', teamId: 'junior', role: 'Junior', note: '限定ライセンスで鈴鹿シリーズ参戦・初参戦初優勝' },
@@ -3363,46 +2709,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Official Hall of Fame: Ayrton Senna da Silva Career Biography and Statistics',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official Historical Archives: Ayrton Senna: 65 Pole Positions and 41 Grand Prix Victories',
-        publisher: 'Formula One Management (FOM)',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-01-15',
-      },
-      {
-        id: 3,
-        title: 'Honda Motor Co. Heritage: The McLaren Honda Turbo Era and Ayrton Senna’s Telemetry Analysis',
-        publisher: 'Honda Motor Co., Ltd. Motorsports Division',
-        url: 'https://global.honda/heritage',
-        verifiedDate: '2023-05-01',
-      },
-      {
-        id: 4,
-        title: 'Racecar Engineering: The Science Behind Senna’s Throttle Technique and Turbo Spool Physics',
-        publisher: 'Racecar Engineering International',
-        url: 'https://www.racecar-engineering.com',
-        verifiedDate: '2021-04-15',
-      },
-      {
-        id: 5,
-        title: 'Instituto Ayrton Senna Official Biographical Archives: The Legacy of a Champion',
-        publisher: 'Instituto Ayrton Senna',
-        url: 'https://www.senna.com.br',
-        verifiedDate: '2024-05-01',
-      },
-      {
-        id: 6,
-        title: 'SAE International: Transient Internal Combustion Engine Throttle Modulation and Tyre Slip Angle Correlation',
-        publisher: 'SAE International',
-        url: 'https://www.sae.org',
-        verifiedDate: '2019-11-10',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
     seasonHistory: [
         { year: 1994, team: 'Williams Renault', role: 'Regular', carNumber: 2, finalPosition: 99, points: 0, wins: 0, podiums: 0, note: '開幕3戦連続ポールポジション獲得' },
@@ -3556,46 +2874,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Official Hall of Fame: Michael Schumacher: Seven-Time World Champion',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official Historical Archives: Michael Schumacher 91 Wins and 7 World Titles',
-        publisher: 'Formula One Management (FOM)',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-01-15',
-      },
-      {
-        id: 3,
-        title: 'Scuderia Ferrari Official Heritage: The Golden Era: Ross Brawn, Rory Byrne and Michael Schumacher',
-        publisher: 'Ferrari S.p.A.',
-        url: 'https://www.ferrari.com',
-        verifiedDate: '2024-01-10',
-      },
-      {
-        id: 4,
-        title: 'Racecar Engineering: Left-Foot Braking and Engine Exhaust Blowing: How Michael Schumacher Revolutionized F1 Vehicle Dynamics',
-        publisher: 'Racecar Engineering International',
-        url: 'https://www.racecar-engineering.com',
-        verifiedDate: '2020-08-15',
-      },
-      {
-        id: 5,
-        title: 'Autosport Historical Dossier: Schumacher at Ferrari: The Engineering Discipline Behind the Five-Year Dominance',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2021-12-28',
-      },
-      {
-        id: 6,
-        title: 'SAE International: Dual-Pedal Modulation and Transient Vehicle Longitudinal/Lateral Stability in High Downforce Racing',
-        publisher: 'SAE International',
-        url: 'https://www.sae.org',
-        verifiedDate: '2018-05-22',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
     seasonHistory: [
         { year: 2012, team: 'Mercedes-AMG Petronas', role: 'Regular', carNumber: 7, finalPosition: 13, points: 49, wins: 0, podiums: 1, note: 'モナコGP予選最速PP・ヨーロッパGP（バレンシア）P3表彰台' },
@@ -3754,45 +3044,17 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "FIA Official Classification: 2020 Italian Grand Prix Race Classification & Technical Verification",
-        publisher: "Fédération Internationale de l’Automobile (FIA)",
-        url: "https://www.fia.com",
-        verifiedDate: "2020-09-06"
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: "Formula 1 Official AWS Insights: Gasly vs Sainz Monza 2020 Apex Speed and Throttle Trace Telemetry Dossier",
-        publisher: "Formula One Management / AWS F1 Insights",
-        url: "https://www.formula1.com",
-        verifiedDate: "2020-09-08"
-      },
-      {
-        id: 3,
-        title: "Autosport Technical Analysis: How AlphaTauri and Gasly Executed the Strategic Miracle of Monza",
-        publisher: "Autosport Media UK",
-        url: "https://www.autosport.com",
-        verifiedDate: "2020-09-10"
-      },
-      {
-        id: 4,
-        title: "The Race Technical Feature: Pierre Gasly's Red Bull Rebound: Mental Toughness and Driving Style Evolution",
-        publisher: "The Race Motorsport",
-        url: "https://the-race.com",
-        verifiedDate: "2021-11-18"
-      },
-      {
-        id: 5,
-        title: "BWT Alpine F1 Team Engineering Dossier: A524 Power Unit Transition and Driver Ergonomics Study",
-        publisher: "Alpine F1 Team",
-        url: "https://www.alpinef1team.com",
-        verifiedDate: "2024-11-05"
-      },
-      {
-        id: 6,
-        title: "BBC Sport Formula 1: The Miracle of Monza: Pierre Gasly’s Emotional Triumph for France and AlphaTauri",
-        publisher: "BBC Sport Formula 1",
-        url: "https://www.bbc.com/sport/formula1",
-        verifiedDate: "2020-09-07"
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
     ],
     seasonHistory: [
@@ -3946,45 +3208,17 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "FIA Official Classification: 2021 Hungarian Grand Prix Race Classification & Technical Verification",
-        publisher: "Fédération Internationale de l’Automobile (FIA)",
-        url: "https://www.fia.com",
-        verifiedDate: "2021-08-01"
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: "Formula 1 Official AWS Insights: Hungaroring 2021 Defensive Telemetry: Ocon vs Vettel Under Pressure",
-        publisher: "Formula One Management / AWS F1 Insights",
-        url: "https://www.formula1.com",
-        verifiedDate: "2021-08-03"
-      },
-      {
-        id: 3,
-        title: "Autosport Race Report: How Esteban Ocon Delivered Alpine's Shock Hungarian Grand Prix Win",
-        publisher: "Autosport Media UK",
-        url: "https://www.autosport.com",
-        verifiedDate: "2021-08-02"
-      },
-      {
-        id: 4,
-        title: "Haas F1 Team Official Technical Bulletin: Esteban Ocon Signs Multi-Year Agreement with Haas F1 Team",
-        publisher: "Haas F1 Team",
-        url: "https://www.haasf1team.com",
-        verifiedDate: "2024-07-25"
-      },
-      {
-        id: 5,
-        title: "The Race Driver Deep Dive: From Camping Van to Grand Prix Winner: The Relentless Rise of Esteban Ocon",
-        publisher: "The Race Motorsport",
-        url: "https://the-race.com",
-        verifiedDate: "2021-08-10"
-      },
-      {
-        id: 6,
-        title: "BBC Sport Formula 1: Hungarian GP: Esteban Ocon Wins for Alpine After Dramatic Rain-Hit Race",
-        publisher: "BBC Sport Formula 1",
-        url: "https://www.bbc.com/sport/formula1",
-        verifiedDate: "2021-08-01"
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
     ],
     seasonHistory: [
@@ -4138,45 +3372,17 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "FIA Official Classification: 2020 Tuscan Grand Prix (Mugello) Podium Results & Race Data",
-        publisher: "Fédération Internationale de l’Automobile (FIA)",
-        url: "https://www.fia.com",
-        verifiedDate: "2020-09-13"
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: "Formula 1 Official AWS Insights: Australian GP 2022: Albon's 57-Lap Hard Tyre Degradation & Micro-Pace Traces",
-        publisher: "Formula One Management / AWS F1 Insights",
-        url: "https://www.formula1.com",
-        verifiedDate: "2022-04-12"
-      },
-      {
-        id: 3,
-        title: "Autosport Technical Analysis: How Alex Albon Became the Ultimate Midfield Defensive Master",
-        publisher: "Autosport Media UK",
-        url: "https://www.autosport.com",
-        verifiedDate: "2023-09-05"
-      },
-      {
-        id: 4,
-        title: "Williams Racing Technical Bulletin: Alexander Albon Leadership & Cockpit Ergonomics in the Ground Effect Era",
-        publisher: "Williams Racing Official Archive",
-        url: "https://www.williamsf1.com",
-        verifiedDate: "2024-05-15"
-      },
-      {
-        id: 5,
-        title: "The Race Driver Assessment: From Red Bull Rejection to Williams Kingpin: The Albon Evolution",
-        publisher: "The Race Motorsport",
-        url: "https://the-race.com",
-        verifiedDate: "2023-11-20"
-      },
-      {
-        id: 6,
-        title: "BBC Sport Formula 1: Alex Albon: How Tyre Preservation and Mental Strength Revived an F1 Career",
-        publisher: "BBC Sport Formula 1",
-        url: "https://www.bbc.com/sport/formula1",
-        verifiedDate: "2022-04-11"
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
     ],
     seasonHistory: [
@@ -4326,45 +3532,17 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "FIA Official Classification: 2024 Azerbaijan Grand Prix Race Results & Championship Points",
-        publisher: "Fédération Internationale de l’Automobile (FIA)",
-        url: "https://www.fia.com",
-        verifiedDate: "2024-09-15"
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: "Formula 1 Official AWS Insights: Baku 2024 Micro-Sector Speeds: Colapinto Castle Section Telemetry",
-        publisher: "Formula One Management / AWS F1 Insights",
-        url: "https://www.formula1.com",
-        verifiedDate: "2024-09-17"
-      },
-      {
-        id: 3,
-        title: "Autosport In-Depth: The 42-Year Wait: How Franco Colapinto Revived Argentine Formula 1 Passion",
-        publisher: "Autosport Media UK",
-        url: "https://www.autosport.com",
-        verifiedDate: "2024-09-16"
-      },
-      {
-        id: 4,
-        title: "Williams Racing Technical Bulletin: Franco Colapinto Debut Telemetry Analysis at Monza and Baku",
-        publisher: "Williams Racing Official Archive",
-        url: "https://www.williamsf1.com",
-        verifiedDate: "2024-09-20"
-      },
-      {
-        id: 5,
-        title: "Alpine F1 Team Official Announcement: Franco Colapinto Confirmed for 2026 Season",
-        publisher: "Alpine F1 Team",
-        url: "https://www.alpinef1team.com",
-        verifiedDate: "2025-11-10"
-      },
-      {
-        id: 6,
-        title: "The Race Driver Assessment: Franco Colapinto’s Sensational Audition: Natural Talent and Zero Fear",
-        publisher: "The Race Motorsport",
-        url: "https://the-race.com",
-        verifiedDate: "2024-09-22"
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
     ],
     seasonHistory: [
@@ -4508,45 +3686,17 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "FIA Official Classification: 2017 Azerbaijan Grand Prix (Baku) Podium Classification",
-        publisher: "Fédération Internationale de l’Automobile (FIA)",
-        url: "https://www.fia.com",
-        verifiedDate: "2017-06-25"
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: "Formula 1 Official AWS Insights: Turkish GP 2020: Stroll Wet-Weather Pole Lap Micro-Telemetry",
-        publisher: "Formula One Management / AWS F1 Insights",
-        url: "https://www.formula1.com",
-        verifiedDate: "2020-11-15"
-      },
-      {
-        id: 3,
-        title: "Autosport Technical Analysis: The Wet Weather Sensor: How Lance Stroll Finds Grip When Others Struggle",
-        publisher: "Autosport Media UK",
-        url: "https://www.autosport.com",
-        verifiedDate: "2020-11-16"
-      },
-      {
-        id: 4,
-        title: "Honda Racing Corporation (HRC) Technical Bulletin: Aston Martin Aramco & Honda Works PU Integration",
-        publisher: "Honda Racing Corporation",
-        url: "https://honda.racing",
-        verifiedDate: "2024-06-27"
-      },
-      {
-        id: 5,
-        title: "The Race Driver Feature: The Polarising Career of Lance Stroll: Podiums, Pole and Tenacity",
-        publisher: "The Race Motorsport",
-        url: "https://the-race.com",
-        verifiedDate: "2023-10-12"
-      },
-      {
-        id: 6,
-        title: "BBC Sport Formula 1: Lance Stroll: From Broken Wrists to Masterclasses in the Rain",
-        publisher: "BBC Sport Formula 1",
-        url: "https://www.bbc.com/sport/formula1",
-        verifiedDate: "2023-03-06"
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
     ],
     seasonHistory: [
@@ -4701,45 +3851,17 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "FIA Official Classification: 2010 Brazilian Grand Prix Qualifying Classification (Maiden Pole Position)",
-        publisher: "Fédération Internationale de l’Automobile (FIA)",
-        url: "https://www.fia.com",
-        verifiedDate: "2010-11-06"
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: "Automobile Club de l'Ouest (ACO) Official Classification: 83e 24 Heures du Mans 2015 Overall Victory",
-        publisher: "24 Hours of Le Mans Official Archive",
-        url: "https://www.24h-lemans.com",
-        verifiedDate: "2015-06-14"
-      },
-      {
-        id: 3,
-        title: "Formula 1 Official AWS Insights: Qualifying Precision: Micro-Apex Speed & Telemetry Traces of Nico Hülkenberg",
-        publisher: "Formula One Management / AWS F1 Insights",
-        url: "https://www.formula1.com",
-        verifiedDate: "2023-06-18"
-      },
-      {
-        id: 4,
-        title: "Autosport Technical Analysis: The Technical Master: Why Audi Chose Nico Hülkenberg to Lead Its 2026 Works Project",
-        publisher: "Autosport Media UK",
-        url: "https://www.autosport.com",
-        verifiedDate: "2024-04-26"
-      },
-      {
-        id: 5,
-        title: "Haas F1 Team Technical Bulletin: VF-24 Aerodynamic Platform Development and Feedback by Nico Hülkenberg",
-        publisher: "Haas F1 Team Official Archive",
-        url: "https://www.haasf1team.com",
-        verifiedDate: "2024-07-01"
-      },
-      {
-        id: 6,
-        title: "The Race Driver Assessment: The Super-Sub Who Never Vanished: Nico Hülkenberg’s Enduring F1 Career",
-        publisher: "The Race Motorsport",
-        url: "https://the-race.com",
-        verifiedDate: "2024-03-15"
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
     ],
     seasonHistory: [
@@ -4871,19 +3993,19 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "Kevin Magnussen Driver Profile",
-        publisher: "Haas F1 Team",
-        url: "https://www.haasf1team.com",
-        verifiedDate: "2024-03-01"
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: "Brazilian GP 2022: Magnussen takes shock Haas pole",
-        publisher: "Formula1.com",
-        url: "https://www.formula1.com",
-        verifiedDate: "2024-03-01"
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
-    ]
+    ],
   },
   {
     id: "valtteri-bottas",
@@ -4997,24 +4119,17 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "Valtteri Bottas Profile & Cadillac Formula 1 Project",
-        publisher: "Cadillac F1 Team Media",
-        url: "https://www.cadillac.com/f1",
-        verifiedDate: "2026-03-01"
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: "Australian GP 2019: Bottas' dominant masterclass and Melbourne victory",
-        publisher: "Formula1.com",
-        url: "https://www.formula1.com",
-        verifiedDate: "2024-03-01"
-      },
-      {
-        id: 3,
-        title: "FIA Grand Prix Winners Record: Valtteri Bottas",
-        publisher: "FIA.com",
-        url: "https://www.fia.com",
-        verifiedDate: "2026-03-01"
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
     ],
     seasonHistory: [
@@ -5147,19 +4262,19 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "Zhou Guanyu Official Site",
-        publisher: "Zhou Racing",
-        url: "https://www.zhou-guanyu.com",
-        verifiedDate: "2024-03-01"
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: "Emotional Zhou reflects on historic home race",
-        publisher: "Formula1.com",
-        url: "https://www.formula1.com",
-        verifiedDate: "2024-04-25"
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
-    ]
+    ],
   },
   {
     id: "daniel-ricciardo",
@@ -5274,17 +4389,17 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "Daniel Ricciardo Official Biography",
-        publisher: "Ricciardo Racing",
-        url: "https://danielricciardo.com",
-        verifiedDate: "2024-01-10"
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: "Italian GP 2021: Ricciardo leads McLaren 1-2",
-        publisher: "Formula1.com",
-        url: "https://www.formula1.com",
-        verifiedDate: "2024-01-10"
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
     ],
     seasonHistory: [
@@ -5434,17 +4549,17 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "Alain Prost: Four-Time World Champion Legacy",
-        publisher: "FIA Hall of Fame",
-        url: "https://www.fia.com",
-        verifiedDate: "2023-05-15"
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: "McLaren Heritage: The Alain Prost Archives",
-        publisher: "McLaren Racing",
-        url: "https://www.mclaren.com",
-        verifiedDate: "2023-05-15"
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
     ],
     seasonHistory: [
@@ -5596,17 +4711,17 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: "Niki Lauda: The Computer and the Phoenix",
-        publisher: "Scuderia Ferrari Historical Archives",
-        url: "https://www.ferrari.com",
-        verifiedDate: "2023-01-15"
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: "FIA Hall of Fame: Andreas Nikolaus Lauda",
-        publisher: "FIA Official Publications",
-        url: "https://www.fia.com",
-        verifiedDate: "2023-01-15"
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
     ],
     seasonHistory: [
@@ -5757,46 +4872,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Official Hall of Fame: Sebastian Vettel Four-Time Formula One World Champion',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official Historical Archives: Sebastian Vettel 53 Victories and 57 Pole Positions',
-        publisher: 'Formula One Management (FOM)',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-01-15',
-      },
-      {
-        id: 3,
-        title: 'Red Bull Racing Technical Heritage: RB6-RB9 Blown Diffuser Dynamics and Vettel Era Dominance',
-        publisher: 'Red Bull Racing Limited',
-        url: 'https://www.redbullracing.com',
-        verifiedDate: '2023-11-20',
-      },
-      {
-        id: 4,
-        title: 'Racecar Engineering: The Aerodynamics and Exhaust Gas Blowing Mechanics of Adrian Newey and Sebastian Vettel',
-        publisher: 'Racecar Engineering International',
-        url: 'https://www.racecar-engineering.com',
-        verifiedDate: '2021-09-12',
-      },
-      {
-        id: 5,
-        title: 'Autosport Historical Dossier: Sebastian Vettel: From Monza Miracle to Environmental Leader',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2022-11-20',
-      },
-      {
-        id: 6,
-        title: 'SAE International: Exhaust Energy Recovery and Underfloor Downforce Enhancement in Modern Racing Cars',
-        publisher: 'SAE International',
-        url: 'https://www.sae.org',
-        verifiedDate: '2019-04-18',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
     seasonHistory: [
       { year: 2022, team: 'Aston Martin Aramco Cognizant', role: 'Regular', carNumber: 5, finalPosition: 12, points: 37, wins: 0, podiums: 0, note: '現役ラストイヤー・鈴鹿P6感動フィニッシュ' },
@@ -5951,46 +5038,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Official Hall of Fame: Kimi-Matias Räikkönen 2007 Formula One World Champion',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official Historical Archives: Kimi Räikkönen Career Records and 349 Grand Prix Starts',
-        publisher: 'Formula One Management (FOM)',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-01-15',
-      },
-      {
-        id: 3,
-        title: 'Scuderia Ferrari Heritage Bureau: The Iceman: Kimi Räikkönen’s 2007 Championship Triumph',
-        publisher: 'Ferrari S.p.A.',
-        url: 'https://www.ferrari.com',
-        verifiedDate: '2023-10-10',
-      },
-      {
-        id: 4,
-        title: 'Autosport Historical Analysis: The Minimalist Steering Precision of Kimi Räikkönen',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2021-12-10',
-      },
-      {
-        id: 5,
-        title: 'BBC Sport Formula 1: Kimi Räikkönen: The Uncompromising Genius Who Defined an F1 Era',
-        publisher: 'BBC Sport',
-        url: 'https://www.bbc.com/sport/formula1',
-        verifiedDate: '2021-12-15',
-      },
-      {
-        id: 6,
-        title: 'Pirelli Motorsport Technical Archive: Steering Input Smoothness and Tyre Grain Prevention',
-        publisher: 'Pirelli Tyre S.p.A.',
-        url: 'https://press.pirelli.com',
-        verifiedDate: '2022-04-12',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
     seasonHistory: [
       { year: 2021, team: 'Alfa Romeo Racing ORLEN', role: 'Regular', carNumber: 7, finalPosition: 16, points: 10, wins: 0, podiums: 0, note: '出走349戦で輝かしいF1キャリアに終止符' },
@@ -6140,46 +5199,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Official Hall of Fame: Nigel Mansell 1992 Formula One World Champion',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official Historical Archives: Nigel Mansell Career Records and 31 Victories',
-        publisher: 'Formula One Management (FOM)',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-01-15',
-      },
-      {
-        id: 3,
-        title: 'Williams Grand Prix Engineering Heritage: FW14B Active Suspension System and Mansell’s Dominance',
-        publisher: 'Williams Grand Prix Engineering Ltd.',
-        url: 'https://www.williamsf1.com',
-        verifiedDate: '2023-08-12',
-      },
-      {
-        id: 4,
-        title: 'Racecar Engineering: The Mechanics of Active Ride Control in Formula One: The 1992 Williams FW14B',
-        publisher: 'Racecar Engineering International',
-        url: 'https://www.racecar-engineering.com',
-        verifiedDate: '2020-05-18',
-      },
-      {
-        id: 5,
-        title: 'Autosport Historical Dossier: Nigel Mansell: The Lionhearted Champion of Formula 1 and IndyCar',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2022-08-08',
-      },
-      {
-        id: 6,
-        title: 'SAE International: Ride-Height Active Control and Aerodynamic Downforce Optimization in Ground-Effect Racecars',
-        publisher: 'SAE International',
-        url: 'https://www.sae.org',
-        verifiedDate: '2019-10-15',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
     seasonHistory: [
       { year: 1995, team: 'Marlboro McLaren Mercedes', role: 'Regular', carNumber: 7, finalPosition: 99, points: 0, wins: 0, podiums: 0, note: 'コックピット狭小問題を経て2戦のみ出走' },
@@ -6322,46 +5353,18 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Official Hall of Fame: Mika Häkkinen Two-Time Formula One World Champion',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official Historical Archives: Mika Häkkinen: The Flying Finn’s 20 Wins and Double Titles',
-        publisher: 'Formula One Management (FOM)',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-01-15',
-      },
-      {
-        id: 3,
-        title: 'McLaren Racing Heritage Dossier: MP4-13 and MP4-14: Adrian Newey and Mika Häkkinen’s Championship Cars',
-        publisher: 'McLaren Racing Limited',
-        url: 'https://www.mclaren.com/racing',
-        verifiedDate: '2023-09-15',
-      },
-      {
-        id: 4,
-        title: 'Autosport Grand Prix Technical Review: The Overtake of the Century: How Häkkinen Passed Schumacher at Spa 2000',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2020-08-25',
-      },
-      {
-        id: 5,
-        title: 'BBC Sport Formula 1: Mika Häkkinen: The Quiet Champion Who Conquered Trauma and Toppled Schumacher',
-        publisher: 'BBC Sport',
-        url: 'https://www.bbc.com/sport/formula1',
-        verifiedDate: '2021-11-01',
-      },
-      {
-        id: 6,
-        title: 'SAE International: Transient Yaw-Rate and High-Speed Aerodynamic Balance in Late-1990s Formula 1 Cars',
-        publisher: 'SAE International',
-        url: 'https://www.sae.org',
-        verifiedDate: '2019-06-20',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
     seasonHistory: [
       { year: 2001, team: 'West McLaren Mercedes', role: 'Regular', carNumber: 3, finalPosition: 5, points: 37, wins: 2, podiums: 3, note: 'シルバーストン＆インディアナポリスで優勝・シーズン終了後に休養宣言' },
@@ -6466,45 +5469,17 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Official Classification: 2023 Singapore Grand Prix Race Results & Points Allocation',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2023-09-17'
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official AWS Insights: Zandvoort & Singapore 2023: Liam Lawson Telemetry Debut Dossier',
-        publisher: 'Formula One Management / AWS F1 Insights',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2023-09-19'
-      },
-      {
-        id: 3,
-        title: 'Autosport Technical Analysis: How Liam Lawson Grabbed His Formula 1 Opportunity with Both Hands',
-        publisher: 'Autosport Media UK',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2023-09-21'
-      },
-      {
-        id: 4,
-        title: 'Visa Cash App RB Official Bulletin: Liam Lawson Driver Lineup and Engineering Assessment',
-        publisher: 'Visa Cash App RB F1 Team',
-        url: 'https://www.visacashapprb.com',
-        verifiedDate: '2024-09-26'
-      },
-      {
-        id: 5,
-        title: 'The Race Driver Assessment: From Super Formula Title Duel to F1 Reality: The Lawson Method',
-        publisher: 'The Race Motorsport',
-        url: 'https://the-race.com',
-        verifiedDate: '2023-11-05'
-      },
-      {
-        id: 6,
-        title: 'BBC Sport Formula 1: Liam Lawson: The Kiwi Kid Who Proved He Belonged on the F1 Grid',
-        publisher: 'BBC Sport Formula 1',
-        url: 'https://www.bbc.com/sport/formula1',
-        verifiedDate: '2023-10-02'
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
     ],
     seasonHistory: [
@@ -6528,7 +5503,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     nickname: 'ボローニャの神童 / Kimi',
     birthDate: '2006-08-25',
     birthPlace: 'Bologna, Italy',
-    f1Debut: '2025年 オーストラリアGP (Mercedes)',
+    f1Debut: '2024年 アブダビGP (Mercedes)',
     driverType: '天才肌のナチュラルスピード派',
     numberOrigin: '幼少期のカート時代から着用してきた憧れのナンバー。',
     visualAsset: {
@@ -6597,45 +5572,17 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'Mercedes-AMG F1 Confirms Kimi Antonelli for 2025 Race Seat Alongside George Russell',
-        publisher: 'Mercedes-AMG PETRONAS Formula One Team',
-        url: 'https://www.mercedesamgf1.com',
-        verifiedDate: '2024-08-31'
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'FIA Super Licence Allocation & Junior Single-Seater Merit Archive: Andrea Kimi Antonelli',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-09-01'
-      },
-      {
-        id: 3,
-        title: 'Formula 1 Official Technical Feature: Why Mercedes Chose Antonelli: Telemetry and TPC Testing Analysis',
-        publisher: 'Formula One Management / AWS F1 Insights',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-09-02'
-      },
-      {
-        id: 4,
-        title: 'Autosport In-Depth: The Making of Andrea Kimi Antonelli: From Karting Prodigy to Silver Arrows',
-        publisher: 'Autosport / Motorsport Network',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-09-05'
-      },
-      {
-        id: 5,
-        title: 'The Race Formula 1: Toto Wolff on the Raw Speed and Natural Car Control of Kimi Antonelli',
-        publisher: 'The Race Formula 1 Media',
-        url: 'https://the-race.com',
-        verifiedDate: '2024-09-10'
-      },
-      {
-        id: 6,
-        title: 'Italian Motorsport Federation (ACI Sport): Andrea Kimi Antonelli Italian F4 and FRECA Dominance Dossier',
-        publisher: 'Automobile Club d’Italia (ACI Sport)',
-        url: 'https://www.acisport.it',
-        verifiedDate: '2023-11-20'
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
     ],
     seasonHistory: [
@@ -6720,38 +5667,17 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Single-Seater Commission Archive: Jack Doohan FIA Formula 2 & Formula 3 Race Records',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2023-12-01'
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'BWT Alpine F1 Team Confirms Jack Doohan for 2025 Formula 1 Race Seat',
-        publisher: 'Alpine F1 Team',
-        url: 'https://www.alpinef1team.com',
-        verifiedDate: '2024-08-23'
-      },
-      {
-        id: 3,
-        title: 'Formula 1 Official Technical Bulletin: Jack Doohan Private TPC Testing & Simulator Correlation Analysis',
-        publisher: 'Formula One Management / Technical Archive',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-08-25'
-      },
-      {
-        id: 4,
-        title: 'Autosport In-Depth: Why Alpine Turned to Academy Graduate Jack Doohan for Its Future',
-        publisher: 'Autosport Media UK',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-08-24'
-      },
-      {
-        id: 5,
-        title: 'The Race Driver Assessment: Jack Doohan: Forging His Own Path Away From MotoGP Royalty',
-        publisher: 'The Race Motorsport',
-        url: 'https://the-race.com',
-        verifiedDate: '2024-08-26'
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
     ],
   },
@@ -6836,45 +5762,17 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Single-Seater Commission: 2024 FIA Formula 2 Championship Classification (Hadjar Runner-Up 4 Wins)',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-12-08'
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Red Bull Racing Official Announcement: Isack Hadjar Confirmed for Red Bull Racing 2026 Works Seat',
-        publisher: 'Oracle Red Bull Racing',
-        url: 'https://www.redbullracing.com',
-        verifiedDate: '2025-11-20'
-      },
-      {
-        id: 3,
-        title: 'Formula 1 Official AWS Insights: Silverstone 2024 F2 Wet Telemetry: Hadjar Throttle Modulation & Tractions',
-        publisher: 'Formula One Management / AWS F1 Insights',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-07-09'
-      },
-      {
-        id: 4,
-        title: 'Autosport Analysis: Helmut Marko’s "Little Prost": Why Red Bull Backs Hadjar for the Ultimate Step',
-        publisher: 'Autosport Media UK',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-11-25'
-      },
-      {
-        id: 5,
-        title: 'The Race Driver Profile: Isack Hadjar: Aggression, High Stakes and the Verstappen Benchmark',
-        publisher: 'The Race Motorsport',
-        url: 'https://the-race.com',
-        verifiedDate: '2025-11-22'
-      },
-      {
-        id: 6,
-        title: 'BBC Sport Formula 1: The French Firebrand: How Isack Hadjar Fought His Way to Red Bull Racing',
-        publisher: 'BBC Sport Formula 1',
-        url: 'https://www.bbc.com/sport/formula1',
-        verifiedDate: '2025-11-21'
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
     ],
     seasonHistory: [
@@ -6967,45 +5865,17 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Single-Seater Commission: Gabriel Bortoleto Historic Back-to-Back FIA F3 & F2 Championship Archive',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-12-08'
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official AWS Insights: Monza 2024 F2 Feature Race: Last-to-First Telemetry Breakdown of Bortoleto',
-        publisher: 'Formula One Management / AWS F1 Insights',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-09-03'
-      },
-      {
-        id: 3,
-        title: 'Audi Revolut F1 Team Official Announcement: Gabriel Bortoleto Joins Nico Hülkenberg for 2026 Works Era',
-        publisher: 'Audi F1 Team / Sauber Motorsport',
-        url: 'https://www.sauber-group.com',
-        verifiedDate: '2024-11-06'
-      },
-      {
-        id: 4,
-        title: 'Autosport Technical Analysis: The Alonso Method: How Gabriel Bortoleto Mastered Tyre Conservation',
-        publisher: 'Autosport Media UK',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-11-10'
-      },
-      {
-        id: 5,
-        title: 'Sauber Motorsport Engineering Briefing: Bortoleto Simulator Correlation and Aero Balance Feedback',
-        publisher: 'Sauber Motorsport Official Archive',
-        url: 'https://www.sauber-group.com',
-        verifiedDate: '2025-01-15'
-      },
-      {
-        id: 6,
-        title: 'BBC Sport Formula 1: The Brazilian Resurgence: Gabriel Bortoleto Brings F1 Back to South America',
-        publisher: 'BBC Sport Formula 1',
-        url: 'https://www.bbc.com/sport/formula1',
-        verifiedDate: '2024-11-08'
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
     ],
     seasonHistory: [
@@ -7105,45 +5975,17 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Official Classification: 2024 Saudi Arabian Grand Prix Classification (Bearman Ferrari Debut P7)',
-        publisher: 'Fédération Internationale de l’Automobile (FIA)',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-03-09'
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Formula 1 Official AWS Insights: Jeddah Corniche 2024: Oliver Bearman High-Speed S-Curves Telemetry',
-        publisher: 'Formula One Management / AWS F1 Insights',
-        url: 'https://www.formula1.com',
-        verifiedDate: '2024-03-11'
-      },
-      {
-        id: 3,
-        title: 'Scuderia Ferrari HP Official Bulletin: Carlos Sainz Medical Update and Oliver Bearman FP3 Call-Up',
-        publisher: 'Scuderia Ferrari Official Press',
-        url: 'https://www.ferrari.com',
-        verifiedDate: '2024-03-08'
-      },
-      {
-        id: 4,
-        title: 'Haas F1 Team Official Technical Announcement: Oliver Bearman Confirmed for 2025 Multi-Year Race Seat',
-        publisher: 'MoneyGram Haas F1 Team',
-        url: 'https://www.haasf1team.com',
-        verifiedDate: '2024-07-04'
-      },
-      {
-        id: 5,
-        title: 'Autosport In-Depth Feature: How Oliver Bearman Handled the Ultimate Pressure Test at Jeddah',
-        publisher: 'Autosport Media UK',
-        url: 'https://www.autosport.com',
-        verifiedDate: '2024-03-12'
-      },
-      {
-        id: 6,
-        title: 'BBC Sport Formula 1: Bearman\'s Fairytale: From F2 Pole to Ferrari Points at Age 18',
-        publisher: 'BBC Sport Formula 1',
-        url: 'https://www.bbc.com/sport/formula1',
-        verifiedDate: '2024-03-10'
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
       }
     ],
     seasonHistory: [
@@ -13323,18 +12165,18 @@ export const KNOWLEDGE_STRATEGIES: StrategyConcept[] = [
     references: [
       {
         id: 1,
-        title: 'Pit Stop Delta and Out-Lap Delta Optimization Model',
-        publisher: 'F1 Strategy Working Group Papers',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
         url: 'https://www.formula1.com',
-        verifiedDate: '2024-01-18',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Pirelli Degradation Slope Formulation in Modern 18-inch Tyres',
-        publisher: 'Pirelli Engineering Whitepaper',
-        url: 'https://www.pirelli.com',
-        verifiedDate: '2024-02-10',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
   {
@@ -13360,18 +12202,18 @@ export const KNOWLEDGE_STRATEGIES: StrategyConcept[] = [
     references: [
       {
         id: 1,
-        title: 'Track Evolution and Clear Air Pace Differential Quantification',
-        publisher: 'SAE Motorsports Symposium',
-        url: 'https://www.sae.org',
-        verifiedDate: '2023-10-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Thermal Window Management in Non-Blanketed / Low Temperature Compounds',
-        publisher: 'FIA Technical Papers',
-        url: 'https://www.fia.com',
-        verifiedDate: '2024-01-22',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
   {
@@ -13397,18 +12239,18 @@ export const KNOWLEDGE_STRATEGIES: StrategyConcept[] = [
     references: [
       {
         id: 1,
-        title: 'FIA Formula 1 Sporting Regulations: Article 55 & 56 (Safety Car / VSC)',
-        publisher: 'FIA Official Regulations',
-        url: 'https://www.fia.com/regulation/category/110',
-        verifiedDate: '2024-03-01',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Mathematical Modeling of Pit Lane Time Delta Under Neutralised Race Conditions',
-        publisher: 'Journal of Sports Engineering and Technology',
-        url: 'https://journals.sagepub.com/home/pip',
-        verifiedDate: '2023-11-05',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
 ];
@@ -13450,18 +12292,18 @@ export const KNOWLEDGE_HISTORY: HistoryArchive[] = [
     references: [
       {
         id: 1,
-        title: 'Ross Brawn: Strategic Mastery in the Refuelling Era',
-        publisher: 'Formula 1 Historical Archive',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
         url: 'https://www.formula1.com',
-        verifiedDate: '2023-08-15',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: '1998 Hungarian Grand Prix Full Race Telemetry & Lap Log',
-        publisher: 'Scuderia Ferrari Heritage Bureau',
-        url: 'https://www.ferrari.com',
-        verifiedDate: '2023-08-20',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
   {
@@ -13495,18 +12337,18 @@ export const KNOWLEDGE_HISTORY: HistoryArchive[] = [
     references: [
       {
         id: 1,
-        title: 'The Longest Race in F1 History: 2011 Canadian Grand Prix Overview',
-        publisher: 'FIA Official History Book',
-        url: 'https://www.fia.com',
-        verifiedDate: '2022-06-12',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Jenson Button Wet-Weather Driving and Tyre Cross-Over Timing',
-        publisher: 'McLaren Racing Heritage Insights',
-        url: 'https://www.mclaren.com',
-        verifiedDate: '2022-06-15',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
   {
@@ -13551,18 +12393,28 @@ export const KNOWLEDGE_HISTORY: HistoryArchive[] = [
     references: [
       {
         id: 1,
-        title: '2021 FIA Formula One World Championship Final Classification & Stewards Decisions',
-        publisher: 'Fédération Internationale de l’Automobile',
-        url: 'https://www.fia.com',
-        verifiedDate: '2021-12-15',
+        title: 'Official F1 Documentation & Statistics',
+        publisher: 'Formula 1 Official',
+        url: 'https://www.formula1.com',
+        verifiedDate: '2026-01-01',
       },
       {
         id: 2,
-        title: 'Abu Dhabi 2021: Lap 53-58 Strategic Pit Call Sequence',
-        publisher: 'Red Bull Racing Oracle Insights',
-        url: 'https://www.redbullracing.com',
-        verifiedDate: '2022-01-10',
-      },
+        title: 'FIA Formula One World Championship Regulations',
+        publisher: 'FIA',
+        url: 'https://www.fia.com/regulation/category/110',
+        verifiedDate: '2026-01-01',
+      }
     ],
   },
 ];
+
+
+// ─────────────────────────────────────────────────────────────
+// HISTORICAL DATA INJECTION (Phase 5 Modular Expansion)
+// ─────────────────────────────────────────────────────────────
+import { HISTORICAL_TEAMS } from './f1HistoricalTeams';
+import { HISTORICAL_DRIVERS } from './f1HistoricalDrivers';
+
+KNOWLEDGE_TEAMS.push(...HISTORICAL_TEAMS);
+KNOWLEDGE_DRIVERS.push(...HISTORICAL_DRIVERS);

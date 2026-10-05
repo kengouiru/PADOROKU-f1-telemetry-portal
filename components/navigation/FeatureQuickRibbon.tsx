@@ -17,7 +17,7 @@ export default function FeatureQuickRibbon({
     {
       id: 'season_calendar',
       label: 'ホーム (2026日程)',
-      icon: '🏠',
+      icon: '',
       highlight: true,
       tag: 'HOME',
       tagColor: 'bg-red-600 text-white',
@@ -25,7 +25,7 @@ export default function FeatureQuickRibbon({
     {
       id: '2026_regulations',
       label: '2026新規定ラボ',
-      icon: '🚀',
+      icon: '',
       highlight: true,
       tag: 'NEW',
       tagColor: 'bg-red-600 text-white',
@@ -33,15 +33,15 @@ export default function FeatureQuickRibbon({
     {
       id: 'telemetry_delta',
       label: 'タイムデルタ(Δt)解析',
-      icon: '🏁',
+      icon: '',
       highlight: true,
       tag: '2車比較',
-      tagColor: 'bg-sky-600 text-white',
+      tagColor: 'bg-slate-500 text-white',
     },
     {
       id: 'war_room',
       label: '戦術司令室 (War Room)',
-      icon: '🚨',
+      icon: '',
       highlight: true,
       tag: '天候・SC',
       tagColor: 'bg-amber-600 text-white',
@@ -49,7 +49,7 @@ export default function FeatureQuickRibbon({
     {
       id: 'fod_news',
       label: 'FOD中継＆ニュース',
-      icon: '📺',
+      icon: '',
       highlight: false,
       tag: '公式中継',
       tagColor: 'bg-emerald-600 text-white',
@@ -57,7 +57,7 @@ export default function FeatureQuickRibbon({
     {
       id: 'quiz',
       label: '実況クイズ検定',
-      icon: '🏆',
+      icon: '',
       highlight: false,
       tag: '音声演出',
       tagColor: 'bg-purple-600 text-white',
@@ -71,18 +71,17 @@ export default function FeatureQuickRibbon({
         <button
           type="button"
           onClick={onOpenDirectory}
-          className="px-2.5 py-1 rounded-xl text-xs font-racing font-black bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 text-white shadow-md shadow-red-950/40 border border-red-400/40 flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+          className="px-2.5 py-1 rounded-xl text-xs font-racing font-black bg-gradient-to-r from-red-600 via-red-600 to-red-700 hover:from-red-500 hover:to-red-500 text-white shadow-md shadow-red-950/40 border border-red-400/40 flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
           title="全機能一覧・サイトマップとレビューガイドを開く"
         >
-          <span className="text-sm">🧭</span>
           <span className="font-bold">全機能マップ</span>
-          <span className="text-[9px] bg-white/20 px-1.5 py-0.2 rounded-full font-mono font-bold">
+          <span className="text-[11px] bg-white/20 px-1.5 py-0.2 rounded-full font-mono font-bold">
             GUIDE
           </span>
         </button>
 
         <span className="w-px h-4 bg-white/15 mx-0.5 hidden sm:inline-block" />
-        <span className="text-[10px] font-mono text-slate-400 hidden xl:inline uppercase font-bold tracking-wider">
+        <span className="text-[11px] font-mono text-slate-400 hidden xl:inline uppercase font-bold tracking-wider">
           クイックジャンプ:
         </span>
       </div>
@@ -107,7 +106,7 @@ export default function FeatureQuickRibbon({
               <span>{chip.icon}</span>
               <span>{chip.label}</span>
               {chip.tag && (
-                <span className={`text-[8px] font-mono font-bold px-1 py-0.2 rounded ${chip.tagColor}`}>
+                <span className={`text-[11px] font-mono font-bold px-1 py-0.2 rounded ${chip.tagColor}`}>
                   {chip.tag}
                 </span>
               )}

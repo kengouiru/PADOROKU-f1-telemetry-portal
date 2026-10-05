@@ -35,6 +35,8 @@ export interface Session {
   date_start: string; // ISO 8601
   date_end?: string;
   year: number;
+  /** OpenF1: true when the session was cancelled (e.g. 2026 Bahrain / Saudi Arabia) */
+  is_cancelled?: boolean;
 }
 
 /** A driver entry for a specific session */

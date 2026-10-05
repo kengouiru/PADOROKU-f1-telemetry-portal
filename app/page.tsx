@@ -9,7 +9,8 @@
  *  Tablet (md):   Sidebar collapses to icon drawer; main + right panel stack
  *  Mobile (<md):  Bottom tab bar: 分析 | AI | ノート
  *
- * Initial state: 2024 Bahrain GP Race, VER (#1) vs HAM (#44) instant display.
+ * Initial state: latest classified race from OpenF1. Default drivers = user's favourite driver +
+ * favourite team's drivers, or winner + P2 when no preferences are saved. No mock fallback.
  */
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import dynamic from 'next/dynamic';
@@ -19,18 +20,15 @@ import type {
   RaceControlMessage, SafetyCarPeriod,
 } from '@/lib/types';
 import {
-  MOCK_SESSIONS, MOCK_DRIVERS, MOCK_STINTS,
-  MOCK_TEAM_RADIO, MOCK_PIT_STOPS, MOCK_RACE_CONTROL,
-  MOCK_LAPS, generateMockLaps,
-  getCatalogSessionsForYear, getDriversForYear,
-  generateCatalogStints, generateCatalogRaceControl,
-} from '@/lib/mockData';
-import { detectSafetyCarPeriods, enrichLapsWithStints } from '@/lib/telemetryUtils';
+  findLatestClassifiedRace, loadSessionBundle, loadDriverTelemetry, pickDefaultDrivers, completedRaces,
+  type SessionBundle, type DriverPreference,
+} from '@/lib/telemetrySessionLoader';
+import { detectSafetyCarPeriods } from '@/lib/telemetryUtils';
 import { resolveCircuitForSession, type CircuitBenchmark } from '@/lib/circuitResolver';
-import {
-  fetchSessions, fetchDrivers, fetchStints, fetchRaceControl,
-  fetchLaps, fetchTeamRadio, fetchPitStops,
-} from '@/lib/openf1Api';
+import { fetchSessions, fetchSessionResult } from '@/lib/openf1Api';
+import { getUserPreferences, hasStoredUserPreferences } from '@/lib/userPreferences';
+
+const isRaceSession = (s: Session) => s.session_name === 'Race' || s.session_type === 'Race';
 
 import Sidebar from '@/components/Sidebar';
 import LapTable from '@/components/LapTable';
@@ -102,6 +100,8 @@ interface AppState {
   isDemoMode: boolean;
   transcriptsCache: Record<string, { transcript: string; translation: string; category: string }>;
   isLoading: boolean;
+  /** Non-null when real data could not be loaded; UI shows an empty state with retry. */
+  loadError: string | null;
 }
 
 // Mobile tab type
@@ -138,57 +138,26 @@ const GLOBAL_DRIVER_NUM_TO_CODE: Record<string, string> = {
   '7': 'DOO',
   '6': 'HAD',
 };
-const DEFAULT_SESSION_KEY = 2026011;
-const DEFAULT_MEETING_KEY = 202601;
-const DEFAULT_YEAR = '2026';
-
 function buildInitialState(): AppState {
-  const currentSession = MOCK_SESSIONS.find(s => s.session_key === DEFAULT_SESSION_KEY) ?? null;
-  const drivers = getDriversForYear(2026);
-  const benchmark = resolveCircuitForSession(currentSession);
-  const stints = generateCatalogStints(drivers, benchmark.totalLaps, benchmark.pit1Lap, benchmark.pit2Lap);
-  const raceControlMessages = generateCatalogRaceControl(DEFAULT_SESSION_KEY);
-  const selectedDrivers = ['1', '12']; // Max Verstappen (#1, Red Bull Ford) & Andrea Kimi Antonelli (#12, Mercedes)
-
-  const lapsCache: Record<string, Lap[]> = {};
-  for (const num of selectedDrivers) {
-    const rawLaps = generateMockLaps(parseInt(num), DEFAULT_SESSION_KEY, benchmark);
-    lapsCache[num] = enrichLapsWithStints(rawLaps, stints, num);
-  }
-
-  const allLaps = Object.values(lapsCache).flat();
-  const safetyCarPeriods = detectSafetyCarPeriods(raceControlMessages, allLaps);
-
-  const teamRadioCache: Record<string, TeamRadio[]> = {};
-  const pitStopsCache: Record<string, PitStop[]> = {};
-  for (const key of Object.keys(MOCK_TEAM_RADIO)) {
-    if (key.startsWith(`${DEFAULT_SESSION_KEY}_`)) {
-      teamRadioCache[key.split('_')[1]] = MOCK_TEAM_RADIO[key] ?? [];
-    }
-  }
-  for (const key of Object.keys(MOCK_PIT_STOPS)) {
-    if (key.startsWith(`${DEFAULT_SESSION_KEY}_`)) {
-      pitStopsCache[key.split('_')[1]] = MOCK_PIT_STOPS[key] ?? [];
-    }
-  }
-
+  // No fabricated race: start empty and load the latest real race from OpenF1 on mount.
   return {
-    selectedYear: DEFAULT_YEAR,
-    selectedMeetingKey: DEFAULT_MEETING_KEY,
-    selectedSessionKey: DEFAULT_SESSION_KEY,
-    sessions: MOCK_SESSIONS,
-    currentSession,
-    drivers,
-    stints,
-    selectedDrivers,
-    lapsCache,
-    teamRadioCache,
-    pitStopsCache,
-    raceControlMessages,
-    safetyCarPeriods,
-    isDemoMode: true,
+    selectedYear: String(new Date().getFullYear()),
+    selectedMeetingKey: null,
+    selectedSessionKey: null,
+    sessions: [],
+    currentSession: null,
+    drivers: [],
+    stints: [],
+    selectedDrivers: [],
+    lapsCache: {},
+    teamRadioCache: {},
+    pitStopsCache: {},
+    raceControlMessages: [],
+    safetyCarPeriods: [],
+    isDemoMode: false,
     transcriptsCache: {},
-    isLoading: false,
+    isLoading: true,
+    loadError: null,
   };
 }
 
@@ -450,297 +419,128 @@ export default function DashboardPage() {
     localStorage.setItem('f1_transcripts_cache', JSON.stringify(state.transcriptsCache));
   }, [state.transcriptsCache]);
 
-  // Background live API fetch on mount
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const liveSessions = await fetchSessions(parseInt(state.selectedYear));
-        if (cancelled || !liveSessions.length) return;
-        setState(prev => ({ ...prev, sessions: liveSessions, isDemoMode: false }));
-      } catch {
-        // Fallback safely to mock sessions without logging unhandled exceptions
-        if (!cancelled) {
-          setState(prev => ({ ...prev, isDemoMode: true }));
-        }
-      }
-    })();
-    return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // ── Real-data loading (OpenF1). No mock / synthetic fallback (GEMINI.md 第2部第4条). ──
+
+  /** Driver preference used for the default selection; null when the user has not set any. */
+  const getDriverPreference = useCallback((): DriverPreference | null => {
+    if (!hasStoredUserPreferences()) return null;
+    const p = getUserPreferences();
+    if (!p.favoriteDriverCode && !p.favoriteTeamId) return null;
+    return { favoriteDriverCode: p.favoriteDriverCode, favoriteTeamId: p.favoriteTeamId };
   }, []);
+
+  /** Applies a loaded bundle to state and syncs the detailed-telemetry parameters. */
+  const applyBundle = useCallback((bundle: SessionBundle, extra: Partial<AppState> = {}) => {
+    const code = (num?: string) =>
+      bundle.drivers.find(d => d.driver_number.toString() === num)?.name_acronym ?? '';
+    setDetailedTelemetryParams({
+      circuitId: resolveCircuitForSession(bundle.session).circuitId,
+      driver1: code(bundle.selectedDrivers[0]),
+      driver2: code(bundle.selectedDrivers[1]),
+    });
+    setState(prev => ({
+      ...prev,
+      ...extra,
+      selectedMeetingKey: bundle.session.meeting_key,
+      selectedSessionKey: bundle.session.session_key,
+      currentSession: bundle.session,
+      drivers: bundle.drivers,
+      stints: bundle.stints,
+      selectedDrivers: bundle.selectedDrivers,
+      lapsCache: bundle.lapsCache,
+      teamRadioCache: bundle.teamRadioCache,
+      pitStopsCache: bundle.pitStopsCache,
+      raceControlMessages: bundle.raceControlMessages,
+      safetyCarPeriods: bundle.safetyCarPeriods,
+      isDemoMode: false,
+      isLoading: false,
+      loadError: null,
+    }));
+  }, []);
+
+  const LOAD_ERROR_MESSAGE = 'OpenF1からデータを取得できませんでした。通信状況を確認して再試行してください。';
+
+  /** Loads the most recent classified race and pre-selects favourite / winner+P2 drivers. */
+  const loadLatestRace = useCallback(async () => {
+    setState(prev => ({ ...prev, isLoading: true, loadError: null }));
+    try {
+      const latest = await findLatestClassifiedRace();
+      if (!latest) throw new Error('No classified race found');
+      const pref = getDriverPreference();
+      const bundle = await loadSessionBundle(latest.race, drivers =>
+        pickDefaultDrivers(drivers, latest.results, pref)
+      );
+      applyBundle(bundle, { selectedYear: String(latest.year), sessions: latest.sessions });
+    } catch (err) {
+      console.warn('[loadLatestRace]', err);
+      setState(prev => ({ ...prev, isLoading: false, loadError: LOAD_ERROR_MESSAGE }));
+    }
+  }, [applyBundle, getDriverPreference]);
+
+  useEffect(() => {
+    loadLatestRace();
+  }, [loadLatestRace]);
+
+  /** Loads a given session, keeping the current driver selection where possible. */
+  const loadSession = useCallback(async (session: Session | null, keepSelected: string[], extra: Partial<AppState> = {}) => {
+    if (!session) {
+      setState(prev => ({ ...prev, ...extra, isLoading: false, loadError: 'このラウンドのセッションデータはまだありません。' }));
+      return;
+    }
+    try {
+      const results = isRaceSession(session)
+        ? await fetchSessionResult(session.session_key).catch(() => [])
+        : [];
+      const pref = getDriverPreference();
+      const bundle = await loadSessionBundle(session, drivers => {
+        const kept = keepSelected.filter(num => drivers.some(d => d.driver_number.toString() === num));
+        return kept.length > 0 ? kept : pickDefaultDrivers(drivers, results, pref);
+      });
+      applyBundle(bundle, extra);
+    } catch (err) {
+      console.warn('[loadSession]', err);
+      setState(prev => ({ ...prev, ...extra, isLoading: false, loadError: LOAD_ERROR_MESSAGE }));
+    }
+  }, [applyBundle, getDriverPreference]);
 
   // ── Handlers ────────────────────────────────────────────────────────────────
 
   const handleYearChange = useCallback(async (year: string) => {
-    setState(prev => ({ ...prev, selectedYear: year, isLoading: true }));
+    setState(prev => ({ ...prev, selectedYear: year, isLoading: true, loadError: null }));
     try {
-      const yrNum = parseInt(year);
-      const liveSessions = await fetchSessions(yrNum).catch(() => []);
-      const catalogSessions = getCatalogSessionsForYear(yrNum);
-      const sessions = (liveSessions && liveSessions.length > 0) ? liveSessions : catalogSessions;
-      
-      const firstMeeting = sessions[0]?.meeting_key ?? null;
-      const meetingSessions = sessions.filter(s => s.meeting_key === firstMeeting);
-      const targetSession = meetingSessions.find(s => s.session_name === 'Race' || s.session_type === 'Race')
-        ?? meetingSessions[0]
-        ?? sessions[0]
+      const sessions = await fetchSessions(parseInt(year));
+      // Default to the latest completed race of that year (or its first session if none finished yet).
+      const target = completedRaces(sessions)[0]
+        ?? sessions.filter(s => !s.is_cancelled).sort((a, b) => a.date_start.localeCompare(b.date_start))[0]
         ?? null;
-
-      const sessionKey = targetSession?.session_key ?? null;
-      let drivers: Driver[] = [];
-      let stints: Stint[] = [];
-      let raceControlMessages: RaceControlMessage[] = [];
-
-      if (sessionKey) {
-        try {
-          const [d, st, rc] = await Promise.all([
-            fetchDrivers(sessionKey).catch(() => []),
-            fetchStints(sessionKey).catch(() => []),
-            fetchRaceControl(sessionKey).catch(() => []),
-          ]);
-          drivers = d;
-          stints = st;
-          raceControlMessages = rc;
-        } catch {}
-      }
-
-      if (!drivers || drivers.length === 0) {
-        drivers = (sessionKey && MOCK_DRIVERS[sessionKey]) ? MOCK_DRIVERS[sessionKey] : getDriversForYear(yrNum);
-      }
-      if (!stints || stints.length === 0) {
-        stints = (sessionKey && MOCK_STINTS[sessionKey]) ? MOCK_STINTS[sessionKey] : generateCatalogStints(drivers);
-      }
-      if (!raceControlMessages || raceControlMessages.length === 0) {
-        raceControlMessages = (sessionKey && MOCK_RACE_CONTROL[sessionKey]) ? MOCK_RACE_CONTROL[sessionKey] : generateCatalogRaceControl(sessionKey ?? 0);
-      }
-
-      const benchmark = resolveCircuitForSession(targetSession);
-
-      if (!stints || stints.length === 0) {
-        stints = (sessionKey && MOCK_STINTS[sessionKey])
-          ? MOCK_STINTS[sessionKey]
-          : generateCatalogStints(drivers, benchmark.totalLaps, benchmark.pit1Lap, benchmark.pit2Lap);
-      }
-
-      const top2Nums = drivers.slice(0, 2).map(d => d.driver_number.toString());
-      const selectedDrivers = top2Nums.length > 0 ? top2Nums : ['1', '44'];
-
-      const lapsCache: Record<string, Lap[]> = {};
-      for (const num of selectedDrivers) {
-        const mk = `${sessionKey}_${num}`;
-        const rawLaps = MOCK_LAPS[mk] ?? generateMockLaps(parseInt(num), sessionKey ?? 9161, benchmark);
-        lapsCache[num] = enrichLapsWithStints(rawLaps, stints, num);
-      }
-
-      const allLaps = Object.values(lapsCache).flat();
-      const safetyCarPeriods = detectSafetyCarPeriods(raceControlMessages, allLaps);
-
-      const d1Code = drivers.find(d => d.driver_number.toString() === selectedDrivers[0])?.name_acronym
-        ?? GLOBAL_DRIVER_NUM_TO_CODE[selectedDrivers[0]]
-        ?? 'VER';
-      const d2Code = drivers.find(d => d.driver_number.toString() === selectedDrivers[1])?.name_acronym
-        ?? GLOBAL_DRIVER_NUM_TO_CODE[selectedDrivers[1]]
-        ?? 'NOR';
-
-      setDetailedTelemetryParams({
-        circuitId: benchmark.circuitId,
-        driver1: d1Code,
-        driver2: d2Code,
-      });
-
-      setState(prev => ({
-        ...prev,
-        selectedYear: year,
-        sessions,
-        selectedMeetingKey: firstMeeting,
-        selectedSessionKey: sessionKey,
-        currentSession: targetSession,
-        drivers,
-        stints,
-        selectedDrivers,
-        lapsCache,
-        teamRadioCache: {},
-        pitStopsCache: {},
-        raceControlMessages,
-        safetyCarPeriods,
-        isDemoMode: liveSessions.length === 0,
-        isLoading: false,
-      }));
+      await loadSession(target, [], { selectedYear: year, sessions });
     } catch (err) {
-      console.error('[handleYearChange error]', err);
-      setState(prev => ({ ...prev, isLoading: false }));
+      console.warn('[handleYearChange]', err);
+      setState(prev => ({ ...prev, isLoading: false, loadError: LOAD_ERROR_MESSAGE }));
     }
-  }, []);
+  }, [loadSession]);
 
   const handleMeetingChange = useCallback(async (key: number) => {
-    setState(prev => ({ ...prev, selectedMeetingKey: key, isLoading: true }));
-
+    setState(prev => ({ ...prev, selectedMeetingKey: key, isLoading: true, loadError: null }));
     const meetingSessions = state.sessions.filter(s => s.meeting_key === key);
-    const targetSession = meetingSessions.find(s => s.session_name === 'Race' || s.session_type === 'Race')
-      ?? meetingSessions[0]
-      ?? null;
-
-    const sessionKey = targetSession?.session_key ?? null;
-    const yrNum = parseInt(state.selectedYear);
-
-    let drivers: Driver[] = [];
-    let stints: Stint[] = [];
-    let raceControlMessages: RaceControlMessage[] = [];
-
-    if (sessionKey) {
-      try {
-        const [d, st, rc] = await Promise.all([
-          fetchDrivers(sessionKey).catch(() => []),
-          fetchStints(sessionKey).catch(() => []),
-          fetchRaceControl(sessionKey).catch(() => []),
-        ]);
-        drivers = d;
-        stints = st;
-        raceControlMessages = rc;
-      } catch {}
-    }
-
-    if (!drivers || drivers.length === 0) {
-      drivers = (sessionKey && MOCK_DRIVERS[sessionKey]) ? MOCK_DRIVERS[sessionKey] : getDriversForYear(yrNum);
-    }
-    if (!stints || stints.length === 0) {
-      stints = (sessionKey && MOCK_STINTS[sessionKey]) ? MOCK_STINTS[sessionKey] : generateCatalogStints(drivers);
-    }
-    if (!raceControlMessages || raceControlMessages.length === 0) {
-      raceControlMessages = (sessionKey && MOCK_RACE_CONTROL[sessionKey]) ? MOCK_RACE_CONTROL[sessionKey] : generateCatalogRaceControl(sessionKey ?? 0);
-    }
-
-    const benchmark = resolveCircuitForSession(targetSession);
-
-    if (!stints || stints.length === 0) {
-      stints = (sessionKey && MOCK_STINTS[sessionKey])
-        ? MOCK_STINTS[sessionKey]
-        : generateCatalogStints(drivers, benchmark.totalLaps, benchmark.pit1Lap, benchmark.pit2Lap);
-    }
-
-    const validSelected = state.selectedDrivers.filter(num => drivers.some(d => d.driver_number.toString() === num));
-    const selectedDrivers = validSelected.length > 0 ? validSelected : drivers.slice(0, 2).map(d => d.driver_number.toString());
-
-    const lapsCache: Record<string, Lap[]> = {};
-    for (const num of selectedDrivers) {
-      const mk = `${sessionKey}_${num}`;
-      const rawLaps = MOCK_LAPS[mk] ?? generateMockLaps(parseInt(num), sessionKey ?? 9161, benchmark);
-      lapsCache[num] = enrichLapsWithStints(rawLaps, stints, num);
-    }
-
-    const allLaps = Object.values(lapsCache).flat();
-    const safetyCarPeriods = detectSafetyCarPeriods(raceControlMessages, allLaps);
-
-    const d1Code = drivers.find(d => d.driver_number.toString() === selectedDrivers[0])?.name_acronym
-      ?? GLOBAL_DRIVER_NUM_TO_CODE[selectedDrivers[0]]
-      ?? 'VER';
-    const d2Code = drivers.find(d => d.driver_number.toString() === selectedDrivers[1])?.name_acronym
-      ?? GLOBAL_DRIVER_NUM_TO_CODE[selectedDrivers[1]]
-      ?? 'NOR';
-
-    setDetailedTelemetryParams({
-      circuitId: benchmark.circuitId,
-      driver1: d1Code,
-      driver2: d2Code,
-    });
-
-    setState(prev => ({
-      ...prev,
-      selectedMeetingKey: key,
-      selectedSessionKey: sessionKey,
-      currentSession: targetSession,
-      drivers,
-      stints,
-      selectedDrivers,
-      lapsCache,
-      teamRadioCache: {},
-      pitStopsCache: {},
-      raceControlMessages,
-      safetyCarPeriods,
-      isLoading: false,
-    }));
-  }, [state.sessions, state.selectedYear, state.selectedDrivers]);
+    const target = meetingSessions.find(isRaceSession) ?? meetingSessions[0] ?? null;
+    await loadSession(target, state.selectedDrivers, { selectedMeetingKey: key });
+  }, [state.sessions, state.selectedDrivers, loadSession]);
 
   const handleSessionChange = useCallback(async (sessionKey: number) => {
-    setState(prev => ({ ...prev, selectedSessionKey: sessionKey, isLoading: true }));
+    setState(prev => ({ ...prev, selectedSessionKey: sessionKey, isLoading: true, loadError: null }));
+    const target = state.sessions.find(s => s.session_key === sessionKey) ?? null;
+    await loadSession(target, state.selectedDrivers);
+  }, [state.sessions, state.selectedDrivers, loadSession]);
 
-    const targetSession = state.sessions.find(s => s.session_key === sessionKey) ?? null;
-    const yrNum = parseInt(state.selectedYear);
-
-    let drivers: Driver[] = [];
-    let stints: Stint[] = [];
-    let raceControlMessages: RaceControlMessage[] = [];
-
-    try {
-      const [d, st, rc] = await Promise.all([
-        fetchDrivers(sessionKey).catch(() => []),
-        fetchStints(sessionKey).catch(() => []),
-        fetchRaceControl(sessionKey).catch(() => []),
-      ]);
-      drivers = d;
-      stints = st;
-      raceControlMessages = rc;
-    } catch {}
-
-    if (!drivers || drivers.length === 0) {
-      drivers = (sessionKey && MOCK_DRIVERS[sessionKey]) ? MOCK_DRIVERS[sessionKey] : getDriversForYear(yrNum);
+  const handleRetryLoad = useCallback(() => {
+    if (state.currentSession) {
+      setState(prev => ({ ...prev, isLoading: true, loadError: null }));
+      loadSession(state.currentSession, state.selectedDrivers);
+    } else {
+      loadLatestRace();
     }
-    if (!stints || stints.length === 0) {
-      stints = (sessionKey && MOCK_STINTS[sessionKey]) ? MOCK_STINTS[sessionKey] : generateCatalogStints(drivers);
-    }
-    if (!raceControlMessages || raceControlMessages.length === 0) {
-      raceControlMessages = (sessionKey && MOCK_RACE_CONTROL[sessionKey]) ? MOCK_RACE_CONTROL[sessionKey] : generateCatalogRaceControl(sessionKey);
-    }
-
-    const benchmark = resolveCircuitForSession(targetSession);
-
-    if (!stints || stints.length === 0) {
-      stints = (sessionKey && MOCK_STINTS[sessionKey])
-        ? MOCK_STINTS[sessionKey]
-        : generateCatalogStints(drivers, benchmark.totalLaps, benchmark.pit1Lap, benchmark.pit2Lap);
-    }
-
-    const validSelected = state.selectedDrivers.filter(num => drivers.some(d => d.driver_number.toString() === num));
-    const selectedDrivers = validSelected.length > 0 ? validSelected : drivers.slice(0, 2).map(d => d.driver_number.toString());
-
-    const lapsCache: Record<string, Lap[]> = {};
-    for (const num of selectedDrivers) {
-      const mk = `${sessionKey}_${num}`;
-      const rawLaps = MOCK_LAPS[mk] ?? generateMockLaps(parseInt(num), sessionKey, benchmark);
-      lapsCache[num] = enrichLapsWithStints(rawLaps, stints, num);
-    }
-
-    const allLaps = Object.values(lapsCache).flat();
-    const safetyCarPeriods = detectSafetyCarPeriods(raceControlMessages, allLaps);
-
-    const d1Code = drivers.find(d => d.driver_number.toString() === selectedDrivers[0])?.name_acronym
-      ?? GLOBAL_DRIVER_NUM_TO_CODE[selectedDrivers[0]]
-      ?? 'VER';
-    const d2Code = drivers.find(d => d.driver_number.toString() === selectedDrivers[1])?.name_acronym
-      ?? GLOBAL_DRIVER_NUM_TO_CODE[selectedDrivers[1]]
-      ?? 'NOR';
-
-    setDetailedTelemetryParams({
-      circuitId: benchmark.circuitId,
-      driver1: d1Code,
-      driver2: d2Code,
-    });
-
-    setState(prev => ({
-      ...prev,
-      selectedSessionKey: sessionKey,
-      currentSession: targetSession,
-      drivers,
-      stints,
-      selectedDrivers,
-      lapsCache,
-      teamRadioCache: {},
-      pitStopsCache: {},
-      raceControlMessages,
-      safetyCarPeriods,
-      isLoading: false,
-    }));
-  }, [state.sessions, state.selectedYear, state.selectedDrivers]);
+  }, [state.currentSession, state.selectedDrivers, loadSession, loadLatestRace]);
 
   const handleDriverToggle = useCallback(async (driverNum: string, checked: boolean) => {
     setState(prev => {
@@ -750,32 +550,22 @@ export default function DashboardPage() {
     });
 
     if (!checked || !state.selectedSessionKey) return;
+    if (state.lapsCache[driverNum]?.length) return;
 
-    try {
-      const [laps, radios, pits] = await Promise.all([
-        fetchLaps(state.selectedSessionKey, parseInt(driverNum)).catch(() => null),
-        fetchTeamRadio(state.selectedSessionKey, parseInt(driverNum)).catch(() => null),
-        fetchPitStops(state.selectedSessionKey, parseInt(driverNum)).catch(() => null),
-      ]);
-      setState(prev => {
-        const mk = `${state.selectedSessionKey}_${driverNum}`;
-        const rawLaps = (laps && laps.length > 0)
-          ? laps
-          : (MOCK_LAPS[mk] ?? generateMockLaps(parseInt(driverNum), state.selectedSessionKey!));
-        const enriched = enrichLapsWithStints(rawLaps, prev.stints, driverNum);
-        const allLaps = { ...prev.lapsCache, [driverNum]: enriched };
-        return {
-          ...prev,
-          lapsCache: { ...prev.lapsCache, [driverNum]: enriched },
-          teamRadioCache: { ...prev.teamRadioCache, [driverNum]: radios?.length ? radios : (prev.teamRadioCache[driverNum] ?? []) },
-          pitStopsCache: { ...prev.pitStopsCache, [driverNum]: pits?.length ? pits : (prev.pitStopsCache[driverNum] ?? []) },
-          safetyCarPeriods: detectSafetyCarPeriods(prev.raceControlMessages, Object.values(allLaps).flat()),
-        };
-      });
-    } catch (e) {
-      console.warn(`[Driver ${driverNum}] load error:`, e);
-    }
-  }, [state.selectedSessionKey]);
+    const sessionKey = state.selectedSessionKey;
+    const data = await loadDriverTelemetry(sessionKey, driverNum, state.stints);
+    setState(prev => {
+      if (prev.selectedSessionKey !== sessionKey) return prev; // session changed meanwhile
+      const lapsCache = { ...prev.lapsCache, [driverNum]: data.laps };
+      return {
+        ...prev,
+        lapsCache,
+        teamRadioCache: { ...prev.teamRadioCache, [driverNum]: data.radios },
+        pitStopsCache: { ...prev.pitStopsCache, [driverNum]: data.pits },
+        safetyCarPeriods: detectSafetyCarPeriods(prev.raceControlMessages, Object.values(lapsCache).flat()),
+      };
+    });
+  }, [state.selectedSessionKey, state.lapsCache, state.stints]);
 
   const handleLapClick = useCallback((driverNum: string, lapNumber: number) => {
     setTelemetrySubTab('radio');
@@ -814,6 +604,8 @@ export default function DashboardPage() {
     // Helper to resolve input ('VER', '44') to 3-letter driver code
     const resolveDriverCode = (input?: string, fallback: string = 'VER') => {
       if (!input) return fallback;
+      const live = state.drivers.find(d => d.driver_number.toString() === input);
+      if (live) return live.name_acronym;
       if (GLOBAL_DRIVER_NUM_TO_CODE[input]) return GLOBAL_DRIVER_NUM_TO_CODE[input];
       return input.toUpperCase();
     };
@@ -822,6 +614,8 @@ export default function DashboardPage() {
     const resolveDriverNumber = (input?: string): string | null => {
       if (!input) return null;
       if (/^\d+$/.test(input)) return input;
+      const live = state.drivers.find(d => d.name_acronym?.toUpperCase() === input.toUpperCase());
+      if (live) return live.driver_number.toString();
       for (const [num, code] of Object.entries(GLOBAL_DRIVER_NUM_TO_CODE)) {
         if (code.toUpperCase() === input.toUpperCase()) return num;
       }
@@ -859,6 +653,24 @@ export default function DashboardPage() {
           selectedDrivers: nextSelected.slice(0, 3),
         };
       });
+      // Load real laps for newly selected drivers (no synthetic fallback)
+      const sessionKey = state.selectedSessionKey;
+      if (sessionKey) {
+        [num1, num2].filter((n): n is string => !!n && !state.lapsCache[n]?.length).forEach(async (n) => {
+          const data = await loadDriverTelemetry(sessionKey, n, state.stints);
+          setState(prev => {
+            if (prev.selectedSessionKey !== sessionKey) return prev;
+            const lapsCache = { ...prev.lapsCache, [n]: data.laps };
+            return {
+              ...prev,
+              lapsCache,
+              teamRadioCache: { ...prev.teamRadioCache, [n]: data.radios },
+              pitStopsCache: { ...prev.pitStopsCache, [n]: data.pits },
+              safetyCarPeriods: detectSafetyCarPeriods(prev.raceControlMessages, Object.values(lapsCache).flat()),
+            };
+          });
+        });
+      }
     }
 
     desktopScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -871,7 +683,7 @@ export default function DashboardPage() {
         timelineRef.current?.scrollToLap(drv, target.targetLap!);
       }, 350);
     }
-  }, [state.selectedDrivers]);
+  }, [state.selectedDrivers, state.drivers, state.selectedSessionKey, state.lapsCache, state.stints]);
 
   // AI-driven navigation handler:
   // - PC (width >= 1024): Opens independent AITelemetryInspectorModal (main screen state completely preserved!)
@@ -1014,6 +826,26 @@ export default function DashboardPage() {
   const currentBenchmark = useMemo(() => {
     return resolveCircuitForSession(state.currentSession);
   }, [state.currentSession]);
+
+  const hasTelemetryData = state.drivers.length > 0;
+  const telemetryStatusBlock: React.ReactNode =
+    state.loadError ? (
+      <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-white/10 bg-slate-900/60 px-6 py-16 text-center">
+        <p className="text-sm text-slate-300 max-w-md leading-relaxed">{state.loadError}</p>
+        <button
+          type="button"
+          onClick={handleRetryLoad}
+          className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500 transition-colors"
+        >
+          再試行
+        </button>
+      </div>
+    ) : state.isLoading && !hasTelemetryData ? (
+      <div className="flex items-center justify-center gap-3 rounded-xl border border-white/10 bg-slate-900/60 px-6 py-16 text-sm text-slate-400">
+        <div className="h-5 w-5 animate-spin rounded-full border-2 border-red-500 border-t-transparent motion-reduce:animate-none" />
+        最新レースのデータを読み込み中…
+      </div>
+    ) : null;
 
   const analysisContent = (
     <div className="flex flex-col gap-3">
@@ -1508,7 +1340,7 @@ export default function DashboardPage() {
           />
         </ErrorBoundary>
       )}
-      {activeHub === 'telemetry' && <ErrorBoundary sectionName="テレメトリー分析">{analysisContent}</ErrorBoundary>}
+      {activeHub === 'telemetry' && <ErrorBoundary sectionName="テレメトリー分析">{telemetryStatusBlock ?? analysisContent}</ErrorBoundary>}
       {activeHub === 'simulator' && (
         <ErrorBoundary sectionName="ピットウォール司令塔 (PITWALL)">
           <RaceSimulatorHub
@@ -2022,6 +1854,7 @@ export default function DashboardPage() {
                 setActiveHub('season');
                 setMobileTab('season');
                 if (aiDrawerOpen) setAiDrawerOpen(false);
+                window.scrollTo({ top: 0, behavior: 'instant' });
               }, appMode === 'season' && activeHub === 'season'],
 
               ['telemetry', <Activity key="t" className="w-5 h-5" />, 'TELEMETRY', () => {
@@ -2029,6 +1862,7 @@ export default function DashboardPage() {
                 setActiveHub('telemetry');
                 setMobileTab('telemetry');
                 if (aiDrawerOpen) setAiDrawerOpen(false);
+                window.scrollTo({ top: 0, behavior: 'instant' });
               }, appMode === 'season' && activeHub === 'telemetry'],
 
               ['pitwall',   <Gamepad2 key="sim" className="w-5 h-5" />, 'PITWALL', () => {
@@ -2036,6 +1870,7 @@ export default function DashboardPage() {
                 setActiveHub('simulator');
                 setMobileTab('simulator');
                 if (aiDrawerOpen) setAiDrawerOpen(false);
+                window.scrollTo({ top: 0, behavior: 'instant' });
               }, activeHub === 'simulator'],
 
               ['news',      <Newspaper key="n" className="w-5 h-5" />, 'NEWS', () => {
@@ -2043,6 +1878,7 @@ export default function DashboardPage() {
                 setActiveHub('news');
                 setMobileTab('news');
                 if (aiDrawerOpen) setAiDrawerOpen(false);
+                window.scrollTo({ top: 0, behavior: 'instant' });
               }, appMode === 'season' && activeHub === 'news'],
 
               ['library',   <BookOpen key="lib" className="w-5 h-5" />, 'LIBRARY', () => {
@@ -2050,6 +1886,7 @@ export default function DashboardPage() {
                 setActiveHub('knowledge');
                 setMobileTab('knowledge');
                 if (aiDrawerOpen) setAiDrawerOpen(false);
+                window.scrollTo({ top: 0, behavior: 'instant' });
               }, appMode === 'library'],
             ] as [string, React.ReactNode, string, () => void, boolean][]
           ).map(([key, icon, label, onClick, isActive]) => (

@@ -2,7 +2,7 @@
 
 /**
  * components/circuits/F1BroadcastTrackGuide.tsx
- * 🎬 Formula 1 Official Broadcast Track Guide with True 3D Elevation Geometry
+ * Formula 1 Official Broadcast Track Guide with True 3D Elevation Geometry
  * 
  * Major Upgrades:
  * 1. True 3D Circuit Geometry (Z-axis elevation lift):
@@ -11,7 +11,7 @@
  * 2. 3D Elevation Curtain / Wall (立体標高ウォール):
  *    - Translucent gradient extrusion connecting the elevated track ribbon down to ground datum.
  * 3. On-Model 3D Floating Elevation Pins:
- *    - Peak altitude (🏔️ 最高地点 +102m), Lowest altitude (🌊 最低地点), and Max Gradient (📈 最大勾配)
+ *    - Peak altitude (最高地点 +102m), Lowest altitude (最低地点), and Max Gradient (最大勾配)
  *      floating directly above the corners on the circuit model itself with vertical guide lines!
  * 4. Elevation Heatmap vs Sector Color Mode:
  *    - Toggle between official Sector colors (Gold/Cyan/Pink) and Elevation Gradient (Deep Blue -> Cyan -> Amber -> Crimson).
@@ -559,7 +559,7 @@ export default function F1BroadcastTrackGuide({
 
   return (
     <div
-      className={`rounded-2xl border border-white/10 bg-gradient-to-br from-slate-950 via-slate-900/90 to-neutral-950 p-4 sm:p-6 shadow-2xl space-y-5 overflow-hidden ${className}`}
+      className={`rounded-2xl border border-white/10 bg-gradient-to-br from-slate-950 via-slate-900/90 to-slate-950 p-4 sm:p-6 shadow-2xl space-y-5 overflow-hidden ${className}`}
     >
       {/* ─────────────────────────────────────────────────────────────
           1. F1 OFFICIAL BROADCAST HEADER BANNER
@@ -568,15 +568,13 @@ export default function F1BroadcastTrackGuide({
         <div className="space-y-1.5">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-red-600/90 text-white font-racing font-bold text-[11px] tracking-wider uppercase shadow-md shadow-red-600/30">
-              <span>🎬</span>
               <span>FORMULA 1 OFFICIAL BROADCAST</span>
             </span>
-            <span className="px-2 py-0.5 rounded-md bg-sky-500/20 border border-sky-500/30 text-sky-300 font-mono text-[10px] font-bold flex items-center gap-1">
-              <span>⛰️</span>
+            <span className="px-2 py-0.5 rounded-md bg-slate-400/20 border border-slate-400/30 text-slate-200 font-mono text-[11px] font-bold flex items-center gap-1">
               <span>3D ELEVATION TERRAIN INTEL</span>
             </span>
             {round && (
-              <span className="px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/30 text-amber-300 font-mono text-[10px] font-bold">
+              <span className="px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/30 text-amber-300 font-mono text-[11px] font-bold">
                 ROUND {round}
               </span>
             )}
@@ -625,7 +623,7 @@ export default function F1BroadcastTrackGuide({
               className="px-2 py-1 rounded-lg text-xs text-slate-400 hover:text-white transition-all font-mono"
               title="視点角度をリセット"
             >
-              🔄
+              
             </button>
           </div>
 
@@ -639,7 +637,7 @@ export default function F1BroadcastTrackGuide({
             >
               －
             </button>
-            <span className="px-1 text-[10px] text-slate-500 font-bold">{Math.round(zoom * 100)}%</span>
+            <span className="px-1 text-[11px] text-slate-500 font-bold">{Math.round(zoom * 100)}%</span>
             <button
               type="button"
               onClick={() => setZoom((z) => Math.min(1.4, Number((z + 0.1).toFixed(2))))}
@@ -657,10 +655,9 @@ export default function F1BroadcastTrackGuide({
               const firstCorner = trackCorners[0]?.number || 'T1';
               setSelectedCornerId(firstCorner);
             }}
-            className="px-3.5 py-1.5 rounded-xl font-racing font-bold text-xs transition-all flex items-center gap-1.5 shadow-lg bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:brightness-110 text-white shadow-red-600/30 border border-red-500/40"
+            className="px-3.5 py-1.5 rounded-xl font-racing font-bold text-xs transition-all flex items-center gap-1.5 shadow-lg bg-gradient-to-r from-red-600 via-red-600 to-amber-600 hover:brightness-110 text-white shadow-red-600/30 border border-red-500/40"
             title="Google Street View風の全コーナー景色・オンボード視界を開く"
           >
-            <span>🏙️</span>
             <span>コーナー景色 (Street View)</span>
           </button>
         </div>
@@ -697,33 +694,33 @@ export default function F1BroadcastTrackGuide({
             {/* Top-Left: 3D Angle Indicator & Elevation Delta Badge */}
             <div className="absolute top-3 left-3 z-20 flex flex-col gap-1.5 pointer-events-none">
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-white/15 text-[10px] font-mono text-slate-300">
-                  🔄 3D視点: <span className="text-amber-400 font-bold">X:{rotX}°</span> <span className="text-sky-400 font-bold">Z:{rotZ}°</span>
+                <span className="px-2.5 py-1 rounded-lg bg-black/75 backdrop-blur-md border border-white/15 text-[11px] font-mono text-slate-300">
+                  3D視点: <span className="text-amber-400 font-bold">X:{rotX}°</span> <span className="text-slate-300 font-bold">Z:{rotZ}°</span>
                 </span>
-                <span className="hidden sm:inline-block px-2 py-1 rounded-lg bg-black/60 border border-white/5 text-[9px] font-mono text-slate-400">
+                <span className="hidden sm:inline-block px-2 py-1 rounded-lg bg-black/60 border border-white/5 text-[11px] font-mono text-slate-400">
                   ドラッグで立体360°回転
                 </span>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[10px] font-mono font-bold w-fit">
-                <span>↕️ コース高低差: {trackInfo.elevation.diffM.toFixed(1)}m</span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[11px] font-mono font-bold w-fit">
+                <span>コース高低差: {trackInfo.elevation.diffM.toFixed(1)}m</span>
               </div>
             </div>
 
             {/* Top-Right: Layer Toggles & Color Mode */}
             <div className="absolute top-3 right-3 z-20 flex flex-wrap items-center gap-1.5 pointer-events-auto">
               {/* Color Mode Toggle */}
-              <div className="inline-flex items-center p-0.5 bg-black/70 rounded-lg border border-white/10 text-[10px] font-racing font-bold">
+              <div className="inline-flex items-center p-0.5 bg-black/70 rounded-lg border border-white/10 text-[11px] font-racing font-bold">
                 <button
                   type="button"
                   onClick={() => setColorMode('elevation')}
                   className={`px-2 py-1 rounded-md transition-all ${
                     colorMode === 'elevation'
-                      ? 'bg-rose-600 text-white shadow-sm'
+                      ? 'bg-red-600 text-white shadow-sm'
                       : 'text-slate-400 hover:text-white'
                   }`}
                   title="標高グラデーション表示（低地:青〜高地:赤）"
                 >
-                  ⛰️ 標高カラー
+                  標高カラー
                 </button>
                 <button
                   type="button"
@@ -735,7 +732,7 @@ export default function F1BroadcastTrackGuide({
                   }`}
                   title="セクター1〜3別色分け"
                 >
-                  🎨 セクター
+                  セクター
                 </button>
               </div>
 
@@ -743,77 +740,76 @@ export default function F1BroadcastTrackGuide({
               <button
                 type="button"
                 onClick={() => setShowElevationWall(!showElevationWall)}
-                className={`px-2 py-1 rounded-lg text-[10px] font-racing font-bold transition-all border ${
+                className={`px-2 py-1 rounded-lg text-[11px] font-racing font-bold transition-all border ${
                   showElevationWall
-                    ? 'bg-sky-500/25 text-sky-300 border-sky-500/50'
+                    ? 'bg-slate-400/25 text-slate-200 border-slate-400/50'
                     : 'bg-black/50 text-slate-500 border-white/5'
                 }`}
                 title="地面からの立体標高ウォール（カーテン）表示"
               >
-                🏢 3Dウォール
+                3Dウォール
               </button>
 
               {/* Elevation Pins Toggle */}
               <button
                 type="button"
                 onClick={() => setShowElevationPins(!showElevationPins)}
-                className={`px-2 py-1 rounded-lg text-[10px] font-racing font-bold transition-all border ${
+                className={`px-2 py-1 rounded-lg text-[11px] font-racing font-bold transition-all border ${
                   showElevationPins
                     ? 'bg-amber-500/25 text-amber-300 border-amber-500/50'
                     : 'bg-black/50 text-slate-500 border-white/5'
                 }`}
                 title="最高峰・最低点・急勾配のフローティングピン"
               >
-                🏔️ 標高ピン
+                標高ピン
               </button>
 
               {/* 2026 Aero X-Mode Toggle */}
               <button
                 type="button"
                 onClick={() => setShowActiveAero(!showActiveAero)}
-                className={`px-2 py-1 rounded-lg text-[10px] font-racing font-bold transition-all border ${
+                className={`px-2 py-1 rounded-lg text-[11px] font-racing font-bold transition-all border ${
                   showActiveAero
                     ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
                     : 'bg-black/50 text-slate-500 border-white/5'
                 }`}
                 title="2026アクティブ空力 X-Modeゾーン"
               >
-                🟩 X-Mode
+                X-Mode
               </button>
 
               {/* Turn Numbers Toggle */}
               <button
                 type="button"
                 onClick={() => setShowCornerPins(!showCornerPins)}
-                className={`px-2 py-1 rounded-lg text-[10px] font-racing font-bold transition-all border ${
+                className={`px-2 py-1 rounded-lg text-[11px] font-racing font-bold transition-all border ${
                   showCornerPins
                     ? 'bg-amber-500/25 text-amber-300 border-amber-500/50'
                     : 'bg-black/50 text-slate-500 border-white/5'
                 }`}
                 title="各コーナー・ターン番号（T1, T2...）の表示"
               >
-                📍 ターン番号
+                ターン番号
               </button>
 
               {/* 2026 MOM Toggle */}
               <button
                 type="button"
                 onClick={() => setShowOvertakeMOM(!showOvertakeMOM)}
-                className={`px-2 py-1 rounded-lg text-[10px] font-racing font-bold transition-all border ${
+                className={`px-2 py-1 rounded-lg text-[11px] font-racing font-bold transition-all border ${
                   showOvertakeMOM
-                    ? 'bg-orange-500/25 text-orange-300 border-orange-500/50'
+                    ? 'bg-amber-500/25 text-amber-300 border-amber-500/50'
                     : 'bg-black/50 text-slate-500 border-white/5'
                 }`}
                 title="MOMオーバーテイク検知地点の表示"
               >
-                🎯 MOM検知
+                MOM検知
               </button>
             </div>
 
             {/* Bottom-Left: Street View Hint */}
             <div className="absolute bottom-3 left-3 z-20 pointer-events-none flex flex-col gap-1">
-              <div className="px-2.5 py-1 rounded-lg bg-black/80 backdrop-blur-md border border-white/10 text-[10px] font-mono text-slate-300 flex items-center gap-1.5 shadow-md">
-                <span className="text-amber-400">💡</span>
+              <div className="px-2.5 py-1 rounded-lg bg-black/80 backdrop-blur-md border border-white/10 text-[11px] font-mono text-slate-300 flex items-center gap-1.5 shadow-md">
                 <span>Turn番号 (T1, T2...) を押すとリアルな景色を閲覧できます</span>
               </div>
             </div>
@@ -821,7 +817,7 @@ export default function F1BroadcastTrackGuide({
             {/* Hover Tooltip on 3D Track */}
             {hoveredPoint && (
               <div
-                className="absolute z-30 pointer-events-none px-2 py-1 rounded-md bg-black/90 border border-white/20 text-[10px] font-mono shadow-xl backdrop-blur-md"
+                className="absolute z-30 pointer-events-none px-2 py-1 rounded-md bg-black/90 border border-white/20 text-[11px] font-mono shadow-xl backdrop-blur-md"
                 style={{ left: Math.min(360, hoveredPoint.x + 12), top: Math.max(10, hoveredPoint.y - 32) }}
               >
                 <div className="font-bold text-white flex items-center gap-1">
@@ -949,7 +945,7 @@ export default function F1BroadcastTrackGuide({
                         <circle r="4" fill="#f59e0b" stroke="#ffffff" strokeWidth="1" />
                         <rect x="8" y="-7" width="56" height="13" rx="3" fill="#18181b" stroke="#f59e0b" strokeWidth="1" />
                         <text x="36" y="2" textAnchor="middle" fill="#fbbf24" fontSize="6.5" fontFamily="monospace" fontWeight="bold">
-                          🎯 MOM検知
+                          MOM検知
                         </text>
                       </g>
                       {/* Braking Target */}
@@ -965,7 +961,7 @@ export default function F1BroadcastTrackGuide({
                 {/* 6. ON-MODEL 3D FLOATING ELEVATION PINS */}
                 {showElevationPins && (
                   <>
-                    {/* 🏔️ PEAK ELEVATION PIN */}
+                    {/* PEAK ELEVATION PIN */}
                     <g transform={`translate(${projected3D.highestPoint.sX}, ${projected3D.highestPoint.sY})`}>
                       {/* Vertical Leader Line */}
                       <line x1="0" y1="0" x2="0" y2="-28" stroke="#f43f5e" strokeWidth="1.5" strokeDasharray="2 2" />
@@ -974,28 +970,28 @@ export default function F1BroadcastTrackGuide({
                       <g transform="translate(0, -32)">
                         <rect x="-56" y="-9" width="112" height="18" rx="4" fill="#1e1b4b" stroke="#f43f5e" strokeWidth="1.5" className="shadow-lg" />
                         <text x="0" y="3" textAnchor="middle" fill="#fda4af" fontSize="7.5" fontFamily="monospace" fontWeight="bold">
-                          🏔️ 最高地点 {projected3D.highestPoint.elevM.toFixed(1)}m (+{projected3D.diffM.toFixed(1)}m)
+                          最高地点 {projected3D.highestPoint.elevM.toFixed(1)}m (+{projected3D.diffM.toFixed(1)}m)
                         </text>
                       </g>
                     </g>
 
-                    {/* 🌊 LOWEST ELEVATION PIN */}
+                    {/* LOWEST ELEVATION PIN */}
                     <g transform={`translate(${projected3D.lowestPoint.sX}, ${projected3D.lowestPoint.sY})`}>
                       <line x1="0" y1="0" x2="0" y2="24" stroke="#38bdf8" strokeWidth="1.5" strokeDasharray="2 2" />
                       <circle r="3.5" fill="#38bdf8" stroke="#ffffff" strokeWidth="1" />
                       <g transform="translate(0, 32)">
                         <rect x="-48" y="-9" width="96" height="18" rx="4" fill="#082f49" stroke="#38bdf8" strokeWidth="1.5" />
                         <text x="0" y="3" textAnchor="middle" fill="#7dd3fc" fontSize="7.5" fontFamily="monospace" fontWeight="bold">
-                          🌊 最低地点 {projected3D.lowestPoint.elevM.toFixed(1)}m
+                          最低地点 {projected3D.lowestPoint.elevM.toFixed(1)}m
                         </text>
                       </g>
                     </g>
 
-                    {/* 📈 MAX GRADIENT CALLOUT */}
+                    {/* MAX GRADIENT CALLOUT */}
                     <g transform={`translate(${projected3D.highestPoint.sX + 40}, ${projected3D.highestPoint.sY + 10})`}>
                       <rect x="-35" y="-7" width="70" height="14" rx="3" fill="#064e3b" stroke="#10b981" strokeWidth="1" />
                       <text x="0" y="3" textAnchor="middle" fill="#6ee7b7" fontSize="7" fontFamily="monospace" fontWeight="bold">
-                        📈 勾配 +{trackInfo.elevation.maxGradientPct}%
+                        勾配 +{trackInfo.elevation.maxGradientPct}%
                       </text>
                     </g>
                   </>
@@ -1016,7 +1012,7 @@ export default function F1BroadcastTrackGuide({
                           setHoveredPoint({
                             x: pin.sX,
                             y: pin.sY,
-                            label: `${pin.number}: ${pin.name || 'コーナー'} (クリックで景色を見る 👁️)`,
+                            label: `${pin.number}: ${pin.name || 'コーナー'} (クリックで景色を見る )`,
                             elevM: pin.elevM,
                             pct: pin.pct
                           });
@@ -1074,7 +1070,7 @@ export default function F1BroadcastTrackGuide({
               <button
                 type="button"
                 onClick={() => setZoom(1.0)}
-                className="px-2 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-sky-300 font-bold text-[11px] flex items-center justify-center transition-all shadow-sm"
+                className="px-2 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 font-bold text-[11px] flex items-center justify-center transition-all shadow-sm"
                 title="標準倍率 (100%) にリセット"
               >
                 {Math.round(zoom * 100)}%
@@ -1090,24 +1086,23 @@ export default function F1BroadcastTrackGuide({
             </div>
 
             {/* Bottom-Center: Zoom Gesture Hint */}
-            <div className="hidden sm:block absolute bottom-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none px-2.5 py-0.5 rounded-full bg-black/75 border border-white/10 text-[9px] font-mono text-slate-300 shadow">
-              🖱️ ホイールスクロール / ピンチで拡大縮小 (0.6x〜2.5x)
+            <div className="hidden sm:block absolute bottom-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none px-2.5 py-0.5 rounded-full bg-black/75 border border-white/10 text-[11px] font-mono text-slate-300 shadow">
+              ホイールスクロール / ピンチで拡大縮小 (0.6x〜2.5x)
             </div>
           </div>
 
-          {/* 🏙️ Google Street View Turn Navigator Bar */}
+          {/* Google Street View Turn Navigator Bar */}
           <div className="p-3 rounded-2xl bg-gradient-to-r from-black/85 via-slate-900/95 to-black/85 border border-white/10 space-y-2 shadow-xl">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <span className="text-base">🏙️</span>
                 <span className="font-racing font-bold text-xs text-white tracking-wide">
                   各コーナーの景色・オンボード視界 (STREET VIEW)
                 </span>
-                <span className="text-[10px] text-amber-400 font-mono hidden sm:inline">
+                <span className="text-[11px] text-amber-400 font-mono hidden sm:inline">
                   • Turn番号を押すとリアルな景色・路面・攻略法が表示されます
                 </span>
               </div>
-              <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2.5 py-0.5 rounded-full border border-white/10">
+              <span className="text-[11px] font-mono text-slate-400 bg-white/5 px-2.5 py-0.5 rounded-full border border-white/10">
                 全 {trackCorners.length} コーナー
               </span>
             </div>
@@ -1128,7 +1123,7 @@ export default function F1BroadcastTrackGuide({
                     title={`${c.number}: ${c.name} (推定速度: ${c.speedEstimated})`}
                   >
                     <span className="text-amber-300 font-black">{c.number}</span>
-                    <span className="text-[10px] font-sans font-normal opacity-80 max-w-[85px] truncate">
+                    <span className="text-[11px] font-sans font-normal opacity-80 max-w-[85px] truncate">
                       {c.name}
                     </span>
                   </button>
@@ -1141,42 +1136,42 @@ export default function F1BroadcastTrackGuide({
           {colorMode === 'elevation' ? (
             <div className="p-2.5 rounded-xl bg-black/40 border border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
               <div className="flex items-center gap-1.5 font-racing font-bold text-slate-300">
-                <span>⛰️ 標高スペクトラム:</span>
+                <span>標高スペクトラム:</span>
               </div>
               <div className="flex items-center gap-2 flex-1 max-w-md">
-                <span className="text-[10px] font-mono text-sky-300">{trackInfo.elevation.lowestM.toFixed(1)}m (低地)</span>
+                <span className="text-[11px] font-mono text-slate-200">{trackInfo.elevation.lowestM.toFixed(1)}m (低地)</span>
                 <div
                   className="flex-1 h-2.5 rounded-full border border-white/10"
                   style={{
                     background: 'linear-gradient(to right, #38bdf8, #34d399, #fbbf24, #f43f5e)'
                   }}
                 />
-                <span className="text-[10px] font-mono text-rose-300 font-bold">{trackInfo.elevation.highestM.toFixed(1)}m (最高峰)</span>
+                <span className="text-[11px] font-mono text-red-300 font-bold">{trackInfo.elevation.highestM.toFixed(1)}m (最高峰)</span>
               </div>
             </div>
           ) : (
             /* Sector Legend Bar */
             <div className="grid grid-cols-3 gap-2 text-center text-xs">
-              <div className="p-2 rounded-xl bg-yellow-500/10 border border-yellow-500/30">
-                <div className="font-racing font-bold text-yellow-400 flex items-center justify-center gap-1">
-                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
+              <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30">
+                <div className="font-racing font-bold text-amber-400 flex items-center justify-center gap-1">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
                   <span>SECTOR 1 (0%〜{trackInfo.sectors.s1EndPct}%)</span>
                 </div>
-                <p className="text-[10px] text-slate-400 truncate mt-0.5">{trackInfo.sectors.s1Description}</p>
+                <p className="text-[11px] text-slate-400 truncate mt-0.5">{trackInfo.sectors.s1Description}</p>
               </div>
-              <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30">
-                <div className="font-racing font-bold text-cyan-400 flex items-center justify-center gap-1">
-                  <span className="w-2.5 h-2.5 rounded-full bg-cyan-400" />
+              <div className="p-2 rounded-xl bg-slate-400/10 border border-slate-400/30">
+                <div className="font-racing font-bold text-slate-300 flex items-center justify-center gap-1">
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-300" />
                   <span>SECTOR 2 ({trackInfo.sectors.s1EndPct}%〜{trackInfo.sectors.s2EndPct}%)</span>
                 </div>
-                <p className="text-[10px] text-slate-400 truncate mt-0.5">{trackInfo.sectors.s2Description}</p>
+                <p className="text-[11px] text-slate-400 truncate mt-0.5">{trackInfo.sectors.s2Description}</p>
               </div>
-              <div className="p-2 rounded-xl bg-pink-500/10 border border-pink-500/30">
-                <div className="font-racing font-bold text-pink-400 flex items-center justify-center gap-1">
-                  <span className="w-2.5 h-2.5 rounded-full bg-pink-400" />
+              <div className="p-2 rounded-xl bg-slate-400/10 border border-slate-400/30">
+                <div className="font-racing font-bold text-slate-300 flex items-center justify-center gap-1">
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-300" />
                   <span>SECTOR 3 ({trackInfo.sectors.s2EndPct}%〜100%)</span>
                 </div>
-                <p className="text-[10px] text-slate-400 truncate mt-0.5">{trackInfo.sectors.s3Description}</p>
+                <p className="text-[11px] text-slate-400 truncate mt-0.5">{trackInfo.sectors.s3Description}</p>
               </div>
             </div>
           )}
@@ -1188,37 +1183,36 @@ export default function F1BroadcastTrackGuide({
           <div className="p-4 rounded-2xl bg-slate-900/90 border border-white/10 space-y-3 shadow-md flex-1">
             <div className="flex items-center justify-between border-b border-white/10 pb-2">
               <h3 className="text-xs font-racing font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
-                <span>📊</span>
                 <span>CIRCUIT TELEMETRY INTEL</span>
               </h3>
-              <span className="text-[10px] font-mono text-emerald-400 font-bold">2026 FIA DATA</span>
+              <span className="text-[11px] font-mono text-emerald-400 font-bold">2026 FIA DATA</span>
             </div>
 
             <div className="grid grid-cols-2 gap-2 text-xs font-mono">
               <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                <span className="text-[10px] text-slate-400 block">サーキット全長</span>
+                <span className="text-[11px] text-slate-400 block">サーキット全長</span>
                 <span className="text-sm font-black text-white">{trackInfo.lengthKm.toFixed(3)} km</span>
               </div>
               <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                <span className="text-[10px] text-slate-400 block">決勝周回数</span>
+                <span className="text-[11px] text-slate-400 block">決勝周回数</span>
                 <span className="text-sm font-black text-white">{trackInfo.laps} LAPS</span>
               </div>
               <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                <span className="text-[10px] text-slate-400 block">コーナー数</span>
+                <span className="text-[11px] text-slate-400 block">コーナー数</span>
                 <span className="text-sm font-bold text-slate-200">
-                  {trackInfo.turnCount} <span className="text-[10px] text-slate-400">(右{trackInfo.turnRightCount}/左{trackInfo.turnLeftCount})</span>
+                  {trackInfo.turnCount} <span className="text-[11px] text-slate-400">(右{trackInfo.turnRightCount}/左{trackInfo.turnLeftCount})</span>
                 </span>
               </div>
               <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                <span className="text-[10px] text-slate-400 block">全開率 (Full Throttle)</span>
+                <span className="text-[11px] text-slate-400 block">全開率 (Full Throttle)</span>
                 <span className="text-sm font-bold text-amber-400">{trackInfo.telemetrySpecs.fullThrottlePct}%</span>
               </div>
               <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                <span className="text-[10px] text-slate-400 block">予想最高速 (MOM作動)</span>
+                <span className="text-[11px] text-slate-400 block">予想最高速 (MOM作動)</span>
                 <span className="text-sm font-bold text-emerald-400">{trackInfo.speedTrap.expectedSpeedKmh} km/h</span>
               </div>
               <div className="p-2 rounded-xl bg-black/40 border border-white/5">
-                <span className="text-[10px] text-slate-400 block">周回変速回数</span>
+                <span className="text-[11px] text-slate-400 block">周回変速回数</span>
                 <span className="text-sm font-bold text-slate-300">約 {trackInfo.telemetrySpecs.gearChangesPerLap} 回</span>
               </div>
             </div>
@@ -1227,11 +1221,11 @@ export default function F1BroadcastTrackGuide({
             <div className="space-y-1.5 pt-1 text-[11px]">
               <div className="flex items-center justify-between text-slate-300">
                 <span className="text-slate-400">タイヤ負荷 (Tyre Stress):</span>
-                <span className="font-bold font-mono text-rose-400">{trackInfo.telemetrySpecs.tyreStress}</span>
+                <span className="font-bold font-mono text-red-400">{trackInfo.telemetrySpecs.tyreStress}</span>
               </div>
               <div className="flex items-center justify-between text-slate-300">
                 <span className="text-slate-400">ダウンフォース要求:</span>
-                <span className="font-bold font-mono text-sky-400">{trackInfo.telemetrySpecs.downforceLevel}</span>
+                <span className="font-bold font-mono text-slate-300">{trackInfo.telemetrySpecs.downforceLevel}</span>
               </div>
               <div className="flex items-center justify-between text-slate-300">
                 <span className="text-slate-400">制動エネルギー (Braking):</span>
@@ -1247,13 +1241,12 @@ export default function F1BroadcastTrackGuide({
           {/* 2026 Regulations Highlights Card */}
           <div className="p-3.5 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 space-y-2 text-xs">
             <div className="font-racing font-bold text-emerald-300 flex items-center gap-1.5">
-              <span>🚀</span>
               <span>2026年規定 アクティブ空力 ＆ MOM概要</span>
             </div>
             <p className="text-[11px] text-slate-300 leading-relaxed">
               DRSに代わり、ストレートで全車一律に空力抵抗を55%落とす<span className="text-emerald-400 font-bold">「X-Mode」</span>と、前走車から1.0秒以内の検知で追加電気出力を解放する<span className="text-amber-400 font-bold">「MOM (マニュアル・オーバーライド)」</span>が導入されます。
             </p>
-            <div className="text-[10px] font-mono text-emerald-400 bg-black/40 p-1.5 rounded-lg border border-emerald-500/20">
+            <div className="text-[11px] font-mono text-emerald-400 bg-black/40 p-1.5 rounded-lg border border-emerald-500/20">
               • 本サーキットのアクティブ空力区間: <span className="font-bold text-white">{trackInfo.activeAeroZones.length} 箇所</span>
               <br />
               • MOM検知ポイント: <span className="font-bold text-white">{trackInfo.overtakeCheckpoints.length} 箇所</span>
@@ -1268,7 +1261,6 @@ export default function F1BroadcastTrackGuide({
       <div className="p-4 sm:p-5 rounded-2xl bg-black/60 border border-white/10 space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="text-lg">⛰️</span>
             <div>
               <h4 className="font-racing font-bold text-sm text-white flex items-center gap-2">
                 <span>標高プロファイル断面図 (CIRCUIT ELEVATION PROFILE)</span>
@@ -1282,19 +1274,19 @@ export default function F1BroadcastTrackGuide({
           {/* Key Elevation Metrics Badges */}
           <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
             <div className="px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 text-slate-300">
-              <span>↕️ 最大高低差: </span>
+              <span>最大高低差: </span>
               <span className="text-amber-300 font-bold">{trackInfo.elevation.diffM.toFixed(1)}m</span>
             </div>
             <div className="px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 text-slate-300">
-              <span>🏔️ 最高標高: </span>
-              <span className="text-rose-300 font-bold">{trackInfo.elevation.highestM.toFixed(1)}m</span>
+              <span>最高標高: </span>
+              <span className="text-red-300 font-bold">{trackInfo.elevation.highestM.toFixed(1)}m</span>
             </div>
             <div className="px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 text-slate-300">
-              <span>🌊 最低標高: </span>
-              <span className="text-cyan-300 font-bold">{trackInfo.elevation.lowestM.toFixed(1)}m</span>
+              <span>最低標高: </span>
+              <span className="text-slate-200 font-bold">{trackInfo.elevation.lowestM.toFixed(1)}m</span>
             </div>
             <div className="px-2.5 py-1 rounded-xl bg-white/5 border border-white/10 text-slate-300">
-              <span>📈 最大勾配: </span>
+              <span>最大勾配: </span>
               <span className="text-emerald-300 font-bold">+{trackInfo.elevation.maxGradientPct.toFixed(1)}%</span>
             </div>
           </div>
@@ -1350,11 +1342,11 @@ export default function F1BroadcastTrackGuide({
             </svg>
 
             {/* Bottom Axis Labels */}
-            <div className="flex items-center justify-between text-[9px] font-mono text-slate-400 px-1 pt-0.5">
-              <span>🏁 START (0%)</span>
+            <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 px-1 pt-0.5">
+              <span>START (0%)</span>
               <span>S1 スプリット ({trackInfo.sectors.s1EndPct}%)</span>
               <span>S2 スプリット ({trackInfo.sectors.s2EndPct}%)</span>
-              <span>🏁 FINISH (100%)</span>
+              <span>FINISH (100%)</span>
             </div>
           </div>
         )}
@@ -1459,7 +1451,7 @@ function CornerStreetViewModal({
             <span className="text-2xl">{flag}</span>
             <div>
               <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded bg-red-600 text-white font-racing font-bold text-[10px] tracking-wider uppercase shadow-sm">
+                <span className="px-2 py-0.5 rounded bg-red-600 text-white font-racing font-bold text-[11px] tracking-wider uppercase shadow-sm">
                   STREET VIEW 360°
                 </span>
                 <span className="text-xs text-slate-400 font-mono hidden sm:inline">
@@ -1505,23 +1497,23 @@ function CornerStreetViewModal({
             {/* Street View HUD Lines & Crosshair Overlays */}
             <div className="absolute inset-0 pointer-events-none opacity-30">
               {/* Center Horizon Line */}
-              <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-sky-400/40" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border border-sky-400/30" />
+              <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-slate-300/40" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full border border-slate-300/30" />
             </div>
 
             {/* Top-Left: Compass & Sector Marker */}
             <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-black/80 backdrop-blur-md border border-white/15 text-xs font-mono">
-                <span className="text-amber-400 font-bold">🧭 STREET VIEW COMPASS</span>
+                <span className="text-amber-400 font-bold">STREET VIEW COMPASS</span>
                 <span className="text-slate-400">|</span>
                 <span className="text-white">SECTOR {activeCorner.sector}</span>
                 <span className="text-slate-400">|</span>
-                <span className="text-sky-300 font-bold">{activeCorner.pct.toFixed(1)}%</span>
+                <span className="text-slate-200 font-bold">{activeCorner.pct.toFixed(1)}%</span>
               </div>
               <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-lg bg-black/70 backdrop-blur-md border border-white/10 text-[11px] font-mono">
-                <span>↕️ 標高 {activeCorner.elevM.toFixed(1)}m</span>
+                <span>標高 {activeCorner.elevM.toFixed(1)}m</span>
                 <span className="text-slate-500">•</span>
-                <span className={activeCorner.gradientPct >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                <span className={activeCorner.gradientPct >= 0 ? 'text-emerald-400' : 'text-red-400'}>
                   勾配 {activeCorner.gradientPct >= 0 ? `+${activeCorner.gradientPct}%` : `${activeCorner.gradientPct}%`}
                 </span>
               </div>
@@ -1539,7 +1531,7 @@ function CornerStreetViewModal({
                 }`}
                 title="ドライバーの視界・エイペックス進入目線"
               >
-                📸 オンボード目線
+                オンボード目線
               </button>
               <button
                 type="button"
@@ -1551,7 +1543,7 @@ function CornerStreetViewModal({
                 }`}
                 title="スタンド・路面サイドからのリアル景観"
               >
-                🏟️ トラックサイド
+                トラックサイド
               </button>
               <button
                 type="button"
@@ -1563,7 +1555,7 @@ function CornerStreetViewModal({
                 }`}
                 title="サーキット全景・空撮視点"
               >
-                🚁 全景
+                全景
               </button>
             </div>
 
@@ -1574,9 +1566,8 @@ function CornerStreetViewModal({
               className="absolute left-3 top-1/2 -translate-y-1/2 z-20 p-3 rounded-2xl bg-black/60 hover:bg-red-600 text-white backdrop-blur-md border border-white/20 hover:border-red-400 transition-all shadow-2xl flex items-center gap-2 group/btn"
               title={`前のコーナー (${prevCorner.number})`}
             >
-              <span className="text-lg font-bold group-hover/btn:-translate-x-0.5 transition-transform">◀</span>
               <div className="text-left hidden md:block">
-                <span className="text-[10px] font-mono text-slate-300 block">PREV</span>
+                <span className="text-[11px] font-mono text-slate-300 block">PREV</span>
                 <span className="text-xs font-racing font-black text-amber-300">{prevCorner.number}</span>
               </div>
             </button>
@@ -1588,28 +1579,27 @@ function CornerStreetViewModal({
               title={`次のコーナー (${nextCorner.number})`}
             >
               <div className="text-right hidden md:block">
-                <span className="text-[10px] font-mono text-slate-300 block">NEXT</span>
+                <span className="text-[11px] font-mono text-slate-300 block">NEXT</span>
                 <span className="text-xs font-racing font-black text-amber-300">{nextCorner.number}</span>
               </div>
-              <span className="text-lg font-bold group-hover/btn:translate-x-0.5 transition-transform">▶</span>
             </button>
 
             {/* Bottom HUD Telemetry Ribbon Overlay */}
             <div className="absolute bottom-3 left-3 right-3 z-10 p-3 rounded-xl bg-black/85 backdrop-blur-md border border-white/15 flex flex-wrap items-center justify-between gap-3 shadow-2xl font-mono">
               <div className="flex items-center gap-4 text-xs">
                 <div>
-                  <span className="text-[10px] text-slate-400 block">推奨ギア</span>
+                  <span className="text-[11px] text-slate-400 block">推奨ギア</span>
                   <span className="text-sm font-black text-amber-400">{activeCorner.gearEstimated}</span>
                 </div>
                 <div className="w-[1px] h-6 bg-white/15" />
                 <div>
-                  <span className="text-[10px] text-slate-400 block">推定通過速度</span>
+                  <span className="text-[11px] text-slate-400 block">推定通過速度</span>
                   <span className="text-sm font-black text-emerald-400">{activeCorner.speedEstimated}</span>
                 </div>
                 <div className="w-[1px] h-6 bg-white/15" />
                 <div>
-                  <span className="text-[10px] text-slate-400 block">横方向負荷 (G)</span>
-                  <span className="text-sm font-black text-rose-400">{activeCorner.gForceLat || '4.2G'}</span>
+                  <span className="text-[11px] text-slate-400 block">横方向負荷 (G)</span>
+                  <span className="text-sm font-black text-red-400">{activeCorner.gForceLat || '4.2G'}</span>
                 </div>
               </div>
 
@@ -1617,15 +1607,15 @@ function CornerStreetViewModal({
               <div className="flex items-center gap-2 text-[11px]">
                 {activeCorner.hasActiveAero && (
                   <span className="px-2 py-0.5 rounded-lg bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 font-bold">
-                    🚀 X-Mode 直結ストレート
+                    X-Mode 直結ストレート
                   </span>
                 )}
                 {activeCorner.hasOvertakePoint && (
                   <span className="px-2 py-0.5 rounded-lg bg-amber-500/25 border border-amber-500/40 text-amber-300 font-bold">
-                    🎯 MOM 追い抜き激戦地
+                    MOM 追い抜き激戦地
                   </span>
                 )}
-                <span className="text-[10px] text-slate-400 hidden sm:inline">
+                <span className="text-[11px] text-slate-400 hidden sm:inline">
                   {currentPhoto.caption}
                 </span>
               </div>
@@ -1633,15 +1623,14 @@ function CornerStreetViewModal({
           </div>
 
           {/* Tactical Engineering Tip & Paddock Intel */}
-          <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-neutral-900 to-black border border-white/10 space-y-2.5 shadow-xl">
+          <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-900 to-black border border-white/10 space-y-2.5 shadow-xl">
             <div className="flex items-center justify-between border-b border-white/10 pb-2">
               <div className="flex items-center gap-2">
-                <span className="text-lg">💡</span>
                 <h4 className="font-racing font-bold text-sm text-white">
                   レーシングエンジニアの攻略指南 ＆ リアル路面特性
                 </h4>
               </div>
-              <span className="text-[10px] font-mono text-amber-400 font-bold">
+              <span className="text-[11px] font-mono text-amber-400 font-bold">
                 FIA RACING INTEL
               </span>
             </div>
@@ -1652,7 +1641,7 @@ function CornerStreetViewModal({
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 text-[11px] font-mono">
               <div className="p-2 rounded-xl bg-black/50 border border-white/5">
-                <span className="text-[10px] text-slate-400 block">🛑 ブレーキング指標</span>
+                <span className="text-[11px] text-slate-400 block">ブレーキング指標</span>
                 <span className="text-slate-200">
                   {parseInt(activeCorner.speedEstimated) > 220
                     ? '100m看板直前からのフル制動・トレイルブレーキ'
@@ -1660,13 +1649,13 @@ function CornerStreetViewModal({
                 </span>
               </div>
               <div className="p-2 rounded-xl bg-black/50 border border-white/5">
-                <span className="text-[10px] text-slate-400 block">🏁 縁石（カーブ）の使い方</span>
+                <span className="text-[11px] text-slate-400 block">縁石（カーブ）の使い方</span>
                 <span className="text-slate-200">
                   イン側縁石はフラットに乗せ、脱出時の外側ソーセージ縁石底付きを警戒。
                 </span>
               </div>
               <div className="p-2 rounded-xl bg-black/50 border border-white/5">
-                <span className="text-[10px] text-slate-400 block">⚡ 加速トラクション</span>
+                <span className="text-[11px] text-slate-400 block">加速トラクション</span>
                 <span className="text-slate-200">
                   ステアリングを素早く戻しながら350kW MGU-K出力をタイヤ限界まで注ぎ込む。
                 </span>
@@ -1677,8 +1666,8 @@ function CornerStreetViewModal({
           {/* Corner Quick Jumper Bar (All Turns) */}
           <div className="space-y-1.5 pt-1">
             <div className="flex items-center justify-between text-xs font-mono text-slate-400 px-1">
-              <span>🗺️ 全コーナーをジャンプ切替 (STREET VIEW JUMP):</span>
-              <span className="text-[10px] text-slate-500 hidden sm:inline">キーボード [←] [→] でコーナー移動 | [ESC] で閉じる</span>
+              <span>全コーナーをジャンプ切替 (STREET VIEW JUMP):</span>
+              <span className="text-[11px] text-slate-500 hidden sm:inline">キーボード [←] [→] でコーナー移動 | [ESC] で閉じる</span>
             </div>
             <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-thin">
               {corners.map((c) => {

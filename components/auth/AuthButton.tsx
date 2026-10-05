@@ -58,7 +58,6 @@ export default function AuthButton({ onOpenAuthModal, onOpenUpgradeModal }: Auth
           onClick={onOpenAuthModal}
           className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-white/10 hover:border-white/20 text-slate-200 text-xs font-racing font-bold transition-all shadow-md cursor-pointer flex-shrink-0"
         >
-          <span>🔑</span>
           <span>ログイン</span>
         </button>
         {profileModalOpen && (
@@ -109,17 +108,17 @@ export default function AuthButton({ onOpenAuthModal, onOpenUpgradeModal }: Auth
               {activeDisplayName}
             </span>
             {isProUser ? (
-              <span suppressHydrationWarning className="px-1.5 py-0.2 rounded text-[9px] font-racing font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm">
+              <span suppressHydrationWarning className="px-1.5 py-0.2 rounded text-[11px] font-racing font-black bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 shadow-sm">
                 PRO
               </span>
             ) : (
-              <span suppressHydrationWarning className="px-1.5 py-0.2 rounded text-[9px] font-racing font-bold bg-slate-800 text-slate-300 border border-white/10">
+              <span suppressHydrationWarning className="px-1.5 py-0.2 rounded text-[11px] font-racing font-bold bg-slate-800 text-slate-300 border border-white/10">
                 FREE
               </span>
             )}
           </div>
 
-          <span className="text-[9px] text-slate-400 group-hover:text-white transition-colors">
+          <span className="text-[11px] text-slate-400 group-hover:text-white transition-colors">
             ▼
           </span>
         </button>
@@ -134,34 +133,34 @@ export default function AuthButton({ onOpenAuthModal, onOpenUpgradeModal }: Auth
                   {activeDisplayName}
                 </p>
                 {isProUser ? (
-                  <span className="px-1.5 py-0.2 rounded text-[9px] font-racing font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950">
+                  <span className="px-1.5 py-0.2 rounded text-[11px] font-racing font-black bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950">
                     PRO
                   </span>
                 ) : (
-                  <span className="px-1.5 py-0.2 rounded text-[9px] font-racing font-bold bg-slate-800 text-slate-300 border border-white/10">
+                  <span className="px-1.5 py-0.2 rounded text-[11px] font-racing font-bold bg-slate-800 text-slate-300 border border-white/10">
                     FREE
                   </span>
                 )}
               </div>
-              <p className="font-mono text-[10px] text-slate-400 truncate">{user?.email}</p>
+              <p className="font-mono text-[11px] text-slate-400 truncate">{user?.email}</p>
 
               {/* Favourites Tags */}
               <div className="pt-1 flex items-center gap-1.5 flex-wrap">
                 {selectedTeam && (
                   <span
-                    className="px-2 py-0.5 rounded text-[9px] font-racing font-bold border"
+                    className="px-2 py-0.5 rounded text-[11px] font-racing font-bold border"
                     style={{
                       backgroundColor: `${selectedTeam.color}20`,
                       borderColor: `${selectedTeam.color}50`,
                       color: selectedTeam.color,
                     }}
                   >
-                    🏁 {selectedTeam.name}
+                    {selectedTeam.name}
                   </span>
                 )}
                 {selectedDriver && (
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-racing font-bold bg-slate-800 border border-white/10 text-slate-300">
-                    🏎️ #{selectedDriver.number} {selectedDriver.code}
+                  <span className="px-1.5 py-0.5 rounded text-[11px] font-racing font-bold bg-slate-800 border border-white/10 text-slate-300">
+                    #{selectedDriver.number} {selectedDriver.code}
                   </span>
                 )}
               </div>
@@ -171,12 +170,12 @@ export default function AuthButton({ onOpenAuthModal, onOpenUpgradeModal }: Auth
                 {isProUser ? (
                   <div className="flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-[10px] font-racing text-emerald-300 font-semibold">
+                    <span className="text-[11px] font-racing text-emerald-300 font-semibold">
                       AI 戦略アナリスト 無制限
                     </span>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between w-full text-[10px] font-mono">
+                  <div className="flex items-center justify-between w-full text-[11px] font-mono">
                     <span className="text-amber-400 font-semibold">
                       AI相談: 残り {aiUsage.remaining}/{aiUsage.max}回
                     </span>
@@ -196,7 +195,6 @@ export default function AuthButton({ onOpenAuthModal, onOpenUpgradeModal }: Auth
               }}
               className="w-full text-left px-2.5 py-2 rounded-xl text-slate-200 hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-2 font-racing font-bold cursor-pointer"
             >
-              <span>⚙️</span>
               <span>プロフィール・推し設定</span>
             </button>
 
@@ -209,12 +207,11 @@ export default function AuthButton({ onOpenAuthModal, onOpenUpgradeModal }: Auth
               className="w-full text-left px-2.5 py-2 rounded-xl text-slate-200 hover:bg-slate-800 hover:text-white transition-colors flex items-center justify-between font-racing font-bold cursor-pointer"
             >
               <div className="flex items-center gap-2">
-                <span>💎</span>
                 <span>プラン確認・切替テスト</span>
               </div>
               <span
-                className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold ${
-                  isPro ? 'bg-amber-500/20 text-amber-300' : 'bg-cyan-500/20 text-cyan-300'
+                className={`px-1.5 py-0.5 rounded text-[11px] font-mono font-bold ${
+                  isPro ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-400/20 text-slate-200'
                 }`}
               >
                 {isPro ? 'PRO' : 'FREE'}
@@ -229,7 +226,6 @@ export default function AuthButton({ onOpenAuthModal, onOpenUpgradeModal }: Auth
               }}
               className="w-full text-left px-2.5 py-2 rounded-xl text-red-300 hover:bg-red-500/15 hover:text-red-200 transition-colors flex items-center gap-2 font-racing font-bold cursor-pointer border-t border-white/5 pt-2"
             >
-              <span>🚪</span>
               <span>ログアウト</span>
             </button>
           </div>

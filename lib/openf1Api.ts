@@ -17,7 +17,7 @@ import type {
   RaceControlMessage,
 } from './types';
 
-const DEFAULT_TIMEOUT_MS = 3500;
+const DEFAULT_TIMEOUT_MS = 9000; // proxy upstream timeout is 8s
 
 // ─────────────────────────────────────────────────────────────
 // Fetch Helper
@@ -148,6 +148,24 @@ export async function fetchRaceControl(
 ): Promise<RaceControlMessage[]> {
   return fetchWithTimeout<RaceControlMessage[]>(
     toProxyUrl('race_control', `session_key=${sessionKey}`)
+  );
+}
+
+/** Official classification row (OpenF1 /session_result). position is null for DNF/DNS/DSQ. */
+export interface SessionResultRow {
+  session_key: number;
+  driver_number: number;
+  position: number | null;
+  dnf?: boolean;
+  dns?: boolean;
+  dsq?: boolean;
+  number_of_laps?: number;
+}
+
+/** Fetch the official classification for a session */
+export async function fetchSessionResult(sessionKey: number): Promise<SessionResultRow[]> {
+  return fetchWithTimeout<SessionResultRow[]>(
+    toProxyUrl('session_result', `session_key=${sessionKey}`)
   );
 }
 

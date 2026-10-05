@@ -76,13 +76,13 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
       {/* ── Header Introduction Banner ── */}
       <div className="bg-slate-900/60 border border-white/10 rounded-2xl p-4 md:p-5 backdrop-blur-md">
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-[10px] font-racing font-bold px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-400 border border-pink-500/30">
+          <span className="text-[11px] font-racing font-bold px-2 py-0.5 rounded-full bg-slate-400/20 text-slate-300 border border-slate-400/30">
             PIRELLI FORMULA 1 TECHNICAL MASTERCLASS
           </span>
-          <span className="text-[10px] text-slate-400">2025 REGULATIONS</span>
+          <span className="text-[11px] text-slate-400">2025 REGULATIONS</span>
         </div>
         <h3 className="text-xl font-racing font-black tracking-wide text-white flex items-center gap-2">
-          <span>🛞</span> F1タイヤ大百科 (3レイヤー完全体系)
+F1タイヤ大百科 (3レイヤー完全体系)
         </h3>
         <p className="text-xs text-slate-400 mt-1 max-w-2xl">
           「初心者向け基礎」「中級者向け戦略」「玄人向けデータ＆歴史」の3段階で、F1の勝敗の8割を支配するタイヤのすべてを体感。
@@ -92,9 +92,8 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
       {/* ── Sticky 3-Layer Navigation Bar (Pinned on scroll!) ── */}
       <div className="sticky top-0 z-20 bg-slate-950/95 border border-white/15 rounded-2xl p-2.5 md:p-3 backdrop-blur-md shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         <div className="flex items-center gap-2">
-          <span className="text-base">🛞</span>
           <span className="text-xs font-racing font-bold text-slate-200">タイヤ階層:</span>
-          <span className="text-[11px] text-pink-400 font-mono font-bold">
+          <span className="text-[11px] text-slate-300 font-mono font-bold">
             {activeLayer === 'beginner' ? '【初級】タイヤの基本' : activeLayer === 'intermediate' ? '【中級】戦略を読む' : '【玄人】データで読む'}
           </span>
         </div>
@@ -109,11 +108,10 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
             }}
             className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 ${
               activeLayer === 'beginner'
-                ? 'bg-gradient-to-r from-blue-600 to-sky-600 text-white shadow-md shadow-blue-500/30'
+                ? 'bg-gradient-to-r from-slate-500 to-slate-500 text-white shadow-md shadow-slate-400/30'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
             }`}
           >
-            <span>🔰</span>
             <span>初級：基本</span>
           </button>
           <button
@@ -124,11 +122,10 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
             }}
             className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 ${
               activeLayer === 'intermediate'
-                ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md shadow-amber-500/30'
+                ? 'bg-gradient-to-r from-amber-600 to-amber-600 text-white shadow-md shadow-amber-500/30'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
             }`}
           >
-            <span>🧭</span>
             <span>中級：戦略</span>
           </button>
           <button
@@ -139,11 +136,10 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
             }}
             className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1.5 shrink-0 ${
               activeLayer === 'expert'
-                ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md shadow-purple-500/30'
+                ? 'bg-gradient-to-r from-purple-600 to-slate-500 text-white shadow-md shadow-purple-500/30'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
             }`}
           >
-            <span>🔬</span>
             <span>玄人：データ</span>
           </button>
         </div>
@@ -162,7 +158,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
               </span>
             </div>
             <h3 className="text-lg font-racing font-black text-white flex items-center gap-2 mb-2">
-              <span>❓</span> そもそも「なぜレース中にタイヤ交換をするのか？」
+そもそも「なぜレース中にタイヤ交換をするのか？」
             </h3>
             <p className="text-xs text-slate-300 leading-relaxed max-w-4xl mb-5">
               「20秒以上もタイムを損してまで、なぜタイヤを替えるの？」という疑問。理由は明確な3つの柱があります。
@@ -171,8 +167,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="bg-slate-950/70 p-4 rounded-xl border border-white/5 flex flex-col gap-1.5">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">🚀</span>
-                  <h4 className="text-xs font-racing font-bold text-sky-400">1. 速さの維持 (数理)</h4>
+                  <h4 className="text-xs font-racing font-bold text-slate-300">1. 速さの維持 (数理)</h4>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
                   古タイヤで毎周2秒遅く走るより、22秒ロスしてでも新品タイヤで1周2秒速く走る方が、305km走破のトータル所要時間が圧倒的に短くなります。
@@ -181,8 +176,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
 
               <div className="bg-slate-950/70 p-4 rounded-xl border border-white/5 flex flex-col gap-1.5">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">💥</span>
-                  <h4 className="text-xs font-racing font-bold text-rose-400">2. バースト（破裂）防止</h4>
+                  <h4 className="text-xs font-racing font-bold text-red-400">2. バースト（破裂）防止</h4>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
                   厚さ5mmのトレッドゴムが摩耗して1.5mm以下になると、内部のベルト層が露出し、時速300km/hで走行中にタイヤが破裂する致命的な危険が生じます。
@@ -191,7 +185,6 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
 
               <div className="bg-slate-950/70 p-4 rounded-xl border border-white/5 flex flex-col gap-1.5">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl">📜</span>
                   <h4 className="text-xs font-racing font-bold text-amber-400">3. FIA規則（2種類義務）</h4>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
@@ -203,11 +196,11 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
             {/* 4-Step Tyre Life Cycle Timeline */}
             <div className="bg-slate-950/90 p-4.5 rounded-xl border border-white/10">
               <div className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                <span>🔄</span> タイヤが辿る4つのステージ（デグラデーションとクリフの推移）
+タイヤが辿る4つのステージ（デグラデーションとクリフの推移）
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <div className="bg-slate-900/90 p-3 rounded-lg border-t-2 border-sky-400 flex flex-col gap-1">
-                  <div className="text-[10px] font-racing font-bold text-sky-400">STAGE 1: 新品投入</div>
+                <div className="bg-slate-900/90 p-3 rounded-lg border-t-2 border-slate-300 flex flex-col gap-1">
+                  <div className="text-[11px] font-racing font-bold text-slate-300">STAGE 1: 新品投入</div>
                   <div className="text-xs font-bold text-white">アウトラップ＆熱入れ</div>
                   <p className="text-[11px] text-slate-400 leading-relaxed">
                     タイヤウォーマー（70℃）から出た直後はまだ滑りやすい。1周かけて100℃の適正作動域に熱を入れる。
@@ -215,7 +208,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                 </div>
 
                 <div className="bg-slate-900/90 p-3 rounded-lg border-t-2 border-emerald-400 flex flex-col gap-1">
-                  <div className="text-[10px] font-racing font-bold text-emerald-400">STAGE 2: 最速期</div>
+                  <div className="text-[11px] font-racing font-bold text-emerald-400">STAGE 2: 最速期</div>
                   <div className="text-xs font-bold text-white">スイートスポット (最頂点)</div>
                   <p className="text-[11px] text-slate-400 leading-relaxed">
                     トレッドゴムが路面のアスファルト凹凸に最大限食い込み、ドライバーが全開でプッシュできる黄金期間。
@@ -223,15 +216,15 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                 </div>
 
                 <div className="bg-slate-900/90 p-3 rounded-lg border-t-2 border-amber-400 flex flex-col gap-1">
-                  <div className="text-[10px] font-racing font-bold text-amber-400">STAGE 3: 摩耗期</div>
+                  <div className="text-[11px] font-racing font-bold text-amber-400">STAGE 3: 摩耗期</div>
                   <div className="text-xs font-bold text-white">熱ダレ＆デグラデーション</div>
                   <p className="text-[11px] text-slate-400 leading-relaxed">
                     ゴム表面が削れ、熱容量が低下。1周ごとに約0.1秒ずつタイムが遅くなり始める。タイヤマネジメントの勝負。
                   </p>
                 </div>
 
-                <div className="bg-slate-900/90 p-3 rounded-lg border-t-2 border-rose-500 flex flex-col gap-1">
-                  <div className="text-[10px] font-racing font-bold text-rose-400">STAGE 4: 限界点</div>
+                <div className="bg-slate-900/90 p-3 rounded-lg border-t-2 border-red-500 flex flex-col gap-1">
+                  <div className="text-[11px] font-racing font-bold text-red-400">STAGE 4: 限界点</div>
                   <div className="text-xs font-bold text-white">ザ・クリフ (崖の崩落)</div>
                   <p className="text-[11px] text-slate-400 leading-relaxed">
                     ゴムが限界まで薄くなり突然グリップが蒸発。1周あたり2〜3秒急落するため、即ピットインが必要。
@@ -273,7 +266,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                       >
                         {compound.code[0]}
                       </div>
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-black/40 text-slate-300">
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-black/40 text-slate-300">
                         {compound.tag}
                       </span>
                     </div>
@@ -284,7 +277,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                     </div>
 
                     <div className="flex items-center gap-1">
-                      <div className="text-[9px] text-slate-500">グリップ</div>
+                      <div className="text-[11px] text-slate-500">グリップ</div>
                       <div className="flex-1 h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full"
@@ -339,8 +332,8 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
                     <div className="bg-slate-950/60 p-3 rounded-xl border border-white/5">
-                      <div className="text-[10px] font-racing font-bold text-amber-400 uppercase tracking-wider mb-1">
-                        🎯 戦術的役割 (Tactical Role)
+                      <div className="text-[11px] font-racing font-bold text-amber-400 uppercase tracking-wider mb-1">
+                        戦術的役割 (Tactical Role)
                       </div>
                       <p className="text-xs text-slate-300 leading-relaxed">
                         {selectedCompound.tacticalRole}
@@ -348,8 +341,8 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                     </div>
 
                     <div className="bg-slate-950/60 p-3 rounded-xl border border-white/5">
-                      <div className="text-[10px] font-racing font-bold text-sky-400 uppercase tracking-wider mb-1">
-                        🌤️ 投入される理想環境 (Ideal Conditions)
+                      <div className="text-[11px] font-racing font-bold text-slate-300 uppercase tracking-wider mb-1">
+                        投入される理想環境 (Ideal Conditions)
                       </div>
                       <p className="text-xs text-slate-300 leading-relaxed">
                         {selectedCompound.idealConditions}
@@ -358,7 +351,6 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                   </div>
 
                   <div className="bg-slate-950/80 p-3.5 rounded-xl border border-white/10 flex items-start gap-2.5">
-                    <span className="text-lg">📊</span>
                     <div>
                       <span className="text-[11px] font-racing font-bold text-white">テレメトリー上の固有挙動:</span>
                       <p className="text-xs text-slate-400 mt-0.5">{selectedCompound.telemetrySignature}</p>
@@ -430,7 +422,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
           {/* Section: Interactive Tyre Cross-Section SVG */}
           <div className="bg-slate-900/60 border border-white/10 rounded-2xl p-5 md:p-6 flex flex-col gap-5">
             <div>
-              <div className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider mb-1">
+              <div className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider mb-1">
                 TYRE CROSS-SECTION ANATOMY
               </div>
               <h3 className="text-lg font-racing font-black text-white">
@@ -463,7 +455,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                       fill={selectedLayerId === 'gas' ? '#06b6d430' : '#06b6d410'}
                       stroke={selectedLayerId === 'gas' ? '#06b6d4' : '#0891b240'}
                       strokeWidth={selectedLayerId === 'gas' ? '3' : '1'}
-                      className="cursor-pointer transition-all hover:fill-cyan-500/30"
+                      className="cursor-pointer transition-all hover:fill-slate-400/30"
                       onClick={() => setSelectedLayerId('gas')}
                     />
 
@@ -501,7 +493,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                       stroke={selectedLayerId === 'carcass' ? '#60a5fa' : '#38bdf8'}
                       strokeWidth={selectedLayerId === 'carcass' ? '8' : '5'}
                       strokeDasharray="4 2"
-                      className="cursor-pointer transition-all hover:stroke-sky-400"
+                      className="cursor-pointer transition-all hover:stroke-slate-300"
                       onClick={() => setSelectedLayerId('carcass')}
                     />
 
@@ -525,7 +517,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                       fill="none"
                       stroke={selectedLayerId === 'tread' ? '#f43f5e' : '#ff2e93'}
                       strokeWidth={selectedLayerId === 'tread' ? '12' : '8'}
-                      className="cursor-pointer transition-all hover:stroke-pink-400"
+                      className="cursor-pointer transition-all hover:stroke-slate-300"
                       onClick={() => setSelectedLayerId('tread')}
                     />
                   </svg>
@@ -565,11 +557,11 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                   </div>
                   <div className="grid grid-cols-2 gap-2 text-xs border-t border-white/10 pt-2">
                     <div>
-                      <span className="text-slate-400 text-[10px]">素材:</span>
+                      <span className="text-slate-400 text-[11px]">素材:</span>
                       <div className="text-slate-200">{selectedCrossLayer.material}</div>
                     </div>
                     <div>
-                      <span className="text-slate-400 text-[10px]">規格:</span>
+                      <span className="text-slate-400 text-[11px]">規格:</span>
                       <div className="text-slate-200">{selectedCrossLayer.thicknessOrSpec}</div>
                     </div>
                   </div>
@@ -594,7 +586,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                 </h3>
               </div>
               <div className="bg-amber-500/10 border border-amber-500/30 px-3.5 py-1.5 rounded-xl text-center self-start md:self-auto">
-                <span className="text-[10px] text-amber-300 font-racing font-bold block">WORLD RECORD</span>
+                <span className="text-[11px] text-amber-300 font-racing font-bold block">WORLD RECORD</span>
                 <span className="text-base font-racing font-black text-white">
                   {PIT_STOP_FACTS.worldRecord.team}: {PIT_STOP_FACTS.worldRecord.time}
                 </span>
@@ -607,11 +599,11 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                 <div key={idx} className="bg-slate-950/80 p-4 rounded-xl border border-white/10 flex flex-col justify-between gap-2">
                   <div className="flex items-center justify-between">
                     <span className="text-2xl">{step.icon}</span>
-                    <span className="text-sm font-racing font-black text-sky-400">+{step.timeSeconds}秒</span>
+                    <span className="text-sm font-racing font-black text-slate-300">+{step.timeSeconds}秒</span>
                   </div>
                   <div>
                     <h5 className="font-racing font-bold text-xs text-white">{step.stage}</h5>
-                    <div className="text-[10px] text-slate-400 mb-1">{step.speed}</div>
+                    <div className="text-[11px] text-slate-400 mb-1">{step.speed}</div>
                     <p className="text-[11px] text-slate-300">{step.description}</p>
                   </div>
                 </div>
@@ -620,7 +612,6 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
 
             {/* Cheap Pit Stop */}
             <div className="bg-emerald-950/20 border border-emerald-500/30 rounded-xl p-4 flex items-start gap-3">
-              <span className="text-2xl">💡</span>
               <div>
                 <h5 className="font-racing font-bold text-xs text-emerald-300 mb-1">
                   セーフティカー中の「激安ピット（約11秒ロス）」のカラクリ
@@ -643,7 +634,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
           <div className="bg-slate-900/80 border border-white/10 rounded-2xl p-6 flex flex-col gap-6">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] font-racing font-bold px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/30">
+                <span className="text-[11px] font-racing font-bold px-2 py-0.5 rounded-full bg-slate-400/20 text-slate-300 border border-slate-400/30">
                   REAL-WORLD CASE STUDY
                 </span>
               </div>
@@ -665,7 +656,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-racing font-black text-base text-white">{concept.name}</h4>
                       <span
-                        className="text-[10px] font-bold px-2.5 py-0.5 rounded-full"
+                        className="text-[11px] font-bold px-2.5 py-0.5 rounded-full"
                         style={{
                           backgroundColor: `${concept.color}20`,
                           color: concept.color,
@@ -677,12 +668,12 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                     </div>
                     <p className="text-xs text-slate-300 leading-relaxed mb-3">{concept.coreRule}</p>
                     <div className="bg-slate-900 p-3 rounded-xl border border-white/5 mb-3 text-xs text-slate-300">
-                      <span className="text-slate-400 text-[10px] block mb-0.5">逆転メカニズム:</span>
+                      <span className="text-slate-400 text-[11px] block mb-0.5">逆転メカニズム:</span>
                       {concept.deltaMechanism}
                     </div>
                   </div>
                   <div className="text-[11px] bg-slate-900/90 p-2.5 rounded-lg border border-white/5 text-slate-300">
-                    <span className="font-bold text-sky-400">実例: </span>
+                    <span className="font-bold text-slate-300">実例: </span>
                     {concept.famousExample}
                   </div>
                 </div>
@@ -690,16 +681,16 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
             </div>
 
             {/* Interactive Calculator */}
-            <div className="bg-slate-950/90 border border-sky-500/30 rounded-2xl p-5 shadow-xl">
+            <div className="bg-slate-950/90 border border-slate-400/30 rounded-2xl p-5 shadow-xl">
               <h4 className="text-sm font-racing font-black text-white mb-2 flex items-center gap-2">
-                <span>⚡</span> アンダーカット逆転デルタ・シミュレーター
+アンダーカット逆転デルタ・シミュレーター
               </h4>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="flex flex-col gap-3">
                   <div>
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-slate-300">ピット前ギャップ</span>
-                      <span className="font-bold text-sky-400 font-racing">{gapBeforePit.toFixed(1)} 秒</span>
+                      <span className="font-bold text-slate-300 font-racing">{gapBeforePit.toFixed(1)} 秒</span>
                     </div>
                     <input
                       type="range"
@@ -708,7 +699,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                       step="0.1"
                       value={gapBeforePit}
                       onChange={(e) => setGapBeforePit(parseFloat(e.target.value))}
-                      className="w-full accent-sky-400 bg-slate-800 rounded-lg h-2"
+                      className="w-full accent-slate-300 bg-slate-800 rounded-lg h-2"
                     />
                   </div>
 
@@ -750,10 +741,10 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                     className={`p-3 rounded-xl border flex items-center gap-3 ${
                       undercutSuccessful
                         ? 'bg-emerald-950/30 border-emerald-500/50 text-emerald-300'
-                        : 'bg-rose-950/30 border-rose-500/50 text-rose-300'
+                        : 'bg-red-950/30 border-red-500/50 text-red-300'
                     }`}
                   >
-                    <span className="text-2xl">{undercutSuccessful ? '🏎️💨' : '🛑'}</span>
+                    <span className="text-2xl">{undercutSuccessful ? '' : ''}</span>
                     <div>
                       <div className="text-sm font-racing font-black">
                         {undercutSuccessful
@@ -765,7 +756,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                       </p>
                     </div>
                   </div>
-                  <div className="text-[10px] text-slate-400 mt-2">
+                  <div className="text-[11px] text-slate-400 mt-2">
                     ※ 相手が翌周ピットに入った際のピット出口合流時点での予測タイム差です。
                   </div>
                 </div>
@@ -797,8 +788,8 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                       <strong className="text-slate-300">理由: </strong>{phase.reason}
                     </div>
                   </div>
-                  <div className="text-[10px] text-rose-400 border-t border-white/5 pt-1">
-                    ⚠️ リスク: {phase.risk}
+                  <div className="text-[11px] text-red-400 border-t border-white/5 pt-1">
+                    リスク: {phase.risk}
                   </div>
                 </div>
               ))}
@@ -808,7 +799,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
           {/* Section: Tyre Cliff (崖のメカニズムと予兆) */}
           <div className="bg-slate-900/80 border border-white/10 rounded-2xl p-6 flex flex-col gap-4">
             <div>
-              <div className="text-xs font-racing font-bold text-rose-400 uppercase tracking-wider mb-1">
+              <div className="text-xs font-racing font-bold text-red-400 uppercase tracking-wider mb-1">
                 THE CLIFF PHENOMENON
               </div>
               <h3 className="text-lg font-racing font-black text-white">{TYRE_CLIFF_GUIDE.title}</h3>
@@ -817,9 +808,9 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {TYRE_CLIFF_GUIDE.symptoms.map((item, idx) => (
-                <div key={idx} className="bg-slate-950/80 p-4 rounded-xl border border-rose-500/20 flex flex-col gap-1.5">
-                  <div className="flex items-center gap-2 text-rose-400 font-racing font-bold text-xs">
-                    <span>⚠️ 予兆 {idx + 1}:</span>
+                <div key={idx} className="bg-slate-950/80 p-4 rounded-xl border border-red-500/20 flex flex-col gap-1.5">
+                  <div className="flex items-center gap-2 text-red-400 font-racing font-bold text-xs">
+                    <span>予兆 {idx + 1}:</span>
                     <span>{item.sign}</span>
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed">{item.detail}</p>
@@ -847,10 +838,10 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                 </p>
               </div>
 
-              <div className="bg-slate-950/80 p-5 rounded-xl border border-sky-500/30 flex flex-col gap-2">
+              <div className="bg-slate-950/80 p-5 rounded-xl border border-slate-400/30 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-racing font-bold text-sm text-sky-400">{TRACK_TEMP_STRATEGY.nightRaces.title}</h4>
-                  <span className="text-xs font-mono bg-sky-500/20 text-sky-300 px-2 py-0.5 rounded">
+                  <h4 className="font-racing font-bold text-sm text-slate-300">{TRACK_TEMP_STRATEGY.nightRaces.title}</h4>
+                  <span className="text-xs font-mono bg-slate-400/20 text-slate-200 px-2 py-0.5 rounded">
                     {TRACK_TEMP_STRATEGY.nightRaces.trackTemp}
                   </span>
                 </div>
@@ -883,7 +874,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                     <p className="text-xs text-slate-300 leading-relaxed">{rule.reason}</p>
                   </div>
                   <div className="bg-slate-900 px-4 py-2 rounded-xl border border-white/10 font-racing font-bold text-xs text-center min-w-[140px]">
-                    <span className="text-[10px] text-slate-400 block">ストラテジスト判断</span>
+                    <span className="text-[11px] text-slate-400 block">ストラテジスト判断</span>
                     <span className={rule.action.includes('BOX') ? 'text-emerald-400' : 'text-amber-400'}>
                       {rule.action}
                     </span>
@@ -904,7 +895,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
           <div className="bg-gradient-to-r from-purple-950/40 via-slate-900/80 to-slate-950 border border-purple-500/30 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-5">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] font-racing font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                <span className="text-[11px] font-racing font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
                   MATHEMATICAL TELEMETRY LINK
                 </span>
               </div>
@@ -919,9 +910,8 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
             {onNavigateToTelemetry && (
               <button
                 onClick={() => onNavigateToTelemetry()}
-                className="px-5 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-racing font-black text-xs flex items-center gap-2 shadow-lg shadow-purple-900/40 active:scale-95 transition-all self-start md:self-auto whitespace-nowrap"
+                className="px-5 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-slate-500 hover:from-purple-500 hover:to-slate-400 text-white font-racing font-black text-xs flex items-center gap-2 shadow-lg shadow-purple-900/40 active:scale-95 transition-all self-start md:self-auto whitespace-nowrap"
               >
-                <span>📊</span>
                 <span>テレメトリー分析で実デグラを見る</span>
                 <span>➔</span>
               </button>
@@ -948,7 +938,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-racing font-black text-base text-white">{driver.driver}</h4>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                      <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
                         {driver.styleCategory}
                       </span>
                     </div>
@@ -967,7 +957,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
           {/* Section: Pirelli C1-C6 Spectrum */}
           <div className="bg-slate-900/80 border border-white/10 rounded-2xl p-6 flex flex-col gap-4">
             <div>
-              <div className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider mb-1">
+              <div className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider mb-1">
                 PIRELLI OFFICIAL ALLOCATION
               </div>
               <h3 className="text-lg font-racing font-black text-white">
@@ -993,7 +983,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <span className="font-racing font-black text-lg text-white">{item.code}</span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
+                        <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
                           {item.hardness}
                         </span>
                       </div>
@@ -1001,7 +991,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                       <div className="text-[11px] text-slate-400 mb-2">作動温度: {item.workingTemp}</div>
                       <p className="text-[11px] text-slate-300 leading-relaxed">{item.characteristic}</p>
                     </div>
-                    <div className="text-[10px] text-slate-400 border-t border-white/5 pt-2">
+                    <div className="text-[11px] text-slate-400 border-t border-white/5 pt-2">
                       耐摩耗性: {item.abrasionResistance}
                     </div>
                   </div>
@@ -1026,7 +1016,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                       isSelected
                         ? trouble.id === 'graining'
                           ? 'bg-amber-950/30 border-amber-500/60'
-                          : 'bg-rose-950/30 border-rose-500/60'
+                          : 'bg-red-950/30 border-red-500/60'
                         : 'bg-slate-950/50 border-white/10 hover:bg-slate-900/50'
                     }`}
                   >
@@ -1034,10 +1024,10 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                       <span className="text-2xl">{trouble.icon}</span>
                       <div>
                         <div className="font-black text-xs text-white">{trouble.name}</div>
-                        <div className="text-[10px] text-slate-400">{trouble.englishName}</div>
+                        <div className="text-[11px] text-slate-400">{trouble.englishName}</div>
                       </div>
                     </div>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-black/40 text-slate-300">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-black/40 text-slate-300">
                       {trouble.severity}
                     </span>
                   </button>
@@ -1052,7 +1042,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 <div className="bg-slate-900 p-3 rounded-lg">
-                  <span className="text-amber-400 font-bold block mb-1">⚠️ 主な原因:</span>
+                  <span className="text-amber-400 font-bold block mb-1">主な原因:</span>
                   <ul className="list-disc list-inside text-slate-300 space-y-0.5">
                     {selectedTrouble.causes.map((c, i) => (
                       <li key={i}>{c}</li>
@@ -1060,7 +1050,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                   </ul>
                 </div>
                 <div className="bg-slate-900 p-3 rounded-lg">
-                  <span className="text-rose-400 font-bold block mb-1">📡 テレメトリー＆無線兆候:</span>
+                  <span className="text-red-400 font-bold block mb-1">テレメトリー＆無線兆候:</span>
                   <ul className="list-disc list-inside text-slate-300 space-y-0.5">
                     {selectedTrouble.telemetrySymptoms.map((s, i) => (
                       <li key={i}>{s}</li>
@@ -1085,12 +1075,12 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                 <div key={t.teamId} className="bg-slate-950/80 p-4 rounded-xl border border-white/10 flex flex-col justify-between gap-2">
                   <div className="flex items-center justify-between">
                     <h5 className="font-racing font-bold text-sm text-white">{t.teamName}</h5>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
                       {t.tyreAggression}
                     </span>
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed">{t.summary}</p>
-                  <div className="text-[10px] text-slate-400 border-t border-white/5 pt-1">
+                  <div className="text-[11px] text-slate-400 border-t border-white/5 pt-1">
                     幾何: {t.suspensionKinematics}
                   </div>
                 </div>
@@ -1101,7 +1091,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
           {/* Section: 3 Historic Tyre Dramas */}
           <div className="bg-slate-900/80 border border-white/10 rounded-2xl p-6 flex flex-col gap-4">
             <div>
-              <div className="text-xs font-racing font-bold text-rose-400 uppercase tracking-wider mb-1">
+              <div className="text-xs font-racing font-bold text-red-400 uppercase tracking-wider mb-1">
                 HISTORIC TYRE CRUCIBLES
               </div>
               <h3 className="text-lg font-racing font-black text-white">
@@ -1118,17 +1108,17 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
                     onClick={() => setSelectedDramaId(drama.id)}
                     className={`p-4 rounded-xl border text-left transition-all flex flex-col justify-between gap-2 ${
                       isSelected
-                        ? 'bg-rose-950/30 border-rose-500 shadow-md'
+                        ? 'bg-red-950/30 border-red-500 shadow-md'
                         : 'bg-slate-950/60 border-white/10 hover:bg-slate-900/60'
                     }`}
                   >
                     <div>
-                      <span className="text-[10px] font-racing font-bold px-2 py-0.5 rounded-full bg-slate-900 text-slate-400 border border-white/5 mb-1.5 inline-block">
+                      <span className="text-[11px] font-racing font-bold px-2 py-0.5 rounded-full bg-slate-900 text-slate-400 border border-white/5 mb-1.5 inline-block">
                         {drama.year} {drama.grandPrix}
                       </span>
                       <h4 className="font-racing font-bold text-xs text-white">{drama.title}</h4>
                     </div>
-                    <div className="text-[10px] text-slate-400 border-t border-white/5 pt-1">
+                    <div className="text-[11px] text-slate-400 border-t border-white/5 pt-1">
                       主人公: {drama.hero}
                     </div>
                   </button>
@@ -1138,7 +1128,7 @@ export default function TyreEncyclopediaHub({ onNavigateToTelemetry }: TyreEncyc
 
             <div className="bg-slate-950/90 border border-white/10 rounded-xl p-5 flex flex-col gap-3">
               <div>
-                <span className="text-[10px] font-racing font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300">
+                <span className="text-[11px] font-racing font-bold px-2 py-0.5 rounded-full bg-red-500/20 text-red-300">
                   {selectedDrama.year}年 {selectedDrama.grandPrix}
                 </span>
                 <h4 className="text-base font-racing font-black text-white mt-1">{selectedDrama.title}</h4>

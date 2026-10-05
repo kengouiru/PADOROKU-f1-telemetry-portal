@@ -153,7 +153,7 @@ export default function GlossaryDetailView({
           <button
             type="button"
             onClick={handleOpenNewWindow}
-            className="px-2.5 py-1 rounded-xl bg-sky-950/80 hover:bg-sky-900 border border-sky-500/40 text-sky-300 hover:text-white text-xs font-racing flex items-center gap-1.5 transition-all cursor-pointer shadow-sm hover:scale-105"
+            className="px-2.5 py-1 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-400/40 text-slate-200 hover:text-white text-xs font-racing flex items-center gap-1.5 transition-all cursor-pointer shadow-sm hover:scale-105"
             title="この用語解説を別ウィンドウ（新しいタブ）で開く"
           >
             <span>別ウィンドウで開く</span>
@@ -206,7 +206,7 @@ export default function GlossaryDetailView({
             {/* Detailed Mechanism & Tactical Explanation (Bounded Reading Width) */}
             <div className="bg-slate-900/70 p-5 rounded-2xl border border-white/10 space-y-3">
               <div className="flex items-center gap-1.5 text-xs font-racing font-bold text-slate-300 tracking-wider uppercase">
-                <BookOpen className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                <BookOpen className="w-3.5 h-3.5 text-slate-300 shrink-0" />
                 <span>詳しいメカニズム・戦術解説</span>
               </div>
               <div className="text-slate-200 text-xs sm:text-sm leading-relaxed font-sans max-w-3xl space-y-3">
@@ -237,7 +237,7 @@ export default function GlossaryDetailView({
             {term.relatedTerms && term.relatedTerms.length > 0 && (
               <div className="pt-3 border-t border-white/10 flex flex-col sm:flex-row sm:items-center gap-3 text-xs text-slate-400">
                 <div className="font-bold text-slate-300 flex items-center gap-1.5 shrink-0">
-                  <Compass className="w-3.5 h-3.5 text-teal-400" />
+                  <Compass className="w-3.5 h-3.5 text-emerald-400" />
                   <span>関連用語:</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -270,11 +270,11 @@ export default function GlossaryDetailView({
             {/* Visual Diagram / Graphical Explanation */}
             <div className="bg-slate-900/90 rounded-2xl border border-white/10 p-3.5 shadow-md overflow-hidden">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3 h-3 text-sky-400" />
+                <span className="text-[11px] font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Sparkles className="w-3 h-3 text-slate-300" />
                   <span>ビジュアル構造図解</span>
                 </span>
-                <span className="text-[9px] font-mono text-slate-400">Interactive SVG</span>
+                <span className="text-[11px] font-mono text-slate-400">Interactive SVG</span>
               </div>
               <GlossaryVisualDiagram visualType={term.visualType} />
             </div>
@@ -282,8 +282,8 @@ export default function GlossaryDetailView({
             {/* In-App Interactive Deep Links */}
             {term.inAppLinks && term.inAppLinks.length > 0 && (
               <div className="bg-slate-950/80 rounded-2xl border border-white/10 p-4 space-y-3 shadow-md">
-                <span className="text-xs font-racing font-bold text-sky-400 tracking-wider uppercase flex items-center gap-1.5">
-                  <Activity className="w-3.5 h-3.5 text-sky-400" />
+                <span className="text-xs font-racing font-bold text-slate-300 tracking-wider uppercase flex items-center gap-1.5">
+                  <Activity className="w-3.5 h-3.5 text-slate-300" />
                   <span>アプリ内連動・実体験</span>
                 </span>
                 <div className="space-y-2">
@@ -298,13 +298,13 @@ export default function GlossaryDetailView({
                           router.push('/?hub=telemetry');
                         }
                       }}
-                      className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-900/90 hover:bg-sky-950/80 border border-white/10 hover:border-sky-500/50 text-slate-200 hover:text-sky-300 text-xs font-medium transition-all shadow-sm group cursor-pointer text-left"
+                      className="w-full flex items-center justify-between p-3 rounded-xl bg-slate-900/90 hover:bg-slate-900/80 border border-white/10 hover:border-slate-400/50 text-slate-200 hover:text-slate-200 text-xs font-medium transition-all shadow-sm group cursor-pointer text-left"
                     >
                       <span className="flex items-center gap-2">
-                        <Activity className="w-3.5 h-3.5 text-sky-400 group-hover:scale-110 transition-transform" />
+                        <Activity className="w-3.5 h-3.5 text-slate-300 group-hover:scale-110 transition-transform" />
                         <span>{link.label}</span>
                       </span>
-                      <ChevronRight className="w-3.5 h-3.5 text-sky-400 group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:translate-x-1 transition-transform" />
                     </button>
                   ))}
                 </div>
@@ -314,15 +314,15 @@ export default function GlossaryDetailView({
             {/* Term Metadata & Level Overview Card */}
             <div className="bg-slate-900/60 rounded-2xl border border-white/5 p-3.5 space-y-2 text-xs font-mono text-slate-400">
               <div className="flex items-center justify-between pb-1.5 border-b border-white/5">
-                <span className="font-sans text-[10px] text-slate-500">カテゴリー</span>
+                <span className="font-sans text-[11px] text-slate-500">カテゴリー</span>
                 <span className="text-slate-200 font-bold">{term.categoryLabel}</span>
               </div>
               <div className="flex items-center justify-between pb-1.5 border-b border-white/5">
-                <span className="font-sans text-[10px] text-slate-500">難易度レベル</span>
+                <span className="font-sans text-[11px] text-slate-500">難易度レベル</span>
                 <span className="text-amber-400 font-bold">Level {term.level} / 3</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="font-sans text-[10px] text-slate-500">英名</span>
+                <span className="font-sans text-[11px] text-slate-500">英名</span>
                 <span className="text-slate-300 font-sans">{term.englishTerm}</span>
               </div>
             </div>

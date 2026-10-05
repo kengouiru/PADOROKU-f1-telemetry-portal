@@ -99,7 +99,7 @@ function PopoutTelemetryContent() {
       {/* ── Pop-out Window Header ── */}
       <header className="flex-shrink-0 bg-slate-950/98 border-b border-white/10 px-4 py-3 flex items-center justify-between gap-3 shadow-xl">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-red-600 via-red-500 to-rose-700 flex items-center justify-center font-racing font-black text-xs text-white shadow-md shadow-red-950/40 border border-red-400/30 flex-shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-red-600 via-red-500 to-red-700 flex items-center justify-center font-racing font-black text-xs text-white shadow-md shadow-red-950/40 border border-red-400/30 flex-shrink-0">
             P1
           </div>
           <div className="min-w-0">
@@ -107,12 +107,11 @@ function PopoutTelemetryContent() {
               <span className="text-xs font-racing font-bold text-red-400 tracking-widest uppercase">
                 F1 PITWALL INSPECTOR
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-purple-950/80 border border-purple-500/30 text-[10px] font-mono text-purple-300 flex items-center gap-1">
-                <span>📡</span>
+              <span className="px-2 py-0.5 rounded-full bg-purple-950/80 border border-purple-500/30 text-[11px] font-mono text-purple-300 flex items-center gap-1">
                 <span>独立ポップアウト画面</span>
               </span>
               {lapNumber && (
-                <span className="px-2 py-0.5 rounded-full bg-red-950/80 border border-red-500/30 text-[10px] font-mono text-red-300 font-bold">
+                <span className="px-2 py-0.5 rounded-full bg-red-950/80 border border-red-500/30 text-[11px] font-mono text-red-300 font-bold">
                   Lap {lapNumber}
                 </span>
               )}
@@ -135,14 +134,13 @@ function PopoutTelemetryContent() {
             }`}
             title="用語や公式規則パネルを開閉します"
           >
-            <span>📖</span>
             <span className="hidden sm:inline">用語・ルール確認</span>
             <span className="sm:hidden">用語</span>
             {isKnowledgeOpen ? (
               <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
             ) : (
               relevantTerms.length > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-mono border border-emerald-500/30">
+                <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-mono border border-emerald-500/30">
                   {relevantTerms.length}
                 </span>
               )
@@ -168,41 +166,38 @@ function PopoutTelemetryContent() {
           {/* Top Status Bar */}
           <div className="px-4 py-2.5 rounded-2xl bg-purple-950/30 border border-purple-500/20 text-xs text-slate-300 flex items-center justify-between gap-3 shadow-inner">
             <div className="flex items-center gap-2">
-              <span className="text-base">🖥️</span>
               <span>
                 <strong>独立マルチモニター検証中：</strong>
                 メイン画面とは完全に独立したテレメトリー環境です。サブモニターやレース中継画面の隣に自由に配置してご活用ください。
               </span>
             </div>
-            <span className="hidden md:inline-block font-mono text-[10px] text-purple-400 px-2 py-0.5 rounded bg-purple-950/60 border border-purple-500/30">
+            <span className="hidden md:inline-block font-mono text-[11px] text-purple-400 px-2 py-0.5 rounded bg-purple-950/60 border border-purple-500/30">
               STANDALONE MODE
             </span>
           </div>
 
           {/* AI Guidance with Clickable Term Chips */}
           {insightNotes && (
-            <div className="rounded-2xl bg-gradient-to-r from-blue-950/80 via-slate-900/90 to-indigo-950/80 border border-blue-500/40 p-4 shadow-md space-y-2.5 animate-fade-in">
+            <div className="rounded-2xl bg-gradient-to-r from-slate-900/80 via-slate-900/90 to-slate-900/80 border border-slate-400/40 p-4 shadow-md space-y-2.5 animate-fade-in">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">🤖</span>
-                  <span className="font-racing font-bold text-xs sm:text-sm text-blue-300 tracking-wide uppercase">
+                  <span className="font-racing font-bold text-xs sm:text-sm text-slate-200 tracking-wide uppercase">
                     AIストラテジストの着眼ポイント ＆ 操作ガイド
                   </span>
                 </div>
-                <span className="text-[10px] font-mono text-slate-400 bg-slate-900/80 px-2 py-0.5 rounded border border-white/5">
+                <span className="text-[11px] font-mono text-slate-400 bg-slate-900/80 px-2 py-0.5 rounded border border-white/5">
                   AI Guidance
                 </span>
               </div>
 
-              <div className="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap pl-6 border-l-2 border-blue-400/50 my-1 font-sans">
+              <div className="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap pl-6 border-l-2 border-slate-300/50 my-1 font-sans">
                 {insightNotes}
               </div>
 
               {/* Clickable Term Chips */}
               {relevantTerms.length > 0 && (
                 <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-white/10 mt-1">
-                  <span className="text-[10px] font-racing font-bold text-sky-400 flex items-center gap-1 flex-shrink-0">
-                    <span>💡</span>
+                  <span className="text-[11px] font-racing font-bold text-slate-300 flex items-center gap-1 flex-shrink-0">
                     <span>解説内の重要用語（クリックで図解確認）:</span>
                   </span>
                   {relevantTerms.map((term) => (
@@ -216,7 +211,6 @@ function PopoutTelemetryContent() {
                       }}
                       className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-slate-800/90 hover:bg-emerald-950/90 text-slate-300 hover:text-emerald-300 border border-white/10 hover:border-emerald-500/40 transition-all flex items-center gap-1 cursor-pointer shadow-sm active:scale-95"
                     >
-                      <span>🧠</span>
                       <span>{term.term.split(' ')[0]}</span>
                     </button>
                   ))}
@@ -243,7 +237,7 @@ function PopoutTelemetryContent() {
             {/* Panel Header */}
             <div className="p-3.5 border-b border-white/10 bg-slate-950/90 flex items-center justify-between gap-2 flex-shrink-0">
               <div className="flex items-center gap-2">
-                <span className="text-base">{knowledgeTab === 'glossary' ? '🧠' : '📜'}</span>
+                <span className="text-base">{knowledgeTab === 'glossary' ? '' : ''}</span>
                 <span className="font-racing font-bold text-xs text-white">
                   {knowledgeTab === 'glossary' ? 'F1用語リファレンス' : 'FIA公式規則リファレンス'}
                 </span>
@@ -251,7 +245,7 @@ function PopoutTelemetryContent() {
 
               <div className="flex items-center gap-1">
                 {/* 2-Mode Pill Switch */}
-                <div className="inline-flex bg-slate-900 p-0.5 rounded-lg border border-white/10 text-[10px] font-racing font-bold">
+                <div className="inline-flex bg-slate-900 p-0.5 rounded-lg border border-white/10 text-[11px] font-racing font-bold">
                   <button
                     type="button"
                     onClick={() => setKnowledgeTab('glossary')}
@@ -290,7 +284,7 @@ function PopoutTelemetryContent() {
             {/* Instant Search Bar */}
             <div className="p-3 border-b border-white/5 bg-slate-950/50 flex-shrink-0">
               <div className="relative">
-                <span className="absolute left-3 top-2.5 text-slate-500 text-xs">🔍</span>
+                <span className="absolute left-3 top-2.5 text-slate-500 text-xs"></span>
                 <input
                   type="text"
                   placeholder={
@@ -329,7 +323,7 @@ function PopoutTelemetryContent() {
                         onClick={() => setSelectedTerm(null)}
                         className="text-xs text-emerald-400 hover:underline flex items-center gap-1 font-bold cursor-pointer"
                       >
-                        ◀ 用語一覧に戻る
+                        用語一覧に戻る
                       </button>
 
                       <div className="bg-slate-950 border border-emerald-500/40 rounded-2xl p-4 space-y-3 shadow-inner">
@@ -343,18 +337,18 @@ function PopoutTelemetryContent() {
                             </div>
                           </div>
                           <div className="flex items-center gap-1 flex-shrink-0">
-                            <span className="text-[9px] px-2 py-0.5 rounded-full bg-slate-900 text-slate-300 border border-white/10">
+                            <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-900 text-slate-300 border border-white/10">
                               {selectedTerm.categoryLabel}
                             </span>
-                            <span className="text-[9px] text-amber-400 font-bold">
-                              {'★'.repeat(selectedTerm.level)}
+                            <span className="text-[11px] text-amber-400 font-bold">
+                              {''.repeat(selectedTerm.level)}
                             </span>
                           </div>
                         </div>
 
                         {/* 30-word Summary */}
                         <div className="bg-emerald-950/30 p-3 rounded-xl border border-emerald-500/30 text-xs text-emerald-200 leading-relaxed font-medium">
-                          <strong className="text-emerald-400 block text-[10px] mb-0.5">30文字要約:</strong>
+                          <strong className="text-emerald-400 block text-[11px] mb-0.5">30文字要約:</strong>
                           {selectedTerm.summary}
                         </div>
 
@@ -367,20 +361,20 @@ function PopoutTelemetryContent() {
 
                         {/* Detailed Description */}
                         <div className="text-xs text-slate-200 leading-relaxed bg-slate-900/60 p-3 rounded-xl border border-white/5">
-                          <strong className="text-slate-400 text-[10px] block mb-1">工学・戦術解説:</strong>
+                          <strong className="text-slate-400 text-[11px] block mb-1">工学・戦術解説:</strong>
                           {selectedTerm.description}
                         </div>
 
                         {/* Real Race Quote */}
-                        <div className="text-xs text-sky-200 leading-relaxed bg-sky-950/20 p-3 rounded-xl border border-sky-500/30 italic">
-                          <strong className="text-sky-400 text-[10px] block mb-1">中継での実例・無線:</strong>
+                        <div className="text-xs text-slate-100 leading-relaxed bg-slate-900/20 p-3 rounded-xl border border-slate-400/30 italic">
+                          <strong className="text-slate-300 text-[11px] block mb-1">中継での実例・無線:</strong>
                           {selectedTerm.realExample}
                         </div>
 
                         {/* Related Terms */}
                         {selectedTerm.relatedTerms && selectedTerm.relatedTerms.length > 0 && (
                           <div className="flex flex-wrap items-center gap-1 pt-2 border-t border-white/10 text-[11px]">
-                            <span className="text-slate-400 text-[10px]">関連:</span>
+                            <span className="text-slate-400 text-[11px]">関連:</span>
                             {selectedTerm.relatedTerms.map((rt, rIdx) => {
                               const found = GLOSSARY_TERMS.find((t) => t.term.includes(rt));
                               return (
@@ -391,7 +385,7 @@ function PopoutTelemetryContent() {
                                     if (found) setSelectedTerm(found);
                                     else setGlossarySearch(rt);
                                   }}
-                                  className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] border border-white/5 cursor-pointer"
+                                  className="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px] border border-white/5 cursor-pointer"
                                 >
                                   {rt}
                                 </button>
@@ -408,18 +402,18 @@ function PopoutTelemetryContent() {
                       <div className="flex flex-wrap gap-1">
                         {[
                           ['all', 'すべて'],
-                          ['engineering', '🔧 工学'],
-                          ['strategy', '⛽ 戦略'],
-                          ['car', '🏎️ マシン'],
-                          ['tyre', '🛞 タイヤ'],
-                          ['race', '🏁 レース'],
-                          ['rule', '📏 規則'],
+                          ['engineering', '工学'],
+                          ['strategy', '戦略'],
+                          ['car', 'マシン'],
+                          ['tyre', 'タイヤ'],
+                          ['race', 'レース'],
+                          ['rule', '規則'],
                         ].map(([cat, label]) => (
                           <button
                             key={cat}
                             type="button"
                             onClick={() => setSelectedCategory(cat as GlossaryCategory | 'all')}
-                            className={`px-2.5 py-1 rounded-lg text-[10px] font-racing font-bold transition-all cursor-pointer ${
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-racing font-bold transition-all cursor-pointer ${
                               selectedCategory === cat
                                 ? 'bg-emerald-600 text-white shadow-xs'
                                 : 'bg-slate-950/60 text-slate-400 hover:text-white border border-white/5'
@@ -430,7 +424,7 @@ function PopoutTelemetryContent() {
                         ))}
                       </div>
 
-                      <div className="text-[10px] font-mono text-slate-400 px-1">
+                      <div className="text-[11px] font-mono text-slate-400 px-1">
                         {filteredTerms.length}件の用語
                       </div>
 
@@ -447,7 +441,7 @@ function PopoutTelemetryContent() {
                                 <span className="font-racing font-bold text-xs text-white group-hover:text-emerald-300 transition-colors">
                                   {term.term}
                                 </span>
-                                <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-900 text-slate-400 border border-white/5">
+                                <span className="text-[11px] px-1.5 py-0.2 rounded bg-slate-900 text-slate-400 border border-white/5">
                                   {term.categoryLabel.split(' ')[0]}
                                 </span>
                               </div>
@@ -472,16 +466,16 @@ function PopoutTelemetryContent() {
                   <div className="flex flex-wrap gap-1">
                     {[
                       ['all', '全規則'],
-                      ['sporting', '📜 競技'],
-                      ['technical', '🔧 技術'],
-                      ['future2026', '🚀 2026'],
-                      ['guidelines', '⚖️ 審議'],
+                      ['sporting', '競技'],
+                      ['technical', '技術'],
+                      ['future2026', '2026'],
+                      ['guidelines', '審議'],
                     ].map(([cat, label]) => (
                       <button
                         key={cat}
                         type="button"
                         onClick={() => setSelectedRegCategory(cat as RegulationCategory | 'all')}
-                        className={`px-2.5 py-1 rounded-lg text-[10px] font-racing font-bold transition-all cursor-pointer ${
+                        className={`px-2.5 py-1 rounded-lg text-[11px] font-racing font-bold transition-all cursor-pointer ${
                           selectedRegCategory === cat
                             ? 'bg-purple-600 text-white shadow-xs'
                             : 'bg-slate-950/60 text-slate-400 hover:text-white border border-white/5'
@@ -507,11 +501,11 @@ function PopoutTelemetryContent() {
                           >
                             <div>
                               <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className="text-[9px] px-1.5 py-0.2 rounded bg-purple-950/60 border border-purple-500/30 text-purple-300 font-mono font-bold">
+                                <span className="text-[11px] px-1.5 py-0.2 rounded bg-purple-950/60 border border-purple-500/30 text-purple-300 font-mono font-bold">
                                   {art.badge}
                                 </span>
                                 {art.articleNumber && (
-                                  <span className="text-[9px] text-slate-500 font-mono">
+                                  <span className="text-[11px] text-slate-500 font-mono">
                                     {art.articleNumber}
                                   </span>
                                 )}
@@ -535,7 +529,7 @@ function PopoutTelemetryContent() {
                               </div>
 
                               <div className="space-y-1 bg-slate-950/60 p-2.5 rounded-xl border border-white/5">
-                                <div className="text-[10px] font-bold text-purple-300">要点ポイント:</div>
+                                <div className="text-[11px] font-bold text-purple-300">要点ポイント:</div>
                                 <ul className="list-disc list-inside text-[11px] text-slate-300 space-y-0.5">
                                   {art.keyPoints.map((kp, kIdx) => (
                                     <li key={kIdx}>{kp}</li>
@@ -543,21 +537,21 @@ function PopoutTelemetryContent() {
                                 </ul>
                               </div>
 
-                              <div className="bg-blue-950/30 p-2.5 rounded-xl border border-blue-500/20 text-[11px] text-blue-200">
-                                <strong className="text-blue-300 block text-[10px]">🏎️ テレメトリー＆戦術への影響:</strong>
+                              <div className="bg-slate-900/30 p-2.5 rounded-xl border border-slate-400/20 text-[11px] text-slate-100">
+                                <strong className="text-slate-200 block text-[11px]">テレメトリー＆戦術への影響:</strong>
                                 {art.telemetryTacticalImpact}
                               </div>
 
                               {art.penaltyOrLimitSummary && art.penaltyOrLimitSummary.length > 0 && (
                                 <div className="pt-1">
-                                  <div className="text-[10px] font-mono text-slate-400 mb-1 font-bold">
-                                    ⚖️ ペナルティ基準サマリー:
+                                  <div className="text-[11px] font-mono text-slate-400 mb-1 font-bold">
+                                    ペナルティ基準サマリー:
                                   </div>
                                   <div className="space-y-1">
                                     {art.penaltyOrLimitSummary.map((p, pIdx) => (
                                       <div
                                         key={pIdx}
-                                        className="flex items-center justify-between text-[10px] bg-slate-950/80 p-2 rounded-lg border border-white/5"
+                                        className="flex items-center justify-between text-[11px] bg-slate-950/80 p-2 rounded-lg border border-white/5"
                                       >
                                         <span className="text-white font-bold">{p.label}</span>
                                         <span className="text-red-400 font-semibold">{p.consequence}</span>
@@ -588,7 +582,6 @@ export default function PopoutTelemetryPage() {
       fallback={
         <div className="h-screen flex items-center justify-center bg-slate-950 text-white font-racing">
           <div className="flex items-center gap-3">
-            <span className="text-2xl animate-spin">⚙️</span>
             <span className="text-sm tracking-wider">LOADING TELEMETRY BOARD...</span>
           </div>
         </div>

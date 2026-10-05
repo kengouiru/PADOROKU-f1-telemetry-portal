@@ -2,7 +2,7 @@
 
 /**
  * components/regulations/NextGenPowerUnitVisualizer.tsx
- * ⚡ 2026 FIA Next-Gen Power Unit (50:50 Power Revolution) Interactive Visualizer
+ * 2026 FIA Next-Gen Power Unit (50:50 Power Revolution) Interactive Visualizer
  * High-precision engineering comparison demonstrating:
  * - 50:50 ICE vs MGU-K electrical split (400kW ICE + 350kW MGU-K)
  * - Complete abolition of MGU-H
@@ -40,7 +40,7 @@ export default function NextGenPowerUnitVisualizer() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-mono font-bold tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[11px] font-mono font-bold tracking-wider">
               2026 POWER UNIT REVOLUTION
             </span>
             <span className="text-[11px] font-mono text-slate-400">
@@ -63,7 +63,7 @@ export default function NextGenPowerUnitVisualizer() {
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            <span>🚀 2026年 新規定 (50:50)</span>
+            <span>2026年 新規定 (50:50)</span>
           </button>
           <button
             type="button"
@@ -83,7 +83,7 @@ export default function NextGenPowerUnitVisualizer() {
       <div className="bg-slate-950/80 p-5 rounded-xl border border-white/10 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="text-xs font-mono font-bold text-slate-300">
-            📊 最大システム出力配分比率（ICE vs MGU-K）:
+            最大システム出力配分比率（ICE vs MGU-K）:
           </span>
           <span className="text-xs font-mono text-amber-300">
             合計ピーク出力: <strong>{totalKw} kW</strong> (約 <strong>{Math.round(totalKw * 1.341)} hp / 1,000馬力超</strong>)
@@ -95,18 +95,18 @@ export default function NextGenPowerUnitVisualizer() {
           {/* ICE Portion */}
           <div
             style={{ width: `${icePct}%` }}
-            className="h-full bg-gradient-to-r from-orange-600 to-red-600 rounded-l-lg flex items-center justify-between px-3 text-[11px] font-mono font-bold text-white transition-all duration-500"
+            className="h-full bg-gradient-to-r from-amber-600 to-red-600 rounded-l-lg flex items-center justify-between px-3 text-[11px] font-mono font-bold text-white transition-all duration-500"
           >
-            <span>🔥 内燃機関 (ICE): {iceKw}kW</span>
+            <span>内燃機関 (ICE): {iceKw}kW</span>
             <span>{icePct}%</span>
           </div>
 
           {/* MGU-K Portion */}
           <div
             style={{ width: `${mgukPct}%` }}
-            className="h-full bg-gradient-to-r from-cyan-500 to-teal-400 rounded-r-lg flex items-center justify-between px-3 text-[11px] font-mono font-bold text-slate-950 transition-all duration-500"
+            className="h-full bg-gradient-to-r from-slate-400 to-emerald-400 rounded-r-lg flex items-center justify-between px-3 text-[11px] font-mono font-bold text-slate-950 transition-all duration-500"
           >
-            <span>⚡ MGU-K: {mgukKw}kW</span>
+            <span>MGU-K: {mgukKw}kW</span>
             <span>{mgukPct}%</span>
           </div>
         </div>
@@ -114,11 +114,11 @@ export default function NextGenPowerUnitVisualizer() {
         {/* Legend & Explanations */}
         <div className="flex flex-wrap items-center justify-between text-[11px] font-mono text-slate-400 pt-1">
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-sm bg-orange-600 inline-block" />
+            <span className="w-3 h-3 rounded-sm bg-amber-600 inline-block" />
             <span>1.6L V6 ターボICE: {iceKw}kW (約{Math.round(iceKw * 1.341)}馬力)</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-sm bg-cyan-400 inline-block" />
+            <span className="w-3 h-3 rounded-sm bg-slate-300 inline-block" />
             <span>電気駆動 MGU-K: {mgukKw}kW (約{Math.round(mgukKw * 1.341)}馬力, {is2026 ? '旧来の約3倍出力' : '旧規定'})</span>
           </div>
         </div>
@@ -129,7 +129,7 @@ export default function NextGenPowerUnitVisualizer() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="text-xs font-mono font-bold text-white flex items-center gap-2">
-              <span>🔄 パワートレイン・エネルギーフロー視覚シミュレーション</span>
+              <span>パワートレイン・エネルギーフロー視覚シミュレーション</span>
             </div>
             <div className="text-[11px] text-slate-400 mt-0.5">
               走行状態を切り替えて、ICE・MGU-K・バッテリー間のエネルギー移動を確認
@@ -147,7 +147,7 @@ export default function NextGenPowerUnitVisualizer() {
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              ⚡ 全開加速 (Deploy)
+              全開加速 (Deploy)
             </button>
             <button
               type="button"
@@ -158,18 +158,18 @@ export default function NextGenPowerUnitVisualizer() {
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              🛑 フル回生 (Regen)
+              フル回生 (Regen)
             </button>
             <button
               type="button"
               onClick={() => setOperation('COAST')}
               className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all ${
                 operation === 'COAST'
-                  ? 'bg-sky-500 text-slate-950 shadow-md'
+                  ? 'bg-slate-400 text-slate-950 shadow-md'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              🔋 燃費温存 (Coast)
+              燃費温存 (Coast)
             </button>
           </div>
         </div>
@@ -284,9 +284,9 @@ export default function NextGenPowerUnitVisualizer() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* MGU-K */}
         <div className="bg-slate-950/70 p-4 rounded-xl border border-white/10 space-y-1">
-          <div className="text-[10px] font-mono text-cyan-400 flex items-center justify-between font-bold">
+          <div className="text-[11px] font-mono text-slate-300 flex items-center justify-between font-bold">
             <span>MGU-K 出力</span>
-            <span>⚡ +192%</span>
+            <span>+192%</span>
           </div>
           <div className="text-xl font-racing font-bold text-white">
             {is2026 ? '350 kW' : '120 kW'}
@@ -298,9 +298,9 @@ export default function NextGenPowerUnitVisualizer() {
 
         {/* MGU-H */}
         <div className="bg-slate-950/70 p-4 rounded-xl border border-white/10 space-y-1">
-          <div className="text-[10px] font-mono text-amber-400 flex items-center justify-between font-bold">
+          <div className="text-[11px] font-mono text-amber-400 flex items-center justify-between font-bold">
             <span>MGU-H (熱回生)</span>
-            <span>{is2026 ? '❌ 廃止' : '⭕ 搭載'}</span>
+            <span>{is2026 ? '廃止' : '搭載'}</span>
           </div>
           <div className="text-xl font-racing font-bold text-white">
             {is2026 ? '完全撤廃' : '超高回転軸'}
@@ -312,9 +312,9 @@ export default function NextGenPowerUnitVisualizer() {
 
         {/* Fuel & E-Fuel */}
         <div className="bg-slate-950/70 p-4 rounded-xl border border-white/10 space-y-1">
-          <div className="text-[10px] font-mono text-emerald-400 flex items-center justify-between font-bold">
+          <div className="text-[11px] font-mono text-emerald-400 flex items-center justify-between font-bold">
             <span>燃料レギュレーション</span>
-            <span>🌱 Net Zero</span>
+            <span>Net Zero</span>
           </div>
           <div className="text-sm font-racing font-bold text-white mt-1">
             {is2026 ? '100% 非化石合成' : 'E10 バイオ混合'}
@@ -326,9 +326,9 @@ export default function NextGenPowerUnitVisualizer() {
 
         {/* Max Regen */}
         <div className="bg-slate-950/70 p-4 rounded-xl border border-white/10 space-y-1">
-          <div className="text-[10px] font-mono text-purple-400 flex items-center justify-between font-bold">
+          <div className="text-[11px] font-mono text-purple-400 flex items-center justify-between font-bold">
             <span>周回あたり回生量</span>
-            <span>🔋 大容量化</span>
+            <span>大容量化</span>
           </div>
           <div className="text-xl font-racing font-bold text-white">
             {is2026 ? '8.5 MJ / Lap' : '2.0 MJ / Lap'}
@@ -342,7 +342,6 @@ export default function NextGenPowerUnitVisualizer() {
       {/* ── Engineering Deep-Dive for Connoisseurs ── */}
       <div className="bg-slate-950/60 rounded-xl p-4 border border-white/5 space-y-2 text-xs text-slate-300">
         <div className="font-bold text-amber-300 font-mono text-sm flex items-center gap-1.5">
-          <span>🧠</span>
           <span>玄人向け工学解説：MGU-H撤廃で「ターボラグ」はどう克服されるのか？</span>
         </div>
         <p className="leading-relaxed text-slate-300">

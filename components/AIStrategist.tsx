@@ -72,7 +72,7 @@ export function parseNavActions(content: string): { cleanContent: string; action
       const lapLabel = lap ? `Lap ${lap}: ` : '';
       actions.push({
         type: 'telemetry',
-        icon: '🏎️',
+        icon: '',
         label: `${lapLabel}${d1} vs ${d2} テレメトリーを開く`,
         circuitId,
         driver1: d1,
@@ -82,13 +82,13 @@ export function parseNavActions(content: string): { cleanContent: string; action
     } else if (category === 'stints') {
       actions.push({
         type: 'stints',
-        icon: '🛞',
+        icon: '',
         label: 'タイヤ・スティント推移を見る',
       });
     } else if (category === 'pit_sim') {
       actions.push({
         type: 'pit_sim',
-        icon: '⛽',
+        icon: '',
         label: 'ピット戦略シミュレーターを試す',
       });
     } else if (category === 'radio') {
@@ -96,27 +96,27 @@ export function parseNavActions(content: string): { cleanContent: string; action
       const lapLabel = lap ? `(Lap ${lap})` : '';
       actions.push({
         type: 'radio',
-        icon: '📻',
+        icon: '',
         label: `チーム無線タイムライン ${lapLabel}`.trim(),
         lapNumber: lap,
       });
     } else if (category === 'library') {
       const sub = parts[1];
       if (sub === 'tyres') {
-        actions.push({ type: 'library_tyres', icon: '🛞', label: 'タイヤ大百科（C1〜C5性能解説）を開く' });
+        actions.push({ type: 'library_tyres', icon: '', label: 'タイヤ大百科（C1〜C5性能解説）を開く' });
       } else if (sub === 'circuits') {
         const cId = parts[2];
-        actions.push({ type: 'library_circuits', icon: '🗺️', label: `サーキット詳細ガイドを開く`, circuitId: cId });
+        actions.push({ type: 'library_circuits', icon: '', label: `サーキット詳細ガイドを開く`, circuitId: cId });
       } else if (sub === 'regulations') {
-        actions.push({ type: 'library_regulations', icon: '⚖️', label: 'FIA公式競技規則・ペナルティ基準を開く' });
+        actions.push({ type: 'library_regulations', icon: '', label: 'FIA公式競技規則・ペナルティ基準を開く' });
       } else if (sub === 'glossary') {
         const termId = parts[2];
-        actions.push({ type: 'library_glossary', icon: '📖', label: `用語図解・解説を開く`, termId });
+        actions.push({ type: 'library_glossary', icon: '', label: `用語図解・解説を開く`, termId });
       } else if (sub === 'drama') {
-        actions.push({ type: 'library_drama', icon: '🎬', label: 'F1歴史的ドラマ・ライバル列伝を開く' });
+        actions.push({ type: 'library_drama', icon: '', label: 'F1歴史的ドラマ・ライバル列伝を開く' });
       }
     } else if (category === 'quiz') {
-      actions.push({ type: 'quiz', icon: '🏆', label: '関連F1クイズに挑戦する' });
+      actions.push({ type: 'quiz', icon: '', label: '関連F1クイズに挑戦する' });
     }
   }
 
@@ -148,17 +148,17 @@ interface AIStrategistProps {
 
 const QUICK_PROMPTS = [
   {
-    icon: '⚡',
+    icon: '',
     label: 'デグラデーション',
     prompt: '各ドライバーのタイヤデグラデーション（劣化ペース）を比較・分析してください。スティントごとに具体的な数値を使って説明してください。',
   },
   {
-    icon: '⛽',
+    icon: '',
     label: 'ピット戦略',
     prompt: 'ピット戦略（アンダーカット・オーバーカット）の観点からレースを分析してください。誰の戦略が最も効果的でしたか？',
   },
   {
-    icon: '🎯',
+    icon: '',
     label: 'ターニングポイント',
     prompt: 'このレースの勝負所・ターニングポイントはどこでしたか？ラップタイムデータから順位変動の可能性がある局面を解説してください。',
   },
@@ -278,7 +278,7 @@ export default function AIStrategist({
         {
           id: aiMsgId,
           role: 'model',
-          content: '💎 **本日のAI戦略相談枠（無料分）の上限に達しました**\n\nヘッダーの「🎬 +2回」ボタンから公式スポンサー案内を視聴すると質問枠を即座に回復できます。\nまた、回数無制限で活用するには**「Pitwall Pro」**へアップグレードしてください。',
+          content: '**本日のAI戦略相談枠（無料分）の上限に達しました**\n\nヘッダーの「+2回」ボタンから公式スポンサー案内を視聴すると質問枠を即座に回復できます。\nまた、回数無制限で活用するには**「Pitwall Pro」**へアップグレードしてください。',
           isStreaming: false,
         },
       ]);
@@ -351,7 +351,7 @@ export default function AIStrategist({
       const msg = err instanceof Error ? err.message : 'Unknown error';
       setMessages(prev =>
         prev.map(m => m.id === aiMsgId
-          ? { ...m, isStreaming: false, content: `⚠️ エラー: ${msg}\n\nGemini API接続に問題が発生しました。しばらく時間を置いてお試しください。` }
+          ? { ...m, isStreaming: false, content: `エラー: ${msg}\n\nGemini API接続に問題が発生しました。しばらく時間を置いてお試しください。` }
           : m
         )
       );
@@ -400,8 +400,7 @@ export default function AIStrategist({
           <div className="flex items-center gap-1.5 sm:gap-2">
             {/* Tier Quota Badge */}
             {isPro ? (
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-bold flex items-center gap-1 shadow-sm">
-                <span>💎</span>
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-bold flex items-center gap-1 shadow-sm">
                 <span>PRO</span>
               </span>
             ) : (
@@ -409,19 +408,19 @@ export default function AIStrategist({
                 <button
                   type="button"
                   onClick={onOpenUpgradeModal}
-                  className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 font-mono flex items-center gap-1 cursor-pointer transition-colors"
+                  className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 font-mono flex items-center gap-1 cursor-pointer transition-colors"
                   title="無料プランの本日残り利用回数（クリックでPro詳細）"
                 >
-                  <span>⚡ {aiUsage.remaining}/{aiUsage.max}回</span>
+                  <span>{aiUsage.remaining}/{aiUsage.max}回</span>
                   <span className="text-amber-400 font-bold">PRO</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowRewardModal(true)}
-                  className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                  className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors"
                   title="公式スポンサー案内を見て質問回数を+2回回復する"
                 >
-                  <span>🎬 +2回</span>
+                  <span>+2回</span>
                 </button>
               </div>
             )}
@@ -439,15 +438,15 @@ export default function AIStrategist({
                   : 'border-white/10 bg-slate-800/80 text-slate-400 hover:text-slate-200 hover:border-white/20'
               }`}
             >
-              <span>{apiKey ? '🟢 🔑 設定済' : '🔑 キー設定'}</span>
+              <span>{apiKey ? '設定済' : 'キー設定'}</span>
             </button>
             <select
               value={modelChoice}
               onChange={e => setModelChoice(e.target.value as 'flash' | 'pro')}
               className="text-xs bg-slate-800 border border-white/10 text-slate-300 rounded px-2 py-1 focus:outline-none cursor-pointer"
             >
-              <option value="flash">Flash ⚡</option>
-              <option value="pro">Pro 🎯</option>
+              <option value="flash">Flash </option>
+              <option value="pro">Pro </option>
             </select>
             {messages.length > 0 && (
               <button
@@ -470,7 +469,7 @@ export default function AIStrategist({
               className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs font-medium transition-colors ${
                 noDrivers || isStreaming
                   ? 'border-white/5 text-slate-600 cursor-not-allowed'
-                  : 'border-white/15 text-slate-300 hover:border-blue-500/60 hover:text-blue-300 hover:bg-blue-500/10 cursor-pointer'
+                  : 'border-white/15 text-slate-300 hover:border-slate-400/60 hover:text-slate-200 hover:bg-slate-400/10 cursor-pointer'
               }`}
             >
               <span>{qp.icon}</span>
@@ -491,10 +490,9 @@ export default function AIStrategist({
         style={{ maxHeight: 380, minHeight: 100 }}
       >
         {!authSession?.user && (
-          <div className="p-3 mb-2 rounded-2xl bg-gradient-to-r from-blue-950/70 to-indigo-950/70 border border-sky-500/40 text-xs text-sky-200 flex items-center justify-between gap-3 shadow-lg">
+          <div className="p-3 mb-2 rounded-2xl bg-gradient-to-r from-slate-900/70 to-slate-900/70 border border-slate-400/40 text-xs text-slate-100 flex items-center justify-between gap-3 shadow-lg">
             <div className="space-y-0.5">
               <p className="font-racing font-bold text-white flex items-center gap-1.5">
-                <span>🔒</span>
                 <span>PROメンバー専用機能</span>
               </p>
               <p className="text-[11px] text-slate-300">
@@ -503,7 +501,7 @@ export default function AIStrategist({
             </div>
             <button
               onClick={() => onRequireAuth?.()}
-              className="flex-shrink-0 px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-racing font-bold text-xs shadow-md transition-all cursor-pointer"
+              className="flex-shrink-0 px-3 py-1.5 rounded-xl bg-gradient-to-r from-slate-400 to-slate-500 hover:from-slate-300 hover:to-slate-400 text-white font-racing font-bold text-xs shadow-md transition-all cursor-pointer"
             >
               ログイン
             </button>
@@ -512,7 +510,6 @@ export default function AIStrategist({
 
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-24 text-slate-600 text-xs gap-2 text-center">
-            <span className="text-2xl">🏎</span>
             <span>上のボタンで即時分析、または<br />下の入力欄から自由に質問できます</span>
           </div>
         ) : (
@@ -551,7 +548,7 @@ export default function AIStrategist({
             placeholder={noDrivers ? 'ドライバーを選択してください...' : 'テレメトリについて質問... (Enter 送信 / Shift+Enter 改行)'}
             disabled={isStreaming || noDrivers}
             rows={2}
-            className="flex-1 bg-slate-800/70 border border-white/10 text-slate-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/50 placeholder:text-slate-600 resize-none disabled:opacity-50"
+            className="flex-1 bg-slate-800/70 border border-white/10 text-slate-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-slate-400/50 placeholder:text-slate-600 resize-none disabled:opacity-50"
           />
           {isStreaming ? (
             <button
@@ -559,16 +556,16 @@ export default function AIStrategist({
               onClick={handleStop}
               className="flex-shrink-0 px-3 py-2 h-10 text-xs bg-red-600/90 hover:bg-red-500 text-white rounded-lg transition-colors font-medium"
             >
-              ⏹ 停止
+              停止
             </button>
           ) : (
             <button
               type="button"
               onClick={() => sendMessage(input)}
               disabled={!input.trim() || noDrivers}
-              className="flex-shrink-0 px-3 py-2 h-10 text-xs bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg transition-colors font-medium"
+              className="flex-shrink-0 px-3 py-2 h-10 text-xs bg-slate-500 hover:bg-slate-400 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg transition-colors font-medium"
             >
-              ✈ 送信
+              送信
             </button>
           )}
         </div>
@@ -581,7 +578,6 @@ export default function AIStrategist({
           <div className="bg-slate-900 border border-white/15 rounded-2xl p-5 max-w-md w-full shadow-2xl space-y-4 text-slate-200">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="font-racing font-bold text-sm text-white flex items-center gap-2">
-                <span>🔑</span>
                 <span>Gemini API キー設定</span>
               </h3>
               <button
@@ -600,9 +596,9 @@ export default function AIStrategist({
               <div className="p-2.5 rounded-xl bg-slate-800/80 border border-white/10 text-[11px] space-y-1">
                 <div className="flex items-center gap-1.5 font-bold">
                   {apiKey ? (
-                    <span className="text-emerald-400">🟢 APIキー設定済み（Gemini実機通信）</span>
+                    <span className="text-emerald-400">APIキー設定済み（Gemini実機通信）</span>
                   ) : (
-                    <span className="text-amber-400">🟡 デモAIモード稼働中（APIキー不要）</span>
+                    <span className="text-amber-400">デモAIモード稼働中（APIキー不要）</span>
                   )}
                 </div>
                 <p className="text-slate-400 leading-relaxed">
@@ -620,9 +616,9 @@ export default function AIStrategist({
                 value={tempApiKey}
                 onChange={e => setTempApiKey(e.target.value)}
                 placeholder="AIzaSy..."
-                className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-sky-500 transition-colors font-mono"
+                className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-slate-400 transition-colors font-mono"
               />
-              <p className="text-[10px] text-slate-500">
+              <p className="text-[11px] text-slate-500">
                 キーはお使いのブラウザのlocalStorageにのみ安全に保存され、第三者サーバーには保存されません。
               </p>
             </div>
@@ -632,10 +628,9 @@ export default function AIStrategist({
                 href="https://aistudio.google.com/app/apikey"
                 target="_blank"
                 rel="noreferrer"
-                className="text-[11px] text-sky-400 hover:text-sky-300 underline inline-flex items-center gap-1"
+                className="text-[11px] text-slate-300 hover:text-slate-200 underline inline-flex items-center gap-1"
               >
                 <span>Google AI Studioで無料のAPIキーを取得 (Google公式)</span>
-                <span>↗</span>
               </a>
             </div>
 
@@ -662,7 +657,7 @@ export default function AIStrategist({
                 <button
                   type="button"
                   onClick={handleSaveApiKey}
-                  className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+                  className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-slate-400 to-slate-500 hover:from-slate-300 hover:to-slate-400 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
                 >
                   保存する
                 </button>
@@ -714,7 +709,7 @@ function MessageBubble({
       <div
         className={`max-w-[92%] text-xs leading-relaxed whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 shadow-sm ${
           isUser
-            ? 'bg-blue-600/90 text-white rounded-br-sm'
+            ? 'bg-slate-500/90 text-white rounded-br-sm'
             : 'bg-slate-800/85 text-slate-200 rounded-bl-sm border border-white/10'
         }`}
       >
@@ -722,7 +717,7 @@ function MessageBubble({
           ? <ThinkingDots />
           : cleanContent}
         {message.isStreaming && cleanContent && (
-          <span className="inline-block w-1.5 h-3.5 bg-blue-400 ml-0.5 animate-pulse rounded-sm align-text-bottom" />
+          <span className="inline-block w-1.5 h-3.5 bg-slate-300 ml-0.5 animate-pulse rounded-sm align-text-bottom" />
         )}
       </div>
 
@@ -734,11 +729,11 @@ function MessageBubble({
               key={idx}
               type="button"
               onClick={() => onNavigate?.(act)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-950/90 via-indigo-950/80 to-blue-900/70 hover:from-blue-900 hover:to-indigo-850 border border-blue-400/40 hover:border-blue-300 text-blue-200 hover:text-white text-xs font-racing font-bold shadow-md transition-all cursor-pointer group active:scale-95"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-slate-900/90 via-slate-900/80 to-slate-800/70 hover:from-slate-800 hover:to-indigo-850 border border-slate-300/40 hover:border-slate-200 text-slate-100 hover:text-white text-xs font-racing font-bold shadow-md transition-all cursor-pointer group active:scale-95"
             >
               <span className="text-sm group-hover:scale-110 transition-transform">{act.icon}</span>
               <span>{act.label}</span>
-              <span className="text-[11px] text-blue-400 group-hover:translate-x-0.5 transition-transform">➔</span>
+              <span className="text-[11px] text-slate-300 group-hover:translate-x-0.5 transition-transform">➔</span>
             </button>
           ))}
         </div>
@@ -758,7 +753,7 @@ function MessageBubble({
               }`}
               title="レースエンジニア風のチーム無線音声で聴く"
             >
-              <span>{isSpeaking ? '⏹️' : '📻'}</span>
+              <span>{isSpeaking ? '' : ''}</span>
               <span>{isSpeaking ? '交信中...' : '無線音声'}</span>
             </button>
           )}
@@ -766,7 +761,7 @@ function MessageBubble({
             onClick={() => onAddToNotebook(cleanContent)}
             className="text-xs text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
           >
-            📝 ノートに追加
+            ノートに追加
           </button>
           <button
             onClick={() => navigator.clipboard.writeText(cleanContent)}

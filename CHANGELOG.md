@@ -2,6 +2,20 @@
 
 本プロジェクト「PADOROKU - F1 Telemetry Intelligence Portal」の全アップデート履歴を記録します。
 
+## [v3.0.0] - 2026-10-04 (進行中: 全体メンテナンス)
+### Changed
+- **ルールファイル v2.2.0 (`GEMINI.md`)**: 検証ツール隔離、モックデータ本番経路禁止、出典品質規約、worklog義務、デザインシステム規約（第6部）、演算精度規約（第7部）を追加。`PROJECT_RULES.md` / `.antigravity/rules.md` は `GEMINI.md` への参照のみに変更（二重管理の解消）。
+- **作業記録の仕組みを新設**: `docs/worklog/YYYY-MM-DD.md`。
+### Fixed
+- `package.json` に調査ツール導入時（`npm init -y`）に混入した不要フィールドを除去し元に戻した。
+### Planned (本バージョン内で実施予定)
+- 架空データ（mockData等）の本番経路からの撤去、PITWALL/テレメトリー演算式の修正とテスト追加、デザイン再構築、LIBRARYの誤り修正・出典強化・大幅拡充。詳細は `docs/worklog/2026-10-04.md`。
+
+## [v2.9.0] - 2026-09-27 (記録漏れを2026-10-04に追記)
+### Changed
+- **スマホ表示の最適化**: 390px幅を基準に、下部タブナビ、AIストラテジストのドロワー化、各タブ（SEASON / TELEMETRY / PITWALL / NEWS / LIBRARY）のモバイルレイアウトを調整。390×844のスクリーンショットで各画面を確認。
+- `app/globals.css` の `.btn-console` を `@layer components` 内に移動。
+
 ## [v2.8.0] - 2026-09-26
 ### Changed
 - **コース解説（Circuits）の全面解体・再構築（破壊と再構築） (`components/hubs/CircuitDetailModal.tsx`, `components/hubs/CircuitsHub.tsx`)**:

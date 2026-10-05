@@ -2,7 +2,7 @@
 
 /**
  * components/ads/InterstitialAdModal.tsx
- * 🏁 Pitwall Game Transition / Multi-Pattern Interstitial Modal
+ * Pitwall Game Transition / Multi-Pattern Interstitial Modal
  * 
  * - Multi-sponsor rotation: Randomly selects from multiple authentic F1 partners
  *   (FANATEC Sim Gear, FOD Live Broadcast, F1 Official Store, F1 Technical Books).
@@ -51,8 +51,8 @@ const MULTI_SPONSORS: (AffiliateSlotConfig & { themeGradient: string; icon: Reac
   },
   {
     ...OFFICIAL_AFFILIATE_ITEMS.f1_store_official,
-    themeGradient: 'from-blue-950/60 via-slate-900 to-slate-950 border-blue-500/40',
-    icon: <ShoppingBag className="w-5 h-5 text-blue-400" />,
+    themeGradient: 'from-slate-900/60 via-slate-900 to-slate-950 border-slate-400/40',
+    icon: <ShoppingBag className="w-5 h-5 text-slate-300" />,
   },
   {
     ...OFFICIAL_AFFILIATE_ITEMS.f1_magazine,
@@ -129,7 +129,7 @@ export default function InterstitialAdModal({
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[10px] text-slate-400">
+            <span className="font-mono text-[11px] text-slate-400">
               PR {sponsorIndex + 1}/{MULTI_SPONSORS.length}
             </span>
             <span className="font-mono text-xs text-amber-400 font-bold px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">
@@ -204,7 +204,7 @@ export default function InterstitialAdModal({
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
             <span className="text-slate-300 text-[11px]">
-              ⭐ <strong>Pitwall Pro</strong>ならロード画面ゼロで即時起動！
+              <strong>Pitwall Pro</strong>ならロード画面ゼロで即時起動！
             </span>
           </div>
           {onUpgradeClick && (
@@ -216,7 +216,7 @@ export default function InterstitialAdModal({
               }}
               className="text-amber-300 hover:text-white underline text-[11px] font-mono shrink-0 font-bold"
             >
-              詳細 ↗
+              詳細 
             </button>
           )}
         </div>
@@ -234,7 +234,7 @@ export default function InterstitialAdModal({
           <button
             type="button"
             onClick={onProceed}
-            className="flex-[2] py-2.5 px-4 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-racing font-bold text-xs tracking-wider uppercase shadow-lg shadow-red-950/60 flex items-center justify-center gap-2 transition-all active:scale-95"
+            className="flex-[2] py-2.5 px-4 rounded-xl bg-gradient-to-r from-red-600 to-red-600 hover:from-red-500 hover:to-red-500 text-white font-racing font-bold text-xs tracking-wider uppercase shadow-lg shadow-red-950/60 flex items-center justify-center gap-2 transition-all active:scale-95"
           >
             <FastForward className="w-4 h-4" />
             <span>

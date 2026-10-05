@@ -74,20 +74,18 @@ export default function DramaDetailModal({
             {moment ? (
               <>
                 <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1">
-                  <span>🏆</span>
                   <span>{moment.year}年 {moment.grandPrix}</span>
                 </span>
                 <span className="px-2.5 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-white/10 text-[11px] font-mono">
                   {moment.badge}
                 </span>
-                <span className="px-2 py-0.5 rounded bg-rose-600/20 text-rose-300 border border-rose-500/30 text-[10px] font-mono font-bold">
+                <span className="px-2 py-0.5 rounded bg-red-600/20 text-red-300 border border-red-500/30 text-[11px] font-mono font-bold">
                   {moment.tag}
                 </span>
               </>
             ) : storyline ? (
               <>
-                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1">
-                  <span>👑</span>
+                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-red-500/20 text-red-300 border border-red-500/40 flex items-center gap-1">
                   <span>{storyline.seasonYear}年 シーズン叙事詩</span>
                 </span>
                 <span className="px-2.5 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-white/10 text-[11px] font-mono">
@@ -99,7 +97,7 @@ export default function DramaDetailModal({
 
           <div className="flex items-center gap-2">
             {moment && (
-              <span className="text-[10px] text-slate-500 font-mono hidden md:inline">
+              <span className="text-[11px] text-slate-500 font-mono hidden md:inline">
                 [←] [→] で名場面切替 / [ESC] 閉じる
               </span>
             )}
@@ -138,10 +136,9 @@ export default function DramaDetailModal({
                 <div className="bg-gradient-to-r from-amber-950/40 via-slate-950 to-slate-900 border-l-4 border-amber-400 p-4 sm:p-5 rounded-r-2xl shadow-inner space-y-2">
                   <div className="flex items-center justify-between text-xs font-racing font-bold text-amber-400">
                     <span className="flex items-center gap-1.5">
-                      <span>🎙️</span>
                       <span>HISTORIC COCKPIT RADIO / 魂の実況・無線コール</span>
                     </span>
-                    <span className="text-[10px] font-mono text-slate-400">
+                    <span className="text-[11px] font-mono text-slate-400">
                       Speaker: {moment.radioSpeaker || moment.hero}
                     </span>
                   </div>
@@ -155,8 +152,8 @@ export default function DramaDetailModal({
               <div className="space-y-4">
                 {/* Chapter 1: The Drama & Story */}
                 <div className="bg-slate-950/70 border border-white/10 p-5 rounded-2xl space-y-2">
-                  <h4 className="text-xs font-racing font-bold text-rose-400 uppercase tracking-wider flex items-center gap-2">
-                    <span className="w-5 h-5 rounded bg-rose-600/20 text-rose-300 border border-rose-500/30 flex items-center justify-center font-mono text-xs">
+                  <h4 className="text-xs font-racing font-bold text-red-400 uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-5 h-5 rounded bg-red-600/20 text-red-300 border border-red-500/30 flex items-center justify-center font-mono text-xs">
                       1
                     </span>
                     <span>奇跡と熱狂の背景ストーリー (Storyline & Crisis)</span>
@@ -181,8 +178,8 @@ export default function DramaDetailModal({
 
                 {/* Chapter 3: Aftermath & Legacy */}
                 <div className="bg-slate-950/70 border border-white/10 p-5 rounded-2xl space-y-2">
-                  <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-2">
-                    <span className="w-5 h-5 rounded bg-sky-600/20 text-sky-300 border border-sky-500/30 flex items-center justify-center font-mono text-xs">
+                  <h4 className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                    <span className="w-5 h-5 rounded bg-slate-500/20 text-slate-200 border border-slate-400/30 flex items-center justify-center font-mono text-xs">
                       3
                     </span>
                     <span>その後のモータースポーツ史への影響 (Historical Aftermath)</span>
@@ -199,9 +196,9 @@ export default function DramaDetailModal({
           {storyline && (
             <div className="space-y-6 animate-fade-in">
               {/* Season Hero Card */}
-              <div className="bg-gradient-to-r from-rose-950/40 via-slate-900 to-slate-950 p-5 sm:p-6 rounded-2xl border border-rose-500/30 shadow-lg">
+              <div className="bg-gradient-to-r from-red-950/40 via-slate-900 to-slate-950 p-5 sm:p-6 rounded-2xl border border-red-500/30 shadow-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs font-racing font-bold px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                  <span className="text-xs font-racing font-bold px-2.5 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/40">
                     {storyline.seasonYear} GRAND SEASON EPIC
                   </span>
                   <span className="text-xs text-slate-400 font-racing">{storyline.subtitle}</span>
@@ -209,23 +206,21 @@ export default function DramaDetailModal({
                 <h2 className="text-2xl sm:text-3xl font-racing font-black text-white tracking-wide">
                   {storyline.title}
                 </h2>
-                <p className="text-xs sm:text-sm text-rose-200/90 italic mt-1.5 font-medium">
+                <p className="text-xs sm:text-sm text-red-200/90 italic mt-1.5 font-medium">
                   &ldquo;{storyline.tagline}&rdquo;
                 </p>
 
                 {/* Champions Bar */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 text-xs font-mono">
                   <div className="bg-slate-950/80 p-3 rounded-xl border border-white/10 flex items-center gap-2">
-                    <span className="text-lg">🏆</span>
                     <div>
-                      <span className="text-slate-400 text-[10px] block">ドライバーズ王者:</span>
+                      <span className="text-slate-400 text-[11px] block">ドライバーズ王者:</span>
                       <strong className="text-white">{storyline.champion}</strong>
                     </div>
                   </div>
                   <div className="bg-slate-950/80 p-3 rounded-xl border border-white/10 flex items-center gap-2">
-                    <span className="text-lg">🏎️</span>
                     <div>
-                      <span className="text-slate-400 text-[10px] block">コンストラクターズ王者:</span>
+                      <span className="text-slate-400 text-[11px] block">コンストラクターズ王者:</span>
                       <strong className="text-white">{storyline.constructorsChampion}</strong>
                     </div>
                   </div>
@@ -251,7 +246,7 @@ export default function DramaDetailModal({
                       onClick={() => setActiveStoryChapter(idx)}
                       className={`px-3.5 py-2 rounded-xl text-xs font-racing font-bold shrink-0 transition-all cursor-pointer ${
                         activeStoryChapter === idx
-                          ? 'bg-rose-600 text-white shadow-md'
+                          ? 'bg-red-600 text-white shadow-md'
                           : 'bg-slate-800/80 text-slate-400 hover:text-white border border-white/5'
                       }`}
                     >
@@ -264,10 +259,10 @@ export default function DramaDetailModal({
                 {(() => {
                   const ch = storyline.chapters[activeStoryChapter] || storyline.chapters[0];
                   return (
-                    <div className="bg-slate-950/80 border border-rose-500/20 rounded-2xl p-5 space-y-4">
+                    <div className="bg-slate-950/80 border border-red-500/20 rounded-2xl p-5 space-y-4">
                       <div className="flex items-center justify-between border-b border-white/10 pb-3">
                         <div>
-                          <span className="text-xs font-mono text-rose-400 font-bold">
+                          <span className="text-xs font-mono text-red-400 font-bold">
                             第{ch.chapterNumber}章
                           </span>
                           <h3 className="text-lg font-bold text-white mt-0.5">{ch.title}</h3>
@@ -283,7 +278,6 @@ export default function DramaDetailModal({
 
                       <div className="bg-slate-900/90 p-4 rounded-xl border border-white/5 space-y-1">
                         <span className="text-xs font-racing font-bold text-amber-400 flex items-center gap-1.5">
-                          <span>⚡</span>
                           <span>決定打となった瞬間:</span>
                         </span>
                         <p className="text-xs text-slate-300 leading-relaxed font-sans">
@@ -292,7 +286,7 @@ export default function DramaDetailModal({
                       </div>
 
                       {ch.radioOrQuote && (
-                        <div className="bg-slate-900/60 p-3.5 rounded-xl border border-sky-500/30 text-xs italic text-sky-200 font-medium">
+                        <div className="bg-slate-900/60 p-3.5 rounded-xl border border-slate-400/30 text-xs italic text-slate-100 font-medium">
                           {ch.radioOrQuote}
                         </div>
                       )}
@@ -304,7 +298,7 @@ export default function DramaDetailModal({
               {/* Season Aftermath */}
               {storyline.aftermath && (
                 <div className="bg-slate-950/70 border border-white/10 p-5 rounded-2xl">
-                  <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider mb-2">
+                  <h4 className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider mb-2">
                     その後の歴史的余波 &amp; レガシー
                   </h4>
                   <div className="text-sm text-slate-200 leading-relaxed font-sans">

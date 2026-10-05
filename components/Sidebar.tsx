@@ -86,7 +86,7 @@ export default function Sidebar({
   );
 
   const selectClass =
-    'w-full bg-slate-800/60 border border-white/10 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 transition-colors';
+    'w-full bg-slate-800/60 border border-white/10 text-slate-200 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-slate-400/60 focus:ring-1 focus:ring-slate-400/30 transition-colors';
 
   return (
     <aside className="flex flex-col gap-3.5 min-h-0">
@@ -199,7 +199,7 @@ export default function Sidebar({
                     type="checkbox"
                     readOnly
                     checked={isChecked}
-                    className="w-3.5 h-3.5 accent-blue-500 flex-shrink-0"
+                    className="w-3.5 h-3.5 accent-slate-400 flex-shrink-0"
                   />
                   {/* Driver info */}
                   <div className="flex-1 min-w-0">

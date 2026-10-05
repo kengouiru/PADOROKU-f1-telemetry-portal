@@ -51,25 +51,25 @@ export default function PhotoGalleryCarousel({
       card: 'w-[64%] sm:w-[38%] md:w-[28%] lg:w-[22%] min-h-[130px] sm:min-h-[145px] md:min-h-[160px] max-h-[180px] rounded-xl',
       pad: 'p-2 sm:p-2.5',
       caption: 'text-[11px] sm:text-xs font-bold text-white leading-snug drop-shadow-md line-clamp-1 group-hover/card:line-clamp-2',
-      meta: 'text-[8.5px] sm:text-[9.5px]',
-      tag: 'text-[8.5px] sm:text-[9px] px-1.5 py-0.5',
-      badge: 'text-[9px] px-1.5 py-0.5',
+      meta: 'text-[11px] sm:text-[11px]',
+      tag: 'text-[11px] sm:text-[11px] px-1.5 py-0.5',
+      badge: 'text-[11px] px-1.5 py-0.5',
     },
     md: {
       card: 'w-[75%] sm:w-[48%] md:w-[36%] min-h-[170px] sm:min-h-[190px] md:min-h-[210px] rounded-2xl',
       pad: 'p-3 sm:p-3.5',
       caption: 'text-xs sm:text-[13px] font-bold text-white leading-snug drop-shadow-md line-clamp-2',
-      meta: 'text-[9px] sm:text-[10px]',
-      tag: 'text-[9px] sm:text-[10px] px-2 py-0.5',
-      badge: 'text-[10px] px-2 py-0.5',
+      meta: 'text-[11px] sm:text-[11px]',
+      tag: 'text-[11px] sm:text-[11px] px-2 py-0.5',
+      badge: 'text-[11px] px-2 py-0.5',
     },
     lg: {
       card: 'w-[85%] sm:w-[58%] md:w-[48%] min-h-[200px] sm:min-h-[230px] md:min-h-[250px] rounded-2xl',
       pad: 'p-3 sm:p-3.5',
       caption: 'text-xs sm:text-[13px] font-bold text-white leading-snug drop-shadow-md line-clamp-2',
-      meta: 'text-[9px] sm:text-[10px]',
-      tag: 'text-[9px] sm:text-[10px] px-2 py-0.5',
-      badge: 'text-[10px] px-2 py-0.5',
+      meta: 'text-[11px] sm:text-[11px]',
+      tag: 'text-[11px] sm:text-[11px] px-2 py-0.5',
+      badge: 'text-[11px] px-2 py-0.5',
     },
   }[size];
 
@@ -132,11 +132,10 @@ export default function PhotoGalleryCarousel({
         {/* Header with Title, Count, and Controls */}
         <div className="flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
-            <span className="text-sm">📸</span>
             <h4 className="text-xs font-racing font-bold text-slate-200 uppercase tracking-wider">
               {title || 'PHOTO GALLERY & SCENES'}
             </h4>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-white/10">
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-white/10">
               {items.length} PHOTOS
             </span>
           </div>
@@ -153,7 +152,7 @@ export default function PhotoGalleryCarousel({
                 className="w-7 h-7 rounded-lg bg-slate-800/90 hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed text-slate-200 flex items-center justify-center text-xs font-bold transition-all border border-white/10 shadow-sm cursor-pointer"
                 title="前の写真"
               >
-                ◀
+                
               </button>
               <button
                 onClick={handleNext}
@@ -161,7 +160,7 @@ export default function PhotoGalleryCarousel({
                 className="w-7 h-7 rounded-lg bg-slate-800/90 hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed text-slate-200 flex items-center justify-center text-xs font-bold transition-all border border-white/10 shadow-sm cursor-pointer"
                 title="次の写真"
               >
-                ▶
+                
               </button>
             </div>
           </div>
@@ -202,7 +201,6 @@ export default function PhotoGalleryCarousel({
                   {!isLoaded && !isError && (
                     <div className="absolute inset-0 bg-slate-900 animate-pulse flex items-center justify-center">
                       <div className="flex items-center gap-1.5 text-slate-500 text-xs font-mono">
-                        <span>🖼️</span>
                         <span>Loading...</span>
                       </div>
                     </div>
@@ -226,7 +224,6 @@ export default function PhotoGalleryCarousel({
                     />
                   ) : (
                     <div className="w-full h-full bg-slate-900 flex flex-col items-center justify-center text-slate-500 text-xs font-mono p-4 text-center">
-                      <span className="text-xl mb-1">📷</span>
                       <span>写真の読み込みに失敗しました</span>
                     </div>
                   )}
@@ -253,7 +250,6 @@ export default function PhotoGalleryCarousel({
                   {/* Top-Right Lightbox Expand Hint */}
                   <div className="absolute top-2 right-2 z-10 opacity-70 group-hover/card:opacity-100 transition-opacity">
                     <span className={`${sizeConfig.badge} rounded-md bg-black/70 backdrop-blur-md text-white/90 font-mono border border-white/20 flex items-center gap-1 shadow`}>
-                      <span>🔍</span>
                       <span className="hidden sm:inline">拡大</span>
                     </span>
                   </div>
@@ -275,7 +271,6 @@ export default function PhotoGalleryCarousel({
                         className="hover:text-white text-slate-300 flex items-center gap-1 transition-colors bg-black/60 hover:bg-black/80 px-1.5 py-0.5 rounded border border-white/15"
                       >
                         <span>Photo: {item.credit}</span>
-                        <span>↗</span>
                       </a>
                     </div>
                   </div>
@@ -320,9 +315,8 @@ export default function PhotoGalleryCarousel({
             {/* Lightbox Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-slate-900/80">
               <div className="flex items-center gap-2">
-                <span className="text-sm">📸</span>
                 <span
-                  className="px-2 py-0.5 rounded text-[10px] font-racing font-bold uppercase tracking-wider border"
+                  className="px-2 py-0.5 rounded text-[11px] font-racing font-bold uppercase tracking-wider border"
                   style={{
                     backgroundColor: `${activeColor}15`,
                     borderColor: activeColor,
@@ -367,7 +361,7 @@ export default function PhotoGalleryCarousel({
                     className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/70 hover:bg-black/90 disabled:opacity-20 text-white flex items-center justify-center text-base font-bold transition-all border border-white/20 shadow-lg cursor-pointer"
                     title="前へ (←)"
                   >
-                    ◀
+                    
                   </button>
                   <button
                     onClick={() =>
@@ -379,7 +373,7 @@ export default function PhotoGalleryCarousel({
                     className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/70 hover:bg-black/90 disabled:opacity-20 text-white flex items-center justify-center text-base font-bold transition-all border border-white/20 shadow-lg cursor-pointer"
                     title="次へ (→)"
                   >
-                    ▶
+                    
                   </button>
                 </>
               )}
@@ -399,10 +393,9 @@ export default function PhotoGalleryCarousel({
                 href={items[lightboxIndex].sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-sky-400 hover:text-sky-300 text-xs font-mono border border-white/10 flex items-center gap-1.5 shrink-0 self-start sm:self-auto transition-colors"
+                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-slate-200 text-xs font-mono border border-white/10 flex items-center gap-1.5 shrink-0 self-start sm:self-auto transition-colors"
               >
                 <span>提供元: {items[lightboxIndex].credit}</span>
-                <span>↗</span>
               </a>
             </div>
           </div>

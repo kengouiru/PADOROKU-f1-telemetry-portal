@@ -1317,7 +1317,7 @@ export const CONSTRUCTOR_STANDINGS_2026: ConstructorStanding[] = [
   { position: 5, teamName: 'RB F1 Team', teamColor: '#6692FF', powerUnit: 'Red Bull Ford', teamPrincipal: 'Laurent Mekies', points: 77, wins: 0 },
   { position: 6, teamName: 'Alpine F1 Team', teamColor: '#0093cc', powerUnit: 'Mercedes', teamPrincipal: 'Oliver Oakes', points: 68, wins: 0 },
   { position: 7, teamName: 'Haas F1 Team', teamColor: '#B6BABD', powerUnit: 'Ferrari', teamPrincipal: 'Ayao Komatsu', points: 21, wins: 0 },
-  { position: 8, teamName: 'Audi', teamColor: '#e0001a', powerUnit: 'Audi Works', teamPrincipal: 'Mattia Binotto', points: 17, wins: 0 },
+  { position: 8, teamName: 'Audi', teamColor: '#e0001a', powerUnit: 'Audi Works', teamPrincipal: 'Jonathan Wheatley', points: 17, wins: 0 },
   { position: 9, teamName: 'Williams', teamColor: '#00A0DE', powerUnit: 'Mercedes', teamPrincipal: 'James Vowles', points: 11, wins: 0 },
   { position: 10, teamName: 'Aston Martin', teamColor: '#229971', powerUnit: 'Honda Works', teamPrincipal: 'Mike Krack', points: 3, wins: 0 },
   { position: 11, teamName: 'Cadillac F1 Team', teamColor: '#D4AF37', powerUnit: 'Ferrari', teamPrincipal: 'Mario Andretti', points: 0, wins: 0 },
@@ -1513,7 +1513,7 @@ export const GRID_2026_TEAMS: GridTeam[] = [
   },
   {
     teamName: 'Audi F1 Team',
-    teamPrincipal: 'Mattia Binotto',
+    teamPrincipal: 'Jonathan Wheatley',
     fullName: 'Audi Revolut F1 Team',
     teamColor: '#e0001a',
     powerUnit: 'Audi Works E-Performance',
@@ -1527,7 +1527,7 @@ export const GRID_2026_TEAMS: GridTeam[] = [
     fullName: 'Cadillac Formula 1 Team',
     teamColor: '#D4AF37',
     powerUnit: 'Ferrari Works Power Unit',
-    teamPrincipal: 'Marcin Budkowski',
+    teamPrincipal: 'Graeme Lowdon',
     drivers: [
       { number: 11, code: 'PER', name: 'セルジオ・ペレス', country: 'メキシコ', flag: '🇲🇽', isTransfer: true, note: '名門キャデラックの初代エースとして電撃就任' },
       { number: 77, code: 'BOT', name: 'バルテリ・ボッタス', country: 'フィンランド', flag: '🇫🇮', isTransfer: true, note: '豊富な勝利経験で第11の新チームを牽引' },
@@ -1638,7 +1638,7 @@ export const GRID_2025_TEAMS: GridTeam[] = [
     fullName: 'Stake F1 Team Kick Sauber',
     teamColor: '#52e252',
     powerUnit: 'Ferrari',
-    teamPrincipal: 'Mattia Binotto',
+    teamPrincipal: 'Jonathan Wheatley',
     drivers: [
       { number: 27, code: 'HUL', name: 'ニコ・ヒュルケンベルグ', country: 'ドイツ', flag: '🇩🇪', isTransfer: true, note: 'アウディワークス化を見据えたベテラン獲得' },
       { number: 5, code: 'BOR', name: 'ガブリエル・ボルトレート', country: 'ブラジル', flag: '🇧🇷', isRookie: true, note: 'F3・F2連続王者の最強大型ルーキー' },

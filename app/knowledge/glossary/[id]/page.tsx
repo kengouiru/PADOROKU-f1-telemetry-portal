@@ -28,7 +28,7 @@ export default function GlossaryTermPage() {
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4">
         <div className="glass-card bg-slate-900 border border-white/10 p-8 rounded-3xl max-w-md w-full text-center space-y-4">
-          <div className="text-4xl">🔍</div>
+          <div className="text-4xl"></div>
           <h2 className="text-xl font-racing font-bold text-white">
             用語が見つかりませんでした
           </h2>

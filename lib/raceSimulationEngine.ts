@@ -1444,7 +1444,7 @@ export function runFullGrandPrixSimulation(params: {
       } else if (currentLap > 1 && currentLap < totalLaps && currentLap - lastIncidentLap >= 3) {
         // Roll against calculated risk deterministically
         const roll = incidentRng() * 100;
-        if (roll < incidentRiskPercent * 0.75) {
+        if (roll < (incidentRiskPercent / totalLaps) * 0.75) {
           triggerIncident = true;
         }
       }
@@ -2036,7 +2036,7 @@ export function runFullGrandPrixSimulation(params: {
         // Standard mode: realistic lap oscillation (-3% on straights, +2% in braking zones)
         tracker.surfaceTemp += 0.5;
         const lapRegen = (currentLap % 2 === 0 ? -3 : +2);
-        tracker.ersBatterySoc = Math.min(95, Math.max(35, tracker.ersBatterySoc + lapRegen));
+        tracker.ersBatterySoc = Math.min(95, Math.max(5, tracker.ersBatterySoc + lapRegen));
       }
 
       // ERS Boost modifier (Manual Override Mode / Overtake)
@@ -2094,13 +2094,7 @@ export function runFullGrandPrixSimulation(params: {
       // Dynamic cliff detection: either cumulative physical wear reaches 75% or tyre age exceeds effective cliff
       const isAtCliff = wearPercent >= 75 || tracker.tyreAge > effectiveCliff;
       const wearMultiplier = isAtCliff ? 3.2 : 1.0;
-      const tyreWearPacePenalty =
-        tracker.tyreAge *
-        tyreProp.wearRate *
-        circuit.tyreAggression *
-        wearMultiplier *
-        wearScale *
-        combinedPhysicsFactor;
+      const tyreWearPacePenalty = (wearPercent / 100) * 3.5 * wearMultiplier;
 
       // Thermal warnings
       let thermalWarning: 'NONE' | 'GRAINING_RISK' | 'BLISTERING_WARNING' | 'OPTIMAL' = 'OPTIMAL';
@@ -2134,7 +2128,7 @@ export function runFullGrandPrixSimulation(params: {
       // Fuel burn off (lighter car = faster lap: -0.033s per lap)
       const lapFuelBurn = isFullGp ? 1.75 : 1.55;
       tracker.fuelKg = Math.max(2, tracker.fuelKg - lapFuelBurn);
-      const fuelPaceBonus = -((totalLaps - currentLap) * 0.033);
+      const fuelPaceBonus = (tracker.fuelKg * 0.033);
 
       // Track limits simulation (push mode on dry track risks track limits)
       if (tracker.puMode === 'push' && !isSC && trackLimitsRng() < 0.05) {

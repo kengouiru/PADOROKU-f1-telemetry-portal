@@ -5,10 +5,10 @@
  * Full-Screen High-Impact Deep-Dive Modal for F1 History Archives & Iconic Grand Prix Battles.
  * Features:
  * - 4 Consolidated Tabs:
- *   1. 🏛️ 戦術全史 & 勝負の分水嶺 (Detailed Narrative, Crucial Turning Points & Outcome)
- *   2. 🎙️ 緊迫のチーム無線交信 (Team Radio Player, Transcript & Translation)
- *   3. 📊 実走テレメトリー追体験 (Historic Telemetry Session Data & Direct Link)
- *   4. 📚 一次引用文献 (Academic Primary Citations)
+ *   1. 戦術全史 & 勝負の分水嶺 (Detailed Narrative, Crucial Turning Points & Outcome)
+ *   2. 緊迫のチーム無線交信 (Team Radio Player, Transcript & Translation)
+ *   3. 実走テレメトリー追体験 (Historic Telemetry Session Data & Direct Link)
+ *   4. 一次引用文献 (Academic Primary Citations)
  * - Keyboard navigation (Left/Right to cycle, ESC to close)
  */
 
@@ -71,18 +71,17 @@ export default function HistoryDetailModal({
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 border-b border-white/10 bg-slate-950/80">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1">
-              <span>🏛️</span>
               <span>{historyItem.year}年 {historyItem.grandPrix}</span>
             </span>
             {historyItem.telemetrySession && (
-              <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30 text-[10px] font-mono font-bold">
+              <span className="px-2 py-0.5 rounded bg-slate-400/20 text-slate-200 border border-slate-400/30 text-[11px] font-mono font-bold">
                 テレメトリー再現
               </span>
             )}
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-slate-500 font-mono hidden md:inline">
+            <span className="text-[11px] text-slate-500 font-mono hidden md:inline">
               [←] [→] で名勝負切替 / [ESC] 閉じる
             </span>
             <button
@@ -109,10 +108,10 @@ export default function HistoryDetailModal({
         <div className="sticky top-0 z-20 flex items-center gap-2 px-4 sm:px-6 pt-2 border-b border-white/10 bg-slate-950/95 backdrop-blur-md overflow-x-auto flex-shrink-0">
           {(
             [
-              ['narrative', '🏛️ 戦術全史 & 勝負の分水嶺'],
-              ['radios', `🎙️ 緊迫の生交信ログ (${historyItem.keyRadios?.length || 0})`],
-              ['telemetry', '📊 実走テレメトリー追体験'],
-              ['citations', `📚 一次引用文献 (${historyItem.references?.length || 0})`],
+              ['narrative', '戦術全史 & 勝負の分水嶺'],
+              ['radios', `緊迫の生交信ログ (${historyItem.keyRadios?.length || 0})`],
+              ['telemetry', '実走テレメトリー追体験'],
+              ['citations', `一次引用文献 (${historyItem.references?.length || 0})`],
             ] as [HistoryModalTab, string][]
           ).map(([tab, label]) => (
             <button
@@ -136,9 +135,8 @@ export default function HistoryDetailModal({
             <div className="space-y-6 animate-fade-in">
               {/* Outcome Badge */}
               <div className="bg-slate-950/80 border border-amber-500/30 p-4 rounded-xl flex items-center gap-3">
-                <span className="text-2xl">🏆</span>
                 <div>
-                  <span className="text-[10px] font-mono text-amber-400 uppercase tracking-widest block font-bold">
+                  <span className="text-[11px] font-mono text-amber-400 uppercase tracking-widest block font-bold">
                     RACE VERDICT / 最終決着
                   </span>
                   <p className="text-sm font-bold text-white mt-0.5">{historyItem.outcome}</p>
@@ -148,7 +146,6 @@ export default function HistoryDetailModal({
               {/* Detailed Narrative */}
               <div className="bg-slate-950/70 border border-white/10 p-5 rounded-2xl space-y-3">
                 <h4 className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <span>📖</span>
                   <span>戦術ドキュメント &amp; 勝敗の分岐点</span>
                 </h4>
                 <div className="text-sm text-slate-200 leading-relaxed font-sans space-y-3">
@@ -169,16 +166,16 @@ export default function HistoryDetailModal({
                       key={radio.id}
                       className={`p-4 rounded-2xl border transition-all ${
                         isPitWall
-                          ? 'bg-slate-900/80 border-sky-500/30'
+                          ? 'bg-slate-900/80 border-slate-400/30'
                           : 'bg-slate-900/80 border-amber-500/30'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold border ${
+                            className={`px-2 py-0.5 rounded text-[11px] font-mono font-bold border ${
                               isPitWall
-                                ? 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+                                ? 'bg-slate-400/20 text-slate-200 border-slate-400/40'
                                 : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
                             }`}
                           >
@@ -186,7 +183,7 @@ export default function HistoryDetailModal({
                           </span>
                           <span className="text-xs font-bold text-white">{radio.speakerName}</span>
                         </div>
-                        <span className="text-[10px] font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded">
+                        <span className="text-[11px] font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded">
                           Lap {radio.lap}
                         </span>
                       </div>
@@ -222,7 +219,7 @@ export default function HistoryDetailModal({
                 <div className="bg-slate-950/70 border border-amber-500/30 p-5 rounded-2xl space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-racing font-bold text-amber-400 uppercase tracking-widest block">
+                      <span className="text-[11px] font-racing font-bold text-amber-400 uppercase tracking-widest block">
                         HISTORIC TELEMETRY REPLAY
                       </span>
                       <h3 className="text-lg font-bold text-white mt-1">
@@ -247,7 +244,6 @@ export default function HistoryDetailModal({
                       }}
                       className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-racing font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer"
                     >
-                      <span>📊</span>
                       <span>実走テレメトリーログを追体験解析する ➔</span>
                     </button>
                   )}
@@ -285,10 +281,9 @@ export default function HistoryDetailModal({
                         href={ref.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sky-400 hover:text-sky-300 text-xs font-bold font-mono flex items-center gap-1 shrink-0 self-end sm:self-center"
+                        className="text-slate-300 hover:text-slate-200 text-xs font-bold font-mono flex items-center gap-1 shrink-0 self-end sm:self-center"
                       >
                         <span>公式文書を開く</span>
-                        <span>↗</span>
                       </a>
                     )}
                   </div>

@@ -31,13 +31,12 @@ export default function RegulationsRulesPage() {
               className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-racing font-bold text-xs sm:text-sm flex items-center gap-1.5 border border-white/10 transition-all cursor-pointer shadow hover:scale-105 shrink-0"
               title="百科事典トップへ戻る"
             >
-              <span>◀</span>
               <span>百科事典へ戻る</span>
             </button>
             <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 font-mono truncate">
               <span>F1 百科事典</span>
               <span>&gt;</span>
-              <span className="text-white font-bold">🏛️ レギュレーション・公式規則</span>
+              <span className="text-white font-bold">レギュレーション・公式規則</span>
             </div>
           </div>
 
@@ -47,11 +46,10 @@ export default function RegulationsRulesPage() {
               onClick={() => {
                 window.open('/knowledge/rules', '_blank', 'width=1280,height=900,menubar=no,toolbar=no');
               }}
-              className="px-2.5 py-1 rounded-xl bg-sky-950/70 hover:bg-sky-900 border border-sky-500/40 text-sky-300 hover:text-white text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:scale-105"
+              className="px-2.5 py-1 rounded-xl bg-slate-900/70 hover:bg-slate-800 border border-slate-400/40 text-slate-200 hover:text-white text-xs font-racing flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:scale-105"
               title="このページを別ウィンドウで開く"
             >
               <span>別ウィンドウで開く</span>
-              <span>↗</span>
             </button>
           </div>
         </div>

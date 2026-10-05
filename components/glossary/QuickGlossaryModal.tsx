@@ -69,7 +69,6 @@ export default function QuickGlossaryModal({
       <div className="relative z-10 w-full max-w-2xl bg-slate-900/95 border border-white/20 rounded-3xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden animate-scale-up">
         {/* Header with Search Input */}
         <div className="p-4 border-b border-white/10 bg-slate-950/80 flex items-center gap-3">
-          <span className="text-xl">🔍</span>
           <input
             type="text"
             autoFocus
@@ -109,7 +108,7 @@ export default function QuickGlossaryModal({
                 onClick={() => setSelectedTerm(null)}
                 className="text-xs text-emerald-400 hover:underline flex items-center gap-1 self-start font-bold"
               >
-                ◀ 検索結果一覧に戻る
+                検索結果一覧に戻る
               </button>
 
               <div className="flex items-center justify-between border-b border-white/10 pb-2">
@@ -118,11 +117,11 @@ export default function QuickGlossaryModal({
                   <div className="text-xs text-slate-400 font-mono">{selectedTerm.englishTerm}</div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
+                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
                     {selectedTerm.categoryLabel}
                   </span>
-                  <span className="text-[10px] text-amber-400 font-bold">
-                    {'★'.repeat(selectedTerm.level)}
+                  <span className="text-[11px] text-amber-400 font-bold">
+                    {''.repeat(selectedTerm.level)}
                   </span>
                 </div>
               </div>
@@ -133,7 +132,7 @@ export default function QuickGlossaryModal({
               </div>
 
               <div className="text-xs text-slate-200 leading-relaxed bg-slate-900/60 p-3 rounded-xl border border-white/5">
-                <strong className="text-slate-400 text-[10px] block mb-1">詳しい解説:</strong>
+                <strong className="text-slate-400 text-[11px] block mb-1">詳しい解説:</strong>
                 {selectedTerm.description}
               </div>
 
@@ -143,15 +142,15 @@ export default function QuickGlossaryModal({
                 </div>
               )}
 
-              <div className="text-xs text-sky-200 leading-relaxed bg-sky-950/20 p-3 rounded-xl border border-sky-500/30 italic">
-                <strong className="text-sky-400 text-[10px] block mb-1">中継での実例場面:</strong>
+              <div className="text-xs text-slate-100 leading-relaxed bg-slate-900/20 p-3 rounded-xl border border-slate-400/30 italic">
+                <strong className="text-slate-300 text-[11px] block mb-1">中継での実例場面:</strong>
                 {selectedTerm.realExample}
               </div>
             </div>
           ) : (
             /* Results List */
             <div className="flex flex-col gap-2">
-              <div className="text-[10px] font-racing font-bold text-slate-400 uppercase tracking-wider px-1">
+              <div className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider px-1">
                 {searchQuery ? `検索結果 (${filteredTerms.length}件)` : '注目の頻出用語'}
               </div>
 
@@ -171,7 +170,7 @@ export default function QuickGlossaryModal({
                         <h4 className="font-racing font-bold text-sm text-white group-hover:text-emerald-300 transition-colors">
                           {term.term}
                         </h4>
-                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-900 text-slate-400 border border-white/5">
+                        <span className="text-[11px] px-1.5 py-0.2 rounded bg-slate-900 text-slate-400 border border-white/5">
                           {term.categoryLabel.split(' ')[0]}
                         </span>
                       </div>
@@ -192,7 +191,7 @@ export default function QuickGlossaryModal({
 
         {/* Footer */}
         <div className="p-3 border-t border-white/10 bg-slate-950/90 text-center text-[11px] text-slate-400">
-          全用語の体系的学習は「📚 F1大百科モード」の用語大辞典をご覧ください
+          全用語の体系的学習は「F1大百科モード」の用語大辞典をご覧ください
         </div>
       </div>
     </div>,

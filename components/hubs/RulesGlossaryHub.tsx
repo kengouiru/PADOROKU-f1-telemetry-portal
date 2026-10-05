@@ -64,10 +64,10 @@ export default function RulesGlossaryHub({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-racing font-bold text-sky-400 tracking-wider uppercase">
+              <span className="text-[11px] font-racing font-bold text-slate-300 tracking-wider uppercase">
                 F1 RULES & TERMINOLOGY
               </span>
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-white/5 text-slate-400 border border-white/10">
+              <span className="px-1.5 py-0.2 rounded text-[11px] font-mono bg-white/5 text-slate-400 border border-white/10">
                 統合ナレッジ
               </span>
             </div>
@@ -86,7 +86,7 @@ export default function RulesGlossaryHub({
             onClick={() => setActiveMode('glossary')}
             className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-racing font-bold transition-all cursor-pointer ${
               activeMode === 'glossary'
-                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-950/40 ring-1 ring-emerald-400/50'
+                ? 'bg-gradient-to-r from-emerald-600 to-emerald-600 text-white shadow-md shadow-emerald-950/40 ring-1 ring-emerald-400/50'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
             }`}
           >
@@ -99,7 +99,7 @@ export default function RulesGlossaryHub({
             onClick={() => setActiveMode('regulations')}
             className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-racing font-bold transition-all cursor-pointer ${
               activeMode === 'regulations'
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-950/40 ring-1 ring-purple-400/50'
+                ? 'bg-gradient-to-r from-purple-600 to-slate-500 text-white shadow-md shadow-purple-950/40 ring-1 ring-purple-400/50'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
             }`}
           >

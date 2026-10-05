@@ -118,11 +118,10 @@ export default function DriverComparisonTool({
       {/* ── 1. Presets Header Bar ── */}
       <div className="glass-card p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 border border-white/10">
         <div>
-          <span className="text-[10px] font-racing font-bold text-sky-400 uppercase tracking-widest block">
+          <span className="text-[11px] font-racing font-bold text-slate-300 uppercase tracking-widest block">
             HEAD-TO-HEAD COMPARISON TOOL
           </span>
           <h2 className="text-lg font-racing font-bold text-white flex items-center gap-2">
-            <span>⚔️</span>
             <span>ドライバー直接比較＆スタイル分析</span>
           </h2>
         </div>
@@ -143,7 +142,7 @@ export default function DriverComparisonTool({
                 }}
                 className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1 ${
                   isCurrent
-                    ? 'bg-sky-600 text-white shadow-md shadow-sky-500/30 ring-1 ring-sky-400/40'
+                    ? 'bg-slate-500 text-white shadow-md shadow-slate-400/30 ring-1 ring-slate-300/40'
                     : 'bg-slate-900/80 text-slate-300 hover:text-white hover:bg-slate-800 border border-white/5'
                 }`}
                 title={p.desc}
@@ -163,13 +162,13 @@ export default function DriverComparisonTool({
           style={{ borderTopColor: color1 }}
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-racing font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white/10 text-slate-300">
+            <span className="text-[11px] font-racing font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white/10 text-slate-300">
               DRIVER 1
             </span>
             <select
               value={driver1Code}
               onChange={(e) => setDriver1Code(e.target.value)}
-              className="bg-slate-900 text-white text-xs rounded-lg px-2.5 py-1.5 border border-white/20 focus:outline-none focus:border-sky-400"
+              className="bg-slate-900 text-white text-xs rounded-lg px-2.5 py-1.5 border border-white/20 focus:outline-none focus:border-slate-300"
             >
               <optgroup label="現役ドライバー (2026)">
                 {KNOWLEDGE_DRIVERS.filter((d) => d.status === 'Current').map((d) => (
@@ -181,7 +180,7 @@ export default function DriverComparisonTool({
               <optgroup label="殿堂レジェンド">
                 {KNOWLEDGE_DRIVERS.filter((d) => d.status === 'Legend').map((d) => (
                   <option key={d.code} value={d.code} disabled={d.code === driver2Code}>
-                    🏆 {d.fullName}
+                    {d.fullName}
                   </option>
                 ))}
               </optgroup>
@@ -217,7 +216,7 @@ export default function DriverComparisonTool({
           {onSelectDriverDetail && (
             <button
               onClick={() => onSelectDriverDetail(driver1)}
-              className="mt-3 text-[11px] text-sky-400 hover:text-sky-300 flex items-center gap-1 font-medium hover:underline"
+              className="mt-3 text-[11px] text-slate-300 hover:text-slate-200 flex items-center gap-1 font-medium hover:underline"
             >
               <span>プロフィール詳細を見る</span>
               <span>➔</span>
@@ -231,13 +230,13 @@ export default function DriverComparisonTool({
           style={{ borderTopColor: color2 }}
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-racing font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white/10 text-slate-300">
+            <span className="text-[11px] font-racing font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-white/10 text-slate-300">
               DRIVER 2
             </span>
             <select
               value={driver2Code}
               onChange={(e) => setDriver2Code(e.target.value)}
-              className="bg-slate-900 text-white text-xs rounded-lg px-2.5 py-1.5 border border-white/20 focus:outline-none focus:border-sky-400"
+              className="bg-slate-900 text-white text-xs rounded-lg px-2.5 py-1.5 border border-white/20 focus:outline-none focus:border-slate-300"
             >
               <optgroup label="現役ドライバー (2026)">
                 {KNOWLEDGE_DRIVERS.filter((d) => d.status === 'Current').map((d) => (
@@ -249,7 +248,7 @@ export default function DriverComparisonTool({
               <optgroup label="殿堂レジェンド">
                 {KNOWLEDGE_DRIVERS.filter((d) => d.status === 'Legend').map((d) => (
                   <option key={d.code} value={d.code} disabled={d.code === driver1Code}>
-                    🏆 {d.fullName}
+                    {d.fullName}
                   </option>
                 ))}
               </optgroup>
@@ -285,7 +284,7 @@ export default function DriverComparisonTool({
           {onSelectDriverDetail && (
             <button
               onClick={() => onSelectDriverDetail(driver2)}
-              className="mt-3 text-[11px] text-sky-400 hover:text-sky-300 flex items-center gap-1 font-medium hover:underline"
+              className="mt-3 text-[11px] text-slate-300 hover:text-slate-200 flex items-center gap-1 font-medium hover:underline"
             >
               <span>プロフィール詳細を見る</span>
               <span>➔</span>
@@ -298,7 +297,7 @@ export default function DriverComparisonTool({
       <div className="glass-card p-6 border border-white/10">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4 border-b border-white/10 pb-3">
           <div>
-            <span className="text-[10px] font-racing font-bold text-amber-400 uppercase tracking-widest block">
+            <span className="text-[11px] font-racing font-bold text-amber-400 uppercase tracking-widest block">
               6-AXIS DRIVING SKILL RADAR
             </span>
             <h3 className="text-base font-racing font-bold text-white">
@@ -366,11 +365,11 @@ export default function DriverComparisonTool({
                   <span className="text-slate-300 font-medium">{row.axis}</span>
                   <div className="flex items-center gap-3 font-mono font-bold">
                     <span style={{ color: color1 }}>{row.d1}</span>
-                    <span className="text-[10px] text-slate-500 font-normal">vs</span>
+                    <span className="text-[11px] text-slate-500 font-normal">vs</span>
                     <span style={{ color: color2 }}>{row.d2}</span>
                     <span
-                      className={`text-[10px] w-8 text-right font-bold ${
-                        diff > 0 ? 'text-emerald-400' : diff < 0 ? 'text-rose-400' : 'text-slate-400'
+                      className={`text-[11px] w-8 text-right font-bold ${
+                        diff > 0 ? 'text-emerald-400' : diff < 0 ? 'text-red-400' : 'text-slate-400'
                       }`}
                     >
                       {diff > 0 ? `+${diff}` : diff === 0 ? '±0' : diff}
@@ -386,7 +385,6 @@ export default function DriverComparisonTool({
       {/* ── 4. Career Stats Side-by-Side Comparison ── */}
       <div className="glass-card p-6 border border-white/10">
         <h3 className="text-sm font-racing font-bold text-white uppercase tracking-wider mb-4 border-b border-white/10 pb-2 flex items-center gap-2">
-          <span>📊</span>
           <span>通算キャリアスタッツ比較</span>
         </h3>
 
@@ -405,11 +403,11 @@ export default function DriverComparisonTool({
             </thead>
             <tbody className="divide-y divide-white/5 font-mono">
               {[
-                { label: '🏆 ワールドチャンピオン', v1: driver1.championships, v2: driver2.championships, suffix: '冠' },
-                { label: '🏁 通算グランプリ出走', v1: driver1.entries, v2: driver2.entries, suffix: '戦' },
-                { label: '🥇 通算勝利数', v1: driver1.wins, v2: driver2.wins, suffix: '勝' },
-                { label: '🥈 通算表彰台', v1: driver1.podiums, v2: driver2.podiums, suffix: '回' },
-                { label: '⚡ ポールポジション', v1: driver1.polePositions, v2: driver2.polePositions, suffix: '回' },
+                { label: 'ワールドチャンピオン', v1: driver1.championships, v2: driver2.championships, suffix: '冠' },
+                { label: '通算グランプリ出走', v1: driver1.entries, v2: driver2.entries, suffix: '戦' },
+                { label: '通算勝利数', v1: driver1.wins, v2: driver2.wins, suffix: '勝' },
+                { label: '通算表彰台', v1: driver1.podiums, v2: driver2.podiums, suffix: '回' },
+                { label: 'ポールポジション', v1: driver1.polePositions, v2: driver2.polePositions, suffix: '回' },
               ].map((row, idx) => {
                 const isD1Ahead = row.v1 > row.v2;
                 const isD2Ahead = row.v2 > row.v1;
@@ -442,11 +440,10 @@ export default function DriverComparisonTool({
       {teammateRecord && (
         <div className="glass-card p-6 border-l-4 border-l-purple-500 border border-white/10 bg-gradient-to-r from-purple-950/20 to-transparent">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-racing font-bold text-purple-400 uppercase tracking-widest flex items-center gap-1.5">
-              <span>🏎️</span>
+            <span className="text-[11px] font-racing font-bold text-purple-400 uppercase tracking-widest flex items-center gap-1.5">
               <span>同一チーム直接対決記録（{teammateRecord.teamName} / {teammateRecord.years}）</span>
             </span>
-            <span className="text-[10px] font-mono text-slate-400">
+            <span className="text-[11px] font-mono text-slate-400">
               全{teammateRecord.racesCount}戦
             </span>
           </div>
@@ -534,7 +531,6 @@ export default function DriverComparisonTool({
               onClick={onNavigateToDrama}
               className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-racing font-bold text-xs shadow-md transition-all flex items-center justify-center gap-1.5"
             >
-              <span>🎬</span>
               <span>因縁ドラマを読む</span>
               <span>➔</span>
             </button>
@@ -542,9 +538,8 @@ export default function DriverComparisonTool({
           {onNavigateToTelemetry && (
             <button
               onClick={() => onNavigateToTelemetry({ year: 2024, meetingName: 'Bahrain Grand Prix' })}
-              className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-racing font-bold text-xs shadow-md transition-all flex items-center justify-center gap-1.5"
+              className="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-slate-500 hover:bg-slate-400 text-white font-racing font-bold text-xs shadow-md transition-all flex items-center justify-center gap-1.5"
             >
-              <span>📊</span>
               <span>テレメトリー比較へ</span>
               <span>➔</span>
             </button>
