@@ -37,7 +37,7 @@ import { getSessionClassification } from '@/lib/sessionResultsService';
 import { getHistoricalArchive } from '@/data/f1HistoricalArchivesData';
 import { getBroadcastTrackData } from '@/data/f1BroadcastTrackData';
 import { CIRCUIT_TRACK_MAPS, GENERIC_TRACK, interpolateTrackCoords } from '@/components/telemetry/TelemetryTrackMap';
-import { Map, ExternalLink, X, Maximize2, Compass, ChevronRight } from 'lucide-react';
+import { Map, Camera, ExternalLink, X, Maximize2, Compass, ChevronRight } from 'lucide-react';
 import SessionResultsModal from './SessionResultsModal';
 import AdSlot from '@/components/ads/AdSlot';
 
@@ -1124,11 +1124,26 @@ export default function SeasonHub({
   return (
     <div className="space-y-3 sm:space-y-4 pb-8 animate-fade-in max-w-7xl mx-auto">
       {/* ─────────────────────────────────────────────────────────────
-          1. NEXT RACE HERO & DUAL-TIME SCHEDULE BANNER (Professional Cockpit Edition)
+      {/* ─────────────────────────────────────────────────────────────
+          1. NEXT RACE HERO: CINEMATIC CIRCUIT BACKDROP & COCKPIT HUD
           ───────────────────────────────────────────────────────────── */}
-      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-gradient-to-br from-slate-900/95 via-slate-950 to-neutral-950 p-3.5 sm:p-5 shadow-2xl">
-        {/* Background subtle atmospheric red glow */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-white/15 bg-slate-950 p-3.5 sm:p-5 shadow-2xl">
+        {/* Cinematic Backdrop Photo with Layered Scrim */}
+        {selectedAtmospherePhotos && selectedAtmospherePhotos.length > 0 && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <img 
+              src={selectedAtmospherePhotos[0].url} 
+              alt={selectedAtmospherePhotos[0].tag} 
+              className="w-full h-full object-cover object-center opacity-40 scale-105 transition-transform duration-1000 ease-out" 
+            />
+            {/* Horizontal scrim: Darkens left side for crystal-clear text readability while revealing track visual */}
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-slate-950/45" />
+            {/* Vertical scrim: Protects bottom timetable and adds cinematic vignette */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
+            {/* Subtle atmospheric glow */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
+          </div>
+        )}
 
         <div className="relative z-10 flex flex-col lg:flex-row gap-4 sm:gap-5 items-stretch justify-between">
           {/* Left Column: Race Header, Circuit Metadata, Dual-Time Schedule */}
@@ -1136,22 +1151,22 @@ export default function SeasonHub({
             {/* Top row: Status Badges Strip */}
             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
               {isRaceLive && (
-                <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-racing font-bold tracking-wider uppercase bg-red-600/20 text-red-400 border border-red-500/40 shadow-sm flex items-center gap-1.5">
+                <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-racing font-bold tracking-wider uppercase bg-red-600/25 text-red-400 border border-red-500/50 shadow-sm flex items-center gap-1.5 backdrop-blur-md">
                   <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse inline-block" />
                   <span>LIVE RACING IN PROGRESS</span>
                 </span>
               )}
-              <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase bg-red-500/15 text-red-400 border border-red-500/30 shadow-sm flex items-center gap-1.5">
+              <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase bg-red-500/20 text-red-300 border border-red-500/40 shadow-sm flex items-center gap-1.5 backdrop-blur-md">
                 <span>🏁</span>
                 <span>{selectedSeason}年 第{selectedRace.round}戦 / 全{activeCalendar.length}戦</span>
               </span>
               {selectedRace.isSprint && (
-                <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-racing font-bold bg-gradient-to-r from-violet-950/80 via-slate-900 to-cyan-950/80 text-cyan-300 border border-cyan-400/50 shadow-md shadow-cyan-950/40 flex items-center gap-1.5">
+                <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-racing font-bold bg-gradient-to-r from-violet-950/80 via-slate-900 to-cyan-950/80 text-cyan-300 border border-cyan-400/50 shadow-md shadow-cyan-950/40 flex items-center gap-1.5 backdrop-blur-md">
                   <span className="text-cyan-400 text-xs sm:text-sm animate-pulse">⚡</span>
                   <span className="tracking-wider">SPRINT</span>
                 </span>
               )}
-              <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-mono text-slate-300 bg-white/5 border border-white/10 flex items-center gap-1.5">
+              <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-mono text-slate-300 bg-slate-950/60 border border-white/15 flex items-center gap-1.5 backdrop-blur-md">
                 <span>📅</span>
                 <span>{selectedRace.dates}</span>
               </span>
@@ -1162,122 +1177,64 @@ export default function SeasonHub({
               <span className="text-2xl sm:text-3xl lg:text-4xl shrink-0 drop-shadow-md">{selectedRace.flag}</span>
               <div className="min-w-0">
                 <div className="flex items-baseline gap-1.5 sm:gap-2.5 flex-wrap">
-                  <h1 className="text-lg sm:text-2xl lg:text-3xl font-black text-white tracking-tight leading-tight">
+                  <h1 className="text-lg sm:text-2xl lg:text-3xl font-black text-white tracking-tight leading-tight drop-shadow-sm">
                     {toJapaneseGpName(selectedRace.gpName)}
                   </h1>
-                  <span className="font-mono text-[11px] sm:text-xs font-semibold text-slate-400 tracking-wider uppercase truncate">
+                  <span className="font-mono text-[11px] sm:text-xs font-semibold text-slate-300/80 tracking-wider uppercase truncate">
                     {getDisplayCircuitName(selectedRace)}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Quick Specs Ribbon: Clean Structured Pills */}
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-slate-300 font-mono">
-              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-200 font-medium flex items-center gap-1 shadow-sm">
+            {/* Quick Specs Ribbon: Clean Structured Pills + Photo Gallery Trigger */}
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs text-slate-200 font-mono">
+              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-slate-950/70 backdrop-blur-md border border-white/10 text-slate-200 font-medium flex items-center gap-1 shadow-sm">
                 <span>📍</span>
                 <span>{selectedRace.city}、{selectedRace.country}</span>
               </span>
-              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-300 flex items-center gap-1 shadow-sm">
+              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-slate-950/70 backdrop-blur-md border border-white/10 text-slate-300 flex items-center gap-1 shadow-sm">
                 <span>🛣️</span>
                 <span>コース: <strong className="text-white font-bold">{selectedRace.lengthKm.toFixed(3)} km</strong></span>
               </span>
-              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-300 flex items-center gap-1 shadow-sm">
+              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-slate-950/70 backdrop-blur-md border border-white/10 text-slate-300 flex items-center gap-1 shadow-sm">
                 <span>🔄</span>
                 <span>周回: <strong className="text-white font-bold">{selectedRace.laps} 周</strong></span>
               </span>
-              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-white/[0.04] border border-white/[0.08] text-slate-300 flex items-center gap-1 shadow-sm">
+              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-slate-950/70 backdrop-blur-md border border-white/10 text-slate-300 flex items-center gap-1 shadow-sm">
                 <span>🛞</span>
                 <span>タイヤ: <strong className="text-slate-100 font-sans font-semibold">{selectedRace.pirelliCompounds}</strong></span>
               </span>
               <button
                 type="button"
                 onClick={() => setIs3dModalOpen(true)}
-                className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 text-sky-300 hover:text-white flex items-center gap-1 shadow-sm transition-all cursor-pointer font-bold group"
+                className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 backdrop-blur-md border border-sky-500/40 text-sky-300 hover:text-white flex items-center gap-1 shadow-sm transition-all cursor-pointer font-bold group"
                 title="コース図・3D標高モデルを起動"
               >
                 <Map className="w-3 h-3 text-sky-400 group-hover:scale-110 transition-transform" />
                 <span>3Dコース ↗</span>
               </button>
+              {selectedAtmospherePhotos && selectedAtmospherePhotos.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setAtmosphereModalImage({
+                    url: selectedAtmospherePhotos[0].url,
+                    caption: selectedAtmospherePhotos[0].caption,
+                    tag: `${toJapaneseGpName(selectedRace.gpName)} - ${selectedAtmospherePhotos[0].tag}`
+                  })}
+                  className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 backdrop-blur-md border border-amber-500/40 text-amber-300 hover:text-white flex items-center gap-1.5 shadow-sm transition-all cursor-pointer font-bold group"
+                  title="サーキット現地フォトギャラリーを開く"
+                >
+                  <Camera className="w-3 h-3 text-amber-400 group-hover:scale-110 transition-transform" />
+                  <span>現地写真 (2枚) ↗</span>
+                </button>
+              )}
             </div>
 
-            {/* Grand Prix & Circuit Atmosphere: 2 Curated Authentic Photos (スマホでも2列横並びで高さを半減) */}
-            {selectedAtmospherePhotos && (
-              <div className="pt-0.5">
-                <div className="grid grid-cols-2 gap-2 sm:gap-2.5">
-                  {/* Photo 1: Grandstand & Circuit Atmosphere */}
-                  <div
-                    onClick={() => setAtmosphereModalImage({
-                      url: selectedAtmospherePhotos[0].url,
-                      caption: selectedAtmospherePhotos[0].caption,
-                      tag: `${toJapaneseGpName(selectedRace.gpName)} - ${selectedAtmospherePhotos[0].tag}`
-                    })}
-                    className="relative group rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 hover:border-amber-400/60 bg-slate-950/90 h-24 sm:h-32 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-amber-950/40"
-                    title="クリックして拡大表示"
-                  >
-                    <img
-                      src={selectedAtmospherePhotos[0].url}
-                      alt={`${selectedRace.gpName} 現地サーキット熱気`}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent pointer-events-none" />
-                    <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 z-10">
-                      <span className="px-1.5 sm:px-2 py-0.2 sm:py-0.5 rounded-md bg-black/80 backdrop-blur-md border border-amber-500/40 text-amber-300 text-[9px] sm:text-[10px] font-racing font-bold tracking-wider uppercase flex items-center gap-1 shadow-sm">
-                        <span>🏁</span>
-                        <span className="truncate max-w-[100px] sm:max-w-none">{selectedAtmospherePhotos[0].tag}</span>
-                      </span>
-                    </div>
-                    <div className="absolute bottom-1.5 sm:bottom-2 left-2 right-2 z-10 flex items-end justify-between gap-1">
-                      <p className="text-[10px] sm:text-[11px] text-slate-200 font-medium leading-tight line-clamp-1 sm:line-clamp-2 drop-shadow group-hover:text-white transition-colors">
-                        {selectedAtmospherePhotos[0].caption}
-                      </p>
-                      <span className="text-[9px] px-1 py-0.2 rounded bg-black/85 text-slate-300 border border-white/20 font-mono shrink-0 group-hover:text-amber-300 group-hover:border-amber-500/50 transition-colors hidden sm:inline">
-                        🔍 拡大
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Photo 2: Iconic Corner / Paddock View */}
-                  <div
-                    onClick={() => setAtmosphereModalImage({
-                      url: selectedAtmospherePhotos[1].url,
-                      caption: selectedAtmospherePhotos[1].caption,
-                      tag: `${toJapaneseGpName(selectedRace.gpName)} - ${selectedAtmospherePhotos[1].tag}`
-                    })}
-                    className="relative group rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 hover:border-sky-400/60 bg-slate-950/90 h-24 sm:h-32 shadow-lg cursor-pointer transition-all duration-300 hover:shadow-sky-950/40"
-                    title="クリックして拡大表示"
-                  >
-                    <img
-                      src={selectedAtmospherePhotos[1].url}
-                      alt={`${selectedRace.gpName} 名物コース景観`}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/35 to-transparent pointer-events-none" />
-                    <div className="absolute top-1.5 sm:top-2 left-1.5 sm:left-2 z-10">
-                      <span className="px-1.5 sm:px-2 py-0.2 sm:py-0.5 rounded-md bg-black/80 backdrop-blur-md border border-sky-500/40 text-sky-300 text-[9px] sm:text-[10px] font-racing font-bold tracking-wider uppercase flex items-center gap-1 shadow-sm">
-                        <span>📸</span>
-                        <span className="truncate max-w-[100px] sm:max-w-none">{selectedAtmospherePhotos[1].tag}</span>
-                      </span>
-                    </div>
-                    <div className="absolute bottom-1.5 sm:bottom-2 left-2 right-2 z-10 flex items-end justify-between gap-1">
-                      <p className="text-[10px] sm:text-[11px] text-slate-200 font-medium leading-tight line-clamp-1 sm:line-clamp-2 drop-shadow group-hover:text-white transition-colors">
-                        {selectedAtmospherePhotos[1].caption}
-                      </p>
-                      <span className="text-[9px] px-1 py-0.2 rounded bg-black/85 text-slate-300 border border-white/20 font-mono shrink-0 group-hover:text-sky-300 group-hover:border-sky-500/50 transition-colors hidden sm:inline">
-                        🔍 拡大
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Sub-view switcher: Dual Timetable vs Weather */}
-            <div className="pt-2.5 border-t border-white/10 space-y-2.5">
+            <div className="pt-2 border-t border-white/10 space-y-2.5">
               <div className="flex items-center justify-between gap-2 flex-wrap">
-                <div className="flex items-center gap-1 bg-slate-950/90 p-1 rounded-xl border border-white/10 shadow-inner">
+                <div className="flex items-center gap-1 bg-slate-950/80 backdrop-blur-md p-1 rounded-xl border border-white/15 shadow-inner">
                   <button
                     type="button"
                     onClick={() => setHeroSubView('schedule')}
@@ -1313,24 +1270,24 @@ export default function SeasonHub({
 
                 {heroSubView === 'schedule' ? (
                   <div className="flex items-center gap-2 text-[11px] font-mono">
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-slate-300">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-950/60 backdrop-blur-md border border-white/10 text-slate-300">
                       <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
                       <span>JST (日本時間: 生中継観戦用)</span>
                     </span>
                     <span className="text-slate-500">/</span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-500/10 border border-sky-500/20 text-sky-300">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-950/60 backdrop-blur-md border border-sky-500/20 text-sky-300">
                       <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
                       <span>現地時間 ({currentTzInfo.tzAbbr})</span>
                     </span>
                   </div>
                 ) : selectedWeather ? (
-                  <span className="text-[11px] text-slate-400 font-mono">
-                    降水確率: <strong className={selectedWeather.rainProb > 30 ? 'text-sky-400' : 'text-slate-300'}>{selectedWeather.rainProb}%</strong>
+                  <span className="text-[11px] text-slate-300 font-mono bg-slate-950/60 backdrop-blur-md px-2 py-0.5 rounded-md border border-white/10">
+                    降水確率: <strong className={selectedWeather.rainProb > 30 ? 'text-sky-400' : 'text-slate-200'}>{selectedWeather.rainProb}%</strong>
                   </span>
                 ) : null}
               </div>
 
-              {/* View 1: Professional Dual-Time Session Timetable Cards (Click to reveal results with spoiler shield) */}
+              {/* View 1: Professional Dual-Time Session Timetable Cards with Frosted Glass */}
               {heroSubView === 'schedule' && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 animate-fadeIn">
                   {selectedRace.scheduleJst.map((s) => {
@@ -1343,15 +1300,15 @@ export default function SeasonHub({
                           setSelectedSessionForModal(s.session);
                           setSessionModalOpen(true);
                         }}
-                        className={`text-left flex flex-col justify-between p-2 sm:p-2.5 md:p-3 rounded-xl border transition-all cursor-pointer group hover:scale-[1.02] active:scale-[0.98] ${
+                        className={`text-left flex flex-col justify-between p-2 sm:p-2.5 md:p-3 rounded-xl border backdrop-blur-md transition-all cursor-pointer group hover:scale-[1.02] active:scale-[0.98] ${
                           dual.isFinalRace
-                            ? 'col-span-2 sm:col-span-1 bg-gradient-to-b from-red-950/35 via-slate-900/90 to-slate-950 border-red-500/40 hover:border-red-400 shadow-md shadow-red-950/20 ring-1 ring-red-500/20 hover:shadow-red-900/30'
-                            : 'bg-slate-900/80 hover:bg-slate-850 border-white/[0.08] hover:border-sky-500/40'
+                            ? 'col-span-2 sm:col-span-1 bg-gradient-to-b from-red-950/65 via-slate-950/80 to-slate-950/95 border-red-500/50 hover:border-red-400 shadow-lg shadow-red-950/30 ring-1 ring-red-500/30 hover:shadow-red-900/40'
+                            : 'bg-slate-950/65 hover:bg-slate-900/80 border-white/10 hover:border-sky-500/40 shadow-md'
                         }`}
                         title={`クリックして${s.session}の結果詳細を表示`}
                       >
                         {/* Session Card Header */}
-                        <div className="flex items-center justify-between gap-1.5 pb-1.5 border-b border-white/[0.06] w-full">
+                        <div className="flex items-center justify-between gap-1.5 pb-1.5 border-b border-white/[0.08] w-full">
                           <div className="flex items-center gap-1.5 truncate">
                             <span
                               className={`text-xs font-mono font-bold tracking-wider uppercase truncate ${
@@ -1361,50 +1318,48 @@ export default function SeasonHub({
                               {dual.isFinalRace ? '🏁 決勝' : s.session}
                             </span>
                             {dual.isFinalRace ? (
-                              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-red-600 text-white font-bold tracking-wider shrink-0">
+                              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-red-600 text-white font-bold tracking-wider shrink-0 shadow-sm">
                                 FINAL
                               </span>
                             ) : s.session.includes('スプリント') ? (
                               <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-gradient-to-r from-violet-900/60 to-cyan-900/60 text-cyan-300 border border-cyan-500/30 font-bold shrink-0">
                                 SPRINT
                               </span>
-                            ) : s.session.includes('予選') ? (
-                              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-white/10 text-slate-300 font-medium shrink-0">
-                                QUALI
-                              </span>
                             ) : null}
                           </div>
-
-                          {/* 結果詳細ボタン (見出し横配置) */}
-                          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.06] group-hover:bg-red-500/25 group-hover:text-white text-slate-300 font-semibold flex items-center gap-0.5 shrink-0 transition-all border border-white/[0.08] group-hover:border-red-500/40 shadow-sm">
-                            <span>結果詳細</span>
-                            <span className="group-hover:translate-x-0.5 transition-transform text-red-400 group-hover:text-white text-[11px]">↗</span>
+                          <span className="text-[9px] text-slate-400 group-hover:text-sky-300 font-mono transition-colors shrink-0">
+                            結果詳細↗
                           </span>
                         </div>
 
-                        {/* JST (日本時間 - Primary) */}
-                        <div className="py-2 w-full">
-                          <div className="flex items-center gap-1 text-[10px] font-mono text-slate-400 mb-0.5">
-                            <span className="px-1 py-0.2 rounded bg-red-500/20 text-red-300 font-bold text-[9px]">JST</span>
-                            <span>日本時間</span>
+                        {/* Session Card Body */}
+                        <div className="pt-1.5 space-y-1">
+                          <div>
+                            <div className="flex items-center gap-1 text-[10px] text-slate-400 font-mono">
+                              <span className="w-1.5 h-1.5 rounded-full bg-red-500/70" />
+                              <span>日本時間</span>
+                            </div>
+                            <div className="text-sm font-racing font-bold text-white tracking-wide">
+                              <span className="text-xs text-slate-300 font-sans mr-1">{dual.jstDay}</span>
+                              <span className={dual.isFinalRace ? 'text-red-300 font-black' : 'text-white'}>
+                                {dual.jstTime}
+                              </span>
+                            </div>
                           </div>
-                          <div className="text-white font-mono font-bold text-sm sm:text-base tracking-tight leading-tight">
-                            <span className="text-slate-300 mr-1 text-xs font-normal">{dual.jstDay}</span>
-                            <span className="text-white font-black">{dual.jstTime}</span>
-                          </div>
-                        </div>
 
-                        {/* Local Track Time (現地時間 - Secondary) */}
-                        <div className="pt-2 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono w-full">
-                          <div className="flex items-center gap-1 text-slate-400 truncate">
-                            <span className="text-[9px] px-1 py-0.2 rounded bg-sky-950/60 text-sky-400 border border-sky-500/20 shrink-0">
-                              現地
-                            </span>
-                            <span className="truncate">{dual.localDay} {dual.localTime}</span>
+                          <div className="pt-1 border-t border-white/[0.04]">
+                            <div className="flex items-center gap-1 text-[9px] text-slate-400 font-mono">
+                              <span className="w-1.5 h-1.5 rounded-full bg-sky-400/70" />
+                              <span>現地時間</span>
+                            </div>
+                            <div className="text-xs font-racing text-slate-300">
+                              <span className="text-[10px] text-slate-400 font-sans mr-1">{dual.localDay}</span>
+                              <span className="text-slate-200">{dual.localTime}</span>
+                              <span className="text-[9px] text-sky-400/80 font-mono ml-1 font-bold">
+                                {dual.tzAbbr}
+                              </span>
+                            </div>
                           </div>
-                          <span className="text-[10px] text-sky-400 font-semibold shrink-0 ml-1">
-                            {dual.tzAbbr}
-                          </span>
                         </div>
                       </button>
                     );
@@ -1412,39 +1367,39 @@ export default function SeasonHub({
                 </div>
               )}
 
-              {/* View 2: Weather & Track Condition */}
+              {/* View 2: Circuit Weather Forecast & Track Evolution HUD */}
               {heroSubView === 'weather' && selectedWeather && (
-                <div className="space-y-2.5 animate-fadeIn">
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                    <div className="bg-slate-900/80 border border-white/[0.08] p-2.5 rounded-xl text-center shadow-sm">
-                      <span className="text-[10px] text-slate-400 block font-mono">気温 / 天候</span>
-                      <span className="text-sm sm:text-base font-bold text-white font-mono mt-0.5 block">
-                        {selectedWeather.weatherIcon} {selectedWeather.airTempC}℃
-                      </span>
+                <div className="p-3 sm:p-4 rounded-xl bg-slate-950/75 backdrop-blur-md border border-white/10 space-y-3 animate-fadeIn">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 text-center">
+                    <div className="p-2 sm:p-2.5 rounded-lg bg-slate-900/60 border border-white/5">
+                      <div className="text-[10px] text-slate-400 font-mono">気温 (Air)</div>
+                      <div className="text-base sm:text-lg font-racing font-black text-amber-300">{selectedWeather.airTempC} ℃</div>
                     </div>
-                    <div className="bg-slate-900/80 border border-white/[0.08] p-2.5 rounded-xl text-center shadow-sm">
-                      <span className="text-[10px] text-slate-400 block font-mono">路面温度 (Track)</span>
-                      <span className="text-sm sm:text-base font-bold text-amber-400 font-mono mt-0.5 block">
-                        🔥 {selectedWeather.trackTempC}℃
-                      </span>
+                    <div className="p-2 sm:p-2.5 rounded-lg bg-slate-900/60 border border-white/5">
+                      <div className="text-[10px] text-slate-400 font-mono">路面温度 (Track)</div>
+                      <div className="text-base sm:text-lg font-racing font-black text-rose-300">{selectedWeather.trackTempC} ℃</div>
                     </div>
-                    <div className="bg-slate-900/80 border border-white/[0.08] p-2.5 rounded-xl text-center shadow-sm">
-                      <span className="text-[10px] text-slate-400 block font-mono">湿度 / 降水リスク</span>
-                      <span className="text-sm sm:text-base font-bold text-sky-300 font-mono mt-0.5 block">
-                        💧 {selectedWeather.humidity}% / {selectedWeather.rainProb}%
-                      </span>
+                    <div className="p-2 sm:p-2.5 rounded-lg bg-slate-900/60 border border-white/5">
+                      <div className="text-[10px] text-slate-400 font-mono">降水確率 (Rain)</div>
+                      <div className={`text-base sm:text-lg font-racing font-black ${selectedWeather.rainProb > 40 ? 'text-sky-300' : 'text-slate-200'}`}>
+                        {selectedWeather.rainProb} %
+                      </div>
                     </div>
-                    <div className="bg-slate-900/80 border border-white/[0.08] p-2.5 rounded-xl text-center shadow-sm">
-                      <span className="text-[10px] text-slate-400 block font-mono">風速・風向き</span>
-                      <span className="text-xs sm:text-sm font-bold text-emerald-300 font-mono mt-0.5 block truncate" title={selectedWeather.windDirection}>
-                        💨 {selectedWeather.windSpeedKmh}km/h
-                      </span>
+                    <div className="p-2 sm:p-2.5 rounded-lg bg-slate-900/60 border border-white/5">
+                      <div className="text-[10px] text-slate-400 font-mono">湿度 (Humidity)</div>
+                      <div className="text-xs sm:text-sm font-racing font-bold text-slate-200 mt-1">
+                        {selectedWeather.humidity}%
+                      </div>
                     </div>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-sky-950/40 border border-sky-500/20 text-xs text-slate-300 leading-snug flex items-center gap-2 shadow-sm">
-                    <span className="text-sky-400 text-sm flex-shrink-0">💡</span>
-                    <span className="font-bold text-sky-300 font-racing">戦術影響:</span>
-                    <span className="truncate">{selectedWeather.tacticalImpact}</span>
+                  <div className="flex items-center justify-between text-xs text-slate-300 border-t border-white/5 pt-2 flex-wrap gap-2">
+                    <span className="flex items-center gap-1.5 text-sky-300 font-semibold">
+                      <span>⛅</span>
+                      <span>気象ステータス: {selectedWeather.conditionText}</span>
+                    </span>
+                    <span className="text-[11px] font-mono text-slate-400">
+                      風速: {selectedWeather.windSpeedKmh} km/h ({selectedWeather.windDirection})
+                    </span>
                   </div>
                 </div>
               )}
@@ -1479,7 +1434,7 @@ export default function SeasonHub({
                 winnerNote={selectedRace.winnerNote}
               />
             ) : (
-              <div className="w-full bg-slate-950/90 p-4 rounded-2xl border border-white/10 shadow-lg relative overflow-hidden backdrop-blur-md flex flex-col justify-between min-h-[170px]">
+              <div className="w-full bg-slate-950/85 backdrop-blur-md p-4 rounded-2xl border border-white/10 shadow-lg relative overflow-hidden flex flex-col justify-between min-h-[170px]">
                 <div>
                   <div className="text-[10px] font-mono font-bold text-amber-400 mb-2 flex items-center justify-between uppercase tracking-wider">
                     <span className="flex items-center gap-1.5">
@@ -1490,7 +1445,7 @@ export default function SeasonHub({
                       アーカイブ確定
                     </span>
                   </div>
-                  <div className="p-3 rounded-xl bg-slate-900/90 border border-white/[0.08] shadow-inner space-y-1.5">
+                  <div className="p-3 rounded-xl bg-slate-900/80 border border-white/[0.08] shadow-inner space-y-1.5">
                     <div className="text-[10px] text-slate-400 font-sans font-semibold uppercase tracking-wider">
                       決勝ウィナー (Race Winner)
                     </div>
@@ -1509,7 +1464,6 @@ export default function SeasonHub({
                 </div>
               </div>
             )}
-
           </div>
         </div>
       </div>
