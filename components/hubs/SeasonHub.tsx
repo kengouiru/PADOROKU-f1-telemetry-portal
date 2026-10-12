@@ -934,7 +934,7 @@ const PreviousRaceHero = React.memo(function PreviousRaceHero({
               レース振り返り (開発中)
             </button>
             <span className="px-2 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded text-[9px] font-bold">
-              // TODO: Phase B 
+              TODO: Phase B 
             </span>
           </div>
         </div>
