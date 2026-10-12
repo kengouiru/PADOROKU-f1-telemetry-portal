@@ -1,3 +1,4 @@
+import { PostRaceReviewModal } from '../pitwall/PostRaceReviewModal';
 'use client';
 
 /**
@@ -885,10 +886,12 @@ const PreviousRaceHero = React.memo(function PreviousRaceHero({
   race,
   circuitId,
   isLive,
+  onOpenReview,
 }: {
   race: RaceWeekendSchedule;
   circuitId: string;
   isLive: boolean;
+  onOpenReview: () => void;
 }) {
   const trackData = useMemo(() => CIRCUIT_TRACK_MAPS[circuitId] || GENERIC_TRACK, [circuitId]);
   const atmosphere = useMemo(() => getCircuitAtmospherePhotos(circuitId, race.gpName), [circuitId, race.gpName]);
@@ -929,13 +932,11 @@ const PreviousRaceHero = React.memo(function PreviousRaceHero({
           </div>
 
           <div className="shrink-0 flex items-center gap-2">
-            <button className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/10 text-xs font-bold font-racing flex items-center gap-2 transition-all opacity-50 cursor-not-allowed">
+            <button onClick={onOpenReview} className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white border border-white/10 text-xs font-bold font-racing flex items-center gap-2 transition-all cursor-pointer">
               <PlayCircle className="w-4 h-4" />
               レース振り返り (開発中)
             </button>
-            <span className="px-2 py-1 bg-amber-500/20 text-amber-300 border border-amber-500/30 rounded text-[9px] font-bold">
-              TODO: Phase B 
-            </span>
+            
           </div>
         </div>
       </div>
@@ -1128,7 +1129,7 @@ export default function SeasonHub({
   }, [selectedRace]);
   useEffect(() => {
     setFetchedSummary(null);
-    if (selectedSeason !== '2026' || raceClassification2026 || !raceFinished || selectedRace.isCancelled) {
+    if (selectedSeason !== '2026' || raceClassification2026 || selectedRace.isCancelled) { // Try to fetch live Quali/Race results even if raceFinished is false
       setSummaryStatus('idle');
       return;
     }
@@ -1211,6 +1212,7 @@ export default function SeasonHub({
           race={previousRace} 
           circuitId={getCircuitIdForRace(previousRace)} 
           isLive={false} 
+          onOpenReview={() => setShowReviewModal(true)}
         />
       )}
       {/* ─────────────────────────────────────────────────────────────

@@ -125,10 +125,10 @@ export async function fetchStints(sessionKey: number): Promise<Stint[]> {
 /** Fetch team radio recordings for a driver in a session */
 export async function fetchTeamRadio(
   sessionKey: number,
-  driverNumber: number
+  driverNumber?: number
 ): Promise<TeamRadio[]> {
   return fetchWithTimeout<TeamRadio[]>(
-    toProxyUrl('team_radio', `session_key=${sessionKey}&driver_number=${driverNumber}`)
+    toProxyUrl('team_radio', `session_key=${sessionKey}${driverNumber ? `&driver_number=${driverNumber}` : ''}`)
   );
 }
 
