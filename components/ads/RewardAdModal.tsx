@@ -2,7 +2,7 @@
 
 /**
  * components/ads/RewardAdModal.tsx
- * 🏁 Rewarded Ad Experience for AI Strategist Quota Recovery
+ * Rewarded Ad Experience for AI Strategist Quota Recovery
  * 
  * Users voluntarily watch a 3-second official sponsor showcase (FOD, Fanatec, etc.)
  * in exchange for +2 AI strategy consultations.
@@ -74,8 +74,8 @@ export default function RewardAdModal({
               REWARD CONSULTATION BONUS
             </span>
           </div>
-          <span className="text-[10px] font-mono text-slate-400">
-            {isCompleted ? '🎉 視聴完了' : `⏳ 残り ${secondsLeft}秒`}
+          <span className="text-[11px] font-mono text-slate-400">
+            {isCompleted ? '視聴完了' : `残り ${secondsLeft}秒`}
           </span>
         </div>
 
@@ -100,14 +100,14 @@ export default function RewardAdModal({
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-1.5 w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-slate-200 text-xs font-mono transition-colors"
           >
-            <span>公式ストアを見る ↗</span>
+            <span>公式ストアを見る </span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
 
         {/* Pro Upsell Strip */}
         <div className="p-2.5 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-between text-[11px] text-slate-400">
-          <span>⭐ <strong>Pitwall Pro</strong>なら回数無制限・広告ゼロ</span>
+          <span><strong>Pitwall Pro</strong>なら回数無制限・広告ゼロ</span>
           {onUpgradeClick && (
             <button
               type="button"
@@ -117,7 +117,7 @@ export default function RewardAdModal({
               }}
               className="text-amber-300 hover:text-white underline font-mono font-bold"
             >
-              Pro詳細 ↗
+              Pro詳細 
             </button>
           )}
         </div>
@@ -128,7 +128,7 @@ export default function RewardAdModal({
             <button
               type="button"
               onClick={handleClaim}
-              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-racing font-bold text-xs tracking-wider uppercase shadow-lg shadow-emerald-950/60 flex items-center justify-center gap-2 transition-all active:scale-95 animate-pulse"
+              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-600 hover:from-emerald-500 hover:to-emerald-500 text-white font-racing font-bold text-xs tracking-wider uppercase shadow-lg shadow-emerald-950/60 flex items-center justify-center gap-2 transition-all active:scale-95 animate-pulse"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>ボーナスを受け取る (+2回 質問枠追加)</span>

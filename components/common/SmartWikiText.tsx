@@ -44,7 +44,7 @@ export default function SmartWikiText({
               href={token.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline text-sky-300 hover:text-white font-medium border-b border-dotted border-sky-400/70 hover:border-sky-200 hover:bg-sky-500/20 px-0.5 rounded transition-all cursor-pointer decoration-clone"
+              className="inline text-slate-200 hover:text-white font-medium border-b border-dotted border-slate-300/70 hover:border-slate-100 hover:bg-slate-400/20 px-0.5 rounded transition-all cursor-pointer decoration-clone"
               title={token.title}
             >
               {token.content}
@@ -66,7 +66,7 @@ export default function SmartWikiText({
                       key={pIdx}
                       type="button"
                       onClick={() => onCitationClick(refId)}
-                      className="inline-flex items-center px-1 mx-0.5 text-[10px] font-mono font-bold text-sky-400 bg-sky-950/60 hover:bg-sky-800/80 border border-sky-500/40 rounded transition-all cursor-pointer hover:scale-110"
+                      className="inline-flex items-center px-1 mx-0.5 text-[11px] font-mono font-bold text-slate-300 bg-slate-900/60 hover:bg-slate-700/80 border border-slate-400/40 rounded transition-all cursor-pointer hover:scale-110"
                       title={`参考文献 [${refId}] を確認`}
                     >
                       [{refId}]

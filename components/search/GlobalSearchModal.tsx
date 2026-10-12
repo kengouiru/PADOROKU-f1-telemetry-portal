@@ -101,9 +101,9 @@ export default function GlobalSearchModal({
         title: `${d.fullName} (${d.code})`,
         subtitle: `#${d.number} ${d.team} • ${d.country} • ${d.championships > 0 ? `${d.championships}冠` : '現役'}`,
         badge: '選手名鑑',
-        badgeBg: 'bg-blue-500/20 border-blue-500/30',
-        badgeText: 'text-blue-300',
-        icon: '👤',
+        badgeBg: 'bg-slate-400/20 border-slate-400/30',
+        badgeText: 'text-slate-200',
+        icon: '',
         onSelect: () => {
           onNavigate({ appMode: 'library', hub: 'knowledge', subTab: 'drivers', targetId: d.code });
           onClose();
@@ -119,9 +119,9 @@ export default function GlobalSearchModal({
         title: t.name,
         subtitle: `${t.fullName} • PU: ${t.powerUnit} • ${t.constructorTitles}冠`,
         badge: 'チーム名鑑',
-        badgeBg: 'bg-indigo-500/20 border-indigo-500/30',
-        badgeText: 'text-indigo-300',
-        icon: '🏎️',
+        badgeBg: 'bg-slate-400/20 border-slate-400/30',
+        badgeText: 'text-slate-200',
+        icon: '',
         onSelect: () => {
           onNavigate({ appMode: 'library', hub: 'knowledge', subTab: 'teams', targetId: t.id });
           onClose();
@@ -137,9 +137,9 @@ export default function GlobalSearchModal({
         title: c.name,
         subtitle: `${c.country} • 全長 ${c.lengthKm}km • コーナー数 ${c.turns}`,
         badge: 'コース解説',
-        badgeBg: 'bg-sky-500/20 border-sky-500/30',
-        badgeText: 'text-sky-300',
-        icon: '🏁',
+        badgeBg: 'bg-slate-400/20 border-slate-400/30',
+        badgeText: 'text-slate-200',
+        icon: '',
         onSelect: () => {
           onNavigate({ appMode: 'library', hub: 'knowledge', subTab: 'circuits', targetId: c.id });
           onClose();
@@ -157,7 +157,7 @@ export default function GlobalSearchModal({
         badge: 'タイヤ大百科',
         badgeBg: 'bg-amber-500/20 border-amber-500/30',
         badgeText: 'text-amber-300',
-        icon: '🛞',
+        icon: '',
         onSelect: () => {
           onNavigate({ appMode: 'library', hub: 'knowledge', subTab: 'tyres' });
           onClose();
@@ -182,7 +182,7 @@ export default function GlobalSearchModal({
         badge: 'タイヤ戦略',
         badgeBg: 'bg-amber-500/20 border-amber-500/30',
         badgeText: 'text-amber-300',
-        icon: '🛞',
+        icon: '',
         onSelect: () => {
           onNavigate({ appMode: 'library', hub: 'knowledge', subTab: 'tyres' });
           onClose();
@@ -200,7 +200,7 @@ export default function GlobalSearchModal({
         badge: 'F1用語辞典',
         badgeBg: 'bg-emerald-500/20 border-emerald-500/30',
         badgeText: 'text-emerald-300',
-        icon: '🧠',
+        icon: '',
         onSelect: () => {
           onNavigate({ appMode: 'library', hub: 'knowledge', subTab: 'glossary', targetId: gt.id });
           onClose();
@@ -216,9 +216,9 @@ export default function GlobalSearchModal({
         title: dm.title,
         subtitle: `${dm.year}年 ${dm.grandPrix} • ${dm.story}`,
         badge: 'ドラマ・歴史',
-        badgeBg: 'bg-rose-500/20 border-rose-500/30',
-        badgeText: 'text-rose-300',
-        icon: '🎬',
+        badgeBg: 'bg-red-500/20 border-red-500/30',
+        badgeText: 'text-red-300',
+        icon: '',
         onSelect: () => {
           onNavigate({ appMode: 'library', hub: 'knowledge', subTab: 'drama', targetId: dm.id });
           onClose();
@@ -234,9 +234,9 @@ export default function GlobalSearchModal({
         title: `${ss.seasonYear}年 ${ss.title}`,
         subtitle: ss.overview || ss.subtitle,
         badge: 'シーズンドラマ',
-        badgeBg: 'bg-rose-500/20 border-rose-500/30',
-        badgeText: 'text-rose-300',
-        icon: '📖',
+        badgeBg: 'bg-red-500/20 border-red-500/30',
+        badgeText: 'text-red-300',
+        icon: '',
         onSelect: () => {
           onNavigate({ appMode: 'library', hub: 'knowledge', subTab: 'drama' });
           onClose();
@@ -254,7 +254,7 @@ export default function GlobalSearchModal({
         badge: '2025カレンダー',
         badgeBg: 'bg-red-500/20 border-red-500/30',
         badgeText: 'text-red-300',
-        icon: '📅',
+        icon: '',
         onSelect: () => {
           onNavigate({ appMode: 'season', hub: 'season', targetId: String(rc.round) });
           onClose();
@@ -267,12 +267,12 @@ export default function GlobalSearchModal({
       items.push({
         id: `radio-${r.id}`,
         category: 'radio',
-        title: `🎙️「${r.title}」- ${r.speaker}`,
+        title: `「${r.title}」- ${r.speaker}`,
         subtitle: `${r.year}年 ${r.gpName} • ${r.transcriptJa} (${r.categoryLabel})`,
         badge: 'ドラマ・伝説の無線',
         badgeBg: 'bg-amber-500/20 border-amber-500/30',
         badgeText: 'text-amber-300',
-        icon: '🎙️',
+        icon: '',
         onSelect: () => {
           onClose();
           onNavigate({
@@ -290,12 +290,12 @@ export default function GlobalSearchModal({
       items.push({
         id: 'quiz-entry',
         category: 'quiz',
-        title: '🏆 F1クイズ＆トリビア検定 (全120問・神域級収録)',
+        title: 'F1クイズ＆トリビア検定 (全120問・神域級収録)',
         subtitle: 'ルール・歴史・コース攻略・戦術テレメトリー全120問から出題！FIAスチュワード級称号認定＆Xシェア',
         badge: 'F1クイズ 2.0',
         badgeBg: 'bg-purple-500/20 border-purple-500/30',
         badgeText: 'text-purple-300',
-        icon: '🏆',
+        icon: '',
         onSelect: () => {
           onClose();
           onOpenQuiz();
@@ -353,7 +353,6 @@ export default function GlobalSearchModal({
       >
         {/* Search Input Bar */}
         <div className="p-4 border-b border-white/10 bg-slate-950/90 flex items-center gap-3">
-          <span className="text-lg text-slate-400">🔍</span>
           <input
             ref={inputRef}
             type="text"
@@ -389,15 +388,15 @@ export default function GlobalSearchModal({
           {(
             [
               ['ALL', 'すべて'],
-              ['driver', '👤 選手'],
-              ['team', '🏎️ チーム'],
-              ['circuit', '🏁 コース'],
-              ['tyre', '🛞 タイヤ'],
-              ['glossary', '🧠 用語'],
-              ['drama', '🎬 ドラマ'],
-              ['race', '📅 カレンダー'],
-              ['radio', '🎙️ 無線'],
-              ['quiz', '🏆 クイズ'],
+              ['driver', '選手'],
+              ['team', 'チーム'],
+              ['circuit', 'コース'],
+              ['tyre', 'タイヤ'],
+              ['glossary', '用語'],
+              ['drama', 'ドラマ'],
+              ['race', 'カレンダー'],
+              ['radio', '無線'],
+              ['quiz', 'クイズ'],
             ] as [SearchCategory, string][]
           ).map(([cat, label]) => (
             <button
@@ -408,7 +407,7 @@ export default function GlobalSearchModal({
               }}
               className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold transition-all shrink-0 ${
                 activeCategory === cat
-                  ? 'bg-sky-600 text-white shadow-sm'
+                  ? 'bg-slate-500 text-white shadow-sm'
                   : 'bg-slate-900/60 text-slate-400 hover:text-white border border-white/5'
               }`}
             >
@@ -432,7 +431,6 @@ export default function GlobalSearchModal({
               }}
               className="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 font-racing flex items-center gap-1 transition-all cursor-pointer"
             >
-              <span>🎙️</span>
               <span>伝説のチーム無線 (16選)</span>
             </button>
             {onOpenQuiz && (
@@ -443,7 +441,6 @@ export default function GlobalSearchModal({
                 }}
                 className="px-2.5 py-1 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 border border-purple-500/30 font-racing flex items-center gap-1 transition-all"
               >
-                <span>🏆</span>
                 <span>F1クイズ＆トリビア検定</span>
               </button>
             )}
@@ -454,7 +451,6 @@ export default function GlobalSearchModal({
               }}
               className="px-2.5 py-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 font-racing flex items-center gap-1 transition-all"
             >
-              <span>📅</span>
               <span>2025年レースカレンダー</span>
             </button>
           </div>
@@ -464,7 +460,7 @@ export default function GlobalSearchModal({
         <div className="flex-1 overflow-y-auto p-2 divide-y divide-white/5">
           {filteredResults.length === 0 ? (
             <div className="p-8 text-center text-slate-400 text-xs">
-              <span className="text-2xl block mb-2">🔎</span>
+              <span className="text-2xl block mb-2"></span>
               一致するコンテンツが見つかりませんでした。別のキーワードをお試しください。
             </div>
           ) : (
@@ -477,7 +473,7 @@ export default function GlobalSearchModal({
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={`p-3 rounded-2xl cursor-pointer transition-all flex items-center justify-between gap-3 ${
                     isSelected
-                      ? 'bg-sky-950/60 border border-sky-500/40 shadow-md'
+                      ? 'bg-slate-900/60 border border-slate-400/40 shadow-md'
                       : 'hover:bg-white/[0.03] border border-transparent'
                   }`}
                 >
@@ -486,7 +482,7 @@ export default function GlobalSearchModal({
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold border ${item.badgeBg} ${item.badgeText}`}
+                          className={`px-2 py-0.5 rounded text-[11px] font-bold border ${item.badgeBg} ${item.badgeText}`}
                         >
                           {item.badge}
                         </span>
@@ -500,7 +496,7 @@ export default function GlobalSearchModal({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 flex-shrink-0 text-[11px] text-sky-400 font-racing">
+                  <div className="flex items-center gap-1.5 flex-shrink-0 text-[11px] text-slate-300 font-racing">
                     <span className="hidden sm:inline">開く</span>
                     <span>➔</span>
                   </div>
@@ -515,7 +511,7 @@ export default function GlobalSearchModal({
           <div className="flex items-center gap-2">
             <span>ヒット数: <strong className="text-white">{filteredResults.length}</strong> 件</span>
           </div>
-          <div className="hidden sm:flex items-center gap-3 text-[10px]">
+          <div className="hidden sm:flex items-center gap-3 text-[11px]">
             <span>[↑][↓] 移動</span>
             <span>[Enter] 選択</span>
             <span>[ESC] 閉じる</span>

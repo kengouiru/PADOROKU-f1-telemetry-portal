@@ -2,7 +2,7 @@
 
 /**
  * components/strategy/VirtualGrandPrixSimulator.tsx
- * 🏎️ Virtual Grand Prix & Multi-Car Race Strategy Simulator Pro
+ * Virtual Grand Prix & Multi-Car Race Strategy Simulator Pro
  * Features:
  * - Multi-Car Grid Simulation (VER, NOR, TSU, LEC, HAM)
  * - Custom Stint & Pit Lap configuration per driver
@@ -272,10 +272,10 @@ export default function VirtualGrandPrixSimulator({
       const lapEvents: string[] = [];
 
       if (scEnabled && lap === scLap) {
-        lapEvents.push(`🚨 Lap ${lap}: フルセーフティカー (SC) 出動！ ピットロスタイムが大幅半減。`);
+        lapEvents.push(`Lap ${lap}: フルセーフティカー (SC) 出動！ ピットロスタイムが大幅半減。`);
       }
       if (rainEnabled && lap === rainLap) {
-        lapEvents.push(`🌧️ Lap ${lap}: 突然の降雨開始 (${rainIntensity} mm/min)！ スリックタイヤでの走行が極度に困難に。`);
+        lapEvents.push(`Lap ${lap}: 突然の降雨開始 (${rainIntensity} mm/min)！ スリックタイヤでの走行が極度に困難に。`);
       }
 
       activeDrivers.forEach((d) => {
@@ -292,14 +292,14 @@ export default function VirtualGrandPrixSimulator({
           tracker.tyreAge = 0;
           tracker.pitCount += 1;
           eventNote = `Pit 1: ${tracker.currentTyre}へ交換 (${d.crewStopTime}s)`;
-          lapEvents.push(`⛽ Lap ${lap}: ${d.code}がピットイン！ ${tracker.currentTyre}へ履き替え。`);
+          lapEvents.push(`Lap ${lap}: ${d.code}がピットイン！ ${tracker.currentTyre}へ履き替え。`);
         } else if (d.pit2Lap && lap === d.pit2Lap) {
           isPitting = true;
           tracker.currentTyre = isRain && rainEnabled ? 'INTERMEDIATE' : d.pit2Tyre || 'SOFT';
           tracker.tyreAge = 0;
           tracker.pitCount += 1;
           eventNote = `Pit 2: ${tracker.currentTyre}へ交換 (${d.crewStopTime}s)`;
-          lapEvents.push(`⛽ Lap ${lap}: ${d.code}が2度目のピットイン！ ${tracker.currentTyre}へ。`);
+          lapEvents.push(`Lap ${lap}: ${d.code}が2度目のピットイン！ ${tracker.currentTyre}へ。`);
         }
 
         // Base lap time with fuel burn-off (car gets lighter by 0.045s per lap)
@@ -499,13 +499,13 @@ export default function VirtualGrandPrixSimulator({
   const getTyreBadge = (compound: TyreCompound) => {
     switch (compound) {
       case 'SOFT':
-        return <span className="px-1.5 py-0.5 rounded bg-red-600 text-white font-mono font-bold text-[10px]">🔴 SOFT</span>;
+        return <span className="px-1.5 py-0.5 rounded bg-red-600 text-white font-mono font-bold text-[11px]">SOFT</span>;
       case 'MEDIUM':
-        return <span className="px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 font-mono font-bold text-[10px]">🟡 MED</span>;
+        return <span className="px-1.5 py-0.5 rounded bg-amber-400 text-slate-950 font-mono font-bold text-[11px]">MED</span>;
       case 'HARD':
-        return <span className="px-1.5 py-0.5 rounded bg-slate-200 text-slate-950 font-mono font-bold text-[10px]">⚪ HARD</span>;
+        return <span className="px-1.5 py-0.5 rounded bg-slate-200 text-slate-950 font-mono font-bold text-[11px]">HARD</span>;
       case 'INTERMEDIATE':
-        return <span className="px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 font-mono font-bold text-[10px]">🟢 INTER</span>;
+        return <span className="px-1.5 py-0.5 rounded bg-emerald-500 text-slate-950 font-mono font-bold text-[11px]">INTER</span>;
     }
   };
 
@@ -515,7 +515,7 @@ export default function VirtualGrandPrixSimulator({
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-red-600 text-slate-950 text-[10px] font-mono font-black tracking-wider uppercase">
+            <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-red-600 text-slate-950 text-[11px] font-mono font-black tracking-wider uppercase">
               VIRTUAL GRAND PRIX PRO
             </span>
             <span className="text-[11px] font-mono text-slate-400">
@@ -523,7 +523,7 @@ export default function VirtualGrandPrixSimulator({
             </span>
           </div>
           <h2 className="text-xl sm:text-2xl font-racing font-black text-white flex items-center gap-2">
-            <span>🏎️ 模擬レースシミュレーター Pro</span>
+            <span>模擬レースシミュレーター Pro</span>
           </h2>
         </div>
 
@@ -537,7 +537,7 @@ export default function VirtualGrandPrixSimulator({
               }}
               className={`px-3 py-1 rounded-lg transition-all ${
                 (!isPro || raceDistanceMode === 'sprint')
-                  ? 'bg-blue-600 text-white font-bold'
+                  ? 'bg-slate-500 text-white font-bold'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -559,7 +559,7 @@ export default function VirtualGrandPrixSimulator({
               }`}
             >
               <span>フルGP ({circuit.totalLaps}周)</span>
-              {!isPro && <span className="text-[9px] bg-amber-400/20 text-amber-300 border border-amber-400/30 px-1 rounded font-mono">PRO</span>}
+              {!isPro && <span className="text-[11px] bg-amber-400/20 text-amber-300 border border-amber-400/30 px-1 rounded font-mono">PRO</span>}
             </button>
           </div>
 
@@ -578,7 +578,7 @@ export default function VirtualGrandPrixSimulator({
           >
             {CIRCUITS.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.flag} {c.name} {!isPro && c.id !== 'suzuka' ? '🔒 [PRO]' : `(${c.totalLaps}周)`}
+                {c.flag} {c.name} {!isPro && c.id !== 'suzuka' ? '[PRO]' : `(${c.totalLaps}周)`}
               </option>
             ))}
           </select>
@@ -587,9 +587,8 @@ export default function VirtualGrandPrixSimulator({
 
       {/* ── Free Tier Experience Banner ── */}
       {!isPro && (
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-yellow-500/10 to-transparent border border-amber-500/30 text-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-transparent border border-amber-500/30 text-xs">
           <div className="flex items-center gap-2.5 text-slate-200">
-            <span className="text-amber-400 text-base">💡</span>
             <div>
               <span className="text-amber-300 font-bold font-racing">FREEプラン体験版: </span>
               <span className="text-slate-300 text-[11px]">
@@ -600,9 +599,9 @@ export default function VirtualGrandPrixSimulator({
           <button
             type="button"
             onClick={() => onOpenUpgradeModal?.()}
-            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:brightness-110 text-slate-950 font-racing font-bold text-xs transition-all shadow-md flex items-center gap-1.5 self-start sm:self-auto flex-shrink-0 cursor-pointer"
+            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:brightness-110 text-slate-950 font-racing font-bold text-xs transition-all shadow-md flex items-center gap-1.5 self-start sm:self-auto flex-shrink-0 cursor-pointer"
           >
-            <span>💎 全24戦・フルGP・5台対戦を解放 (¥300/月)</span>
+            <span>全24戦・フルGP・5台対戦を解放 (¥300/月)</span>
           </button>
         </div>
       )}
@@ -610,23 +609,23 @@ export default function VirtualGrandPrixSimulator({
       {/* ── Dynamic Event & Strategy Tuning Panel ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-900/60 p-4 rounded-2xl border border-white/10 text-xs font-mono">
         {/* Rain Event Box */}
-        <div className="bg-slate-950/80 p-3 rounded-xl border border-sky-500/30 space-y-2">
+        <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-400/30 space-y-2">
           <div className="flex items-center justify-between">
-            <span className="font-racing font-bold text-sky-300 flex items-center gap-1">
-              <span>🌧️ 突然の降雨イベント</span>
+            <span className="font-racing font-bold text-slate-200 flex items-center gap-1">
+              <span>突然の降雨イベント</span>
             </span>
             <input
               type="checkbox"
               checked={rainEnabled}
               onChange={(e) => setRainEnabled(e.target.checked)}
-              className="accent-sky-400 rounded cursor-pointer w-4 h-4"
+              className="accent-slate-300 rounded cursor-pointer w-4 h-4"
             />
           </div>
           {rainEnabled && (
             <div className="space-y-2 pt-1 border-t border-white/5">
               <div className="flex items-center justify-between text-[11px]">
                 <span className="text-slate-400">降雨開始周回:</span>
-                <span className="text-sky-400 font-bold font-racing">Lap {rainLap}</span>
+                <span className="text-slate-300 font-bold font-racing">Lap {rainLap}</span>
               </div>
               <input
                 type="range"
@@ -634,11 +633,11 @@ export default function VirtualGrandPrixSimulator({
                 max={maxLaps - 2}
                 value={rainLap}
                 onChange={(e) => setRainLap(Number(e.target.value))}
-                className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-400"
+                className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-slate-300"
               />
               <div className="flex items-center justify-between text-[11px]">
                 <span className="text-slate-400">雨量強度:</span>
-                <span className="text-sky-300 font-bold">{rainIntensity} mm/min</span>
+                <span className="text-slate-200 font-bold">{rainIntensity} mm/min</span>
               </div>
               <input
                 type="range"
@@ -647,7 +646,7 @@ export default function VirtualGrandPrixSimulator({
                 step={0.5}
                 value={rainIntensity}
                 onChange={(e) => setRainIntensity(Number(e.target.value))}
-                className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-400"
+                className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-slate-300"
               />
             </div>
           )}
@@ -657,7 +656,7 @@ export default function VirtualGrandPrixSimulator({
         <div className="bg-slate-950/80 p-3 rounded-xl border border-amber-500/30 space-y-2">
           <div className="flex items-center justify-between">
             <span className="font-racing font-bold text-amber-300 flex items-center gap-1">
-              <span>🚨 セーフティカー (SC) 出動</span>
+              <span>セーフティカー (SC) 出動</span>
             </span>
             <input
               type="checkbox"
@@ -699,7 +698,7 @@ export default function VirtualGrandPrixSimulator({
         {/* Environment & Track Temp */}
         <div className="bg-slate-950/80 p-3 rounded-xl border border-white/10 space-y-2">
           <div className="font-racing font-bold text-slate-300">
-            🌡️ 路面温度 ＆ デグラデーション
+            路面温度 ＆ デグラデーション
           </div>
           <div className="space-y-2 pt-1 border-t border-white/5">
             <div className="flex items-center justify-between text-[11px]">
@@ -714,7 +713,7 @@ export default function VirtualGrandPrixSimulator({
               onChange={(e) => setTrackTemp(Number(e.target.value))}
               className="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-400"
             />
-            <div className="text-[10px] text-slate-500">
+            <div className="text-[11px] text-slate-500">
               燃料消費効果: 1周あたり -0.045秒/周 車重減ペース向上
             </div>
           </div>
@@ -724,7 +723,7 @@ export default function VirtualGrandPrixSimulator({
       {/* ── Driver Strategy Customizer Accordion ── */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-xs font-mono">
-          <span className="text-slate-400 font-bold">🏎️ 出走マシンの作戦カスタマイズ（ピットイン周回・タイヤ選択）:</span>
+          <span className="text-slate-400 font-bold">出走マシンの作戦カスタマイズ（ピットイン周回・タイヤ選択）:</span>
           <button
             type="button"
             onClick={() => setDrivers(DEFAULT_DRIVERS)}
@@ -743,7 +742,7 @@ export default function VirtualGrandPrixSimulator({
             >
               <div className="flex items-center justify-between">
                 <span className="font-racing font-bold text-white text-sm">{d.code}</span>
-                <span className="text-[10px] text-slate-400">#{d.number}</span>
+                <span className="text-[11px] text-slate-400">#{d.number}</span>
               </div>
 
               {/* Start Tyre */}
@@ -752,11 +751,11 @@ export default function VirtualGrandPrixSimulator({
                 <select
                   value={d.startTyre}
                   onChange={(e) => handleUpdateDriver(d.code, 'startTyre', e.target.value as TyreCompound)}
-                  className="bg-slate-950 border border-white/15 rounded px-1.5 py-0.5 text-[10px] text-white"
+                  className="bg-slate-950 border border-white/15 rounded px-1.5 py-0.5 text-[11px] text-white"
                 >
-                  <option value="SOFT">🔴 SOFT</option>
-                  <option value="MEDIUM">🟡 MED</option>
-                  <option value="HARD">⚪ HARD</option>
+                  <option value="SOFT">SOFT</option>
+                  <option value="MEDIUM">MED</option>
+                  <option value="HARD">HARD</option>
                 </select>
               </div>
 
@@ -773,23 +772,23 @@ export default function VirtualGrandPrixSimulator({
                     max={maxLaps - 1}
                     value={d.pit1Lap}
                     onChange={(e) => handleUpdateDriver(d.code, 'pit1Lap', Number(e.target.value))}
-                    className="w-12 bg-slate-950 border border-white/15 rounded px-1 text-center text-[10px]"
+                    className="w-12 bg-slate-950 border border-white/15 rounded px-1 text-center text-[11px]"
                   />
                   <select
                     value={d.pit1Tyre}
                     onChange={(e) => handleUpdateDriver(d.code, 'pit1Tyre', e.target.value as TyreCompound)}
-                    className="bg-slate-950 border border-white/15 rounded px-1 text-[10px] text-white"
+                    className="bg-slate-950 border border-white/15 rounded px-1 text-[11px] text-white"
                   >
-                    <option value="SOFT">🔴 S</option>
-                    <option value="MEDIUM">🟡 M</option>
-                    <option value="HARD">⚪ H</option>
-                    <option value="INTERMEDIATE">🟢 I</option>
+                    <option value="SOFT">S</option>
+                    <option value="MEDIUM">M</option>
+                    <option value="HARD">H</option>
+                    <option value="INTERMEDIATE">I</option>
                   </select>
                 </div>
               </div>
 
               {/* Pit Crew Stop Time */}
-              <div className="flex items-center justify-between text-[10px] pt-1 border-t border-white/5 text-slate-500">
+              <div className="flex items-center justify-between text-[11px] pt-1 border-t border-white/5 text-slate-500">
                 <span>作業秒数:</span>
                 <span className="text-slate-300 font-bold">{d.crewStopTime}s</span>
               </div>
@@ -803,9 +802,9 @@ export default function VirtualGrandPrixSimulator({
             >
               <div className="flex items-center justify-between">
                 <span className="font-racing font-bold text-amber-300 flex items-center gap-1">
-                  <span>🔒 PRO限定: フェラーリ陣営（LEC / HAM）</span>
+                  <span>PRO限定: フェラーリ陣営（LEC / HAM）</span>
                 </span>
-                <span className="text-[10px] font-racing font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">
+                <span className="text-[11px] font-racing font-bold px-2 py-0.5 rounded bg-amber-500 text-slate-950">
                   解放
                 </span>
               </div>
@@ -827,10 +826,10 @@ export default function VirtualGrandPrixSimulator({
             className={`px-4 py-2 rounded-xl text-xs font-racing font-bold shadow-lg transition-all flex items-center gap-1.5 ${
               isPlaying
                 ? 'bg-amber-500 text-slate-950 shadow-amber-500/20'
-                : 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-blue-500/30 hover:brightness-110'
+                : 'bg-gradient-to-r from-slate-500 to-slate-400 text-white shadow-slate-400/30 hover:brightness-110'
             }`}
           >
-            {isPlaying ? '⏸️ 一時停止' : '▶️ 仮想レース開始'}
+            {isPlaying ? '一時停止' : '仮想レース開始'}
           </button>
 
           <button
@@ -842,17 +841,17 @@ export default function VirtualGrandPrixSimulator({
             className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono transition-colors"
             title="最初に戻す"
           >
-            ⏮️
+            
           </button>
 
-          <div className="flex items-center bg-slate-950 rounded-xl border border-white/10 p-0.5 text-[10px] font-mono">
+          <div className="flex items-center bg-slate-950 rounded-xl border border-white/10 p-0.5 text-[11px] font-mono">
             {([1, 2, 5] as const).map((spd) => (
               <button
                 key={spd}
                 type="button"
                 onClick={() => setPlaySpeed(spd)}
                 className={`px-2 py-1 rounded-lg transition-all ${
-                  playSpeed === spd ? 'bg-blue-600 text-white font-bold' : 'text-slate-400 hover:text-white'
+                  playSpeed === spd ? 'bg-slate-500 text-white font-bold' : 'text-slate-400 hover:text-white'
                 }`}
               >
                 {spd}x
@@ -877,7 +876,7 @@ export default function VirtualGrandPrixSimulator({
           />
           <div className="w-20 text-right">
             <span className="font-racing font-bold text-amber-400 text-sm">Lap {currentLap}</span>
-            <span className="text-slate-500 text-[10px]"> / {maxLaps}</span>
+            <span className="text-slate-500 text-[11px]"> / {maxLaps}</span>
           </div>
         </div>
       </div>
@@ -888,15 +887,15 @@ export default function VirtualGrandPrixSimulator({
           <div className="flex items-center gap-3">
             {currentSnapshot.isSC ? (
               <span className="px-3 py-1 rounded-lg bg-amber-500 text-slate-950 font-racing font-black text-xs flex items-center gap-1 animate-pulse">
-                <span>🚨 SAFETY CAR DEPLOYED</span>
+                <span>SAFETY CAR DEPLOYED</span>
               </span>
             ) : currentSnapshot.isRain ? (
-              <span className="px-3 py-1 rounded-lg bg-sky-500 text-slate-950 font-racing font-black text-xs flex items-center gap-1">
-                <span>🌧️ WET TRACK (RAIN ACTIVE)</span>
+              <span className="px-3 py-1 rounded-lg bg-slate-400 text-slate-950 font-racing font-black text-xs flex items-center gap-1">
+                <span>WET TRACK (RAIN ACTIVE)</span>
               </span>
             ) : (
               <span className="px-3 py-1 rounded-lg bg-emerald-600 text-white font-racing font-bold text-xs flex items-center gap-1">
-                <span>🟢 TRACK CLEAR (GREEN)</span>
+                <span>TRACK CLEAR (GREEN)</span>
               </span>
             )}
             <span className="text-slate-300 font-bold">首位: {currentSnapshot.leaderCode}</span>
@@ -938,14 +937,14 @@ export default function VirtualGrandPrixSimulator({
 
                 <div className="space-y-1 text-xs">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-slate-400">トップ差:</span>
+                    <span className="text-[11px] text-slate-400">トップ差:</span>
                     <span className="font-bold text-white">
                       {car.gapToLeader === 0 ? 'LEADER' : `+${car.gapToLeader}s`}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-slate-400">前走車差:</span>
+                    <span className="text-[11px] text-slate-400">前走車差:</span>
                     <span className="text-slate-300">
                       {car.gapToAhead === 0 ? '-' : `+${car.gapToAhead}s`}
                     </span>
@@ -953,12 +952,12 @@ export default function VirtualGrandPrixSimulator({
 
                   <div className="flex items-center justify-between pt-1 border-t border-white/5">
                     {getTyreBadge(car.tyreCompound)}
-                    <span className="text-[10px] text-slate-400">L{car.tyreAge}</span>
+                    <span className="text-[11px] text-slate-400">L{car.tyreAge}</span>
                   </div>
 
                   {car.isPitting && (
-                    <div className="text-[10px] font-racing font-bold text-amber-400 animate-pulse text-center bg-amber-500/10 rounded py-0.5 mt-1">
-                      ⛽ PIT IN
+                    <div className="text-[11px] font-racing font-bold text-amber-400 animate-pulse text-center bg-amber-500/10 rounded py-0.5 mt-1">
+                      PIT IN
                     </div>
                   )}
                 </div>
@@ -975,7 +974,7 @@ export default function VirtualGrandPrixSimulator({
             <div className="text-xs font-racing font-bold text-white uppercase tracking-wider">
               GAP TO LEADER CHART (全周回タイム差推移線図)
             </div>
-            <div className="text-[10px] text-slate-400">
+            <div className="text-[11px] text-slate-400">
               各周回におけるトップとの秒差推移（ピットイン・SC・雨天での逆転劇を可視化）
             </div>
           </div>
@@ -1058,7 +1057,7 @@ export default function VirtualGrandPrixSimulator({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
           <div>
             <div className="text-xs font-racing font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-              <span>🤖 AI チーフストラテジスト・戦術デブリーフ</span>
+              <span>AI チーフストラテジスト・戦術デブリーフ</span>
             </div>
             <div className="text-[11px] text-slate-400">
               Gemini AIがシミュレーション結果を工学的に解析し、勝敗のターニングポイントを総括
@@ -1069,7 +1068,7 @@ export default function VirtualGrandPrixSimulator({
             type="button"
             disabled={loadingAiDebrief}
             onClick={handleGenerateAiDebrief}
-            className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:brightness-110 text-slate-950 text-xs font-racing font-bold transition-all shadow-md flex items-center justify-center gap-1.5 disabled:opacity-50"
+            className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:brightness-110 text-slate-950 text-xs font-racing font-bold transition-all shadow-md flex items-center justify-center gap-1.5 disabled:opacity-50"
           >
             {loadingAiDebrief ? (
               <>
@@ -1078,7 +1077,7 @@ export default function VirtualGrandPrixSimulator({
               </>
             ) : (
               <>
-                <span>🧠 レース総括レポートを生成</span>
+                <span>レース総括レポートを生成</span>
               </>
             )}
           </button>

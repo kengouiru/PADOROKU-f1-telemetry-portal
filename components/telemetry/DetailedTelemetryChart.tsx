@@ -18,7 +18,7 @@
  * - Driving Style Decoded Intelligence Insights
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   ResponsiveContainer,
   LineChart,
@@ -32,19 +32,23 @@ import {
   Area,
 } from 'recharts';
 import {
-  generateNormalizedTelemetry,
+  fetchAndGenerateNormalizedTelemetry,
   type NormalizedTelemetryPoint,
   type TelemetryComparisonData,
 } from '@/lib/carTelemetryService';
 import { KNOWLEDGE_CIRCUITS, KNOWLEDGE_DRIVERS } from '@/data/f1KnowledgeData';
 import TelemetryTrackMap, { CIRCUIT_TRACK_MAPS } from './TelemetryTrackMap';
 import TelemetryDeltaAnalyzer from './TelemetryDeltaAnalyzer';
+import type { Lap, Driver } from '@/lib/types';
 
 export interface DetailedTelemetryChartProps {
   initialCircuitId?: string;
   initialDriver1Code?: string;
   initialDriver2Code?: string;
   initialTab?: 'charts' | 'delta_matrix';
+  sessionKey?: number | null;
+  lapsCache?: Record<string, Lap[]>;
+  drivers?: Driver[];
   onNavigateToCircuit?: (circuitId: string) => void;
   onNavigateToGlossary?: (termId: string) => void;
   className?: string;
@@ -55,6 +59,9 @@ export default function DetailedTelemetryChart({
   initialDriver1Code = 'VER',
   initialDriver2Code = 'NOR',
   initialTab,
+  sessionKey,
+  lapsCache = {},
+  drivers = [],
   onNavigateToCircuit,
   onNavigateToGlossary,
   className = '',
@@ -71,6 +78,10 @@ export default function DetailedTelemetryChart({
   const [selectedCornerName, setSelectedCornerName] = useState<string | null>(null);
   const [activeTelemetryTab, setActiveTelemetryTab] = useState<'charts' | 'delta_matrix'>(initialTab || 'charts');
   const [isMounted, setIsMounted] = useState(false);
+
+  const [telemetryData, setTelemetryData] = useState<TelemetryComparisonData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -102,22 +113,72 @@ export default function DetailedTelemetryChart({
   // Driver definitions
   const d1 = useMemo(() => {
     const found = KNOWLEDGE_DRIVERS.find((d) => d.code === driver1Code);
+    const apiD = drivers.find(d => d.name_acronym === driver1Code);
     return found
-      ? { code: found.code, number: String(found.number), name: found.fullName, color: found.teamColor }
-      : { code: 'VER', number: '1', name: 'Max Verstappen', color: '#3b82f6' };
-  }, [driver1Code]);
+      ? { code: found.code, number: apiD?.driver_number.toString() || String(found.number), name: found.fullName, color: found.teamColor }
+      : { code: 'VER', number: apiD?.driver_number.toString() || '1', name: 'Max Verstappen', color: '#3b82f6' };
+  }, [driver1Code, drivers]);
 
   const d2 = useMemo(() => {
     const found = KNOWLEDGE_DRIVERS.find((d) => d.code === driver2Code);
+    const apiD = drivers.find(d => d.name_acronym === driver2Code);
     return found
-      ? { code: found.code, number: String(found.number), name: found.fullName, color: found.teamColor }
-      : { code: 'NOR', number: '4', name: 'Lando Norris', color: '#f97316' };
-  }, [driver2Code]);
+      ? { code: found.code, number: apiD?.driver_number.toString() || String(found.number), name: found.fullName, color: found.teamColor }
+      : { code: 'NOR', number: apiD?.driver_number.toString() || '4', name: 'Lando Norris', color: '#f97316' };
+  }, [driver2Code, drivers]);
 
-  // Compute telemetry comparison data
-  const telemetryData: TelemetryComparisonData = useMemo(() => {
-    return generateNormalizedTelemetry(selectedCircuit, d1, d2);
-  }, [selectedCircuit, d1, d2]);
+  // Fetch telemetry comparison data
+  const fetchData = useCallback(() => {
+    if (!sessionKey || !lapsCache[d1.number] || !lapsCache[d2.number]) {
+      setTelemetryData(null);
+      setErrorMsg('ラップデータが不足しています。');
+      return;
+    }
+    let ignore = false;
+    setIsLoading(true);
+    setErrorMsg(null);
+    fetchAndGenerateNormalizedTelemetry(sessionKey, d1, d2, lapsCache, selectedCircuit)
+      .then(data => {
+        if (!ignore) {
+          setTelemetryData(data);
+          setIsLoading(false);
+        }
+      })
+      .catch(err => {
+        if (!ignore) {
+          console.warn('Telemetry fetch error', err);
+          setErrorMsg('カーデータの取得に失敗しました。');
+          setTelemetryData(null);
+          setIsLoading(false);
+        }
+      });
+    return () => { ignore = true; };
+  }, [sessionKey, d1, d2, lapsCache, selectedCircuit]);
+
+  useEffect(() => {
+    const cleanup = fetchData();
+    return cleanup;
+  }, [fetchData]);
+
+  if (isLoading || !telemetryData) {
+    return (
+      <div className={`glass-card bg-slate-950/90 border border-white/10 rounded-2xl p-4 sm:p-5 flex flex-col gap-4 relative ${className}`}>
+        <div className="flex items-center justify-center h-64 flex-col gap-4">
+          {isLoading ? (
+            <>
+              <div className="w-8 h-8 animate-spin border-2 border-red-500 border-t-transparent rounded-full" />
+              <span className="text-slate-400 font-mono text-sm">🔄 テレメトリーデータを取得中...</span>
+            </>
+          ) : (
+            <>
+              <span className="text-slate-400 font-mono text-sm">⚠️ {errorMsg || 'データがありません'}</span>
+              <button onClick={fetchData} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded text-sm transition-colors">再試行</button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   const { points, insights, circuitName, circuitLengthM } = telemetryData;
 
@@ -425,6 +486,9 @@ export default function DetailedTelemetryChart({
           initialCircuitId={selectedCircuit}
           initialDriver1Code={driver1Code}
           initialDriver2Code={driver2Code}
+          sessionKey={sessionKey}
+          lapsCache={lapsCache}
+          drivers={drivers}
         />
       ) : (
         <>

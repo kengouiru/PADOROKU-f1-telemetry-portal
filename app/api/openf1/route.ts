@@ -20,6 +20,9 @@ const ALLOWED_ENDPOINTS = [
   'car_data',
   'location',
   'weather',
+  'session_result',
+  'position',
+  'intervals',
 ];
 
 export async function GET(req: NextRequest) {

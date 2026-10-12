@@ -70,7 +70,7 @@ export const GRAND_PRIX_REPORTS: Record<number, GrandPrixReportData> = {
     circuitRecords: {
       qualifyingRecord: { time: '1:15.915', driver: 'M. フェルスタッペン', year: 2024, car: 'Red Bull RB20' },
       raceLapRecord: { time: '1:19.813', driver: 'C. ルクレール', year: 2024, car: 'Ferrari SF-24' },
-      mostWinsDriver: 'レジェンド: レクサス・シューマッハ (4勝)',
+      mostWinsDriver: 'レジェンド: ミハエル・シューマッハ (4勝)',
       mostWinsTeam: 'フェラーリ (10勝)',
     },
     tacticalProfile: {

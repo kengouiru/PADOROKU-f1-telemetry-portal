@@ -101,7 +101,7 @@ export default function AuthModal({
         {/* Header */}
         <div className="space-y-1.5 text-center">
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-f1-red/20 border border-f1-red/40 text-2xl shadow-lg">
-            🏎️
+            
           </div>
           <h2 className="text-xl font-racing font-black text-white tracking-wide">
             {title}
@@ -114,7 +114,7 @@ export default function AuthModal({
         {/* Error Alert */}
         {errorMessage && (
           <div className="p-3 rounded-xl bg-red-950/60 border border-red-500/30 text-red-300 text-xs text-center font-mono">
-            ⚠️ {errorMessage}
+            {errorMessage}
           </div>
         )}
 
@@ -122,50 +122,46 @@ export default function AuthModal({
         <div className="space-y-2.5">
           <div className="flex items-center justify-between text-[11px] font-mono">
             <span className="text-amber-300 font-bold flex items-center gap-1">
-              <span>⚡</span>
               <span>評価・即時テスト用デモアカウント</span>
             </span>
             <span className="text-slate-400">1-Click Access</span>
           </div>
 
           {/* PRO Demo Button */}
-          <div className="bg-gradient-to-r from-amber-950/40 via-yellow-950/30 to-amber-950/40 p-3 rounded-2xl border border-amber-500/30 space-y-1.5">
-            <div className="flex items-center justify-between text-[10px]">
+          <div className="bg-gradient-to-r from-amber-950/40 via-amber-950/30 to-amber-950/40 p-3 rounded-2xl border border-amber-500/30 space-y-1.5">
+            <div className="flex items-center justify-between text-[11px]">
               <span className="font-racing font-bold text-amber-300 flex items-center gap-1">
-                <span>👑</span>
                 <span>PRO デモ (全機能開放・無制限)</span>
               </span>
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-racing font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950">
+              <span className="px-1.5 py-0.2 rounded text-[11px] font-racing font-black bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950">
                 PRO
               </span>
             </div>
             <button
               onClick={() => handleDemoLogin('pro')}
               disabled={isLoading}
-              className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 text-xs font-racing font-black shadow-md shadow-amber-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-500 hover:from-amber-400 hover:to-amber-400 text-slate-950 text-xs font-racing font-black shadow-md shadow-amber-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {isLoading ? (
                 <span className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>🚀</span>
                   <span>PRO アカウントで1クリック ログイン</span>
                 </>
               )}
             </button>
-            <p className="text-[10px] text-slate-400 text-center font-mono">
+            <p className="text-[11px] text-slate-400 text-center font-mono">
               demo-pro@f1telemetry.pro / f1pro2026 (AI無制限・フルGP)
             </p>
           </div>
 
           {/* FREE Demo Button */}
           <div className="bg-slate-950/60 p-3 rounded-2xl border border-white/10 space-y-1.5">
-            <div className="flex items-center justify-between text-[10px]">
+            <div className="flex items-center justify-between text-[11px]">
               <span className="font-racing font-bold text-slate-300 flex items-center gap-1">
-                <span>🆓</span>
                 <span>FREE デモ (無料プラン制限テスト)</span>
               </span>
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-racing font-bold bg-slate-800 text-slate-400 border border-white/10">
+              <span className="px-1.5 py-0.2 rounded text-[11px] font-racing font-bold bg-slate-800 text-slate-400 border border-white/10">
                 FREE
               </span>
             </div>
@@ -178,12 +174,11 @@ export default function AuthModal({
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>👤</span>
                   <span>FREE アカウントで1クリック ログイン</span>
                 </>
               )}
             </button>
-            <p className="text-[10px] text-slate-400 text-center font-mono">
+            <p className="text-[11px] text-slate-400 text-center font-mono">
               demo-free@f1telemetry.pro / f1free2026 (AI1日3回・制限テスト)
             </p>
           </div>
@@ -207,7 +202,7 @@ export default function AuthModal({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full bg-slate-950/80 border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-sky-500 transition-colors"
+              className="w-full bg-slate-950/80 border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-slate-400 transition-colors"
               placeholder="user@example.com"
             />
           </div>
@@ -221,7 +216,7 @@ export default function AuthModal({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full bg-slate-950/80 border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-sky-500 transition-colors"
+              className="w-full bg-slate-950/80 border border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-slate-400 transition-colors"
               placeholder="••••••••"
             />
           </div>
@@ -234,7 +229,7 @@ export default function AuthModal({
             {isLoading ? (
               <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
-              <span>🔑 メールアドレスでサインイン</span>
+              <span>メールアドレスでサインイン</span>
             )}
           </button>
         </form>
@@ -245,12 +240,11 @@ export default function AuthModal({
           disabled={isLoading}
           className="w-full py-2 px-4 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 text-xs font-mono font-medium border border-white/5 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
         >
-          <span>🌐</span>
           <span>Googleアカウントでサインイン</span>
         </button>
 
         {/* Footer Note */}
-        <p className="text-[10px] text-slate-500 text-center font-mono">
+        <p className="text-[11px] text-slate-500 text-center font-mono">
           ※ サーキット・ドライバー名鑑・テレメトリー閲覧は未ログインでも利用可能です。
         </p>
       </div>

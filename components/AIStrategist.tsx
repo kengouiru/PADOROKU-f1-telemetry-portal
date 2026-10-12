@@ -29,6 +29,7 @@ interface ChatMessage {
   role: 'user' | 'model';
   content: string;
   isStreaming?: boolean;
+  attachment?: { data: string; mimeType: string; name: string };
 }
 
 // ── Navigation Action Types ───────────────────────────────────────────────────
@@ -72,7 +73,7 @@ export function parseNavActions(content: string): { cleanContent: string; action
       const lapLabel = lap ? `Lap ${lap}: ` : '';
       actions.push({
         type: 'telemetry',
-        icon: '🏎️',
+        icon: '',
         label: `${lapLabel}${d1} vs ${d2} テレメトリーを開く`,
         circuitId,
         driver1: d1,
@@ -82,13 +83,13 @@ export function parseNavActions(content: string): { cleanContent: string; action
     } else if (category === 'stints') {
       actions.push({
         type: 'stints',
-        icon: '🛞',
+        icon: '',
         label: 'タイヤ・スティント推移を見る',
       });
     } else if (category === 'pit_sim') {
       actions.push({
         type: 'pit_sim',
-        icon: '⛽',
+        icon: '',
         label: 'ピット戦略シミュレーターを試す',
       });
     } else if (category === 'radio') {
@@ -96,27 +97,27 @@ export function parseNavActions(content: string): { cleanContent: string; action
       const lapLabel = lap ? `(Lap ${lap})` : '';
       actions.push({
         type: 'radio',
-        icon: '📻',
+        icon: '',
         label: `チーム無線タイムライン ${lapLabel}`.trim(),
         lapNumber: lap,
       });
     } else if (category === 'library') {
       const sub = parts[1];
       if (sub === 'tyres') {
-        actions.push({ type: 'library_tyres', icon: '🛞', label: 'タイヤ大百科（C1〜C5性能解説）を開く' });
+        actions.push({ type: 'library_tyres', icon: '', label: 'タイヤ大百科（C1〜C5性能解説）を開く' });
       } else if (sub === 'circuits') {
         const cId = parts[2];
-        actions.push({ type: 'library_circuits', icon: '🗺️', label: `サーキット詳細ガイドを開く`, circuitId: cId });
+        actions.push({ type: 'library_circuits', icon: '', label: `サーキット詳細ガイドを開く`, circuitId: cId });
       } else if (sub === 'regulations') {
-        actions.push({ type: 'library_regulations', icon: '⚖️', label: 'FIA公式競技規則・ペナルティ基準を開く' });
+        actions.push({ type: 'library_regulations', icon: '', label: 'FIA公式競技規則・ペナルティ基準を開く' });
       } else if (sub === 'glossary') {
         const termId = parts[2];
-        actions.push({ type: 'library_glossary', icon: '📖', label: `用語図解・解説を開く`, termId });
+        actions.push({ type: 'library_glossary', icon: '', label: `用語図解・解説を開く`, termId });
       } else if (sub === 'drama') {
-        actions.push({ type: 'library_drama', icon: '🎬', label: 'F1歴史的ドラマ・ライバル列伝を開く' });
+        actions.push({ type: 'library_drama', icon: '', label: 'F1歴史的ドラマ・ライバル列伝を開く' });
       }
     } else if (category === 'quiz') {
-      actions.push({ type: 'quiz', icon: '🏆', label: '関連F1クイズに挑戦する' });
+      actions.push({ type: 'quiz', icon: '', label: '関連F1クイズに挑戦する' });
     }
   }
 
@@ -127,6 +128,7 @@ export function parseNavActions(content: string): { cleanContent: string; action
 interface StrategistMessage {
   role: 'user' | 'model';
   content: string;
+  attachment?: { data: string; mimeType: string; name: string };
 }
 
 // ── Props ──────────────────────────────────────────────────────────────────────
@@ -148,17 +150,17 @@ interface AIStrategistProps {
 
 const QUICK_PROMPTS = [
   {
-    icon: '⚡',
+    icon: '',
     label: 'デグラデーション',
     prompt: '各ドライバーのタイヤデグラデーション（劣化ペース）を比較・分析してください。スティントごとに具体的な数値を使って説明してください。',
   },
   {
-    icon: '⛽',
+    icon: '',
     label: 'ピット戦略',
     prompt: 'ピット戦略（アンダーカット・オーバーカット）の観点からレースを分析してください。誰の戦略が最も効果的でしたか？',
   },
   {
-    icon: '🎯',
+    icon: '',
     label: 'ターニングポイント',
     prompt: 'このレースの勝負所・ターニングポイントはどこでしたか？ラップタイムデータから順位変動の可能性がある局面を解説してください。',
   },
@@ -181,8 +183,10 @@ export default function AIStrategist({
   const { data: authSession } = useSession();
   const { isPro, aiUsage, consumeAi, addBonus } = usePlanTier();
   const [showRewardModal, setShowRewardModal] = useState<boolean>(false);
+  const [useUltraRegulations, setUseUltraRegulations] = useState<boolean>(false);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [attachedFile, setAttachedFile] = useState<{ file: File; base64: string } | null>(null);
 
   useEffect(() => {
     try {
@@ -238,6 +242,19 @@ export default function AIStrategist({
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64Str = event.target?.result as string;
+      setAttachedFile({ file, base64: base64Str });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
 
   // Stop radio speech on unmount
   useEffect(() => {
@@ -259,9 +276,10 @@ export default function AIStrategist({
   );
 
   // Core: send message and stream response
-  const sendMessage = useCallback(async (textToSend: string) => {
+  const sendMessage = useCallback(async (textToSend: string, options?: { includeRaw?: boolean }) => {
     const trimmed = textToSend.trim();
     if (!trimmed || isStreaming) return;
+    const includeRaw = options?.includeRaw ?? false;
 
     if (!authSession?.user) {
       onRequireAuth?.();
@@ -278,7 +296,10 @@ export default function AIStrategist({
         {
           id: aiMsgId,
           role: 'model',
-          content: '💎 **本日のAI戦略相談枠（無料分）の上限に達しました**\n\nヘッダーの「🎬 +2回」ボタンから公式スポンサー案内を視聴すると質問枠を即座に回復できます。\nまた、回数無制限で活用するには**「Pitwall Pro」**へアップグレードしてください。',
+          content: `**本日のAI戦略相談枠（無料分）の上限に達しました**
+
+ヘッダーの「+2回」ボタンから公式スポンサー案内を視聴すると質問枠を即座に回復できます。
+また、回数無制限で活用するには**「Pitwall Pro」**へアップグレードしてください。`,
           isStreaming: false,
         },
       ]);
@@ -289,17 +310,24 @@ export default function AIStrategist({
     const userMsgId = `user_${Date.now()}`;
     const aiMsgId = `ai_${Date.now()}`;
 
-    const userMsg: ChatMessage = { id: userMsgId, role: 'user', content: trimmed };
+    const attachmentPayload = attachedFile ? {
+      data: attachedFile.base64.replace(/^data:.*?;base64,/, ''),
+      mimeType: attachedFile.file.type,
+      name: attachedFile.file.name,
+    } : undefined;
+
+    const userMsg: ChatMessage = { id: userMsgId, role: 'user', content: trimmed, attachment: attachmentPayload };
     const aiMsg: ChatMessage = { id: aiMsgId, role: 'model', content: '', isStreaming: true };
 
     setMessages(prev => [...prev, userMsg, aiMsg]);
     setInput('');
+    setAttachedFile(null);
     setIsStreaming(true);
 
     // Build history for API (exclude the blank AI placeholder)
     const history: StrategistMessage[] = [
-      ...messages.map(m => ({ role: m.role, content: m.content })),
-      { role: 'user', content: trimmed },
+      ...messages.map(m => ({ role: m.role, content: m.content, attachment: m.attachment })),
+      { role: 'user', content: trimmed, attachment: attachmentPayload },
     ];
 
     abortRef.current = new AbortController();
@@ -309,11 +337,27 @@ export default function AIStrategist({
       const effectiveKey = apiKey;
       if (effectiveKey) headers['x-gemini-key'] = effectiveKey;
 
+      let rawTelemetryData = undefined;
+      if (includeRaw) {
+        rawTelemetryData = JSON.stringify({
+          lapsCache,
+          stints,
+          pitStopsCache,
+          selectedDrivers,
+        });
+      }
+
       const res = await fetch('/api/strategist', {
         method: 'POST',
         headers,
         signal: abortRef.current.signal,
-        body: JSON.stringify({ messages: history, context: getContext(), model: modelChoice }),
+        body: JSON.stringify({ 
+          messages: history, 
+          context: getContext(), 
+          model: modelChoice,
+          includeFiaRegulations: useUltraRegulations,
+          rawTelemetryData 
+        }),
       });
 
       if (res.status === 401) {
@@ -351,7 +395,7 @@ export default function AIStrategist({
       const msg = err instanceof Error ? err.message : 'Unknown error';
       setMessages(prev =>
         prev.map(m => m.id === aiMsgId
-          ? { ...m, isStreaming: false, content: `⚠️ エラー: ${msg}\n\nGemini API接続に問題が発生しました。しばらく時間を置いてお試しください。` }
+          ? { ...m, isStreaming: false, content: `エラー: ${msg}\n\nGemini API接続に問題が発生しました。しばらく時間を置いてお試しください。` }
           : m
         )
       );
@@ -359,7 +403,7 @@ export default function AIStrategist({
       setIsStreaming(false);
       inputRef.current?.focus();
     }
-  }, [isStreaming, messages, apiKey, getContext, modelChoice, authSession, onRequireAuth, isPro, aiUsage, consumeAi, onOpenUpgradeModal]);
+  }, [isStreaming, messages, attachedFile, apiKey, getContext, modelChoice, authSession, onRequireAuth, isPro, aiUsage, consumeAi, onOpenUpgradeModal, useUltraRegulations, lapsCache, stints, pitStopsCache, selectedDrivers]);
 
   const handleStop = () => {
     abortRef.current?.abort();
@@ -400,8 +444,7 @@ export default function AIStrategist({
           <div className="flex items-center gap-1.5 sm:gap-2">
             {/* Tier Quota Badge */}
             {isPro ? (
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-bold flex items-center gap-1 shadow-sm">
-                <span>💎</span>
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono font-bold flex items-center gap-1 shadow-sm">
                 <span>PRO</span>
               </span>
             ) : (
@@ -409,46 +452,50 @@ export default function AIStrategist({
                 <button
                   type="button"
                   onClick={onOpenUpgradeModal}
-                  className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 font-mono flex items-center gap-1 cursor-pointer transition-colors"
+                  className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-300 border border-white/10 font-mono flex items-center gap-1 cursor-pointer transition-colors"
                   title="無料プランの本日残り利用回数（クリックでPro詳細）"
                 >
-                  <span>⚡ {aiUsage.remaining}/{aiUsage.max}回</span>
+                  <span>{aiUsage.remaining}/{aiUsage.max}回</span>
                   <span className="text-amber-400 font-bold">PRO</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowRewardModal(true)}
-                  className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                  className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 font-mono font-bold flex items-center gap-1 cursor-pointer transition-colors"
                   title="公式スポンサー案内を見て質問回数を+2回回復する"
                 >
-                  <span>🎬 +2回</span>
+                  <span>+2回</span>
                 </button>
               </div>
             )}
 
-            <button
-              type="button"
-              onClick={() => {
-                setTempApiKey(apiKey);
-                setShowKeyModal(true);
-              }}
-              title={apiKey ? 'Gemini APIキー設定済み（クリックで変更）' : 'APIキー設定（現在デモAIモード稼働中・クリックで設定）'}
-              className={`text-[11px] px-2 py-1 rounded border flex items-center gap-1 transition-all cursor-pointer ${
-                apiKey
-                  ? 'border-emerald-500/50 bg-emerald-950/40 text-emerald-300 hover:bg-emerald-950/70'
-                  : 'border-white/10 bg-slate-800/80 text-slate-400 hover:text-slate-200 hover:border-white/20'
-              }`}
-            >
-              <span>{apiKey ? '🟢 🔑 設定済' : '🔑 キー設定'}</span>
-            </button>
+            
             <select
               value={modelChoice}
               onChange={e => setModelChoice(e.target.value as 'flash' | 'pro')}
               className="text-xs bg-slate-800 border border-white/10 text-slate-300 rounded px-2 py-1 focus:outline-none cursor-pointer"
             >
-              <option value="flash">Flash ⚡</option>
-              <option value="pro">Pro 🎯</option>
+              <option value="flash">Flash </option>
+              <option value="pro">Pro </option>
             </select>
+            <label className="flex items-center gap-1.5 cursor-pointer group pl-1">
+              <div className="relative flex items-center">
+                <input
+                  type="checkbox"
+                  checked={useUltraRegulations}
+                  onChange={(e) => setUseUltraRegulations(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-7 h-4 bg-slate-700 rounded-full peer-checked:bg-indigo-600 transition-colors"></div>
+                <div className="absolute left-[2px] top-[2px] bg-white w-3 h-3 rounded-full transition-transform peer-checked:translate-x-3"></div>
+              </div>
+              <span className="text-xs font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 hidden sm:inline-block">
+                📚 2026 FIA Regulations <span className="text-[10px] bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-900 px-1.5 py-0.5 rounded font-black tracking-wider shadow-[0_0_5px_rgba(251,191,36,0.6)] ml-1">PRO</span>
+              </span>
+              <span className="text-xs font-bold text-indigo-400 sm:hidden">
+                📚 <span className="text-[9px] bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-900 px-1 py-0.5 rounded font-black shadow-[0_0_5px_rgba(251,191,36,0.6)] ml-1">PRO</span>
+              </span>
+            </label>
             {messages.length > 0 && (
               <button
                 onClick={handleClear}
@@ -470,7 +517,7 @@ export default function AIStrategist({
               className={`flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs font-medium transition-colors ${
                 noDrivers || isStreaming
                   ? 'border-white/5 text-slate-600 cursor-not-allowed'
-                  : 'border-white/15 text-slate-300 hover:border-blue-500/60 hover:text-blue-300 hover:bg-blue-500/10 cursor-pointer'
+                  : 'border-white/15 text-slate-300 hover:border-slate-400/60 hover:text-slate-200 hover:bg-slate-400/10 cursor-pointer'
               }`}
             >
               <span>{qp.icon}</span>
@@ -491,10 +538,9 @@ export default function AIStrategist({
         style={{ maxHeight: 380, minHeight: 100 }}
       >
         {!authSession?.user && (
-          <div className="p-3 mb-2 rounded-2xl bg-gradient-to-r from-blue-950/70 to-indigo-950/70 border border-sky-500/40 text-xs text-sky-200 flex items-center justify-between gap-3 shadow-lg">
+          <div className="p-3 mb-2 rounded-2xl bg-gradient-to-r from-slate-900/70 to-slate-900/70 border border-slate-400/40 text-xs text-slate-100 flex items-center justify-between gap-3 shadow-lg">
             <div className="space-y-0.5">
               <p className="font-racing font-bold text-white flex items-center gap-1.5">
-                <span>🔒</span>
                 <span>PROメンバー専用機能</span>
               </p>
               <p className="text-[11px] text-slate-300">
@@ -503,7 +549,7 @@ export default function AIStrategist({
             </div>
             <button
               onClick={() => onRequireAuth?.()}
-              className="flex-shrink-0 px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-racing font-bold text-xs shadow-md transition-all cursor-pointer"
+              className="flex-shrink-0 px-3 py-1.5 rounded-xl bg-gradient-to-r from-slate-400 to-slate-500 hover:from-slate-300 hover:to-slate-400 text-white font-racing font-bold text-xs shadow-md transition-all cursor-pointer"
             >
               ログイン
             </button>
@@ -512,7 +558,6 @@ export default function AIStrategist({
 
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-24 text-slate-600 text-xs gap-2 text-center">
-            <span className="text-2xl">🏎</span>
             <span>上のボタンで即時分析、または<br />下の入力欄から自由に質問できます</span>
           </div>
         ) : (
@@ -542,35 +587,79 @@ export default function AIStrategist({
 
       {/* ── Input bar (always visible) ── */}
       <div className="flex-shrink-0 border-t border-white/10 p-3 bg-slate-900/30">
-        <div className="flex gap-2 items-end">
+        {attachedFile && (
+          <div className="flex items-center gap-2 mb-2 px-3 py-1.5 bg-slate-800/80 rounded-lg w-max border border-slate-700/50">
+            <span className="text-xs text-slate-300 truncate max-w-[200px]" title={attachedFile.file.name}>
+              📎 {attachedFile.file.name}
+            </span>
+            <button
+              type="button"
+              onClick={() => setAttachedFile(null)}
+              className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+        <div className="flex flex-col gap-2.5">
+          <div className="flex items-center gap-2">
+          <input
+            type="file"
+            accept="image/*,audio/*"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="flex-shrink-0 p-2 h-10 w-10 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors cursor-pointer flex items-center justify-center"
+            title="ファイルを添付"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" /></svg>
+          </button>
           <textarea
             ref={inputRef}
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={noDrivers ? 'ドライバーを選択してください...' : 'テレメトリについて質問... (Enter 送信 / Shift+Enter 改行)'}
+            placeholder={noDrivers ? "ドライバーを選択してください..." : "質問を入力..."}
             disabled={isStreaming || noDrivers}
             rows={2}
-            className="flex-1 bg-slate-800/70 border border-white/10 text-slate-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/50 placeholder:text-slate-600 resize-none disabled:opacity-50"
+            className="flex-1 bg-slate-800/70 border border-white/10 text-slate-200 text-xs rounded-lg px-3 py-2.5 focus:outline-none focus:border-slate-400/50 placeholder:text-slate-600 resize-none disabled:opacity-50 h-10 leading-relaxed"
           />
+          </div>
+          <div className="flex justify-end gap-2 items-center w-full">
           {isStreaming ? (
             <button
               type="button"
               onClick={handleStop}
               className="flex-shrink-0 px-3 py-2 h-10 text-xs bg-red-600/90 hover:bg-red-500 text-white rounded-lg transition-colors font-medium"
             >
-              ⏹ 停止
+              停止
             </button>
           ) : (
-            <button
-              type="button"
-              onClick={() => sendMessage(input)}
-              disabled={!input.trim() || noDrivers}
-              className="flex-shrink-0 px-3 py-2 h-10 text-xs bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg transition-colors font-medium"
-            >
-              ✈ 送信
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => sendMessage(input, { includeRaw: true })}
+                disabled={!input.trim() || noDrivers}
+                title="生データを含めて送信"
+                className="flex-shrink-0 px-2.5 py-2 h-10 text-xs bg-indigo-600/90 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-1"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mr-1"><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" /></svg><span className="hidden sm:inline">DATA</span><span className="ml-1 text-[9px] font-black bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-900 px-1 rounded-sm shadow-[0_0_8px_rgba(251,191,36,0.5)] tracking-wide">PRO</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => sendMessage(input)}
+                disabled={!input.trim() || noDrivers}
+                className="flex-shrink-0 px-3 py-2 h-10 text-xs bg-slate-500 hover:bg-slate-400 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg transition-colors font-medium"
+              >
+                送信
+              </button>
+            </>
           )}
+          </div>
         </div>
         <p className="text-xs text-slate-700 mt-1">Enter: 送信 ／ Shift+Enter: 改行</p>
       </div>
@@ -581,7 +670,6 @@ export default function AIStrategist({
           <div className="bg-slate-900 border border-white/15 rounded-2xl p-5 max-w-md w-full shadow-2xl space-y-4 text-slate-200">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="font-racing font-bold text-sm text-white flex items-center gap-2">
-                <span>🔑</span>
                 <span>Gemini API キー設定</span>
               </h3>
               <button
@@ -600,9 +688,9 @@ export default function AIStrategist({
               <div className="p-2.5 rounded-xl bg-slate-800/80 border border-white/10 text-[11px] space-y-1">
                 <div className="flex items-center gap-1.5 font-bold">
                   {apiKey ? (
-                    <span className="text-emerald-400">🟢 APIキー設定済み（Gemini実機通信）</span>
+                    <span className="text-emerald-400">APIキー設定済み（Gemini実機通信）</span>
                   ) : (
-                    <span className="text-amber-400">🟡 デモAIモード稼働中（APIキー不要）</span>
+                    <span className="text-amber-400">デモAIモード稼働中（APIキー不要）</span>
                   )}
                 </div>
                 <p className="text-slate-400 leading-relaxed">
@@ -620,9 +708,9 @@ export default function AIStrategist({
                 value={tempApiKey}
                 onChange={e => setTempApiKey(e.target.value)}
                 placeholder="AIzaSy..."
-                className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-sky-500 transition-colors font-mono"
+                className="w-full bg-slate-950 border border-white/15 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-slate-400 transition-colors font-mono"
               />
-              <p className="text-[10px] text-slate-500">
+              <p className="text-[11px] text-slate-500">
                 キーはお使いのブラウザのlocalStorageにのみ安全に保存され、第三者サーバーには保存されません。
               </p>
             </div>
@@ -632,10 +720,9 @@ export default function AIStrategist({
                 href="https://aistudio.google.com/app/apikey"
                 target="_blank"
                 rel="noreferrer"
-                className="text-[11px] text-sky-400 hover:text-sky-300 underline inline-flex items-center gap-1"
+                className="text-[11px] text-slate-300 hover:text-slate-200 underline inline-flex items-center gap-1"
               >
                 <span>Google AI Studioで無料のAPIキーを取得 (Google公式)</span>
-                <span>↗</span>
               </a>
             </div>
 
@@ -662,7 +749,7 @@ export default function AIStrategist({
                 <button
                   type="button"
                   onClick={handleSaveApiKey}
-                  className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+                  className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-slate-400 to-slate-500 hover:from-slate-300 hover:to-slate-400 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
                 >
                   保存する
                 </button>
@@ -714,7 +801,7 @@ function MessageBubble({
       <div
         className={`max-w-[92%] text-xs leading-relaxed whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 shadow-sm ${
           isUser
-            ? 'bg-blue-600/90 text-white rounded-br-sm'
+            ? 'bg-slate-500/90 text-white rounded-br-sm'
             : 'bg-slate-800/85 text-slate-200 rounded-bl-sm border border-white/10'
         }`}
       >
@@ -722,7 +809,7 @@ function MessageBubble({
           ? <ThinkingDots />
           : cleanContent}
         {message.isStreaming && cleanContent && (
-          <span className="inline-block w-1.5 h-3.5 bg-blue-400 ml-0.5 animate-pulse rounded-sm align-text-bottom" />
+          <span className="inline-block w-1.5 h-3.5 bg-slate-300 ml-0.5 animate-pulse rounded-sm align-text-bottom" />
         )}
       </div>
 
@@ -734,11 +821,11 @@ function MessageBubble({
               key={idx}
               type="button"
               onClick={() => onNavigate?.(act)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-blue-950/90 via-indigo-950/80 to-blue-900/70 hover:from-blue-900 hover:to-indigo-850 border border-blue-400/40 hover:border-blue-300 text-blue-200 hover:text-white text-xs font-racing font-bold shadow-md transition-all cursor-pointer group active:scale-95"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-slate-900/90 via-slate-900/80 to-slate-800/70 hover:from-slate-800 hover:to-indigo-850 border border-slate-300/40 hover:border-slate-200 text-slate-100 hover:text-white text-xs font-racing font-bold shadow-md transition-all cursor-pointer group active:scale-95"
             >
               <span className="text-sm group-hover:scale-110 transition-transform">{act.icon}</span>
               <span>{act.label}</span>
-              <span className="text-[11px] text-blue-400 group-hover:translate-x-0.5 transition-transform">➔</span>
+              <span className="text-[11px] text-slate-300 group-hover:translate-x-0.5 transition-transform">➔</span>
             </button>
           ))}
         </div>
@@ -758,7 +845,7 @@ function MessageBubble({
               }`}
               title="レースエンジニア風のチーム無線音声で聴く"
             >
-              <span>{isSpeaking ? '⏹️' : '📻'}</span>
+              <span>{isSpeaking ? '' : ''}</span>
               <span>{isSpeaking ? '交信中...' : '無線音声'}</span>
             </button>
           )}
@@ -766,7 +853,7 @@ function MessageBubble({
             onClick={() => onAddToNotebook(cleanContent)}
             className="text-xs text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
           >
-            📝 ノートに追加
+            ノートに追加
           </button>
           <button
             onClick={() => navigator.clipboard.writeText(cleanContent)}

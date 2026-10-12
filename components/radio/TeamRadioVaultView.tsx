@@ -106,11 +106,10 @@ export default function TeamRadioVaultView({
     <div className="flex flex-col gap-5 text-white">
       {/* Header Banner (only when viewed as inline page) */}
       {!isInsideModal && (
-        <div className="bg-gradient-to-r from-emerald-950/60 via-slate-900/80 to-teal-950/60 border border-emerald-500/20 rounded-2xl p-5 shadow-lg">
+        <div className="bg-gradient-to-r from-emerald-950/60 via-slate-900/80 to-emerald-950/60 border border-emerald-500/20 rounded-2xl p-5 shadow-lg">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <span className="text-[10px] font-racing font-bold text-emerald-400 tracking-wider uppercase flex items-center gap-1.5 mb-1">
-                <span>🎙️</span>
+              <span className="text-[11px] font-racing font-bold text-emerald-400 tracking-wider uppercase flex items-center gap-1.5 mb-1">
                 <span>LEGENDARY TEAM RADIO VAULT / 人間ドラマの極地</span>
               </span>
               <h4 className="text-lg font-racing font-black text-white">
@@ -158,7 +157,7 @@ export default function TeamRadioVaultView({
               >
                 <span>{cfg.icon}</span>
                 <span>{cfg.label.replace(/^.*?\s/, '')}</span>
-                <span className="text-[10px] opacity-70 font-mono">({count})</span>
+                <span className="text-[11px] opacity-70 font-mono">({count})</span>
               </button>
             );
           })}
@@ -206,7 +205,7 @@ export default function TeamRadioVaultView({
                           {radio.speaker}
                         </h4>
                         <span
-                          className="text-[10px] font-mono px-2 py-0.5 rounded-full border"
+                          className="text-[11px] font-mono px-2 py-0.5 rounded-full border"
                           style={{
                             borderColor: `${radio.teamColor}50`,
                             color: radio.teamColor,
@@ -223,7 +222,7 @@ export default function TeamRadioVaultView({
                   </div>
 
                   <span
-                    className="text-[10px] font-racing font-bold px-2.5 py-1 rounded-lg border flex-shrink-0"
+                    className="text-[11px] font-racing font-bold px-2.5 py-1 rounded-lg border flex-shrink-0"
                     style={{
                       backgroundColor: catCfg.bg,
                       borderColor: catCfg.color,
@@ -236,7 +235,7 @@ export default function TeamRadioVaultView({
 
                 {/* Original Quote */}
                 <div className="p-3 bg-slate-950/80 rounded-xl border border-white/5 space-y-1">
-                  <span className="text-[9px] font-racing font-bold text-slate-400 uppercase tracking-wider block">
+                  <span className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider block">
                     ORIGINAL TEAM RADIO / 英語原文
                   </span>
                   <p className="text-xs sm:text-sm font-mono font-bold text-amber-300 italic leading-relaxed">
@@ -246,7 +245,7 @@ export default function TeamRadioVaultView({
 
                 {/* Japanese Translation */}
                 <div className="p-3 bg-slate-900/80 rounded-xl border border-white/5 space-y-0.5">
-                  <span className="text-[9px] font-racing font-bold text-slate-400 uppercase tracking-wider block">
+                  <span className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider block">
                     JAPANESE TRANSLATION / 日本語訳
                   </span>
                   <p className="text-xs text-slate-200 leading-relaxed font-medium">
@@ -256,8 +255,7 @@ export default function TeamRadioVaultView({
 
                 {/* Context & Background */}
                 <div className="text-xs bg-black/40 p-3 rounded-xl border border-white/5 space-y-1">
-                  <span className="text-[10px] font-racing font-bold text-sky-400 flex items-center gap-1">
-                    <span>📖</span>
+                  <span className="text-[11px] font-racing font-bold text-slate-300 flex items-center gap-1">
                     <span>戦術背景とエピソード</span>
                   </span>
                   <p className="text-[11px] leading-relaxed text-slate-300">
@@ -276,15 +274,15 @@ export default function TeamRadioVaultView({
                         className={`px-3 py-1.5 rounded-xl text-xs font-racing font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
                           isThisPlaying
                             ? 'bg-amber-500 text-black shadow-amber-500/40 animate-pulse'
-                            : 'bg-blue-600 hover:bg-blue-500 text-white'
+                            : 'bg-slate-500 hover:bg-slate-400 text-white'
                         }`}
                       >
-                        <span>{isThisPlaying ? '⏸ 一時停止' : '▶ 実音声再生'}</span>
+                        <span>{isThisPlaying ? '一時停止' : '実音声再生'}</span>
                       </button>
 
                       {activePlayingId === radio.id ? (
                         <div className="flex items-center gap-2 flex-1 max-w-xs">
-                          <span className="text-[10px] font-mono text-slate-400 w-8">
+                          <span className="text-[11px] font-mono text-slate-400 w-8">
                             {currentTime.toFixed(1)}s
                           </span>
                           <input
@@ -296,13 +294,12 @@ export default function TeamRadioVaultView({
                             onChange={handleSeek}
                             className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-400"
                           />
-                          <span className="text-[10px] font-mono text-slate-500 w-8">
+                          <span className="text-[11px] font-mono text-slate-500 w-8">
                             {duration ? `${duration.toFixed(1)}s` : '--'}
                           </span>
                         </div>
                       ) : (
-                        <span className="text-[10px] font-mono text-emerald-400 flex items-center gap-1">
-                          <span>🔊</span>
+                        <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1">
                           <span>F1生中継オンボード実音声</span>
                         </span>
                       )}
@@ -317,13 +314,12 @@ export default function TeamRadioVaultView({
                       className="px-3 py-1.5 rounded-xl text-xs font-racing font-bold bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-500/40 hover:border-red-400 flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
                       title="F1公式アーカイブ映像・実音声を別タブで再生"
                     >
-                      <span>🎬 公式アーカイブ映像・実音声</span>
-                      <span className="text-[10px]">↗</span>
+                      <span>公式アーカイブ映像・実音声</span>
                     </a>
                   )}
 
                   {!radio.audioUrl && (
-                    <span className="text-[10px] text-slate-400 font-mono">
+                    <span className="text-[11px] text-slate-400 font-mono">
                       ※歴史的アーカイブ（FOM著作権保護のため公式クリップ連携）
                     </span>
                   )}
@@ -333,7 +329,7 @@ export default function TeamRadioVaultView({
                   {radio.tags.slice(0, 3).map((tag) => (
                     <span
                       key={tag}
-                      className="text-[9px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-white/5"
+                      className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-white/5"
                     >
                       #{tag}
                     </span>
@@ -341,7 +337,7 @@ export default function TeamRadioVaultView({
                   {onNavigateToDrama && (
                     <button
                       onClick={onNavigateToDrama}
-                      className="text-[10px] font-racing text-rose-400 hover:text-rose-300 hover:underline flex items-center gap-0.5 ml-1"
+                      className="text-[11px] font-racing text-red-400 hover:text-red-300 hover:underline flex items-center gap-0.5 ml-1"
                     >
                       <span>ドラマHub</span>
                       <span>➔</span>

@@ -197,9 +197,9 @@ export function getCircuitDirection(circuitId: string): { label: string; icon: s
     'las-vegas',
     'imola',
   ];
-  if (circuitId === 'suzuka') return { label: '8の字立体交差', icon: '♾️' };
+  if (circuitId === 'suzuka') return { label: '8の字立体交差', icon: '' };
   if (antiClockwise.includes(circuitId)) return { label: '反時計回り', icon: '↺' };
-  return { label: '時計回り', icon: '🔄' };
+  return { label: '時計回り', icon: '' };
 }
 
 export default function CircuitsHub({
@@ -338,7 +338,7 @@ export default function CircuitsHub({
 
           <div className="relative flex-1 max-w-sm">
             <span className="absolute inset-y-0 left-0 flex items-center pl-2.5 pointer-events-none text-slate-400 text-xs">
-              🔍
+              
             </span>
             <input
               type="text"
@@ -373,7 +373,7 @@ export default function CircuitsHub({
             }`}
             title="お気に入りに登録したサーキットのみ表示"
           >
-            <span>{onlyFavorites ? '★' : '☆'}</span>
+            <span>{onlyFavorites ? '' : '☆'}</span>
             <span>推しコース ({prefs.favoriteCircuitIds?.length || 0})</span>
           </button>
 
@@ -390,14 +390,13 @@ export default function CircuitsHub({
             }`}
             title="詳細フィルター（地域・コース特性）の開閉"
           >
-            <span>⚙️</span>
             <span>絞り込み</span>
             {activeFilterCount > 0 && (
-              <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[10px] font-mono flex items-center justify-center font-bold">
+              <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[11px] font-mono flex items-center justify-center font-bold">
                 {activeFilterCount}
               </span>
             )}
-            <span className="text-[10px] transition-transform">{isFilterOpen ? '▲' : '▼'}</span>
+            <span className="text-[11px] transition-transform">{isFilterOpen ? '▲' : '▼'}</span>
           </button>
 
           {/* Reset all button if anything is filtered */}
@@ -405,7 +404,7 @@ export default function CircuitsHub({
             <button
               type="button"
               onClick={handleResetFilters}
-              className="text-xs font-mono font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
+              className="text-xs font-mono font-bold bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
               title="すべての絞り込み条件をリセット"
             >
               <span>✕</span>
@@ -492,7 +491,7 @@ export default function CircuitsHub({
       {/* ── 3. Active Filter Dismissible Chips Strip ── */}
       {(regionFilter !== 'ALL' || characteristicFilter !== 'ALL' || onlyFavorites || effectiveSearch.trim()) && (
         <div className="flex flex-wrap items-center gap-1.5 px-1 text-xs">
-          <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1 mr-1">
+          <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1 mr-1">
             <SlidersHorizontal className="w-3 h-3 text-red-400" />
             <span>絞り込み中:</span>
           </span>
@@ -552,7 +551,7 @@ export default function CircuitsHub({
           <button
             type="button"
             onClick={handleResetFilters}
-            className="text-[11px] text-rose-400 hover:text-rose-300 underline ml-1 cursor-pointer font-mono"
+            className="text-[11px] text-red-400 hover:text-red-300 underline ml-1 cursor-pointer font-mono"
           >
             すべて解除
           </button>
@@ -562,7 +561,6 @@ export default function CircuitsHub({
       {/* ── Empty State ── */}
       {filteredCircuits.length === 0 && (
         <div className="glass-card p-12 text-center flex flex-col items-center justify-center gap-3">
-          <span className="text-4xl">🏁</span>
           <h3 className="text-base font-bold text-white">
             条件に一致するサーキットが見つかりませんでした
           </h3>
@@ -607,10 +605,10 @@ export default function CircuitsHub({
                 {/* Floating Top Bar on Image */}
                 <div className="absolute top-2.5 inset-x-2.5 flex items-center justify-between gap-1.5 z-10">
                   <div className="flex items-center gap-1.5 flex-wrap">
-                    <span className="text-[10px] font-mono px-2 py-0.5 bg-black/60 backdrop-blur-md text-white rounded-md border border-white/10 font-bold">
+                    <span className="text-[11px] font-mono px-2 py-0.5 bg-black/60 backdrop-blur-md text-white rounded-md border border-white/10 font-bold">
                       {circuit.country}
                     </span>
-                    <span className="text-[9px] font-mono px-1.5 py-0.5 bg-slate-900/80 backdrop-blur-md text-slate-300 rounded border border-white/10">
+                    <span className="text-[11px] font-mono px-1.5 py-0.5 bg-slate-900/80 backdrop-blur-md text-slate-300 rounded border border-white/10">
                       {region === 'EUROPE' && '欧州'}
                       {region === 'ASIA_ME' && 'アジア中東'}
                       {region === 'AMERICAS' && '米州'}
@@ -619,7 +617,7 @@ export default function CircuitsHub({
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-mono font-bold text-white bg-black/70 backdrop-blur-md border border-white/10 px-2 py-0.5 rounded-md">
+                    <span className="text-[11px] font-mono font-bold text-white bg-black/70 backdrop-blur-md border border-white/10 px-2 py-0.5 rounded-md">
                       {circuit.lengthKm} km
                     </span>
                     {/* Favorite Star Button */}
@@ -642,14 +640,14 @@ export default function CircuitsHub({
                 </div>
 
                 {/* Floating Bottom Bar on Image (Direction, Elevation, DRS) */}
-                <div className="absolute bottom-2 inset-x-2.5 flex items-center justify-between text-[9.5px] font-mono text-slate-300 z-10">
+                <div className="absolute bottom-2 inset-x-2.5 flex items-center justify-between text-[11px] font-mono text-slate-300 z-10">
                   <div className="flex items-center gap-1.5">
                     <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md border border-white/10 flex items-center gap-1">
                       <span>{direction.icon}</span>
                       <span>{direction.label}</span>
                     </span>
                     {elevation !== undefined && (
-                      <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md border border-white/10 text-sky-300">
+                      <span className="px-2 py-0.5 rounded bg-black/60 backdrop-blur-md border border-white/10 text-slate-200">
                         高低差 {elevation}m
                       </span>
                     )}
@@ -667,23 +665,23 @@ export default function CircuitsHub({
                     <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-red-400 transition-colors leading-snug">
                       {circuit.name}
                     </h3>
-                    <p className="text-[10px] text-slate-400 font-mono truncate mt-0.5">
+                    <p className="text-[11px] text-slate-400 font-mono truncate mt-0.5">
                       {circuit.officialName}
                     </p>
                   </div>
 
                   {/* Circuit Specs Badges */}
-                  <div className="grid grid-cols-3 gap-1.5 bg-slate-950/60 p-2 rounded-xl border border-white/5 text-center text-[10px] font-mono">
+                  <div className="grid grid-cols-3 gap-1.5 bg-slate-950/60 p-2 rounded-xl border border-white/5 text-center text-[11px] font-mono">
                     <div>
-                      <span className="text-slate-500 block text-[9px]">DF要求</span>
+                      <span className="text-slate-500 block text-[11px]">DF要求</span>
                       <strong className="text-slate-200">{circuit.downforceLevel}</strong>
                     </div>
                     <div>
-                      <span className="text-slate-500 block text-[9px]">タイヤ負荷</span>
+                      <span className="text-slate-500 block text-[11px]">タイヤ負荷</span>
                       <strong className="text-amber-400">{circuit.tyreStress}</strong>
                     </div>
                     <div>
-                      <span className="text-slate-500 block text-[9px]">ピットロス</span>
+                      <span className="text-slate-500 block text-[11px]">ピットロス</span>
                       <strong className="text-slate-200">約{circuit.typicalPitLossSec}s</strong>
                     </div>
                   </div>
@@ -691,17 +689,17 @@ export default function CircuitsHub({
                   {/* Characteristics Tag Pills */}
                   <div className="flex flex-wrap items-center gap-1">
                     {chars.includes('POWER') && (
-                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                      <span className="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
                         超高速パワー
                       </span>
                     )}
                     {chars.includes('STREET') && (
-                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                      <span className="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
                         市街地ストリート
                       </span>
                     )}
                     {chars.includes('TECHNICAL') && (
-                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                      <span className="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
                         高DFテクニカル
                       </span>
                     )}
@@ -714,22 +712,22 @@ export default function CircuitsHub({
 
                   {/* Weather Pill */}
                   {weather && (
-                    <div className="flex items-center justify-between text-[10px] font-mono text-slate-300 bg-white/[0.03] px-2 py-1 rounded-lg border border-white/5">
+                    <div className="flex items-center justify-between text-[11px] font-mono text-slate-300 bg-white/[0.03] px-2 py-1 rounded-lg border border-white/5">
                       <span className="flex items-center gap-1">
                         <span>{weather.weatherIcon}</span>
                         <span>{weather.airTempC}℃</span>
                         <span className="text-amber-400">/ 路面{weather.trackTempC}℃</span>
                       </span>
-                      <span className={weather.rainProb > 30 ? 'text-sky-400 font-bold' : 'text-slate-400'}>
+                      <span className={weather.rainProb > 30 ? 'text-slate-300 font-bold' : 'text-slate-400'}>
                         降水 {weather.rainProb}%
                       </span>
                     </div>
                   )}
 
                   {/* Lap Record Snippet */}
-                  <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between gap-1 bg-slate-950/40 px-2 py-1 rounded-lg border border-white/5">
+                  <div className="text-[11px] font-mono text-slate-400 flex items-center justify-between gap-1 bg-slate-950/40 px-2 py-1 rounded-lg border border-white/5">
                     <span className="whitespace-nowrap shrink-0">レコード:</span>
-                    <span className="text-amber-300 font-bold text-right text-[10.5px] truncate">
+                    <span className="text-amber-300 font-bold text-right text-[11px] truncate">
                       {circuit.lapRecord.time} <span className="text-slate-400 font-normal">({circuit.lapRecord.driver})</span>
                     </span>
                   </div>
@@ -738,7 +736,7 @@ export default function CircuitsHub({
                 {/* Card Footer with Quick Links + Telemetry CTA + Details */}
                 <div className="flex items-center justify-between pt-2.5 border-t border-white/5 text-[11px] font-mono text-slate-400 gap-2">
                   <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                    <span className="text-[10px] text-slate-400 shrink-0 font-bold">
+                    <span className="text-[11px] text-slate-400 shrink-0 font-bold">
                       {circuit.turns} ターン
                     </span>
                     {circuit.officialLinks?.website && (
@@ -747,12 +745,10 @@ export default function CircuitsHub({
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-sky-300 border border-white/10 text-[9.5px] font-mono transition-all"
+                        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-slate-200 border border-white/10 text-[11px] font-mono transition-all"
                         title={`${circuit.name} 公式Webサイト`}
                       >
-                        <span>🌐</span>
                         <span>公式</span>
-                        <span className="text-[8px]">↗</span>
                       </a>
                     )}
                     {circuit.officialLinks?.f1Official && (
@@ -761,11 +757,10 @@ export default function CircuitsHub({
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-red-300 border border-white/10 text-[9.5px] font-mono transition-all"
+                        className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-red-300 border border-white/10 text-[11px] font-mono transition-all"
                         title={`${circuit.name} F1.com公式ガイド`}
                       >
-                        <span className="text-red-500 font-bold text-[8.5px]">F1</span>
-                        <span className="text-[8px]">↗</span>
+                        <span className="text-red-500 font-bold text-[11px]">F1</span>
                       </a>
                     )}
                   </div>
@@ -782,10 +777,9 @@ export default function CircuitsHub({
                             onNavigateToTelemetry({ year: 2024, meetingName: circuit.name });
                           }
                         }}
-                        className="px-2 py-1 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 text-[10px] font-racing font-bold flex items-center gap-1 transition-all cursor-pointer"
+                        className="px-2 py-1 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 text-[11px] font-racing font-bold flex items-center gap-1 transition-all cursor-pointer"
                         title="テレメトリーへジャンプ"
                       >
-                        <span>📊</span>
                         <span>テレメトリー</span>
                       </button>
                     )}

@@ -77,8 +77,6 @@ export default function PitStrategySimulator({
 - 装着タイヤ: ${result.currentTyreCompound} (${result.currentTyreAge}周走行)
 - ピット後想定復帰順位: P${result.predictedExitPosition}
 - コース復帰時トラフィック: ${result.trafficStatus === 'CLEAN_AIR' ? 'クリーンエア（クリアラップ）' : result.trafficStatus === 'IN_TRAFFIC' ? `トラフィックに遭遇 (${result.aheadDriverAcronym}の後方 ${result.gapAheadSeconds}秒)` : `近接 (${result.aheadDriverAcronym}の後方 ${result.gapAheadSeconds}秒)`}
-- 前走車に対するアンダーカット成功確率: ${result.undercutSuccessProb}%
-- オーバーカット推奨度: ${result.overcutViability}
 - ピットロスタイム: ${result.pitLossSeconds}秒
 - 新品${result.targetCompound}タイヤの想定ゲイン: +${result.freshTyreDeltaPerLap}秒/周`;
 
@@ -324,43 +322,29 @@ export default function PitStrategySimulator({
                 <span className="truncate">{trafficText}</span>
               </div>
 
-              {/* Undercut Success Probability & Progress Bar */}
-              <div className="bg-slate-950/60 rounded-xl p-2.5 border border-white/5 flex flex-col gap-1.5">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-400 flex items-center gap-1 text-[11px]">
-                    <span>⚡</span>
-                    <span>アンダーカット成功確率</span>
+              {/* Gap status */}
+              <div className="bg-slate-950/60 rounded-xl p-2.5 border border-white/5 flex flex-col gap-1.5 mt-2">
+                <div className="text-xs text-slate-400 mb-1">想定ギャップ (復帰時)</div>
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-slate-300">
+                    前走: {r.aheadDriverAcronym || 'なし'}
                   </span>
-                  <span
-                    className={`font-mono font-bold text-xs ${
-                      r.undercutSuccessProb >= 70
-                        ? 'text-emerald-400'
-                        : r.undercutSuccessProb >= 40
-                        ? 'text-yellow-400'
-                        : 'text-red-400'
-                    }`}
-                  >
-                    {r.undercutSuccessProb}%
+                  {r.gapAheadSeconds !== null ? (
+                    <span className="text-red-400 font-bold">+{r.gapAheadSeconds.toFixed(1)}s</span>
+                  ) : (
+                    <span className="text-slate-500">-</span>
+                  )}
+                </div>
+                <div className="w-full h-[1px] bg-white/5 my-0.5" />
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-slate-300">
+                    後続: {r.behindDriverAcronym || 'なし'}
                   </span>
-                </div>
-
-                {/* Bar */}
-                <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full transition-all duration-500 rounded-full ${
-                      r.undercutSuccessProb >= 70
-                        ? 'bg-gradient-to-r from-emerald-500 to-green-400'
-                        : r.undercutSuccessProb >= 40
-                        ? 'bg-gradient-to-r from-yellow-500 to-amber-400'
-                        : 'bg-gradient-to-r from-red-500 to-rose-400'
-                    }`}
-                    style={{ width: `${r.undercutSuccessProb}%` }}
-                  />
-                </div>
-
-                <div className="flex justify-between text-[10px] text-slate-500 font-mono mt-0.5">
-                  <span>オーバーカット推奨度: <strong className="text-slate-300">{r.overcutViability}</strong></span>
-                  <span>想定ゲイン: <strong className="text-green-400">+{r.freshTyreDeltaPerLap}s/L</strong></span>
+                  {r.gapBehindSeconds !== null ? (
+                    <span className="text-emerald-400 font-bold">-{r.gapBehindSeconds.toFixed(1)}s</span>
+                  ) : (
+                    <span className="text-slate-500">-</span>
+                  )}
                 </div>
               </div>
 

@@ -107,7 +107,7 @@ export default function SessionResultsModal({
               <span className="text-2xl sm:text-3xl shrink-0">{race.flag}</span>
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-red-500/20 text-red-300 border border-red-500/30">
+                  <span className="px-2 py-0.5 rounded text-[11px] font-mono font-bold uppercase bg-red-500/20 text-red-300 border border-red-500/30">
                     ROUND {race.round}
                   </span>
                   <h2 className="text-base sm:text-xl font-black text-white truncate">
@@ -145,12 +145,12 @@ export default function SessionResultsModal({
                     className={`px-3 py-1.5 rounded-lg text-xs font-racing font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
                       isActive
                         ? isFinal
-                          ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950/50 border border-red-500/50'
+                          ? 'bg-gradient-to-r from-red-600 to-red-600 text-white shadow-md shadow-red-950/50 border border-red-500/50'
                           : 'bg-white text-slate-950 shadow-md shadow-white/10'
                         : 'bg-slate-900 hover:bg-slate-850 text-slate-300 hover:text-white border border-white/10'
                     }`}
                   >
-                    <span>{isFinal ? '🏁' : s.session.includes('予選') ? '⏱️' : '🏎️'}</span>
+                    <span>{isFinal ? '' : s.session.includes('予選') ? '' : ''}</span>
                     <span>{s.session}</span>
                   </button>
                 );
@@ -163,7 +163,7 @@ export default function SessionResultsModal({
                 <span className="text-red-400 font-bold">JST:</span>
                 <span>{dualTime.jstDay} {dualTime.jstTime}</span>
                 <span className="text-slate-500">/</span>
-                <span className="text-sky-300">現地:</span>
+                <span className="text-slate-200">現地:</span>
                 <span>{dualTime.localTime} {dualTime.tzAbbr}</span>
               </div>
             )}
@@ -202,7 +202,7 @@ export default function SessionResultsModal({
                   </div>
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-slate-400">現地時間 ({dualTime.tzAbbr}):</span>
-                    <span className="text-sky-300 font-bold">{dualTime.localDay || dualTime.jstDay} {dualTime.localTime}</span>
+                    <span className="text-slate-200 font-bold">{dualTime.localDay || dualTime.jstDay} {dualTime.localTime}</span>
                   </div>
                   <div className="flex items-center justify-between gap-3 pt-1.5 border-t border-white/5">
                     <span className="text-slate-400">サーキット:</span>
@@ -235,7 +235,7 @@ export default function SessionResultsModal({
                 {sessionData.polePosition && (
                   <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500/15 to-transparent border border-amber-500/30 flex items-center justify-between gap-2 shadow-sm">
                     <div>
-                      <div className="text-[10px] font-mono text-amber-300 font-bold uppercase">POLE POSITION</div>
+                      <div className="text-[11px] font-mono text-amber-300 font-bold uppercase">POLE POSITION</div>
                       <div className="text-sm font-black text-white font-mono mt-0.5">
                         {sessionData.polePosition.driverName}
                       </div>
@@ -249,7 +249,7 @@ export default function SessionResultsModal({
                 {sessionData.fastestLap && (
                   <div className="p-3 rounded-xl bg-gradient-to-br from-purple-500/15 to-transparent border border-purple-500/30 flex items-center justify-between gap-2 shadow-sm">
                     <div>
-                      <div className="text-[10px] font-mono text-purple-300 font-bold uppercase">FASTEST LAP</div>
+                      <div className="text-[11px] font-mono text-purple-300 font-bold uppercase">FASTEST LAP</div>
                       <div className="text-sm font-black text-white font-mono mt-0.5">
                         {sessionData.fastestLap.driverName}
                       </div>
@@ -263,12 +263,12 @@ export default function SessionResultsModal({
                 {sessionData.airTempC && sessionData.trackTempC && (
                   <div className="p-3 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-between gap-2 shadow-sm">
                     <div>
-                      <div className="text-[10px] font-mono text-slate-400 font-bold uppercase">TRACK CONDITION</div>
+                      <div className="text-[11px] font-mono text-slate-400 font-bold uppercase">TRACK CONDITION</div>
                       <div className="text-xs font-bold text-slate-200 mt-0.5">
                         気温 {sessionData.airTempC}℃ / 路面 {sessionData.trackTempC}℃
                       </div>
                     </div>
-                    <span className="text-[10px] font-mono text-slate-300 px-2 py-1 rounded bg-white/5 border border-white/10">
+                    <span className="text-[11px] font-mono text-slate-300 px-2 py-1 rounded bg-white/5 border border-white/10">
                       DRY
                     </span>
                   </div>
@@ -279,7 +279,7 @@ export default function SessionResultsModal({
               <div className="rounded-xl border border-white/10 overflow-hidden bg-slate-900/60 shadow-lg">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs font-mono">
-                    <thead className="bg-slate-950/90 text-slate-400 uppercase text-[10px] tracking-wider border-b border-white/10">
+                    <thead className="bg-slate-950/90 text-slate-400 uppercase text-[11px] tracking-wider border-b border-white/10">
                       <tr>
                         <th className="py-2.5 px-3 w-14 text-center">POS</th>
                         <th className="py-2.5 px-2 w-10 text-center">NO</th>
@@ -348,17 +348,17 @@ export default function SessionResultsModal({
                                     className="text-white hover:text-red-400 font-bold hover:underline transition-colors text-xs text-left truncate flex items-center gap-1.5 cursor-pointer"
                                   >
                                     <span>{row.driverName}</span>
-                                    <span className="text-[10px] text-slate-400 font-mono font-normal">
+                                    <span className="text-[11px] text-slate-400 font-mono font-normal">
                                       ({row.driverCode})
                                     </span>
                                     {row.isFastestLap && (
-                                      <span className="text-[9px] px-1 py-0.2 rounded bg-purple-500/20 text-purple-300 font-mono font-bold">
+                                      <span className="text-[11px] px-1 py-0.2 rounded bg-purple-500/20 text-purple-300 font-mono font-bold">
                                         FL
                                       </span>
                                     )}
                                   </button>
                                   {row.retireReason && (
-                                    <div className="text-[10px] text-red-400 font-sans truncate">
+                                    <div className="text-[11px] text-red-400 font-sans truncate">
                                       {row.retireReason}
                                     </div>
                                   )}
@@ -441,9 +441,8 @@ export default function SessionResultsModal({
                   onClose();
                   onNavigateToTelemetry(race.gpName);
                 }}
-                className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-racing font-bold text-xs shadow-md transition-all cursor-pointer flex items-center gap-1.5"
+                className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-red-600 to-red-600 hover:from-red-500 hover:to-red-500 text-white font-racing font-bold text-xs shadow-md transition-all cursor-pointer flex items-center gap-1.5"
               >
-                <span>🏎️</span>
                 <span>テレメトリー詳細分析</span>
               </button>
             )}

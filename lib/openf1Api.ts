@@ -17,7 +17,7 @@ import type {
   RaceControlMessage,
 } from './types';
 
-const DEFAULT_TIMEOUT_MS = 3500;
+const DEFAULT_TIMEOUT_MS = 9000; // proxy upstream timeout is 8s
 
 // ─────────────────────────────────────────────────────────────
 // Fetch Helper
@@ -125,10 +125,10 @@ export async function fetchStints(sessionKey: number): Promise<Stint[]> {
 /** Fetch team radio recordings for a driver in a session */
 export async function fetchTeamRadio(
   sessionKey: number,
-  driverNumber: number
+  driverNumber?: number
 ): Promise<TeamRadio[]> {
   return fetchWithTimeout<TeamRadio[]>(
-    toProxyUrl('team_radio', `session_key=${sessionKey}&driver_number=${driverNumber}`)
+    toProxyUrl('team_radio', `session_key=${sessionKey}${driverNumber ? `&driver_number=${driverNumber}` : ''}`)
   );
 }
 
@@ -148,6 +148,24 @@ export async function fetchRaceControl(
 ): Promise<RaceControlMessage[]> {
   return fetchWithTimeout<RaceControlMessage[]>(
     toProxyUrl('race_control', `session_key=${sessionKey}`)
+  );
+}
+
+/** Official classification row (OpenF1 /session_result). position is null for DNF/DNS/DSQ. */
+export interface SessionResultRow {
+  session_key: number;
+  driver_number: number;
+  position: number | null;
+  dnf?: boolean;
+  dns?: boolean;
+  dsq?: boolean;
+  number_of_laps?: number;
+}
+
+/** Fetch the official classification for a session */
+export async function fetchSessionResult(sessionKey: number): Promise<SessionResultRow[]> {
+  return fetchWithTimeout<SessionResultRow[]>(
+    toProxyUrl('session_result', `session_key=${sessionKey}`)
   );
 }
 
@@ -229,3 +247,47 @@ export async function fetchCarData(
   if (dateEnd) q += `&date<=${encodeURIComponent(dateEnd)}`;
   return fetchWithTimeout<RawCarData[]>(toProxyUrl('car_data', q), 5000);
 }
+
+export interface PositionData {
+  session_key: number;
+  meeting_key: number;
+  driver_number: number;
+  date: string;
+  position: number;
+}
+
+export async function fetchPosition(
+  sessionKey: number,
+  driverNumber?: number,
+  dateStart?: string,
+  dateEnd?: string
+): Promise<PositionData[]> {
+  let q = `session_key=${sessionKey}`;
+  if (driverNumber) q += `&driver_number=${driverNumber}`;
+  if (dateStart) q += `&date>=${encodeURIComponent(dateStart)}`;
+  if (dateEnd) q += `&date<=${encodeURIComponent(dateEnd)}`;
+  return fetchWithTimeout<PositionData[]>(toProxyUrl('position', q), 8000);
+}
+
+export interface IntervalData {
+  session_key: number;
+  meeting_key: number;
+  driver_number: number;
+  date: string;
+  gap_to_leader: number;
+  interval: number;
+}
+
+export async function fetchIntervals(
+  sessionKey: number,
+  driverNumber?: number,
+  dateStart?: string,
+  dateEnd?: string
+): Promise<IntervalData[]> {
+  let q = `session_key=${sessionKey}`;
+  if (driverNumber) q += `&driver_number=${driverNumber}`;
+  if (dateStart) q += `&date>=${encodeURIComponent(dateStart)}`;
+  if (dateEnd) q += `&date<=${encodeURIComponent(dateEnd)}`;
+  return fetchWithTimeout<IntervalData[]>(toProxyUrl('intervals', q), 8000);
+}
+

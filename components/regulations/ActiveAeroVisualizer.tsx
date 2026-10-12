@@ -2,7 +2,7 @@
 
 /**
  * components/regulations/ActiveAeroVisualizer.tsx
- * 🏎️ 2026 FIA Active Aerodynamics (X-Mode vs Z-Mode) Interactive Visualizer
+ * 2026 FIA Active Aerodynamics (X-Mode vs Z-Mode) Interactive Visualizer
  * High-precision engineering simulator demonstrating:
  * - Active front wing and rear wing flap deflection
  * - Drag reduction (-55%) & Top Speed delta (+25 km/h)
@@ -57,12 +57,12 @@ export default function ActiveAeroVisualizer() {
   }, [isZMode, simSpeed]);
 
   return (
-    <div className="bg-slate-900/90 rounded-2xl border border-sky-500/30 overflow-hidden shadow-2xl p-5 md:p-6 space-y-6">
+    <div className="bg-slate-900/90 rounded-2xl border border-slate-400/30 overflow-hidden shadow-2xl p-5 md:p-6 space-y-6">
       {/* ── Title & Status Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/30 text-[10px] font-mono font-bold tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-full bg-slate-400/20 text-slate-300 border border-slate-400/30 text-[11px] font-mono font-bold tracking-wider">
               FIA 2026 ACTIVE AERO SIMULATOR
             </span>
             <span className="text-[11px] font-mono text-slate-400">
@@ -81,24 +81,24 @@ export default function ActiveAeroVisualizer() {
             onClick={() => setMode('Z-MODE')}
             className={`px-4 py-2 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-2 ${
               isZMode
-                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/40 ring-1 ring-blue-400'
+                ? 'bg-gradient-to-r from-slate-500 to-slate-500 text-white shadow-lg shadow-slate-400/40 ring-1 ring-slate-300'
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            <span>🛡️ Z-MODE</span>
-            <span className="text-[10px] opacity-80 font-mono font-normal">(旋回/高ダウンフォース)</span>
+            <span>Z-MODE</span>
+            <span className="text-[11px] opacity-80 font-mono font-normal">(旋回/高ダウンフォース)</span>
           </button>
           <button
             type="button"
             onClick={() => setMode('X-MODE')}
             className={`px-4 py-2 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-2 ${
               !isZMode
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/40 ring-1 ring-emerald-300'
+                ? 'bg-gradient-to-r from-emerald-500 to-emerald-500 text-white shadow-lg shadow-emerald-500/40 ring-1 ring-emerald-300'
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            <span>🚀 X-MODE</span>
-            <span className="text-[10px] opacity-80 font-mono font-normal">(直線/低ドラッグ)</span>
+            <span>X-MODE</span>
+            <span className="text-[11px] opacity-80 font-mono font-normal">(直線/低ドラッグ)</span>
           </button>
         </div>
       </div>
@@ -107,12 +107,12 @@ export default function ActiveAeroVisualizer() {
       <div
         className={`p-3.5 rounded-xl border transition-all ${
           isZMode
-            ? 'bg-blue-950/30 border-blue-500/30 text-blue-200'
+            ? 'bg-slate-900/30 border-slate-400/30 text-slate-100'
             : 'bg-emerald-950/30 border-emerald-500/30 text-emerald-200'
         }`}
       >
         <div className="flex items-start gap-3">
-          <span className="text-xl mt-0.5">{isZMode ? '🌀' : '⚡'}</span>
+          <span className="text-xl mt-0.5">{isZMode ? '' : ''}</span>
           <div className="text-xs space-y-1">
             <div className="font-bold flex items-center gap-2">
               <span className="font-mono text-sm">{mode}:</span>
@@ -138,9 +138,9 @@ export default function ActiveAeroVisualizer() {
           <button
             type="button"
             onClick={() => setShowAirflow(!showAirflow)}
-            className={`px-2.5 py-1 rounded-lg text-[10px] font-mono border transition-all ${
+            className={`px-2.5 py-1 rounded-lg text-[11px] font-mono border transition-all ${
               showAirflow
-                ? 'bg-sky-500/20 text-sky-300 border-sky-500/40'
+                ? 'bg-slate-400/20 text-slate-200 border-slate-400/40'
                 : 'bg-slate-800/80 text-slate-400 border-white/10'
             }`}
           >
@@ -356,8 +356,8 @@ export default function ActiveAeroVisualizer() {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-mono font-bold text-slate-300 flex items-center gap-1.5">
-            <span>🎛️ 車速シミュレーションスライダー:</span>
-            <span className="text-sky-400 text-sm font-racing">{simSpeed} km/h</span>
+            <span>車速シミュレーションスライダー:</span>
+            <span className="text-slate-300 text-sm font-racing">{simSpeed} km/h</span>
           </span>
           <span className="text-[11px] text-slate-400 font-mono">
             {simSpeed < 180 ? '低速〜中速コーナー区間' : simSpeed < 280 ? '高速コーナー区間' : 'メインストレート超高速域'}
@@ -371,63 +371,61 @@ export default function ActiveAeroVisualizer() {
           step={5}
           value={simSpeed}
           onChange={(e) => setSimSpeed(Number(e.target.value))}
-          className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-400"
+          className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-slate-300"
         />
 
         {/* Metrics Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
           {/* Downforce */}
           <div className="bg-slate-950/70 p-3.5 rounded-xl border border-white/10">
-            <div className="text-[10px] font-mono text-slate-400 mb-1 flex items-center justify-between">
+            <div className="text-[11px] font-mono text-slate-400 mb-1 flex items-center justify-between">
               <span>実ダウンフォース荷重</span>
-              <span className="text-xs">{isZMode ? '🌀' : '📉'}</span>
+              <span className="text-xs">{isZMode ? '' : ''}</span>
             </div>
             <div className="text-xl font-racing font-bold text-white">
               {stats.downforceKg.toLocaleString()} <span className="text-xs text-slate-400 font-mono">kgf</span>
             </div>
-            <div className="text-[10px] text-slate-400 font-mono mt-1">
+            <div className="text-[11px] text-slate-400 font-mono mt-1">
               CL係数: {stats.cL} ({isZMode ? '旋回最大化' : '-55% 開放'})
             </div>
           </div>
 
           {/* Drag Force */}
           <div className="bg-slate-950/70 p-3.5 rounded-xl border border-white/10">
-            <div className="text-[10px] font-mono text-slate-400 mb-1 flex items-center justify-between">
+            <div className="text-[11px] font-mono text-slate-400 mb-1 flex items-center justify-between">
               <span>空気抵抗 (Drag Force)</span>
-              <span className="text-xs">{isZMode ? '🛑' : '⚡'}</span>
+              <span className="text-xs">{isZMode ? '' : ''}</span>
             </div>
             <div className={`text-xl font-racing font-bold ${isZMode ? 'text-amber-400' : 'text-emerald-400'}`}>
               {stats.dragN.toLocaleString()} <span className="text-xs text-slate-400 font-mono">N</span>
             </div>
-            <div className="text-[10px] text-slate-400 font-mono mt-1">
+            <div className="text-[11px] text-slate-400 font-mono mt-1">
               CD係数: {stats.cD} ({isZMode ? '標準抵抗' : 'ドラッグ -55%'})
             </div>
           </div>
 
           {/* Top Speed Delta */}
           <div className="bg-slate-950/70 p-3.5 rounded-xl border border-white/10">
-            <div className="text-[10px] font-mono text-slate-400 mb-1 flex items-center justify-between">
+            <div className="text-[11px] font-mono text-slate-400 mb-1 flex items-center justify-between">
               <span>ストレート最高速予測</span>
-              <span className="text-xs">🏁</span>
             </div>
-            <div className="text-xl font-racing font-bold text-sky-400">
+            <div className="text-xl font-racing font-bold text-slate-300">
               {stats.topSpeedEstimate} <span className="text-xs text-slate-400 font-mono">km/h</span>
             </div>
-            <div className="text-[10px] text-slate-400 font-mono mt-1">
+            <div className="text-[11px] text-slate-400 font-mono mt-1">
               デルタ: {isZMode ? '基準値' : '+25 km/h アドバンテージ'}
             </div>
           </div>
 
           {/* DRS Replacement Note */}
           <div className="bg-slate-950/70 p-3.5 rounded-xl border border-white/10">
-            <div className="text-[10px] font-mono text-slate-400 mb-1 flex items-center justify-between">
+            <div className="text-[11px] font-mono text-slate-400 mb-1 flex items-center justify-between">
               <span>DRSシステムとの比較</span>
-              <span className="text-xs">⚖️</span>
             </div>
             <div className="text-sm font-racing font-bold text-purple-300 mt-1">
               全車自由展開型
             </div>
-            <div className="text-[10px] text-slate-400 font-mono mt-1">
+            <div className="text-[11px] text-slate-400 font-mono mt-1">
               1秒以内条件なし (先行車も使用可能)
             </div>
           </div>
@@ -437,7 +435,6 @@ export default function ActiveAeroVisualizer() {
       {/* ── Engineering Deep-Dive Q&A for Connoisseurs ── */}
       <div className="bg-slate-950/60 rounded-xl p-4 border border-white/5 space-y-2.5 text-xs text-slate-300">
         <div className="font-bold text-amber-300 font-mono text-sm flex items-center gap-1.5">
-          <span>🧠</span>
           <span>玄人向け工学解説：なぜリアだけでなく「フロントウイングも可変」なのか？</span>
         </div>
         <p className="leading-relaxed text-slate-300">

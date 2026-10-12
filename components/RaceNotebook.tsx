@@ -112,7 +112,7 @@ const RaceNotebook = React.forwardRef<RaceNotebookHandle, RaceNotebookProps>(
         .map(n => {
           const dateStr = new Date(n.timestamp).toLocaleString('ja-JP');
           const tag = n.sessionTag ? ` [${n.sessionTag}]` : '';
-          const badge = n.source === 'ai' ? '🤖 AI分析' : '✏️ メモ';
+          const badge = n.source === 'ai' ? 'AI分析' : 'メモ';
           return `### ${badge}${tag}\n*${dateStr}*\n\n${n.content}`;
         })
         .join('\n\n---\n\n');
@@ -136,7 +136,7 @@ const RaceNotebook = React.forwardRef<RaceNotebookHandle, RaceNotebookProps>(
                   onClick={copyAllMarkdown}
                   className="text-xs text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-1 px-2 py-1 rounded border border-white/10 hover:border-white/20"
                 >
-                  {copiedAll ? '✓ コピー済' : '📋 MD'}
+                  {copiedAll ? '✓ コピー済' : 'MD'}
                 </button>
               )}
             </div>
@@ -150,7 +150,6 @@ const RaceNotebook = React.forwardRef<RaceNotebookHandle, RaceNotebookProps>(
         <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-2.5 min-h-0">
           {notes.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full text-slate-600 text-xs gap-2 text-center">
-              <span className="text-3xl">📓</span>
               <span>メモがまだありません<br />AIの分析やノートを追加してください</span>
             </div>
           )}
@@ -180,7 +179,7 @@ const RaceNotebook = React.forwardRef<RaceNotebookHandle, RaceNotebookProps>(
             }}
             placeholder="メモを入力... (Ctrl+Enter で保存)"
             rows={3}
-            className="w-full bg-slate-800/60 border border-white/10 text-slate-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500/60 placeholder:text-slate-600 resize-none"
+            className="w-full bg-slate-800/60 border border-white/10 text-slate-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-slate-400/60 placeholder:text-slate-600 resize-none"
           />
           <div className="flex justify-end mt-1.5">
             <button
@@ -188,7 +187,7 @@ const RaceNotebook = React.forwardRef<RaceNotebookHandle, RaceNotebookProps>(
               disabled={!draft.trim()}
               className="px-3 py-1.5 text-xs bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:text-slate-600 text-white rounded-lg transition-colors"
             >
-              ✏️ メモを保存
+              メモを保存
             </button>
           </div>
         </div>
@@ -222,7 +221,7 @@ function NoteCard({
     <div
       className={`rounded-lg border text-xs transition-all ${
         note.source === 'ai'
-          ? 'border-blue-500/20 bg-blue-950/20'
+          ? 'border-slate-400/20 bg-slate-900/20'
           : 'border-white/8 bg-slate-800/40'
       }`}
     >
@@ -232,7 +231,7 @@ function NoteCard({
         onClick={onToggleExpand}
       >
         <span className="flex-shrink-0">
-          {note.source === 'ai' ? '🤖' : '✏️'}
+          {note.source === 'ai' ? '' : ''}
         </span>
         <span suppressHydrationWarning className="text-slate-400 flex-shrink-0">{dateStr}</span>
         {note.sessionTag && (

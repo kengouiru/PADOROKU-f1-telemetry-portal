@@ -332,7 +332,7 @@ export default function RaceSimulatorHub({
       circuit: activeScenario.circuit,
       totalLaps: activeScenario.totalLaps,
       drivers: allDrivers,
-      weatherType: activeScenario.startWeather === 'dry' ? 'variable' : activeScenario.startWeather,
+      weatherType: activeScenario.startWeather,
       rainStartLap: activeScenario.actualRainLap,
       rainIntensityMm: activeScenario.actualRainIntensity,
       incidentFrequency: activeScenario.scProbability > 0.4 ? 'realistic' : 'none',
@@ -421,8 +421,6 @@ export default function RaceSimulatorHub({
         targetCarColor: tyreTarget.color,
         headline: '前走車タレ・クリフ監視',
         summary: `${tyreTarget.name}（P${tyreTarget.position}）のラップタイムが直近2周で+${degDelta}秒悪化。セクター2でリアがスライドしています。なおストレート最高速は相手が依然+${Math.max(3, deltaSt)}km/h優勢です。`,
-        confidence: tyreTarget.tyreWearPercent >= 65 ? 'high' : 'verified',
-        confidenceLabel: tyreTarget.tyreWearPercent >= 65 ? '確度 92%' : '確度 96%',
         rawTelemetry: {
           lapTimes: [
             `L${Math.max(1, challengeLap - 1)}: ${formatTimeSeconds(tyreTarget.lapTime - parseFloat(degDelta))}`,
@@ -459,8 +457,6 @@ export default function RaceSimulatorHub({
         targetCarColor: telemTarget.color,
         headline: '最高速＆マイクロセクター',
         summary: `${telemTarget.code}とのスピードトラップ比較: 相手${stTarget}km/h vs 自車${stPlayer}km/h (${deltaSt >= 0 ? '+' : ''}${deltaSt}km/h)。相手は高速コーナー脱出が強力ですが、シケインの進入で約0.15秒ロスしています。`,
-        confidence: 'verified',
-        confidenceLabel: '確度 100%',
         rawTelemetry: {
           lapTimes: [`L${challengeLap}: ${formatTimeSeconds(telemTarget.lapTime)}`],
           speedTrapKmh: stTarget,
@@ -492,8 +488,6 @@ export default function RaceSimulatorHub({
           targetCarColor: radioTarget.color,
           headline: '敵ピット無線傍受（ブラフ疑い）',
           summary: `${radioTarget.code}に『Box to overtake, box now』の指示を傍受。…しかしピットクルーがガレージから出てきていません。我々を先にピットインさせるダミー無線の疑いがあります。`,
-          confidence: 'suspect_bluff',
-          confidenceLabel: 'ブラフ疑い 55%',
           rawTelemetry: {
             lapTimes: [`L${challengeLap}: ${formatTimeSeconds(radioTarget.lapTime)}`],
             speedTrapKmh: radioTarget.currentSpeedKmH || 335,
@@ -519,8 +513,6 @@ export default function RaceSimulatorHub({
           targetCarColor: radioTarget.color,
           headline: '敵ドライバー無線傍受',
           summary: `${radioTarget.code}『フロント左が完全に死んだ！アンダーステアが酷くて曲がれない』と絶叫。フロントタイヤの摩耗限界が近いと推測されます。`,
-          confidence: 'high',
-          confidenceLabel: '確度 90%',
           rawTelemetry: {
             lapTimes: [`L${challengeLap}: ${formatTimeSeconds(radioTarget.lapTime)}`],
             speedTrapKmh: radioTarget.currentSpeedKmH || 333,
@@ -554,8 +546,6 @@ export default function RaceSimulatorHub({
         summary: isAhead
           ? `${ersTarget.code}のGPS加速度トレースを解析。メインストレート手前140mで加速が頭打ち（クリッピング発生）。バッテリー残量25%以下と推定されます。`
           : `後続${ersTarget.code}がチャージモードに切り替え。バッテリー残量低下のため、今周のストレートでの仕掛けは困難とみられます。`,
-        confidence: 'high',
-        confidenceLabel: '確度 88%',
         rawTelemetry: {
           lapTimes: [`L${challengeLap}: ${formatTimeSeconds(ersTarget.lapTime)}`],
           speedTrapKmh: ersTarget.currentSpeedKmH || 331,
@@ -592,8 +582,6 @@ export default function RaceSimulatorHub({
         summary: isQuick
           ? `${pitTarget.team}（${pitTarget.code}）の静止作業時間は${stopDuration}秒！電光石火の好作業です。アウトラップペースは1分24秒台を刻む見込み。`
           : `${pitTarget.team}（${pitTarget.code}）のピットで左リア交換に手間取り作業時間${stopDuration}秒のタイムロス。コース復帰位置はトラフィックの中です。`,
-        confidence: 'verified',
-        confidenceLabel: '確定 100%',
         rawTelemetry: {
           lapTimes: [`Pit Lap ${challengeLap}`],
           speedTrapKmh: 80,
@@ -722,7 +710,7 @@ export default function RaceSimulatorHub({
   // Player car's real-time pit status and physical track progress
   const playerPitStatus = useMemo(() => {
     const effectiveLapTime = currentSnapshot?.isSC ? Math.max(60, activeScenario.circuit.baseLapTime * 1.42) : Math.max(60, activeScenario.circuit.baseLapTime);
-    const pitLossSec = currentSnapshot?.isSC ? 11.5 : 22.0;
+    const pitLossSec = currentSnapshot?.isSC ? activeScenario.circuit.pitLaneLoss * 0.52 : activeScenario.circuit.pitLaneLoss;
     const playerEffectiveGap = playerCar?.isPitting ? Math.max(0, playerCar.gapToLeader - pitLossSec) : (playerCar?.gapToLeader || 0);
     const playerTrackPct = ((lapProgressPct - (playerEffectiveGap / effectiveLapTime) * 100) % 100 + 100) % 100;
     const isPlayerInPit = !!playerCar?.isPitting && (playerTrackPct >= 90.0 || playerTrackPct <= 4.0);
