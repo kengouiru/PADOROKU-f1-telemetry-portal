@@ -29,6 +29,7 @@ interface ChatMessage {
   role: 'user' | 'model';
   content: string;
   isStreaming?: boolean;
+  attachment?: { data: string; mimeType: string; name: string };
 }
 
 // ── Navigation Action Types ───────────────────────────────────────────────────
@@ -127,6 +128,7 @@ export function parseNavActions(content: string): { cleanContent: string; action
 interface StrategistMessage {
   role: 'user' | 'model';
   content: string;
+  attachment?: { data: string; mimeType: string; name: string };
 }
 
 // ── Props ──────────────────────────────────────────────────────────────────────
@@ -181,8 +183,10 @@ export default function AIStrategist({
   const { data: authSession } = useSession();
   const { isPro, aiUsage, consumeAi, addBonus } = usePlanTier();
   const [showRewardModal, setShowRewardModal] = useState<boolean>(false);
+  const [useUltraRegulations, setUseUltraRegulations] = useState<boolean>(false);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [attachedFile, setAttachedFile] = useState<{ file: File; base64: string } | null>(null);
 
   useEffect(() => {
     try {
@@ -238,6 +242,19 @@ export default function AIStrategist({
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const base64Str = event.target?.result as string;
+      setAttachedFile({ file, base64: base64Str });
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
 
   // Stop radio speech on unmount
   useEffect(() => {
@@ -259,9 +276,10 @@ export default function AIStrategist({
   );
 
   // Core: send message and stream response
-  const sendMessage = useCallback(async (textToSend: string) => {
+  const sendMessage = useCallback(async (textToSend: string, options?: { includeRaw?: boolean }) => {
     const trimmed = textToSend.trim();
     if (!trimmed || isStreaming) return;
+    const includeRaw = options?.includeRaw ?? false;
 
     if (!authSession?.user) {
       onRequireAuth?.();
@@ -289,17 +307,24 @@ export default function AIStrategist({
     const userMsgId = `user_${Date.now()}`;
     const aiMsgId = `ai_${Date.now()}`;
 
-    const userMsg: ChatMessage = { id: userMsgId, role: 'user', content: trimmed };
+    const attachmentPayload = attachedFile ? {
+      data: attachedFile.base64.replace(/^data:.*?;base64,/, ''),
+      mimeType: attachedFile.file.type,
+      name: attachedFile.file.name,
+    } : undefined;
+
+    const userMsg: ChatMessage = { id: userMsgId, role: 'user', content: trimmed, attachment: attachmentPayload };
     const aiMsg: ChatMessage = { id: aiMsgId, role: 'model', content: '', isStreaming: true };
 
     setMessages(prev => [...prev, userMsg, aiMsg]);
     setInput('');
+    setAttachedFile(null);
     setIsStreaming(true);
 
     // Build history for API (exclude the blank AI placeholder)
     const history: StrategistMessage[] = [
-      ...messages.map(m => ({ role: m.role, content: m.content })),
-      { role: 'user', content: trimmed },
+      ...messages.map(m => ({ role: m.role, content: m.content, attachment: m.attachment })),
+      { role: 'user', content: trimmed, attachment: attachmentPayload },
     ];
 
     abortRef.current = new AbortController();
@@ -309,11 +334,27 @@ export default function AIStrategist({
       const effectiveKey = apiKey;
       if (effectiveKey) headers['x-gemini-key'] = effectiveKey;
 
+      let rawTelemetryData = undefined;
+      if (includeRaw) {
+        rawTelemetryData = JSON.stringify({
+          lapsCache,
+          stints,
+          pitStopsCache,
+          selectedDrivers,
+        });
+      }
+
       const res = await fetch('/api/strategist', {
         method: 'POST',
         headers,
         signal: abortRef.current.signal,
-        body: JSON.stringify({ messages: history, context: getContext(), model: modelChoice }),
+        body: JSON.stringify({ 
+          messages: history, 
+          context: getContext(), 
+          model: modelChoice,
+          includeFiaRegulations: useUltraRegulations,
+          rawTelemetryData 
+        }),
       });
 
       if (res.status === 401) {
@@ -359,7 +400,7 @@ export default function AIStrategist({
       setIsStreaming(false);
       inputRef.current?.focus();
     }
-  }, [isStreaming, messages, apiKey, getContext, modelChoice, authSession, onRequireAuth, isPro, aiUsage, consumeAi, onOpenUpgradeModal]);
+  }, [isStreaming, messages, attachedFile, apiKey, getContext, modelChoice, authSession, onRequireAuth, isPro, aiUsage, consumeAi, onOpenUpgradeModal, useUltraRegulations, lapsCache, stints, pitStopsCache, selectedDrivers]);
 
   const handleStop = () => {
     abortRef.current?.abort();
@@ -448,6 +489,24 @@ export default function AIStrategist({
               <option value="flash">Flash </option>
               <option value="pro">Pro </option>
             </select>
+            <label className="flex items-center gap-1.5 cursor-pointer group pl-1">
+              <div className="relative flex items-center">
+                <input
+                  type="checkbox"
+                  checked={useUltraRegulations}
+                  onChange={(e) => setUseUltraRegulations(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-7 h-4 bg-slate-700 rounded-full peer-checked:bg-indigo-600 transition-colors"></div>
+                <div className="absolute left-[2px] top-[2px] bg-white w-3 h-3 rounded-full transition-transform peer-checked:translate-x-3"></div>
+              </div>
+              <span className="text-xs font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400 hidden sm:inline-block">
+                📚 2026 FIA Regulations <span className="text-[10px] bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-900 px-1.5 py-0.5 rounded font-black tracking-wider shadow-[0_0_5px_rgba(251,191,36,0.6)] ml-1">PRO</span>
+              </span>
+              <span className="text-xs font-bold text-indigo-400 sm:hidden">
+                📚 <span className="text-[9px] bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-900 px-1 py-0.5 rounded font-black shadow-[0_0_5px_rgba(251,191,36,0.6)] ml-1">PRO</span>
+              </span>
+            </label>
             {messages.length > 0 && (
               <button
                 onClick={handleClear}
@@ -539,7 +598,36 @@ export default function AIStrategist({
 
       {/* ── Input bar (always visible) ── */}
       <div className="flex-shrink-0 border-t border-white/10 p-3 bg-slate-900/30">
+        {attachedFile && (
+          <div className="flex items-center gap-2 mb-2 px-3 py-1.5 bg-slate-800/80 rounded-lg w-max border border-slate-700/50">
+            <span className="text-xs text-slate-300 truncate max-w-[200px]" title={attachedFile.file.name}>
+              📎 {attachedFile.file.name}
+            </span>
+            <button
+              type="button"
+              onClick={() => setAttachedFile(null)}
+              className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+        )}
         <div className="flex gap-2 items-end">
+          <input
+            type="file"
+            accept="image/*,audio/*"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="flex-shrink-0 px-2.5 py-2 h-10 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer flex items-center justify-center"
+            title="ファイルを添付"
+          >
+            📎
+          </button>
           <textarea
             ref={inputRef}
             value={input}
@@ -559,14 +647,25 @@ export default function AIStrategist({
               停止
             </button>
           ) : (
-            <button
-              type="button"
-              onClick={() => sendMessage(input)}
-              disabled={!input.trim() || noDrivers}
-              className="flex-shrink-0 px-3 py-2 h-10 text-xs bg-slate-500 hover:bg-slate-400 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg transition-colors font-medium"
-            >
-              送信
-            </button>
+            <div className="flex gap-1.5">
+              <button
+                type="button"
+                onClick={() => sendMessage(input, { includeRaw: true })}
+                disabled={!input.trim() || noDrivers}
+                title="生データを含めて送信"
+                className="flex-shrink-0 px-2.5 py-2 h-10 text-xs bg-indigo-600/90 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-1"
+              >
+                📊<span className="hidden sm:inline">生データを含めて送信</span><span className="ml-1 text-[10px] font-black bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-900 px-1 rounded-sm shadow-[0_0_8px_rgba(251,191,36,0.5)] tracking-wide">PRO</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => sendMessage(input)}
+                disabled={!input.trim() || noDrivers}
+                className="flex-shrink-0 px-3 py-2 h-10 text-xs bg-slate-500 hover:bg-slate-400 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg transition-colors font-medium"
+              >
+                送信
+              </button>
+            </div>
           )}
         </div>
         <p className="text-xs text-slate-700 mt-1">Enter: 送信 ／ Shift+Enter: 改行</p>
