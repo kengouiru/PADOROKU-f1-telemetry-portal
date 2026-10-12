@@ -296,7 +296,10 @@ export default function AIStrategist({
         {
           id: aiMsgId,
           role: 'model',
-          content: '**本日のAI戦略相談枠（無料分）の上限に達しました**\n\nヘッダーの「+2回」ボタンから公式スポンサー案内を視聴すると質問枠を即座に回復できます。\nまた、回数無制限で活用するには**「Pitwall Pro」**へアップグレードしてください。',
+          content: `**本日のAI戦略相談枠（無料分）の上限に達しました**
+
+ヘッダーの「+2回」ボタンから公式スポンサー案内を視聴すると質問枠を即座に回復できます。
+また、回数無制限で活用するには**「Pitwall Pro」**へアップグレードしてください。`,
           isStreaming: false,
         },
       ]);
@@ -466,21 +469,7 @@ export default function AIStrategist({
               </div>
             )}
 
-            <button
-              type="button"
-              onClick={() => {
-                setTempApiKey(apiKey);
-                setShowKeyModal(true);
-              }}
-              title={apiKey ? 'Gemini APIキー設定済み（クリックで変更）' : 'APIキー設定（現在デモAIモード稼働中・クリックで設定）'}
-              className={`text-[11px] px-2 py-1 rounded border flex items-center gap-1 transition-all cursor-pointer ${
-                apiKey
-                  ? 'border-emerald-500/50 bg-emerald-950/40 text-emerald-300 hover:bg-emerald-950/70'
-                  : 'border-white/10 bg-slate-800/80 text-slate-400 hover:text-slate-200 hover:border-white/20'
-              }`}
-            >
-              <span>{apiKey ? '設定済' : 'キー設定'}</span>
-            </button>
+            
             <select
               value={modelChoice}
               onChange={e => setModelChoice(e.target.value as 'flash' | 'pro')}
@@ -612,7 +601,8 @@ export default function AIStrategist({
             </button>
           </div>
         )}
-        <div className="flex gap-2 items-end">
+        <div className="flex flex-col gap-2.5">
+          <div className="flex items-center gap-2">
           <input
             type="file"
             accept="image/*,audio/*"
@@ -623,21 +613,23 @@ export default function AIStrategist({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex-shrink-0 px-2.5 py-2 h-10 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer flex items-center justify-center"
+            className="flex-shrink-0 p-2 h-10 w-10 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors cursor-pointer flex items-center justify-center"
             title="ファイルを添付"
           >
-            📎
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" /></svg>
           </button>
           <textarea
             ref={inputRef}
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={noDrivers ? 'ドライバーを選択してください...' : 'テレメトリについて質問... (Enter 送信 / Shift+Enter 改行)'}
+            placeholder={noDrivers ? "ドライバーを選択してください..." : "質問を入力..."}
             disabled={isStreaming || noDrivers}
             rows={2}
-            className="flex-1 bg-slate-800/70 border border-white/10 text-slate-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-slate-400/50 placeholder:text-slate-600 resize-none disabled:opacity-50"
+            className="flex-1 bg-slate-800/70 border border-white/10 text-slate-200 text-xs rounded-lg px-3 py-2.5 focus:outline-none focus:border-slate-400/50 placeholder:text-slate-600 resize-none disabled:opacity-50 h-10 leading-relaxed"
           />
+          </div>
+          <div className="flex justify-end gap-2 items-center w-full">
           {isStreaming ? (
             <button
               type="button"
@@ -647,7 +639,7 @@ export default function AIStrategist({
               停止
             </button>
           ) : (
-            <div className="flex gap-1.5 flex-col sm:flex-row items-end">
+            <>
               <button
                 type="button"
                 onClick={() => sendMessage(input, { includeRaw: true })}
@@ -665,8 +657,9 @@ export default function AIStrategist({
               >
                 送信
               </button>
-            </div>
+            </>
           )}
+          </div>
         </div>
         <p className="text-xs text-slate-700 mt-1">Enter: 送信 ／ Shift+Enter: 改行</p>
       </div>
