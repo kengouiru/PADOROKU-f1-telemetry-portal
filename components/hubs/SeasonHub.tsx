@@ -1198,8 +1198,8 @@ export default function SeasonHub({
     // or if the hero is currently showing it.
     // Actually, always show it as a separate section if we want it to be a permanent block.
     // Let's show it if it exists and is different from selectedRound.
-    if (prevRound === selectedRound) return null;
-    return activeCalendar.find(r => r.round === prevRound);
+    if (prevRound.round === selectedRound) return null;
+    return prevRound;
   }, [activeCalendar, selectedRound]);
 
 
