@@ -1698,6 +1698,8 @@ export default function DashboardPage() {
         <main ref={desktopScrollRef} className="flex-1 min-w-0 p-5 overflow-y-auto">
           {mainHubContent}
         </main>
+
+        
       </div>
 
       {/* ── MOBILE / TABLET Layout (<lg) ── */}

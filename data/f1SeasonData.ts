@@ -1907,3 +1907,18 @@ export function isSeasonConcluded(calendar: RaceWeekendSchedule[]): boolean {
 }
 
 
+
+export function getPreviousCompletedRound(calendar: RaceWeekendSchedule[]): number | null {
+  const now = Date.now();
+  let prev = null;
+  for (const race of calendar) {
+    if (!race.targetDateUtc || race.isCancelled) continue;
+    const raceTime = new Date(race.targetDateUtc).getTime();
+    if (now > raceTime) {
+      prev = race.round;
+    } else {
+      break;
+    }
+  }
+  return prev;
+}

@@ -165,3 +165,19 @@
 ### Added
 - 百科事典の暗幕モーダル脱却と独立URLルート化 (`/knowledge/drivers/[code]`, `/knowledge/teams/[id]`, `/knowledge/rules`)。
 - PITWALLゲーム スマホ縦画面（ポートレート）統合コクピット ＆ 横画面（ランドスケープ）自動適応。
+
+## [v2.5.0] - 2026-10-12
+### Added
+- **Phase 5: データモジュラー分割化 (f1KnowledgeData.ts)**
+  - 巨大化していた12,418行のファイルを 1KnowledgeTeams, 1KnowledgeDrivers, 1KnowledgeCircuits など6つのファイルに完全分割し、AI編集時の構文破損リスクを解消。
+  - プロジェクトステータス管理ドキュメント (docs/PROJECT_STATUS.md) を新設。
+
+### Fixed
+- 前セッションの文字コード不整合により破損していた data/f1KnowledgeHistory.ts の日本語エピソード文を復元・修復。
+
+## [v2.6.0] - 2026-10-12
+### Added
+- **Phase A: UIの即効改善 ＆ SEASON画面の拡張**
+  - \SeasonHub.tsx\ のカレンダーカードに国旗アイコン (\FlagIcon\ / flagcdn) を追加し、視認性を向上。
+  - \SeasonHub.tsx\ のヒーローセクションを拡張し、「Previous GP (直近のレースの振り返り)」セクションを新設。
+  - 直近レース用の「レース振り返り（開発中）」モックボタンを配置。

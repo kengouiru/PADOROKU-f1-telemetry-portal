@@ -414,3 +414,10 @@
   旧来の Vanilla JS / HTML / CSS プロトタイプから、Next.js (App Router) + TypeScript + Tailwind CSS への本格的リプレイスを実施（`f1-telemetry-next/`）。
 - **背景・理由 (Rationale)**:
   型安全性の欠如、グローバル変数汚染、APIキーのブラウザ露出リスクを解消し、BFF（Backend for Frontend）による安全なGemini API連携とSSR/SSGによる高速レンダリングを実現するため。
+## [2026-10-12] Phase 5: LIBRARYデータのモジュラー分割化 (3,000行ルール適用)
+- **決定事項 (Decision)**:
+  巨大化していた data/f1KnowledgeData.ts (約12,400行) を 1KnowledgeTypes.ts, 1KnowledgeTeams.ts, 1KnowledgeDrivers.ts, 1KnowledgeCircuits.ts, 1KnowledgeStrategies.ts, 1KnowledgeHistory.ts に分割。元の 1KnowledgeData.ts は全てをインポート・再エクスポートするファサードとして残置。
+- **背景・理由 (Rationale)**:
+  GEMINI.md に定める「巨大ファイルのモジュラー分割原則（第4部第5条）」に基づき、AIによるコード編集時の構文破損リスクやコンテキスト溢れを回避するため。
+- **却下した代替案 (Rejected Alternatives)**:
+  - 「既存ファイルのまま一部のみ編集する」: ファイルサイズがLLMの編集閾値を超過しており、事実上一部の文字列置換（文字化け含む）などでファイル全体が破損する事故が発生したため却下。
