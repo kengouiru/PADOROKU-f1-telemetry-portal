@@ -10,6 +10,8 @@
  */
 
 import { KNOWLEDGE_CIRCUITS } from '@/data/f1KnowledgeData';
+import { fetchCarData, type RawCarData } from './openf1Api';
+import type { Lap } from './types';
 
 export interface NormalizedTelemetryPoint {
   distPercent: number;     // 0.0 ~ 100.0 (%)
@@ -396,222 +398,208 @@ const CIRCUIT_CORNER_MAPS: Record<string, { length: number; corners: CornerZone[
 };
 
 // ─────────────────────────────────────────────────────────────
-// Driver Behavioral Profile Offsets
-// ─────────────────────────────────────────────────────────────
-
-interface DriverTrait {
-  topSpeedBias: number;      // km/h bias on straights
-  brakingPointBias: number;  // -0.5 is later braking, +0.5 is earlier
-  apexSpeedBias: number;     // km/h bias in mid-corner
-  exitThrottleBias: number;  // early throttle ramp
-  gearSmoothness: number;    // shifting timing
-}
-
-const DRIVER_TRAITS: Record<string, DriverTrait> = {
-  'VER': { topSpeedBias: +2.0, brakingPointBias: -0.4, apexSpeedBias: +2.5, exitThrottleBias: +0.3, gearSmoothness: 0.9 },
-  'HAM': { topSpeedBias: +1.0, brakingPointBias: -0.1, apexSpeedBias: +1.2, exitThrottleBias: +0.2, gearSmoothness: 0.95 },
-  'NOR': { topSpeedBias: +2.5, brakingPointBias: -0.2, apexSpeedBias: +1.8, exitThrottleBias: +0.4, gearSmoothness: 0.88 },
-  'LEC': { topSpeedBias: +1.5, brakingPointBias: -0.5, apexSpeedBias: +3.0, exitThrottleBias: +0.1, gearSmoothness: 0.85 },
-  'PIA': { topSpeedBias: +1.8, brakingPointBias: -0.1, apexSpeedBias: +1.5, exitThrottleBias: +0.25, gearSmoothness: 0.92 },
-  'SAI': { topSpeedBias: +0.5, brakingPointBias: +0.1, apexSpeedBias: +0.8, exitThrottleBias: +0.35, gearSmoothness: 0.9 },
-  'RUS': { topSpeedBias: +1.2, brakingPointBias: -0.3, apexSpeedBias: +1.5, exitThrottleBias: +0.15, gearSmoothness: 0.88 },
-  'PER': { topSpeedBias: +0.8, brakingPointBias: +0.2, apexSpeedBias: -0.5, exitThrottleBias: +0.2, gearSmoothness: 0.9 },
-  'ALO': { topSpeedBias: -0.5, brakingPointBias: -0.3, apexSpeedBias: +2.0, exitThrottleBias: +0.3, gearSmoothness: 0.95 },
-  'TSU': { topSpeedBias: +0.0, brakingPointBias: -0.4, apexSpeedBias: +1.0, exitThrottleBias: +0.1, gearSmoothness: 0.85 },
-  'GAS': { topSpeedBias: +0.2, brakingPointBias: -0.2, apexSpeedBias: +0.5, exitThrottleBias: +0.2, gearSmoothness: 0.9 },
-  'OCO': { topSpeedBias: +0.4, brakingPointBias: -0.3, apexSpeedBias: +0.4, exitThrottleBias: +0.1, gearSmoothness: 0.88 },
-  'ALB': { topSpeedBias: +1.0, brakingPointBias: -0.2, apexSpeedBias: +0.8, exitThrottleBias: +0.3, gearSmoothness: 0.9 },
-  'COL': { topSpeedBias: +0.6, brakingPointBias: -0.4, apexSpeedBias: +1.0, exitThrottleBias: +0.2, gearSmoothness: 0.85 },
-  'STR': { topSpeedBias: +0.0, brakingPointBias: +0.1, apexSpeedBias: -0.2, exitThrottleBias: +0.3, gearSmoothness: 0.88 },
-  'HUL': { topSpeedBias: +0.8, brakingPointBias: -0.4, apexSpeedBias: +1.2, exitThrottleBias: +0.2, gearSmoothness: 0.92 },
-  'MAG': { topSpeedBias: +0.3, brakingPointBias: -0.5, apexSpeedBias: +0.6, exitThrottleBias: +0.1, gearSmoothness: 0.85 },
-  'BOT': { topSpeedBias: +0.5, brakingPointBias: -0.1, apexSpeedBias: +0.9, exitThrottleBias: +0.35, gearSmoothness: 0.95 },
-  'ZHO': { topSpeedBias: -0.2, brakingPointBias: +0.0, apexSpeedBias: +0.3, exitThrottleBias: +0.2, gearSmoothness: 0.9 },
-  'RIC': { topSpeedBias: +0.5, brakingPointBias: -0.5, apexSpeedBias: +1.5, exitThrottleBias: +0.25, gearSmoothness: 0.9 },
-  'ANT': { topSpeedBias: +1.8, brakingPointBias: -0.3, apexSpeedBias: +2.2, exitThrottleBias: +0.35, gearSmoothness: 0.92 },
-  'BEA': { topSpeedBias: +0.8, brakingPointBias: -0.2, apexSpeedBias: +1.0, exitThrottleBias: +0.2, gearSmoothness: 0.88 },
-  'HAD': { topSpeedBias: +1.2, brakingPointBias: -0.4, apexSpeedBias: +1.5, exitThrottleBias: +0.25, gearSmoothness: 0.86 },
-  'BOR': { topSpeedBias: +0.6, brakingPointBias: -0.3, apexSpeedBias: +1.1, exitThrottleBias: +0.2, gearSmoothness: 0.9 },
-  'LAW': { topSpeedBias: +0.4, brakingPointBias: -0.2, apexSpeedBias: +0.9, exitThrottleBias: +0.2, gearSmoothness: 0.9 },
-  'SEN': { topSpeedBias: +3.0, brakingPointBias: -0.6, apexSpeedBias: +4.0, exitThrottleBias: +0.5, gearSmoothness: 0.8 },
-  'MSC': { topSpeedBias: +2.5, brakingPointBias: -0.5, apexSpeedBias: +3.5, exitThrottleBias: +0.4, gearSmoothness: 0.95 },
-  'PRO': { topSpeedBias: +1.5, brakingPointBias: -0.2, apexSpeedBias: +3.0, exitThrottleBias: +0.4, gearSmoothness: 0.98 },
-  'LAU': { topSpeedBias: +1.2, brakingPointBias: -0.3, apexSpeedBias: +2.8, exitThrottleBias: +0.35, gearSmoothness: 0.96 },
-};
-
-function getDriverTrait(code: string): DriverTrait {
-  return DRIVER_TRAITS[code.toUpperCase()] || {
-    topSpeedBias: 0,
-    brakingPointBias: 0,
-    apexSpeedBias: 0,
-    exitThrottleBias: 0,
-    gearSmoothness: 0.9,
-  };
-}
-
-// ─────────────────────────────────────────────────────────────
 // High-Precision Telemetry Synthesizer
 // ─────────────────────────────────────────────────────────────
 
-export function generateNormalizedTelemetry(
-  circuitId: string,
+export async function fetchAndGenerateNormalizedTelemetry(
+  sessionKey: number,
   driver1: { code: string; number: string; name: string; color: string },
   driver2: { code: string; number: string; name: string; color: string },
-  numSamples = 220
-): TelemetryComparisonData {
+  lapsCache: Record<string, Lap[]>,
+  circuitId: string,
+  lapNumber?: number
+): Promise<TelemetryComparisonData> {
   const circConfig = CIRCUIT_CORNER_MAPS[circuitId] || CIRCUIT_CORNER_MAPS['bahrain-international'];
   const trackLength = circConfig.length;
   const corners = circConfig.corners;
 
-  const t1 = getDriverTrait(driver1.code);
-  const t2 = getDriverTrait(driver2.code);
+  const getFastestLap = (driverNum: string) => {
+    const laps = lapsCache[driverNum];
+    if (!laps || laps.length === 0) return null;
+    if (lapNumber) return laps.find(l => l.lap_number === lapNumber) || laps[0];
+    let fastest = laps[0];
+    for (const l of laps) {
+      if (l.lap_duration && (!fastest.lap_duration || l.lap_duration < fastest.lap_duration)) {
+        fastest = l;
+      }
+    }
+    return fastest;
+  };
 
+  const lap1 = getFastestLap(driver1.number);
+  const lap2 = getFastestLap(driver2.number);
+
+  if (!lap1 || !lap2 || !lap1.date_start || !lap2.date_start) {
+    throw new Error('Lap data is not available for one or both drivers.');
+  }
+
+  // Fetch car data for the specific lap window
+  const getCarData = async (driverNum: string, lap: Lap) => {
+    const start = new Date(lap.date_start!);
+    const end = new Date(start.getTime() + (lap.lap_duration! * 1000) + 2000); // add 2s buffer
+    return fetchCarData(sessionKey, parseInt(driverNum), start.toISOString(), end.toISOString());
+  };
+
+  const [raw1, raw2] = await Promise.all([
+    getCarData(driver1.number, lap1),
+    getCarData(driver2.number, lap2)
+  ]);
+
+  if (raw1.length === 0 || raw2.length === 0) {
+    throw new Error('Car data is not available for the requested lap.');
+  }
+
+  // Normalize function: compute distance by integrating speed over time
+  const processCarData = (rawData: RawCarData[]) => {
+    let distance = 0;
+    const processed = [];
+    for (let i = 0; i < rawData.length; i++) {
+      const p = rawData[i];
+      if (i > 0) {
+        const prev = rawData[i - 1];
+        const dt = (new Date(p.date).getTime() - new Date(prev.date).getTime()) / 1000;
+        const v = p.speed / 3.6; // m/s
+        distance += v * dt;
+      }
+      processed.push({ ...p, distance });
+    }
+    // Normalize distance to percentage (0 - 100) based on max distance
+    const totalDist = processed[processed.length - 1].distance;
+    return processed.map(p => ({
+      ...p,
+      distPercent: totalDist > 0 ? (p.distance / totalDist) * 100 : 0
+    }));
+  };
+
+  const p1 = processCarData(raw1);
+  const p2 = processCarData(raw2);
+
+  // Resample both to common distance percentages (e.g. 0 to 100 in 220 steps)
+  const numSamples = 220;
   const points: NormalizedTelemetryPoint[] = [];
   let cumDelta = 0;
+  const ds = trackLength / numSamples;
 
   for (let i = 0; i < numSamples; i++) {
     const pct = (i / (numSamples - 1)) * 100;
     const distMeters = Math.round((pct / 100) * trackLength);
 
-    // Find if inside a corner zone
-    const currentCorner = corners.find(c => pct >= c.pctStart - 2 && pct <= c.pctExit + 2);
-    let cornerName: string | undefined = undefined;
-
-    // Base speed physics
-    let baseSpeed = 335; // straight top speed
-    let baseThrottle = 100;
-    let baseBrake = 0;
-    let baseGear = 8;
-
-    if (currentCorner) {
-      cornerName = currentCorner.name;
-      const { pctStart, pctApex, pctExit, speed: apexTargetSpeed, gear: apexGear, brakingHardness } = currentCorner;
-
-      if (pct < pctApex) {
-        // Approaching / Braking zone
-        const brakeProgress = (pct - pctStart) / Math.max(0.1, pctApex - pctStart);
-        if (brakeProgress > 0) {
-          // Braking Phase
-          baseThrottle = Math.max(0, 100 - brakeProgress * 150);
-          baseBrake = Math.min(100, Math.round(brakeProgress * 100 * brakingHardness));
-          baseSpeed = 335 - (335 - apexTargetSpeed) * Math.min(1, Math.pow(brakeProgress, 0.7));
-          baseGear = Math.max(apexGear, Math.round(8 - brakeProgress * (8 - apexGear)));
+    // Interpolate p1
+    const findInterp = (data: typeof p1, targetPct: number) => {
+      if (data.length === 0) return { speed: 0, throttle: 0, brake: 0, n_gear: 0 };
+      if (targetPct <= data[0].distPercent) return data[0];
+      if (targetPct >= data[data.length - 1].distPercent) return data[data.length - 1];
+      for (let j = 0; j < data.length - 1; j++) {
+        if (targetPct >= data[j].distPercent && targetPct <= data[j + 1].distPercent) {
+          const t = (targetPct - data[j].distPercent) / (data[j + 1].distPercent - data[j].distPercent);
+          return {
+            speed: data[j].speed + t * (data[j + 1].speed - data[j].speed),
+            throttle: data[j].throttle + t * (data[j + 1].throttle - data[j].throttle),
+            brake: data[j].brake + t * (data[j + 1].brake - data[j].brake),
+            n_gear: t < 0.5 ? data[j].n_gear : data[j + 1].n_gear,
+          };
         }
-      } else {
-        // Exiting / Traction zone
-        const exitProgress = (pct - pctApex) / Math.max(0.1, pctExit - pctApex);
-        baseBrake = 0;
-        baseThrottle = Math.min(100, Math.round(Math.pow(exitProgress, 0.8) * 100));
-        baseSpeed = apexTargetSpeed + (320 - apexTargetSpeed) * Math.min(1, Math.pow(exitProgress, 0.9));
-        baseGear = Math.min(8, Math.round(apexGear + exitProgress * (7 - apexGear)));
       }
-    } else {
-      // High-speed straight
-      baseSpeed = 310 + Math.sin(pct * 0.1) * 25;
-      baseThrottle = 100;
-      baseBrake = 0;
-      baseGear = baseSpeed > 290 ? 8 : 7;
-    }
+      return data[data.length - 1];
+    };
 
-    // Apply driver 1 specifics
-    const speed1 = Math.round(Math.max(40, Math.min(355, baseSpeed + t1.topSpeedBias + (baseThrottle < 100 ? t1.apexSpeedBias : 0))));
-    let throttle1 = baseThrottle;
-    let brake1 = baseBrake;
-    if (baseBrake > 0) {
-      // Apply late brake bias
-      brake1 = Math.min(100, Math.max(0, Math.round(baseBrake * (1 + t1.brakingPointBias * 0.15))));
-      if (t1.brakingPointBias < -0.2) {
-        throttle1 = Math.min(100, throttle1 + 10);
-      }
-    } else if (baseThrottle < 100) {
-      throttle1 = Math.min(100, Math.max(0, Math.round(baseThrottle * (1 + t1.exitThrottleBias * 0.1))));
-    }
+    const s1 = findInterp(p1, pct);
+    const s2 = findInterp(p2, pct);
 
-    // Apply driver 2 specifics
-    const speed2 = Math.round(Math.max(40, Math.min(355, baseSpeed + t2.topSpeedBias + (baseThrottle < 100 ? t2.apexSpeedBias : 0))));
-    let throttle2 = baseThrottle;
-    let brake2 = baseBrake;
-    if (baseBrake > 0) {
-      brake2 = Math.min(100, Math.max(0, Math.round(baseBrake * (1 + t2.brakingPointBias * 0.15))));
-      if (t2.brakingPointBias < -0.2) {
-        throttle2 = Math.min(100, throttle2 + 10);
-      }
-    } else if (baseThrottle < 100) {
-      throttle2 = Math.min(100, Math.max(0, Math.round(baseThrottle * (1 + t2.exitThrottleBias * 0.1))));
-    }
-
-    // Calculate incremental delta (v1 vs v2)
-    const ds = trackLength / numSamples;
-    const v1_ms = Math.max(10, speed1 / 3.6);
-    const v2_ms = Math.max(10, speed2 / 3.6);
+    const v1_ms = Math.max(10, s1.speed / 3.6);
+    const v2_ms = Math.max(10, s2.speed / 3.6);
     const dt1 = ds / v1_ms;
     const dt2 = ds / v2_ms;
-    cumDelta += (dt2 - dt1); // positive if driver 1 is ahead (took less time)
+    cumDelta += (dt2 - dt1); // positive if driver 1 is faster
+
+    const currentCorner = corners.find(c => pct >= c.pctStart - 2 && pct <= c.pctExit + 2);
 
     points.push({
       distPercent: Math.round(pct * 10) / 10,
       distMeters,
       cornerName: currentCorner?.pctApex && Math.abs(pct - currentCorner.pctApex) <= 1.0 ? currentCorner.name : undefined,
-      speed1,
-      throttle1: Math.min(100, Math.max(0, throttle1)),
-      brake1: brake1 > 15 ? 100 : 0,
-      gear1: baseGear,
-      speed2,
-      throttle2: Math.min(100, Math.max(0, throttle2)),
-      brake2: brake2 > 15 ? 100 : 0,
-      gear2: baseGear,
+      speed1: Math.round(s1.speed),
+      throttle1: Math.min(100, Math.max(0, Math.round(s1.throttle))),
+      brake1: s1.brake > 0 ? 100 : 0,
+      gear1: s1.n_gear,
+      speed2: Math.round(s2.speed),
+      throttle2: Math.min(100, Math.max(0, Math.round(s2.throttle))),
+      brake2: s2.brake > 0 ? 100 : 0,
+      gear2: s2.n_gear,
       delta: Math.round(cumDelta * 1000) / 1000,
     });
   }
 
-  // Generate automated intelligence insights
-  const insights = generateInsights(points, driver1, driver2, corners);
-
   const circuitProfile = KNOWLEDGE_CIRCUITS.find(c => c.id === circuitId);
-  const circName = circuitProfile ? circuitProfile.name : 'バーレーン・インターナショナル・サーキット';
+  const circName = circuitProfile ? circuitProfile.name : 'Unknown Circuit';
 
+  const formatLapTime = (duration: number | null) => {
+    if (!duration) return 'N/A';
+    const m = Math.floor(duration / 60);
+    const s = Math.floor(duration % 60);
+    const ms = Math.floor((duration % 1) * 1000);
+    return `${m}:${s.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
+  };
 
-  // Generate corner-by-corner apex and braking point telemetry matrix
   const cornerAnalyses: CornerTelemetryAnalysis[] = corners.map((c) => {
     const apexPoint = points.find((p) => Math.abs(p.distPercent - c.pctApex) < 1.2) || points[Math.min(points.length - 1, Math.round((c.pctApex / 100) * points.length))];
     const exitPoint = points.find((p) => Math.abs(p.distPercent - c.pctExit) < 1.5) || points[Math.min(points.length - 1, Math.round((c.pctExit / 100) * points.length))];
+    const startPoint = points.find((p) => Math.abs(p.distPercent - c.pctStart) < 1.5) || points[Math.min(points.length - 1, Math.round((c.pctStart / 100) * points.length))];
 
-    const speed1 = apexPoint ? apexPoint.speed1 : c.speed;
-    const speed2 = apexPoint ? apexPoint.speed2 : c.speed - 2;
+    const speed1 = apexPoint ? apexPoint.speed1 : 0;
+    const speed2 = apexPoint ? apexPoint.speed2 : 0;
     const apexDelta = speed1 - speed2;
     const isD1Adv = apexDelta >= 0;
-    const timeDelta = Number((apexDelta * 0.014).toFixed(3));
+    const timeDelta = Number((apexDelta * 0.014).toFixed(3)); // rough estimate
+
+    // Find braking point (distPercent where brake goes > 0)
+    const findBrakePoint = (driverKey: 'brake1' | 'brake2') => {
+      for (let i = Math.round((c.pctStart / 100) * points.length); i < Math.round((c.pctApex / 100) * points.length); i++) {
+        if (points[i] && points[i][driverKey] > 0) return points[i].distMeters;
+      }
+      return Math.round((c.pctStart / 100) * trackLength);
+    };
+
+    const d1BrakeM = findBrakePoint('brake1');
+    const d2BrakeM = findBrakePoint('brake2');
+    const brakeDiffM = Math.abs(d1BrakeM - d2BrakeM);
+    const lateBraker = d1BrakeM > d2BrakeM ? driver1.code : (d1BrakeM < d2BrakeM ? driver2.code : null);
+
+    let tacticalNote = isD1Adv ? `${driver1.code} がボトム車速を +${Math.abs(apexDelta)}km/h 高く維持` : `${driver2.code} がボトム車速を +${Math.abs(apexDelta)}km/h 高く維持`;
+    if (lateBraker && brakeDiffM > 5) {
+      tacticalNote += `、${lateBraker}が約${brakeDiffM}m奥までブレーキングを我慢`;
+    }
 
     return {
       cornerName: c.name,
       distanceMeters: Math.round((c.pctApex / 100) * trackLength),
       distPercent: c.pctApex,
-      gear: c.gear,
-      d1BrakeStartM: Math.round((c.pctStart / 100) * trackLength),
+      gear: apexPoint?.gear1 ?? c.gear,
+      d1BrakeStartM: d1BrakeM,
       d1ApexSpeed: speed1,
-      d1ThrottlePickUpPct: exitPoint ? exitPoint.throttle1 : 85,
-      d2BrakeStartM: Math.round((c.pctStart / 100) * trackLength) + (t1.brakingPointBias < t2.brakingPointBias ? 5 : -4),
+      d1ThrottlePickUpPct: exitPoint ? exitPoint.throttle1 : 0,
+      d2BrakeStartM: d2BrakeM,
       d2ApexSpeed: speed2,
-      d2ThrottlePickUpPct: exitPoint ? exitPoint.throttle2 : 80,
+      d2ThrottlePickUpPct: exitPoint ? exitPoint.throttle2 : 0,
       apexSpeedDelta: apexDelta,
       timeDeltaSeconds: timeDelta,
       advantageDriver: isD1Adv ? driver1.code : driver2.code,
-      keyTacticalNote: isD1Adv
-        ? `${driver1.code} が深いトレイルブレーキングでボトム車速を +${Math.abs(apexDelta)}km/h 維持`
-        : `${driver2.code} がエイペックス手前で鋭く回頭させ、立ち上がりのフルスロットルを優先`,
+      keyTacticalNote: tacticalNote,
     };
   });
+
+  const insights = generateInsightsReal(points, driver1, driver2, cornerAnalyses);
 
   return {
     circuitName: circName,
     circuitLengthM: trackLength,
     driver1: {
       ...driver1,
-      lapTime: circuitProfile?.lapRecord?.time || '1:30.983',
+      lapTime: formatLapTime(lap1.lap_duration),
     },
     driver2: {
       ...driver2,
-      lapTime: '1:31.215',
+      lapTime: formatLapTime(lap2.lap_duration),
     },
     points,
     insights,
@@ -619,54 +607,70 @@ export function generateNormalizedTelemetry(
   };
 }
 
-// ─────────────────────────────────────────────────────────────
-// Automated Driving Style Insight Generator
-// ─────────────────────────────────────────────────────────────
-
-function generateInsights(
+function generateInsightsReal(
   points: NormalizedTelemetryPoint[],
   d1: { code: string; name: string },
   d2: { code: string; name: string },
-  corners: CornerZone[]
+  corners: CornerTelemetryAnalysis[]
 ): TelemetryInsight {
-  const t1 = getDriverTrait(d1.code);
-  const t2 = getDriverTrait(d2.code);
+  let d1LateBrakeCount = 0;
+  let d2LateBrakeCount = 0;
+  let d1TotalBrakeAdv = 0;
+  let d2TotalBrakeAdv = 0;
 
-  const isD1LateBraker = t1.brakingPointBias < t2.brakingPointBias;
-  const isD1HigherApex = t1.apexSpeedBias > t2.apexSpeedBias;
-  const isD1EarlyThrottle = t1.exitThrottleBias > t2.exitThrottleBias;
+  let d1ApexCount = 0;
+  let d2ApexCount = 0;
+  let d1TotalApexAdv = 0;
+  let d2TotalApexAdv = 0;
 
-  const lateBraker = isD1LateBraker ? d1.code : d2.code;
-  const fasterApex = isD1HigherApex ? d1.code : d2.code;
-  const earlierThrottle = isD1EarlyThrottle ? d1.code : d2.code;
+  corners.forEach(c => {
+    if (c.d1BrakeStartM > c.d2BrakeStartM) {
+      d1LateBrakeCount++;
+      d1TotalBrakeAdv += (c.d1BrakeStartM - c.d2BrakeStartM);
+    } else if (c.d2BrakeStartM > c.d1BrakeStartM) {
+      d2LateBrakeCount++;
+      d2TotalBrakeAdv += (c.d2BrakeStartM - c.d1BrakeStartM);
+    }
 
-  const keyCornersAnalysis = corners.slice(0, 4).map((c, idx) => {
-    const adv = (idx % 2 === 0 ? d1.code : d2.code);
+    if (c.d1ApexSpeed > c.d2ApexSpeed) {
+      d1ApexCount++;
+      d1TotalApexAdv += (c.d1ApexSpeed - c.d2ApexSpeed);
+    } else if (c.d2ApexSpeed > c.d1ApexSpeed) {
+      d2ApexCount++;
+      d2TotalApexAdv += (c.d2ApexSpeed - c.d1ApexSpeed);
+    }
+  });
+
+  const lateBraker = d1LateBrakeCount > d2LateBrakeCount ? d1.code : d2.code;
+  const avgBrakeAdv = lateBraker === d1.code ? (d1LateBrakeCount ? Math.round(d1TotalBrakeAdv / d1LateBrakeCount) : 0) : (d2LateBrakeCount ? Math.round(d2TotalBrakeAdv / d2LateBrakeCount) : 0);
+  
+  const fasterApex = d1ApexCount > d2ApexCount ? d1.code : d2.code;
+  const avgApexAdv = fasterApex === d1.code ? (d1ApexCount ? Math.round(d1TotalApexAdv / d1ApexCount) : 0) : (d2ApexCount ? Math.round(d2TotalApexAdv / d2ApexCount) : 0);
+
+  const keyCornersAnalysis = corners.slice(0, 4).map((c) => {
     return {
-      corner: c.name,
-      advantageDriver: adv,
-      timeDelta: `+0.${15 + idx * 12}s`,
-      explanation: adv === d1.code
-        ? `${d1.code} が進入でブレーキを限界まで遅らせ、ボトムスピードで +${Math.abs(t1.apexSpeedBias - t2.apexSpeedBias) + 2}km/h を維持。`
-        : `${d2.code} がよりタイトなインベタラインを取り、立ち上がりのスロットル全開を0.08秒早く開始。`,
+      corner: c.cornerName,
+      advantageDriver: c.advantageDriver,
+      timeDelta: c.timeDeltaSeconds > 0 ? `+${c.timeDeltaSeconds}s` : `${c.timeDeltaSeconds}s`,
+      explanation: c.keyTacticalNote,
     };
   });
 
   return {
     braking: {
-      summary: `${lateBraker} が主要減速帯で平均 4.5m 奥までブレーキングを我慢`,
+      summary: `${lateBraker} が主要減速帯で平均 ${avgBrakeAdv}m 奥までブレーキング`,
       lateBraker,
-      details: `${lateBraker} はトレイルブレーキングの踏力コントロールが極めて鋭く、エイペックス手前まで高い車速をキープして進入タイムを短縮しています。`,
+      details: `${lateBraker} はブレーキングを遅らせることで進入タイムを短縮しています。`,
     },
     apexSpeed: {
-      summary: `${fasterApex} が中高速コーナーで +3.2 km/h 高いボトムスピードを記録`,
+      summary: `${fasterApex} がコーナーで平均 +${avgApexAdv} km/h 高いボトムスピードを記録`,
       fasterDriver: fasterApex,
-      details: `${fasterApex} はマシンのフロントグリップを最大限に引き出し、旋回中のミニマムスピードでコンスタントにアドバンテージを構築しています。`,
+      details: `${fasterApex} は旋回中のミニマムスピードでアドバンテージを構築しています。`,
     },
     throttleApplication: {
-      summary: `${earlierThrottle} がコーナー脱出時に 0.12秒 早くフルスロットルへ到達`,
-      earlierDriver: earlierThrottle,
-      details: `${earlierThrottle} はステアリングの舵角の戻しが素早く、リアのトラクション抜けを抑えながらストレート最高速を最大化しています。`,
+      summary: `両者のトラクション特性に違いが見られます`,
+      earlierDriver: d1.code,
+      details: `スロットル全開タイミングの違いがストレートエンドの最高速に影響しています。`,
     },
     keyCorners: keyCornersAnalysis,
   };

@@ -98,10 +98,10 @@ export default function F1GlossaryHub({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-racing font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span className="text-[11px] font-racing font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                 F1 INTELLIGENCE GLOSSARY
               </span>
-              <span className="text-[10px] text-slate-400 font-mono">BEGINNER TO EXPERT</span>
+              <span className="text-[11px] text-slate-400 font-mono">BEGINNER TO EXPERT</span>
             </div>
             <h3 className="text-xl font-racing font-black tracking-wide text-white flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-emerald-400" />
@@ -159,12 +159,12 @@ export default function F1GlossaryHub({
 
         {/* Level Pills */}
         <div className="flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-white/10 self-start md:self-auto">
-          <span className="text-[10px] font-racing font-bold text-slate-400 px-2">難易度:</span>
+          <span className="text-[11px] font-racing font-bold text-slate-400 px-2">難易度:</span>
           {[
             ['all', 'すべて'],
-            [1, '★ 初級'],
-            [2, '★★ 中級'],
-            [3, '★★★ 上級'],
+            [1, '初級'],
+            [2, '中級'],
+            [3, '上級'],
           ].map(([lvl, label]) => (
             <button
               type="button"
@@ -242,17 +242,17 @@ export default function F1GlossaryHub({
               <div>
                 {/* Top Badges Strip */}
                 <div className="flex items-center justify-between gap-2 mb-2.5">
-                  <span className="text-[10px] font-racing font-bold px-2.5 py-0.5 rounded-full bg-slate-950/90 text-slate-300 border border-white/10 group-hover:border-emerald-500/30 transition-colors">
+                  <span className="text-[11px] font-racing font-bold px-2.5 py-0.5 rounded-full bg-slate-950/90 text-slate-300 border border-white/10 group-hover:border-emerald-500/30 transition-colors">
                     {term.categoryLabel}
                   </span>
                   <div className="flex items-center gap-1.5">
                     {term.visualType && term.visualType !== 'default' && (
-                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                      <span className="text-[11px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
                         図解あり
                       </span>
                     )}
-                    <span className="text-[10px] font-mono text-amber-400 tracking-tight">
-                      {'★'.repeat(term.level)}
+                    <span className="text-[11px] font-mono text-amber-400 tracking-tight">
+                      {''.repeat(term.level)}
                     </span>
                   </div>
                 </div>
@@ -261,7 +261,7 @@ export default function F1GlossaryHub({
                 <h4 className="font-racing font-bold text-sm text-white group-hover:text-emerald-300 transition-colors leading-snug line-clamp-1 mb-0.5">
                   {term.term}
                 </h4>
-                <div className="text-[10px] font-mono text-slate-400 mb-2 truncate">
+                <div className="text-[11px] font-mono text-slate-400 mb-2 truncate">
                   {term.englishTerm}
                 </div>
 
@@ -273,7 +273,7 @@ export default function F1GlossaryHub({
 
               {/* Bottom Action Strip */}
               <div className="mt-3.5 pt-2.5 border-t border-white/[0.06] flex items-center justify-between text-[11px] font-racing font-bold text-slate-400 group-hover:text-emerald-400 transition-colors">
-                <span className="text-[10px] font-mono text-slate-500 group-hover:text-slate-400">
+                <span className="text-[11px] font-mono text-slate-500 group-hover:text-slate-400">
                   {term.relatedTerms && term.relatedTerms.length > 0 ? `#${term.relatedTerms[0]}` : '詳細解説・実例'}
                 </span>
                 <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
@@ -305,18 +305,18 @@ export default function F1GlossaryHub({
               {/* Left: Term Name & Category */}
               <div className="flex items-start sm:items-center gap-3 sm:w-72 flex-shrink-0">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="text-[10px] font-racing font-bold px-2 py-0.5 rounded-full bg-slate-950 text-slate-300 border border-white/10">
+                  <span className="text-[11px] font-racing font-bold px-2 py-0.5 rounded-full bg-slate-950 text-slate-300 border border-white/10">
                     {term.categoryLabel}
                   </span>
-                  <span className="text-[10px] font-mono text-amber-400">
-                    {'★'.repeat(term.level)}
+                  <span className="text-[11px] font-mono text-amber-400">
+                    {''.repeat(term.level)}
                   </span>
                 </div>
                 <div>
                   <h4 className="font-racing font-bold text-sm text-white group-hover:text-emerald-300 transition-colors">
                     {term.term}
                   </h4>
-                  <div className="text-[10px] font-mono text-slate-400">
+                  <div className="text-[11px] font-mono text-slate-400">
                     {term.englishTerm}
                   </div>
                 </div>

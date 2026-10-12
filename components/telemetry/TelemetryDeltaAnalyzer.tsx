@@ -10,7 +10,7 @@
  * - AI Race Engineer debrief generator powered by Gemini
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -23,18 +23,22 @@ import {
   ReferenceLine,
 } from 'recharts';
 import {
-  generateNormalizedTelemetry,
+  fetchAndGenerateNormalizedTelemetry,
   type TelemetryComparisonData,
   type CornerTelemetryAnalysis,
 } from '@/lib/carTelemetryService';
 import { KNOWLEDGE_CIRCUITS, KNOWLEDGE_DRIVERS } from '@/data/f1KnowledgeData';
 import { getGeminiAuthHeaders } from '@/lib/apiKeyService';
+import type { Lap, Driver } from '@/lib/types';
 
 interface TelemetryDeltaAnalyzerProps {
   initialCircuitId?: string;
   initialDriver1Code?: string;
   initialDriver2Code?: string;
   geminiApiKey?: string;
+  sessionKey?: number | null;
+  lapsCache?: Record<string, Lap[]>;
+  drivers?: Driver[];
 }
 
 const PRESET_MATCHUPS = [
@@ -59,6 +63,9 @@ export default function TelemetryDeltaAnalyzer({
   initialDriver1Code = 'TSU',
   initialDriver2Code = 'VER',
   geminiApiKey = '',
+  sessionKey,
+  lapsCache = {},
+  drivers = [],
 }: TelemetryDeltaAnalyzerProps) {
   const [circuitId, setCircuitId] = useState(initialCircuitId);
   const [driver1Code, setDriver1Code] = useState(initialDriver1Code);
@@ -68,25 +75,67 @@ export default function TelemetryDeltaAnalyzer({
   const [aiDebrief, setAiDebrief] = useState<string | null>(null);
   const [isLoadingAi, setIsLoadingAi] = useState<boolean>(false);
 
+  const [telemetryData, setTelemetryData] = useState<TelemetryComparisonData | null>(null);
+  const [isLoadingData, setIsLoadingData] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
   // Driver definitions
   const d1 = useMemo(() => {
     const found = KNOWLEDGE_DRIVERS.find((d) => d.code === driver1Code);
+    const apiD = drivers.find(d => d.name_acronym === driver1Code);
     return found
-      ? { code: found.code, number: String(found.number), name: found.fullName, color: found.teamColor }
-      : { code: 'TSU', number: '22', name: 'Yuki Tsunoda', color: '#38bdf8' };
-  }, [driver1Code]);
+      ? { code: found.code, number: apiD?.driver_number.toString() || String(found.number), name: found.fullName, color: found.teamColor }
+      : { code: 'TSU', number: apiD?.driver_number.toString() || '22', name: 'Yuki Tsunoda', color: '#38bdf8' };
+  }, [driver1Code, drivers]);
 
   const d2 = useMemo(() => {
     const found = KNOWLEDGE_DRIVERS.find((d) => d.code === driver2Code);
+    const apiD = drivers.find(d => d.name_acronym === driver2Code);
     return found
-      ? { code: found.code, number: String(found.number), name: found.fullName, color: found.teamColor }
-      : { code: 'VER', number: '1', name: 'Max Verstappen', color: '#1e40af' };
-  }, [driver2Code]);
+      ? { code: found.code, number: apiD?.driver_number.toString() || String(found.number), name: found.fullName, color: found.teamColor }
+      : { code: 'VER', number: apiD?.driver_number.toString() || '1', name: 'Max Verstappen', color: '#1e40af' };
+  }, [driver2Code, drivers]);
 
-  // Telemetry computation
-  const telemetryData: TelemetryComparisonData = useMemo(() => {
-    return generateNormalizedTelemetry(circuitId, d1, d2);
-  }, [circuitId, d1, d2]);
+  // Fetch telemetry data
+  const fetchData = useCallback(() => {
+    if (!sessionKey || !lapsCache[d1.number] || !lapsCache[d2.number]) {
+      setTelemetryData(null);
+      setErrorMsg('ラップデータが不足しています。');
+      return;
+    }
+    let ignore = false;
+    setIsLoadingData(true);
+    setErrorMsg(null);
+    fetchAndGenerateNormalizedTelemetry(sessionKey, d1, d2, lapsCache, circuitId)
+      .then(data => {
+        if (!ignore) {
+          setTelemetryData(data);
+          setIsLoadingData(false);
+        }
+      })
+      .catch(err => {
+        if (!ignore) {
+          console.warn('Telemetry fetch error', err);
+          setErrorMsg('カーデータの取得に失敗しました。');
+          setTelemetryData(null);
+          setIsLoadingData(false);
+        }
+      });
+    return () => { ignore = true; };
+  }, [sessionKey, d1, d2, lapsCache, circuitId]);
+
+  useEffect(() => {
+    const cleanup = fetchData();
+    return cleanup;
+  }, [fetchData]);
+
+  if (isLoadingData || !telemetryData) {
+    return (
+      <div className="bg-slate-950 p-4 rounded text-center">
+        {isLoadingData ? '🔄 テレメトリーデータを取得中...' : `⚠️ ${errorMsg || 'データがありません'}`}
+      </div>
+    );
+  }
 
   const { points, cornerAnalyses, circuitName, circuitLengthM } = telemetryData;
 

@@ -2,9 +2,9 @@
 
 /**
  * components/strategy/VirtualPitwallWarRoom.tsx
- * ⏱️ Virtual Pitwall Tactical War Room & Chief Strategist Simulator
+ * Virtual Pitwall Tactical War Room & Chief Strategist Simulator
  * Features:
- * - Dynamic Weather & Track Temperature Sliders (15°C~55°C, 0~15mm/min Rain)
+ * - Dynamic Weather & Track Temperature Sliders (15°C~55°C, 0~15mm/h Rain)
  * - Multi-Compound Tyre Degradation Curves & Tyre Cliff Detection
  * - Safety Car (SC) / Virtual Safety Car (VSC) Cheap Pit Advantage Calculator
  * - Real-time Clean Air vs Traffic Exit Window Forecasting
@@ -56,7 +56,7 @@ interface TacticalDilemma {
 const TACTICAL_DILEMMAS: TacticalDilemma[] = [
   {
     id: 'dilemma-1',
-    title: '🌧️ 雨雲急接近：残り18周でトップ快走中のステイアウト判断',
+    title: '雨雲急接近：残り18周でトップ快走中のステイアウト判断',
     scenario: '残り18周、2位に4.2秒差をつけてトップを走行中。レーダー予測で4周後に大粒の雨（3mm/min）が直撃する見込み。今周回、2位のライバルが博打でインターミディエイトへピットインした。あなたのストラテジストコールは？',
     options: [
       {
@@ -81,7 +81,7 @@ const TACTICAL_DILEMMAS: TacticalDilemma[] = [
   },
   {
     id: 'dilemma-2',
-    title: '🚨 レース終盤SC出動：残り8周で中古ハードから新品ソフトへ替えるか？',
+    title: 'レース終盤SC出動：残り8周で中古ハードから新品ソフトへ替えるか？',
     scenario: '残り8周でクラッシュ発生、フルセーフティカー（SC）導入。あなたは首位走行中だが、タイヤは28周走行した中古ハード。2位のライバルは新品ソフトへ替える構え。ピットに入ると2位へ転落するが、タイヤのグリップ差は歴然。どうする？',
     options: [
       {
@@ -103,7 +103,7 @@ const TACTICAL_DILEMMAS: TacticalDilemma[] = [
 export default function VirtualPitwallWarRoom() {
   const [selectedCircuitId, setSelectedCircuitId] = useState<string>('suzuka');
   const [trackTemp, setTrackTemp] = useState<number>(38); // °C (15~55)
-  const [rainRate, setRainRate] = useState<number>(0); // mm/min (0~15)
+  const [rainRate, setRainRate] = useState<number>(0); // mm/h (0~15)
   const [gapAheadSeconds, setGapAheadSeconds] = useState<number>(2.4); // s
   const [gapBehindSeconds, setGapBehindSeconds] = useState<number>(14.2); // s
   const [selectedDilemmaId, setSelectedDilemmaId] = useState<string>('dilemma-1');
@@ -166,7 +166,7 @@ export default function VirtualPitwallWarRoom() {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-mono font-bold tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[11px] font-mono font-bold tracking-wider">
               TACTICAL WAR ROOM
             </span>
             <span className="text-[11px] font-mono text-slate-400">
@@ -200,7 +200,7 @@ export default function VirtualPitwallWarRoom() {
         {/* Track Temp Slider */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-slate-400">🌡️ 路面温度 (Track Temp):</span>
+            <span className="text-slate-400">路面温度 (Track Temp):</span>
             <span className="text-amber-400 font-bold font-racing">{trackTemp} °C</span>
           </div>
           <input
@@ -211,7 +211,7 @@ export default function VirtualPitwallWarRoom() {
             onChange={(e) => setTrackTemp(Number(e.target.value))}
             className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-400"
           />
-          <div className="text-[10px] font-mono text-slate-500">
+          <div className="text-[11px] font-mono text-slate-500">
             {trackTemp > 45 ? '猛暑・ブリスター急増' : trackTemp < 25 ? '低温・グレイニング警戒' : '適正作動ウィンドウ'}
           </div>
         </div>
@@ -219,8 +219,8 @@ export default function VirtualPitwallWarRoom() {
         {/* Rain Rate Slider */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-slate-400">🌧️ 天候 / 降水量:</span>
-            <span className="text-sky-400 font-bold font-racing">{rainRate} mm/min</span>
+            <span className="text-slate-400">天候 / 降水量:</span>
+            <span className="text-slate-300 font-bold font-racing">{rainRate} mm/h</span>
           </div>
           <input
             type="range"
@@ -229,9 +229,9 @@ export default function VirtualPitwallWarRoom() {
             step={0.5}
             value={rainRate}
             onChange={(e) => setRainRate(Number(e.target.value))}
-            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-400"
+            className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-slate-300"
           />
-          <div className="text-[10px] font-mono text-slate-500">
+          <div className="text-[11px] font-mono text-slate-500">
             {rainRate === 0 ? '完全ドライ路面' : rainRate <= 2.0 ? 'ダンプ（湿潤・滑りやすい）' : rainRate <= 6.0 ? 'インターミディエイト適正' : 'フルウエット豪雨'}
           </div>
         </div>
@@ -239,7 +239,7 @@ export default function VirtualPitwallWarRoom() {
         {/* Gap Behind Slider */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-slate-400">⏱️ 後続とのギャップ:</span>
+            <span className="text-slate-400">後続とのギャップ:</span>
             <span className="text-emerald-400 font-bold font-racing">{gapBehindSeconds} 秒</span>
           </div>
           <input
@@ -251,15 +251,15 @@ export default function VirtualPitwallWarRoom() {
             onChange={(e) => setGapBehindSeconds(Number(e.target.value))}
             className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-400"
           />
-          <div className="text-[10px] font-mono text-slate-500">
-            {canFreePitUnderSC ? '🚨 SC中フリーピット可能！' : 'ピットで順位後退リスクあり'}
+          <div className="text-[11px] font-mono text-slate-500">
+            {canFreePitUnderSC ? 'SC中フリーピット可能！' : 'ピットで順位後退リスクあり'}
           </div>
         </div>
 
         {/* Gap Ahead Slider */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-slate-400">🎯 前走車とのギャップ:</span>
+            <span className="text-slate-400">前走車とのギャップ:</span>
             <span className="text-purple-300 font-bold font-racing">{gapAheadSeconds} 秒</span>
           </div>
           <input
@@ -271,8 +271,8 @@ export default function VirtualPitwallWarRoom() {
             onChange={(e) => setGapAheadSeconds(Number(e.target.value))}
             className="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-purple-400"
           />
-          <div className="text-[10px] font-mono text-slate-500">
-            {gapAheadSeconds <= 2.5 ? '⚡ アンダーカット有効射程内' : '間隔大・オーバーカット警戒'}
+          <div className="text-[11px] font-mono text-slate-500">
+            {gapAheadSeconds <= 2.5 ? 'アンダーカット有効射程内' : '間隔大・オーバーカット警戒'}
           </div>
         </div>
       </div>
@@ -281,7 +281,7 @@ export default function VirtualPitwallWarRoom() {
       <div className="p-4 rounded-xl bg-slate-950/80 border border-white/10 space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-mono font-bold text-white flex items-center gap-1.5">
-            <span>🚨 セーフティカー（SC）＆ VSC「チープピット」アドバンテージ計算</span>
+            <span>セーフティカー（SC）＆ VSC「チープピット」アドバンテージ計算</span>
           </span>
           <span className="text-[11px] font-mono text-slate-400">
             通常ピットロス基準: <strong className="text-white">{normalPitLoss}秒</strong>
@@ -291,40 +291,40 @@ export default function VirtualPitwallWarRoom() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {/* Green Flag */}
           <div className="bg-slate-900/80 p-3 rounded-xl border border-white/10 space-y-1">
-            <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between">
-              <span>🟢 通常グリーンフラッグ</span>
+            <div className="text-[11px] font-mono text-slate-400 flex items-center justify-between">
+              <span>通常グリーンフラッグ</span>
               <span>基準ロス</span>
             </div>
             <div className="text-xl font-racing font-bold text-slate-300">
               -{normalPitLoss} <span className="text-xs font-mono text-slate-500">秒</span>
             </div>
-            <div className="text-[10px] text-slate-500 font-mono">全車が全開走行中のピット</div>
+            <div className="text-[11px] text-slate-500 font-mono">全車が全開走行中のピット</div>
           </div>
 
           {/* VSC */}
-          <div className="bg-slate-900/80 p-3 rounded-xl border border-sky-500/30 space-y-1">
-            <div className="text-[10px] font-mono text-sky-400 flex items-center justify-between">
-              <span>🟡 バーチャルSC (VSC)</span>
+          <div className="bg-slate-900/80 p-3 rounded-xl border border-slate-400/30 space-y-1">
+            <div className="text-[11px] font-mono text-slate-300 flex items-center justify-between">
+              <span>バーチャルSC (VSC)</span>
               <span className="text-emerald-400 font-bold">+{vscSavings}秒 ゲイン</span>
             </div>
-            <div className="text-xl font-racing font-bold text-sky-300">
+            <div className="text-xl font-racing font-bold text-slate-200">
               -{vscPitLoss} <span className="text-xs font-mono text-slate-500">秒</span>
             </div>
-            <div className="text-[10px] font-mono text-slate-400">
+            <div className="text-[11px] font-mono text-slate-400">
               {canFreePitUnderVSC ? '✓ 順位キープ可能 (フリーピット)' : '✕ 順位後退の可能性あり'}
             </div>
           </div>
 
           {/* Full SC */}
           <div className="bg-gradient-to-br from-red-950/40 to-slate-900 p-3 rounded-xl border border-red-500/40 space-y-1">
-            <div className="text-[10px] font-mono text-amber-300 flex items-center justify-between font-bold">
-              <span>🚨 フルセーフティカー (SC)</span>
+            <div className="text-[11px] font-mono text-amber-300 flex items-center justify-between font-bold">
+              <span>フルセーフティカー (SC)</span>
               <span className="text-emerald-400 font-bold">+{scSavings}秒 ゲイン</span>
             </div>
             <div className="text-xl font-racing font-bold text-amber-400">
               -{scPitLoss} <span className="text-xs font-mono text-slate-500">秒</span>
             </div>
-            <div className="text-[10px] font-mono text-emerald-400 font-bold">
+            <div className="text-[11px] font-mono text-emerald-400 font-bold">
               {canFreePitUnderSC ? '✓ 完璧な無償ピットストップ成立！' : '✕ 前走車のピットに引っかかる危険'}
             </div>
           </div>
@@ -336,9 +336,9 @@ export default function VirtualPitwallWarRoom() {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <div className="text-xs font-mono font-bold text-white flex items-center gap-2">
-              <span>📉 コンパウンド別タイヤデグラデーション曲線 ＆「タイヤの崖（クリフ）」予測</span>
+              <span>コンパウンド別タイヤデグラデーション曲線 ＆「タイヤの崖（クリフ）」予測</span>
             </div>
-            <div className="text-[10px] text-slate-400">
+            <div className="text-[11px] text-slate-400">
               周回を重ねるにつれラップタイムが急激に跳ね上がる変曲点（崖）を自動検知
             </div>
           </div>
@@ -378,10 +378,10 @@ export default function VirtualPitwallWarRoom() {
                     return (
                       <div className="bg-slate-950/95 border border-white/20 p-2.5 rounded-xl text-xs font-mono space-y-1">
                         <div className="text-slate-400 font-bold">周回: Lap {data.lap}</div>
-                        <div className="text-red-400">🔴 Soft: {data.soft}s {data.lap > 11 ? '(⚠️ 崖落ち)' : ''}</div>
-                        <div className="text-amber-400">🟡 Medium: {data.medium}s {data.lap > 22 ? '(⚠️ 崖落ち)' : ''}</div>
-                        <div className="text-slate-300">⚪ Hard: {data.hard}s {data.lap > 32 ? '(⚠️ 崖落ち)' : ''}</div>
-                        {rainRate > 0 && <div className="text-emerald-400">🟢 Inter: {data.intermediate}s</div>}
+                        <div className="text-red-400">Soft: {data.soft}s {data.lap > 11 ? '(崖落ち)' : ''}</div>
+                        <div className="text-amber-400">Medium: {data.medium}s {data.lap > 22 ? '(崖落ち)' : ''}</div>
+                        <div className="text-slate-300">Hard: {data.hard}s {data.lap > 32 ? '(崖落ち)' : ''}</div>
+                        {rainRate > 0 && <div className="text-emerald-400">Inter: {data.intermediate}s</div>}
                       </div>
                     );
                   }
@@ -407,8 +407,8 @@ export default function VirtualPitwallWarRoom() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
           <div>
             <div className="text-xs font-racing font-bold text-amber-300 uppercase tracking-wider flex items-center gap-2">
-              <span>🧠 TACTICAL CALL DILEMMA</span>
-              <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-mono">
+              <span>TACTICAL CALL DILEMMA</span>
+              <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-mono">
                 現場ストラテジスト意思決定
               </span>
             </div>
@@ -464,7 +464,7 @@ export default function VirtualPitwallWarRoom() {
                 >
                   <span className="font-medium">{opt.text}</span>
                   {isSelected && (
-                    <span className={`font-mono font-bold px-2 py-0.5 rounded text-[10px] flex-shrink-0 ml-2 ${
+                    <span className={`font-mono font-bold px-2 py-0.5 rounded text-[11px] flex-shrink-0 ml-2 ${
                       opt.score >= 80 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'
                     }`}>
                       評価スコア: {opt.score}点
@@ -479,7 +479,7 @@ export default function VirtualPitwallWarRoom() {
           {selectedChoiceIdx !== null && (
             <div className="p-4 rounded-xl bg-slate-900 border border-white/10 space-y-2 text-xs animate-fadeIn">
               <div className="font-bold text-white flex items-center gap-2">
-                <span>🏁 判定結果:</span>
+                <span>判定結果:</span>
                 <span className={currentDilemma.options[selectedChoiceIdx].score >= 80 ? 'text-emerald-400' : 'text-red-400'}>
                   {currentDilemma.options[selectedChoiceIdx].score >= 80 ? '大勝利！極めて優秀なストラテジスト判断' : '痛恨の戦術ミス！'}
                 </span>
@@ -487,8 +487,8 @@ export default function VirtualPitwallWarRoom() {
               <p className="text-slate-300 leading-relaxed text-[11px]">
                 {currentDilemma.options[selectedChoiceIdx].outcome}
               </p>
-              <div className="text-[10px] font-mono text-amber-300 pt-1 border-t border-white/5">
-                🏛️ 類似の実例・先例: {currentDilemma.options[selectedChoiceIdx].precedent}
+              <div className="text-[11px] font-mono text-amber-300 pt-1 border-t border-white/5">
+                類似の実例・先例: {currentDilemma.options[selectedChoiceIdx].precedent}
               </div>
             </div>
           )}

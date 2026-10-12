@@ -494,12 +494,12 @@ export default function DriversHub({
 
           <div className="flex items-center gap-1.5 shrink-0">
             {isLegend ? (
-              <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono flex items-center gap-1 shadow-sm">
+              <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full text-[11px] font-bold font-mono flex items-center gap-1 shadow-sm">
                 <Crown className="w-2.5 h-2.5 text-amber-400 shrink-0" />
                 <span>{driver.championships}冠</span>
               </span>
             ) : driver.championships > 0 ? (
-              <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-bold font-mono flex items-center gap-1">
+              <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[11px] font-bold font-mono flex items-center gap-1">
                 <Trophy className="w-2.5 h-2.5 text-amber-400 shrink-0" />
                 <span>{driver.championships}冠</span>
               </span>
@@ -543,15 +543,15 @@ export default function DriversHub({
 
           <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
             <div className="h-9 sm:h-10 flex items-center">
-              <h3 className={`font-bold text-white leading-snug group-hover:text-sky-300 transition-colors break-words ${getCardDriverNameClass(driver.fullName)}`}>
+              <h3 className={`font-bold text-white leading-snug group-hover:text-slate-200 transition-colors break-words ${getCardDriverNameClass(driver.fullName)}`}>
                 {driver.fullName}
               </h3>
             </div>
             <p className="text-xs text-slate-400 font-medium truncate">
               {driver.team}
             </p>
-            <div className="text-[10px] text-slate-400 font-mono">
-              <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/5 text-[9.5px] font-mono text-slate-300 inline-block">
+            <div className="text-[11px] text-slate-400 font-mono">
+              <span className="px-1.5 py-0.5 rounded bg-white/5 border border-white/5 text-[11px] font-mono text-slate-300 inline-block">
                 {driver.driverType}
               </span>
             </div>
@@ -559,14 +559,14 @@ export default function DriversHub({
         </div>
 
         {/* Card Bottom: Standardized Stats Grid */}
-        <div className="grid grid-cols-3 gap-1 py-1.5 px-2 rounded-xl bg-slate-950/70 border border-white/5 text-center text-[10px] font-mono whitespace-nowrap">
+        <div className="grid grid-cols-3 gap-1 py-1.5 px-2 rounded-xl bg-slate-950/70 border border-white/5 text-center text-[11px] font-mono whitespace-nowrap">
           <div className="flex items-center justify-center gap-1">
             <span className="text-slate-500">勝</span>
             <strong className="text-amber-400 font-bold tabular-nums">{driver.wins}</strong>
           </div>
           <div className="flex items-center justify-center gap-1 border-x border-white/10">
             <span className="text-slate-500">登壇</span>
-            <strong className="text-sky-400 font-bold tabular-nums">{driver.podiums}</strong>
+            <strong className="text-slate-300 font-bold tabular-nums">{driver.podiums}</strong>
           </div>
           <div className="flex items-center justify-center gap-1">
             <span className="text-slate-500">PP</span>
@@ -642,7 +642,7 @@ export default function DriversHub({
             >
               <Calendar className="w-3.5 h-3.5" />
               <span>年度別グリッド</span>
-              <span className="text-[9px] px-1 py-0.2 rounded bg-red-400/20 text-red-200 border border-red-400/30 ml-0.5">
+              <span className="text-[11px] px-1 py-0.2 rounded bg-red-400/20 text-red-200 border border-red-400/30 ml-0.5">
                 2016-2026
               </span>
             </button>
@@ -698,7 +698,7 @@ export default function DriversHub({
 
           {/* Counter Badge */}
           <div className="flex items-center gap-2 self-end lg:self-auto shrink-0">
-            <span className="text-xs font-mono font-bold bg-slate-900 px-3 py-1.5 rounded-xl border border-white/10 text-sky-400">
+            <span className="text-xs font-mono font-bold bg-slate-900 px-3 py-1.5 rounded-xl border border-white/10 text-slate-300">
               {(viewMode === 'seasonGrid' || viewMode === 'grid2026' || viewMode === 'grid2025') && (
                 <>
                   表示中: <strong className="text-white text-sm">{selectedYear}年</strong> ({currentSeasonGrid.teams.length}チーム / レギュラー{currentSeasonGrid.teams.reduce((acc, t) => acc + t.drivers.length, 0)}名 / リザーブ{currentSeasonGrid.teams.reduce((acc, t) => acc + (t.reserves?.length || 0), 0)}名)
@@ -741,7 +741,7 @@ export default function DriversHub({
                 placeholder="ドライバー名・3文字略称・チーム・国籍で検索..."
                 value={effectiveSearch}
                 onChange={handleSearchInputChange}
-                className="w-full bg-slate-900/80 border border-white/10 rounded-lg pl-8 pr-7 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
+                className="w-full bg-slate-900/80 border border-white/10 rounded-lg pl-8 pr-7 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-slate-300 transition-colors"
               />
               {effectiveSearch && (
                 <button
@@ -782,9 +782,9 @@ export default function DriversHub({
                 onClick={() => setIsFilterOpen((prev) => !prev)}
                 className={`text-xs font-racing font-bold px-3 py-1.5 rounded-lg border transition-all flex items-center gap-1.5 shadow-sm cursor-pointer ${
                   isFilterOpen
-                    ? 'bg-blue-600 text-white border-blue-400 shadow-blue-500/30 ring-1 ring-blue-400/50'
+                    ? 'bg-slate-500 text-white border-slate-300 shadow-slate-400/30 ring-1 ring-slate-300/50'
                     : activeFilterCount > 0
-                    ? 'bg-blue-950/80 border-blue-500/50 text-blue-300 hover:bg-blue-900/80'
+                    ? 'bg-slate-900/80 border-slate-400/50 text-slate-200 hover:bg-slate-800/80'
                     : 'bg-slate-900/80 border-white/10 text-slate-300 hover:text-white hover:bg-slate-800'
                 }`}
                 title="詳細フィルター（ステータス・所属チーム）の開閉"
@@ -792,18 +792,18 @@ export default function DriversHub({
                 <Filter className="w-3.5 h-3.5" />
                 <span>絞り込み</span>
                 {activeFilterCount > 0 && (
-                  <span className="w-4 h-4 rounded-full bg-blue-500 text-white text-[10px] font-mono flex items-center justify-center font-bold">
+                  <span className="w-4 h-4 rounded-full bg-slate-400 text-white text-[11px] font-mono flex items-center justify-center font-bold">
                     {activeFilterCount}
                   </span>
                 )}
-                <span className="text-[10px]">{isFilterOpen ? '▲' : '▼'}</span>
+                <span className="text-[11px]">{isFilterOpen ? '▲' : '▼'}</span>
               </button>
 
               {isFiltered && (
                 <button
                   type="button"
                   onClick={handleResetFilters}
-                  className="text-xs font-mono font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
+                  className="text-xs font-mono font-bold bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
                   title="すべての絞り込み条件をリセット"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -817,7 +817,7 @@ export default function DriversHub({
 
       {/* ── Collapsible Filter Tray (On-demand) ── */}
       {isFilterOpen && viewMode !== 'compare' && (
-        <div className="glass-card-premium rounded-xl p-3 sm:p-4 border border-blue-500/30 shadow-xl flex flex-col gap-3 animate-fade-in">
+        <div className="glass-card-premium rounded-xl p-3 sm:p-4 border border-slate-400/30 shadow-xl flex flex-col gap-3 animate-fade-in">
           <div className="flex items-center justify-between pb-2 border-b border-white/10 text-xs">
             <span className="font-racing font-bold text-slate-300 flex items-center gap-1.5">
               <Filter className="w-3.5 h-3.5 text-slate-300" />
@@ -853,7 +853,7 @@ export default function DriversHub({
                     onClick={() => setDriverStatusFilter(opt.key)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold transition-all flex items-center gap-1 border shadow-sm cursor-pointer ${
                       active
-                        ? 'bg-blue-600 text-white border-blue-400 shadow-blue-500/20 ring-1 ring-blue-400/40'
+                        ? 'bg-slate-500 text-white border-slate-300 shadow-slate-400/20 ring-1 ring-slate-300/40'
                         : 'bg-slate-900/80 text-slate-400 border-white/5 hover:border-white/20 hover:text-white hover:bg-slate-800'
                     }`}
                   >
@@ -893,7 +893,7 @@ export default function DriversHub({
                     onClick={() => setDriverTeamFilter(t)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all flex items-center gap-1 border shadow-sm cursor-pointer ${
                       active
-                        ? 'bg-sky-600 text-white border-sky-400 shadow-sky-500/20 ring-1 ring-sky-400/40 font-bold'
+                        ? 'bg-slate-500 text-white border-slate-300 shadow-slate-400/20 ring-1 ring-slate-300/40 font-bold'
                         : 'bg-slate-900/80 text-slate-400 border-white/5 hover:border-white/20 hover:text-white hover:bg-slate-800'
                     }`}
                   >
@@ -909,17 +909,17 @@ export default function DriversHub({
       {/* ── Active Filter Dismissible Chips Strip ── */}
       {viewMode !== 'compare' && (driverStatusFilter !== 'ALL' || driverTeamFilter !== 'ALL' || effectiveSearch.trim()) && (
         <div className="flex flex-wrap items-center gap-1.5 px-1 text-xs">
-          <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1 mr-1">
+          <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1 mr-1">
             <Filter className="w-3 h-3 text-slate-400" />
             <span>絞り込み中:</span>
           </span>
           {driverStatusFilter !== 'ALL' && driverStatusFilter !== 'Favorites' && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-950/80 border border-blue-500/40 text-blue-200 text-[11px] font-mono">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-900/80 border border-slate-400/40 text-slate-100 text-[11px] font-mono">
               <span>{driverStatusFilter === 'Current' ? '現役' : 'レジェンド'}</span>
               <button
                 type="button"
                 onClick={() => setDriverStatusFilter('ALL')}
-                className="hover:text-white text-blue-400 hover:bg-blue-800/50 rounded p-0.5 ml-0.5 cursor-pointer inline-flex items-center justify-center"
+                className="hover:text-white text-slate-300 hover:bg-slate-700/50 rounded p-0.5 ml-0.5 cursor-pointer inline-flex items-center justify-center"
                 title="ステータス解除"
               >
                 <X className="w-2.5 h-2.5" />
@@ -941,12 +941,12 @@ export default function DriversHub({
             </span>
           )}
           {driverTeamFilter !== 'ALL' && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-950/80 border border-sky-500/40 text-sky-200 text-[11px] font-mono">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-900/80 border border-slate-400/40 text-slate-100 text-[11px] font-mono">
               <span>{driverTeamFilter}</span>
               <button
                 type="button"
                 onClick={() => setDriverTeamFilter('ALL')}
-                className="hover:text-white text-sky-400 hover:bg-sky-800/50 rounded p-0.5 ml-0.5 cursor-pointer inline-flex items-center justify-center"
+                className="hover:text-white text-slate-300 hover:bg-slate-700/50 rounded p-0.5 ml-0.5 cursor-pointer inline-flex items-center justify-center"
                 title="チーム解除"
               >
                 <X className="w-2.5 h-2.5" />
@@ -954,12 +954,12 @@ export default function DriversHub({
             </span>
           )}
           {effectiveSearch.trim() && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-950/80 border border-sky-500/40 text-sky-200 text-[11px] font-mono">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-900/80 border border-slate-400/40 text-slate-100 text-[11px] font-mono">
               <span>&quot;{effectiveSearch}&quot;</span>
               <button
                 type="button"
                 onClick={handleClearLocalSearch}
-                className="hover:text-white text-sky-400 hover:bg-sky-800/50 rounded p-0.5 ml-0.5 cursor-pointer inline-flex items-center justify-center"
+                className="hover:text-white text-slate-300 hover:bg-slate-700/50 rounded p-0.5 ml-0.5 cursor-pointer inline-flex items-center justify-center"
                 title="検索解除"
               >
                 <X className="w-2.5 h-2.5" />
@@ -969,7 +969,7 @@ export default function DriversHub({
           <button
             type="button"
             onClick={handleResetFilters}
-            className="text-[11px] text-rose-400 hover:text-rose-300 underline ml-1 cursor-pointer font-mono"
+            className="text-[11px] text-red-400 hover:text-red-300 underline ml-1 cursor-pointer font-mono"
           >
             すべて解除
           </button>
@@ -1014,29 +1014,29 @@ export default function DriversHub({
                     <button
                       type="button"
                       onClick={() => handleOpenTeamDetail(team.id)}
-                      className="group/team flex items-center gap-1.5 hover:text-sky-300 transition-colors cursor-pointer text-left min-w-0"
+                      className="group/team flex items-center gap-1.5 hover:text-slate-200 transition-colors cursor-pointer text-left min-w-0"
                       title={`${team.name} のチーム詳細・スペック・系譜を見る`}
                     >
-                      <h3 className="text-sm sm:text-base font-racing font-bold text-white group-hover/team:text-sky-300 leading-tight truncate">
+                      <h3 className="text-sm sm:text-base font-racing font-bold text-white group-hover/team:text-slate-200 leading-tight truncate">
                         {team.name}
                       </h3>
-                      <ArrowRight className="w-3 h-3 text-sky-400 opacity-60 group-hover/team:opacity-100 group-hover/team:translate-x-0.5 transition-all" />
+                      <ArrowRight className="w-3 h-3 text-slate-300 opacity-60 group-hover/team:opacity-100 group-hover/team:translate-x-0.5 transition-all" />
                     </button>
                     {team.powerUnit && (
                       <span
-                        className="px-1.5 py-0.5 rounded bg-white/5 border border-white/5 text-[10px] font-mono text-slate-300 hidden sm:inline-flex items-center gap-1 shrink-0"
+                        className="px-1.5 py-0.5 rounded bg-white/5 border border-white/5 text-[11px] font-mono text-slate-300 hidden sm:inline-flex items-center gap-1 shrink-0"
                         title={`パワーユニット: ${team.powerUnit}`}
                       >
-                        <span className="text-[9px] font-bold text-slate-400 font-racing">PU</span>
+                        <span className="text-[11px] font-bold text-slate-400 font-racing">PU</span>
                         <span className="truncate max-w-[130px]">{team.powerUnit}</span>
                       </span>
                     )}
                   </div>
 
                   {/* Right: Principal & Titles Badges */}
-                  <div className="flex items-center justify-end gap-1.5 text-[10px] font-mono text-slate-400 shrink-0">
+                  <div className="flex items-center justify-end gap-1.5 text-[11px] font-mono text-slate-400 shrink-0">
                     {team.constructorTitles > 0 && (
-                      <span className="bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-md text-[10px] font-mono font-bold shrink-0 flex items-center gap-1">
+                      <span className="bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-md text-[11px] font-mono font-bold shrink-0 flex items-center gap-1">
                         <Trophy className="w-2.5 h-2.5 text-amber-400 shrink-0" />
                         <span>{team.constructorTitles}冠</span>
                       </span>
@@ -1103,10 +1103,10 @@ export default function DriversHub({
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div>
                 <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                  <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white text-[10px] font-mono font-bold uppercase tracking-wider">
+                  <span className="px-2.5 py-0.5 rounded-full bg-red-600 text-white text-[11px] font-mono font-bold uppercase tracking-wider">
                     {currentSeasonGrid.year} SEASON GRID
                   </span>
-                  <span className="text-xs text-sky-400 font-mono font-bold">
+                  <span className="text-xs text-slate-300 font-mono font-bold">
                     {currentSeasonGrid.eraName}
                   </span>
                 </div>
@@ -1145,34 +1145,34 @@ export default function DriversHub({
                   <div className="flex items-center gap-2.5 bg-amber-500/10 border border-amber-500/30 px-3.5 py-2 rounded-xl text-amber-200 shadow-sm">
                     <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
                     <div className="min-w-0">
-                      <span className="font-bold font-mono text-[10px] text-amber-400 block uppercase tracking-wider">
+                      <span className="font-bold font-mono text-[11px] text-amber-400 block uppercase tracking-wider">
                         世界王者 (World Champion Status)
                       </span>
                       <span className="text-white font-bold text-xs truncate">
                         未確定（2026シーズン未終了・全23戦予定）
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-500/30 ml-auto shrink-0 font-bold">
+                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-950/80 text-amber-300 border border-amber-500/30 ml-auto shrink-0 font-bold">
                       タイトル未確定
                     </span>
                   </div>
-                  <div className="flex items-center gap-2.5 bg-sky-500/10 border border-sky-500/30 px-3.5 py-2 rounded-xl text-sky-200 shadow-sm">
-                    <Shield className="w-4 h-4 text-sky-400 shrink-0" />
+                  <div className="flex items-center gap-2.5 bg-slate-400/10 border border-slate-400/30 px-3.5 py-2 rounded-xl text-slate-100 shadow-sm">
+                    <Shield className="w-4 h-4 text-slate-300 shrink-0" />
                     <div className="min-w-0">
-                      <span className="font-bold font-mono text-[10px] text-sky-400 block uppercase tracking-wider">
+                      <span className="font-bold font-mono text-[11px] text-slate-300 block uppercase tracking-wider">
                         情報の出所 / 一次出典 (Official Sources)
                       </span>
                       <span className="text-white font-bold text-xs truncate">
                         {currentSeasonGrid.sourceNotice || 'FIA公式レギュレーション ＆ 各チーム参戦発表'}
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-950/80 text-sky-300 border border-sky-500/30 ml-auto shrink-0 font-bold">
+                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-900/80 text-slate-200 border border-slate-400/30 ml-auto shrink-0 font-bold">
                       全11チーム・22名体制
                     </span>
                   </div>
                   {currentSeasonGrid.statusNotice && (
                     <div className="sm:col-span-2 px-3.5 py-2 rounded-xl bg-slate-950/80 border border-white/10 text-[11px] text-slate-300 flex items-start gap-2 shadow-sm">
-                      <Info className="w-3.5 h-3.5 text-sky-400 shrink-0 mt-0.5" />
+                      <Info className="w-3.5 h-3.5 text-slate-300 shrink-0 mt-0.5" />
                       <span className="leading-relaxed">{currentSeasonGrid.statusNotice}</span>
                     </div>
                   )}
@@ -1189,13 +1189,13 @@ export default function DriversHub({
                       {currentSeasonGrid.championDriver.wins}勝 / {currentSeasonGrid.championDriver.points}点
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 bg-sky-500/10 border border-sky-500/30 px-3 py-1.5 rounded-lg text-sky-200">
-                    <Trophy className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                  <div className="flex items-center gap-2 bg-slate-400/10 border border-slate-400/30 px-3 py-1.5 rounded-lg text-slate-100">
+                    <Trophy className="w-3.5 h-3.5 text-slate-300 shrink-0" />
                     <span className="font-bold font-mono">製造者王者 (Constructors):</span>
                     <span className="text-white font-bold truncate">
                       {currentSeasonGrid.championConstructor.name}
                     </span>
-                    <span className="text-[11px] font-mono text-sky-400/90 ml-auto shrink-0">
+                    <span className="text-[11px] font-mono text-slate-300/90 ml-auto shrink-0">
                       {currentSeasonGrid.championConstructor.wins}勝 / {currentSeasonGrid.championConstructor.points}点
                     </span>
                   </div>
@@ -1220,7 +1220,7 @@ export default function DriversHub({
                       style={{ backgroundColor: team.teamColor }}
                     />
                     {!currentSeasonGrid.isOngoing && team.finalRank && (
-                      <span className="bg-white/10 text-white font-mono text-[10px] font-bold px-1.5 py-0.2 rounded">
+                      <span className="bg-white/10 text-white font-mono text-[11px] font-bold px-1.5 py-0.2 rounded">
                         #{team.finalRank}
                       </span>
                     )}
@@ -1237,10 +1237,10 @@ export default function DriversHub({
                     </button>
                     {team.powerUnit && (
                       <span
-                        className="text-[10px] font-mono text-slate-300 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 hidden sm:inline-flex items-center gap-1 truncate max-w-[160px]"
+                        className="text-[11px] font-mono text-slate-300 bg-white/5 px-1.5 py-0.5 rounded border border-white/5 hidden sm:inline-flex items-center gap-1 truncate max-w-[160px]"
                         title={`パワーユニット: ${team.powerUnit}`}
                       >
-                        <span className="text-slate-400 font-semibold font-racing text-[9px]">PU</span>
+                        <span className="text-slate-400 font-semibold font-racing text-[11px]">PU</span>
                         <span className="truncate">{team.powerUnit}</span>
                       </span>
                     )}
@@ -1248,13 +1248,13 @@ export default function DriversHub({
 
                   <div className="flex items-center gap-1.5 text-xs font-mono shrink-0">
                     {team.teamPrincipal && (
-                      <span className="bg-slate-950/80 border border-white/5 px-2 py-0.5 rounded-md text-slate-300 text-[10px] hidden md:inline-flex items-center gap-1">
+                      <span className="bg-slate-950/80 border border-white/5 px-2 py-0.5 rounded-md text-slate-300 text-[11px] hidden md:inline-flex items-center gap-1">
                         <Users className="w-2.5 h-2.5 text-slate-400 shrink-0" />
                         <span>{team.teamPrincipal}</span>
                       </span>
                     )}
                     {team.points !== undefined && (
-                      <span className="bg-amber-400/10 border border-amber-400/20 text-amber-300 font-mono text-[10px] px-2 py-0.5 rounded-md font-bold">
+                      <span className="bg-amber-400/10 border border-amber-400/20 text-amber-300 font-mono text-[11px] px-2 py-0.5 rounded-md font-bold">
                         {team.points} pts
                       </span>
                     )}
@@ -1287,7 +1287,7 @@ export default function DriversHub({
                             </div>
                           )}
                           <div
-                            className="absolute bottom-0 inset-x-0 py-0.5 text-center text-[10px] font-racing font-black bg-black/85 backdrop-blur-sm border-t border-white/10"
+                            className="absolute bottom-0 inset-x-0 py-0.5 text-center text-[11px] font-racing font-black bg-black/85 backdrop-blur-sm border-t border-white/10"
                             style={{ color: team.teamColor }}
                           >
                             #{drv.number || drv.code}
@@ -1298,8 +1298,8 @@ export default function DriversHub({
                         <div className="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
                           <div className="flex items-center gap-1.5 text-xs">
                             <span className="text-xs shrink-0">{drv.flag}</span>
-                            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider">{drv.country}</span>
-                            <span className="text-[10px] font-mono font-bold text-slate-500 ml-auto shrink-0">{drv.code}</span>
+                            <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">{drv.country}</span>
+                            <span className="text-[11px] font-mono font-bold text-slate-500 ml-auto shrink-0">{drv.code}</span>
                           </div>
 
                           {/* Full Name Container - Fixed Height for Uniform Rhythm */}
@@ -1314,25 +1314,25 @@ export default function DriversHub({
                           </div>
 
                           {/* Badges & Clean Status Note - Unified 1-Line Strip */}
-                          <div className="flex items-center gap-1 min-h-[18px] text-[10px] overflow-hidden whitespace-nowrap pt-0.5">
+                          <div className="flex items-center gap-1 min-h-[18px] text-[11px] overflow-hidden whitespace-nowrap pt-0.5">
                             {drv.isTransfer && (
-                              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
+                              <span className="px-1.5 py-0.2 rounded text-[11px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0">
                                 移籍
                               </span>
                             )}
                             {drv.isRookie && (
-                              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40 shrink-0">
+                              <span className="px-1.5 py-0.2 rounded text-[11px] font-mono font-bold bg-slate-400/20 text-slate-200 border border-slate-400/40 shrink-0">
                                 ルーキー
                               </span>
                             )}
                             {profile && profile.championships > 0 && (
-                              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 shrink-0 flex items-center gap-0.5">
+                              <span className="px-1.5 py-0.2 rounded text-[11px] font-mono font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 shrink-0 flex items-center gap-0.5">
                                 <Trophy className="w-2.5 h-2.5 text-amber-400" />
                                 <span>{profile.championships}冠</span>
                               </span>
                             )}
                             {drv.note && (
-                              <span className="text-[10px] text-slate-400 truncate" title={drv.note}>
+                              <span className="text-[11px] text-slate-400 truncate" title={drv.note}>
                                 {drv.note}
                               </span>
                             )}
@@ -1345,7 +1345,7 @@ export default function DriversHub({
 
                 {/* Reserve & Test Drivers Section (Unified Single-Line Horizontal Strip) */}
                 <div className="pt-2 mt-auto border-t border-white/10 flex items-center justify-between gap-2 text-xs min-h-[30px]">
-                  <div className="flex items-center gap-1.5 shrink-0 text-slate-400 font-mono text-[10px]">
+                  <div className="flex items-center gap-1.5 shrink-0 text-slate-400 font-mono text-[11px]">
                     <Shield className="w-3 h-3 text-slate-400 shrink-0" />
                     <span className="font-racing font-bold tracking-wider text-slate-400 uppercase">RESERVE:</span>
                   </div>
@@ -1362,18 +1362,18 @@ export default function DriversHub({
                             className="group/res inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-950/80 hover:bg-slate-800 border border-white/10 hover:border-red-500/40 text-slate-300 hover:text-white text-[11px] font-medium transition-all shrink-0 cursor-pointer shadow-xs max-w-[170px]"
                             title={`${res.name} の選手詳細を見る`}
                           >
-                            <span className="text-[10px] shrink-0">{res.flag}</span>
+                            <span className="text-[11px] shrink-0">{res.flag}</span>
                             <span className="font-mono text-slate-200 group-hover/res:text-red-400 transition-colors truncate">
                               {cleanName}
                             </span>
-                            <span className="text-[9px] font-mono text-slate-500 shrink-0">
+                            <span className="text-[11px] font-mono text-slate-500 shrink-0">
                               #{res.number || res.code}
                             </span>
                           </button>
                         );
                       })
                     ) : (
-                      <span className="text-[10px] font-mono text-slate-600">未登録</span>
+                      <span className="text-[11px] font-mono text-slate-600">未登録</span>
                     )}
                   </div>
                 </div>
@@ -1390,9 +1390,9 @@ export default function DriversHub({
           <div className="glass-card-premium rounded-xl p-3.5 border flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-md">
             <div>
               <h2 className="text-base sm:text-lg font-racing font-bold text-white flex items-center gap-2">
-                <Users className="w-4 h-4 text-sky-400 shrink-0" />
+                <Users className="w-4 h-4 text-slate-300 shrink-0" />
                 <span>全ドライバー名鑑・一覧</span>
-                <span className="text-xs font-mono bg-sky-500/20 text-sky-300 border border-sky-500/40 px-2 py-0.5 rounded-full">
+                <span className="text-xs font-mono bg-slate-400/20 text-slate-200 border border-slate-400/40 px-2 py-0.5 rounded-full">
                   {filteredDrivers.length} 名表示中
                 </span>
               </h2>
@@ -1421,7 +1421,7 @@ export default function DriversHub({
                   onClick={() => setSortField(field)}
                   className={`px-2.5 py-1 rounded-lg text-xs font-racing font-bold transition-all cursor-pointer ${
                     sortField === field
-                      ? 'bg-sky-600 text-white shadow-sm'
+                      ? 'bg-slate-500 text-white shadow-sm'
                       : 'bg-slate-900/80 text-slate-400 hover:text-white border border-white/5 hover:bg-slate-800'
                   }`}
                 >
@@ -1452,7 +1452,7 @@ export default function DriversHub({
               </p>
               <button
                 onClick={handleResetFilters}
-                className="mt-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-racing font-bold transition-all shadow-md cursor-pointer"
+                className="mt-2 px-4 py-2 rounded-xl bg-slate-500 hover:bg-slate-400 text-white text-xs font-racing font-bold transition-all shadow-md cursor-pointer"
               >
                 フィルターをリセットする
               </button>

@@ -2,7 +2,7 @@
 
 /**
  * components/ads/PitwallProUpgradeModal.tsx
- * 🏁 Pitwall Pro Subscription & Feature Showcase Modal
+ * Pitwall Pro Subscription & Feature Showcase Modal
  * 
  * Showcases exclusive Pro benefits (Unlimited AI, Ad-Free, Popouts, Historical Data)
  * with a clean toggle to test Pro mode in the current development environment.
@@ -70,7 +70,7 @@ export default function PitwallProUpgradeModal({
             <span className="text-sm font-normal text-slate-400 font-mono">/ 月</span>
           </div>
           <p className="text-[11px] text-emerald-400 font-mono">
-            ✨ 初回 14日間無料トライアル実施中
+            初回 14日間無料トライアル実施中
           </p>
         </div>
 
@@ -112,7 +112,7 @@ export default function PitwallProUpgradeModal({
               className={`w-full py-3 px-6 rounded-2xl font-racing font-bold text-sm uppercase tracking-wider transition-all shadow-xl active:scale-95 flex items-center justify-center gap-2 ${
                 isPro
                   ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-white/20'
-                  : 'bg-gradient-to-r from-red-600 via-rose-600 to-red-600 hover:from-red-500 hover:to-rose-500 text-white shadow-red-950/60'
+                  : 'bg-gradient-to-r from-red-600 via-red-600 to-red-600 hover:from-red-500 hover:to-red-500 text-white shadow-red-950/60'
               }`}
             >
               <Zap className="w-4 h-4" />
@@ -124,7 +124,7 @@ export default function PitwallProUpgradeModal({
             <button
               type="button"
               onClick={onClose}
-              className="w-full py-3 px-6 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 text-white font-racing font-bold text-sm tracking-wider uppercase shadow-xl"
+              className="w-full py-3 px-6 rounded-2xl bg-gradient-to-r from-red-600 to-red-600 text-white font-racing font-bold text-sm tracking-wider uppercase shadow-xl"
             >
               無料トライアルを開始する
             </button>

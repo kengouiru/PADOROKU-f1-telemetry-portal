@@ -113,7 +113,9 @@ export function buildTelemetryContext(input: TelemetryContextInput): string {
     if (pitStops.length > 0) {
       lines.push('  Pit stops:');
       for (const pit of pitStops) {
-        lines.push(`    Lap ${pit.lap_number}: stationary ${pit.stop_duration.toFixed(1)}s, pit lane ${pit.lane_duration.toFixed(1)}s`);
+        const stopDur = pit.stop_duration != null ? `${pit.stop_duration.toFixed(1)}s` : 'unknown';
+        const laneDur = pit.lane_duration != null ? `${pit.lane_duration.toFixed(1)}s` : 'unknown';
+        lines.push(`    Lap ${pit.lap_number}: stationary ${stopDur}, pit lane ${laneDur}`);
       }
       lines.push('');
     } else {

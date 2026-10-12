@@ -275,7 +275,7 @@ export const TacticalDataDeckPanel: React.FC<TacticalDataDeckPanelProps> = ({
                     <div className="flex items-center gap-1.5 min-w-0">
                       <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                       <span className="font-racing text-xs font-bold text-white truncate" title="CAR TELEMETRY & TYRE THERMALS">
-                        CAR TELEMETRY
+                        CAR TELEMETRY (イメージ)
                       </span>
                       {/* Help button (shrink-0 ensures it is NEVER pushed off or hidden) */}
                       <button

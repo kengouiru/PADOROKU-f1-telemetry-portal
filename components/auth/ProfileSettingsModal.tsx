@@ -20,11 +20,11 @@ interface ProfileSettingsModalProps {
 }
 
 const FAN_TYPES = [
-  '🏎️ 推し活・ドラマ派',
-  '📊 データ分析・テレメトリー派',
-  '🔰 F1初心者・勉強中',
-  '🕹️ シミュレーター・eSports派',
-  '☕ まったり週末観戦派',
+  '推し活・ドラマ派',
+  'データ分析・テレメトリー派',
+  'F1初心者・勉強中',
+  'シミュレーター・eSports派',
+  'まったり週末観戦派',
 ];
 
 export default function ProfileSettingsModal({
@@ -132,13 +132,13 @@ export default function ProfileSettingsModal({
                 color: themeColor,
               }}
             >
-              ⚙️
+              
             </div>
             <div>
               <h2 className="text-sm sm:text-base font-racing font-bold text-white leading-tight">
                 メンバープロフィール & 個人設定
               </h2>
-              <p className="text-[10px] text-slate-400 font-mono">
+              <p className="text-[11px] text-slate-400 font-mono">
                 アイコン、推しチーム・推し選手、表示名のカスタマイズ
               </p>
             </div>
@@ -181,11 +181,11 @@ export default function ProfileSettingsModal({
                   {displayName || session?.user?.name || (isProUser ? 'Pro User' : 'Free User')}
                 </h3>
                 {isProUser ? (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-racing font-black bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm flex-shrink-0">
+                  <span className="px-2 py-0.5 rounded text-[11px] font-racing font-black bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 shadow-sm flex-shrink-0">
                     PRO
                   </span>
                 ) : (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-racing font-bold bg-slate-800 text-slate-300 border border-white/15 flex-shrink-0">
+                  <span className="px-2 py-0.5 rounded text-[11px] font-racing font-bold bg-slate-800 text-slate-300 border border-white/15 flex-shrink-0">
                     FREE
                   </span>
                 )}
@@ -196,19 +196,19 @@ export default function ProfileSettingsModal({
               <div className="flex items-center gap-2 mt-1 flex-wrap">
                 {selectedTeam && (
                   <span
-                    className="px-2 py-0.5 rounded-full text-[10px] font-racing font-bold border"
+                    className="px-2 py-0.5 rounded-full text-[11px] font-racing font-bold border"
                     style={{
                       backgroundColor: `${selectedTeam.color}20`,
                       borderColor: `${selectedTeam.color}60`,
                       color: selectedTeam.color,
                     }}
                   >
-                    🏁 {selectedTeam.name}
+                    {selectedTeam.name}
                   </span>
                 )}
                 {selectedDriver && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-racing font-bold bg-slate-800 border border-white/10 text-slate-200">
-                    🏎️ #{selectedDriver.number} {selectedDriver.code}
+                  <span className="px-2 py-0.5 rounded-full text-[11px] font-racing font-bold bg-slate-800 border border-white/10 text-slate-200">
+                    #{selectedDriver.number} {selectedDriver.code}
                   </span>
                 )}
               </div>
@@ -229,31 +229,31 @@ export default function ProfileSettingsModal({
             onClick={() => setActiveSubTab('avatar')}
             className={`px-3 py-1.5 rounded-xl font-racing font-bold transition-all cursor-pointer ${
               activeSubTab === 'avatar'
-                ? 'bg-blue-600 text-white shadow-md'
+                ? 'bg-slate-500 text-white shadow-md'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
-            👤 アイコン選択
+            アイコン選択
           </button>
           <button
             onClick={() => setActiveSubTab('favorites')}
             className={`px-3 py-1.5 rounded-xl font-racing font-bold transition-all cursor-pointer ${
               activeSubTab === 'favorites'
-                ? 'bg-blue-600 text-white shadow-md'
+                ? 'bg-slate-500 text-white shadow-md'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
-            ❤️ 推しチーム & 選手
+            推しチーム & 選手
           </button>
           <button
             onClick={() => setActiveSubTab('plan')}
             className={`px-3 py-1.5 rounded-xl font-racing font-bold transition-all cursor-pointer ${
               activeSubTab === 'plan'
-                ? 'bg-blue-600 text-white shadow-md'
+                ? 'bg-slate-500 text-white shadow-md'
                 : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
-            ⭐ プラン & 特典
+            プラン & 特典
           </button>
         </div>
 
@@ -271,7 +271,7 @@ export default function ProfileSettingsModal({
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="お好きな表示名を入力..."
-                  className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs font-racing focus:outline-none focus:border-sky-400 transition-colors"
+                  className="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-white/10 text-white text-xs font-racing focus:outline-none focus:border-slate-300 transition-colors"
                 />
               </div>
 
@@ -280,7 +280,7 @@ export default function ProfileSettingsModal({
                   <label className="text-xs font-racing font-bold text-slate-300">
                     F1ドライバーのポートレートからアイコンを選ぶ (全30名)
                   </label>
-                  <span className="text-[10px] text-slate-400 font-mono">
+                  <span className="text-[11px] text-slate-400 font-mono">
                     クリックで即時プレビュー反映
                   </span>
                 </div>
@@ -294,7 +294,7 @@ export default function ProfileSettingsModal({
                         onClick={() => handleSelectDriverAsAvatar(driver)}
                         className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border transition-all cursor-pointer group ${
                           isSelected
-                            ? 'bg-sky-500/20 border-sky-400 shadow-lg scale-105'
+                            ? 'bg-slate-400/20 border-slate-300 shadow-lg scale-105'
                             : 'bg-slate-800/40 border-white/5 hover:bg-slate-800 hover:border-white/20'
                         }`}
                         title={`${driver.fullName} (${driver.team})`}
@@ -314,12 +314,12 @@ export default function ProfileSettingsModal({
                             </div>
                           )}
                           {isSelected && (
-                            <div className="absolute inset-0 bg-sky-500/30 flex items-center justify-center text-white text-xs font-bold">
+                            <div className="absolute inset-0 bg-slate-400/30 flex items-center justify-center text-white text-xs font-bold">
                               ✓
                             </div>
                           )}
                         </div>
-                        <span className="text-[10px] font-racing font-bold text-slate-300 truncate max-w-full text-center">
+                        <span className="text-[11px] font-racing font-bold text-slate-300 truncate max-w-full text-center">
                           {driver.code}
                         </span>
                       </button>
@@ -336,7 +336,7 @@ export default function ProfileSettingsModal({
               {/* Favorite Team */}
               <div>
                 <label className="text-xs font-racing font-bold text-slate-300 mb-2 block">
-                  🏁 推しチーム (応援するコンストラクター)
+                  推しチーム (応援するコンストラクター)
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
                   {KNOWLEDGE_TEAMS.map((team) => {
@@ -364,7 +364,7 @@ export default function ProfileSettingsModal({
                             {team.name}
                           </span>
                         </div>
-                        <p className="text-[9px] text-slate-400 font-mono truncate">
+                        <p className="text-[11px] text-slate-400 font-mono truncate">
                           {team.powerUnit}
                         </p>
                       </button>
@@ -376,12 +376,12 @@ export default function ProfileSettingsModal({
               {/* Favorite Driver */}
               <div>
                 <label className="text-xs font-racing font-bold text-slate-300 mb-2 block">
-                  🏎️ 推しドライバー (一番応援している選手)
+                  推しドライバー (一番応援している選手)
                 </label>
                 <select
                   value={favoriteDriverCode}
                   onChange={(e) => setFavoriteDriverCode(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs font-racing focus:outline-none focus:border-sky-400 transition-colors"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900 border border-white/10 text-white text-xs font-racing focus:outline-none focus:border-slate-300 transition-colors"
                 >
                   {KNOWLEDGE_DRIVERS.map((d) => (
                     <option key={d.id} value={d.code}>
@@ -394,7 +394,7 @@ export default function ProfileSettingsModal({
               {/* Fan Style */}
               <div>
                 <label className="text-xs font-racing font-bold text-slate-300 mb-2 block">
-                  🏷️ 応援スタイル / ファンタイプ
+                  応援スタイル / ファンタイプ
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {FAN_TYPES.map((type) => {
@@ -405,7 +405,7 @@ export default function ProfileSettingsModal({
                         onClick={() => setFanType(type)}
                         className={`p-2.5 rounded-xl border text-xs font-racing font-bold text-center transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-blue-600 text-white border-blue-400 shadow-md'
+                            ? 'bg-slate-500 text-white border-slate-300 shadow-md'
                             : 'bg-slate-900/60 border-white/5 text-slate-300 hover:bg-slate-800'
                         }`}
                       >
@@ -420,10 +420,9 @@ export default function ProfileSettingsModal({
               <div className="pt-3 border-t border-white/10 space-y-3.5">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-racing font-bold text-amber-300 flex items-center gap-1.5">
-                    <span>⭐</span>
                     <span>マイパドック・お気に入り登録一覧</span>
                   </h4>
-                  <span className="text-[10px] font-mono text-slate-400">
+                  <span className="text-[11px] font-mono text-slate-400">
                     計 {(prefs.favoriteDriverCodes?.length || 0) + (prefs.favoriteTeamIds?.length || 0) + (prefs.favoriteCircuitIds?.length || 0)} 件
                   </span>
                 </div>
@@ -431,7 +430,6 @@ export default function ProfileSettingsModal({
                 {/* Starred Drivers */}
                 <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5 space-y-2">
                   <span className="text-[11px] font-racing font-bold text-slate-300 flex items-center gap-1">
-                    <span>🏎️</span>
                     <span>お気に入りドライバー ({prefs.favoriteDriverCodes?.length || 0})</span>
                   </span>
                   <div className="flex flex-wrap gap-1.5">
@@ -446,13 +444,13 @@ export default function ProfileSettingsModal({
                           <span className="font-bold" style={{ color: d?.teamColor }}>
                             #{d?.number ?? ''} {code}
                           </span>
-                          <span className="text-[10px] text-slate-400 truncate max-w-[80px]">
+                          <span className="text-[11px] text-slate-400 truncate max-w-[80px]">
                             {d?.fullName.split(' ')[1] || code}
                           </span>
                           <button
                             type="button"
                             onClick={() => toggleDriver(code)}
-                            className="text-slate-400 hover:text-rose-400 text-xs ml-0.5 cursor-pointer"
+                            className="text-slate-400 hover:text-red-400 text-xs ml-0.5 cursor-pointer"
                             title="解除"
                           >
                             ✕
@@ -469,7 +467,6 @@ export default function ProfileSettingsModal({
                 {/* Starred Teams */}
                 <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5 space-y-2">
                   <span className="text-[11px] font-racing font-bold text-slate-300 flex items-center gap-1">
-                    <span>🏁</span>
                     <span>お気に入りチーム ({prefs.favoriteTeamIds?.length || 0})</span>
                   </span>
                   <div className="flex flex-wrap gap-1.5">
@@ -489,7 +486,7 @@ export default function ProfileSettingsModal({
                           <button
                             type="button"
                             onClick={() => toggleTeam(teamId)}
-                            className="text-slate-400 hover:text-rose-400 text-xs ml-0.5 cursor-pointer"
+                            className="text-slate-400 hover:text-red-400 text-xs ml-0.5 cursor-pointer"
                             title="解除"
                           >
                             ✕
@@ -506,7 +503,6 @@ export default function ProfileSettingsModal({
                 {/* Starred Circuits */}
                 <div className="bg-slate-900/60 p-3 rounded-xl border border-white/5 space-y-2">
                   <span className="text-[11px] font-racing font-bold text-slate-300 flex items-center gap-1">
-                    <span>📍</span>
                     <span>お気に入りサーキット ({prefs.favoriteCircuitIds?.length || 0})</span>
                   </span>
                   <div className="flex flex-wrap gap-1.5">
@@ -515,16 +511,16 @@ export default function ProfileSettingsModal({
                       return (
                         <span
                           key={cid}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800/90 text-xs font-racing border border-sky-500/30 text-white"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800/90 text-xs font-racing border border-slate-400/30 text-white"
                         >
-                          <span className="text-sky-300 font-bold">{c?.name || cid}</span>
-                          <span className="text-[10px] text-slate-400 font-mono">
+                          <span className="text-slate-200 font-bold">{c?.name || cid}</span>
+                          <span className="text-[11px] text-slate-400 font-mono">
                             {c?.country}
                           </span>
                           <button
                             type="button"
                             onClick={() => toggleCircuit(cid)}
-                            className="text-slate-400 hover:text-rose-400 text-xs ml-0.5 cursor-pointer"
+                            className="text-slate-400 hover:text-red-400 text-xs ml-0.5 cursor-pointer"
                             title="解除"
                           >
                             ✕
@@ -545,20 +541,19 @@ export default function ProfileSettingsModal({
           {activeSubTab === 'plan' && (
             <div className="space-y-4">
               {isProUser ? (
-                <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-950/40 via-yellow-900/20 to-slate-900 border border-amber-500/30 space-y-3">
+                <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-950/40 via-amber-900/20 to-slate-900 border border-amber-500/30 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">🏆</span>
                       <div>
                         <h4 className="text-sm font-racing font-bold text-amber-300">
                           PADOROKU PRO MEMBERSHIP
                         </h4>
-                        <p className="text-[10px] text-slate-400 font-mono">
+                        <p className="text-[11px] text-slate-400 font-mono">
                           プレミアム分析＆AIストラテジスト完全アクセス
                         </p>
                       </div>
                     </div>
-                    <span className="px-2.5 py-1 rounded-full text-xs font-racing font-black bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-950 shadow-md">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-racing font-black bg-gradient-to-r from-amber-400 to-amber-300 text-slate-950 shadow-md">
                       ACTIVE
                     </span>
                   </div>
@@ -586,12 +581,11 @@ export default function ProfileSettingsModal({
                 <div className="p-4 rounded-2xl bg-slate-900/80 border border-white/10 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">⚡</span>
                       <div>
                         <h4 className="text-sm font-racing font-bold text-slate-200">
                           FREE PLAN（無料プラン利用中）
                         </h4>
-                        <p className="text-[10px] text-slate-400 font-mono">
+                        <p className="text-[11px] text-slate-400 font-mono">
                           シーズン観戦・カレンダー・大百科・基本テレメトリー
                         </p>
                       </div>
@@ -601,12 +595,12 @@ export default function ProfileSettingsModal({
                     </span>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-gradient-to-r from-amber-500/10 via-yellow-400/10 to-transparent border border-amber-500/30 flex items-center justify-between gap-3">
+                  <div className="p-3 rounded-xl bg-gradient-to-r from-amber-500/10 via-amber-400/10 to-transparent border border-amber-500/30 flex items-center justify-between gap-3">
                     <div>
                       <p className="text-xs font-racing font-bold text-amber-300">
-                        💎 Pitwall Pro で全機能を無制限解放
+                        Pitwall Pro で全機能を無制限解放
                       </p>
-                      <p className="text-[10px] text-slate-400">
+                      <p className="text-[11px] text-slate-400">
                         AIストラテジスト・チーム無線リアルタイム翻訳・テレメトリー詳細分析
                       </p>
                     </div>
@@ -617,7 +611,7 @@ export default function ProfileSettingsModal({
                           onClose();
                           onOpenUpgradeModal();
                         }}
-                        className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-racing font-black text-xs hover:brightness-110 transition-all cursor-pointer shrink-0 shadow-md"
+                        className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 font-racing font-black text-xs hover:brightness-110 transition-all cursor-pointer shrink-0 shadow-md"
                       >
                         アップグレード ➔
                       </button>
@@ -627,15 +621,14 @@ export default function ProfileSettingsModal({
               )}
 
               {/* Interactive Test Switcher: Toggle between Free and Pro with 1 Click */}
-              <div className="p-4 rounded-2xl bg-slate-900/90 border border-cyan-500/30 shadow-lg space-y-3">
+              <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-400/30 shadow-lg space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm">🧪</span>
-                    <span className="text-xs font-racing font-bold text-cyan-300 tracking-wide uppercase">
+                    <span className="text-xs font-racing font-bold text-slate-200 tracking-wide uppercase">
                       プラン切り替えテスト（動作確認用）
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono text-slate-400">
+                  <span className="text-[11px] font-mono text-slate-400">
                     ワンクリックで即座に権限を切替
                   </span>
                 </div>
@@ -651,21 +644,20 @@ export default function ProfileSettingsModal({
                     }}
                     className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
                       !isProUser
-                        ? 'bg-cyan-950/40 border-cyan-400/80 shadow-md ring-1 ring-cyan-400/50'
-                        : 'bg-slate-950/60 border-white/10 hover:border-cyan-500/40 hover:bg-slate-900/60'
+                        ? 'bg-slate-900/40 border-slate-300/80 shadow-md ring-1 ring-slate-300/50'
+                        : 'bg-slate-950/60 border-white/10 hover:border-slate-400/40 hover:bg-slate-900/60'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-racing font-bold text-slate-200 flex items-center gap-1.5">
-                        <span>⚡</span>
                         <span>Free (無料プラン)</span>
                       </span>
                       {!isProUser ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                        <span className="px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-slate-400/20 text-slate-200 border border-slate-400/40">
                           ✓ 現在適用中
                         </span>
                       ) : (
-                        <span className="text-[10px] font-mono text-cyan-400 font-bold hover:underline">
+                        <span className="text-[11px] font-mono text-slate-300 font-bold hover:underline">
                           Freeに切り替える ➔
                         </span>
                       )}
@@ -691,15 +683,14 @@ export default function ProfileSettingsModal({
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-racing font-bold text-amber-300 flex items-center gap-1.5">
-                        <span>💎</span>
                         <span>Pitwall Pro (無制限)</span>
                       </span>
                       {isProUser ? (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                        <span className="px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
                           ✓ 現在適用中
                         </span>
                       ) : (
-                        <span className="text-[10px] font-mono text-amber-400 font-bold hover:underline">
+                        <span className="text-[11px] font-mono text-amber-400 font-bold hover:underline">
                           Proに切り替える ➔
                         </span>
                       )}
@@ -722,9 +713,8 @@ export default function ProfileSettingsModal({
                         setSavedNotice(true);
                         setTimeout(() => setSavedNotice(false), 2000);
                       }}
-                      className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer border border-white/10 flex items-center gap-1 text-[10px]"
+                      className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer border border-white/10 flex items-center gap-1 text-[11px]"
                     >
-                      <span>🔄</span>
                       <span>利用枠をリセット</span>
                     </button>
                   </div>
@@ -754,9 +744,8 @@ export default function ProfileSettingsModal({
             </button>
             <button
               onClick={handleSave}
-              className="px-5 py-2 rounded-xl text-xs font-racing font-bold bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/30 transition-all cursor-pointer flex items-center gap-1.5"
+              className="px-5 py-2 rounded-xl text-xs font-racing font-bold bg-slate-500 hover:bg-slate-400 text-white shadow-lg shadow-slate-400/30 transition-all cursor-pointer flex items-center gap-1.5"
             >
-              <span>💾</span>
               <span>設定を保存</span>
             </button>
           </div>

@@ -2,7 +2,7 @@
 
 /**
  * components/regulations/ChassisDownsizingVisualizer.tsx
- * 📐 2026 FIA "Nimble Car" Chassis Downsizing & Weight Reduction Visualizer
+ * 2026 FIA "Nimble Car" Chassis Downsizing & Weight Reduction Visualizer
  * Visual top-down and dimension overlay comparing:
  * - Wheelbase (-200mm) & Overall Width (-100mm)
  * - Minimum car weight (-30kg target)
@@ -21,7 +21,7 @@ export default function ChassisDownsizingVisualizer() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono font-bold tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-mono font-bold tracking-wider">
               NIMBLE CAR CONCEPT
             </span>
             <span className="text-[11px] font-mono text-slate-400">
@@ -157,24 +157,24 @@ export default function ChassisDownsizingVisualizer() {
         {/* Delta Summary Badges */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full pt-2">
           <div className="bg-slate-900/80 p-2.5 rounded-xl border border-white/10 text-center">
-            <div className="text-[10px] text-slate-400 font-mono">ホイールベース</div>
+            <div className="text-[11px] text-slate-400 font-mono">ホイールベース</div>
             <div className="text-base font-racing font-bold text-emerald-400">-200 mm</div>
-            <div className="text-[10px] text-slate-500 font-mono">3,600 ➡️ 3,400mm</div>
+            <div className="text-[11px] text-slate-500 font-mono">3,600 3,400mm</div>
           </div>
           <div className="bg-slate-900/80 p-2.5 rounded-xl border border-white/10 text-center">
-            <div className="text-[10px] text-slate-400 font-mono">全幅 (Overall Width)</div>
+            <div className="text-[11px] text-slate-400 font-mono">全幅 (Overall Width)</div>
             <div className="text-base font-racing font-bold text-emerald-400">-100 mm</div>
-            <div className="text-[10px] text-slate-500 font-mono">2,000 ➡️ 1,900mm</div>
+            <div className="text-[11px] text-slate-500 font-mono">2,000 1,900mm</div>
           </div>
           <div className="bg-slate-900/80 p-2.5 rounded-xl border border-white/10 text-center">
-            <div className="text-[10px] text-slate-400 font-mono">最低重量 (Min Weight)</div>
+            <div className="text-[11px] text-slate-400 font-mono">最低重量 (Min Weight)</div>
             <div className="text-base font-racing font-bold text-emerald-400">-30 kg</div>
-            <div className="text-[10px] text-slate-500 font-mono">798kg ➡️ 768kg目標</div>
+            <div className="text-[11px] text-slate-500 font-mono">798kg 768kg目標</div>
           </div>
           <div className="bg-slate-900/80 p-2.5 rounded-xl border border-white/10 text-center">
-            <div className="text-[10px] text-slate-400 font-mono">タイヤ幅 (前後縮小)</div>
+            <div className="text-[11px] text-slate-400 font-mono">タイヤ幅 (前後縮小)</div>
             <div className="text-base font-racing font-bold text-emerald-400">前-25 / 後-30mm</div>
-            <div className="text-[10px] text-slate-500 font-mono">F: 280mm / R: 375mm</div>
+            <div className="text-[11px] text-slate-500 font-mono">F: 280mm / R: 375mm</div>
           </div>
         </div>
       </div>
@@ -182,8 +182,8 @@ export default function ChassisDownsizingVisualizer() {
       {/* ── Driver & Racing Impact ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
         <div className="bg-slate-950/60 p-4 rounded-xl border border-white/5 space-y-1.5">
-          <div className="font-bold text-sky-400 font-mono flex items-center gap-1.5">
-            <span>🏁 モナコや鈴鹿シケインでの劇的な旋回機動性</span>
+          <div className="font-bold text-slate-300 font-mono flex items-center gap-1.5">
+            <span>モナコや鈴鹿シケインでの劇的な旋回機動性</span>
           </div>
           <p className="text-slate-300 leading-relaxed text-[11px]">
             現行の3,600mmホイールベースは歴代F1史上最も長く、「リムジンのように曲がらない」とドライバーから批判されていました。
@@ -193,7 +193,7 @@ export default function ChassisDownsizingVisualizer() {
 
         <div className="bg-slate-950/60 p-4 rounded-xl border border-white/5 space-y-1.5">
           <div className="font-bold text-amber-400 font-mono flex items-center gap-1.5">
-            <span>💨 ダーティエア（後方乱流）-30% 削減</span>
+            <span>ダーティエア（後方乱流）-30% 削減</span>
           </div>
           <p className="text-slate-300 leading-relaxed text-[11px]">
             グラウンドエフェクトフロアのトンネル幅を狭め、ディフューザーの拡大角度を抑制。

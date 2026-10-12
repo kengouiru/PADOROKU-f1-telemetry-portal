@@ -39,12 +39,12 @@ interface NavGroup {
 const NAV_GROUPS: NavGroup[] = [
   {
     groupTitle: 'メインハブ (5大画面)',
-    groupIcon: '🏁',
+    groupIcon: '',
     items: [
       {
         id: 'season_calendar',
         label: 'シーズン観戦 ＆ カレンダー',
-        icon: '📅',
+        icon: '',
         badge: 'SEASON',
         badgeColor: 'bg-red-600/30 text-red-300 border border-red-500/30',
         keywords: 'カレンダー 日程 順位表 スケジュール ホーム 2026',
@@ -52,7 +52,7 @@ const NAV_GROUPS: NavGroup[] = [
       {
         id: 'telemetry_laps',
         label: '実戦テレメトリー分析',
-        icon: '📊',
+        icon: '',
         badge: 'TELEMETRY',
         badgeColor: 'bg-red-600/30 text-red-300 border border-red-500/30',
         keywords: 'テレメトリー ラップタイム 車速 比較 ペース',
@@ -60,7 +60,7 @@ const NAV_GROUPS: NavGroup[] = [
       {
         id: 'virtual_gp',
         label: 'ピットウォール司令塔',
-        icon: '🎮',
+        icon: '',
         badge: 'PITWALL',
         badgeColor: 'bg-red-600/30 text-red-300 border border-red-500/30',
         keywords: 'ピットウォール シミュレーター 戦術 指揮 司令室',
@@ -68,7 +68,7 @@ const NAV_GROUPS: NavGroup[] = [
       {
         id: 'fod_news',
         label: 'パドックニュース ＆ FOD中継',
-        icon: '📰',
+        icon: '',
         badge: 'NEWS',
         badgeColor: 'bg-red-600/30 text-red-300 border border-red-500/30',
         keywords: 'ニュース 放送日程 FOD フジテレビ パドック',
@@ -76,56 +76,56 @@ const NAV_GROUPS: NavGroup[] = [
       {
         id: 'library',
         label: 'F1大百科 ＆ ナレッジ',
-        icon: '📚',
+        icon: '',
         badge: 'LIBRARY',
-        badgeColor: 'bg-sky-600/30 text-sky-300 border border-sky-500/30',
+        badgeColor: 'bg-slate-500/30 text-slate-200 border border-slate-400/30',
         keywords: '百科事典 ライブラリ ナレッジ 知識',
       },
     ],
   },
   {
     groupTitle: 'F1大百科ダイレクト目次',
-    groupIcon: '🏎️',
+    groupIcon: '',
     items: [
       {
         id: 'drivers',
         label: '選手名鑑 (全22名・レジェンド)',
-        icon: '👤',
+        icon: '',
         isSubItem: true,
         keywords: 'ドライバー 選手名鑑 角田 フェルスタッペン ハミルトン',
       },
       {
         id: 'teams',
         label: 'チーム名鑑 (全11チーム・PU)',
-        icon: '🏎️',
+        icon: '',
         isSubItem: true,
         keywords: 'コンストラクター チーム レッドブル フェラーリ アウディ ホンダ',
       },
       {
         id: 'circuits',
         label: 'サーキット解説 (全24コース)',
-        icon: '🏁',
+        icon: '',
         isSubItem: true,
         keywords: 'コース サーキット 鈴鹿 モナコ スパ DRS',
       },
       {
         id: 'tyres',
         label: 'タイヤ大百科 (ピレリ C1〜C5)',
-        icon: '🛞',
+        icon: '',
         isSubItem: true,
         keywords: 'タイヤ ピレリ コンパウンド 作動温度 摩耗 デグラデーション',
       },
       {
         id: 'glossary',
         label: 'F1用語辞典 (図解・80語+)',
-        icon: '🧠',
+        icon: '',
         isSubItem: true,
         keywords: '用語 辞書 解説 アペックス アンダーカット トウ スリップストリーム',
       },
       {
         id: 'fia_rules',
         label: 'FIA公式規則 ＆ 2026年規定',
-        icon: '⚖️',
+        icon: '',
         badge: '2026規定',
         badgeColor: 'bg-amber-500/20 text-amber-300 border border-amber-500/30',
         isSubItem: true,
@@ -134,7 +134,7 @@ const NAV_GROUPS: NavGroup[] = [
       {
         id: 'drama',
         label: '名勝負ドラマ ＆ 歴史無線',
-        icon: '🎬',
+        icon: '',
         isSubItem: true,
         keywords: '名勝負 ドラマ 歴史 無線 クラシック 確執 アーカイブ',
       },
@@ -142,20 +142,20 @@ const NAV_GROUPS: NavGroup[] = [
   },
   {
     groupTitle: '専門ツール ＆ 分析機能',
-    groupIcon: '🛠️',
+    groupIcon: '',
     items: [
       {
         id: 'telemetry_delta',
         label: 'タイムデルタ(Δt) ＆ コーナー解析',
-        icon: '⏱️',
+        icon: '',
         badge: 'Δt',
-        badgeColor: 'bg-sky-600/30 text-sky-300 border border-sky-500/30',
+        badgeColor: 'bg-slate-500/30 text-slate-200 border border-slate-400/30',
         keywords: 'デルタ コーナー GPS タイム差 エイペックス',
       },
       {
         id: 'stint_visualizer',
         label: '全車タイヤスティント ＆ 戦略',
-        icon: '🛞',
+        icon: '',
         badge: 'Stint',
         badgeColor: 'bg-emerald-600/30 text-emerald-300 border border-emerald-500/30',
         keywords: 'スティント タイヤ履歴 ピットイン 戦略',
@@ -163,7 +163,7 @@ const NAV_GROUPS: NavGroup[] = [
       {
         id: 'team_radios',
         label: 'チーム無線 ＆ AIリアルタイム要約',
-        icon: '🎙️',
+        icon: '',
         badge: 'Radio',
         badgeColor: 'bg-purple-600/30 text-purple-300 border border-purple-500/30',
         keywords: '無線 チームラジオ 音声 文字起こし AI 翻訳',
@@ -171,21 +171,21 @@ const NAV_GROUPS: NavGroup[] = [
       {
         id: 'ai_strategist',
         label: 'AIチーフレースストラテジスト',
-        icon: '🤖',
+        icon: '',
         badge: 'AI',
-        badgeColor: 'bg-blue-600/30 text-blue-300 border border-blue-500/30',
+        badgeColor: 'bg-slate-500/30 text-slate-200 border border-slate-400/30',
         keywords: 'AI ストラテジスト アナリスト 作戦 戦略 Gemini',
       },
       {
         id: 'race_notes',
         label: 'レースノート ＆ 総括レポート',
-        icon: '📝',
+        icon: '',
         keywords: 'ノート メモ レポート 観戦記録',
       },
       {
         id: 'quiz',
         label: 'F1検定クイズ (実況音声演出)',
-        icon: '🏆',
+        icon: '',
         badge: 'Quiz',
         badgeColor: 'bg-amber-600/30 text-amber-300 border border-amber-500/30',
         keywords: 'クイズ 検定 音声 実況 148問',
@@ -333,7 +333,7 @@ export default function AppNavigationDrawer({
             title="ホーム画面（2026年シーズン観戦カレンダー）に戻る"
             aria-label="ホーム画面に戻る"
           >
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-red-600 via-red-500 to-rose-700 flex items-center justify-center font-racing font-black text-white text-xs shadow-md shadow-red-950/40 border border-red-400/40 group-hover:border-red-300 group-hover:scale-105 transition-all">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-red-600 via-red-500 to-red-700 flex items-center justify-center font-racing font-black text-white text-xs shadow-md shadow-red-950/40 border border-red-400/40 group-hover:border-red-300 group-hover:scale-105 transition-all">
               P1
             </div>
             <div>
@@ -341,12 +341,11 @@ export default function AppNavigationDrawer({
                 <h2 className="font-racing font-bold text-sm tracking-wider text-white group-hover:text-red-400 transition-colors">
                   PADOROKU
                 </h2>
-                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-600/30 text-red-300 border border-red-500/30 flex items-center gap-0.5">
-                  <span>🏠</span>
+                <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-red-600/30 text-red-300 border border-red-500/30 flex items-center gap-0.5">
                   <span>ホーム</span>
                 </span>
               </div>
-              <p className="text-[10px] text-slate-400 font-mono group-hover:text-slate-300">
+              <p className="text-[11px] text-slate-400 font-mono group-hover:text-slate-300">
                 全機能ナビゲーション・目次
               </p>
             </div>
@@ -372,7 +371,7 @@ export default function AppNavigationDrawer({
               onChange={(e) => setSearchFilter(e.target.value)}
               className="w-full bg-slate-950/90 border border-white/10 rounded-xl px-3 py-1.5 pl-8 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-500 transition-colors"
             />
-            <span className="absolute left-2.5 top-1.5 text-xs text-slate-500">🔍</span>
+            <span className="absolute left-2.5 top-1.5 text-xs text-slate-500"></span>
             {searchFilter && (
               <button
                 type="button"
@@ -390,7 +389,7 @@ export default function AppNavigationDrawer({
           {filteredGroups.map((group, gIdx) => (
             <div key={gIdx} className="space-y-1">
               {/* Group Title */}
-              <div className="flex items-center gap-1.5 px-2 py-0.5 text-[10px] font-racing font-bold text-slate-400 uppercase tracking-wider">
+              <div className="flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider">
                 <span>{group.groupIcon}</span>
                 <span>{group.groupTitle}</span>
               </div>
@@ -429,7 +428,7 @@ export default function AppNavigationDrawer({
                       <div className="flex items-center gap-1.5 shrink-0">
                         {item.badge && (
                           <span
-                            className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded shrink-0 ${
+                            className={`text-[11px] font-mono font-bold px-1.5 py-0.2 rounded shrink-0 ${
                               item.badgeColor || 'bg-slate-800 text-slate-300'
                             }`}
                           >
@@ -437,7 +436,7 @@ export default function AppNavigationDrawer({
                           </span>
                         )}
                         <span
-                          className={`text-[10px] transition-transform ${
+                          className={`text-[11px] transition-transform ${
                             isActive
                               ? 'text-red-400 font-bold'
                               : 'text-slate-600 group-hover/btn:text-slate-400 group-hover/btn:translate-x-0.5'
@@ -495,9 +494,9 @@ export default function AppNavigationDrawer({
                       {activeDisplayName}
                     </p>
                     <span
-                      className={`px-1.5 py-0.2 rounded text-[8px] font-racing font-black ${
+                      className={`px-1.5 py-0.2 rounded text-[11px] font-racing font-black ${
                         isPro
-                          ? 'bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 shadow-sm'
+                          ? 'bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 shadow-sm'
                           : 'bg-slate-800 text-slate-400 border border-white/10'
                       }`}
                     >
@@ -505,11 +504,11 @@ export default function AppNavigationDrawer({
                     </span>
                   </div>
                   {selectedTeam ? (
-                    <p className="text-[10px] font-mono truncate" style={{ color: selectedTeam.color }}>
-                      🏁 {selectedTeam.name}
+                    <p className="text-[11px] font-mono truncate" style={{ color: selectedTeam.color }}>
+                      {selectedTeam.name}
                     </p>
                   ) : (
-                    <p className="text-[10px] font-mono text-slate-400 group-hover/user:text-slate-300">
+                    <p className="text-[11px] font-mono text-slate-400 group-hover/user:text-slate-300">
                       個人設定を開く ➔
                     </p>
                   )}
@@ -525,19 +524,17 @@ export default function AppNavigationDrawer({
                     setProfileModalOpen(true);
                   }}
                   className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-white/10 hover:border-amber-500/40 transition-all cursor-pointer shadow-sm"
-                  title="個人設定画面を開く (⚙️)"
+                  title="個人設定画面を開く ()"
                   aria-label="個人設定"
                 >
-                  <span className="text-sm">⚙️</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => signOut()}
-                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-rose-950/60 text-slate-400 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 transition-all cursor-pointer shadow-sm"
+                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-red-950/60 text-slate-400 hover:text-red-300 border border-white/10 hover:border-red-500/30 transition-all cursor-pointer shadow-sm"
                   title="ログアウト"
                   aria-label="ログアウト"
                 >
-                  <span className="text-sm">🚪</span>
                 </button>
               </div>
             </div>
@@ -548,7 +545,7 @@ export default function AppNavigationDrawer({
                   <span className="w-2 h-2 rounded-full bg-slate-500" />
                   <span>ゲスト利用中</span>
                 </span>
-                <span className="text-[10px] font-mono text-slate-500">Escで閉じる</span>
+                <span className="text-[11px] font-mono text-slate-500">Escで閉じる</span>
               </div>
               <button
                 type="button"
@@ -558,9 +555,8 @@ export default function AppNavigationDrawer({
                   }
                   onClose();
                 }}
-                className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:from-red-500 hover:to-rose-500 text-white font-racing font-bold text-xs transition-all shadow-md shadow-red-950/40 border border-red-400/30 flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-red-600 via-red-600 to-red-700 hover:from-red-500 hover:to-red-500 text-white font-racing font-bold text-xs transition-all shadow-md shadow-red-950/40 border border-red-400/30 flex items-center justify-center gap-2 cursor-pointer"
               >
-                <span>🔑</span>
                 <span>ログイン / メンバー登録</span>
               </button>
             </div>

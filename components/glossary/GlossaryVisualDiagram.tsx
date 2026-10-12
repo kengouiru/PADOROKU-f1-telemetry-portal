@@ -24,10 +24,9 @@ export default function GlossaryVisualDiagram({ visualType }: GlossaryVisualDiag
       <div className="bg-slate-950/80 rounded-2xl border border-amber-500/30 p-4 space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-racing font-bold text-amber-400 flex items-center gap-1.5">
-            <span>📊</span>
             <span>アンダーカット逆転のメカニズム図解</span>
           </span>
-          <span className="text-[10px] text-slate-400 font-mono">Lap N 〜 Lap N+1</span>
+          <span className="text-[11px] text-slate-400 font-mono">Lap N 〜 Lap N+1</span>
         </div>
 
         <div className="bg-slate-900/90 rounded-xl p-3 border border-white/10 space-y-3 text-xs">
@@ -39,7 +38,7 @@ export default function GlossaryVisualDiagram({ visualType }: GlossaryVisualDiag
             </div>
             <div className="w-full bg-slate-800 rounded-full h-3 relative overflow-hidden flex items-center">
               <div className="h-full bg-red-500/70 rounded-full w-[65%]" />
-              <span className="absolute right-2 text-[9px] text-slate-400">翌周ピットインへ</span>
+              <span className="absolute right-2 text-[11px] text-slate-400">翌周ピットインへ</span>
             </div>
           </div>
 
@@ -50,14 +49,13 @@ export default function GlossaryVisualDiagram({ visualType }: GlossaryVisualDiag
               <span className="text-emerald-400 font-mono font-bold">アウトラップ激走: -1.8秒</span>
             </div>
             <div className="w-full bg-slate-800 rounded-full h-3 relative overflow-hidden flex items-center">
-              <div className="h-full bg-gradient-to-r from-emerald-500 to-sky-400 rounded-full w-[90%]" />
-              <span className="absolute right-2 text-[9px] text-emerald-300 font-bold">ピット出口で鼻先を押さえて逆転！</span>
+              <div className="h-full bg-gradient-to-r from-emerald-500 to-slate-300 rounded-full w-[90%]" />
+              <span className="absolute right-2 text-[11px] text-emerald-300 font-bold">ピット出口で鼻先を押さえて逆転！</span>
             </div>
           </div>
 
           {/* Track Delta Outcome */}
           <div className="pt-2 border-t border-white/10 flex items-center gap-2 text-[11px] text-slate-300">
-            <span className="text-base">🏁</span>
             <div>
               <strong className="text-amber-300">成功の鍵：</strong>
               <span>新品タイヤの「アウトラップ1周の爆発的グリップ差」がピット作業ロスタイムを上回ることで成立します。</span>
@@ -70,13 +68,12 @@ export default function GlossaryVisualDiagram({ visualType }: GlossaryVisualDiag
 
   if (visualType === 'overcut') {
     return (
-      <div className="bg-slate-950/80 rounded-2xl border border-sky-500/30 p-4 space-y-3">
+      <div className="bg-slate-950/80 rounded-2xl border border-slate-400/30 p-4 space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-racing font-bold text-sky-400 flex items-center gap-1.5">
-            <span>📊</span>
+          <span className="text-xs font-racing font-bold text-slate-300 flex items-center gap-1.5">
             <span>オーバーカット成立のメカニズム図解</span>
           </span>
-          <span className="text-[10px] text-slate-400 font-mono">クリアエア活用型</span>
+          <span className="text-[11px] text-slate-400 font-mono">クリアエア活用型</span>
         </div>
 
         <div className="bg-slate-900/90 rounded-xl p-3 border border-white/10 space-y-2 text-xs">
@@ -85,11 +82,11 @@ export default function GlossaryVisualDiagram({ visualType }: GlossaryVisualDiag
             <span className="text-red-400 font-mono font-bold">ウォームアップ遅延</span>
           </div>
           <div className="flex items-center justify-between text-[11px]">
-            <span className="text-sky-300 font-bold">自分: コース上で前が空き、クリーンエアで全開アタック</span>
-            <span className="text-sky-400 font-mono font-bold">高速ラップ連発</span>
+            <span className="text-slate-200 font-bold">自分: コース上で前が空き、クリーンエアで全開アタック</span>
+            <span className="text-slate-300 font-mono font-bold">高速ラップ連発</span>
           </div>
           <div className="pt-2 border-t border-white/10 text-[11px] text-slate-300">
-            <strong className="text-sky-300">有効な場面：</strong> モナコ市街地など抜きにくく、かつタイヤが長持ちするコースで劇的な効果を発揮します。
+            <strong className="text-slate-200">有効な場面：</strong> モナコ市街地など抜きにくく、かつタイヤが長持ちするコースで劇的な効果を発揮します。
           </div>
         </div>
       </div>
@@ -101,10 +98,9 @@ export default function GlossaryVisualDiagram({ visualType }: GlossaryVisualDiag
       <div className="bg-slate-950/80 rounded-2xl border border-emerald-500/30 p-4 space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-racing font-bold text-emerald-400 flex items-center gap-1.5">
-            <span>💨</span>
             <span>DRS作動メカニズム図解</span>
           </span>
-          <span className="text-[10px] text-slate-400 font-mono">最高速 +15〜20 km/h</span>
+          <span className="text-[11px] text-slate-400 font-mono">最高速 +15〜20 km/h</span>
         </div>
 
         <div className="bg-slate-900/90 rounded-xl p-3 border border-white/10 space-y-2.5 text-xs">
@@ -117,7 +113,6 @@ export default function GlossaryVisualDiagram({ visualType }: GlossaryVisualDiag
             <span className="text-emerald-400 font-mono font-bold">リアウィングフラップ開口（85mm）</span>
           </div>
           <div className="pt-2 border-t border-white/10 text-[11px] text-slate-300 flex items-center gap-2">
-            <span className="text-base">🚀</span>
             <span>空気抵抗（ドラッグ）が急減し、ストレートエンドで強力なオーバーテイクが可能になります。</span>
           </div>
         </div>
@@ -127,13 +122,12 @@ export default function GlossaryVisualDiagram({ visualType }: GlossaryVisualDiag
 
   if (visualType === 'slipstream') {
     return (
-      <div className="bg-slate-950/80 rounded-2xl border border-indigo-500/30 p-4 space-y-3">
+      <div className="bg-slate-950/80 rounded-2xl border border-slate-400/30 p-4 space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-racing font-bold text-indigo-400 flex items-center gap-1.5">
-            <span>🏎️💨🏎️</span>
+          <span className="text-xs font-racing font-bold text-slate-300 flex items-center gap-1.5">
             <span>スリップストリーム（トウ）気流図解</span>
           </span>
-          <span className="text-[10px] text-slate-400 font-mono">牽引効果</span>
+          <span className="text-[11px] text-slate-400 font-mono">牽引効果</span>
         </div>
 
         <div className="bg-slate-900/90 rounded-xl p-3 border border-white/10 space-y-2 text-xs">
@@ -153,10 +147,9 @@ export default function GlossaryVisualDiagram({ visualType }: GlossaryVisualDiag
       <div className="bg-slate-950/80 rounded-2xl border border-red-500/30 p-4 space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-racing font-bold text-red-400 flex items-center gap-1.5">
-            <span>🌪️</span>
             <span>ダーティエア（乱気流）の影響図解</span>
           </span>
-          <span className="text-[10px] text-red-300 font-mono">ダウンフォース -30%</span>
+          <span className="text-[11px] text-red-300 font-mono">ダウンフォース -30%</span>
         </div>
 
         <div className="bg-slate-900/90 rounded-xl p-3 border border-white/10 space-y-2 text-xs">
@@ -177,10 +170,9 @@ export default function GlossaryVisualDiagram({ visualType }: GlossaryVisualDiag
       <div className="bg-slate-950/80 rounded-2xl border border-purple-500/30 p-4 space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-xs font-racing font-bold text-purple-400 flex items-center gap-1.5">
-            <span>🐬</span>
             <span>ポーパシング（空力振動）のサイクル</span>
           </span>
-          <span className="text-[10px] text-slate-400 font-mono">グラウンドエフェクト</span>
+          <span className="text-[11px] text-slate-400 font-mono">グラウンドエフェクト</span>
         </div>
 
         <div className="bg-slate-900/90 rounded-xl p-3 border border-white/10 space-y-2 text-xs">
@@ -194,18 +186,17 @@ export default function GlossaryVisualDiagram({ visualType }: GlossaryVisualDiag
 
   if (visualType === 'degradation') {
     return (
-      <div className="bg-slate-950/80 rounded-2xl border border-yellow-500/30 p-4 space-y-3">
+      <div className="bg-slate-950/80 rounded-2xl border border-amber-500/30 p-4 space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-racing font-bold text-yellow-400 flex items-center gap-1.5">
-            <span>📉</span>
+          <span className="text-xs font-racing font-bold text-amber-400 flex items-center gap-1.5">
             <span>タイヤデグラデーション＆クリフ（崖）</span>
           </span>
-          <span className="text-[10px] text-slate-400 font-mono">熱ダレ vs 摩耗</span>
+          <span className="text-[11px] text-slate-400 font-mono">熱ダレ vs 摩耗</span>
         </div>
 
         <div className="bg-slate-900/90 rounded-xl p-3 border border-white/10 space-y-2 text-xs">
           <div className="flex items-center justify-between text-[11px]">
-            <span className="text-yellow-300">初期〜中期: リニアな劣化 (+0.05〜0.1秒/周)</span>
+            <span className="text-amber-300">初期〜中期: リニアな劣化 (+0.05〜0.1秒/周)</span>
             <span className="text-slate-400 font-mono">マネジメント領域</span>
           </div>
           <div className="flex items-center justify-between text-[11px]">
@@ -219,13 +210,12 @@ export default function GlossaryVisualDiagram({ visualType }: GlossaryVisualDiag
 
   if (visualType === 'apex') {
     return (
-      <div className="bg-slate-950/80 rounded-2xl border border-cyan-500/30 p-4 space-y-3">
+      <div className="bg-slate-950/80 rounded-2xl border border-slate-400/30 p-4 space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-racing font-bold text-cyan-400 flex items-center gap-1.5">
-            <span>📐</span>
+          <span className="text-xs font-racing font-bold text-slate-300 flex items-center gap-1.5">
             <span>エイペックス＆ボトムスピードの相関図</span>
           </span>
-          <span className="text-[10px] text-slate-400 font-mono">幾何学的頂点 vs レーシング頂点</span>
+          <span className="text-[11px] text-slate-400 font-mono">幾何学的頂点 vs レーシング頂点</span>
         </div>
 
         <div className="bg-slate-900/90 rounded-xl p-3 border border-white/10 space-y-2 text-xs">
@@ -234,15 +224,15 @@ export default function GlossaryVisualDiagram({ visualType }: GlossaryVisualDiag
             <span className="text-amber-400 font-mono">トレイルブレーキングでノーズを入れる</span>
           </div>
           <div className="flex items-center justify-between text-[11px]">
-            <span className="text-cyan-300 font-bold">② エイペックス（クリップ）:</span>
-            <span className="text-cyan-400 font-mono font-bold">最低速度（ボトムスピード）の極小点</span>
+            <span className="text-slate-200 font-bold">② エイペックス（クリップ）:</span>
+            <span className="text-slate-300 font-mono font-bold">最低速度（ボトムスピード）の極小点</span>
           </div>
           <div className="flex items-center justify-between text-[11px]">
             <span className="text-emerald-300">③ 脱出（イグジット）:</span>
             <span className="text-emerald-400 font-mono">スロットル100%全開＋トラクション</span>
           </div>
           <div className="pt-2 border-t border-white/10 text-[11px] text-slate-300">
-            <strong className="text-cyan-300">テレメトリーの見方：</strong> 速度グラフがV字の谷になる最下点が「ボトムスピード」。谷が浅く（速度が高く）、谷からの立ち上がりが鋭いドライバーがタイムを削っています。
+            <strong className="text-slate-200">テレメトリーの見方：</strong> 速度グラフがV字の谷になる最下点が「ボトムスピード」。谷が浅く（速度が高く）、谷からの立ち上がりが鋭いドライバーがタイムを削っています。
           </div>
         </div>
       </div>
@@ -251,18 +241,17 @@ export default function GlossaryVisualDiagram({ visualType }: GlossaryVisualDiag
 
   if (visualType === 'telemetry') {
     return (
-      <div className="bg-slate-950/80 rounded-2xl border border-blue-500/30 p-4 space-y-3">
+      <div className="bg-slate-950/80 rounded-2xl border border-slate-400/30 p-4 space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-racing font-bold text-blue-400 flex items-center gap-1.5">
-            <span>📈</span>
+          <span className="text-xs font-racing font-bold text-slate-300 flex items-center gap-1.5">
             <span>テレメトリートレースの読み解き方</span>
           </span>
-          <span className="text-[10px] text-slate-400 font-mono">Speed / Throttle / Brake / Delta</span>
+          <span className="text-[11px] text-slate-400 font-mono">Speed / Throttle / Brake / Delta</span>
         </div>
 
         <div className="bg-slate-900/90 rounded-xl p-3 border border-white/10 space-y-2 text-xs">
           <div className="flex items-center justify-between text-[11px]">
-            <span className="text-blue-300 font-bold">Speed（車速）:</span>
+            <span className="text-slate-200 font-bold">Speed（車速）:</span>
             <span className="text-slate-300">最高速（DRS効果）と最低速（コーナリング）の差</span>
           </div>
           <div className="flex items-center justify-between text-[11px]">
@@ -285,7 +274,6 @@ export default function GlossaryVisualDiagram({ visualType }: GlossaryVisualDiag
   // Default schematic banner
   return (
     <div className="p-3 rounded-2xl bg-slate-950/70 border border-white/10 text-xs text-slate-400 flex items-center gap-2">
-      <span className="text-base">🏁</span>
       <span>F1公式テクニカル・スポーティングレギュレーションおよび実戦戦略に基づく用語解説です。</span>
     </div>
   );

@@ -71,9 +71,10 @@ export function getTyreColor(compound: string | null | undefined): string {
  */
 export function formatLapTime(seconds: number | null | undefined): string {
   if (seconds === null || seconds === undefined || isNaN(seconds)) return 'N/A';
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  const ms = Math.round((seconds - Math.floor(seconds)) * 1000);
+  const roundedSeconds = Math.round(seconds * 1000) / 1000;
+  const mins = Math.floor(roundedSeconds / 60);
+  const secs = Math.floor(roundedSeconds % 60);
+  const ms = Math.round((roundedSeconds - Math.floor(roundedSeconds)) * 1000);
   return `${mins}:${secs.toString().padStart(2, '0')}.${ms.toString().padStart(3, '0')}`;
 }
 
@@ -213,13 +214,13 @@ export function detectSafetyCarPeriods(
     const lapNum = msg.lap_number ?? 0;
 
     if (!activePeriod) {
-      if (
+      if (text.includes('VIRTUAL SAFETY CAR') && text.includes('DEPLOYED')) {
+        activePeriod = { startLap: lapNum, endLap: null, type: 'VSC' };
+      } else if (
         msg.category === 'SafetyCar' &&
         (text.includes('DEPLOYED') || text.includes('SAFETY CAR'))
       ) {
         activePeriod = { startLap: lapNum, endLap: null, type: 'SC' };
-      } else if (text.includes('VIRTUAL SAFETY CAR') && text.includes('DEPLOYED')) {
-        activePeriod = { startLap: lapNum, endLap: null, type: 'VSC' };
       } else if (msg.flag === 'RED') {
         activePeriod = { startLap: lapNum, endLap: null, type: 'RED' };
       }
@@ -435,11 +436,19 @@ export function calculateCumulativeGaps(
       const laps = enrichedLaps[num] ?? [];
       let total = 0;
       cumulativeTimes[num] = {};
-      laps.forEach((l) => {
-        const dur = l.lap_duration ?? l.lap_time ?? 0;
+      laps.forEach((l, i) => {
+        let dur = l.lap_duration ?? l.lap_time ?? 0;
+        if (dur === 0 && l.date_start && laps[i + 1]?.date_start) {
+          dur = (new Date(laps[i + 1].date_start!).getTime() - new Date(l.date_start).getTime()) / 1000;
+        }
         if (dur > 0) {
           total += dur;
           cumulativeTimes[num][l.lap_number] = total;
+        } else if (l.lap_number > 1) {
+          // Carry forward
+          cumulativeTimes[num][l.lap_number] = cumulativeTimes[num][l.lap_number - 1] ?? 0;
+        } else {
+          cumulativeTimes[num][l.lap_number] = 0;
         }
       });
       return laps.length > 0 ? Math.max(...laps.map((l) => l.lap_number)) : 0;
@@ -568,11 +577,23 @@ export function calculateStintDegradation(
         };
       });
 
-      // Compute simple linear degradation rate (s/lap)
+      // Compute least-squares linear degradation rate (s/lap) on clean laps
       let degRate = 0;
-      if (points.length > 2) {
-        const lastP = points[points.length - 1];
-        degRate = Number(((lastP.y - points[0].y) / (points.length - 1)).toFixed(3));
+      const fastestLap = Math.min(...validTimes);
+      const threshold107 = fastestLap * 1.07;
+      const cleanPoints = points.filter(p => p.y <= threshold107 && p.lapNumber > 1);
+      
+      if (cleanPoints.length > 2) {
+        const n = cleanPoints.length;
+        let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+        cleanPoints.forEach(p => {
+          sumX += p.x;
+          sumY += p.y;
+          sumXY += p.x * p.y;
+          sumX2 += p.x * p.x;
+        });
+        const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+        degRate = Number(slope.toFixed(3));
       }
 
       result.push({
@@ -690,8 +711,8 @@ export function simulatePitStrategy(
     }
   });
 
-  // Sort by cumulative race time to establish current track order
-  allDriversCumulative.sort((a, b) => a.cumulativeTime - b.cumulativeTime);
+  // Sort by laps completed (descending) then cumulative race time (ascending) to establish current track order
+  allDriversCumulative.sort((a, b) => b.lapCount - a.lapCount || a.cumulativeTime - b.cumulativeTime);
 
   return selectedDrivers.map((driverNum) => {
     const driverInfo = drivers.find((d) => d.driver_number.toString() === driverNum);
@@ -741,23 +762,6 @@ export function simulatePitStrategy(
       trafficStatus = 'CLOSE_GAP';
     }
 
-    // Undercut success probability against target ahead (if in P2+)
-    let undercutSuccessProb = 50;
-    let overcutViability: 'HIGH' | 'MEDIUM' | 'LOW' = 'MEDIUM';
-
-    if (currentPos > 1 && currentEntryIdx > 0) {
-      const targetCarAhead = allDriversCumulative[currentEntryIdx - 1];
-      const gapToTarget = Number((myCurrentTime - targetCarAhead.cumulativeTime).toFixed(2));
-      // Net gain on out-lap + next lap vs tyre degradation
-      const netGain = freshGain * 1.5 - gapToTarget;
-      undercutSuccessProb = Math.min(95, Math.max(10, Math.round(50 + netGain * 25)));
-      overcutViability = undercutSuccessProb > 70 ? 'LOW' : undercutSuccessProb < 35 ? 'HIGH' : 'MEDIUM';
-    } else {
-      // Leading driver: undercut danger from behind
-      undercutSuccessProb = 85; // Strong defense capability
-      overcutViability = 'MEDIUM';
-    }
-
     return {
       driverNum,
       driverName,
@@ -771,8 +775,6 @@ export function simulatePitStrategy(
       aheadDriverAcronym: aheadCar?.driverAcronym ?? null,
       gapBehindSeconds: gapBehind,
       behindDriverAcronym: behindCar?.driverAcronym ?? null,
-      undercutSuccessProb,
-      overcutViability,
       freshTyreDeltaPerLap: freshGain,
       pitLossSeconds: pitLoss,
       currentTyreCompound: currentEntry?.compound ?? 'UNKNOWN',

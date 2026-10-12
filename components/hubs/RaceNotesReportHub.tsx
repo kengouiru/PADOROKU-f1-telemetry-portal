@@ -45,7 +45,7 @@ export default function RaceNotesReportHub({
         setNoteContent(saved);
       } else {
         // Default starter template
-        setNoteContent(`# 📝 レース観戦ノート — ${sessionName}\n\n## 🏁 レース序盤 (Lap 1 - 15)\n- \n\n## 🛞 ピットストップ＆戦略分岐 (Lap 16 - 35)\n- \n\n## 🏆 レース終盤＆総括 (Lap 36 - Finish)\n- \n`);
+        setNoteContent(`# レース観戦ノート — ${sessionName}\n\n## レース序盤 (Lap 1 - 15)\n- \n\n## ピットストップ＆戦略分岐 (Lap 16 - 35)\n- \n\n## レース終盤＆総括 (Lap 36 - Finish)\n- \n`);
       }
     }
   }, [storageKey, sessionName]);
@@ -91,10 +91,10 @@ ${driverSummaries.join('\n')}
 ${noteContent}
 
 【レポート作成構成】
-1. 🏁 レースサマリー（勝敗の決定打・レース展開の要約）
-2. ⚡ タイヤ戦略とアンダーカット成否の分析
-3. 🏎️ 各ドライバーのペース比較とセクターパフォーマンス評価
-4. 💡 次戦に向けた総括と技術的課題`;
+1. レースサマリー（勝敗の決定打・レース展開の要約）
+2. タイヤ戦略とアンダーカット成否の分析
+3. 各ドライバーのペース比較とセクターパフォーマンス評価
+4. 次戦に向けた総括と技術的課題`;
 
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
@@ -137,7 +137,7 @@ ${noteContent}
 
   // Export as Markdown File
   const handleExportMarkdown = () => {
-    const fullText = `${noteContent}\n\n---\n\n# 🤖 Gemini AI レース総括レポート\n\n${aiReport || '（AIレポート未生成）'}`;
+    const fullText = `${noteContent}\n\n---\n\n# Gemini AI レース総括レポート\n\n${aiReport || '（AIレポート未生成）'}`;
     const blob = new Blob([fullText], { type: 'text/markdown;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -226,7 +226,7 @@ ${noteContent}
               <span>AI EXECUTIVE SUMMARY REPORT</span>
             </h3>
             {aiReport && (
-              <span className="text-[10px] text-red-300 bg-red-950/40 border border-red-500/30 px-2 py-0.5 rounded-full font-mono flex items-center gap-1">
+              <span className="text-[11px] text-red-300 bg-red-950/40 border border-red-500/30 px-2 py-0.5 rounded-full font-mono flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3 text-red-400" />
                 Gemini 生成完了
               </span>

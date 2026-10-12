@@ -22,8 +22,8 @@ export const ALL_FEATURES: FeatureItem[] = [
     category: 'new',
     title: 'ピットウォール司令塔 (PITWALL COMMAND)',
     badge: '注目 No.1 / 司令塔参戦',
-    badgeColor: 'bg-gradient-to-r from-red-600 to-rose-600 text-white border-red-500/40',
-    icon: '🎮',
+    badgeColor: 'bg-gradient-to-r from-red-600 to-red-600 text-white border-red-500/40',
+    icon: '',
     summary: '全24公式グランプリ・全11チーム・22名ドライバー対応。5大マルチモニター、双方向チーム無線、路面乾燥物理＆動的SC出動、AI 100点採点を備えた世界最高峰のF1レース司令塔参戦体験。',
     reviewPoints: [
       '【全24戦・全11チーム】角田裕毅やフェルスタッペンらのチーフストラテジストとして参戦',
@@ -31,7 +31,7 @@ export const ALL_FEATURES: FeatureItem[] = [
       '【双方向チーム無線】F1トランシーバー着信音とリアルタイム戦術判断ダイアログ',
       '【動的環境物理】雨上がり乾燥ライン形成、路面悪化連動SCリスク、AI 100点採点＆大百科連携',
     ],
-    locationHint: 'ヘッダーナビ ➔ 「🎮 PITWALL」タブ',
+    locationHint: 'ヘッダーナビ ➔ 「PITWALL」タブ',
     actionText: 'ピットウォール司令塔を開く',
   },
   {
@@ -39,8 +39,8 @@ export const ALL_FEATURES: FeatureItem[] = [
     category: 'new',
     title: 'タイムデルタ(Δt) ＆ コーナー詳細解析（角田裕毅 vs TOP）',
     badge: '注目 No.2 / 独自解析',
-    badgeColor: 'bg-sky-600/30 text-sky-300 border-sky-500/40',
-    icon: '🏁',
+    badgeColor: 'bg-slate-500/30 text-slate-200 border-slate-400/40',
+    icon: '',
     summary: 'GPS積算タイム差（Δt）折れ線グラフと、全コーナーのエイペックス速度・制動開始点マトリクス。角田裕毅（TSU）とフェルスタッペン/ローソン/ノリスの走りを比較し、Gemini AIによるエンジニアデブリーフを生成。',
     reviewPoints: [
       '【GPS累積デルタ】ラップ進行に伴うタイム差の増減が折れ線グラフで一目瞭然',
@@ -57,7 +57,7 @@ export const ALL_FEATURES: FeatureItem[] = [
     title: '戦術司令室 (Virtual Pitwall War Room)',
     badge: '注目 No.3 / 戦術司令室',
     badgeColor: 'bg-amber-600/30 text-amber-300 border-amber-500/40',
-    icon: '🚨',
+    icon: '',
     summary: '天候雨量・路面温度スライダー、タイヤ劣化カーブ＆タイヤクリフ（崖）探知、セーフティカー/VSC時のピットロスタイム損得計算器（+11秒短縮）を搭載した仮想ピットウォール司令室。',
     reviewPoints: [
       '【天候・温度スライダー】雨量操作でドライからインター/ウェットへのクロスオーバーを検証',
@@ -74,11 +74,11 @@ export const ALL_FEATURES: FeatureItem[] = [
     title: 'FOD公式中継スケジュール ＆ 一次ソース格付けニュース',
     badge: '注目 No.4 / 公式中継',
     badgeColor: 'bg-emerald-600/30 text-emerald-300 border-emerald-500/40',
-    icon: '📺',
+    icon: '',
     summary: 'フジテレビNEXT / FOD公式中継基準の週末全セッション生配信スケジュール表と、一次情報（FIA公式、チーム公式、FOD）格付けバッジ付き最新パドックニュースフィード。',
     reviewPoints: [
       '【FOD中継タイムテーブル】FP1・FP2・FP3・予選・スプリント・決勝の公式配信時刻',
-      '【一次ソース権威バッジ】👑 FIA公式、🏎️ チーム公式、📺 FOD、📰 パドックによる信頼度評価',
+      '【一次ソース権威バッジ】FIA公式、チーム公式、FOD、パドックによる信頼度評価',
       '【2世代バックアップ】最新データと前回バックアップの切り替え・復元機構',
     ],
     locationHint: 'レース観戦 ➔ ニュース＆パドック',
@@ -90,14 +90,14 @@ export const ALL_FEATURES: FeatureItem[] = [
     title: 'F1検定クイズ（本格実況音声 ＆ FOD公式中継基準）',
     badge: '注目 No.5 / 実況音声',
     badgeColor: 'bg-purple-600/30 text-purple-300 border-purple-500/40',
-    icon: '🏆',
+    icon: '',
     summary: '全4難易度・148問の本格対話型クイズ。迫力あるエンジンエキゾースト・ピット無線エフェクトつき実況音声と、問題文に安易なヒントを含まない真のF1知識を問う厳選設問。',
     reviewPoints: [
       '【迫力の実況音声】スピーカーボタンでエンジン始動音・ピット無線エフェクトつき実況が再生',
       '【FOD公式中継基準】安易な国名ヒントを廃し、鈴鹿・モナコ・スパなどコース特性の本質を問う問題',
       '【4難易度】ビギナー・中級・マニア・超人モードでF1知識を測定',
     ],
-    locationHint: 'ヘッダー右上「🏆 クイズ」ボタン',
+    locationHint: 'ヘッダー右上「クイズ」ボタン',
     actionText: '実況クイズを起動',
   },
 
@@ -108,7 +108,7 @@ export const ALL_FEATURES: FeatureItem[] = [
     title: 'テレメトリー・ラップタイム比較',
     badge: 'CORE / テレメトリー',
     badgeColor: 'bg-slate-700/50 text-slate-300 border-slate-600/40',
-    icon: '📊',
+    icon: '',
     summary: '選択ドライバー間の全周回ラップタイム推移、ペース比較、ファステストラップ表示。',
     reviewPoints: ['ドライバー間のペースの落ち込みやピット後のアウトラップペースを比較'],
     locationHint: 'テレメトリー＆Live ➔ 画面上部メイングラフ',
@@ -120,7 +120,7 @@ export const ALL_FEATURES: FeatureItem[] = [
     title: '全車タイヤスティント・ピット戦略タイムライン',
     badge: 'CORE / 戦略',
     badgeColor: 'bg-slate-700/50 text-slate-300 border-slate-600/40',
-    icon: '🛞',
+    icon: '',
     summary: 'グリッド全ドライバーの装着タイヤ（S/M/H/I/W）とピットタイミングをカラー帯で一元可視化。',
     reviewPoints: ['各チームの1ストップ vs 2ストップの戦略差やアンダーカットの成功状況を確認'],
     locationHint: 'テレメトリー＆Live ➔ STINT VISUALIZER セクション',
@@ -132,7 +132,7 @@ export const ALL_FEATURES: FeatureItem[] = [
     title: 'チーム無線タイムライン ＆ AIリアルタイム文字起こし',
     badge: 'CORE / 音声解析',
     badgeColor: 'bg-slate-700/50 text-slate-300 border-slate-600/40',
-    icon: '🎙️',
+    icon: '',
     summary: '緊迫のレース中チーム無線を周回順に再生。Gemini AIによる英語無線の日本語翻訳と戦術解説。',
     reviewPoints: ['ドライバーとレースエンジニアの生無線音声とAI日本語翻訳'],
     locationHint: 'テレメトリー＆Live ➔ 画面最下部 TEAM RADIO TIMELINE',
@@ -145,8 +145,8 @@ export const ALL_FEATURES: FeatureItem[] = [
     category: 'knowledge',
     title: '選手名鑑 (ドライバーハブ)',
     badge: 'LIBRARY / 選手',
-    badgeColor: 'bg-blue-900/40 text-blue-300 border-blue-500/40',
-    icon: '👤',
+    badgeColor: 'bg-slate-800/40 text-slate-200 border-slate-400/40',
+    icon: '',
     summary: '2026年現役全22ドライバー＋歴代伝説ドライバーの戦績、ドライビングスタイル、一次出典付きバイオグラフィー。',
     reviewPoints: ['角田裕毅、フェルスタッペン、ハミルトン、アントネッリ等の詳細プロフィール'],
     locationHint: 'F1大百科 ➔ 選手名鑑',
@@ -157,8 +157,8 @@ export const ALL_FEATURES: FeatureItem[] = [
     category: 'knowledge',
     title: 'チーム名鑑 (コンストラクター＆PU)',
     badge: 'LIBRARY / チーム',
-    badgeColor: 'bg-blue-900/40 text-blue-300 border-blue-500/40',
-    icon: '🏎️',
+    badgeColor: 'bg-slate-800/40 text-slate-200 border-slate-400/40',
+    icon: '',
     summary: 'アウディ、レッドブル・フォード、アストンマーティン・ホンダを含む全11チームの開発拠点、PU、工学哲学。',
     reviewPoints: ['2026年新規参入アウディやホンダワークス体制の工学哲学'],
     locationHint: 'F1大百科 ➔ チーム名鑑',
@@ -169,8 +169,8 @@ export const ALL_FEATURES: FeatureItem[] = [
     category: 'knowledge',
     title: 'コース解説 (24サーキット詳細)',
     badge: 'LIBRARY / コース',
-    badgeColor: 'bg-blue-900/40 text-blue-300 border-blue-500/40',
-    icon: '🏁',
+    badgeColor: 'bg-slate-800/40 text-slate-200 border-slate-400/40',
+    icon: '',
     summary: '全24サーキットのDRSゾーン、最高速、全開率、タイヤ負荷、標高差、追い抜き難易度を完全網羅。',
     reviewPoints: ['鈴鹿サーキット、スパ、モンツァなどの名所コーナーとセクター特性'],
     locationHint: 'F1大百科 ➔ コース解説',
@@ -182,7 +182,7 @@ export const ALL_FEATURES: FeatureItem[] = [
     title: 'タイヤ大百科 (ピレリコンパウンド＆作動温度)',
     badge: 'LIBRARY / タイヤ',
     badgeColor: 'bg-amber-900/40 text-amber-300 border-amber-500/40',
-    icon: '🛞',
+    icon: '',
     summary: 'ピレリC1〜C5コンパウンド特性、作動温度ウィンドウ、グレイニングとブリスターの科学的メカニズム。',
     reviewPoints: ['タイヤ作動温度帯やアンダーカットが効くメカニズムを解説'],
     locationHint: 'F1大百科 ➔ タイヤ大百科',
@@ -194,7 +194,7 @@ export const ALL_FEATURES: FeatureItem[] = [
     title: 'F1用語辞典 (図解・辞書)',
     badge: 'LIBRARY / 用語',
     badgeColor: 'bg-emerald-900/40 text-emerald-300 border-emerald-500/40',
-    icon: '🧠',
+    icon: '',
     summary: 'ポーパシング、アンダーカット、ダーティエア、MOMなど80語以上のF1専門用語をSVG図解付きで即時検索。',
     reviewPoints: ['SVG図解付きで初心者の疑問を瞬時に解決'],
     locationHint: 'F1大百科 ➔ 規定・用語集 ➔ 用語辞典',
@@ -206,7 +206,7 @@ export const ALL_FEATURES: FeatureItem[] = [
     title: 'FIA公式規則 ＆ 2026年新規定解説ラボ',
     badge: 'LIBRARY / 規定',
     badgeColor: 'bg-purple-900/40 text-purple-300 border-purple-500/40',
-    icon: '⚖️',
+    icon: '',
     summary: 'FIA公式競技規則・技術規則・スチュワード判定基準に加え、2026年導入のアクティブ空力（Z/Xモード）、50:50 次世代PU、マニュアルオーバーライド（MOM）、車体小型化をSVGアニメーションと数値で分かりやすく図解。',
     reviewPoints: [
       '【2026年新規定図解】Z/Xモード空力フラップ可変・50:50 PU出力比率・MOMオーバーライド',
@@ -221,8 +221,8 @@ export const ALL_FEATURES: FeatureItem[] = [
     category: 'knowledge',
     title: '名勝負ドラマ ＆ 歴史無線アーカイブ',
     badge: 'LIBRARY / 歴史',
-    badgeColor: 'bg-rose-900/40 text-rose-300 border-rose-500/40',
-    icon: '🎬',
+    badgeColor: 'bg-red-900/40 text-red-300 border-red-500/40',
+    icon: '',
     summary: 'F1の歴史に刻まれた伝説のチャンピオン争い、無線バトル、名勝負を当時の生音声とともに追体験。',
     reviewPoints: ['セナ・プロストから2021年アブダビ最終周まで'],
     locationHint: 'F1大百科 ➔ ドラマ・歴史',
@@ -235,11 +235,11 @@ export const ALL_FEATURES: FeatureItem[] = [
     category: 'ai',
     title: 'AIチーフレースストラテジスト',
     badge: 'AI / 戦略提案',
-    badgeColor: 'bg-blue-600/30 text-blue-300 border-blue-500/40',
-    icon: '🤖',
+    badgeColor: 'bg-slate-500/30 text-slate-200 border-slate-400/40',
+    icon: '',
     summary: 'Google Gemini 2.5 Pro を搭載。レース状況・ラップタイム・タイヤ摩耗をもとにピット戦略を即時提言。',
     reviewPoints: ['「今ピットインすべきか？」「アンダーカットの勝率は？」など自由に質問可能'],
-    locationHint: 'ヘッダー右上「🤖 AI STRATEGIST」ボタンで展開',
+    locationHint: 'ヘッダー右上「AI STRATEGIST」ボタンで展開',
     actionText: 'AIチャットを開く',
   },
 ];
@@ -280,15 +280,15 @@ export default function FeatureDirectoryModal({
         {/* Header */}
         <div className="p-4 sm:p-6 border-b border-white/10 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-red-600 to-rose-700 flex items-center justify-center text-xl shadow-lg shadow-red-900/40 border border-red-400/40">
-              🧭
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-xl shadow-lg shadow-red-900/40 border border-red-400/40">
+              
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base sm:text-xl font-racing font-black tracking-wider text-white">
                   全機能マップ ＆ クイックナビゲーション
                 </h2>
-                <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-mono bg-red-600/30 text-red-300 border border-red-500/40 font-bold">
+                <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[11px] font-mono bg-red-600/30 text-red-300 border border-red-500/40 font-bold">
                   レビューガイド
                 </span>
               </div>
@@ -314,10 +314,10 @@ export default function FeatureDirectoryModal({
           <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 no-scrollbar">
             {([
               { id: 'all', label: 'すべて表示', count: ALL_FEATURES.length },
-              { id: 'new', label: '🔥 注目新機能', count: ALL_FEATURES.filter((f) => f.category === 'new').length },
-              { id: 'telemetry', label: '🏎️ テレメトリー', count: ALL_FEATURES.filter((f) => f.category === 'telemetry').length },
-              { id: 'knowledge', label: '📚 F1大百科', count: ALL_FEATURES.filter((f) => f.category === 'knowledge').length },
-              { id: 'ai', label: '🤖 AI機能', count: ALL_FEATURES.filter((f) => f.category === 'ai').length },
+              { id: 'new', label: '注目新機能', count: ALL_FEATURES.filter((f) => f.category === 'new').length },
+              { id: 'telemetry', label: 'テレメトリー', count: ALL_FEATURES.filter((f) => f.category === 'telemetry').length },
+              { id: 'knowledge', label: 'F1大百科', count: ALL_FEATURES.filter((f) => f.category === 'knowledge').length },
+              { id: 'ai', label: 'AI機能', count: ALL_FEATURES.filter((f) => f.category === 'ai').length },
             ] as const).map((cat) => (
               <button
                 key={cat.id}
@@ -330,7 +330,7 @@ export default function FeatureDirectoryModal({
                 }`}
               >
                 <span>{cat.label}</span>
-                <span className="text-[10px] opacity-75 font-mono">({cat.count})</span>
+                <span className="text-[11px] opacity-75 font-mono">({cat.count})</span>
               </button>
             ))}
           </div>
@@ -344,7 +344,7 @@ export default function FeatureDirectoryModal({
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-slate-950/80 border border-white/10 rounded-xl px-3 py-1.5 pl-8 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-500 transition-colors"
             />
-            <span className="absolute left-2.5 top-2 text-xs text-slate-500">🔍</span>
+            <span className="absolute left-2.5 top-2 text-xs text-slate-500"></span>
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
@@ -379,15 +379,14 @@ export default function FeatureDirectoryModal({
                         <h3 className="text-sm font-racing font-bold text-white leading-tight">
                           {feature.title}
                         </h3>
-                        <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1 mt-0.5">
-                          <span>📍</span>
+                        <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1 mt-0.5">
                           <span>{feature.locationHint}</span>
                         </span>
                       </div>
                     </div>
 
                     <span
-                      className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-md border uppercase flex-shrink-0 ${feature.badgeColor}`}
+                      className={`text-[11px] font-mono font-bold px-2 py-0.5 rounded-md border uppercase flex-shrink-0 ${feature.badgeColor}`}
                     >
                       {feature.badge}
                     </span>
@@ -401,8 +400,7 @@ export default function FeatureDirectoryModal({
                   {/* Review Points Checklist */}
                   {feature.reviewPoints && feature.reviewPoints.length > 0 && (
                     <div className="bg-slate-950/60 rounded-xl p-2.5 border border-white/5 space-y-1">
-                      <div className="text-[10px] font-racing font-bold text-amber-400 flex items-center gap-1">
-                        <span>🔍</span>
+                      <div className="text-[11px] font-racing font-bold text-amber-400 flex items-center gap-1">
                         <span>レビューの注目ポイント:</span>
                       </div>
                       <ul className="space-y-1">
@@ -430,7 +428,7 @@ export default function FeatureDirectoryModal({
                     }}
                     className={`w-full py-2 px-3 rounded-xl text-xs font-racing font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md active:scale-95 ${
                       feature.category === 'new'
-                        ? 'bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white shadow-red-900/30'
+                        ? 'bg-gradient-to-r from-red-600 to-red-600 hover:from-red-500 hover:to-red-500 text-white shadow-red-900/30'
                         : 'bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-white/10'
                     }`}
                   >
@@ -444,7 +442,7 @@ export default function FeatureDirectoryModal({
 
           {filteredFeatures.length === 0 && (
             <div className="text-center py-12 text-slate-500">
-              <span className="text-3xl block mb-2">🔍</span>
+              <span className="text-3xl block mb-2"></span>
               <p className="text-sm font-racing">該当する機能が見つかりませんでした。</p>
             </div>
           )}

@@ -569,7 +569,7 @@ export default function TelemetryChart({
                                   {code}
                                 </span>
                                 <span className="text-white font-bold">
-                                  {valNum === 0 ? '基準 (0.0s)' : `+${valNum.toFixed(2)}s`}
+                                  {valNum === 0 ? '基準 (0.0s)' : `${valNum > 0 ? '+' : ''}${valNum.toFixed(2)}s`}
                                 </span>
                               </div>
                             );

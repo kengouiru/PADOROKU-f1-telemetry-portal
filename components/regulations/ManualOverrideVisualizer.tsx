@@ -2,7 +2,7 @@
 
 /**
  * components/regulations/ManualOverrideVisualizer.tsx
- * 🎯 2026 FIA Manual Override Mode (MOM) Interactive Visualizer
+ * 2026 FIA Manual Override Mode (MOM) Interactive Visualizer
  * High-precision engineering simulator of the DRS replacement system:
  * - Velocity vs Electrical Output Taper Curve (290 km/h vs 337 km/h)
  * - Real-time power delta calculation (+160kW ~ +250kW advantage)
@@ -84,7 +84,7 @@ export default function ManualOverrideVisualizer() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[10px] font-mono font-bold tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[11px] font-mono font-bold tracking-wider">
               FIA 2026 OVERTAKE WEAPON
             </span>
             <span className="text-[11px] font-mono text-slate-400">
@@ -104,7 +104,6 @@ export default function ManualOverrideVisualizer() {
       {/* ── Core Concept Strip ── */}
       <div className="p-4 rounded-xl bg-gradient-to-r from-purple-950/40 via-slate-900 to-slate-950 border border-purple-500/30 text-xs space-y-2">
         <div className="flex items-center gap-2 font-bold text-purple-300 font-mono text-sm">
-          <span>🎯</span>
           <span>MOM（Manual Override Mode）とは？</span>
         </div>
         <p className="text-slate-300 leading-relaxed text-[11px]">
@@ -118,7 +117,7 @@ export default function ManualOverrideVisualizer() {
       <div className="bg-slate-950/90 rounded-2xl border border-white/10 p-4 md:p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="text-xs font-mono font-bold text-white flex items-center gap-2">
-            <span>📈 車速 vs MGU-K電力供給テーパー曲線（FIA公式規定ライン）</span>
+            <span>車速 vs MGU-K電力供給テーパー曲線（FIA公式規定ライン）</span>
           </div>
           <div className="flex items-center gap-4 text-xs font-mono">
             <div className="flex items-center gap-1.5">
@@ -178,7 +177,7 @@ export default function ManualOverrideVisualizer() {
               fill="url(#momAdvantageArea)"
             />
             <text x="420" y="100" fill="#d8b4fe" fontSize="11" fontFamily="racing" fontWeight="bold" textAnchor="middle">
-              ⚡ MOM 超絶アドバンテージ領域 (+150〜250kW)
+              MOM 超絶アドバンテージ領域 (+150〜250kW)
             </text>
 
             {/* Curve 1: Leader (Baseline Taper) */}
@@ -233,13 +232,13 @@ export default function ManualOverrideVisualizer() {
         <div className="space-y-2 pt-2">
           <div className="flex items-center justify-between text-xs font-mono">
             <span className="text-slate-300">
-              🎛️ 車速ポインター調整: <strong className="text-sky-400 font-racing text-sm">{inspectSpeed} km/h</strong>
+              車速ポインター調整: <strong className="text-slate-300 font-racing text-sm">{inspectSpeed} km/h</strong>
             </span>
             <span className="text-purple-300">
               {inspectSpeed < 290
                 ? '全車等倍フルブースト区間 (差なし)'
                 : inspectSpeed <= 337
-                ? '⚡ MOM最大ブースト差発生区間！'
+                ? 'MOM最大ブースト差発生区間！'
                 : '超高速域テーパー収束区間'}
             </span>
           </div>
@@ -258,33 +257,33 @@ export default function ManualOverrideVisualizer() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
           {/* Leader Power */}
           <div className="bg-slate-900/90 p-3.5 rounded-xl border border-white/10">
-            <div className="text-[10px] font-mono text-slate-400 mb-1">先行車 MGU-K 出力</div>
+            <div className="text-[11px] font-mono text-slate-400 mb-1">先行車 MGU-K 出力</div>
             <div className="text-xl font-racing font-bold text-slate-300">
               {powerStats.leaderPower} <span className="text-xs font-mono text-slate-500">kW</span>
             </div>
-            <div className="text-[10px] text-slate-500 font-mono mt-0.5">
+            <div className="text-[11px] text-slate-500 font-mono mt-0.5">
               {inspectSpeed >= 290 ? '規定テーパーにより減衰中' : 'フル出力'}
             </div>
           </div>
 
           {/* MOM Power */}
           <div className="bg-slate-900/90 p-3.5 rounded-xl border border-purple-500/30">
-            <div className="text-[10px] font-mono text-purple-300 mb-1">MOM追従車 MGU-K 出力</div>
+            <div className="text-[11px] font-mono text-purple-300 mb-1">MOM追従車 MGU-K 出力</div>
             <div className="text-xl font-racing font-bold text-purple-300">
               {powerStats.momPower} <span className="text-xs font-mono text-purple-400/80">kW</span>
             </div>
-            <div className="text-[10px] text-purple-400 font-mono mt-0.5">
+            <div className="text-[11px] text-purple-400 font-mono mt-0.5">
               {inspectSpeed <= 337 ? 'フル350kWブースト継続！' : '最終段階テーパー'}
             </div>
           </div>
 
           {/* Power Delta Advantage */}
           <div className="bg-gradient-to-br from-purple-950/60 to-slate-900 p-3.5 rounded-xl border border-purple-500/40 shadow-inner">
-            <div className="text-[10px] font-mono text-amber-300 mb-1 font-bold">⚡ MOMオーバーテイク出力差</div>
+            <div className="text-[11px] font-mono text-amber-300 mb-1 font-bold">MOMオーバーテイク出力差</div>
             <div className="text-xl font-racing font-bold text-amber-400">
               +{powerStats.deltaKw} kW <span className="text-xs font-mono text-amber-300">({powerStats.deltaHp} 馬力差)</span>
             </div>
-            <div className="text-[10px] text-slate-300 font-mono mt-0.5">
+            <div className="text-[11px] text-slate-300 font-mono mt-0.5">
               {powerStats.deltaKw > 0 ? '圧倒的なストレート推進力' : '同等出力'}
             </div>
           </div>
@@ -296,7 +295,7 @@ export default function ManualOverrideVisualizer() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="text-xs font-mono font-bold text-white flex items-center gap-2">
-              <span>🏎️💨 1,000mストレート MOMオーバーテイク実走シミュレーター</span>
+              <span>1,000mストレート MOMオーバーテイク実走シミュレーター</span>
             </div>
             <div className="text-[11px] text-slate-400">
               先行車（白）に対し、MOMを発動した追従車（紫）が300km/h超でどう逆転するかを検証
@@ -307,9 +306,8 @@ export default function ManualOverrideVisualizer() {
             type="button"
             onClick={() => setIsSimulatingRace(true)}
             disabled={isSimulatingRace}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-racing font-bold shadow-lg shadow-purple-500/30 flex items-center gap-2 disabled:opacity-50 transition-all"
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-slate-500 hover:from-purple-500 hover:to-slate-400 text-white text-xs font-racing font-bold shadow-lg shadow-purple-500/30 flex items-center gap-2 disabled:opacity-50 transition-all"
           >
-            <span>🚀</span>
             <span>{isSimulatingRace ? 'ストレート激走中...' : 'MOMを発動してバトル開始'}</span>
           </button>
         </div>
@@ -317,7 +315,7 @@ export default function ManualOverrideVisualizer() {
         {/* Track Sprint Visualizer */}
         <div className="relative h-28 bg-slate-900 rounded-xl border border-white/10 overflow-hidden flex flex-col justify-around p-3">
           {/* Distance Markers */}
-          <div className="absolute top-1 left-0 right-0 flex justify-between px-4 text-[9px] font-mono text-slate-600 pointer-events-none">
+          <div className="absolute top-1 left-0 right-0 flex justify-between px-4 text-[11px] font-mono text-slate-600 pointer-events-none">
             <span>コーナー脱出 (0m)</span>
             <span>300m</span>
             <span>600m (MOM威力炸裂)</span>
@@ -331,10 +329,10 @@ export default function ManualOverrideVisualizer() {
               style={{ left: `${Math.min(92, leaderPos)}%` }}
               className="absolute flex items-center gap-2 transition-all duration-75"
             >
-              <div className="w-12 h-6 bg-slate-200 text-slate-950 text-[10px] font-racing font-bold rounded flex items-center justify-center shadow-md border border-slate-400">
+              <div className="w-12 h-6 bg-slate-200 text-slate-950 text-[11px] font-racing font-bold rounded flex items-center justify-center shadow-md border border-slate-400">
                 先行車
               </div>
-              <span className="text-[9px] font-mono text-slate-400">
+              <span className="text-[11px] font-mono text-slate-400">
                 {raceProgress > 60 ? '減衰中 (320km/h)' : '通常加速'}
               </span>
             </div>
@@ -349,10 +347,10 @@ export default function ManualOverrideVisualizer() {
               style={{ left: `${Math.min(92, momPos)}%` }}
               className="absolute flex items-center gap-2 transition-all duration-75"
             >
-              <div className="w-14 h-6 bg-gradient-to-r from-purple-600 to-pink-500 text-white text-[10px] font-racing font-bold rounded flex items-center justify-center shadow-lg shadow-purple-500/50 border border-purple-300">
-                MOM⚡
+              <div className="w-14 h-6 bg-gradient-to-r from-purple-600 to-slate-400 text-white text-[11px] font-racing font-bold rounded flex items-center justify-center shadow-lg shadow-purple-500/50 border border-purple-300">
+                MOM
               </div>
-              <span className="text-[9px] font-mono text-purple-300 font-bold">
+              <span className="text-[11px] font-mono text-purple-300 font-bold">
                 {raceProgress > 60 ? '348km/h 猛追！' : 'スリップストリーム'}
               </span>
             </div>

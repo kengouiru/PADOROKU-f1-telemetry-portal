@@ -109,17 +109,17 @@ function EmbeddedRadioCard({ radio }: { radio: EmbeddedRadio }) {
       {/* Radio Header: Lap badge + Speaker badge */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="bg-slate-800 text-sky-400 border border-sky-500/30 px-2 py-0.5 rounded text-[10px] font-mono font-bold">
+          <span className="bg-slate-800 text-slate-300 border border-slate-400/30 px-2 py-0.5 rounded text-[11px] font-mono font-bold">
             {radio.lap}
           </span>
           <span
-            className={`px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase border ${
+            className={`px-2 py-0.5 rounded text-[11px] font-bold tracking-wider uppercase border ${
               isPitWall
                 ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
                 : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
             }`}
           >
-            {isPitWall ? '📡 PIT WALL' : '🏎️ DRIVER'}
+            {isPitWall ? 'PIT WALL' : 'DRIVER'}
           </span>
           <span className="text-xs font-bold text-white leading-tight">
             {radio.speakerName}
@@ -129,16 +129,16 @@ function EmbeddedRadioCard({ radio }: { radio: EmbeddedRadio }) {
         {radio.audioUrl && !audioError && (
           <button
             onClick={togglePlay}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold font-mono transition-all shadow-md active:scale-95"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-500 hover:bg-slate-400 text-white text-[11px] font-bold font-mono transition-all shadow-md active:scale-95"
           >
-            <span>{isPlaying ? '⏸ 一時停止' : '▶ 音声再生'}</span>
+            <span>{isPlaying ? '一時停止' : '音声再生'}</span>
           </button>
         )}
       </div>
 
       {/* Audio Seek Bar (if audio available) */}
       {radio.audioUrl && !audioError && (
-        <div className="flex items-center gap-2 bg-slate-900/80 px-2.5 py-1 rounded-lg border border-white/5 text-[10px] font-mono">
+        <div className="flex items-center gap-2 bg-slate-900/80 px-2.5 py-1 rounded-lg border border-white/5 text-[11px] font-mono">
           <span className="text-slate-400 w-8">{currentTime.toFixed(1)}s</span>
           <input
             type="range"
@@ -147,7 +147,7 @@ function EmbeddedRadioCard({ radio }: { radio: EmbeddedRadio }) {
             step={0.1}
             value={currentTime}
             onChange={handleSeek}
-            className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sky-400"
+            className="w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-slate-300"
           />
           <span className="text-slate-500 w-8">{duration ? `${duration.toFixed(1)}s` : '--'}</span>
         </div>
@@ -158,14 +158,14 @@ function EmbeddedRadioCard({ radio }: { radio: EmbeddedRadio }) {
         <p className="text-slate-200 font-mono text-[11px] italic bg-slate-900/50 p-2 rounded-lg border border-white/5">
           &ldquo;{radio.transcript}&rdquo;
         </p>
-        <p className="text-sky-200/90 text-xs pl-1">
-          💬 {radio.translation}
+        <p className="text-slate-100/90 text-xs pl-1">
+          {radio.translation}
         </p>
       </div>
 
       {/* Strategic Tactical Impact Context */}
       <div className="bg-purple-950/30 border border-purple-500/20 p-2 rounded-lg text-[11px] text-purple-200 flex items-start gap-1.5">
-        <span className="text-purple-400 font-bold">⚡ 戦略的決定打:</span>
+        <span className="text-purple-400 font-bold">戦略的決定打:</span>
         <span className="text-slate-300 leading-snug">{radio.strategicContext}</span>
       </div>
     </div>
@@ -177,19 +177,19 @@ export type PuFilter = 'ALL' | 'Ferrari' | 'Mercedes' | 'RedBullFord' | 'Honda' 
 export const PU_OPTIONS: { key: PuFilter; label: string; count: number; badgeColor: string; pillColor: string }[] = [
   { key: 'ALL', label: 'ALL (全11チーム)', count: 11, badgeColor: 'border-white/20 text-slate-200', pillColor: 'bg-white/10' },
   { key: 'Ferrari', label: 'Ferrari PU', count: 3, badgeColor: 'border-red-500/40 text-red-300', pillColor: 'bg-red-500/20' },
-  { key: 'Mercedes', label: 'Mercedes PU', count: 4, badgeColor: 'border-teal-500/40 text-teal-300', pillColor: 'bg-teal-500/20' },
-  { key: 'RedBullFord', label: 'RB Ford PU', count: 2, badgeColor: 'border-sky-500/40 text-sky-300', pillColor: 'bg-sky-500/20' },
-  { key: 'Honda', label: 'Honda Works', count: 1, badgeColor: 'border-rose-500/40 text-rose-300', pillColor: 'bg-rose-500/20' },
+  { key: 'Mercedes', label: 'Mercedes PU', count: 4, badgeColor: 'border-emerald-500/40 text-emerald-300', pillColor: 'bg-emerald-500/20' },
+  { key: 'RedBullFord', label: 'RB Ford PU', count: 2, badgeColor: 'border-slate-400/40 text-slate-200', pillColor: 'bg-slate-400/20' },
+  { key: 'Honda', label: 'Honda Works', count: 1, badgeColor: 'border-red-500/40 text-red-300', pillColor: 'bg-red-500/20' },
   { key: 'Audi', label: 'Audi Works', count: 1, badgeColor: 'border-amber-500/40 text-amber-300', pillColor: 'bg-amber-500/20' },
 ];
 
 export function getPuBadgeInfo(pu: string) {
   const p = pu.toLowerCase();
-  if (p.includes('honda')) return { label: 'Honda Works (HRC)', color: 'bg-rose-950/70 border-rose-500/40 text-rose-300' };
-  if (p.includes('ford') || p.includes('red bull')) return { label: 'Red Bull Ford Powertrains', color: 'bg-sky-950/70 border-sky-500/40 text-sky-300' };
+  if (p.includes('honda')) return { label: 'Honda Works (HRC)', color: 'bg-red-950/70 border-red-500/40 text-red-300' };
+  if (p.includes('ford') || p.includes('red bull')) return { label: 'Red Bull Ford Powertrains', color: 'bg-slate-900/70 border-slate-400/40 text-slate-200' };
   if (p.includes('audi')) return { label: 'Audi Works E-Performance', color: 'bg-amber-950/70 border-amber-500/40 text-amber-300' };
   if (p.includes('ferrari')) return { label: 'Ferrari Works / Customer', color: 'bg-red-950/70 border-red-500/40 text-red-300' };
-  return { label: 'Mercedes-AMG M17', color: 'bg-teal-950/70 border-teal-500/40 text-teal-300' };
+  return { label: 'Mercedes-AMG M17', color: 'bg-emerald-950/70 border-emerald-500/40 text-emerald-300' };
 }
 
 export default function KnowledgeHistoryHub({
@@ -283,7 +283,7 @@ export default function KnowledgeHistoryHub({
           <button
             key={idx}
             onClick={() => handleCitationClick(cardId, refId)}
-            className="inline-flex items-center px-1 mx-0.5 text-[10px] font-mono font-bold text-sky-400 bg-sky-950/60 hover:bg-sky-800/80 border border-sky-500/40 rounded transition-all cursor-pointer hover:scale-110"
+            className="inline-flex items-center px-1 mx-0.5 text-[11px] font-mono font-bold text-slate-300 bg-slate-900/60 hover:bg-slate-700/80 border border-slate-400/40 rounded transition-all cursor-pointer hover:scale-110"
             title={`参考文献 [${refId}] を確認`}
           >
             [{refId}]
@@ -301,11 +301,10 @@ export default function KnowledgeHistoryHub({
     return (
       <div className="mt-3 pt-3 border-t border-white/10 bg-slate-950/40 rounded-xl p-3 flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-racing font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-            <span>📚</span>
+          <span className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
             <span>REFERENCES / 一次出典・公式文献</span>
           </span>
-          <span className="text-[9px] text-slate-500 font-mono">Academic Verified</span>
+          <span className="text-[11px] text-slate-500 font-mono">Academic Verified</span>
         </div>
 
         <div className="space-y-1.5">
@@ -323,14 +322,14 @@ export default function KnowledgeHistoryHub({
                 }`}
               >
                 <div className="flex items-start gap-2">
-                  <span className="font-mono text-[10px] font-bold text-sky-400 mt-0.5">
+                  <span className="font-mono text-[11px] font-bold text-slate-300 mt-0.5">
                     [{ref.id}]
                   </span>
                   <div>
                     <p className="text-slate-200 font-medium text-[11px] leading-tight">
                       {ref.title}
                     </p>
-                    <span className="text-[10px] text-slate-400 font-mono">
+                    <span className="text-[11px] text-slate-400 font-mono">
                       {ref.publisher} • 検証日: {ref.verifiedDate}
                     </span>
                   </div>
@@ -340,10 +339,9 @@ export default function KnowledgeHistoryHub({
                   href={ref.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sky-400 hover:text-sky-300 text-[10px] font-medium flex items-center gap-1 flex-shrink-0 self-end sm:self-center"
+                  className="text-slate-300 hover:text-slate-200 text-[11px] font-medium flex items-center gap-1 flex-shrink-0 self-end sm:self-center"
                 >
                   <span>公式ドキュメントを開く</span>
-                  <span>↗</span>
                 </a>
               </div>
             );
@@ -399,7 +397,6 @@ export default function KnowledgeHistoryHub({
             {/* Left: Title & Count */}
             <div className="flex items-center gap-2.5 flex-wrap">
               <h2 className="text-sm sm:text-base font-racing font-bold text-white tracking-wide flex items-center gap-1.5">
-                <span>🏎️</span>
                 <span>F1チーム名鑑</span>
               </h2>
               <span className="text-xs font-mono font-bold bg-slate-900/90 px-2.5 py-1 rounded-lg border border-white/10 text-red-400">
@@ -424,7 +421,7 @@ export default function KnowledgeHistoryHub({
                 }`}
                 title="推しチームのみ絞り込み"
               >
-                <span>{teamsFilterStarred ? '★' : '☆'}</span>
+                <span>{teamsFilterStarred ? '' : '☆'}</span>
                 <span>推しチーム ({prefs.favoriteTeamIds?.length || 0})</span>
               </button>
 
@@ -440,14 +437,13 @@ export default function KnowledgeHistoryHub({
                 }`}
                 title="PU供給元フィルターの開閉"
               >
-                <span>⚡</span>
                 <span>PU供給元</span>
                 {puFilter !== 'ALL' && (
-                  <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[10px] font-mono flex items-center justify-center font-bold">
+                  <span className="w-4 h-4 rounded-full bg-red-600 text-white text-[11px] font-mono flex items-center justify-center font-bold">
                     1
                   </span>
                 )}
-                <span className="text-[10px]">{isPuFilterOpen ? '▲' : '▼'}</span>
+                <span className="text-[11px]">{isPuFilterOpen ? '▲' : '▼'}</span>
               </button>
 
               {(puFilter !== 'ALL' || teamsFilterStarred || searchQuery) && (
@@ -458,7 +454,7 @@ export default function KnowledgeHistoryHub({
                     setTeamsFilterStarred(false);
                     setSearchQuery('');
                   }}
-                  className="text-xs font-mono font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
+                  className="text-xs font-mono font-bold bg-red-500/20 hover:bg-red-500/30 text-red-300 border border-red-500/40 px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1 shadow-sm active:scale-95 cursor-pointer"
                   title="すべての絞り込み条件をリセット"
                 >
                   <span>✕</span>
@@ -473,7 +469,6 @@ export default function KnowledgeHistoryHub({
             <div className="glass-card-premium rounded-xl p-3 sm:p-3.5 border border-red-500/30 shadow-xl shadow-red-950/20 flex flex-col gap-2.5 animate-fade-in">
               <div className="flex items-center justify-between pb-1.5 border-b border-white/10 text-xs">
                 <span className="font-racing font-bold text-slate-300 flex items-center gap-1.5">
-                  <span>⚡</span>
                   <span>2026年パワーユニット (PU) 供給元を選択</span>
                 </span>
                 <button
@@ -494,12 +489,12 @@ export default function KnowledgeHistoryHub({
                       onClick={() => setPuFilter(opt.key)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all shrink-0 cursor-pointer flex items-center gap-1.5 ${
                         isActive
-                          ? 'bg-gradient-to-r from-red-600 to-rose-600 text-white shadow-md shadow-red-950/40 border border-red-500/40 ring-1 ring-red-400/40'
+                          ? 'bg-red-600 text-white shadow-md shadow-red-950/40 border border-red-500/40 ring-1 ring-red-400/40'
                           : 'bg-slate-900/80 text-slate-300 hover:text-white hover:bg-white/10 border border-white/5'
                       }`}
                     >
                       <span>{opt.label}</span>
-                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isActive ? 'bg-white/20 text-white' : opt.pillColor}`}>
+                      <span className={`text-[11px] px-1.5 py-0.2 rounded-full ${isActive ? 'bg-white/20 text-white' : opt.pillColor}`}>
                         {opt.count}
                       </span>
                     </button>
@@ -512,13 +507,12 @@ export default function KnowledgeHistoryHub({
           {/* Active PU Filter Chips Strip */}
           {(puFilter !== 'ALL' || teamsFilterStarred || searchQuery) && (
             <div className="flex flex-wrap items-center gap-1.5 px-1 text-xs">
-              <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1 mr-1">
-                <span>🎯</span>
+              <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1 mr-1">
                 <span>絞り込み中:</span>
               </span>
               {puFilter !== 'ALL' && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-red-950/80 border border-red-500/40 text-red-200 text-[11px] font-mono">
-                  <span>⚡ {PU_OPTIONS.find((p) => p.key === puFilter)?.label}</span>
+                  <span>{PU_OPTIONS.find((p) => p.key === puFilter)?.label}</span>
                   <button
                     type="button"
                     onClick={() => setPuFilter('ALL')}
@@ -531,7 +525,7 @@ export default function KnowledgeHistoryHub({
               )}
               {teamsFilterStarred && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-950/80 border border-amber-500/40 text-amber-200 text-[11px] font-mono">
-                  <span>★ 推しチームのみ</span>
+                  <span>推しチームのみ</span>
                   <button
                     type="button"
                     onClick={() => setTeamsFilterStarred(false)}
@@ -562,7 +556,7 @@ export default function KnowledgeHistoryHub({
                   setTeamsFilterStarred(false);
                   setSearchQuery('');
                 }}
-                className="text-[11px] text-rose-400 hover:text-rose-300 underline ml-1 cursor-pointer font-mono"
+                className="text-[11px] text-red-400 hover:text-red-300 underline ml-1 cursor-pointer font-mono"
               >
                 すべて解除
               </button>
@@ -595,8 +589,8 @@ export default function KnowledgeHistoryHub({
                           {team.name.slice(0, 3).toUpperCase()}
                         </div>
                         <div>
-                          <span className="text-[10px] text-slate-400 font-mono block">
-                            📍 {team.base.split(',')[0]}
+                          <span className="text-[11px] text-slate-400 font-mono block">
+                            {team.base.split(',')[0]}
                           </span>
                           <h3 className="text-sm sm:text-base font-bold text-white group-hover:text-red-400 transition-colors leading-tight">
                             {team.name}
@@ -606,8 +600,7 @@ export default function KnowledgeHistoryHub({
 
                       <div className="flex items-center gap-1.5 shrink-0">
                         {team.constructorTitles > 0 && (
-                          <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-mono font-bold flex items-center gap-1">
-                            <span>🏆</span>
+                          <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold flex items-center gap-1">
                             <span>{team.constructorTitles}冠</span>
                           </span>
                         )}
@@ -625,30 +618,30 @@ export default function KnowledgeHistoryHub({
                           }`}
                           title={isFavoriteTeam(team.id) ? '推しチームから外す' : '推しチーム (マイパドック) に登録'}
                         >
-                          <span className="text-xs">{isFavoriteTeam(team.id) ? '★' : '☆'}</span>
+                          <span className="text-xs">{isFavoriteTeam(team.id) ? '' : '☆'}</span>
                         </button>
                       </div>
                     </div>
 
                     {/* PU Supplier & Principal Badges */}
                     <div className="flex flex-wrap gap-1.5 text-[11px] font-mono">
-                      <span className={`px-2 py-0.5 rounded-lg border text-[10px] font-bold ${puInfo.color}`}>
-                        ⚡ {team.powerUnit}
+                      <span className={`px-2 py-0.5 rounded-lg border text-[11px] font-bold ${puInfo.color}`}>
+                        {team.powerUnit}
                       </span>
-                      <span className="bg-slate-900/80 px-2 py-0.5 rounded-lg text-slate-300 border border-white/5 text-[10px]">
-                        👔 {team.teamPrincipal}
+                      <span className="bg-slate-900/80 px-2 py-0.5 rounded-lg text-slate-300 border border-white/5 text-[11px]">
+                        {team.teamPrincipal}
                       </span>
                     </div>
 
                     {/* Drivers Lineup */}
                     <div className="flex items-center gap-1.5 text-[11px] font-mono text-slate-400">
-                      <span className="text-[10px]">ドライバー:</span>
+                      <span className="text-[11px]">ドライバー:</span>
                       {team.drivers.map((d) => (
                         <span
                           key={d}
-                          className="px-2 py-0.5 rounded-md bg-slate-800/90 text-white font-bold border border-white/10 text-[10px]"
+                          className="px-2 py-0.5 rounded-md bg-slate-800/90 text-white font-bold border border-white/10 text-[11px]"
                         >
-                          🏎️ {d}
+                          {d}
                         </span>
                       ))}
                     </div>
@@ -656,11 +649,11 @@ export default function KnowledgeHistoryHub({
                     {/* Engineering & Philosophy Highlights */}
                     <div className="space-y-1 bg-slate-950/60 p-2.5 rounded-xl border border-white/5 text-[11px]">
                       <div className="flex items-start gap-1.5 text-slate-300">
-                        <span className="text-red-400 shrink-0 font-bold">🌪️ 空力:</span>
+                        <span className="text-red-400 shrink-0 font-bold">空力:</span>
                         <span className="text-slate-200 line-clamp-1">{team.philosophy.aeroFocus}</span>
                       </div>
                       <div className="flex items-start gap-1.5 text-slate-300">
-                        <span className="text-amber-400 shrink-0 font-bold">⚙️ 車体:</span>
+                        <span className="text-amber-400 shrink-0 font-bold">車体:</span>
                         <span className="text-slate-200 line-clamp-1">{team.philosophy.mechanicalFocus}</span>
                       </div>
                     </div>
@@ -668,8 +661,8 @@ export default function KnowledgeHistoryHub({
 
                   {/* Card Footer */}
                   <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[11px] font-mono text-slate-400">
-                    <span className="text-[10px] text-slate-500 whitespace-nowrap">
-                      📚 一次出典: {team.references.length}件
+                    <span className="text-[11px] text-slate-500 whitespace-nowrap">
+                      一次出典: {team.references.length}件
                     </span>
                     <span className="text-red-400 group-hover:underline flex items-center gap-1 font-bold text-xs whitespace-nowrap shrink-0">
                       <span>詳細スペック・歴史を見る</span>
@@ -713,10 +706,9 @@ export default function KnowledgeHistoryHub({
           <div className="glass-card-premium px-3.5 py-2.5 rounded-xl flex items-center justify-between gap-2.5 border border-white/10 shadow-sm">
             <div className="flex items-center gap-2.5 flex-wrap">
               <h2 className="text-sm sm:text-base font-racing font-bold text-white tracking-wide flex items-center gap-2">
-                <span>⏱️</span>
                 <span>F1作戦司令室 ＆ レース戦略公理</span>
               </h2>
-              <span className="text-[10px] font-mono text-slate-400 hidden md:inline">
+              <span className="text-[11px] font-mono text-slate-400 hidden md:inline">
                 アンダーカット・SC戦略の数理・生無線ログ・実走テレメトリー再現
               </span>
             </div>
@@ -726,7 +718,7 @@ export default function KnowledgeHistoryHub({
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="text-sky-400 hover:text-white ml-1 cursor-pointer"
+                  className="text-slate-300 hover:text-white ml-1 cursor-pointer"
                 >
                   ✕
                 </button>
@@ -738,12 +730,11 @@ export default function KnowledgeHistoryHub({
           <div className="space-y-2">
             <div className="flex items-center justify-between pb-1 border-b border-white/10">
               <div className="flex items-center gap-2">
-                <span className="text-base">⏱️</span>
                 <h3 className="font-racing font-bold text-sm text-white tracking-wider uppercase">
                   VIRTUAL PITWALL WAR ROOM / インタラクティブ作戦シミュレーター
                 </h3>
               </div>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-sky-950 text-sky-300 border border-sky-500/30">
+              <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-slate-900 text-slate-200 border border-slate-400/30">
                 理論実践ビジュアル
               </span>
             </div>
@@ -751,7 +742,6 @@ export default function KnowledgeHistoryHub({
           </div>
 
           <div className="flex items-center gap-2 pt-2 border-b border-white/10 pb-1.5">
-            <span className="text-base">📚</span>
             <h3 className="font-racing font-bold text-sm text-white tracking-wider uppercase">
               STRATEGY CONCEPTS & ARCHIVE / レース戦略公理・重要原則
             </h3>
@@ -765,15 +755,15 @@ export default function KnowledgeHistoryHub({
               <div
                 key={strat.id}
                 onClick={() => setSelectedStrategyDetail(strat)}
-                className="glass-card-premium p-4 sm:p-5 rounded-2xl flex flex-col justify-between gap-3.5 shadow-xl h-full border border-white/10 hover:border-sky-500/40 cursor-pointer transition-all duration-200 group"
+                className="glass-card-premium p-4 sm:p-5 rounded-2xl flex flex-col justify-between gap-3.5 shadow-xl h-full border border-white/10 hover:border-slate-400/40 cursor-pointer transition-all duration-200 group"
               >
                 <div className="flex flex-col gap-3">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <span className="text-[10px] font-racing font-bold text-sky-400 uppercase tracking-widest bg-sky-950/60 px-2 py-0.5 rounded-full border border-sky-500/30">
+                      <span className="text-[11px] font-racing font-bold text-slate-300 uppercase tracking-widest bg-slate-900/60 px-2 py-0.5 rounded-full border border-slate-400/30">
                         {strat.category}
                       </span>
-                      <h3 className="text-base sm:text-lg font-bold text-white leading-tight mt-1.5 group-hover:text-sky-300 transition-colors">
+                      <h3 className="text-base sm:text-lg font-bold text-white leading-tight mt-1.5 group-hover:text-slate-200 transition-colors">
                         {strat.title}
                       </h3>
                       <p className="text-xs text-slate-400 mt-0.5">{strat.subtitle}</p>
@@ -785,10 +775,9 @@ export default function KnowledgeHistoryHub({
                         e.stopPropagation();
                         setSelectedStrategyDetail(strat);
                       }}
-                      className="px-2.5 py-1 rounded-lg bg-sky-600/20 hover:bg-sky-600/40 text-sky-300 border border-sky-500/30 text-xs font-racing font-bold flex items-center gap-1 transition-all cursor-pointer shadow-sm shrink-0"
+                      className="px-2.5 py-1 rounded-lg bg-slate-500/20 hover:bg-slate-500/40 text-slate-200 border border-slate-400/30 text-xs font-racing font-bold flex items-center gap-1 transition-all cursor-pointer shadow-sm shrink-0"
                       title="詳細公理・数理モーダルを開く"
                     >
-                      <span>📐</span>
                       <span>全解剖</span>
                     </button>
                   </div>
@@ -799,8 +788,8 @@ export default function KnowledgeHistoryHub({
 
                   {/* Key Takeaways */}
                   <div>
-                    <h4 className="text-[10px] font-racing font-bold text-slate-400 uppercase tracking-wider mb-1.5">
-                      📌 戦略シミュレーションの重要公理
+                    <h4 className="text-[11px] font-racing font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                      戦略シミュレーションの重要公理
                     </h4>
                     <ul className="grid grid-cols-1 gap-1.5 text-xs">
                       {strat.keyTakeaways.map((takeaway, idx) => (
@@ -808,7 +797,7 @@ export default function KnowledgeHistoryHub({
                           key={idx}
                           className="bg-slate-900/80 p-2 rounded-lg border border-white/5 text-[11px] text-slate-300 flex items-start gap-2"
                         >
-                          <span className="text-sky-400 font-bold">•</span>
+                          <span className="text-slate-300 font-bold">•</span>
                           <span>{takeaway}</span>
                         </li>
                       ))}
@@ -818,8 +807,7 @@ export default function KnowledgeHistoryHub({
                   {/* Embedded Key Team Radio Logs */}
                   {strat.keyRadios && strat.keyRadios.length > 0 && (
                     <div className="space-y-1.5 pt-2 border-t border-white/10">
-                      <h4 className="text-[10px] font-racing font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1">
-                        <span>🎙️</span>
+                      <h4 className="text-[11px] font-racing font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1">
                         <span>KEY TEAM RADIO / 象徴的チーム無線ログ</span>
                       </h4>
                       <div className="space-y-2">
@@ -832,13 +820,13 @@ export default function KnowledgeHistoryHub({
 
                   {/* Hero Telemetry Banner CTA */}
                   {strat.telemetrySession && onNavigateToTelemetry && (
-                    <div className="mt-1 bg-gradient-to-r from-sky-950/70 via-slate-900/90 to-indigo-950/70 border border-sky-500/40 rounded-xl p-3 flex flex-col sm:flex-row items-center justify-between gap-2.5 shadow-md">
+                    <div className="mt-1 bg-slate-900/80 border border-slate-400/40 rounded-xl p-3 flex flex-col sm:flex-row items-center justify-between gap-2.5 shadow-md">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-base shrink-0">
-                          📊
+                        <div className="w-8 h-8 rounded-lg bg-slate-400/20 border border-slate-300/30 flex items-center justify-center text-base shrink-0">
+                          
                         </div>
                         <div>
-                          <div className="text-[10px] font-racing font-bold text-sky-300 uppercase tracking-wider">
+                          <div className="text-[11px] font-racing font-bold text-slate-200 uppercase tracking-wider">
                             実走テレメトリー再現解析
                           </div>
                           <div className="text-xs text-slate-200 font-mono">
@@ -873,11 +861,10 @@ export default function KnowledgeHistoryHub({
           <div className="glass-card-premium px-3.5 py-2.5 rounded-xl flex items-center justify-between gap-2.5 border border-white/10 shadow-sm">
             <div className="flex items-center gap-2.5 flex-wrap">
               <h2 className="text-sm sm:text-base font-racing font-bold text-white tracking-wide flex items-center gap-2">
-                <span>🏛️</span>
                 <span>歴史アーカイブ ＆ 伝説の名勝負録</span>
               </h2>
-              <span className="text-[10px] font-mono text-slate-400 hidden md:inline">
-                生チーム無線ログ（🎙️）と実走テレメトリー連携付き名勝負
+              <span className="text-[11px] font-mono text-slate-400 hidden md:inline">
+                生チーム無線ログ（）と実走テレメトリー連携付き名勝負
               </span>
             </div>
             {searchQuery && (
@@ -886,7 +873,7 @@ export default function KnowledgeHistoryHub({
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="text-sky-400 hover:text-white ml-1 cursor-pointer"
+                  className="text-slate-300 hover:text-white ml-1 cursor-pointer"
                 >
                   ✕
                 </button>
@@ -909,7 +896,7 @@ export default function KnowledgeHistoryHub({
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold">
+                        <span className="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold">
                           {item.year}
                         </span>
                         <span className="text-xs font-mono text-slate-400">
@@ -931,7 +918,6 @@ export default function KnowledgeHistoryHub({
                       className="px-2.5 py-1 rounded-lg bg-amber-600/20 hover:bg-amber-600/40 text-amber-300 border border-amber-500/30 text-xs font-racing font-bold flex items-center gap-1 transition-all cursor-pointer shadow-sm shrink-0"
                       title="名勝負全解剖モーダルを開く"
                     >
-                      <span>🏛️</span>
                       <span>全解剖</span>
                     </button>
                   </div>
@@ -941,7 +927,6 @@ export default function KnowledgeHistoryHub({
                   </p>
 
                   <div className="bg-slate-900/80 p-2.5 rounded-xl border border-amber-500/20 text-xs flex items-center gap-2">
-                    <span className="text-amber-400 text-sm">🏆</span>
                     <span className="text-slate-200 font-medium text-[11px]">
                       {item.outcome}
                     </span>
@@ -950,8 +935,7 @@ export default function KnowledgeHistoryHub({
                   {/* Embedded Key Team Radio Logs */}
                   {item.keyRadios && item.keyRadios.length > 0 && (
                     <div className="space-y-1.5 pt-2 border-t border-white/10">
-                      <h4 className="text-[10px] font-racing font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1">
-                        <span>🎙️</span>
+                      <h4 className="text-[11px] font-racing font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1">
                         <span>KEY TEAM RADIO / 象徴的チーム無線ログ</span>
                       </h4>
                       <div className="space-y-2">
@@ -964,13 +948,13 @@ export default function KnowledgeHistoryHub({
 
                   {/* Hero Telemetry Banner */}
                   {item.telemetrySession && onNavigateToTelemetry && (
-                    <div className="mt-1 bg-gradient-to-r from-amber-950/60 via-slate-900/90 to-rose-950/60 border border-amber-500/40 rounded-xl p-3 flex flex-col sm:flex-row items-center justify-between gap-2.5 shadow-md">
+                    <div className="mt-1 bg-slate-900/80 border border-amber-500/40 rounded-xl p-3 flex flex-col sm:flex-row items-center justify-between gap-2.5 shadow-md">
                       <div className="flex items-center gap-2.5">
                         <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-base shrink-0">
-                          🏁
+                          
                         </div>
                         <div>
-                          <div className="text-[10px] font-racing font-bold text-amber-300 uppercase tracking-wider">
+                          <div className="text-[11px] font-racing font-bold text-amber-300 uppercase tracking-wider">
                             {item.year} {item.grandPrix} 実走テレメトリー再現
                           </div>
                           <div className="text-xs text-slate-200 font-mono">

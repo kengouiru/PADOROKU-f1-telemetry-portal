@@ -80,7 +80,7 @@ export default function RegulationDetailModal({
     technical: {
       label: 'テクニカル規則 (技術規則)',
       icon: Wrench,
-      badgeColor: 'bg-sky-500/20 text-sky-300 border-sky-500/40',
+      badgeColor: 'bg-slate-400/20 text-slate-200 border-slate-400/40',
     },
     future2026: {
       label: '2026年 次世代規定',
@@ -90,7 +90,7 @@ export default function RegulationDetailModal({
     guidelines: {
       label: 'FIA審議ガイドライン',
       icon: Scale,
-      badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
+      badgeColor: 'bg-red-500/20 text-red-300 border-red-500/40',
     },
   };
 
@@ -122,13 +122,13 @@ export default function RegulationDetailModal({
                 {article.articleNumber}
               </span>
             )}
-            <span className="px-2 py-0.5 rounded bg-red-600/20 text-red-300 border border-red-500/30 text-[10px] font-mono font-bold">
+            <span className="px-2 py-0.5 rounded bg-red-600/20 text-red-300 border border-red-500/30 text-[11px] font-mono font-bold">
               {article.badge}
             </span>
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-slate-500 font-mono hidden md:inline">
+            <span className="text-[11px] text-slate-500 font-mono hidden md:inline">
               [←] [→] で切替 / [ESC] 閉じる
             </span>
             <button
@@ -195,8 +195,8 @@ export default function RegulationDetailModal({
 
                 {/* Core Key Points */}
                 <div className="bg-slate-950/70 border border-white/10 p-4 sm:p-5 rounded-2xl space-y-3">
-                  <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <Shield className="w-3.5 h-3.5 text-sky-400" />
+                  <h4 className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <Shield className="w-3.5 h-3.5 text-slate-300" />
                     <span>公式運用ルール・重要条項</span>
                   </h4>
                   <div className="space-y-2.5">
@@ -222,8 +222,8 @@ export default function RegulationDetailModal({
                 {/* Penalty and Limits Table */}
                 {article.penaltyOrLimitSummary && article.penaltyOrLimitSummary.length > 0 && (
                   <div className="bg-slate-950/80 border border-white/10 p-4 rounded-2xl space-y-2.5 shadow-md">
-                    <h4 className="text-xs font-racing font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                    <h4 className="text-xs font-racing font-bold text-red-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
                       <span>違反時の罰則基準 & 許容限界値</span>
                     </h4>
                     <div className="overflow-x-auto rounded-xl border border-white/10">
@@ -258,15 +258,15 @@ export default function RegulationDetailModal({
                 {/* Regulation Metadata Card */}
                 <div className="bg-slate-900/60 rounded-2xl border border-white/5 p-3.5 space-y-2 text-xs font-mono text-slate-400">
                   <div className="flex items-center justify-between pb-1.5 border-b border-white/5">
-                    <span className="font-sans text-[10px] text-slate-500">条文番号</span>
+                    <span className="font-sans text-[11px] text-slate-500">条文番号</span>
                     <span className="text-slate-200 font-bold">{article.articleNumber || 'FIA Guideline'}</span>
                   </div>
                   <div className="flex items-center justify-between pb-1.5 border-b border-white/5">
-                    <span className="font-sans text-[10px] text-slate-500">管轄カテゴリー</span>
+                    <span className="font-sans text-[11px] text-slate-500">管轄カテゴリー</span>
                     <span className="text-slate-200 font-bold">{catMeta.label}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="font-sans text-[10px] text-slate-500">適用レギュレーション</span>
+                    <span className="font-sans text-[11px] text-slate-500">適用レギュレーション</span>
                     <span className="text-amber-400 font-bold">2026 FIA Code</span>
                   </div>
                 </div>
@@ -291,13 +291,13 @@ export default function RegulationDetailModal({
                 </div>
 
                 {/* Telemetry Impact */}
-                <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-blue-950/40 border border-blue-500/30 p-4 sm:p-5 rounded-2xl space-y-3">
+                <div className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-900/40 border border-slate-400/30 p-4 sm:p-5 rounded-2xl space-y-3">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-racing font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
-                      <Activity className="w-3.5 h-3.5 text-sky-400" />
+                    <h4 className="text-xs font-racing font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <Activity className="w-3.5 h-3.5 text-slate-300" />
                       <span>テレメトリー挙動 & ピット判断プロトコル</span>
                     </h4>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-400/20 text-slate-200 border border-slate-400/30">
                       Live Telemetry Linked
                     </span>
                   </div>
@@ -310,24 +310,24 @@ export default function RegulationDetailModal({
 
               {/* ── Right Column: Sticky Sensor Protocol HUD ── */}
               <div className="lg:col-span-5 xl:col-span-4 space-y-4 lg:sticky lg:top-0">
-                <div className="bg-slate-950/90 border border-sky-500/30 p-4 rounded-2xl space-y-3 shadow-md">
-                  <h4 className="text-xs font-racing font-bold text-sky-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <Cpu className="w-3.5 h-3.5 text-sky-400" />
+                <div className="bg-slate-950/90 border border-slate-400/30 p-4 rounded-2xl space-y-3 shadow-md">
+                  <h4 className="text-xs font-racing font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                    <Cpu className="w-3.5 h-3.5 text-slate-300" />
                     <span>FIAセンサー測定プロトコル</span>
                   </h4>
 
                   <div className="space-y-2 text-[11px] font-mono">
                     <div className="bg-slate-900/80 p-2.5 rounded-xl border border-white/5">
-                      <span className="text-slate-400 block text-[9.5px]">測定方式</span>
-                      <strong className="text-sky-300">FIA標準規格レーザー/光電センサー</strong>
+                      <span className="text-slate-400 block text-[11px]">測定方式</span>
+                      <strong className="text-slate-200">FIA標準規格レーザー/光電センサー</strong>
                     </div>
                     <div className="bg-slate-900/80 p-2.5 rounded-xl border border-white/5">
-                      <span className="text-slate-400 block text-[9.5px]">データ伝送</span>
+                      <span className="text-slate-400 block text-[11px]">データ伝送</span>
                       <strong className="text-amber-300">ECU暗号化リアルタイム送信</strong>
                     </div>
                     <div className="bg-slate-900/80 p-2.5 rounded-xl border border-white/5">
-                      <span className="text-slate-400 block text-[9.5px]">失格基準</span>
-                      <strong className="text-rose-400">マージンゼロ絶対判定 (公認ゲージ)</strong>
+                      <span className="text-slate-400 block text-[11px]">失格基準</span>
+                      <strong className="text-red-400">マージンゼロ絶対判定 (公認ゲージ)</strong>
                     </div>
                   </div>
                 </div>
@@ -389,11 +389,11 @@ export default function RegulationDetailModal({
 
                       <div className="space-y-2 text-xs font-mono">
                         <div className="bg-slate-900/70 p-2.5 rounded-xl border border-white/5">
-                          <span className="text-slate-500 block text-[10px] font-sans">対象グランプリ</span>
+                          <span className="text-slate-500 block text-[11px] font-sans">対象グランプリ</span>
                           <span className="text-white font-bold">{article.historicalCaseStudy.gp} ({article.historicalCaseStudy.year}年)</span>
                         </div>
                         <div className="bg-slate-900/70 p-2.5 rounded-xl border border-white/5">
-                          <span className="text-slate-500 block text-[10px] font-sans">関連重要判例</span>
+                          <span className="text-slate-500 block text-[11px] font-sans">関連重要判例</span>
                           <span className="text-slate-300">{article.historicalCaseStudy.title}</span>
                         </div>
                       </div>

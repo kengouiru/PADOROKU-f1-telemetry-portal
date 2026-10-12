@@ -67,7 +67,7 @@ export default function PitwallProModal({
     setTimeout(() => {
       changeTier('pro');
       setIsUpgrading(false);
-      setToastMessage('🎉 Pitwall Pro へようこそ！ 全機能がアンロックされました。');
+      setToastMessage('Pitwall Pro へようこそ！ 全機能がアンロックされました。');
       setTimeout(() => {
         setToastMessage(null);
       }, 4000);
@@ -76,7 +76,7 @@ export default function PitwallProModal({
 
   const handleDowngradeToFree = () => {
     changeTier('free');
-    setToastMessage('⚡ フリープランに切り替えました（AI相談: 1日3回制限 / 鈴鹿限定10周シミュレーター）');
+    setToastMessage('フリープランに切り替えました（AI相談: 1日3回制限 / 鈴鹿限定10周シミュレーター）');
     setTimeout(() => {
       setToastMessage(null);
     }, 4000);
@@ -93,7 +93,7 @@ export default function PitwallProModal({
 
       {/* Toast */}
       {toastMessage && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[110] px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-racing font-bold text-sm shadow-2xl animate-bounce">
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[110] px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 font-racing font-bold text-sm shadow-2xl animate-bounce">
           {toastMessage}
         </div>
       )}
@@ -104,21 +104,20 @@ export default function PitwallProModal({
         <div className="p-4 sm:p-6 pb-3 sm:pb-4 bg-gradient-to-b from-amber-950/40 via-slate-900/90 to-slate-950 border-b border-white/10 flex items-start justify-between gap-4 shrink-0">
           <div>
             <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
-              <span className="px-2.5 sm:px-3 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 text-[10px] font-mono font-black tracking-widest uppercase shadow-md">
+              <span className="px-2.5 sm:px-3 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 text-[11px] font-mono font-black tracking-widest uppercase shadow-md">
                 PITWALL PRO MEMBERSHIP
               </span>
               {isPro ? (
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-mono font-bold">
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-mono font-bold">
                   ✓ PRO 会員有効中
                 </span>
               ) : (
-                <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[10px] font-mono">
+                <span className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 text-[11px] font-mono">
                   FREE プラン利用中 ({aiUsage.remaining}/3 回)
                 </span>
               )}
             </div>
             <h2 className="text-lg sm:text-2xl font-racing font-black text-white tracking-wide flex items-center gap-2">
-              <span className="text-amber-400">💎</span>
               <span>Pitwall Pro メンバーシップ</span>
             </h2>
             <p className="text-[11px] sm:text-xs text-slate-300 mt-1 leading-relaxed">
@@ -155,13 +154,13 @@ export default function PitwallProModal({
                     : 'border-white/10 bg-slate-900/60 hover:border-white/20'
                 }`}
               >
-                <div className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 font-racing font-black text-[9px] shadow-sm">
-                  ★ 最も人気 (2ヶ月無料)
+                <div className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 font-racing font-black text-[11px] shadow-sm">
+                  最も人気 (2ヶ月無料)
                 </div>
                 <div>
                   <div className="flex items-center justify-between">
                     <span className="font-racing font-bold text-sm text-white">年額プラン</span>
-                    <span className="text-[10px] font-mono text-emerald-400 font-bold">¥600お得</span>
+                    <span className="text-[11px] font-mono text-emerald-400 font-bold">¥600お得</span>
                   </div>
                   <div className="mt-2 flex items-baseline gap-1">
                     <span className="text-2xl sm:text-3xl font-racing font-black text-amber-300">
@@ -191,7 +190,7 @@ export default function PitwallProModal({
                 <div>
                   <div className="flex items-center justify-between">
                     <span className="font-racing font-bold text-sm text-white">月額プラン</span>
-                    <span className="text-[10px] font-mono text-slate-400">基本プラン</span>
+                    <span className="text-[11px] font-mono text-slate-400">基本プラン</span>
                   </div>
                   <div className="mt-2 flex items-baseline gap-1">
                     <span className="text-2xl sm:text-3xl font-racing font-black text-white">
@@ -219,7 +218,7 @@ export default function PitwallProModal({
                 type="button"
                 disabled={isUpgrading}
                 onClick={handleActivatePro}
-                className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:brightness-110 text-slate-950 font-racing font-black text-base shadow-xl shadow-amber-500/30 active:scale-[0.99] transition-all flex items-center justify-center gap-2 uppercase tracking-wide cursor-pointer"
+                className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:brightness-110 text-slate-950 font-racing font-black text-base shadow-xl shadow-amber-500/30 active:scale-[0.99] transition-all flex items-center justify-center gap-2 uppercase tracking-wide cursor-pointer"
               >
                 {isUpgrading ? (
                   <>
@@ -228,7 +227,7 @@ export default function PitwallProModal({
                   </>
                 ) : (
                   <>
-                    <span>💎 7日間無料トライアルでProを開始 (¥300/月)</span>
+                    <span>7日間無料トライアルでProを開始 (¥300/月)</span>
                     <span className="text-xs font-mono px-2 py-0.5 rounded bg-slate-950/20">
                       即時アンロック
                     </span>
@@ -238,25 +237,23 @@ export default function PitwallProModal({
             ) : (
               <div className="p-3.5 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2 text-emerald-300 font-bold">
-                  <span className="text-base">👑</span>
                   <span>現在 Pitwall Pro メンバーです（全機能無制限）</span>
                 </div>
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono font-bold text-[10px]">
+                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono font-bold text-[11px]">
                   PRO 有効中
                 </span>
               </div>
             )}
 
             {/* Interactive Test Switcher: Toggle between Free and Pro with 1 Click */}
-            <div className="p-4 rounded-2xl bg-slate-900/90 border border-cyan-500/30 shadow-lg space-y-3">
+            <div className="p-4 rounded-2xl bg-slate-900/90 border border-slate-400/30 shadow-lg space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm">🧪</span>
-                  <span className="text-xs font-racing font-bold text-cyan-300 tracking-wide uppercase">
+                  <span className="text-xs font-racing font-bold text-slate-200 tracking-wide uppercase">
                     プラン切り替えテスト（開発・動作確認用）
                   </span>
                 </div>
-                <span className="text-[10px] font-mono text-slate-400">
+                <span className="text-[11px] font-mono text-slate-400">
                   ワンクリックで即座に権限を切替
                 </span>
               </div>
@@ -268,21 +265,20 @@ export default function PitwallProModal({
                   onClick={handleDowngradeToFree}
                   className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1.5 ${
                     !isPro
-                      ? 'bg-cyan-950/40 border-cyan-400/80 shadow-md ring-1 ring-cyan-400/50'
-                      : 'bg-slate-950/60 border-white/10 hover:border-cyan-500/40 hover:bg-slate-900/60'
+                      ? 'bg-slate-900/40 border-slate-300/80 shadow-md ring-1 ring-slate-300/50'
+                      : 'bg-slate-950/60 border-white/10 hover:border-slate-400/40 hover:bg-slate-900/60'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-racing font-bold text-slate-200 flex items-center gap-1.5">
-                      <span>⚡</span>
                       <span>Free (無料プラン)</span>
                     </span>
                     {!isPro ? (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+                      <span className="px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-slate-400/20 text-slate-200 border border-slate-400/40">
                         ✓ 現在適用中
                       </span>
                     ) : (
-                      <span className="text-[10px] font-mono text-cyan-400 font-bold hover:underline">
+                      <span className="text-[11px] font-mono text-slate-300 font-bold hover:underline">
                         Freeに切り替える ➔
                       </span>
                     )}
@@ -304,15 +300,14 @@ export default function PitwallProModal({
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-racing font-bold text-amber-300 flex items-center gap-1.5">
-                      <span>💎</span>
                       <span>Pitwall Pro (無制限)</span>
                     </span>
                     {isPro ? (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                      <span className="px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
                         ✓ 現在適用中
                       </span>
                     ) : (
-                      <span className="text-[10px] font-mono text-amber-400 font-bold hover:underline">
+                      <span className="text-[11px] font-mono text-amber-400 font-bold hover:underline">
                         Proに切り替える ➔
                       </span>
                     )}
@@ -333,19 +328,18 @@ export default function PitwallProModal({
                     type="button"
                     onClick={() => {
                       resetDailyAiUsage();
-                      setToastMessage('🔄 本日の無料AI利用回数をリセットしました（残り3回）');
+                      setToastMessage('本日の無料AI利用回数をリセットしました（残り3回）');
                       setTimeout(() => setToastMessage(null), 3000);
                     }}
-                    className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer border border-white/10 flex items-center gap-1 text-[10px]"
+                    className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer border border-white/10 flex items-center gap-1 text-[11px]"
                   >
-                    <span>🔄</span>
                     <span>利用枠をリセット</span>
                   </button>
                 </div>
               )}
             </div>
 
-            <p className="text-center text-[10px] font-mono text-slate-500">
+            <p className="text-center text-[11px] font-mono text-slate-500">
               ※ デモ環境では決済情報を入力することなく、ワンクリックでFree/Proの動作確認を行えます。
             </p>
           </div>
@@ -384,7 +378,7 @@ export default function PitwallProModal({
           {/* Social Proof / Security Badge */}
           <div className="p-3.5 rounded-2xl bg-slate-900/40 border border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-400">
             <div className="flex items-center gap-2">
-              <span>🔒 256-bit SSL 安全暗号化通信</span>
+              <span>256-bit SSL 安全暗号化通信</span>
               <span>•</span>
               <span>いつでも解約可能</span>
             </div>

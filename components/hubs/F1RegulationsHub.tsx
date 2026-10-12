@@ -2,7 +2,7 @@
 
 /**
  * components/hubs/F1RegulationsHub.tsx
- * 🏛️ FIA Formula 1 Official Regulations & Rules Deep-Dive Hub
+ * FIA Formula 1 Official Regulations & Rules Deep-Dive Hub
  * Features:
  * - 4 Key Regulation Pillars (Sporting, Technical, 2026 Next-Gen, Driving Standards)
  * - Real-time Keyword Filter & Category Switcher
@@ -82,19 +82,19 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-slate-950/60 p-3 rounded-xl border border-white/10 flex-shrink-0">
             <div className="text-center px-3 py-1">
               <div className="text-lg font-racing font-bold text-amber-400">4大柱</div>
-              <div className="text-[10px] text-slate-400 font-mono">競技・技術・2026・審議</div>
+              <div className="text-[11px] text-slate-400 font-mono">競技・技術・2026・審議</div>
             </div>
             <div className="text-center px-3 py-1 border-l border-white/10">
-              <div className="text-lg font-racing font-bold text-blue-400">798kg</div>
-              <div className="text-[10px] text-slate-400 font-mono">最低重量基準</div>
+              <div className="text-lg font-racing font-bold text-slate-300">798kg</div>
+              <div className="text-[11px] text-slate-400 font-mono">最低重量基準</div>
             </div>
             <div className="text-center px-3 py-1 border-l border-white/10">
               <div className="text-lg font-racing font-bold text-purple-400">350kW</div>
-              <div className="text-[10px] text-slate-400 font-mono">2026年 MGU-K</div>
+              <div className="text-[11px] text-slate-400 font-mono">2026年 MGU-K</div>
             </div>
             <div className="text-center px-3 py-1 border-l border-white/10">
               <div className="text-lg font-racing font-bold text-emerald-400">9.0mm</div>
-              <div className="text-[10px] text-slate-400 font-mono">プランク摩耗限界</div>
+              <div className="text-[11px] text-slate-400 font-mono">プランク摩耗限界</div>
             </div>
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                 : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
           >
-            🏁 全規則 ({REGULATION_ARTICLES.length})
+            全規則 ({REGULATION_ARTICLES.length})
           </button>
           {REGULATION_CATEGORIES.map((cat) => (
             <button
@@ -160,8 +160,8 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="text-2xl">{cat.icon}</span>
-                <span className="text-[10px] font-mono text-slate-500 group-hover:text-red-400 transition-colors">
-                  開く ↗
+                <span className="text-[11px] font-mono text-slate-500 group-hover:text-red-400 transition-colors">
+                  開く 
                 </span>
               </div>
               <h3 className="font-racing font-bold text-white text-sm mb-1 group-hover:text-red-300 transition-colors">
@@ -183,8 +183,8 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
             onClick={() => setShow2026Simulator(!show2026Simulator)}
             className="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600/30 to-purple-600/30 hover:from-red-600/40 hover:to-purple-600/40 border border-red-500/40 text-xs font-racing font-bold text-white flex items-center gap-2 shadow-lg transition-all"
           >
-            <span>🚀 2026年 次世代規定 インタラクティブ・シミュレーター群</span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 font-mono">
+            <span>2026年 次世代規定 インタラクティブ・シミュレーター群</span>
+            <span className="text-[11px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 font-mono">
               {show2026Simulator ? '▲ 格納する' : '▼ 展開して体験する'}
             </span>
           </button>
@@ -197,7 +197,7 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
               }}
               className="text-xs text-red-400 hover:text-red-300 font-mono hidden sm:inline-block"
             >
-              2026規定カテゴリーを開く ↗
+              2026規定カテゴリーを開く 
             </button>
           )}
         </div>
@@ -211,7 +211,7 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
       <div className="space-y-4">
         {filteredArticles.length === 0 ? (
           <div className="text-center py-12 bg-slate-900/40 rounded-2xl border border-white/5">
-            <div className="text-3xl mb-2">🔍</div>
+            <div className="text-3xl mb-2"></div>
             <p className="text-slate-300 text-sm font-bold">該当するレギュレーションが見つかりませんでした</p>
             <p className="text-slate-500 text-xs mt-1">別のキーワードでお試しいただくか、カテゴリ選択を切り替えてください</p>
             <button
@@ -243,16 +243,16 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                 >
                   <div className="space-y-1.5 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 text-[10px] font-mono font-bold">
+                      <span className="px-2 py-0.5 rounded bg-red-500/20 text-red-300 border border-red-500/30 text-[11px] font-mono font-bold">
                         {art.badge}
                       </span>
                       {art.articleNumber && (
-                        <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[10px] font-mono border border-white/5">
+                        <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[11px] font-mono border border-white/5">
                           {art.articleNumber}
                         </span>
                       )}
-                      <span className="text-[10px] text-slate-500 font-mono">
-                        {art.category === 'sporting' ? '📜 競技規則' : art.category === 'technical' ? '🔧 技術規則' : art.category === 'future2026' ? '🚀 2026年規定' : '⚖️ 審議基準'}
+                      <span className="text-[11px] text-slate-500 font-mono">
+                        {art.category === 'sporting' ? '競技規則' : art.category === 'technical' ? '技術規則' : art.category === 'future2026' ? '2026年規定' : '審議基準'}
                       </span>
                     </div>
 
@@ -274,7 +274,6 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                       className="px-2.5 py-1 rounded-lg bg-red-600/20 hover:bg-red-600/40 text-red-300 border border-red-500/30 text-xs font-racing font-bold flex items-center gap-1 transition-all cursor-pointer shadow-sm"
                       title="大百科モーダルで開く"
                     >
-                      <span>📖</span>
                       <span>全解剖</span>
                     </button>
                     <span className="text-xs font-mono text-slate-400 hidden sm:inline-block">
@@ -295,7 +294,7 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                   <div className="border-t border-white/10 bg-slate-950/60 p-5 md:p-6 space-y-6 animate-fadeIn">
                     {/* Summary */}
                     <div className="bg-slate-900/90 rounded-xl p-4 border border-white/5">
-                      <div className="text-xs font-mono text-slate-400 mb-1 font-bold">📋 概要と骨子</div>
+                      <div className="text-xs font-mono text-slate-400 mb-1 font-bold">概要と骨子</div>
                       <p className="text-slate-200 text-xs md:text-sm leading-relaxed">
                         <SmartWikiText text={art.summary} />
                       </p>
@@ -304,7 +303,6 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                     {/* Key Points Grid */}
                     <div>
                       <div className="text-xs font-mono text-red-400 mb-2.5 font-bold flex items-center gap-1.5">
-                        <span>⚡</span>
                         <span>知っておくべき重要条項 &amp; ルール</span>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
@@ -329,7 +327,6 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                       {/* Deep Dive */}
                       <div className="bg-gradient-to-br from-slate-900 to-slate-900/60 rounded-xl p-4 border border-amber-500/20">
                         <div className="text-xs font-mono text-amber-400 mb-1.5 font-bold flex items-center gap-1.5">
-                          <span>🔭</span>
                           <span>ピットウォール戦術 &amp; 工学的深層分析</span>
                         </div>
                         <p className="text-slate-300 text-xs leading-relaxed">
@@ -338,9 +335,8 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                       </div>
 
                       {/* Telemetry Impact */}
-                      <div className="bg-gradient-to-br from-slate-900 to-slate-900/60 rounded-xl p-4 border border-blue-500/20">
-                        <div className="text-xs font-mono text-blue-400 mb-1.5 font-bold flex items-center gap-1.5">
-                          <span>📊</span>
+                      <div className="bg-gradient-to-br from-slate-900 to-slate-900/60 rounded-xl p-4 border border-slate-400/20">
+                        <div className="text-xs font-mono text-slate-300 mb-1.5 font-bold flex items-center gap-1.5">
                           <span>テレメトリーデータ・波形への直接的影響</span>
                         </div>
                         <p className="text-slate-300 text-xs leading-relaxed">
@@ -353,7 +349,7 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                     {art.historicalCaseStudy && (
                       <div className="bg-red-950/20 border border-red-500/30 rounded-xl p-4">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="px-2 py-0.5 rounded bg-red-600 text-white font-mono text-[10px] font-bold">
+                          <span className="px-2 py-0.5 rounded bg-red-600 text-white font-mono text-[11px] font-bold">
                             HISTORIC PRECEDENT / 判例
                           </span>
                           <span className="text-white font-bold text-xs">
@@ -364,7 +360,7 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                           <SmartWikiText text={art.historicalCaseStudy.description} />
                         </p>
                         <div className="bg-slate-900/80 rounded-lg p-2.5 border border-white/5 text-[11px] text-amber-300">
-                          <span className="font-bold">🏁 FIA規則への影響・裁定結果: </span>
+                          <span className="font-bold">FIA規則への影響・裁定結果: </span>
                           <SmartWikiText text={art.historicalCaseStudy.outcome} />
                         </div>
                       </div>
@@ -374,11 +370,11 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                     {art.penaltyOrLimitSummary && art.penaltyOrLimitSummary.length > 0 && (
                       <div>
                         <div className="text-xs font-mono text-slate-400 mb-2 font-bold">
-                          ⚖️ 違反時のペナルティ・制限値サマリー
+                          違反時のペナルティ・制限値サマリー
                         </div>
                         <div className="overflow-x-auto rounded-xl border border-white/10">
                           <table className="w-full text-xs text-left">
-                            <thead className="bg-slate-900 text-slate-400 font-mono text-[10px] uppercase">
+                            <thead className="bg-slate-900 text-slate-400 font-mono text-[11px] uppercase">
                               <tr>
                                 <th className="px-4 py-2">違反・検査対象</th>
                                 <th className="px-4 py-2">判定基準・閾値</th>
@@ -405,7 +401,6 @@ export default function F1RegulationsHub({ onNavigateToTab }: F1RegulationsHubPr
                       onClick={() => setSelectedModalArticle(art)}
                       className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-red-600/30 via-slate-800 to-red-600/30 hover:from-red-600/50 hover:to-red-600/50 border border-red-500/40 text-white font-racing font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all hover:scale-[1.01] cursor-pointer"
                     >
-                      <span>📖</span>
                       <span>大百科モーダルで条文・工学・判例を横断全画面閲覧する ➔</span>
                     </button>
                   </div>
