@@ -647,7 +647,7 @@ export default function AIStrategist({
               停止
             </button>
           ) : (
-            <div className="flex gap-1.5">
+            <div className="flex gap-1.5 flex-col sm:flex-row items-end">
               <button
                 type="button"
                 onClick={() => sendMessage(input, { includeRaw: true })}
@@ -655,7 +655,7 @@ export default function AIStrategist({
                 title="生データを含めて送信"
                 className="flex-shrink-0 px-2.5 py-2 h-10 text-xs bg-indigo-600/90 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-1"
               >
-                📊<span className="hidden sm:inline">生データを含めて送信</span><span className="ml-1 text-[10px] font-black bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-900 px-1 rounded-sm shadow-[0_0_8px_rgba(251,191,36,0.5)] tracking-wide">PRO</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 mr-1"><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z" /></svg><span className="hidden sm:inline">DATA</span><span className="ml-1 text-[9px] font-black bg-gradient-to-r from-amber-400 to-yellow-300 text-slate-900 px-1 rounded-sm shadow-[0_0_8px_rgba(251,191,36,0.5)] tracking-wide">PRO</span>
               </button>
               <button
                 type="button"
