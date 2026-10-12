@@ -11,6 +11,7 @@
 export type RegulationCategory = 'sporting' | 'technical' | 'future2026' | 'guidelines';
 
 export interface RegulationArticle {
+  references?: any[];
   id: string;
   category: RegulationCategory;
   articleNumber?: string; // e.g. "FIA Sporting Regs Art. 54"
@@ -47,7 +48,7 @@ export const REGULATION_CATEGORIES = [
     id: 'technical' as RegulationCategory,
     name: 'テクニカル規則 (技術規則)',
     icon: '🔧',
-    description: 'パワーユニット6要素、最低車重798kg、フロアプランク検査、DRS、コストキャップとATR空力制限',
+    description: 'パワーユニット6要素、最低車重768 kg、フロアプランク検査、DRS、コストキャップとATR空力制限',
     color: 'from-blue-600 to-cyan-500',
   },
   {
@@ -191,12 +192,12 @@ export const REGULATION_ARTICLES: RegulationArticle[] = [
     id: 'weight-and-plank-inspection',
     category: 'technical',
     articleNumber: 'Technical Regs Art. 3.5.9 & Art. 4.1',
-    title: '最低車重 798kg & フロアプランク摩耗規定',
+    title: '最低車重 768 kg & フロアプランク摩耗規定',
     subtitle: 'スキッドブロックの厚さ9mm限界値と失格判定の工学的背景',
     badge: '車検・グラウンドエフェクト',
-    summary: 'F1マシンの最低重量（燃料を除くドライ重量＋ドライバー）は厳密に798kgと規定される。また車体底面に設置されたスキッドブロック（プランク）の摩耗量はレース後にミクロン単位で計測される。',
+    summary: 'F1マシンの最低重量（燃料を除くドライ重量＋ドライバー）は厳密に768 kgと規定される。また車体底面に設置されたスキッドブロック（プランク）の摩耗量はレース後にミクロン単位で計測される。',
     keyPoints: [
-      '最低重量 798kg: レース終了直後、燃料を抜き取った状態で計量。ドライバーはヘルメットやレーシングスーツ等の全装備を着用して体重計に乗る。',
+      '最低重量 768 kg: レース終了直後、燃料を抜き取った状態で計量。ドライバーはヘルメットやレーシングスーツ等の全装備を着用して体重計に乗る。',
       '燃料サンプル提出義務: レース終了時、燃料タンク内に「最低1.0リットル（検査用）」のFIA提出用ガソリンサンプルが残っていなければならない。',
       'プランクの構造と目的: 車体底面中央に敷かれた樹脂合板（ジャブロク）とチタン製スキッドブロック。車高を極端に下げてグラウンドエフェクトを過大に発生させる不正を防ぐ。',
       '9mmの摩耗限界: 新品時の厚さ10mmに対し、レース終了後の計測ポイントで「9.0mm未満（摩耗1.0mm超）」に削れていた場合、意図に関わらず即座に決勝リザルトから失格。',
@@ -211,7 +212,7 @@ export const REGULATION_ARTICLES: RegulationArticle[] = [
       outcome: 'スプリントフォーマットでのパルクフェルメ再解除（2段階化）導入の強い契機となった。',
     },
     penaltyOrLimitSummary: [
-      { label: '車重798kg未満', value: '軽量違反', consequence: 'レース失格（DSQ）' },
+      { label: '車重768 kg未満', value: '軽量違反', consequence: 'レース失格（DSQ）' },
       { label: 'プランク厚さ9mm未満', value: '摩耗1mm超過', consequence: 'レース失格（DSQ）' },
       { label: '燃料サンプル不足', value: '残量1.0L未満', consequence: 'レース失格（DSQ）' },
     ],
@@ -304,7 +305,7 @@ export const REGULATION_ARTICLES: RegulationArticle[] = [
     summary: '肥大化・重量化が批判されてきた現代F1マシンを一新する「俊敏なマシン（Nimble Car）」コンセプト。車体寸法を縮小して30kgの軽量化を達成し、フロアのグラウンドエフェクト依存度を下げて接近戦バトルを促す。',
     keyPoints: [
       '車体寸法の小型化: ホイールベースが3600mmから3400mmへ200mm短縮、全幅が2000mmから1900mmへ100mm縮小。狭い市街地コースでも圧倒的な回頭性と俊敏性を発揮。',
-      '最低車重 768kgへの軽量化: 現行の798kgから30kg減量。巨大なバッテリーを搭載しながらも、車体構造の最適化と寸法縮小によって近年の重量化トレンドに初めて歯止めをかける。',
+      '最低車重 768kgへの軽量化: 現行の768 kgから30kg減量。巨大なバッテリーを搭載しながらも、車体構造の最適化と寸法縮小によって近年の重量化トレンドに初めて歯止めをかける。',
       '空力ドラッグ55%削減 & ダウンフォース30%削減: 不要な空気抵抗を半分以下にし、後流の乱気流（ダーティエア）を抑制。前走車への追従限界距離が大幅に短縮される。',
       'パーシャル・フラットフロアの採用: 2022-2025年の過激なベンチュリトンネルから、前方をフラット化しディフューザーを小型化。車高のミリ単位の沈み込みで乱高下するポーパシング現象を根本から根絶。',
     ],

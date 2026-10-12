@@ -247,3 +247,47 @@ export async function fetchCarData(
   if (dateEnd) q += `&date<=${encodeURIComponent(dateEnd)}`;
   return fetchWithTimeout<RawCarData[]>(toProxyUrl('car_data', q), 5000);
 }
+
+export interface PositionData {
+  session_key: number;
+  meeting_key: number;
+  driver_number: number;
+  date: string;
+  position: number;
+}
+
+export async function fetchPosition(
+  sessionKey: number,
+  driverNumber?: number,
+  dateStart?: string,
+  dateEnd?: string
+): Promise<PositionData[]> {
+  let q = `session_key=${sessionKey}`;
+  if (driverNumber) q += `&driver_number=${driverNumber}`;
+  if (dateStart) q += `&date>=${encodeURIComponent(dateStart)}`;
+  if (dateEnd) q += `&date<=${encodeURIComponent(dateEnd)}`;
+  return fetchWithTimeout<PositionData[]>(toProxyUrl('position', q), 8000);
+}
+
+export interface IntervalData {
+  session_key: number;
+  meeting_key: number;
+  driver_number: number;
+  date: string;
+  gap_to_leader: number;
+  interval: number;
+}
+
+export async function fetchIntervals(
+  sessionKey: number,
+  driverNumber?: number,
+  dateStart?: string,
+  dateEnd?: string
+): Promise<IntervalData[]> {
+  let q = `session_key=${sessionKey}`;
+  if (driverNumber) q += `&driver_number=${driverNumber}`;
+  if (dateStart) q += `&date>=${encodeURIComponent(dateStart)}`;
+  if (dateEnd) q += `&date<=${encodeURIComponent(dateEnd)}`;
+  return fetchWithTimeout<IntervalData[]>(toProxyUrl('intervals', q), 8000);
+}
+

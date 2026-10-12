@@ -13,7 +13,7 @@
  * - Pit stop event badges on relevant laps.
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   ResponsiveContainer,
   LineChart,
@@ -24,7 +24,8 @@ import {
   CartesianGrid,
   ReferenceArea,
 } from 'recharts';
-import type { Driver, SafetyCarPeriod, Stint } from '@/lib/types';
+import { fetchPosition, type PositionData } from '@/lib/openf1Api';
+import type { Lap, Driver, Stint, SafetyCarPeriod } from '@/lib/types';
 
 export interface PositionChangeChartProps {
   drivers: Driver[];
@@ -32,75 +33,12 @@ export interface PositionChangeChartProps {
   safetyCarPeriods?: SafetyCarPeriod[];
   totalLaps?: number;
   selectedDrivers?: string[];
+  sessionKey?: number | null;
+  lapsCache?: Record<string, Lap[]>;
   onDriverSelect?: (driverNumber: string) => void;
 }
 
 type FilterView = 'top5' | 'points' | 'selected' | 'all';
-
-// Deterministic lap-by-lap position simulation model for Bahrain GP 2024 / general race
-function generateRacePositions(
-  drivers: Driver[],
-  stints: Stint[],
-  totalLaps: number
-): Record<string, number>[] {
-  const result: Record<string, number>[] = [];
-
-  // Key historical inflection points for 2024 Bahrain GP:
-  // Finish order: VER, PER, SAI, LEC, RUS, NOR, HAM, PIA, ALO, STR, ZHO, MAG, RIC, TSU, ALB, HUL, OCO, GAS, BOT, SAR
-  // Start order: VER (1), LEC (2), RUS (3), SAI (4), PER (5), ALO (6), NOR (7), PIA (8), HAM (9), HUL (10), TSU (11), STR (12), ALB (13), RIC (14), MAG (15), BOT (16), ZHO (17), SAR (18), OCO (19), GAS (20)
-
-  const startOrder = [1, 16, 63, 55, 11, 14, 4, 81, 44, 27, 22, 18, 23, 3, 20, 77, 24, 2, 31, 10];
-  const finishOrder = [1, 11, 55, 16, 63, 4, 44, 81, 14, 18, 24, 20, 3, 22, 23, 27, 31, 10, 77, 2];
-
-  // Map drivers to relative progression curve
-  const driverNumbers = drivers.map((d) => d.driver_number);
-
-  for (let lap = 1; lap <= totalLaps; lap++) {
-    const lapData: Record<string, number> = { lap };
-
-    // Calculate progression ratio (0 to 1)
-    const progress = lap / totalLaps;
-
-    // Simulate realistic position changes based on pit windows (L11-17 and L33-37)
-    // and battles (Perez climbing from P5 to P2, Sainz to P3)
-    const currentRanks: { num: number; score: number }[] = [];
-
-    driverNumbers.forEach((num) => {
-      const sIdx = startOrder.indexOf(num);
-      const fIdx = finishOrder.indexOf(num);
-      const startPos = sIdx >= 0 ? sIdx + 1 : 15;
-      const finishPos = fIdx >= 0 ? fIdx + 1 : 15;
-
-      // Base interpolation
-      let expectedPos = startPos + (finishPos - startPos) * Math.pow(progress, 0.85);
-
-      // Pit stop effects: if driver has a stint boundary near this lap, add temporary drop
-      const drvStints = stints.filter((s) => s.driver_number === num);
-      drvStints.forEach((s) => {
-        if (s.lap_end && Math.abs(lap - s.lap_end) <= 1) {
-          expectedPos += 4.5; // pit stop drop
-        }
-      });
-
-      // Special events in 2024 Bahrain
-      if (num === 27 && lap <= 2) expectedPos = 20; // Hulkenberg lap 1 wing damage
-      if (num === 18 && lap <= 2) expectedPos = 19; // Stroll lap 1 spin
-      if (num === 1) expectedPos = 1; // Verstappen led all laps except during lap 17/18 pit cycle
-
-      currentRanks.push({ num, score: expectedPos });
-    });
-
-    // Sort by score to get 1..20 unique ranks
-    currentRanks.sort((a, b) => a.score - b.score);
-    currentRanks.forEach((item, rankIdx) => {
-      lapData[`pos_${item.num}`] = rankIdx + 1;
-    });
-
-    result.push(lapData);
-  }
-
-  return result;
-}
 
 export default function PositionChangeChart({
   drivers,
@@ -108,10 +46,40 @@ export default function PositionChangeChart({
   safetyCarPeriods = [],
   totalLaps: propTotalLaps,
   selectedDrivers = [],
+  sessionKey,
+  lapsCache = {},
   onDriverSelect,
 }: PositionChangeChartProps) {
   const [filterView, setFilterView] = useState<FilterView>('all');
   const [hoveredDriver, setHoveredDriver] = useState<number | null>(null);
+  const [positionData, setPositionData] = useState<PositionData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!sessionKey) {
+      setPositionData([]);
+      return;
+    }
+    let ignore = false;
+    setIsLoading(true);
+    fetchPosition(sessionKey)
+      .then((data) => {
+        if (!ignore) {
+          setPositionData(data || []);
+          setIsLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.warn('Failed to fetch position data', err);
+        if (!ignore) {
+          setPositionData([]);
+          setIsLoading(false);
+        }
+      });
+    return () => {
+      ignore = true;
+    };
+  }, [sessionKey]);
 
   const totalLaps = useMemo(() => {
     if (propTotalLaps && propTotalLaps > 0) return propTotalLaps;
@@ -122,10 +90,76 @@ export default function PositionChangeChart({
     return max > 0 ? max : 57;
   }, [propTotalLaps, stints]);
 
-  // Generate lap-by-lap position data
+  // Generate lap-by-lap position data from positionData stream
   const data = useMemo(() => {
-    return generateRacePositions(drivers, stints, totalLaps);
-  }, [drivers, stints, totalLaps]);
+    if (!positionData || positionData.length === 0) return [];
+    
+    // Fallback: If we don't have accurate lap boundary times for all drivers, we can approximate 
+    // lap by lap by finding the position of each driver at the start of each lap.
+    // For a real lap chart, we need a time reference per lap. We can use the leader's lap times or lap times from lapsCache.
+    const result: Record<string, number>[] = [];
+    
+    // Group positions by driver
+    const posByDriver: Record<string, PositionData[]> = {};
+    for (const p of positionData) {
+      const d = p.driver_number.toString();
+      if (!posByDriver[d]) posByDriver[d] = [];
+      posByDriver[d].push(p);
+    }
+    // Sort chronologically
+    for (const d in posByDriver) {
+      posByDriver[d].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    }
+
+    // Try to find reference lap timestamps (e.g. from any driver in lapsCache)
+    const lapTimestamps: number[] = [];
+    const lapNumbers = new Set<number>();
+    
+    for (const driverLaps of Object.values(lapsCache)) {
+      for (const l of driverLaps) {
+        if (l.date_start) {
+          lapNumbers.add(l.lap_number);
+          const t = new Date(l.date_start).getTime();
+          // Keep the earliest date_start for each lap as a rough lap boundary
+          if (!lapTimestamps[l.lap_number] || t < lapTimestamps[l.lap_number]) {
+            lapTimestamps[l.lap_number] = t;
+          }
+        }
+      }
+    }
+
+    for (let lap = 1; lap <= totalLaps; lap++) {
+      const lapData: Record<string, number> = { lap };
+      const lapTime = lapTimestamps[lap];
+      
+      drivers.forEach((drv) => {
+        const d = drv.driver_number.toString();
+        const drvPosList = posByDriver[d];
+        if (drvPosList && drvPosList.length > 0) {
+          // Find the last position update before this lap started, or the closest one
+          let pos = drvPosList[0].position;
+          if (lapTime) {
+            for (let i = drvPosList.length - 1; i >= 0; i--) {
+              if (new Date(drvPosList[i].date).getTime() <= lapTime) {
+                pos = drvPosList[i].position;
+                break;
+              }
+            }
+          } else {
+            // Very rough fallback if no lap times available: divide position events by total laps
+            const idx = Math.min(
+              Math.floor((lap / totalLaps) * drvPosList.length),
+              drvPosList.length - 1
+            );
+            pos = drvPosList[idx]?.position ?? pos;
+          }
+          lapData[`pos_${d}`] = pos;
+        }
+      });
+      result.push(lapData);
+    }
+    return result;
+  }, [positionData, totalLaps, drivers, lapsCache]);
 
   // Filter which drivers to display
   const visibleDrivers = useMemo(() => {
@@ -223,8 +257,17 @@ export default function PositionChangeChart({
       {/* ── Recharts Canvas ── */}
       <div className="bg-slate-950/70 border border-white/10 rounded-xl p-2 sm:p-4 pt-4">
         <div className="h-[380px] sm:h-[440px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data} margin={{ top: 10, right: 25, left: -10, bottom: 5 }}>
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full text-slate-400 text-sm font-mono">
+              🔄 ポジションデータを読み込み中...
+            </div>
+          ) : data.length === 0 ? (
+            <div className="flex items-center justify-center h-full text-slate-400 text-sm font-mono">
+              ⚠️ このセッションのポジションデータはありません
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data} margin={{ top: 10, right: 25, left: -10, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={true} />
 
               {/* Safety Car Shaded Areas */}
@@ -335,6 +378,7 @@ export default function PositionChangeChart({
               })}
             </LineChart>
           </ResponsiveContainer>
+          )}
         </div>
       </div>
 

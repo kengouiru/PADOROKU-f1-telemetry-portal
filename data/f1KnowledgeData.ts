@@ -36,6 +36,9 @@ export interface Reference {
   publisher: string;
   url: string;
   verifiedDate: string;
+  type?: 'official' | 'press' | 'encyclopedia' | 'other';
+  accessedDate?: string;
+  archiveUrl?: string;
 }
 
 export interface TeamIconicCar {
@@ -46,6 +49,7 @@ export interface TeamIconicCar {
 }
 
 export interface TeamProfile {
+  statsAsOf?: string;
   id: string;
   name: string;
   fullName: string;
@@ -136,6 +140,7 @@ export interface DriverSeasonHistory {
 }
 
 export interface DriverProfile {
+  statsAsOf?: string;
   id: string;
   code: string; // 3-letter e.g. "VER"
   number: number;
@@ -380,7 +385,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/teams/red-bull.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -441,7 +446,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/teams/ferrari.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -460,7 +465,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     teamPrincipal: 'Andrea Stella',
     powerUnit: 'Mercedes-AMG M17 E Performance',
     base: 'Woking, United Kingdom',
-    constructorTitles: 9,
+    constructorTitles: 10,
     drivers: ['NOR', 'PIA'],
     color: '#fb923c',
     visualGallery: [
@@ -502,7 +507,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/teams/mclaren.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -555,7 +560,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/teams/mercedes.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -608,7 +613,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/teams/aston-martin.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -661,7 +666,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/teams/alpine.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -714,7 +719,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/teams/williams.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -734,7 +739,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     powerUnit: 'Red Bull Ford Powertrains',
     base: 'Faenza, Italy / Milton Keynes, United Kingdom',
     constructorTitles: 0,
-    drivers: ['TSU', 'LAW'],
+    drivers: ['LAW', 'LIN'],
     color: '#60a5fa',
     visualGallery: [
       {
@@ -767,7 +772,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/teams/rb.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -783,7 +788,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     id: 'audi',
     name: 'Audi F1 Team',
     fullName: 'Audi Revolut F1 Team',
-    teamPrincipal: 'Mattia Binotto',
+    teamPrincipal: 'Jonathan Wheatley',
     powerUnit: 'Audi Works E-Performance',
     base: 'Neuburg an der Donau, Germany / Hinwil, Switzerland',
     constructorTitles: 0,
@@ -820,7 +825,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/teams/audi.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -873,7 +878,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/teams/haas.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -889,7 +894,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
     id: 'cadillac',
     name: 'Cadillac Formula 1 Team',
     fullName: 'Cadillac Formula 1 Team',
-    teamPrincipal: 'Marcin Budkowski',
+    teamPrincipal: 'Graeme Lowdon',
     powerUnit: 'Ferrari Works Power Unit',
     base: 'Silverstone, United Kingdom / Fishers, Indiana, United States',
     constructorTitles: 0,
@@ -918,7 +923,7 @@ export const KNOWLEDGE_TEAMS: TeamProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/teams/cadillac.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -942,7 +947,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
   {
     id: 'max-verstappen',
     code: 'VER',
-    number: 1,
+    number: 3,
     fullName: 'Max Verstappen',
     country: 'オランダ 🇳🇱',
     team: 'Red Bull Racing',
@@ -1004,7 +1009,8 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     wins: 61,
     podiums: 109,
     polePositions: 40,
-    championships: 3,
+    statsAsOf: '2026-10-05',
+    championships: 4,
     championshipYears: [2021, 2022, 2023],
     drivingStyle: {
       traits: [
@@ -1071,7 +1077,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       { date: '2019-06-30', event: 'オーストリアGPにてホンダ第4期ハイブリッドPU初優勝をもたらす', refId: 8 },
       { date: '2021-12-12', event: 'アブダビGP最終周オーバーテイクで初の世界ドライバーズチャンピオン戴冠', refId: 5 },
       { date: '2022-10-09', event: '雨の日本GP（鈴鹿）で圧勝し、2度目の世界ドライバーズタイトルを確定', refId: 8 },
-      { date: '2023-09-03', event: 'イタリアGPでF1史上初となる個人10連勝の金字塔を樹立', refId: 1 },
+      { date: '2023-09-03', event: 'イタリアGPでF1初となる個人10連勝の金字塔を樹立', refId: 1 },
       { date: '2023-11-26', event: '年間22戦19勝（勝率86.4%）、年間575得点の歴史的記録でシーズンを完勝', refId: 1 },
       { date: '2024-11-03', event: 'サンパウロGPにて17番グリッドから豪雨の中大逆転優勝を飾り4連覇を固める', refId: 2 },
     ],
@@ -1080,7 +1086,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/max-verstappen.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -1236,7 +1242,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       { date: '2008-11-02', event: 'ブラジルGP最終周・最終コーナーで劇的な自身初のワールドチャンピオン戴冠', refId: 1 },
       { date: '2014-11-23', event: 'アブダビGPでシーズン11勝目を挙げ、メルセデス移籍後初の王座奪還', refId: 1 },
       { date: '2020-11-15', event: 'トルコGPでミハエル・シューマッハに並ぶ歴代最多タイ7度目のタイトル獲得', refId: 1 },
-      { date: '2021-09-26', event: 'ロシアGPにてF1史上初となる通算100勝の偉業を達成', refId: 1 },
+      { date: '2021-09-26', event: 'ロシアGPにてF1初となる通算100勝の偉業を達成', refId: 1 },
       { date: '2024-07-07', event: 'シルバーストンで歴代単独最多となる同一グランプリ通算9勝目を達成', refId: 1 },
     ],
     references: [
@@ -1244,7 +1250,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/lewis-hamilton.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -1261,7 +1267,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       { year: 2018, team: 'Mercedes-AMG Petronas Motorsport', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 1, points: 408, wins: 11, podiums: 17, note: 'キャリア最高峰の安定感で自身5度目のワールドチャンピオン' },
       { year: 2019, team: 'Mercedes-AMG Petronas Motorsport', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 1, points: 413, wins: 11, podiums: 17, note: 'ファン・マヌエル・ファンジオを超える通算6度目のタイトル獲得' },
       { year: 2020, team: 'Mercedes-AMG Petronas F1 Team', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 1, points: 347, wins: 11, podiums: 14, note: 'シューマッハの最多勝(91勝)を更新＆歴代最多タイ7度目のタイトル獲得' },
-      { year: 2021, team: 'Mercedes-AMG Petronas F1 Team', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 2, points: 387.5, wins: 8, podiums: 17, note: 'フェルスタッペンと歴史的一騎打ち、F1史上初通算100勝達成' },
+      { year: 2021, team: 'Mercedes-AMG Petronas F1 Team', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 2, points: 387.5, wins: 8, podiums: 17, note: 'フェルスタッペンと歴史的一騎打ち、F1初通算100勝達成' },
       { year: 2022, team: 'Mercedes-AMG Petronas F1 Team', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 6, points: 240, podiums: 9, note: 'ポーパシングに苦しむマシンで開発を牽引' },
       { year: 2023, team: 'Mercedes-AMG Petronas F1 Team', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 3, points: 234, podiums: 6, note: 'ハンガリーGPでポールポジション獲得、ランキング3位' },
       { year: 2024, team: 'Mercedes-AMG Petronas F1 Team', teamId: 'mercedes', role: 'Regular', carNumber: 44, finalPosition: 7, points: 223, wins: 2, podiums: 4, note: 'イギリスGPで感動の2年半ぶり勝利(通算104勝目)、ベルギーGPでも勝利' },
@@ -1417,7 +1423,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/lando-norris.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -1589,7 +1595,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/charles-leclerc.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -1674,7 +1680,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       website: 'https://oscarpiastri.com',
     },
     careerSummary:
-      '【第1章：前人未到のジュニアカテゴリー3階級即時制覇】\n2001年4月6日オーストラリア・メルセデス生まれ。元F1ドライバーのマーク・ウェバーをマネージャーに迎え、欧州シングルシーターへ進出 [1][5]。2019年フォーミュラ・ルノー・ユーロカップにR-ace GPから参戦し7勝で年間チャンピオンに輝く [1]。2020年、名門プレマ・レーシングよりFIA-F3選手権へルーキー参戦。熾烈な三つ巴のタイトル争いを制し、デビューイヤーで年間世界王座を獲得 [1]。翌2021年にはそのままFIA-F2選手権へ即昇格すると、圧巻の5戦連続ポールポジションを含む年間6勝・11表彰台を記録し、2位に60.5点差をつける歴史的圧勝でルーキー年間チャンピオンに戴冠 [1][5]。ルイス・ハミルトン、ニコ・ロズベルグ、シャルル・ルクレール、ジョージ・ラッセルに並ぶ「F3・F2ルーキー連続制覇」の金字塔を打ち立てた [1][5]。\n\n【第2章：夏の契約騒動「Piasco」とマクラーレン電撃加入】\n2022年、アルピーヌのリザーブドライバーを務めながらシミュレーターとテストをこなす中、夏休み期間中にアルピーヌ側がピアストリの翌季レギュラー昇格を一方的に発表 [5][7]。これに対しピアストリ本人がSNS上で「私は2023年にアルピーヌでドライブすることに同意していない。ドライブすることはない」と電撃声明を発表（通称“Piasco”事件）[5][7]。FIA契約承認委員会（CRB）の満場一致の判決によりマクラーレンとの契約の正当性が認められ、名門マクラーレンのレギュラーシートを獲得した [1][5]。\n\n【第3章：衝撃のルーキーイヤーとカタールスプリント優勝】\n2023年開幕戦母国オーストラリアGPでデビュー。前半戦のマクラーレンのマシン戦闘力不足を冷静に耐え抜き、夏の大規模アップデート以降に大躍進を遂げる [1][2]。第17戦日本GP（鈴鹿）で予選フロントローを獲得し自身初の3位表彰台に登壇 [1][2]。続く第18戦カタールGPでは、スプリントでポールポジションからフェルスタッペンを抑え切ってトップチェッカーを受け、スプリントレース初優勝を達成 [1][2][5]。決勝でも2位表彰台を獲得し、世界中から「アイルトン・セナやルイス・ハミルトンのデビュー時に匹敵する逸材」と大絶賛を浴びた [2][5]。\n\n【第4章：2024年の飛躍：ハンガリー初優勝とバクー伝説の防戦劇】\n2024年、マクラーレンMCL38の戦闘力向上とともに勝利を量産 [1][3]。第13戦ハンガリーGP（ハンガロリンク）では、スタートで同僚ノリスを鮮やかに交わして首位を奪い、巧みなレースコントロールで悲願のF1初優勝を達成（21世紀生まれとして史上初のF1グランプリウィナー）[1][2][3]。さらに第17戦アゼルバイジャンGP（バクー）では、首位ルクレールのインへ1コーナー遥か手前から電光石火のダイブボムを仕掛けて首位を奪取 [3][4]。以降30周以上にわたり、DRS圏内で猛追するルクレールの猛攻を一切の乱れなく抑え切る伝説的な防戦マスタークラスを演じ、シーズン2勝目をマークした [1][3][4][7]。',
+      '【第1章：前人未到のジュニアカテゴリー3階級即時制覇】\n2001年4月6日オーストラリア・メルセデス生まれ。元F1ドライバーのマーク・ウェバーをマネージャーに迎え、欧州シングルシーターへ進出 [1][5]。2019年フォーミュラ・ルノー・ユーロカップにR-ace GPから参戦し7勝で年間チャンピオンに輝く [1]。2020年、名門プレマ・レーシングよりFIA-F3選手権へルーキー参戦。熾烈な三つ巴のタイトル争いを制し、デビューイヤーで年間世界王座を獲得 [1]。翌2021年にはそのままFIA-F2選手権へ即昇格すると、圧巻の5戦連続ポールポジションを含む年間6勝・11表彰台を記録し、2位に60.5点差をつける歴史的圧勝でルーキー年間チャンピオンに戴冠 [1][5]。ルイス・ハミルトン、ニコ・ロズベルグ、シャルル・ルクレール、ジョージ・ラッセルに並ぶ「F3・F2ルーキー連続制覇」の金字塔を打ち立てた [1][5]。\n\n【第2章：夏の契約騒動「Piasco」とマクラーレン電撃加入】\n2022年、アルピーヌのリザーブドライバーを務めながらシミュレーターとテストをこなす中、夏休み期間中にアルピーヌ側がピアストリの翌季レギュラー昇格を一方的に発表 [5][7]。これに対しピアストリ本人がSNS上で「私は2023年にアルピーヌでドライブすることに同意していない。ドライブすることはない」と電撃声明を発表（通称“Piasco”事件）[5][7]。FIA契約承認委員会（CRB）の満場一致の判決によりマクラーレンとの契約の正当性が認められ、名門マクラーレンのレギュラーシートを獲得した [1][5]。\n\n【第3章：衝撃のルーキーイヤーとカタールスプリント優勝】\n2023年開幕戦母国オーストラリアGPでデビュー。前半戦のマクラーレンのマシン戦闘力不足を冷静に耐え抜き、夏の大規模アップデート以降に大躍進を遂げる [1][2]。第17戦日本GP（鈴鹿）で予選フロントローを獲得し自身初の3位表彰台に登壇 [1][2]。続く第18戦カタールGPでは、スプリントでポールポジションからフェルスタッペンを抑え切ってトップチェッカーを受け、スプリントレース初優勝を達成 [1][2][5]。決勝でも2位表彰台を獲得し、世界中から「アイルトン・セナやルイス・ハミルトンのデビュー時に匹敵する逸材」と大絶賛を浴びた [2][5]。\n\n【第4章：2024年の飛躍：ハンガリー初優勝とバクー伝説の防戦劇】\n2024年、マクラーレンMCL38の戦闘力向上とともに勝利を量産 [1][3]。第13戦ハンガリーGP（ハンガロリンク）では、スタートで同僚ノリスを鮮やかに交わして首位を奪い、巧みなレースコントロールで悲願のF1初優勝を達成（21世紀生まれとして初のF1グランプリウィナー）[1][2][3]。さらに第17戦アゼルバイジャンGP（バクー）では、首位ルクレールのインへ1コーナー遥か手前から電光石火のダイブボムを仕掛けて首位を奪取 [3][4]。以降30周以上にわたり、DRS圏内で猛追するルクレールの猛攻を一切の乱れなく抑え切る伝説的な防戦マスタークラスを演じ、シーズン2勝目をマークした [1][3][4][7]。',
     entries: 46,
     wins: 2,
     podiums: 9,
@@ -1718,7 +1724,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
           gp: '2024 ハンガリーGP (ハンガロリンク)',
           year: 2024,
           description:
-            'スタートで首位を奪い、堂々たるレース展開でF1キャリア初優勝を達成。21世紀生まれとして史上初のF1ウィナーとなった [1][2][3]。',
+            'スタートで首位を奪い、堂々たるレース展開でF1キャリア初優勝を達成。21世紀生まれとして初のF1ウィナーとなった [1][2][3]。',
           tacticalMasterclass:
             '第1スティントでクリーンエアを最大限に活かしてリードを広げ、チーム戦略の揺れにも動じず勝利を掴み取ったメンタリティ [2][3]。',
         },
@@ -1752,7 +1758,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/oscar-piastri.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -1833,7 +1839,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       website: 'https://www.carlossainz.es',
     },
     careerSummary:
-      '【第1章：ラリー界の伝説の血統とフォーミュラ・ルノー3.5王者】\n1994年9月1日スペイン・マドリード生まれ。世界ラリー選手権（WRC）2冠王者カルロス・サインツ・シニアの長男として生まれ、幼少期から父のストイックなプロフェッショナリズムを叩き込まれる [1][5]。レッドブル・ジュニアチームに加入し、2011年フォーミュラ・ルノー2.0 NEC王者 [1]。2014年にはフォーミュラ・ルノー3.5シリーズ（フォーミュラV8）において年間7勝を挙げ、レッドブル育成ドライバーとして史上初となる年間世界チャンピオンに輝いた [1][5]。2015年、スクーデリア・トロ・ロッソよりマックス・フェルスタッペンとルーキー同士でF1デビュー [1][2]。ルノー、マクラーレンと渡り歩き、2019年ブラジルGPで初表彰台（3位）、2020年イタリアGP（モンツァ）で激闘の2位を記録、名門マクラーレンの再建に決定的な貢献を果たした [1][2][5]。\n\n【第2章：フェラーリ加入とシルバーストンでのF1初勝利】\n2021年、名門スクーデリア・フェラーリへ電撃移籍 [1][2]。加入初年度から4度の表彰台を獲得し、同僚ルクレールを上回るランキング総合5位を記録してパドックを驚嘆させた [1][2]。2022年イギリスGP（シルバーストン）、通算150戦目にしてキャリア初ポールポジションを獲得すると、荒れた決勝レースを卓越した判断力と勝負強さで制し、悲願のF1初優勝を達成 [1][2][3]。\n\n【第3章：2023年シンガポール：レッドブル全勝を止めた究極の頭脳戦】\n2023年、レッドブルが全勝街道を突き進む中、第16戦シンガポールGPでポールポジションを獲得 [1][3]。決勝では、背後から猛追するメルセデス勢（新品ミディアムタイヤを履いたラッセルとハミルトン）の逆転を防ぐため、あえて2位のランド・ノリスにDRS（1秒以内の間隔）を与え続けるという前代未聞の天才的戦術（“DRSトレイン戦略”）を独創 [3][4]。メルセデスを完璧に防ぎ切り、2023年シーズンにおいて唯一「レッドブル以外の勝利」をもぎ取る歴史的マスターピースを完成させた [1][3][4][7]。\n\n【第4章：盲腸手術から16日後の奇跡：2024年オーストラリア制覇】\n2024年開幕直後の第2戦サウジアラビアGPで急性虫垂炎（盲腸）を発症し緊急手術 [1][2]。しかし驚異的な回復力を見せ、わずか16日後の第3戦オーストラリアGP（メルボルン）でコックピットに復帰 [1][2]。予選フロントローからスタートすると、2周目にフェルスタッペンを豪快に交わして首位を奪い、傷口の痛みを微塵も感じさせない圧巻の走りで独走優勝を達成 [1][2][3]。メキシコシティGPでも圧巻のポール・トゥ・ウィンを飾り、2025年のウィリアムズ移籍を前に、現代F1屈指のコンプリートドライバーとしての絶対的価値を世界に証明した [1][3][5]。',
+      '【第1章：ラリー界の伝説の血統とフォーミュラ・ルノー3.5王者】\n1994年9月1日スペイン・マドリード生まれ。世界ラリー選手権（WRC）2冠王者カルロス・サインツ・シニアの長男として生まれ、幼少期から父のストイックなプロフェッショナリズムを叩き込まれる [1][5]。レッドブル・ジュニアチームに加入し、2011年フォーミュラ・ルノー2.0 NEC王者 [1]。2014年にはフォーミュラ・ルノー3.5シリーズ（フォーミュラV8）において年間7勝を挙げ、レッドブル育成ドライバーとして初となる年間世界チャンピオンに輝いた [1][5]。2015年、スクーデリア・トロ・ロッソよりマックス・フェルスタッペンとルーキー同士でF1デビュー [1][2]。ルノー、マクラーレンと渡り歩き、2019年ブラジルGPで初表彰台（3位）、2020年イタリアGP（モンツァ）で激闘の2位を記録、名門マクラーレンの再建に決定的な貢献を果たした [1][2][5]。\n\n【第2章：フェラーリ加入とシルバーストンでのF1初勝利】\n2021年、名門スクーデリア・フェラーリへ電撃移籍 [1][2]。加入初年度から4度の表彰台を獲得し、同僚ルクレールを上回るランキング総合5位を記録してパドックを驚嘆させた [1][2]。2022年イギリスGP（シルバーストン）、通算150戦目にしてキャリア初ポールポジションを獲得すると、荒れた決勝レースを卓越した判断力と勝負強さで制し、悲願のF1初優勝を達成 [1][2][3]。\n\n【第3章：2023年シンガポール：レッドブル全勝を止めた究極の頭脳戦】\n2023年、レッドブルが全勝街道を突き進む中、第16戦シンガポールGPでポールポジションを獲得 [1][3]。決勝では、背後から猛追するメルセデス勢（新品ミディアムタイヤを履いたラッセルとハミルトン）の逆転を防ぐため、あえて2位のランド・ノリスにDRS（1秒以内の間隔）を与え続けるという前代未聞の天才的戦術（“DRSトレイン戦略”）を独創 [3][4]。メルセデスを完璧に防ぎ切り、2023年シーズンにおいて唯一「レッドブル以外の勝利」をもぎ取る歴史的マスターピースを完成させた [1][3][4][7]。\n\n【第4章：盲腸手術から16日後の奇跡：2024年オーストラリア制覇】\n2024年開幕直後の第2戦サウジアラビアGPで急性虫垂炎（盲腸）を発症し緊急手術 [1][2]。しかし驚異的な回復力を見せ、わずか16日後の第3戦オーストラリアGP（メルボルン）でコックピットに復帰 [1][2]。予選フロントローからスタートすると、2周目にフェルスタッペンを豪快に交わして首位を奪い、傷口の痛みを微塵も感じさせない圧巻の走りで独走優勝を達成 [1][2][3]。メキシコシティGPでも圧巻のポール・トゥ・ウィンを飾り、2025年のウィリアムズ移籍を前に、現代F1屈指のコンプリートドライバーとしての絶対的価値を世界に証明した [1][3][5]。',
     entries: 204,
     wins: 4,
     podiums: 25,
@@ -1912,7 +1918,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/carlos-sainz.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -2075,7 +2081,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/george-russell.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -2198,7 +2204,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       { date: '2020-12-06', event: 'サヒールGPにて最後尾から奇跡のF1初優勝を達成', refId: 1 },
       { date: '2021-12-12', event: 'アブダビGPでハミルトンを相手に伝説のディフェンス（大臣）を披露', refId: 2 },
       { date: '2022-05-29', event: 'モナコGPで伝統のストリートウィナーとなる', refId: 4 },
-      { date: '2023-04-30', event: 'バクー市街地で史上初となるスプリント＆決勝完全ダブル優勝', refId: 6 },
+      { date: '2023-04-30', event: 'バクー市街地で初となるスプリント＆決勝完全ダブル優勝', refId: 6 },
       { date: '2025-10-15', event: 'キャデラックF1チームの2026年初代ワークスドライバーに就任', refId: 5 },
     ],
     references: [
@@ -2206,7 +2212,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/sergio-perez.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -2225,7 +2231,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       { year: 2020, team: 'BWT Racing Point F1 Team', teamId: 'racing-point', role: 'Regular', carNumber: 11, finalPosition: 4, points: 125, wins: 1, podiums: 2, note: 'サヒールGPで1周目最後尾から奇跡のF1初優勝、ランキング4位' },
       { year: 2021, team: 'Red Bull Racing Honda', teamId: 'red-bull', role: 'Regular', carNumber: 11, finalPosition: 4, points: 190, wins: 1, podiums: 5, note: 'アゼルバイジャンGP優勝、アブダビGPでハミルトンを抑え込み「防衛大臣」の称号を得る' },
       { year: 2022, team: 'Oracle Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 11, finalPosition: 3, points: 305, wins: 2, podiums: 11, note: 'モナコGP＆シンガポールGP優勝、コンストラクターズ王座奪還に貢献' },
-      { year: 2023, team: 'Oracle Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 11, finalPosition: 2, points: 285, wins: 2, podiums: 9, note: 'サウジアラビア＆アゼルバイジャン優勝、チーム史上初のドライバーズ1-2フィニッシュ達成' },
+      { year: 2023, team: 'Oracle Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 11, finalPosition: 2, points: 285, wins: 2, podiums: 9, note: 'サウジアラビア＆アゼルバイジャン優勝、チーム初のドライバーズ1-2フィニッシュ達成' },
       { year: 2024, team: 'Oracle Red Bull Racing', teamId: 'red-bull', role: 'Regular', carNumber: 11, finalPosition: 8, points: 152, podiums: 4, note: '序盤4戦で3度の表彰台獲得、チームのコンストラクターズ争いを支える' },
       { year: 2025, team: 'Cadillac Formula 1 Team', teamId: 'cadillac', role: 'Regular', carNumber: 11, note: '新設キャデラックF1の初代エースドライバーに就任' },
       { year: 2026, team: 'Cadillac Formula 1 Team', teamId: 'cadillac', role: 'Regular', carNumber: 11, note: '経験豊富なリーダーとして新興アメリカンチームを牽引' }
@@ -2373,14 +2379,14 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       { date: '2012-06-24', event: 'ヨーロッパGP（バレンシア）にて11番グリッドからの奇跡の大逆転優勝', refId: 2 },
       { date: '2018-06-17', event: 'ル・マン24時間レース初参戦で総合優勝（翌年2連覇達成）', refId: 5 },
       { date: '2023-03-05', event: 'アストンマーティン移籍初戦のバーレーンGPで劇的表彰台（3位）獲得', refId: 3 },
-      { date: '2024-10-27', event: 'メキシコシティGPにてF1史上初となる通算400グランプリ出走の金字塔を達成', refId: 1 },
+      { date: '2024-10-27', event: 'メキシコシティGPにてF1初となる通算400グランプリ出走の金字塔を達成', refId: 1 },
     ],
     references: [
       {
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/fernando-alonso.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -2465,7 +2471,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       website: 'https://www.yukitsunoda.com',
     },
     careerSummary:
-      '【第1章：カートから欧州シングルシーター席巻までの育成時代】\n4歳で中神奈川カートウェイにてレーシングカートを始め、数々の東日本・全日本選手権で頭角を現す [1][9]。2016年に鈴鹿サーキット・レーシングスクール・フォーミュラ（SRS-F、現HRS）を首席スカラシップで卒業し、JAF-F4デビュー戦でいきなり表彰台を獲得 [1]。2017年からホンダ・フォーミュラ・ドリーム・プロジェクト（HFDP）育成生としてFIA-F4日本選手権へフル参戦し総合3位、翌2018年には7勝・8ポールポジション・11表彰台という圧倒的戦績で年間チャンピオンに輝いた [1][9]。その圧倒的なスピードと勝負強さがレッドブル首脳のヘルムート・マルコ博士の目に留まり、ホンダとレッドブルの共同育成ドライバーとして渡欧が決定した [1][7]。\n\n【第2章：欧州F3・F2ルーキーイヤーでの破竹の進撃】\n2019年、初渡欧かつ全コース未経験の過酷な環境下でイェンツァー・モータースポーツ（Jenzer Motorsport）からFIA-F3へ参戦 [1][10]。戦闘力で劣るマシンながら雨上がりのモンツァ決勝でP6スタートから圧巻のオーバーテイクショーを演じて劇的初優勝を飾り、スパでも表彰台に登壇してイェンツァーの全獲得ポイントを一人で稼ぎ出す年間9位の快挙を達成 [1][10]。翌2020年にはカーリン（Carlin）からFIA-F2へ異例の即昇格を果たすと、シルバーストン70周年記念GP、スパ・フランコルシャン、サヒールで計3勝、グリッド最多の4ポールポジション、7表彰台を記録 [1][10]。年間ランキング3位（200点・首位と15点差）に入り、ルーキー・オブ・ザ・イヤー（アントワーヌ・ユベール賞）を受賞してスーパーライセンス発給要件を最速でクリア、2021年のF1昇格を確定させた [1][10]。\n\n【第3章：F1デビューから苦闘、そしてファエンツァでの肉体・精神改造】\n2021年、スクーデリア・アルファタウリ・ホンダよりF1デビュー [1][2]。開幕戦バーレーンGPで終盤にフェルナンド・アロンソらをオーバーテイクして9位に入賞し、日本人史上初となる「F1デビュー戦入賞」の偉業を達成 [1][2]。しかしシーズン中盤は過度なアグレッシブさが仇となり予選クラッシュが重なったため、チーム代表フランツ・トーストの指示でイギリスからチーム本拠地イタリア・ファエンツァへ移住 [7][9]。毎朝9時からのジムトレーニング、エンジニアとの徹底的なデータ解析、シミュレーター訓練というストイックな規律を叩き込まれた [7][9]。その成果は実を結び、荒れたアゼルバイジャンGPで7位、そしてホンダF1ラストレースとなった最終戦アブダビGPでは、最終ラップでバルテリ・ボッタス（メルセデス）を豪快に交わして日本人歴代最高位タイに迫る自己最高4位入賞を果たした [1][2]。\n\n【第4章：中堅チームリーダーへの進化と母国鈴鹿での歴史的入賞】\n2022年〜2023年は新グラウンドエフェクト規定下でアルファタウリAT03/AT04の空力ドラッグとマシン戦闘力不足に苦しみながらも、堅実に入賞圏内（P10/P11）を狙うレース巧者へと変貌 [1][11]。2023年アメリカGP（オースティン）では8位入賞に加えてレース最終56周目に1分38秒139のファステストラップを刻み、最終戦アブダビGPではキャリア初となる決勝ラップリーダー（通算5周）を記録して世界中のファン投票による「ドライバー・オブ・ザ・デイ（24.2%獲得）」に選出された [1][2]。新体制Visa Cash App RBとなった2024年は、GP8勝の実績を誇るダニエル・リカルドを予選・決勝ともに圧倒 [7][8]。第4戦母国日本GP（鈴鹿）では、RBクルーによる驚異の2.1秒ピット作業に呼応し、S字進入やヘアピンでライバルを果敢に仕留めて10位入賞を達成、日本人ドライバーとして小林可夢偉以来12年ぶりとなる鈴鹿でのポイント獲得に日本中が沸き立った [1][3][5]。さらにマイアミ（スプリントP8・決勝P7）、モナコ（P8）など年間を通じて予選Q3進出常連となり、レッドブルグループ屈指の精密なドライバーとして世界中から絶大な評価を確立している [1][4][7]。',
+      '【第1章：カートから欧州シングルシーター席巻までの育成時代】\n4歳で中神奈川カートウェイにてレーシングカートを始め、数々の東日本・全日本選手権で頭角を現す [1][9]。2016年に鈴鹿サーキット・レーシングスクール・フォーミュラ（SRS-F、現HRS）を首席スカラシップで卒業し、JAF-F4デビュー戦でいきなり表彰台を獲得 [1]。2017年からホンダ・フォーミュラ・ドリーム・プロジェクト（HFDP）育成生としてFIA-F4日本選手権へフル参戦し総合3位、翌2018年には7勝・8ポールポジション・11表彰台という圧倒的戦績で年間チャンピオンに輝いた [1][9]。その圧倒的なスピードと勝負強さがレッドブル首脳のヘルムート・マルコ博士の目に留まり、ホンダとレッドブルの共同育成ドライバーとして渡欧が決定した [1][7]。\n\n【第2章：欧州F3・F2ルーキーイヤーでの破竹の進撃】\n2019年、初渡欧かつ全コース未経験の過酷な環境下でイェンツァー・モータースポーツ（Jenzer Motorsport）からFIA-F3へ参戦 [1][10]。戦闘力で劣るマシンながら雨上がりのモンツァ決勝でP6スタートから圧巻のオーバーテイクショーを演じて劇的初優勝を飾り、スパでも表彰台に登壇してイェンツァーの全獲得ポイントを一人で稼ぎ出す年間9位の快挙を達成 [1][10]。翌2020年にはカーリン（Carlin）からFIA-F2へ異例の即昇格を果たすと、シルバーストン70周年記念GP、スパ・フランコルシャン、サヒールで計3勝、グリッド最多の4ポールポジション、7表彰台を記録 [1][10]。年間ランキング3位（200点・首位と15点差）に入り、ルーキー・オブ・ザ・イヤー（アントワーヌ・ユベール賞）を受賞してスーパーライセンス発給要件を最速でクリア、2021年のF1昇格を確定させた [1][10]。\n\n【第3章：F1デビューから苦闘、そしてファエンツァでの肉体・精神改造】\n2021年、スクーデリア・アルファタウリ・ホンダよりF1デビュー [1][2]。開幕戦バーレーンGPで終盤にフェルナンド・アロンソらをオーバーテイクして9位に入賞し、日本人初となる「F1デビュー戦入賞」の偉業を達成 [1][2]。しかしシーズン中盤は過度なアグレッシブさが仇となり予選クラッシュが重なったため、チーム代表フランツ・トーストの指示でイギリスからチーム本拠地イタリア・ファエンツァへ移住 [7][9]。毎朝9時からのジムトレーニング、エンジニアとの徹底的なデータ解析、シミュレーター訓練というストイックな規律を叩き込まれた [7][9]。その成果は実を結び、荒れたアゼルバイジャンGPで7位、そしてホンダF1ラストレースとなった最終戦アブダビGPでは、最終ラップでバルテリ・ボッタス（メルセデス）を豪快に交わして日本人歴代最高位タイに迫る自己最高4位入賞を果たした [1][2]。\n\n【第4章：中堅チームリーダーへの進化と母国鈴鹿での歴史的入賞】\n2022年〜2023年は新グラウンドエフェクト規定下でアルファタウリAT03/AT04の空力ドラッグとマシン戦闘力不足に苦しみながらも、堅実に入賞圏内（P10/P11）を狙うレース巧者へと変貌 [1][11]。2023年アメリカGP（オースティン）では8位入賞に加えてレース最終56周目に1分38秒139のファステストラップを刻み、最終戦アブダビGPではキャリア初となる決勝ラップリーダー（通算5周）を記録して世界中のファン投票による「ドライバー・オブ・ザ・デイ（24.2%獲得）」に選出された [1][2]。新体制Visa Cash App RBとなった2024年は、GP8勝の実績を誇るダニエル・リカルドを予選・決勝ともに圧倒 [7][8]。第4戦母国日本GP（鈴鹿）では、RBクルーによる驚異の2.1秒ピット作業に呼応し、S字進入やヘアピンでライバルを果敢に仕留めて10位入賞を達成、日本人ドライバーとして小林可夢偉以来12年ぶりとなる鈴鹿でのポイント獲得に日本中が沸き立った [1][3][5]。さらにマイアミ（スプリントP8・決勝P7）、モナコ（P8）など年間を通じて予選Q3進出常連となり、レッドブルグループ屈指の精密なドライバーとして世界中から絶大な評価を確立している [1][4][7]。',
     entries: 88,
     wins: 0,
     podiums: 0,
@@ -2534,7 +2540,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       { date: '2018-11-11', event: 'FIA-F4日本選手権にて年間7勝を挙げシリーズチャンピオンを獲得', refId: 1 },
       { date: '2019-09-08', event: 'FIA-F3選手権モンツァ決勝にてP6スタートから大逆転で初優勝', refId: 10 },
       { date: '2020-12-06', event: 'FIA-F2サヒール戦で優勝、年間3位・アントワーヌ・ユベール賞を受賞', refId: 10 },
-      { date: '2021-03-28', event: 'F1開幕戦バーレーンGPにて9位入賞（日本人史上初のデビュー戦入賞）', refId: 1 },
+      { date: '2021-03-28', event: 'F1開幕戦バーレーンGPにて9位入賞（日本人初のデビュー戦入賞）', refId: 1 },
       { date: '2021-12-12', event: 'F1最終戦アブダビGPにて自己最高位となる4位入賞を達成', refId: 2 },
       { date: '2023-10-22', event: 'アメリカGPにて8位入賞＋自身初のF1公式ファステストラップを記録', refId: 2 },
       { date: '2023-11-26', event: 'アブダビGPにて自身初の決勝ラップリーダー（5周）＆ドライバー・オブ・ザ・デイ獲得', refId: 2 },
@@ -2546,7 +2552,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/yuki-tsunoda.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -2711,7 +2717,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/ayrton-senna.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -2794,7 +2800,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       website: 'https://www.michael-schumacher.de',
     },
     careerSummary:
-      '【第1章：メルセデス・ジュニアからジョーダンでの電撃デビューとベネトン戴冠】\n1969年1月3日ドイツ・ヒュルト生まれ。ケルン近郊のケルペン・カートコースで腕を磨き、ドイツF3王者を経てメルセデスの若手育成プログラム（Group Cスポーツカー世界選手権）で時速350km超のマシンマネジメントと耐久レースの技術を習得 [1][5]。1991年ベルギーGP（スパ・フランコルシャン）、負傷欠場したベルトラン・ガショーの代役としてジョーダンから電撃F1デビュー [1]。難コースのスパを初走行ながら予選7番手を獲得してパドックを騒然とさせ、直後に名門ベネトンへ引き抜かれる [1][2]。翌1992年のスパで雨の好判断によりF1初優勝を達成 [1][2]。1994年、アイルトン・セナの事故死という激動のシーズンを制し、ドイツ人史上初となる世界ドライバーズチャンピオンを獲得 [1][2]。1995年には年間9勝を挙げて2年連続世界王座を連覇した [1][2][5]。\n\n【第2章：名門フェラーリへの移籍と雌伏の再建期】\n1996年、1979年以来タイトルから遠ざかり混迷を極めていた名門スクーデリア・フェラーリへ電撃移籍 [1][2]。同年のスペインGP（バルセロナ）では、豪雨の泥沼のような路面でV10エンジンが1気筒失火しながらも、2位に45秒以上の大差をつけてフェラーリ移籍後初勝利を挙げる伝説を打ち立てた [1][2][4]。チーム代表ジャン・トッド、天才設計者ロリー・バーン、戦略の魔術師ロス・ブラウンらをベネトンからマラネロへ招聘し、自らフィオラノサーキットで何万キロものテスト走行を重ねてフェラーリを常勝軍団へと鍛え上げた [1][3][5]。\n\n【第3章：前人未到の5年連続世界王座とフェラーリ黄金王朝】\n2000年日本GP（鈴鹿）、ミカ・ハッキネン（マクラーレン）との歴史的死闘を制し、フェラーリに21年ぶりとなる歓喜のドライバーズ世界タイトルをもたらす [1][2][5]。ここから2004年まで、前人未到の「5年連続世界チャンピオン」という金字塔を樹立 [1]。特に2002年は全17戦中全戦で表彰台に登壇、2004年には歴史的最高傑作「F2004」を駆り年間13勝を記録 [1][2]。通算91勝・7度目の世界タイトルという、当時のあらゆるF1歴代記録を塗り替える前人未到の黄金王朝を築き上げた [1][2][5]。\n\n【第4章：メルセデスでの復帰と現代F1への不滅の遺産】\n2006年限りで一度現役を引退するも、2010年に母国の名門メルセデスのF1ワークス復帰に伴い現役復帰 [1][2]。40代を迎えてなお卓越した開発能力を発揮し、2012年モナコGPで予選最速タイムを記録、ヨーロッパGP（バレンシア）で復帰後初表彰台を獲得 [1][2]。ハミルトンへと引き継がれるメルセデス常勝軍団の車体・パワーユニットの基礎を築き上げた [1][5]。徹底的なフィジカルトレーニング、食事管理、データテレメトリーの活用、そして近代F1における「左足ブレーキ技術の完成」など、プロレーシングドライバーの概念そのものを根本から覆した不世出の巨人である [1][3][4][5]。',
+      '【第1章：メルセデス・ジュニアからジョーダンでの電撃デビューとベネトン戴冠】\n1969年1月3日ドイツ・ヒュルト生まれ。ケルン近郊のケルペン・カートコースで腕を磨き、ドイツF3王者を経てメルセデスの若手育成プログラム（Group Cスポーツカー世界選手権）で時速350km超のマシンマネジメントと耐久レースの技術を習得 [1][5]。1991年ベルギーGP（スパ・フランコルシャン）、負傷欠場したベルトラン・ガショーの代役としてジョーダンから電撃F1デビュー [1]。難コースのスパを初走行ながら予選7番手を獲得してパドックを騒然とさせ、直後に名門ベネトンへ引き抜かれる [1][2]。翌1992年のスパで雨の好判断によりF1初優勝を達成 [1][2]。1994年、アイルトン・セナの事故死という激動のシーズンを制し、ドイツ人初となる世界ドライバーズチャンピオンを獲得 [1][2]。1995年には年間9勝を挙げて2年連続世界王座を連覇した [1][2][5]。\n\n【第2章：名門フェラーリへの移籍と雌伏の再建期】\n1996年、1979年以来タイトルから遠ざかり混迷を極めていた名門スクーデリア・フェラーリへ電撃移籍 [1][2]。同年のスペインGP（バルセロナ）では、豪雨の泥沼のような路面でV10エンジンが1気筒失火しながらも、2位に45秒以上の大差をつけてフェラーリ移籍後初勝利を挙げる伝説を打ち立てた [1][2][4]。チーム代表ジャン・トッド、天才設計者ロリー・バーン、戦略の魔術師ロス・ブラウンらをベネトンからマラネロへ招聘し、自らフィオラノサーキットで何万キロものテスト走行を重ねてフェラーリを常勝軍団へと鍛え上げた [1][3][5]。\n\n【第3章：前人未到の5年連続世界王座とフェラーリ黄金王朝】\n2000年日本GP（鈴鹿）、ミカ・ハッキネン（マクラーレン）との歴史的死闘を制し、フェラーリに21年ぶりとなる歓喜のドライバーズ世界タイトルをもたらす [1][2][5]。ここから2004年まで、前人未到の「5年連続世界チャンピオン」という金字塔を樹立 [1]。特に2002年は全17戦中全戦で表彰台に登壇、2004年には歴史的最高傑作「F2004」を駆り年間13勝を記録 [1][2]。通算91勝・7度目の世界タイトルという、当時のあらゆるF1歴代記録を塗り替える前人未到の黄金王朝を築き上げた [1][2][5]。\n\n【第4章：メルセデスでの復帰と現代F1への不滅の遺産】\n2006年限りで一度現役を引退するも、2010年に母国の名門メルセデスのF1ワークス復帰に伴い現役復帰 [1][2]。40代を迎えてなお卓越した開発能力を発揮し、2012年モナコGPで予選最速タイムを記録、ヨーロッパGP（バレンシア）で復帰後初表彰台を獲得 [1][2]。ハミルトンへと引き継がれるメルセデス常勝軍団の車体・パワーユニットの基礎を築き上げた [1][5]。徹底的なフィジカルトレーニング、食事管理、データテレメトリーの活用、そして近代F1における「左足ブレーキ技術の完成」など、プロレーシングドライバーの概念そのものを根本から覆した不世出の巨人である [1][3][4][5]。',
     entries: 308,
     wins: 91,
     podiums: 155,
@@ -2876,7 +2882,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/michael-schumacher.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -3046,7 +3052,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/michael-schumacher.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -3210,7 +3216,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/michael-schumacher.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -3374,7 +3380,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/michael-schumacher.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -3534,7 +3540,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/michael-schumacher.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -3688,7 +3694,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/michael-schumacher.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -3853,7 +3859,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/michael-schumacher.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -3969,7 +3975,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         {
           gp: "2022 ブラジルGP (インテルラゴス)",
           year: 2022,
-          description: "雨が近づく金曜予選で完璧なタイミングでアタックを決め、ハースにチーム史上初の奇跡のポールポジションをもたらす。",
+          description: "雨が近づく金曜予選で完璧なタイミングでアタックを決め、ハースにチーム初の奇跡のポールポジションをもたらす。",
           tacticalMasterclass: "セクター1からノーミスでタイムをまとめ、赤旗中断の好機を最大限に活かした。"
         }
       ],
@@ -3986,7 +3992,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       },
       {
         date: "2022-11-11",
-        event: "ブラジルGPでハースに史上初のポールポジションをもたらす",
+        event: "ブラジルGPでハースに初のポールポジションをもたらす",
         refId: 2
       }
     ],
@@ -3995,7 +4001,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/michael-schumacher.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -4121,7 +4127,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/michael-schumacher.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -4209,7 +4215,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       pedalFeel: "長めのストロークで繊細にコントロールできるブレーキタッチ。",
       steeringWeight: "標準的。滑らかな操舵感を好む。"
     },
-    careerSummary: "中国人ドライバーとして史上初のF1フル参戦を果たした歴史的パイオニア。デビュー戦での入賞や母国中国GPでの熱狂など、アジアのモータースポーツを牽引。",
+    careerSummary: "中国人ドライバーとして初のF1フル参戦を果たした歴史的パイオニア。デビュー戦での入賞や母国中国GPでの熱狂など、アジアのモータースポーツを牽引。",
     entries: 68,
     wins: 0,
     podiums: 0,
@@ -4255,7 +4261,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
       },
       {
         date: "2024-04-21",
-        event: "中国人ドライバーとして史上初めて母国中国GPを走行・完走",
+        event: "中国人ドライバーとして初めて母国中国GPを走行・完走",
         refId: 2
       }
     ],
@@ -4264,7 +4270,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/michael-schumacher.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -4391,7 +4397,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/michael-schumacher.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -4551,7 +4557,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/michael-schumacher.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -4713,7 +4719,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/michael-schumacher.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -4793,7 +4799,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         '中立付近の応答が極めてシャープ。ターンイン初期の鋭い回頭性と、路面ミクロの凹凸を掌で感知できるダイレクトなラック特性 [3][5]。',
     },
     careerSummary:
-      '【第1章：BMWザウバーでの代役入賞からモンツァでの雨の奇跡】\n1987年7月3日ドイツ・ヘッペンハイム生まれ。カートで頭角を現し、2004年フォーミュラ・BMWで20戦18勝という圧倒的レコードで年間王者 [1]。2007年アメリカGP（インディアナポリス）、負傷欠場したロバート・クビサの代役としてBMWザウバーから弱冠19歳349日でF1デビューを果たし、当時の史上最年少入賞記録（8位）を樹立 [1][2]。直後にトロロッソのレギュラーシートを獲得すると、2008年第14戦イタリアGP（モンツァ）、豪雨の予選で史上最年少ポールポジションを獲得。決勝でも水煙をものともせず全周回でレースを支配し、トロロッソにチーム史上初優勝をもたらす「モンツァの奇跡」を成し遂げた [1][2][5]。\n\n【第2章：レッドブル黄金王朝と前人未到の4連覇】\n2009年レッドブル・レーシングへ昇格し、中国GPでチーム初優勝 [1][2]。2010年、最終戦アブダビGPでフェルナンド・アロンソを逆転し、23歳134日という史上最年少世界ドライバーズチャンピオンに戴冠 [1][2]。エイドリアン・ニューウェイが設計した名機RB6〜RB9を駆り、2011年（年間11勝・15ポール）、2012年（最終戦ブラジルでの大逆転戴冠）、2013年（F1新記録となる前人未到のシーズン9連勝・年間13勝）と、4年連続世界チャンピオンという歴史的黄金王朝を築き上げた [1][2][5]。\n\n【第3章：跳ね馬への移籍とティフォシの英雄へ】\n2015年、憧れのミハエル・シューマッハの足跡を追い名門スクーデリア・フェラーリへ移籍 [1][2]。移籍2戦目のマレーシアGPで早くもフェラーリ初勝利を飾り、2017年・2018年にはルイス・ハミルトン（メルセデス）と世界王座を賭けた熾烈な一騎打ちを展開 [1][2]。フェラーリ通算14勝を挙げ、歴代3位のフェラーリ通算勝利数を刻んでティフォシから絶大な敬愛を集めた [1][3]。\n\n【第4章：アストンマーティンでの有終の美と不滅の遺産】\n2021年アストンマーティンへ移籍し、アゼルバイジャンGPでチーム初表彰台（2位）を獲得 [1][2]。2022年シーズン限りでF1現役を引退。通算53勝（歴代4位）、ポールポジション57回、表彰台122回という燦然たる大記録とともに、環境保護活動や多様性推進、ミツバチ保護プロジェクトなど、地球環境とモータースポーツの共生を訴え続ける真のリーダーとして世界中から惜しまれつつヘルメットを置いた [1][3][5]。',
+      '【第1章：BMWザウバーでの代役入賞からモンツァでの雨の奇跡】\n1987年7月3日ドイツ・ヘッペンハイム生まれ。カートで頭角を現し、2004年フォーミュラ・BMWで20戦18勝という圧倒的レコードで年間王者 [1]。2007年アメリカGP（インディアナポリス）、負傷欠場したロバート・クビサの代役としてBMWザウバーから弱冠19歳349日でF1デビューを果たし、当時の史上最年少入賞記録（8位）を樹立 [1][2]。直後にトロロッソのレギュラーシートを獲得すると、2008年第14戦イタリアGP（モンツァ）、豪雨の予選で史上最年少ポールポジションを獲得。決勝でも水煙をものともせず全周回でレースを支配し、トロロッソにチーム初優勝をもたらす「モンツァの奇跡」を成し遂げた [1][2][5]。\n\n【第2章：レッドブル黄金王朝と前人未到の4連覇】\n2009年レッドブル・レーシングへ昇格し、中国GPでチーム初優勝 [1][2]。2010年、最終戦アブダビGPでフェルナンド・アロンソを逆転し、23歳134日という史上最年少世界ドライバーズチャンピオンに戴冠 [1][2]。エイドリアン・ニューウェイが設計した名機RB6〜RB9を駆り、2011年（年間11勝・15ポール）、2012年（最終戦ブラジルでの大逆転戴冠）、2013年（F1新記録となる前人未到のシーズン9連勝・年間13勝）と、4年連続世界チャンピオンという歴史的黄金王朝を築き上げた [1][2][5]。\n\n【第3章：跳ね馬への移籍とティフォシの英雄へ】\n2015年、憧れのミハエル・シューマッハの足跡を追い名門スクーデリア・フェラーリへ移籍 [1][2]。移籍2戦目のマレーシアGPで早くもフェラーリ初勝利を飾り、2017年・2018年にはルイス・ハミルトン（メルセデス）と世界王座を賭けた熾烈な一騎打ちを展開 [1][2]。フェラーリ通算14勝を挙げ、歴代3位のフェラーリ通算勝利数を刻んでティフォシから絶大な敬愛を集めた [1][3]。\n\n【第4章：アストンマーティンでの有終の美と不滅の遺産】\n2021年アストンマーティンへ移籍し、アゼルバイジャンGPでチーム初表彰台（2位）を獲得 [1][2]。2022年シーズン限りでF1現役を引退。通算53勝（歴代4位）、ポールポジション57回、表彰台122回という燦然たる大記録とともに、環境保護活動や多様性推進、ミツバチ保護プロジェクトなど、地球環境とモータースポーツの共生を訴え続ける真のリーダーとして世界中から惜しまれつつヘルメットを置いた [1][3][5]。',
     entries: 299,
     wins: 53,
     podiums: 122,
@@ -4874,7 +4880,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/sebastian-vettel.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -5040,7 +5046,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/kimi-raikkonen.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -5123,7 +5129,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         'パワーステアリングのない時代において、極太スリックタイヤの巨大な接地抵抗を強靭な腕力でねじ込む超重量級ステアリング [1][3][5]。',
     },
     careerSummary:
-      '【第1章：借金と骨折を乗り越えた不屈の這い上がり】\n1953年8月8日英国ウスターシャー生まれ。自宅を売却して資金を作り、首の骨折や脊椎損傷の重傷を負いながらもレースを諦めず、1977年英国フォーミュラ・フォード王座を獲得 [1]。1980年名門ロータスからF1デビュー [1][2]。デビュー戦で燃料漏れによる火傷を負いながら走り続けるなど、不屈のガッツをコーリン・チャップマンに見初められた [1][5]。1985年にウィリアムズへ移籍し、第14戦ヨーロッパGP（ブランズハッチ）でF1初優勝を達成 [1][2]。1986年・1987年とホンダパワーを武器に年間最多勝を挙げながらも、最終戦のタイヤバーストや鈴鹿予選クラッシュなどの悲運に見舞われタイトルを逃す [1][2][5]。\n\n【第2章：フェラーリでの「獅子」とウィリアムズでの歴史的完全制覇】\n1989年フェラーリへ移籍。エンツォ・フェラーリが生前最後に自ら契約したドライバーとなり、デビュー戦ブラジルGPでパドルシフト初実戦優勝を達成 [1][2]。情熱的な走りで熱狂的ティフォシから「イル・レオーネ（Il Leone: 獅子）」と崇拝された [1][5]。1991年にウィリアムズへ復帰。そして1992年、エイドリアン・ニューウェイとパトリック・ヘッドが開発したハイテクの結晶「FW14B（アクティブサスペンション搭載）」を駆り、開幕5連勝・年間9勝・14ポールポジションという前代未聞の圧倒的レコードで悲願のドライバーズ世界チャンピオンに輝いた [1][2][3]。\n\n【第3章：インディカー制覇とF1・INDY同時王者の金字塔】\n1993年、F1王者のままアメリカCARTインディカー・シリーズへ電撃転向 [1][5]。ルーキーイヤーで名門ニューマン・ハース・レーシングから年間5勝を挙げ、史上初となる「F1世界王者とインディカー王者の同時君臨」という前人未到の偉業を達成 [1][5]。1994年アイルトン・セナ急逝後のウィリアムズに請われてF1スポット復帰を果たし、最終戦オーストラリアGPで通算31勝目を挙げ、歴史的レジェンドとしてファンを魅了し続けた [1][2][5]。',
+      '【第1章：借金と骨折を乗り越えた不屈の這い上がり】\n1953年8月8日英国ウスターシャー生まれ。自宅を売却して資金を作り、首の骨折や脊椎損傷の重傷を負いながらもレースを諦めず、1977年英国フォーミュラ・フォード王座を獲得 [1]。1980年名門ロータスからF1デビュー [1][2]。デビュー戦で燃料漏れによる火傷を負いながら走り続けるなど、不屈のガッツをコーリン・チャップマンに見初められた [1][5]。1985年にウィリアムズへ移籍し、第14戦ヨーロッパGP（ブランズハッチ）でF1初優勝を達成 [1][2]。1986年・1987年とホンダパワーを武器に年間最多勝を挙げながらも、最終戦のタイヤバーストや鈴鹿予選クラッシュなどの悲運に見舞われタイトルを逃す [1][2][5]。\n\n【第2章：フェラーリでの「獅子」とウィリアムズでの歴史的完全制覇】\n1989年フェラーリへ移籍。エンツォ・フェラーリが生前最後に自ら契約したドライバーとなり、デビュー戦ブラジルGPでパドルシフト初実戦優勝を達成 [1][2]。情熱的な走りで熱狂的ティフォシから「イル・レオーネ（Il Leone: 獅子）」と崇拝された [1][5]。1991年にウィリアムズへ復帰。そして1992年、エイドリアン・ニューウェイとパトリック・ヘッドが開発したハイテクの結晶「FW14B（アクティブサスペンション搭載）」を駆り、開幕5連勝・年間9勝・14ポールポジションという前代未聞の圧倒的レコードで悲願のドライバーズ世界チャンピオンに輝いた [1][2][3]。\n\n【第3章：インディカー制覇とF1・INDY同時王者の金字塔】\n1993年、F1王者のままアメリカCARTインディカー・シリーズへ電撃転向 [1][5]。ルーキーイヤーで名門ニューマン・ハース・レーシングから年間5勝を挙げ、初となる「F1世界王者とインディカー王者の同時君臨」という前人未到の偉業を達成 [1][5]。1994年アイルトン・セナ急逝後のウィリアムズに請われてF1スポット復帰を果たし、最終戦オーストラリアGPで通算31勝目を挙げ、歴史的レジェンドとしてファンを魅了し続けた [1][2][5]。',
     entries: 187,
     wins: 31,
     podiums: 59,
@@ -5201,7 +5207,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/nigel-mansell.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -5355,7 +5361,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/mika-hakkinen.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -5471,7 +5477,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/liam-lawson.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -5574,7 +5580,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/andrea-kimi-antonelli.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -5669,7 +5675,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/jack-doohan.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -5764,7 +5770,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/isack-hadjar.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -5867,7 +5873,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/gabriel-bortoleto.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -5938,7 +5944,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
     socialLinks: {
       instagram: 'https://www.instagram.com/olliebearman/'
     },
-    careerSummary: '2024年サウジアラビアGPで急病のカルロス・サインツの代役としてスクーデリア・フェラーリから急遽F1デビューを飾り、予選11番手から7位入賞の快挙を達成 [1][3][5]。さらに同年のアゼルバイジャンGPではハースからも代役参戦し10位入賞を記録、史上初となる「同一シーズンに異なる2チームから参戦し両方でポイント獲得」の歴史的記録を樹立した [2][4]。2025年よりハースF1のフルタイムレギュラーとして参戦し、エステバン・オコンとともにチームの若き牽引役を務める [4][6]。',
+    careerSummary: '2024年サウジアラビアGPで急病のカルロス・サインツの代役としてスクーデリア・フェラーリから急遽F1デビューを飾り、予選11番手から7位入賞の快挙を達成 [1][3][5]。さらに同年のアゼルバイジャンGPではハースからも代役参戦し10位入賞を記録、初となる「同一シーズンに異なる2チームから参戦し両方でポイント獲得」の歴史的記録を樹立した [2][4]。2025年よりハースF1のフルタイムレギュラーとして参戦し、エステバン・オコンとともにチームの若き牽引役を務める [4][6]。',
     entries: 3,
     wins: 0,
     podiums: 0,
@@ -5977,7 +5983,7 @@ export const KNOWLEDGE_DRIVERS: DriverProfile[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/oliver-bearman.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -6697,7 +6703,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         "year": 2008,
         "title": "ベッテルの史上最年少初優勝（トロロッソの奇跡）",
         "description": "豪雨のモンツァでセバスチャン・ベッテルがトロロッソ（旧ミナルディ）でポール・トゥ・ウィンを達成。",
-        "detailedStory": "ウェットコンディションの予選で驚異的なポールポジションを獲得した21歳のベッテル。決勝でも水煙を上げるモンツァのストレートを一人旅で駆け抜け、一度も首位を譲ることなく初優勝。ファエンツァの小さなチームに史上初の栄冠をもたらした。",
+        "detailedStory": "ウェットコンディションの予選で驚異的なポールポジションを獲得した21歳のベッテル。決勝でも水煙を上げるモンツァのストレートを一人旅で駆け抜け、一度も首位を譲ることなく初優勝。ファエンツァの小さなチームに初の栄冠をもたらした。",
         "significance": "歴史的快挙となったベッテルの初勝利と新時代の幕開け。"
       },
       {
@@ -7289,7 +7295,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       "driver": "Max Verstappen (Red Bull)",
       "year": 2020
     },
-    "characteristics": "【第1章：F1世界選手権発祥の聖地と伝説の超高速S字複合】\\n1950年5月13日にF1史上初の公式世界選手権レースが開催されたモータースポーツの揺り籠、シルバーストン・サーキット [1][5]。旧第二次世界大戦時の英空軍飛行場跡地を利用した広大で平坦なレイアウトに、時速260〜295km/hで連続して駆け抜ける世界屈指の超高速S字セクション「マゴッツ〜ベケッツ〜チャペル（Maggots - Becketts - Chapel: Turns 10-14）」が鎮座する [1][2]。ルイス・ハミルトン、ランド・ノリス、ジョージ・ラッセルら英国勢の母国グランプリとして熱狂的なファンが集う伝統の舞台である [1][5]。\\n\\n【第2章：5.2G横加速度とピレリ最強構造タイヤへの剪断ストレス】\\nマゴッツ〜ベケッツ区間では、ステアリングを左・右・左と切り返すたびに最大5.2Gを超える激烈な横加速度が連続してマシンを襲う [2][3]。この極限の高速旋回により、グラウンドエフェクトフロアとウィングが発生する巨大なダウンフォースがタイヤを路面に押し付け、左フロントおよび左リアタイヤの内部カーカスベルトに世界最大の剪断ストレス（Shear Stress）が加わる [2][3]。ピレリは毎年このサーキットに最高強度の専用構造タイヤを供給するが、サーマルデグラデーションの進行は極めて早く、ブリスター防止のためのタイヤマネジメントが不可欠となる [3][6]。\\n\\n【第3章：ハンガーストレートXモードと2ストップ・アンダーカット決戦】\\nチャペルを全開で立ち上がった後の「ハンガーストレート」では、2026年規定の「アクティブエアロ（Xモード）」が作動し時速335km/hに到達 [2][4]。直後のストウ（Turn 15: Stowe）では時速180km/hの「Zモード」へと高速移行し、ストレートエンドでの激しいオーバーテイクバトルが繰り広げられる [2][4]。さらに広大な吹き抜けの地形ゆえに突風や横風がフロア負圧を急激に乱すため、ドライバーは卓越したマシンバランスのセンシングが求められる [2][4]。タイヤ摩耗の激しさから2ストップ戦略が基本であり、フレッシュタイヤの強烈なグリップを活かしたアンダーカットが勝負を決する決定打となる [1][6]。",
+    "characteristics": "【第1章：F1世界選手権発祥の聖地と伝説の超高速S字複合】\\n1950年5月13日にF1初の公式世界選手権レースが開催されたモータースポーツの揺り籠、シルバーストン・サーキット [1][5]。旧第二次世界大戦時の英空軍飛行場跡地を利用した広大で平坦なレイアウトに、時速260〜295km/hで連続して駆け抜ける世界屈指の超高速S字セクション「マゴッツ〜ベケッツ〜チャペル（Maggots - Becketts - Chapel: Turns 10-14）」が鎮座する [1][2]。ルイス・ハミルトン、ランド・ノリス、ジョージ・ラッセルら英国勢の母国グランプリとして熱狂的なファンが集う伝統の舞台である [1][5]。\\n\\n【第2章：5.2G横加速度とピレリ最強構造タイヤへの剪断ストレス】\\nマゴッツ〜ベケッツ区間では、ステアリングを左・右・左と切り返すたびに最大5.2Gを超える激烈な横加速度が連続してマシンを襲う [2][3]。この極限の高速旋回により、グラウンドエフェクトフロアとウィングが発生する巨大なダウンフォースがタイヤを路面に押し付け、左フロントおよび左リアタイヤの内部カーカスベルトに世界最大の剪断ストレス（Shear Stress）が加わる [2][3]。ピレリは毎年このサーキットに最高強度の専用構造タイヤを供給するが、サーマルデグラデーションの進行は極めて早く、ブリスター防止のためのタイヤマネジメントが不可欠となる [3][6]。\\n\\n【第3章：ハンガーストレートXモードと2ストップ・アンダーカット決戦】\\nチャペルを全開で立ち上がった後の「ハンガーストレート」では、2026年規定の「アクティブエアロ（Xモード）」が作動し時速335km/hに到達 [2][4]。直後のストウ（Turn 15: Stowe）では時速180km/hの「Zモード」へと高速移行し、ストレートエンドでの激しいオーバーテイクバトルが繰り広げられる [2][4]。さらに広大な吹き抜けの地形ゆえに突風や横風がフロア負圧を急激に乱すため、ドライバーは卓越したマシンバランスのセンシングが求められる [2][4]。タイヤ摩耗の激しさから2ストップ戦略が基本であり、フレッシュタイヤの強烈なグリップを活かしたアンダーカットが勝負を決する決定打となる [1][6]。",
     "officialLinks": {
           "website": "https://www.silverstone.co.uk/",
           "f1Official": "https://www.formula1.com/en/racing/2026/great-britain.html",
@@ -7967,7 +7973,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
       },
       {
         "year": 2009,
-        "title": "レッドブル・レーシング、チーム史上初優勝",
+        "title": "レッドブル・レーシング、チーム初優勝",
         "description": "豪雨の上海でセバスチャン・ベッテルがポール・トゥ・ウィン、ウェバーが2位に入りレッドブルが初の1-2を達成。",
         "detailedStory": "ニューウェイ設計のRB5が豪雨の中で圧倒的なダウンフォースを発揮。ベッテルが終始レースを支配し、チーム設立5年目にして初のポールポジションと初優勝を1-2フィニッシュという完璧な形で成し遂げた。",
         "significance": "レッドブル黄金時代の幕開けとなった記念碑的グランプリ。"
@@ -9524,7 +9530,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         "year": 2006,
         "title": "ジェンソン・バトン、波乱の雨中でキャリア初優勝",
         "description": "ホンダ第3期F1の記念すべき初勝利。14番手スタートのバトンが悪天候を読み切り113戦目の初勝利。",
-        "detailedStory": "ハンガロリンク史上初の雨のレース。アロンソやライコネンがトラブルで脱落する中、ホンダRA106を駆るバトンが濡れた路面で圧巻の速さを披露。的確なピット判断で首位に立ち、ホンダに1992年以来のワークス優勝をもたらした。",
+        "detailedStory": "ハンガロリンク初の雨のレース。アロンソやライコネンがトラブルで脱落する中、ホンダRA106を駆るバトンが濡れた路面で圧巻の速さを披露。的確なピット判断で首位に立ち、ホンダに1992年以来のワークス優勝をもたらした。",
         "significance": "ホンダ第3期唯一の勝利とバトンの歴史的初タイトルへの足がかり。"
       },
       {
@@ -10282,7 +10288,7 @@ export const KNOWLEDGE_CIRCUITS: CircuitProfile[] = [
         "year": 2008,
         "title": "初開催ナイトレースと「クラッシュゲート」事件",
         "description": "ルノーのピケJr.が故意にクラッシュしセーフティカーを導入させ、僚友フェルナンド・アロンソが逆転優勝。",
-        "detailedStory": "F1史上初の夜間レース。ルノー首脳陣の謀略により、ピケJr.が指示通りターン17で単独クラッシュ。直前にピットインしていたアロンソがSC導入によりトップへ浮上し優勝。翌年に不正が告発され、ブリアトーレが追放されるF1史上最大の不正スキャンダルとなった。",
+        "detailedStory": "F1初の夜間レース。ルノー首脳陣の謀略により、ピケJr.が指示通りターン17で単独クラッシュ。直前にピットインしていたアロンソがSC導入によりトップへ浮上し優勝。翌年に不正が告発され、ブリアトーレが追放されるF1史上最大の不正スキャンダルとなった。",
         "significance": "モータースポーツの統治構造と公正性を揺るがした世紀の大事件。"
       },
       {
@@ -12151,7 +12157,6 @@ export const KNOWLEDGE_STRATEGIES: StrategyConcept[] = [
         transcript: 'Box box, Lewis, box box. Let\'s get the undercut on Leclerc.',
         translation: 'ピットインだルイス。ルクレールに対してアンダーカットを仕掛けるぞ。',
         strategicContext: 'フェラーリの前でピットアウトし順位を逆転するための決定打となった無線指示。',
-        audioUrl: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/LEWHAM01_44_20230916_142617.mp3',
       },
     ],
     telemetrySession: {
@@ -12167,7 +12172,7 @@ export const KNOWLEDGE_STRATEGIES: StrategyConcept[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/radio-undercut-1.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -12204,7 +12209,7 @@ export const KNOWLEDGE_STRATEGIES: StrategyConcept[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/overcut-dynamics.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -12241,7 +12246,7 @@ export const KNOWLEDGE_STRATEGIES: StrategyConcept[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/safety-car-vsc-delta.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -12294,7 +12299,7 @@ export const KNOWLEDGE_HISTORY: HistoryArchive[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/radio-1998-2.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -12339,7 +12344,7 @@ export const KNOWLEDGE_HISTORY: HistoryArchive[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/radio-2011-1.html',
         verifiedDate: '2026-01-01',
       },
       {
@@ -12369,7 +12374,6 @@ export const KNOWLEDGE_HISTORY: HistoryArchive[] = [
         transcript: 'Safety car deployed. Box, Max, box for Softs! Opportunity for a free stop.',
         translation: 'セーフティカー導入だ。ピットインだマックス、ソフトタイヤを履く！フリーストップの好機だ。',
         strategicContext: 'ステイアウトを選択したメルセデスに対し、逆転を賭けてソフトタイヤへ履き替える勝負手となったピットコール。',
-        audioUrl: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/MAXVER01_1_20230916_144953.mp3',
       },
       {
         id: 'radio-2021-2',
@@ -12379,7 +12383,6 @@ export const KNOWLEDGE_HISTORY: HistoryArchive[] = [
         transcript: 'MAX VERSTAPPEN! YOU ARE THE WORLD CHAMPION! THE WORLD CHAMPION!',
         translation: 'マックス・フェルスタッペン！君が世界チャンピオンだ！世界チャンピオンだ！',
         strategicContext: 'ファイナルラップでの逆転劇直後、チーム代表ホーナーが絶叫した戴冠の瞬間。',
-        audioUrl: 'https://livetiming.formula1.com/static/2023/2023-09-17_Singapore_Grand_Prix/2023-09-16_Qualifying/TeamRadio/MAXVER01_1_20230916_142555.mp3',
       },
     ],
     telemetrySession: {
@@ -12395,7 +12398,7 @@ export const KNOWLEDGE_HISTORY: HistoryArchive[] = [
         id: 1,
         title: 'Official F1 Documentation & Statistics',
         publisher: 'Formula 1 Official',
-        url: 'https://www.formula1.com',
+        url: 'https://www.formula1.com/en/drivers/radio-2021-2.html',
         verifiedDate: '2026-01-01',
       },
       {

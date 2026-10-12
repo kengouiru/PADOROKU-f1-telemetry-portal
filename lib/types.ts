@@ -247,8 +247,8 @@ export interface PitSimulationResult {
   aheadDriverAcronym: string | null;
   gapBehindSeconds: number | null;
   behindDriverAcronym: string | null;
-  undercutSuccessProb: number; // 0 - 100%
-  overcutViability: 'HIGH' | 'MEDIUM' | 'LOW';
+  undercutSuccessProb?: number; // 0 - 100%
+  overcutViability?: 'HIGH' | 'MEDIUM' | 'LOW';
   freshTyreDeltaPerLap: number; // e.g. +1.4s
   pitLossSeconds: number; // e.g. 22.5s
   currentTyreCompound: TyreCompound;

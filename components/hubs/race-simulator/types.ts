@@ -36,8 +36,8 @@ export interface RivalIntelReport {
   targetCarColor: string;
   headline: string;
   summary: string;
-  confidence: 'verified' | 'high' | 'suspect_bluff' | 'low';
-  confidenceLabel: string;
+  confidence?: 'verified' | 'high' | 'suspect_bluff' | 'low';
+  confidenceLabel?: string;
   rawTelemetry: {
     lapTimes: string[];
     speedTrapKmh: number;

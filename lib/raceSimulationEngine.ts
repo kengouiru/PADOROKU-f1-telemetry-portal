@@ -21,6 +21,17 @@ import {
   ensureAudioContextResumed,
 } from './radioAudioEffect';
 import {
+  FUEL_EFFECT_S_PER_KG,
+  BASE_RACE_FUEL_KG,
+  ERS_MAX_CHARGE_MJ,
+  ERS_MAX_HARVEST_PER_LAP_MJ,
+  ERS_MIN_CHARGE_PERCENT,
+  ERS_MAX_CHARGE_PERCENT,
+  TEAM_ORDER_DEFEND_PENALTY_S,
+  DIRTY_AIR_THRESHOLD_S,
+} from './physicsConstants';
+import { seededRandom, setGlobalSeed } from './seededRandom';
+import {
   MASTER_TRAITS,
   DRIVER_TRAIT_ASSIGNMENTS,
   type DriverTraitId,
@@ -1394,17 +1405,17 @@ export function runFullGrandPrixSimulation(params: {
     }
 
     // 3. Dynamic Incident / Safety Car Risk Evaluation
-    let calculatedRisk = incidentFrequency === 'high_chaos' ? 14 : incidentFrequency === 'none' ? 1 : 5;
-    // Water depth penalty
-    if (currentWaterDepth > 4.0) calculatedRisk += 52; // Monsoon aquaplaning
-    else if (currentWaterDepth >= 2.2) calculatedRisk += 32; // Wet standing water
-    else if (currentWaterDepth >= 1.0) calculatedRisk += 16; // Damp slippery braking
-    else if (trackPhase === 'DRYING_LINE') calculatedRisk += 10; // Stepping off dry line onto damp patch
+    let pRaceBase = incidentFrequency === 'high_chaos' ? 0.90 : incidentFrequency === 'none' ? 0.0 : 0.45;
+    
+    // Add track and weather conditions to the race-level probability
+    let pRaceMod = 0;
+    if (currentWaterDepth > 4.0) pRaceMod += 0.50; // Monsoon aquaplaning
+    else if (currentWaterDepth >= 2.2) pRaceMod += 0.35; // Wet standing water
+    else if (currentWaterDepth >= 1.0) pRaceMod += 0.20; // Damp slippery braking
+    else if (trackPhase === 'DRYING_LINE') pRaceMod += 0.10;
+    
+    pRaceMod += (circuit.overtakeDifficulty - 1.0) * 0.25;
 
-    // Circuit difficulty bonus
-    calculatedRisk += (circuit.overtakeDifficulty - 1.0) * 12;
-
-    // Check cars on grid running mismatched tyres (slicks in wet dramatically spike crash risk!)
     let slickCarsInWetCount = 0;
     for (const d of drivers) {
       const t = trackers[d.code];
@@ -1412,11 +1423,13 @@ export function runFullGrandPrixSimulation(params: {
         slickCarsInWetCount += 1;
       }
     }
-    calculatedRisk += slickCarsInWetCount * 12;
-
-    const incidentRiskPercent = Math.min(90, Math.max(4, Math.round(calculatedRisk * incidentRiskMultiplier)));
+    pRaceMod += slickCarsInWetCount * 0.15;
+    
+    const pRace = Math.min(0.99, Math.max(0, (pRaceBase + pRaceMod) * incidentRiskMultiplier));
+    const perLapHazard = pRace > 0 ? 1 - Math.pow(1 - pRace, 1 / totalLaps) : 0;
+    const incidentRiskPercent = Math.round(pRace * 100);
     const incidentRiskLevel: IncidentRiskLevel =
-      incidentRiskPercent >= 55 ? 'CRITICAL' : incidentRiskPercent >= 32 ? 'HIGH' : incidentRiskPercent >= 16 ? 'ELEVATED' : 'LOW';
+      incidentRiskPercent >= 65 ? 'CRITICAL' : incidentRiskPercent >= 40 ? 'HIGH' : incidentRiskPercent >= 20 ? 'ELEVATED' : 'LOW';
 
     // 4. Dynamic SC Triggering
     let isSC = false;
@@ -1442,9 +1455,9 @@ export function runFullGrandPrixSimulation(params: {
       if (scTriggerLap && currentLap === scTriggerLap) {
         triggerIncident = true;
       } else if (currentLap > 1 && currentLap < totalLaps && currentLap - lastIncidentLap >= 3) {
-        // Roll against calculated risk deterministically
-        const roll = incidentRng() * 100;
-        if (roll < (incidentRiskPercent / totalLaps) * 0.75) {
+        // Roll against perLapHazard deterministically
+        const roll = incidentRng();
+        if (roll < perLapHazard) {
           triggerIncident = true;
         }
       }
@@ -1454,13 +1467,15 @@ export function runFullGrandPrixSimulation(params: {
         activeScLapsRemaining = 2; // 2 laps of SC
         lastIncidentLap = currentLap;
 
-        // Choose victim car from non-retired AI cars deterministically
-        const potentialVictims = drivers.filter((d) => !d.isPlayer && !trackers[d.code].isRetired);
-        if (potentialVictims.length > 0) {
-          const victim = potentialVictims[Math.floor(incidentRng() * potentialVictims.length)];
-          const victimTracker = trackers[victim.code];
-          victimTracker.isRetired = true;
-          victimTracker.retirementLap = currentLap;
+        const isDnf = incidentRng() < 0.4; // 40% chance of an actual DNF causing SC
+        if (isDnf) {
+          // Choose victim car from non-retired AI cars deterministically
+          const potentialVictims = drivers.filter((d) => !d.isPlayer && !trackers[d.code].isRetired);
+          if (potentialVictims.length > 0) {
+            const victim = potentialVictims[Math.floor(incidentRng() * potentialVictims.length)];
+            const victimTracker = trackers[victim.code];
+            victimTracker.isRetired = true;
+            victimTracker.retirementLap = currentLap;
 
           let reason = '💥 クラッシュ';
           if (currentWaterDepth > 2.0) {
@@ -1503,7 +1518,17 @@ export function runFullGrandPrixSimulation(params: {
             text: `📻 "${radioLine}"`,
           });
         }
+      } else {
+        // SC for debris or spun car that continued
+        globalCommentary.unshift({
+          id: `sc-debris-${currentLap}`,
+          lap: currentLap,
+          type: 'incident',
+          speaker: 'FIA RACE CONTROL',
+          text: `🚨 SAFETY CAR DEPLOYED — コース上にデブリ発生またはスピン車両による黄旗！全車減速指示。`,
+        });
       }
+    }
     }
 
     // Safety Car Green Flag Restart Broadcast & Radio
@@ -1719,30 +1744,25 @@ export function runFullGrandPrixSimulation(params: {
       const leaderTargetTime = preLapCumulative[onTrackLeader.code] + scBaseLap;
 
       let runningQueueTime = leaderTargetTime;
-      let prevNonPittingDriver: DriverSimConfig | null = null;
+      let prevDriver: DriverSimConfig | null = null;
 
       for (let idx = 0; idx < preLapActiveDrivers.length; idx++) {
         const d = preLapActiveDrivers[idx];
         const isPitting = pittingCarsThisLap.has(d.code);
 
-        if (!isPitting) {
-          if (d.code === onTrackLeader.code) {
-            scTargetCumulative[d.code] = leaderTargetTime;
-          } else {
-            const prevGap = prevNonPittingDriver
-              ? Math.max(0.5, preLapCumulative[d.code] - preLapCumulative[prevNonPittingDriver.code])
-              : 1.0;
-            // Smoothly compress queue gap to ~0.85s - 1.15s behind the car ahead
-            const compressedGap = Math.max(0.85, Math.min(prevGap * 0.5, 1.15)) + ((hashStringToSeed(`${d.code}-${currentLap}`) % 7) * 0.01);
-            runningQueueTime += compressedGap;
-            scTargetCumulative[d.code] = Number(runningQueueTime.toFixed(3));
-          }
-          prevNonPittingDriver = d;
+        if (d.code === onTrackLeader.code) {
+          runningQueueTime = leaderTargetTime;
+          scTargetCumulative[d.code] = leaderTargetTime;
         } else {
-          // Pitting car under SC: takes SC base lap + cheap pit loss (~11.5s) + crew time
-          const pitLoss = circuit.pitLaneLoss * 0.52 + d.crewStopTime;
-          scTargetCumulative[d.code] = Number((preLapCumulative[d.code] + scBaseLap + pitLoss).toFixed(3));
+          const prevGap = prevDriver
+            ? Math.max(0.5, preLapCumulative[d.code] - preLapCumulative[prevDriver.code])
+            : 1.0;
+          // Smoothly compress queue gap to ~0.85s - 1.15s behind the car ahead
+          const compressedGap = Math.max(0.85, Math.min(prevGap * 0.5, 1.15)) + ((hashStringToSeed(`${d.code}-${currentLap}`) % 7) * 0.01);
+          runningQueueTime += compressedGap;
+          scTargetCumulative[d.code] = Number(runningQueueTime.toFixed(3));
         }
+        prevDriver = d;
       }
     }
 
@@ -1805,6 +1825,14 @@ export function runFullGrandPrixSimulation(params: {
       const preBehindDriver = prePosition < preLapActiveDrivers.length ? preLapActiveDrivers[prePosition] : null;
       const aheadGap = preAheadDriver ? preLapCumulative[driver.code] - preLapCumulative[preAheadDriver.code] : 999;
       const behindGap = preBehindDriver ? preLapCumulative[preBehindDriver.code] - preLapCumulative[driver.code] : 999;
+
+      let dirtyAirPaceLoss = 0;
+      if (!isSC && aheadGap < DIRTY_AIR_THRESHOLD_S && currentLap > 1) {
+        tracker.inDirtyAir = true;
+        dirtyAirPaceLoss = 0.45;
+      } else {
+        tracker.inDirtyAir = false;
+      }
 
       // ── Machine Performance Package & Driver Core Skills ──
       const carPkg = getCarPackage(driver.team);
@@ -2021,31 +2049,41 @@ export function runFullGrandPrixSimulation(params: {
       const baseLap = circuit.baseLapTime + driver.basePaceOffset;
 
       // PU Mode modifier & ERS Battery Management (High-impact tactical trade-offs)
+      // Track energy in MJ: 4.0 MJ is 100% SoC.
+      let currentMj = (tracker.ersBatterySoc / 100) * ERS_MAX_CHARGE_MJ;
+
       let puPaceMod = 0;
+      // Natural thermal equilibrium at standard pace is around 100°C
+      const targetEquilibrium = 100;
+      tracker.surfaceTemp += (targetEquilibrium - tracker.surfaceTemp) * 0.1;
+      tracker.coreTemp += (targetEquilibrium - tracker.coreTemp) * 0.1;
+
       if (tracker.puMode === 'push') {
         puPaceMod = -0.55; // aggressive high-combustion engine attack
         tracker.surfaceTemp += 4.5; // noticeable thermal rise (leads to blister if sustained)
         tracker.coreTemp += 2.0;
-        tracker.ersBatterySoc = Math.max(6, tracker.ersBatterySoc - 18); // rapid electrical drain
+        currentMj = Math.max(ERS_MIN_CHARGE_PERCENT * ERS_MAX_CHARGE_MJ / 100, currentMj - 0.8); // rapid electrical drain
       } else if (tracker.puMode === 'conserve') {
         puPaceMod = +0.65; // lift & coast pacing
-        tracker.surfaceTemp = Math.max(88, tracker.surfaceTemp - 4.0); // rapid tyre cooling into optimal zone
-        tracker.coreTemp = Math.max(88, tracker.coreTemp - 2.2);
-        tracker.ersBatterySoc = Math.min(98, tracker.ersBatterySoc + 22); // heavy MGU-K regen under braking
+        tracker.surfaceTemp = Math.max(80, tracker.surfaceTemp - 4.0); // rapid tyre cooling
+        tracker.coreTemp = Math.max(80, tracker.coreTemp - 2.2);
+        currentMj = Math.min(ERS_MAX_CHARGE_MJ, currentMj + (ERS_MAX_HARVEST_PER_LAP_MJ * 0.15)); // heavy MGU-K regen under braking
       } else {
-        // Standard mode: realistic lap oscillation (-3% on straights, +2% in braking zones)
+        // Standard mode: realistic lap oscillation
         tracker.surfaceTemp += 0.5;
-        const lapRegen = (currentLap % 2 === 0 ? -3 : +2);
-        tracker.ersBatterySoc = Math.min(95, Math.max(5, tracker.ersBatterySoc + lapRegen));
+        const lapRegen = (currentLap % 2 === 0 ? -0.15 : +0.10);
+        currentMj = Math.min(ERS_MAX_CHARGE_MJ, Math.max(ERS_MIN_CHARGE_PERCENT * ERS_MAX_CHARGE_MJ / 100, currentMj + lapRegen));
       }
 
       // ERS Boost modifier (Manual Override Mode / Overtake)
       let ersPaceMod = 0;
-      if (tracker.ersBoostUsed && tracker.ersBatterySoc > 15) {
+      if (tracker.ersBoostUsed && currentMj > 0.5) {
         ersPaceMod = -0.75;
-        // Heavy discharge: drains 35% battery in a single lap of full deployment!
-        tracker.ersBatterySoc = Math.max(5, tracker.ersBatterySoc - 35);
+        // Heavy discharge: max 350 kW -> approx 1.4 MJ per lap
+        currentMj = Math.max(ERS_MIN_CHARGE_PERCENT * ERS_MAX_CHARGE_MJ / 100, currentMj - 1.4);
       }
+      
+      tracker.ersBatterySoc = (currentMj / ERS_MAX_CHARGE_MJ) * 100;
 
       // Team Order physics
       let teamOrderPaceMod = 0;
@@ -2091,10 +2129,13 @@ export function runFullGrandPrixSimulation(params: {
       tracker.tyreWearPercent = Math.min(100, (tracker.tyreWearPercent || 0) + baseWearIncrement * combinedPhysicsFactor);
       const wearPercent = Math.min(100, Math.round(tracker.tyreWearPercent));
 
-      // Dynamic cliff detection: either cumulative physical wear reaches 75% or tyre age exceeds effective cliff
-      const isAtCliff = wearPercent >= 75 || tracker.tyreAge > effectiveCliff;
-      const wearMultiplier = isAtCliff ? 3.2 : 1.0;
-      const tyreWearPacePenalty = (wearPercent / 100) * 3.5 * wearMultiplier;
+      // Dynamic cliff detection continuous penalty:
+      let tyreWearPacePenalty = (wearPercent / 100) * 3.5;
+      const cliffThreshold = 75;
+      if (wearPercent > cliffThreshold) {
+        const overflow = (wearPercent - cliffThreshold) / (100 - cliffThreshold);
+        tyreWearPacePenalty += overflow * overflow * 5.5; // Smooth quadratic penalty beyond cliff
+      }
 
       // Thermal warnings
       let thermalWarning: 'NONE' | 'GRAINING_RISK' | 'BLISTERING_WARNING' | 'OPTIMAL' = 'OPTIMAL';
@@ -2125,10 +2166,10 @@ export function runFullGrandPrixSimulation(params: {
         }
       }
 
-      // Fuel burn off (lighter car = faster lap: -0.033s per lap)
-      const lapFuelBurn = isFullGp ? 1.75 : 1.55;
-      tracker.fuelKg = Math.max(2, tracker.fuelKg - lapFuelBurn);
-      const fuelPaceBonus = (tracker.fuelKg * 0.033);
+      // Fuel burn off: lighter car = faster lap
+      const perLapFuelBurn = BASE_RACE_FUEL_KG / totalLaps;
+      tracker.fuelKg = Math.max(0, tracker.fuelKg - perLapFuelBurn);
+      const fuelPacePenalty = (tracker.fuelKg * FUEL_EFFECT_S_PER_KG);
 
       // Track limits simulation (push mode on dry track risks track limits)
       if (tracker.puMode === 'push' && !isSC && trackLimitsRng() < 0.05) {
@@ -2200,8 +2241,7 @@ export function runFullGrandPrixSimulation(params: {
       if (isSC) {
         // Under Safety Car, pace is governed by SC delta pace and queue compression (STRICT ZERO-OVERTAKE RULE)
         const targetCumulative =
-          scTargetCumulative[driver.code] ??
-          (preLapCumulative[driver.code] + circuit.baseLapTime * 1.42 + lapPitLoss);
+          (scTargetCumulative[driver.code] ?? (preLapCumulative[driver.code] + circuit.baseLapTime * 1.42)) + lapPitLoss;
         lapDuration = Math.max(circuit.baseLapTime * 1.10, targetCumulative - preLapCumulative[driver.code]);
       } else {
         lapDuration =
@@ -2217,8 +2257,9 @@ export function runFullGrandPrixSimulation(params: {
           traitPaceDelta +
           tyreWearPacePenalty +
           waterPenalty +
-          fuelPaceBonus +
+          fuelPacePenalty +
           trackEvolutionBonus +
+          dirtyAirPaceLoss +
           lapPitLoss +
           jitter;
       }
@@ -2289,7 +2330,41 @@ export function runFullGrandPrixSimulation(params: {
     const activeCars = lapCarStates.filter((c) => !c.isRetired);
     const retiredCars = lapCarStates.filter((c) => c.isRetired);
 
-    // Under Safety Car and normal racing, track order is naturally determined by cumulativeTime!
+    // Sort by start-of-lap order to evaluate overtakes sequentially
+    activeCars.sort((a, b) => (preLapCumulative[a.code] ?? 0) - (preLapCumulative[b.code] ?? 0));
+    
+    for (let i = 1; i < activeCars.length; i++) {
+      const car = activeCars[i];
+      const carAhead = activeCars[i - 1];
+      
+      if (!isSC && car.cumulativeTime < carAhead.cumulativeTime) {
+        // Attempt overtake
+        const paceDelta = carAhead.lapTime - car.lapTime;
+        const trk = trackers[car.code];
+        const aheadTrk = trackers[carAhead.code];
+        
+        let overtakeProb = 0.4 + (paceDelta * 0.2) - ((circuit.overtakeDifficulty - 1.0) * 0.5);
+        if (trk.ersBoostUsed) overtakeProb += 0.35;
+        if (aheadTrk.ersBoostUsed) overtakeProb -= 0.35;
+        
+        const overtakeRng = createSeededRng(baseSeed ^ (currentLap * 1111) ^ (i * 2222) ^ 0xabc);
+        
+        if (overtakeProb > 0 && overtakeRng() < overtakeProb) {
+           if (!car.eventNote) car.eventNote = 'OVERTAKE';
+           // Swap in array so the next car evaluates against the new order
+           activeCars[i] = carAhead;
+           activeCars[i - 1] = car;
+        } else {
+           // Overtake failed, held up behind
+           car.cumulativeTime = carAhead.cumulativeTime + 0.150;
+           car.lapTime = Number((car.cumulativeTime - preLapCumulative[car.code]).toFixed(3));
+           trk.cumulativeTime = car.cumulativeTime;
+           if (!car.eventNote) car.eventNote = 'ATTACK FAILED';
+        }
+      }
+    }
+    
+    // Sort by final resolved cumulative times
     activeCars.sort((a, b) => a.cumulativeTime - b.cumulativeTime);
 
     // If under SC, guarantee strict queue spacing (monotonic >= 0.85s between consecutive cars)
@@ -2318,9 +2393,14 @@ export function runFullGrandPrixSimulation(params: {
       if (tmIdx >= 0 && tmIdx < activeCars.length - 1) {
         const carBehind = activeCars[tmIdx + 1];
         if (carBehind && carBehind.code !== playerDriver.code) {
-          carBehind.cumulativeTime += 0.6;
-          carBehind.lapTime = Number((carBehind.lapTime + 0.6).toFixed(3));
+          carBehind.cumulativeTime += TEAM_ORDER_DEFEND_PENALTY_S;
+          carBehind.lapTime = Number((carBehind.lapTime + TEAM_ORDER_DEFEND_PENALTY_S).toFixed(3));
           if (!carBehind.eventNote) carBehind.eventNote = 'HELD UP BY DEFENSE';
+          
+          const trackerBehind = trackers[carBehind.code];
+          if (trackerBehind) {
+            trackerBehind.cumulativeTime = carBehind.cumulativeTime;
+          }
         }
       }
     }
@@ -3324,13 +3404,14 @@ export const MISSION_CHALLENGES: ChallengeScenario[] = [
 // Weather re-roll helper for any scenario
 export function rerollScenarioWeather(base: ChallengeScenario): ChallengeScenario {
   const weatherChoices: WeatherType[] = ['dry', 'variable', 'drizzle', 'monsoon'];
-  const newWeather = weatherChoices[Math.floor(Math.random() * weatherChoices.length)];
+  const newWeather = weatherChoices[Math.floor(seededRandom() * weatherChoices.length)];
   const hasRain = newWeather !== 'dry';
-  const rainLap = hasRain ? Math.max(2, Math.floor(Math.random() * Math.max(2, base.totalLaps - 1)) + 1) : undefined;
+  const rainLap = hasRain ? Math.max(2, Math.floor(seededRandom() * Math.max(2, base.totalLaps - 1)) + 1) : undefined;
   const rainIntensity =
     newWeather === 'monsoon' ? 4.2 : newWeather === 'drizzle' ? 1.4 : hasRain ? 2.5 : 0;
-  const scProb = Math.random() < 0.35 ? 0.85 : Math.random() < 0.7 ? 0.45 : 0.15;
-  const scLap = scProb > 0.4 ? Math.max(2, Math.floor(Math.random() * base.totalLaps) + 1) : undefined;
+  
+  const scProb = seededRandom() < 0.35 ? 0.85 : seededRandom() < 0.7 ? 0.45 : 0.15;
+  const scLap = scProb > 0.4 ? Math.max(2, Math.floor(seededRandom() * base.totalLaps) + 1) : undefined;
 
   let radarDesc = '快晴ドライコンディション。天候安定。';
   if (newWeather === 'monsoon') {
@@ -3340,6 +3421,10 @@ export function rerollScenarioWeather(base: ChallengeScenario): ChallengeScenari
   } else if (newWeather === 'variable') {
     radarDesc = `雨雲が接近中。${rainLap ? `Lap ${rainLap}前後に降雨到達の可能性高し。` : '突発降雨警戒。'}`;
   }
+  
+  // Forecast probability is calculated based on how far into the race the rain is.
+  // The earlier the rain, the higher the forecast confidence.
+  const forecastProb = hasRain && rainLap ? Math.round(95 - (rainLap / base.totalLaps) * 20) : 10;
 
   return {
     ...base,
@@ -3349,7 +3434,7 @@ export function rerollScenarioWeather(base: ChallengeScenario): ChallengeScenari
       radarDesc,
       estimatedLapMin: rainLap ? Math.max(1, rainLap - 1) : 99,
       estimatedLapMax: rainLap ? Math.min(base.totalLaps, rainLap + 2) : 99,
-      rainProbabilityPercent: hasRain ? Math.floor(Math.random() * 35) + 65 : 10,
+      rainProbabilityPercent: forecastProb,
     },
     actualRainLap: rainLap,
     actualRainIntensity: rainIntensity,
@@ -3484,14 +3569,17 @@ export function generateSprintRaceScenario(circuitId: string, playerCode: string
 
 // Procedural random scenario generator
 export function generateProceduralScenario(): ChallengeScenario {
-  const randCircuit = SIM_CIRCUITS[Math.floor(Math.random() * SIM_CIRCUITS.length)];
-  const randPlayer = GRID_DRIVERS[Math.floor(Math.random() * GRID_DRIVERS.length)];
+  const randCircuit = SIM_CIRCUITS[Math.floor(seededRandom() * SIM_CIRCUITS.length)];
+  const randPlayer = GRID_DRIVERS[Math.floor(seededRandom() * GRID_DRIVERS.length)];
   const randTeammate = GRID_DRIVERS.find((d) => d.team === randPlayer.team && d.code !== randPlayer.code) || GRID_DRIVERS[1];
   const randRivals = GRID_DRIVERS.filter((d) => d.code !== randPlayer.code && d.code !== randTeammate.code);
 
-  const hasRain = Math.random() > 0.45;
-  const laps = Math.floor(Math.random() * 4) + 6; // 6 to 9 laps
+  const hasRain = seededRandom() > 0.45;
+  const laps = Math.floor(seededRandom() * 4) + 6; // 6 to 9 laps
   const rainLap = hasRain ? Math.floor(laps * 0.4) + 1 : undefined;
+  
+  const scProb = seededRandom() > 0.5 ? 0.8 : 0.2;
+  const scLap = scProb > 0.4 ? Math.max(2, Math.floor(seededRandom() * laps)) : undefined;
 
   return {
     id: `procedural_${Date.now()}`,
@@ -3520,12 +3608,12 @@ export function generateProceduralScenario(): ChallengeScenario {
       radarDesc: hasRain ? 'レーダー上に散発的な降水エコーあり。急変警戒。' : '快晴ドライコンディション。',
       estimatedLapMin: hasRain ? Math.max(2, (rainLap || 3) - 1) : 99,
       estimatedLapMax: hasRain ? (rainLap || 3) + 2 : 99,
-      rainProbabilityPercent: hasRain ? 75 : 10,
+      rainProbabilityPercent: hasRain ? Math.round(95 - (rainLap! / laps) * 20) : 10,
     },
     actualRainLap: rainLap,
     actualRainIntensity: hasRain ? 2.5 : 0,
-    scProbability: Math.random() > 0.5 ? 0.8 : 0.2,
-    actualScLap: Math.random() > 0.5 ? 4 : undefined,
+    scProbability: scProb,
+    actualScLap: scLap,
     hiddenTireWearMultiplier: 1.2,
   };
 }
@@ -3587,11 +3675,16 @@ export function evaluateTacticalScore(
 
     if (playerPittedOptimal) {
       pitTiming = 25;
+      const snapAtPit = snapshots[rainLap + 1];
+      const rivalSlick = snapAtPit?.cars.find(c => c.code !== scenario.playerConfig.code && c.tyreCompound === 'SOFT')?.lapTime || 85;
+      const playerTime = snapAtPit?.cars.find(c => c.code === scenario.playerConfig.code)?.lapTime || 80;
+      const timeGained = Math.max(3.5, rivalSlick - playerTime);
+      
       decisions.push({
         lap: rainLap,
         title: 'クロスオーバー直後の即時インター乗り換え',
         verdict: 'optimal',
-        impactSeconds: +6.8,
+        impactSeconds: Number(timeGained.toFixed(1)),
         description: '路面水量の急増（クロスオーバー）を的確に察知し、ライバルに先駆けてピットイン。圧倒的なアウトラップペースで順位を奪取。',
         linkedKeywords: ['crossover', 'undercut'],
       });
@@ -3599,23 +3692,36 @@ export function evaluateTacticalScore(
       keywordSet.add('undercut');
     } else if (playerPittedLate) {
       pitTiming = 10;
+      const snapAtLate = snapshots[rainLap + 1];
+      const leaderTime = snapAtLate?.cars[0]?.lapTime || 80;
+      const playerTime = snapAtLate?.cars.find(c => c.code === scenario.playerConfig.code)?.lapTime || 85;
+      const timeLost = Math.max(2.0, playerTime - leaderTime);
+      
       decisions.push({
         lap: rainLap + 2,
         title: 'ピットイン判断の遅れ（1周ステイアウト過多）',
         verdict: 'costly',
-        impactSeconds: -4.5,
+        impactSeconds: -Number(timeLost.toFixed(1)),
         description: '雨の強まりに対してピット判断が1周遅れ、スリックタイヤで水たまりを踏みタイムロスを喫した。',
         linkedKeywords: ['crossover'],
       });
       keywordSet.add('crossover');
     } else {
       pitTiming = 0; // Never pitted for wet tyres in rain!
+      let totalTimeLost = 0;
+      for (let l = rainLap + 1; l <= scenario.totalLaps; l++) {
+         const s = snapshots[l];
+         const p = s?.cars.find(c => c.code === scenario.playerConfig.code);
+         const leader = s?.cars[0];
+         if (p && leader) totalTimeLost += (p.lapTime - leader.lapTime);
+      }
+      
       decisions.push({
         lap: rainLap + 1,
         title: '豪雨時のスリック走行強行（致命的判断ミス）',
         verdict: 'costly',
-        impactSeconds: -18.5,
-        description: '路面水量が2.0mmを超えた状態でスリックのまま周回を強行。ハイドロプレーニングにより1周あたり5秒以上の大出血を招いた。',
+        impactSeconds: -Number(Math.max(10, totalTimeLost).toFixed(1)),
+        description: '路面水量が2.0mmを超えた状態でスリックのまま周回を強行。ハイドロプレーニングにより大出血を招いた。',
         linkedKeywords: ['crossover', 'degradation'],
       });
       keywordSet.add('crossover');
@@ -3629,12 +3735,16 @@ export function evaluateTacticalScore(
     const pitUnderSc = playerOverrides[scLap]?.boxNextLap || playerOverrides[scLap + 1]?.boxNextLap;
     if (pitUnderSc) {
       pitTiming = Math.min(25, pitTiming + 5);
+      const normalPitLoss = scenario.circuit.pitLaneLoss;
+      const scPitLoss = scenario.circuit.pitLaneLoss * 0.52;
+      const timeSaved = normalPitLoss - scPitLoss;
+      
       decisions.push({
         lap: scLap,
         title: 'セーフティカー時のチープピット敢行',
         verdict: 'optimal',
-        impactSeconds: +11.2,
-        description: '通常22秒のピットロスが11秒に半減するチープピットの窓を完璧に活用。失うはずだったポジションを守り抜いた。',
+        impactSeconds: Number(timeSaved.toFixed(1)),
+        description: `通常${normalPitLoss.toFixed(1)}秒のピットロスがチープピットの窓により軽減。失うはずだったポジションを守り抜いた。`,
         linkedKeywords: ['cheap-pit', 'double-stack'],
       });
       keywordSet.add('cheap-pit');

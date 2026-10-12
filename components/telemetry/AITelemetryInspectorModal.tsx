@@ -18,6 +18,7 @@ import { KNOWLEDGE_CIRCUITS, KNOWLEDGE_DRIVERS } from '@/data/f1KnowledgeData';
 import { GLOSSARY_TERMS, type GlossaryTerm, type GlossaryCategory } from '@/data/f1GlossaryData';
 import { REGULATION_ARTICLES, type RegulationCategory, type RegulationArticle } from '@/data/f1RegulationsData';
 import GlossaryVisualDiagram from '@/components/glossary/GlossaryVisualDiagram';
+import type { Lap, Driver } from '@/lib/types';
 
 export interface AITelemetryInspectorModalProps {
   isOpen: boolean;
@@ -27,6 +28,9 @@ export interface AITelemetryInspectorModalProps {
   driver2Code?: string;
   lapNumber?: number;
   insightNotes?: string;
+  sessionKey?: number | null;
+  lapsCache?: Record<string, Lap[]>;
+  drivers?: Driver[];
   onApplyToMain?: (params: { circuitId: string; driver1Code: string; driver2Code: string; lapNumber?: number }) => void;
 }
 
@@ -52,6 +56,9 @@ export default function AITelemetryInspectorModal({
   driver2Code = 'NOR',
   lapNumber,
   insightNotes,
+  sessionKey,
+  lapsCache,
+  drivers,
   onApplyToMain,
 }: AITelemetryInspectorModalProps) {
   const [mounted, setMounted] = useState(false);
@@ -309,6 +316,9 @@ export default function AITelemetryInspectorModal({
                 initialCircuitId={circuitId}
                 initialDriver1Code={driver1Code}
                 initialDriver2Code={driver2Code}
+                sessionKey={sessionKey}
+                lapsCache={lapsCache}
+                drivers={drivers}
               />
             </div>
           </div>

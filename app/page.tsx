@@ -1001,6 +1001,8 @@ export default function DashboardPage() {
               safetyCarPeriods={state.safetyCarPeriods}
               totalLaps={currentBenchmark.totalLaps}
               selectedDrivers={state.selectedDrivers}
+              sessionKey={state.selectedSessionKey}
+              lapsCache={state.lapsCache}
               onDriverSelect={(driverNum) =>
                 handleDriverToggle(driverNum, !state.selectedDrivers.includes(driverNum))
               }
@@ -1038,6 +1040,9 @@ export default function DashboardPage() {
               initialDriver1Code={detailedTelemetryParams.driver1}
               initialDriver2Code={detailedTelemetryParams.driver2}
               initialTab={detailedTelemetryTab}
+              sessionKey={state.selectedSessionKey}
+              lapsCache={state.lapsCache}
+              drivers={state.drivers}
               onNavigateToCircuit={(circId) => {
                 setTargetCircuitId(circId);
                 setAppMode('library');
@@ -1915,7 +1920,7 @@ export default function DashboardPage() {
         {!aiDrawerOpen && (
           <button
             type="button"
-            onClick={() => setAiDrawerOpen(true)}
+            onClick={() => { setAiDrawerOpen(true); setRightPanelTab('ai'); }}
             className="md:hidden fixed right-3.5 bottom-[calc(4.9rem+env(safe-area-inset-bottom))] z-40 w-11 h-11 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 cursor-pointer thumb-target active:scale-90 bg-gradient-to-tr from-red-600 via-rose-600 to-amber-500 text-white border border-red-400/40 shadow-red-950/80 hover:scale-105"
             aria-label="AI Strategist を起動"
             title="AI 戦略アナリスト（タップで起動）"
@@ -1968,7 +1973,7 @@ export default function DashboardPage() {
 
             {/* Drawer Content */}
             <div className="flex-1 min-h-0 flex flex-col overflow-hidden p-3 bg-slate-900/50">
-              {rightPanelTab === 'ai' ? aiContent : notebookContent}
+              <ErrorBoundary sectionName="AI Drawer">{rightPanelTab === 'ai' ? aiContent : notebookContent}</ErrorBoundary>
             </div>
           </div>
         </div>
@@ -1977,7 +1982,7 @@ export default function DashboardPage() {
       {/* ── Floating Action Button (FAB) (Visible when drawer is closed) ── */}
       {!aiDrawerOpen && (
         <button
-          onClick={() => setAiDrawerOpen(true)}
+          onClick={() => { setAiDrawerOpen(true); setRightPanelTab('ai'); }}
           className="fixed bottom-6 right-6 z-40 hidden lg:flex items-center gap-2 px-4 py-3 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-racing font-bold text-xs shadow-2xl border border-white/20 transition-all hover:scale-105 active:scale-95 group"
           title="AIストラテジストを開く"
         >
@@ -2060,6 +2065,9 @@ export default function DashboardPage() {
         driver2Code={aiInspectorState.driver2Code}
         lapNumber={aiInspectorState.lapNumber}
         insightNotes={aiInspectorState.insightNotes}
+        sessionKey={state.selectedSessionKey}
+        lapsCache={state.lapsCache}
+        drivers={state.drivers}
         onApplyToMain={({ circuitId, driver1Code, driver2Code }) => {
           setAppMode('season');
           setActiveHub('telemetry');

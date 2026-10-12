@@ -4,7 +4,7 @@
  * components/strategy/VirtualPitwallWarRoom.tsx
  * Virtual Pitwall Tactical War Room & Chief Strategist Simulator
  * Features:
- * - Dynamic Weather & Track Temperature Sliders (15°C~55°C, 0~15mm/min Rain)
+ * - Dynamic Weather & Track Temperature Sliders (15°C~55°C, 0~15mm/h Rain)
  * - Multi-Compound Tyre Degradation Curves & Tyre Cliff Detection
  * - Safety Car (SC) / Virtual Safety Car (VSC) Cheap Pit Advantage Calculator
  * - Real-time Clean Air vs Traffic Exit Window Forecasting
@@ -103,7 +103,7 @@ const TACTICAL_DILEMMAS: TacticalDilemma[] = [
 export default function VirtualPitwallWarRoom() {
   const [selectedCircuitId, setSelectedCircuitId] = useState<string>('suzuka');
   const [trackTemp, setTrackTemp] = useState<number>(38); // °C (15~55)
-  const [rainRate, setRainRate] = useState<number>(0); // mm/min (0~15)
+  const [rainRate, setRainRate] = useState<number>(0); // mm/h (0~15)
   const [gapAheadSeconds, setGapAheadSeconds] = useState<number>(2.4); // s
   const [gapBehindSeconds, setGapBehindSeconds] = useState<number>(14.2); // s
   const [selectedDilemmaId, setSelectedDilemmaId] = useState<string>('dilemma-1');
@@ -220,7 +220,7 @@ export default function VirtualPitwallWarRoom() {
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-xs font-mono">
             <span className="text-slate-400">天候 / 降水量:</span>
-            <span className="text-slate-300 font-bold font-racing">{rainRate} mm/min</span>
+            <span className="text-slate-300 font-bold font-racing">{rainRate} mm/h</span>
           </div>
           <input
             type="range"

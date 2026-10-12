@@ -226,7 +226,7 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         fullName: 'Audi Revolut Formula One Team',
         teamColor: '#E0001A',
         powerUnit: 'Audi Works E-Performance',
-        teamPrincipal: 'Mattia Binotto',
+        teamPrincipal: 'Jonathan Wheatley',
         drivers: [
           { code: 'HUL', name: 'ニコ・ヒュルケンベルグ', number: 27, country: 'ドイツ', flag: '🇩🇪', role: 'Regular', isTransfer: true, note: 'ドイツ名門アウディ初代ワークスエース' },
           { code: 'BOR', name: 'ガブリエル・ボルトレート', number: 5, country: 'ブラジル', flag: '🇧🇷', role: 'Regular', note: 'F3・F2ルーキー制覇の大型新鋭' },
@@ -430,7 +430,7 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         fullName: 'Stake F1 Team Kick Sauber',
         teamColor: '#52E252',
         powerUnit: 'Ferrari',
-        teamPrincipal: 'Mattia Binotto',
+        teamPrincipal: 'Jonathan Wheatley',
         finalRank: 10,
         drivers: [
           { code: 'HUL', name: 'ニコ・ヒュルケンベルグ', number: 27, country: 'ドイツ', flag: '🇩🇪', role: 'Regular', isTransfer: true },
@@ -631,7 +631,7 @@ export const HISTORICAL_SEASONS_DATA: Record<number, SeasonGridInfo> = {
         fullName: 'Stake F1 Team Kick Sauber',
         teamColor: '#52E252',
         powerUnit: 'Ferrari',
-        teamPrincipal: 'Alessandro Alunni Bravi / Mattia Binotto',
+        teamPrincipal: 'Alessandro Alunni Bravi / Jonathan Wheatley',
         finalRank: 10,
         points: 4,
         drivers: [
