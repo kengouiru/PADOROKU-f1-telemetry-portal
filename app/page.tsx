@@ -1799,7 +1799,9 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Single Unified Main Hub Area (mounted once across all viewports) */}
+        {/* WHY: CSSの hidden / lg:hidden で別々のコンテナに {mainHubContent} を2箇所配置すると、
+            Reactツリー上で全ハブが2重マウントされ、OpenF1/Jolpica APIリクエストが倍増して HTTP 429 を引き起こすため、
+            必ずこの単一の <main> コンテナ内で1回のみマウントすること（Chesterton's Fence）。 */}
         <main ref={desktopScrollRef} className="flex-1 min-w-0 min-h-0 overflow-y-auto p-3 sm:p-4 lg:p-5 pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-6">
           {mainHubContent}
 
