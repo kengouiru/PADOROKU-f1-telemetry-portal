@@ -2,6 +2,31 @@
 
 本プロジェクト「PADOROKU - F1 Telemetry Intelligence Portal」の全アップデート履歴を記録します。
 
+## [v3.1.0] - 2026-10-14
+### Added
+- **前回大会確認セクション（Previous Race Summary）の完全復旧と機能拡張 (`components/hubs/SeasonHub.tsx`)**:
+  - 次戦（例: 第18戦 アメリカGP）を表示中、ヒーローコックピット上部に直近完了戦（第17戦 シンガポールGP）の公式ポディウム（P1〜P3、タイム差、チームカラー）、ポールポジション、ファステストラップを表示する「前回大会リザルト ＆ 振り返り」セクションを常時表示。
+  - 「全順位・リザルト詳細」ボタン（`SessionResultsModal` の直接起動）、「レース振り返り (無線・RC)」ボタン（`PostRaceReviewModal` 起動）、「このGPをメイン表示」ボタン（ラウンド切替）の3アクションを完備。
+- **完了済みGP選択時のメインコックピット内ポディウムサマリー表示 (`components/hubs/SeasonHub.tsx`)**:
+  - カレンダーから完了済みGPを選択した際にも、メインコックピット内に決勝TOP3・PP・FLと詳細モーダル起動ボタンを即座に表示。
+- **2026年 第15戦〜第17戦（シンガポールGPまで）の公式リザルトおよびポイントランキング反映 (`lib/sessionResultsService.ts`, `data/f1SeasonData.ts`)**:
+  - 第15戦 アゼルバイジャンGP（優勝: G.ラッセル）、第16戦 マレーシアGP（優勝: M.フェルスタッペン）、第17戦 シンガポールGP（優勝: M.フェルスタッペン `1:42:00.785`、2位: C.ルクレール `+7.335s`、3位: K.アントネッリ `+24.573s`、スプリント優勝: M.フェルスタッペン）の公式確定リザルト・予選・スプリント・ファステストラップ・ピット戦略を収録。
+  - 第17戦終了時点のドライバーズ／コンストラクターズ選手権ポイントランキングを更新。
+- **Post-Race Review モーダルの実音声再生対応 (`components/pitwall/PostRaceReviewModal.tsx`)**:
+  - OpenF1 Team Radio の `recording_url` を `HTMLAudioElement` で再生・一時停止できるオーディオプレイヤー機能を実装。
+
+### Fixed
+- **クライアントコンポーネント宣言の破損修正 (`components/hubs/SeasonHub.tsx`)**:
+  - ファイル先頭1行目の `'use client';` より上に `import` 文が挿入されていたことによる Next.js App Router のイベントハンドラ無効化（ボタン押下無反応）バグを修正。
+- **メインコンテンツの二重マウント（Dual Mounting）解消 (`app/page.tsx`)**:
+  - デスクトップ用コンテナ（`hidden lg:flex`）とモバイル用コンテナ（`lg:hidden flex`）の双方で `{mainHubContent}` が同時にマウントされ、OpenF1 / Jolpica API リクエストが2倍発火して HTTP 429 レート制限を引き起こしていた問題を、単一のレスポンシブ `<main>` コンテナへ統合して解消。
+- **React Hooks 呼び出し順序違反（Rules of Hooks）および Vercel ビルドエラーの修正 (`components/telemetry/DetailedTelemetryChart.tsx`, `components/telemetry/TelemetryDeltaAnalyzer.tsx`)**:
+  - 条件分岐（`if (isLoading || !telemetryData) return ...`）の後に `useMemo` が配置されていたことによる ESLint `react-hooks/rules-of-hooks` エラー（Vercel ビルド失敗の原因）およびデータ読込完了時のランタイムクラッシュを修正。
+- **OpenF1 2024年ハードコードフォールバックの撤去 (`lib/openf1LiveResult.ts`, `components/pitwall/PostRaceReviewModal.tsx`)**:
+  - ゼロ・ファブリケーション原則に違反していた `year = 2024` 固定フォールバックを撤去し、2026年実データのプレシーズンテスト除外＋開催日マッチングへ修正。
+- **リポジトリルートの調査用一時ファイル群の完全撤去 (`.gitignore`)**:
+  - ルートにコミットされていた `scratch/`, `fix_*.js`, `test*.js`, `dom.html`, `screenshot.png` 等を削除し、`.gitignore` に `/scratch/` を追加。
+
 ## [v3.0.0] - 2026-10-04 (進行中: 全体メンテナンス)
 ### Changed
 - **ルールファイル v2.2.0 (`GEMINI.md`)**: 検証ツール隔離、モックデータ本番経路禁止、出典品質規約、worklog義務、デザインシステム規約（第6部）、演算精度規約（第7部）を追加。`PROJECT_RULES.md` / `.antigravity/rules.md` は `GEMINI.md` への参照のみに変更（二重管理の解消）。

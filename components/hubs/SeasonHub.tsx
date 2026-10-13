@@ -1,4 +1,3 @@
-import { PostRaceReviewModal } from '../pitwall/PostRaceReviewModal';
 'use client';
 
 /**
@@ -15,6 +14,7 @@ import { PostRaceReviewModal } from '../pitwall/PostRaceReviewModal';
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { PostRaceReviewModal } from '../pitwall/PostRaceReviewModal';
 import { fetchRaceSummary, constructorColour, type RaceSummary } from '@/lib/jolpicaRaceSummary';
 import {
   type SeasonYear,
@@ -39,11 +39,10 @@ import { getSessionClassification } from '@/lib/sessionResultsService';
 import { getHistoricalArchive } from '@/data/f1HistoricalArchivesData';
 import { getBroadcastTrackData } from '@/data/f1BroadcastTrackData';
 import { CIRCUIT_TRACK_MAPS, GENERIC_TRACK, interpolateTrackCoords } from '@/components/telemetry/TelemetryTrackMap';
-import { Map, Camera, ExternalLink, X, Maximize2, Compass, ChevronRight } from 'lucide-react';
+import { Map, Camera, ExternalLink, X, Maximize2, Compass, ChevronRight, PlayCircle, Trophy } from 'lucide-react';
 import SessionResultsModal from './SessionResultsModal';
 import AdSlot from '@/components/ads/AdSlot';
 import { FlagIcon } from '../ui/FlagIcon';
-import { PlayCircle } from 'lucide-react';
 
 interface SeasonHubProps {
   onNavigateToTelemetry?: (gpName?: string) => void;
@@ -880,67 +879,175 @@ export const SEASON_OPTIONS: { value: SeasonYear; label: string }[] = [
 
 
 // ─────────────────────────────────────────────────────────────
-// PREVIOUS RACE HERO (Phase A)
+// PREVIOUS RACE HERO (前回大会 結果確認＆振り返りセクション)
 // ─────────────────────────────────────────────────────────────
 const PreviousRaceHero = React.memo(function PreviousRaceHero({
   race,
+  seasonYear,
   circuitId,
-  isLive,
+  onOpenResults,
   onOpenReview,
+  onSelectRace,
 }: {
   race: RaceWeekendSchedule;
+  seasonYear: SeasonYear;
   circuitId: string;
-  isLive: boolean;
+  onOpenResults: () => void;
   onOpenReview: () => void;
+  onSelectRace: () => void;
 }) {
-  const trackData = useMemo(() => CIRCUIT_TRACK_MAPS[circuitId] || GENERIC_TRACK, [circuitId]);
   const atmosphere = useMemo(() => getCircuitAtmospherePhotos(circuitId, race.gpName), [circuitId, race.gpName]);
 
+  const raceClass = useMemo(() => {
+    const res = getSessionClassification(seasonYear, race.round, '決勝', 101.5, circuitId);
+    return res.status === 'completed' && res.results.length > 0 ? res : null;
+  }, [seasonYear, race.round, circuitId]);
+
+  const qualiClass = useMemo(() => {
+    const res = getSessionClassification(seasonYear, race.round, '予選', 101.5, circuitId);
+    return res.status === 'completed' && res.results.length > 0 ? res : null;
+  }, [seasonYear, race.round, circuitId]);
+
+  const podium = useMemo(() => raceClass?.results.slice(0, 3) ?? [], [raceClass]);
+
   return (
-    <div className="rounded-2xl sm:rounded-3xl border border-white/10 bg-slate-900 shadow-xl overflow-hidden mb-8 group">
-      <div className="relative h-48 sm:h-56 w-full overflow-hidden flex flex-col justify-between p-4 sm:p-5">
+    <section
+      aria-label="前回大会確認セクション"
+      className="rounded-2xl sm:rounded-3xl border border-emerald-500/30 bg-slate-950 shadow-xl overflow-hidden group"
+    >
+      <div className="relative w-full overflow-hidden p-4 sm:p-5 flex flex-col gap-3.5">
         {/* Background Image */}
         {atmosphere && atmosphere.length > 0 ? (
-          <div className="absolute inset-0">
-            <img 
-              src={atmosphere[0].url} 
-              alt={atmosphere[0].tag} 
-              className="w-full h-full object-cover brightness-[0.6] contrast-125 saturate-50 transition-transform duration-700 group-hover:scale-105" 
+          <div className="absolute inset-0 pointer-events-none">
+            <img
+              src={atmosphere[0].url}
+              alt={atmosphere[0].tag}
+              className="w-full h-full object-cover brightness-[0.38] contrast-115 saturate-75 transition-transform duration-700 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 to-slate-900/40" />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-slate-950/60" />
           </div>
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 to-slate-950" />
+          <div className="absolute inset-0 bg-slate-900 pointer-events-none" />
         )}
 
-        <div className="relative z-10 flex items-center justify-between">
-          <span className="px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase bg-slate-900/80 text-emerald-400 border border-emerald-500/30 backdrop-blur-md shadow-lg flex items-center gap-1.5">
-            <span>🏁 PREVIOUS RACE (終了)</span>
+        {/* Top Header Row */}
+        <div className="relative z-10 flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-mono font-bold tracking-wider uppercase bg-emerald-950/90 text-emerald-300 border border-emerald-500/40 backdrop-blur-md shadow-md flex items-center gap-1.5">
+              <Trophy className="w-3.5 h-3.5 text-emerald-400" />
+              <span>前回大会 結果確認 (PREVIOUS RACE — 第{race.round}戦 終了)</span>
+            </span>
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono text-slate-300 bg-slate-900/80 border border-white/15">
+              {race.dates}
+            </span>
+          </div>
+          <span className="text-slate-400 text-xs font-mono">
+            {raceClass?.dataSource || 'FIA Formula 1 Official Timing'}
           </span>
-          <span className="text-white/60 text-xs font-mono">ROUND {race.round}</span>
         </div>
 
-        <div className="relative z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4 mt-auto">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-2xl"><FlagIcon emojiFlag={race.flag} /></span>
-              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight drop-shadow-md">
-                {toJapaneseGpName(race.gpName)}
-              </h2>
+        {/* Main Content: Race Title + Official Podium + Actions */}
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          {/* Left: GP Info */}
+          <div className="space-y-1 min-w-0">
+            <div className="flex items-center gap-2.5">
+              <span className="text-2xl sm:text-3xl shrink-0">
+                <FlagIcon emojiFlag={race.flag} />
+              </span>
+              <div className="min-w-0">
+                <h2 className="text-lg sm:text-2xl font-black text-white tracking-tight truncate">
+                  {toJapaneseGpName(race.gpName)}
+                </h2>
+                <p className="text-xs font-mono text-slate-300 truncate">
+                  {getDisplayCircuitName(race)}（{race.laps}周）
+                </p>
+              </div>
             </div>
-            <p className="text-sm font-mono text-slate-300 drop-shadow-md">{race.circuitName}</p>
+
+            {(qualiClass?.polePosition || raceClass?.fastestLap) && (
+              <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] font-mono">
+                {qualiClass?.polePosition && (
+                  <span className="px-2 py-0.5 rounded bg-slate-900/90 border border-white/10 text-slate-300">
+                    PP: <strong className="text-white">{qualiClass.polePosition.driverCode}</strong> ({qualiClass.polePosition.time})
+                  </span>
+                )}
+                {raceClass?.fastestLap && (
+                  <span className="px-2 py-0.5 rounded bg-slate-900/90 border border-white/10 text-slate-300">
+                    FL: <strong className="text-white">{raceClass.fastestLap.driverCode}</strong> ({raceClass.fastestLap.time})
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
-          <div className="shrink-0 flex items-center gap-2">
-            <button onClick={onOpenReview} className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white border border-white/10 text-xs font-bold font-racing flex items-center gap-2 transition-all cursor-pointer">
-              <PlayCircle className="w-4 h-4" />
-              レース振り返り (開発中)
+          {/* Center: Top 3 Podium Cards */}
+          {podium.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 flex-1 max-w-2xl">
+              {podium.map((p, idx) => (
+                <div
+                  key={p.driverCode}
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-slate-900/90 border border-white/10 backdrop-blur-md"
+                >
+                  <span
+                    className={`w-6 h-6 rounded-lg font-racing font-black text-xs flex items-center justify-center shrink-0 ${
+                      idx === 0
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-400/40'
+                        : idx === 1
+                        ? 'bg-slate-400/20 text-slate-200 border border-slate-400/40'
+                        : 'bg-amber-700/20 text-amber-400 border border-amber-600/40'
+                    }`}
+                  >
+                    {idx + 1}
+                  </span>
+                  <span
+                    className="w-1 h-7 rounded-full shrink-0"
+                    style={{ backgroundColor: p.teamColor }}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-xs font-bold text-white truncate">{p.driverName}</span>
+                      <span className="text-[11px] font-mono text-slate-400 shrink-0">{p.driverCode}</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-1 text-[11px] font-mono">
+                      <span className="text-slate-400 truncate">{p.teamName}</span>
+                      <span className="text-emerald-300 shrink-0">{p.gapToLeader}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Right: Action Buttons */}
+          <div className="shrink-0 flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={onOpenResults}
+              className="px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-md transition-all cursor-pointer"
+            >
+              <Trophy className="w-4 h-4" />
+              <span>全順位・リザルト詳細</span>
             </button>
-            
+            <button
+              type="button"
+              onClick={onOpenReview}
+              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white border border-white/10 text-xs font-bold flex items-center gap-1.5 shadow-md transition-all cursor-pointer"
+            >
+              <PlayCircle className="w-4 h-4" />
+              <span>レース振り返り (無線・RC)</span>
+            </button>
+            <button
+              type="button"
+              onClick={onSelectRace}
+              className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-white/15 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer"
+            >
+              <span>このGPをメイン表示</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 });
 
@@ -982,6 +1089,8 @@ export default function SeasonHub({
   const [heroSubView, setHeroSubView] = useState<'schedule' | 'weather'>('schedule');
   const [sessionModalOpen, setSessionModalOpen] = useState<boolean>(false);
   const [selectedSessionForModal, setSelectedSessionForModal] = useState<string>('FP1');
+  const [modalRaceOverride, setModalRaceOverride] = useState<RaceWeekendSchedule | null>(null);
+  const [reviewModalRound, setReviewModalRound] = useState<number | null>(null);
   const [is3dModalOpen, setIs3dModalOpen] = useState<boolean>(false);
 
   // Active season calendar & grid — starts with local data, upgradeable via API
@@ -1129,7 +1238,7 @@ export default function SeasonHub({
   }, [selectedRace]);
   useEffect(() => {
     setFetchedSummary(null);
-    if (selectedSeason !== '2026' || raceClassification2026 || selectedRace.isCancelled) { // Try to fetch live Quali/Race results even if raceFinished is false
+    if (selectedSeason !== '2026' || raceClassification2026 || selectedRace.isCancelled || !raceFinished) {
       setSummaryStatus('idle');
       return;
     }
@@ -1193,28 +1302,33 @@ export default function SeasonHub({
 
   const previousRace = useMemo(() => {
     const prevRound = getPreviousCompletedRound(activeCalendar);
-    if (!prevRound) return null;
-    // Don't show it if the user selected a specific past round to view in the hero, 
-    // or if the hero is currently showing it.
-    // Actually, always show it as a separate section if we want it to be a permanent block.
-    // Let's show it if it exists and is different from selectedRound.
-    if (prevRound.round === selectedRound) return null;
-    return prevRound;
+    if (!prevRound || prevRound === selectedRound) return null;
+    return activeCalendar.find((r) => r.round === prevRound) ?? null;
   }, [activeCalendar, selectedRound]);
-
 
   return (
     <div className="space-y-3 sm:space-y-4 pb-8 animate-fade-in max-w-7xl mx-auto">
       {/* ─────────────────────────────────────────────────────────────
-      
+          0. PREVIOUS RACE HERO (前回大会 結果確認セクション)
+          ───────────────────────────────────────────────────────────── */}
       {previousRace && (
-        <PreviousRaceHero 
-          race={previousRace} 
-          circuitId={getCircuitIdForRace(previousRace)} 
-          isLive={false} 
-          onOpenReview={() => setShowReviewModal(true)}
+        <PreviousRaceHero
+          race={previousRace}
+          seasonYear={selectedSeason}
+          circuitId={getCircuitIdForRace(previousRace)}
+          onOpenResults={() => {
+            setModalRaceOverride(previousRace);
+            setSelectedSessionForModal('決勝');
+            setSessionModalOpen(true);
+          }}
+          onOpenReview={() => setReviewModalRound(previousRace.round)}
+          onSelectRace={() => {
+            userHasSelectedRoundRef.current = true;
+            setSelectedRound(previousRace.round);
+          }}
         />
       )}
+
       {/* ─────────────────────────────────────────────────────────────
           1. NEXT RACE HERO: CINEMATIC SHOWCASE & COMMAND COCKPIT
           ───────────────────────────────────────────────────────────── */}
@@ -1400,6 +1514,71 @@ export default function SeasonHub({
                 ) : null}
               </div>
 
+              {/* Completed Race Official Podium Summary inside Hero Cockpit */}
+              {raceResultView && (
+                <div className="p-3 rounded-xl bg-emerald-950/25 border border-emerald-500/30 space-y-2.5 animate-fadeIn">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2">
+                      <Trophy className="w-4 h-4 text-emerald-400" />
+                      <span className="text-xs font-bold text-white">
+                        {selectedSeason}年 第{selectedRace.round}戦 公式決勝リザルト (TOP 3)
+                      </span>
+                      {raceResultView.pole && (
+                        <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-900/90 border border-white/10 text-slate-300">
+                          PP: <strong className="text-white">{raceResultView.pole}</strong>
+                        </span>
+                      )}
+                      {raceResultView.fastest && (
+                        <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-900/90 border border-white/10 text-slate-300">
+                          FL: <strong className="text-white">{raceResultView.fastest}</strong>
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setModalRaceOverride(null);
+                          setSelectedSessionForModal('決勝');
+                          setSessionModalOpen(true);
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold transition-colors cursor-pointer"
+                      >
+                        全順位・リザルト詳細 ↗
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setReviewModalRound(selectedRace.round)}
+                        className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                      >
+                        <PlayCircle className="w-3.5 h-3.5" />
+                        <span>無線・RC記録</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    {raceResultView.podium.map((p, idx) => (
+                      <div
+                        key={p.code}
+                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-slate-900/90 border border-white/10"
+                      >
+                        <span className="w-5 h-5 rounded font-racing font-black text-xs flex items-center justify-center bg-white/10 text-amber-300 shrink-0">
+                          {idx + 1}
+                        </span>
+                        <span className="w-1 h-6 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
+                        <div className="min-w-0 flex-1">
+                          <div className="text-xs font-bold text-white truncate">{p.name}</div>
+                          <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                            <span className="truncate">{p.team}</span>
+                            <span className="text-emerald-300 shrink-0">{p.note}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* View 1: 5 Session Timetable Cards */}
               {heroSubView === 'schedule' && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5 animate-fadeIn">
@@ -1410,6 +1589,7 @@ export default function SeasonHub({
                         key={s.session}
                         type="button"
                         onClick={() => {
+                          setModalRaceOverride(null);
                           setSelectedSessionForModal(s.session);
                           setSessionModalOpen(true);
                         }}
@@ -1680,6 +1860,9 @@ export default function SeasonHub({
                       {gp.replacementNote && (
                         <p className="text-[11px] text-amber-400 mt-0.5 truncate">{gp.replacementNote}</p>
                       )}
+                      {gp.winnerNote && isGpPast && (
+                        <p className="text-[11px] text-emerald-300 font-mono mt-0.5 truncate">{gp.winnerNote}</p>
+                      )}
                     </div>
                   </div>
 
@@ -1831,18 +2014,18 @@ export default function SeasonHub({
                 <div className="text-xs font-bold text-white flex items-center gap-2">
                   <span>
                     {standingsYear === '2026'
-                      ? '2026シーズン 第14戦マドリード終了時点 公式ランキング (全23戦中14戦終了 / 第15戦バクー進行中)'
+                      ? '2026シーズン 第17戦シンガポールGP終了時点 公式ランキング (全23戦中17戦終了 / 次戦 第18戦アメリカGP)'
                       : `${standingsYear}シーズン 年間確定選手権ランキング (全${getSeasonCalendar(standingsYear).length}戦終了 / ${standingsArchive?.championConstructor?.name || ''} WCC)`}
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-400 mt-0.5">
                   {standingsYear === '2026'
-                    ? '新PU規定元年。全11チーム・22名体制による2026年公式選手権ランキング（第14戦終了時点）。メルセデスのキミ・アントネッリが292ptで首位。'
+                    ? '新PU規定元年。全11チーム・22名体制による2026年公式選手権ランキング（第17戦シンガポールGP終了時点）。メルセデスのキミ・アントネッリが340ptで首位。'
                     : standingsArchive?.seasonSummary || `${standingsYear}年公式年間アーカイブ`}
                 </p>
               </div>
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-950/40 border border-red-500/30 text-red-300 font-mono text-[11px] self-start sm:self-auto shadow-sm">
-                <span>{standingsYear === '2026' ? '2026 公式WDC ＆ WCC ランキング (第14戦終了時点)' : `${standingsYear}年確定 WDC ＆ WCC アーカイブ`}</span>
+                <span>{standingsYear === '2026' ? '2026 公式WDC ＆ WCC ランキング (第17戦終了時点)' : `${standingsYear}年確定 WDC ＆ WCC アーカイブ`}</span>
               </div>
             </div>
 
@@ -2120,7 +2303,7 @@ export default function SeasonHub({
                       </h4>
                     </div>
                     <span className="text-[11px] font-mono text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">
-                      {standingsYear === '2026' ? '2026 第14戦終了時点' : `${standingsYear}年確定結果`}
+                      {standingsYear === '2026' ? '2026 第17戦終了時点' : `${standingsYear}年確定結果`}
                     </span>
                   </div>
 
@@ -2152,7 +2335,7 @@ export default function SeasonHub({
                   <div className="text-[11px] text-slate-300 bg-slate-950/40 p-2 rounded-lg border border-white/5 leading-relaxed">
                     {standingsYear === '2026' ? (
                       <>
-                        <strong className="text-slate-200">2026シーズン戦況分析 (第14戦マドリード終了時点):</strong> 14戦を終えてメルセデスの新星キミ・アントネッリが8勝を挙げて選手権首位（292pt）。チームメイトのラッセル（211pt・2勝）、フェラーリのハミルトン（191pt・1勝）、マクラーレンのノリス（186pt・2勝）が追走。今夜開催の第15戦バクー決勝が後半戦の天王山となります。
+                        <strong className="text-slate-200">2026シーズン戦況分析 (第17戦シンガポールGP終了時点):</strong> 17戦を終えてメルセデスのキミ・アントネッリが8勝・340ptで選手権首位を快走。第15戦バクーを制したラッセル（238pt・3勝）、フェラーリのハミルトン（229pt・1勝）、そして第16戦マレーシア＆第17戦シンガポールで2連勝を飾ったフェルスタッペン（221pt・2勝）とルクレール（215pt・1勝）が激しく追撃しています。
                       </>
                     ) : (
                       <>
@@ -2266,14 +2449,27 @@ export default function SeasonHub({
       {/* Session Results & Timing Classification Modal with Spoiler Shield */}
       <SessionResultsModal
         isOpen={sessionModalOpen}
-        onClose={() => setSessionModalOpen(false)}
-        race={selectedRace}
-        circuitId={selectedCircuitId}
+        onClose={() => {
+          setSessionModalOpen(false);
+          setModalRaceOverride(null);
+        }}
+        race={modalRaceOverride || selectedRace}
+        circuitId={modalRaceOverride ? getCircuitIdForRace(modalRaceOverride) : selectedCircuitId}
         initialSessionName={selectedSessionForModal}
         seasonYear={selectedSeason}
         onNavigateToTelemetry={onNavigateToTelemetry}
         onNavigateToDriver={onNavigateToDriver}
       />
+
+      {/* Post-Race Review Modal (Team Radio & Race Control Timeline) */}
+      {reviewModalRound !== null && (
+        <PostRaceReviewModal
+          round={reviewModalRound}
+          seasonYear={selectedSeason}
+          gpName={activeCalendar.find((r) => r.round === reviewModalRound)?.gpName}
+          onClose={() => setReviewModalRound(null)}
+        />
+      )}
 
       {/* 3D Track Elevation & Tactical Guide Modal */}
       {is3dModalOpen && (

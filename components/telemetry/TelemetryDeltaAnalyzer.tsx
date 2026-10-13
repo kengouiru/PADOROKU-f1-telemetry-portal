@@ -129,6 +129,11 @@ export default function TelemetryDeltaAnalyzer({
     return cleanup;
   }, [fetchData]);
 
+  // Key corner reference markers
+  const cornerMarkers = useMemo(() => {
+    return telemetryData?.cornerAnalyses || [];
+  }, [telemetryData]);
+
   if (isLoadingData || !telemetryData) {
     return (
       <div className="bg-slate-950 p-4 rounded text-center">
@@ -142,11 +147,6 @@ export default function TelemetryDeltaAnalyzer({
   // Final lap delta
   const finalDelta = points.length > 0 ? points[points.length - 1].delta : 0;
   const isD1OverallFaster = finalDelta >= 0;
-
-  // Key corner reference markers
-  const cornerMarkers = useMemo(() => {
-    return cornerAnalyses || [];
-  }, [cornerAnalyses]);
 
   // Request Gemini AI Debrief
   const handleGenerateAiDebrief = async () => {

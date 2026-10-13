@@ -1685,28 +1685,18 @@ export default function DashboardPage() {
         )}
       </header>
 
-      {/* ── DESKTOP Layout (lg+) ── */}
-      <div className="hidden lg:flex flex-1 min-h-0 overflow-hidden relative">
-        {/* Left Sidebar (Only visible in Telemetry Hub) */}
+      {/* ── UNIFIED RESPONSIVE WORKSPACE (Desktop lg+ & Mobile/Tablet <lg) ── */}
+      <div className="flex flex-1 min-h-0 overflow-hidden relative">
+        {/* Desktop Left Sidebar (Only visible in Telemetry Hub on lg+) */}
         {activeHub === 'telemetry' && (
-          <aside className="w-56 flex-shrink-0 border-r border-white/10 p-4 overflow-y-auto bg-slate-950/50">
+          <aside className="hidden lg:block w-56 flex-shrink-0 border-r border-white/10 p-4 overflow-y-auto bg-slate-950/50">
             {sidebarContent}
           </aside>
         )}
 
-        {/* Main Hub Area */}
-        <main ref={desktopScrollRef} className="flex-1 min-w-0 p-5 overflow-y-auto">
-          {mainHubContent}
-        </main>
-
-        
-      </div>
-
-      {/* ── MOBILE / TABLET Layout (<lg) ── */}
-      <div className="lg:hidden flex flex-1 flex-col min-h-0">
-        {/* Mobile sidebar drawer overlay */}
+        {/* Mobile sidebar drawer overlay (<lg) */}
         {sidebarOpen && (
-          <div className="fixed inset-0 z-40 flex">
+          <div className="lg:hidden fixed inset-0 z-40 flex">
             <div
               className="absolute inset-0 bg-black/60 backdrop-blur-xs"
               onClick={() => setSidebarOpen(false)}
@@ -1809,8 +1799,8 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Tab content (with generous bottom padding so fixed navigation doesn't hide content) */}
-        <div ref={mobileScrollRef} className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-6">
+        {/* Single Unified Main Hub Area (mounted once across all viewports) */}
+        <main ref={desktopScrollRef} className="flex-1 min-w-0 min-h-0 overflow-y-auto p-3 sm:p-4 lg:p-5 pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:pb-6">
           {mainHubContent}
 
           {/* Global App Footer with Legal Disclaimer & Quick Links */}
@@ -1850,7 +1840,7 @@ export default function DashboardPage() {
               © 2026 F1 Padoroku Telemetry Portal. All rights reserved.
             </p>
           </footer>
-        </div>
+        </main>
 
         {/* ── Fixed Mobile Bottom Navigation Bar (< md) (常に安定した5大コアタブ) ── */}
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-xl border-t border-white/10 flex items-center justify-around safe-bottom-nav shadow-[0_-4px_24px_rgba(0,0,0,0.6)]">

@@ -2,6 +2,19 @@
 
 本ドキュメントは、プロジェクト「F1 Telemetry Intelligence Portal (`f1-telemetry-next`)」におけるアーキテクチャ設計、UI/UXレイアウト、データ仕様、および運用方針に関する意思決定の背景・理由・却下代替案を記録する永続ログである。
 
+## [2026-10-14] クライアントハイドレーション復旧・単一メインコンテナ化・前回大会リザルト常時表示とVercelブランチ同期
+- **決定事項 (Decision)**:
+  1. **単一 `<main>` コンテナへの統合 (`app/page.tsx`)**: デスクトップ（`lg+`）とモバイル（`<lg`）で別々に `{mainHubContent}` を描画していた構造を廃止し、単一のレスポンシブ `<main>` 内で1回のみマウントする設計に変更。
+  2. **前回大会確認セクション（`PreviousRaceHero`）の常時表示と直接モーダル起動 (`components/hubs/SeasonHub.tsx`)**: 次戦が自動選択されている状態でも、直近完了戦（第17戦 シンガポールGP等）のTOP3ポディウム・PP・FLを一目で確認でき、その場から「全順位・リザルト詳細（`SessionResultsModal`）」と「レース振り返り（`PostRaceReviewModal`）」を直接開けるUIを採用。
+  3. **OpenF1 2024年フォールバックの完全撤去 (`lib/openf1LiveResult.ts`, `components/pitwall/PostRaceReviewModal.tsx`)**: `year = 2024` への暗黙フォールバックを廃止し、2026年実セッション（プレシーズンテスト `meeting_key: 1277, 1278` を除外し、`targetDateUtc` 近傍のGPセッションを特定）のみを参照する仕様に統一。
+  4. **Vercel 本番（`main`）とプレビュー（`preview-update`）の完全同期**: React Hooks 順序違反および一時ファイル混入によるビルドエラーを解消したうえで、`main` と `preview-update` を同一コミットに同期。
+- **背景・理由 (Rationale)**:
+  1. `SeasonHub.tsx` 先頭の `'use client';` の上に `import` 文が挿入されたことでクライアント境界が壊れ、さらに JSX コメントの閉じ忘れによって `PreviousRaceHero` が非表示化していたため。
+  2. CSS の `hidden` / `lg:hidden` で `{mainHubContent}` を2箇所に置くと、React ツリー上は全ハブが2重にマウントされ、OpenF1 API への並列リクエストが倍増して `HTTP 429 Too Many Requests` を誘発していたため。
+  3. 2024年データへのフォールバックは `GEMINI.md` 第2部第4条（ゼロ・ファブリケーション原則）に明確に違反するため。
+- **却下した代替案 (Rejected Alternatives)**:
+  - 「`window.innerWidth` による条件分岐でデスクトップ/モバイルのツリーを切り替える案」: SSR 初回レンダー時とハイドレーション時で不一致（Hydration Mismatch）を起こすリスクがあるため、CSS Flexbox による単一 `<main>` コンテナ構造を採用。
+
 ## [2026-10-05] 巨大ファイル（10,000行超）の分割設計とファクト検証
 - **決定事項 (Decision)**:
   1. `data/f1KnowledgeData.ts` などの巨大なデータファイルにおいて、歴史的データ（過去のチーム、ドライバー、マシン等）の拡張（Phase 5）を、元のファイルへの直接パッチではなく、新ファイル（例: `f1HistoricalTeams.ts`）に分割・モジュール化して実装するアーキテクチャ方針を決定。

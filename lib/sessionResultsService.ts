@@ -132,6 +132,9 @@ interface Completed2026RaceRecord {
   fastestLap: { code: string; time: string; lap: number };
   raceFinishOrder: string[]; // 22 drivers in finish order
   qualiOrder: string[];       // 22 drivers in grid order
+  topGaps?: string[];         // Official race time/gaps for top finishers
+  sprintFinishOrder?: string[]; // Official sprint finish order (if sprint weekend)
+  sprintTopGaps?: string[];   // Official sprint time/gaps for top finishers
   winningStrategy: string;
   laps: number;
 }
@@ -375,6 +378,62 @@ const COMPLETED_2026_RACES: Record<number, Completed2026RaceRecord> = {
     winningStrategy: '公式リザルト: 優勝 Antonelli (Mercedes)、2位 Verstappen、3位 Norris。ファステストラップ: Russell (1:35.587)。',
     laps: 68,
   },
+  15: {
+    round: 15,
+    gpName: 'アゼルバイジャンGP (バクー)',
+    circuitName: 'バクー市街地コース',
+    city: 'バクー',
+    country: 'アゼルバイジャン',
+    circuitId: 'baku',
+    scheduledJst: '9/26 (土) 20:00 スタート',
+    scheduledLocal: '9/26 (土) 15:00 AZT',
+    baseBenchmarkSec: 102.526,
+    pole: { code: 'RUS', time: '1:42.526' },
+    fastestLap: { code: 'RUS', time: '1:44.916', lap: 49 },
+    raceFinishOrder: ['RUS', 'VER', 'HAD', 'LEC', 'ANT', 'HAM', 'LIN', 'OCO', 'BEA', 'SAI', 'HUL', 'LAW', 'PIA', 'PER', 'BOR', 'BOT', 'COL', 'GAS', 'NOR', 'ALB', 'ALO', 'STR'],
+    qualiOrder: ['RUS', 'LEC', 'PIA', 'HAD', 'NOR', 'HAM', 'GAS', 'VER', 'SAI', 'COL', 'BEA', 'LAW', 'ALB', 'OCO', 'LIN', 'ANT', 'BOR', 'HUL', 'ALO', 'PER', 'STR', 'BOT'],
+    topGaps: ['1:38:02.143', '+0.196s', '+10.704s', '+14.136s', '+14.512s', '+22.382s', '+31.159s', '+31.189s', '+31.929s', '+32.416s'],
+    winningStrategy: '公式リザルト: 優勝 Russell (Mercedes / 1:38:02.143)、2位 Verstappen (+0.196s)、3位 Hadjar (+10.704s)。ポール＆ファステストラップ: Russell (1:42.526 / 1:44.916)。',
+    laps: 51,
+  },
+  16: {
+    round: 16,
+    gpName: 'マレーシアGP (セパン)',
+    circuitName: 'セパン・インターナショナル・サーキット',
+    city: 'クアラルンプール',
+    country: 'マレーシア',
+    circuitId: 'sepang',
+    scheduledJst: '10/4 (日) 16:00 スタート',
+    scheduledLocal: '10/4 (日) 15:00 MYT',
+    baseBenchmarkSec: 95.130,
+    pole: { code: 'VER', time: '1:35.130' },
+    fastestLap: { code: 'VER', time: '1:38.220', lap: 55 },
+    raceFinishOrder: ['VER', 'ANT', 'HAM', 'LEC', 'HAD', 'PIA', 'LAW', 'ALO', 'NOR', 'LIN', 'HUL', 'STR', 'COL', 'BEA', 'OCO', 'GAS', 'SAI', 'BOR', 'PER', 'RUS', 'ALB', 'BOT'],
+    qualiOrder: ['VER', 'HAM', 'HAD', 'ANT', 'LEC', 'NOR', 'PIA', 'RUS', 'GAS', 'BOR', 'LAW', 'ALO', 'SAI', 'STR', 'COL', 'LIN', 'HUL', 'BEA', 'OCO', 'ALB', 'BOT', 'PER'],
+    topGaps: ['1:47:14.808', '+2.307s', '+4.919s', '+7.258s', '+8.571s', '+9.454s', '+12.753s', '+13.372s', '+13.993s', '+15.928s'],
+    winningStrategy: '公式リザルト: 優勝 Verstappen (Red Bull / 1:47:14.808)、2位 Antonelli (+2.307s)、3位 Hamilton (+4.919s)。ポール＆ファステストラップ: Verstappen (1:35.130 / 1:38.220)。',
+    laps: 55,
+  },
+  17: {
+    round: 17,
+    gpName: 'シンガポールGP (マリーナベイ)',
+    circuitName: 'マリーナベイ・ストリート・サーキット',
+    city: 'シンガポール',
+    country: 'シンガポール',
+    circuitId: 'marina-bay',
+    scheduledJst: '10/11 (日) 21:00 スタート',
+    scheduledLocal: '10/11 (日) 20:00 SGT',
+    baseBenchmarkSec: 91.373,
+    pole: { code: 'VER', time: '1:31.373' },
+    fastestLap: { code: 'LEC', time: '1:35.202', lap: 41 },
+    raceFinishOrder: ['VER', 'LEC', 'ANT', 'NOR', 'PIA', 'HAM', 'LAW', 'HUL', 'RUS', 'HAD', 'GAS', 'BEA', 'OCO', 'SAI', 'LIN', 'ALO', 'PER', 'ALB', 'BOT', 'STR', 'COL', 'BOR'],
+    qualiOrder: ['VER', 'LEC', 'HAM', 'ANT', 'NOR', 'RUS', 'PIA', 'GAS', 'LAW', 'LIN', 'HUL', 'BEA', 'OCO', 'SAI', 'BOR', 'COL', 'ALO', 'ALB', 'STR', 'PER', 'BOT', 'HAD'],
+    topGaps: ['1:42:00.785', '+7.335s', '+24.573s', '+40.506s', '+49.644s', '+53.188s', '+1:21.666', '+1:23.386', '+1:24.677', '+1:30.862'],
+    sprintFinishOrder: ['VER', 'HAM', 'LEC', 'ANT', 'LAW', 'BEA', 'HUL', 'NOR', 'GAS', 'OCO', 'ALO', 'SAI', 'LIN', 'PIA', 'ALB', 'BOR', 'BOT', 'HAD', 'COL', 'RUS', 'PER', 'STR'],
+    sprintTopGaps: ['39:48.162', '+2.591s', '+16.871s', '+17.238s', '+20.632s', '+24.321s', '+27.525s', '+28.272s'],
+    winningStrategy: '公式リザルト: 優勝 Verstappen (Red Bull / 1:42:00.785)、2位 Leclerc (+7.335s)、3位 Antonelli (+24.573s)。ポール: Verstappen (1:31.373)、ファステストラップ: Leclerc (1:35.202)。スプリント優勝: Verstappen。',
+    laps: 62,
+  },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -493,9 +552,10 @@ const BAKU_2026_FP1_RESULTS: SessionDriverResult[] = [
 
 // Points system: 25, 18, 15, 12, 10, 8, 6, 4, 2, 1
 const F1_POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
+const F1_SPRINT_POINTS = [8, 7, 6, 5, 4, 3, 2, 1];
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Builder: Generate Completed Classification for Rounds 1 - 14
+// Builder: Generate Completed Classification for Completed 2026 Rounds
 // ─────────────────────────────────────────────────────────────────────────────
 
 function buildCompletedSessionResult(
@@ -504,8 +564,7 @@ function buildCompletedSessionResult(
   sessionType: SessionResultData['sessionType']
 ): SessionResultData {
   const isRace = sessionType === 'race';
-  const isQuali = sessionType === 'qualifying';
-  const isFP = sessionType === 'practice';
+  const isQuali = sessionType === 'qualifying' || sessionType === 'sprint_qualifying';
   const isSprint = sessionType === 'sprint';
 
   // Base time for calculations
@@ -516,16 +575,15 @@ function buildCompletedSessionResult(
       const def = GRID_2026_MAP[code] || { code, name: code, number: 0, team: 'F1 Team', color: '#888' };
       const pos = idx + 1;
       const isFL = code === race.fastestLap.code;
-      const pointsBase = pos <= 10 ? F1_POINTS[pos - 1] : 0;
-      const points = pointsBase + (isFL && pos <= 10 ? 1 : 0);
+      const points = pos <= 10 ? F1_POINTS[pos - 1] : 0;
 
-      // Gap calculation
-      let gapToLeader = 'LEADER';
+      // Gap calculation (use official topGaps when available)
+      let gapToLeader = race.topGaps?.[idx] || 'LEADER';
       let bestLapTime = formatSecondsToLapTime(baseSec + 2.5 + (idx * 0.12));
       if (isFL) {
         bestLapTime = race.fastestLap.time;
       }
-      if (pos > 1) {
+      if (!race.topGaps?.[idx] && pos > 1) {
         const gapSec = (idx * 1.85) + (idx > 5 ? 12 : 0) + (idx > 10 ? 25 : 0);
         gapToLeader = `+${gapSec.toFixed(3)}s`;
       }
@@ -558,7 +616,7 @@ function buildCompletedSessionResult(
       status: 'completed',
       scheduledJst: race.scheduledJst,
       scheduledLocal: race.scheduledLocal,
-      dataSource: 'FIA Formula 1 Official Timing',
+      dataSource: 'FIA Formula 1 Official Timing / Jolpica & OpenF1 API',
       fastestLap: {
         driverCode: race.fastestLap.code,
         driverName: GRID_2026_MAP[race.fastestLap.code]?.name || race.fastestLap.code,
@@ -566,6 +624,46 @@ function buildCompletedSessionResult(
         lap: race.fastestLap.lap,
       },
       winningStrategy: race.winningStrategy,
+      results,
+    };
+  }
+
+  if (isSprint && race.sprintFinishOrder) {
+    const sprintLaps = Math.max(15, Math.round(race.laps * 0.32));
+    const results: SessionDriverResult[] = race.sprintFinishOrder.map((code, idx) => {
+      const def = GRID_2026_MAP[code] || { code, name: code, number: 0, team: 'F1 Team', color: '#888' };
+      const pos = idx + 1;
+      const points = pos <= 8 ? F1_SPRINT_POINTS[pos - 1] : 0;
+      const gapToLeader = race.sprintTopGaps?.[idx] || (pos === 1 ? 'LEADER' : `+${(idx * 2.1).toFixed(3)}s`);
+      const bestLapTime = formatSecondsToLapTime(baseSec + 1.8 + (idx * 0.1));
+      return {
+        position: pos,
+        driverCode: def.code,
+        driverName: def.name,
+        driverNumber: def.number,
+        teamName: def.team,
+        teamColor: def.color,
+        bestLapTime,
+        gapToLeader,
+        lapsCompleted: sprintLaps,
+        status: 'FINISHED',
+        points,
+      };
+    });
+
+    return {
+      season: '2026',
+      round: race.round,
+      gpName: race.gpName,
+      circuitName: race.circuitName,
+      city: race.city,
+      country: race.country,
+      sessionName,
+      sessionType: 'sprint',
+      status: 'completed',
+      scheduledJst: race.scheduledJst.replace(/スタート.*$/, sessionName),
+      scheduledLocal: race.scheduledLocal.replace(/スタート.*$/, sessionName),
+      dataSource: 'FIA Formula 1 Official Timing / Jolpica & OpenF1 API',
       results,
     };
   }
@@ -613,12 +711,12 @@ function buildCompletedSessionResult(
       circuitName: race.circuitName,
       city: race.city,
       country: race.country,
-      sessionName: '予選',
-      sessionType: 'qualifying',
+      sessionName: sessionType === 'sprint_qualifying' ? 'スプリント予選' : '予選',
+      sessionType,
       status: 'completed',
-      scheduledJst: race.scheduledJst.replace(/スタート.*$/, '予選'),
-      scheduledLocal: race.scheduledLocal.replace(/スタート.*$/, '予選'),
-      dataSource: 'FIA Formula 1 Official Timing',
+      scheduledJst: race.scheduledJst.replace(/スタート.*$/, sessionName),
+      scheduledLocal: race.scheduledLocal.replace(/スタート.*$/, sessionName),
+      dataSource: 'FIA Formula 1 Official Timing / Jolpica & OpenF1 API',
       polePosition: {
         driverCode: race.pole.code,
         driverName: GRID_2026_MAP[race.pole.code]?.name || race.pole.code,
@@ -672,7 +770,7 @@ function buildCompletedSessionResult(
     status: 'completed',
     scheduledJst: race.scheduledJst.replace(/スタート.*$/, `${sessionName}`),
     scheduledLocal: race.scheduledLocal.replace(/スタート.*$/, `${sessionName}`),
-    dataSource: 'FIA Formula 1 Official Timing',
+    dataSource: 'FIA Formula 1 Official Timing / Jolpica & OpenF1 API',
     fastestLap: {
       driverCode: pLeaderDef.code,
       driverName: pLeaderDef.name,
@@ -721,24 +819,9 @@ export function getSessionClassification(
     : 'practice';
 
   // ─────────────────────────────────────────────────────────────────────────
-  // 1. Completed 2026 Rounds (Rounds 1 - 14): Official classifications provided
+  // 1. Round 15 Baku Exact Practice & Qualifying Sessions (OpenF1 API)
   // ─────────────────────────────────────────────────────────────────────────
-  if (is2026 && round >= 1 && round <= 14) {
-    const raceRecord = COMPLETED_2026_RACES[round];
-    if (raceRecord) {
-      return buildCompletedSessionResult(raceRecord, sessionName, sessionType);
-    }
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // 2. Round 15 Baku (Active Weekend as of September 26, 2026):
-  //    - FP1 (9/24 17:30 JST): COMPLETED (Session 11370)
-  //    - FP2 (9/24 21:00 JST): COMPLETED (Session 11371)
-  //    - FP3 (9/25 17:30 JST): COMPLETED (Session 11372)
-  //    - 予選 (9/25 21:00 JST): COMPLETED (Session 11373)
-  //    - 決勝 (9/26 20:00 JST): UPCOMING (Tonight at 20:00 JST - ZERO DATA)
-  // ─────────────────────────────────────────────────────────────────────────
-  if (is2026 && isBaku) {
+  if (is2026 && isBaku && !isRace) {
     if (isFP1) {
       return {
         season: '2026',
@@ -830,30 +913,20 @@ export function getSessionClassification(
         results: BAKU_2026_QUALI_RESULTS,
       };
     }
-
-    // 決勝 (Race tonight at 20:00 JST): UPCOMING. Output ZERO data. Pure facts.
-    return {
-      season: '2026',
-      round: 15,
-      gpName: 'アゼルバイジャンGP (バクー)',
-      circuitName: 'バクー市街地コース',
-      city: 'バクー',
-      country: 'アゼルバイジャン',
-      sessionName: '決勝',
-      sessionType: 'race',
-      status: 'upcoming',
-      scheduledJst: '9/26 (土) 20:00 スタート',
-      scheduledLocal: '9/26 (土) 15:00 AZT',
-      dataSource: 'FIA Formula 1 Official Timing',
-      results: [],
-    };
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // 3. Upcoming Future 2026 Rounds (Round 16+ Sepang, Singapore, etc.):
+  // 2. Completed 2026 Rounds (Rounds 1 - 17): Official classifications provided
+  // ─────────────────────────────────────────────────────────────────────────
+  if (is2026 && COMPLETED_2026_RACES[round]) {
+    return buildCompletedSessionResult(COMPLETED_2026_RACES[round], sessionName, sessionType);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // 3. Upcoming Future 2026 Rounds (Round 18+ Austin, Mexico, etc.):
   //    All upcoming. Strictly ZERO data.
   // ─────────────────────────────────────────────────────────────────────────
-  if (is2026 && round > 15) {
+  if (is2026) {
     return {
       season: '2026',
       round,

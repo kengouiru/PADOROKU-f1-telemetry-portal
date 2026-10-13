@@ -160,27 +160,9 @@ export default function DetailedTelemetryChart({
     return cleanup;
   }, [fetchData]);
 
-  if (isLoading || !telemetryData) {
-    return (
-      <div className={`glass-card bg-slate-950/90 border border-white/10 rounded-2xl p-4 sm:p-5 flex flex-col gap-4 relative ${className}`}>
-        <div className="flex items-center justify-center h-64 flex-col gap-4">
-          {isLoading ? (
-            <>
-              <div className="w-8 h-8 animate-spin border-2 border-red-500 border-t-transparent rounded-full" />
-              <span className="text-slate-400 font-mono text-sm">🔄 テレメトリーデータを取得中...</span>
-            </>
-          ) : (
-            <>
-              <span className="text-slate-400 font-mono text-sm">⚠️ {errorMsg || 'データがありません'}</span>
-              <button onClick={fetchData} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded text-sm transition-colors">再試行</button>
-            </>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  const { points, insights, circuitName, circuitLengthM } = telemetryData;
+  const points = useMemo(() => telemetryData?.points ?? [], [telemetryData]);
+  const circuitName = telemetryData?.circuitName ?? '';
+  const circuitLengthM = telemetryData?.circuitLengthM ?? 5000;
 
   // Match circuit from KNOWLEDGE_CIRCUITS for deep encyclopedic navigation
   const matchedKnowledgeCircuit = useMemo(() => {
@@ -190,7 +172,7 @@ export default function DetailedTelemetryChart({
           c.id === selectedCircuit ||
           c.id.includes(selectedCircuit) ||
           selectedCircuit.includes(c.id) ||
-          c.name.includes(circuitName)
+          (circuitName && c.name.includes(circuitName))
       ) || KNOWLEDGE_CIRCUITS[0]
     );
   }, [selectedCircuit, circuitName]);
@@ -223,33 +205,6 @@ export default function DetailedTelemetryChart({
       y: 0,
     }));
   }, [selectedCircuit, cornerMarkers]);
-
-  // Quick preset matchups
-  const applyPreset = (c1: string, c2: string) => {
-    setDriver1Code(c1);
-    setDriver2Code(c2);
-  };
-
-  // Zoom to a specific corner (approx 200m buffer)
-  const handleSelectCorner = (corner: { name: string; pct: number }) => {
-    const bufferPct = Math.max(4, Math.round((200 / circuitLengthM) * 100));
-    const start = Math.max(0, Math.round(corner.pct - bufferPct));
-    const end = Math.min(100, Math.round(corner.pct + bufferPct));
-    setZoomRange({ start, end });
-    setSelectedCornerName(corner.name);
-    setHoverDistPercent(corner.pct);
-  };
-
-  // Reset zoom to 0% ~ 100%
-  const handleResetZoom = () => {
-    setZoomRange(null);
-    setSelectedCornerName(null);
-  };
-
-  // Filtered or active data points in view
-  const currentDomain: [number, number] = zoomRange
-    ? [zoomRange.start, zoomRange.end]
-    : [0, 100];
 
   // Sliced telemetry data points for active zoom window (stretches cleanly across full chart width)
   const displayPoints = useMemo(() => {
@@ -342,6 +297,55 @@ export default function DetailedTelemetryChart({
     }
     return closestPt;
   }, [hoverDistPercent, points]);
+
+  if (isLoading || !telemetryData) {
+    return (
+      <div className={`glass-card bg-slate-950/90 border border-white/10 rounded-2xl p-4 sm:p-5 flex flex-col gap-4 relative ${className}`}>
+        <div className="flex items-center justify-center h-64 flex-col gap-4">
+          {isLoading ? (
+            <>
+              <div className="w-8 h-8 animate-spin border-2 border-red-500 border-t-transparent rounded-full" />
+              <span className="text-slate-400 font-mono text-sm">🔄 テレメトリーデータを取得中...</span>
+            </>
+          ) : (
+            <>
+              <span className="text-slate-400 font-mono text-sm">⚠️ {errorMsg || 'データがありません'}</span>
+              <button onClick={fetchData} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded text-sm transition-colors">再試行</button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  const { insights } = telemetryData;
+
+  // Quick preset matchups
+  const applyPreset = (c1: string, c2: string) => {
+    setDriver1Code(c1);
+    setDriver2Code(c2);
+  };
+
+  // Zoom to a specific corner (approx 200m buffer)
+  const handleSelectCorner = (corner: { name: string; pct: number }) => {
+    const bufferPct = Math.max(4, Math.round((200 / circuitLengthM) * 100));
+    const start = Math.max(0, Math.round(corner.pct - bufferPct));
+    const end = Math.min(100, Math.round(corner.pct + bufferPct));
+    setZoomRange({ start, end });
+    setSelectedCornerName(corner.name);
+    setHoverDistPercent(corner.pct);
+  };
+
+  // Reset zoom to 0% ~ 100%
+  const handleResetZoom = () => {
+    setZoomRange(null);
+    setSelectedCornerName(null);
+  };
+
+  // Filtered or active data points in view
+  const currentDomain: [number, number] = zoomRange
+    ? [zoomRange.start, zoomRange.end]
+    : [0, 100];
 
   // Chart hover mouse movement handler
   const handleChartMouseMove = (state: Parameters<NonNullable<React.ComponentProps<typeof LineChart>['onMouseMove']>>[0]) => {

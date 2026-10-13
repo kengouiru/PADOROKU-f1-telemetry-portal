@@ -584,7 +584,8 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
         "session": "決勝",
         "dayTime": "9/13 (日) 22:00 スタート"
       }
-    ]
+    ],
+    "winnerNote": "🏆 優勝: K.アントネッリ (Mercedes)"
   },
   {
     "round": 15,
@@ -620,7 +621,8 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
         "session": "決勝",
         "dayTime": "9/26 (土) 20:00 スタート"
       }
-    ]
+    ],
+    "winnerNote": "🏆 優勝: G.ラッセル (Mercedes)"
   },
   {
     "round": 16,
@@ -633,7 +635,7 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
     "targetDateUtc": "2026-10-04T07:00:00Z",
     "isSprint": false,
     "lengthKm": 5.543,
-    "laps": 56,
+    "laps": 55,
     "pirelliCompounds": "C1 / C2 / C3 (熱帯スコール & 高熱)",
     "scheduleJst": [
       {
@@ -656,7 +658,8 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
         "session": "決勝",
         "dayTime": "10/4 (日) 16:00 スタート"
       }
-    ]
+    ],
+    "winnerNote": "🏆 優勝: M.フェルスタッペン (Red Bull)"
   },
   {
     "round": 17,
@@ -692,7 +695,8 @@ export const SEASON_2026_CALENDAR: RaceWeekendSchedule[] = [
         "session": "決勝レース",
         "dayTime": "10/11 (日) 21:00 スタート"
       }
-    ]
+    ],
+    "winnerNote": "🏆 優勝: M.フェルスタッペン (Red Bull)"
   },
   {
     "round": 18,
@@ -1280,29 +1284,29 @@ export const SEASON_2025_CALENDAR: RaceWeekendSchedule[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────
-// 3. 2026 STANDINGS (OFFICIAL GROUND TRUTH THROUGH ROUND 14 MADRID)
+// 3. 2026 STANDINGS (OFFICIAL GROUND TRUTH THROUGH ROUND 17 SINGAPORE)
 // ─────────────────────────────────────────────────────────────
 
 export const DRIVER_STANDINGS_2026: DriverStanding[] = [
-  { position: 1, driverCode: 'ANT', driverName: 'アンドレア・キミ・アントネッリ', team: 'Mercedes', teamColor: '#27F4D2', points: 292, wins: 8, podiums: 12 },
-  { position: 2, driverCode: 'RUS', driverName: 'ジョージ・ラッセル', team: 'Mercedes', teamColor: '#27F4D2', points: 211, wins: 2, podiums: 7 },
-  { position: 3, driverCode: 'HAM', driverName: 'ルイス・ハミルトン', team: 'Ferrari', teamColor: '#E80020', points: 191, wins: 1, podiums: 5 },
-  { position: 4, driverCode: 'NOR', driverName: 'ランド・ノリス', team: 'McLaren', teamColor: '#FF8000', points: 186, wins: 2, podiums: 5 },
-  { position: 5, driverCode: 'LEC', driverName: 'シャルル・ルクレール', team: 'Ferrari', teamColor: '#E80020', points: 167, wins: 1, podiums: 4 },
-  { position: 6, driverCode: 'VER', driverName: 'マックス・フェルスタッペン', team: 'Red Bull', teamColor: '#3671C6', points: 145, wins: 0, podiums: 6 },
-  { position: 7, driverCode: 'PIA', driverName: 'オスカー・ピアストリ', team: 'McLaren', teamColor: '#FF8000', points: 120, wins: 0, podiums: 2 },
-  { position: 8, driverCode: 'HAD', driverName: 'イサック・ハジャー', team: 'Red Bull', teamColor: '#3671C6', points: 71, wins: 0, podiums: 1 },
-  { position: 9, driverCode: 'LAW', driverName: 'リアム・ローソン', team: 'RB F1 Team', teamColor: '#6692FF', points: 59, wins: 0, podiums: 0 },
+  { position: 1, driverCode: 'ANT', driverName: 'アンドレア・キミ・アントネッリ', team: 'Mercedes', teamColor: '#27F4D2', points: 340, wins: 8, podiums: 14 },
+  { position: 2, driverCode: 'RUS', driverName: 'ジョージ・ラッセル', team: 'Mercedes', teamColor: '#27F4D2', points: 238, wins: 3, podiums: 8 },
+  { position: 3, driverCode: 'HAM', driverName: 'ルイス・ハミルトン', team: 'Ferrari', teamColor: '#E80020', points: 229, wins: 1, podiums: 6 },
+  { position: 4, driverCode: 'VER', driverName: 'マックス・フェルスタッペン', team: 'Red Bull', teamColor: '#3671C6', points: 221, wins: 2, podiums: 9 },
+  { position: 5, driverCode: 'LEC', driverName: 'シャルル・ルクレール', team: 'Ferrari', teamColor: '#E80020', points: 215, wins: 1, podiums: 5 },
+  { position: 6, driverCode: 'NOR', driverName: 'ランド・ノリス', team: 'McLaren', teamColor: '#FF8000', points: 201, wins: 2, podiums: 5 },
+  { position: 7, driverCode: 'PIA', driverName: 'オスカー・ピアストリ', team: 'McLaren', teamColor: '#FF8000', points: 138, wins: 0, podiums: 2 },
+  { position: 8, driverCode: 'HAD', driverName: 'イサック・ハジャー', team: 'Red Bull', teamColor: '#3671C6', points: 97, wins: 0, podiums: 2 },
+  { position: 9, driverCode: 'LAW', driverName: 'リアム・ローソン', team: 'RB F1 Team', teamColor: '#6692FF', points: 75, wins: 0, podiums: 0 },
   { position: 10, driverCode: 'GAS', driverName: 'ピエール・ガスリー', team: 'Alpine F1 Team', teamColor: '#0093cc', points: 41, wins: 0, podiums: 0 },
-  { position: 11, driverCode: 'LIN', driverName: 'アービッド・リンドブラッド', team: 'RB F1 Team', teamColor: '#6692FF', points: 31, wins: 0, podiums: 0 },
+  { position: 11, driverCode: 'LIN', driverName: 'アービッド・リンドブラッド', team: 'RB F1 Team', teamColor: '#6692FF', points: 38, wins: 0, podiums: 0 },
   { position: 12, driverCode: 'COL', driverName: 'フランコ・コラピント', team: 'Alpine F1 Team', teamColor: '#0093cc', points: 27, wins: 0, podiums: 0 },
-  { position: 13, driverCode: 'BEA', driverName: 'オリバー・ベアマン', team: 'Haas F1 Team', teamColor: '#B6BABD', points: 18, wins: 0, podiums: 0 },
-  { position: 14, driverCode: 'BOR', driverName: 'ガブリエル・ボルトレート', team: 'Audi', teamColor: '#e0001a', points: 10, wins: 0, podiums: 0 },
-  { position: 15, driverCode: 'HUL', driverName: 'ニコ・ヒュルケンベルグ', team: 'Audi', teamColor: '#e0001a', points: 7, wins: 0, podiums: 0 },
-  { position: 16, driverCode: 'SAI', driverName: 'カルロス・サインツ', team: 'Williams', teamColor: '#00A0DE', points: 6, wins: 0, podiums: 0 },
-  { position: 17, driverCode: 'ALB', driverName: 'アレクサンダー・アルボン', team: 'Williams', teamColor: '#00A0DE', points: 5, wins: 0, podiums: 0 },
-  { position: 18, driverCode: 'OCO', driverName: 'エステバン・オコン', team: 'Haas F1 Team', teamColor: '#B6BABD', points: 3, wins: 0, podiums: 0 },
-  { position: 19, driverCode: 'ALO', driverName: 'フェルナンド・アロンソ', team: 'Aston Martin', teamColor: '#229971', points: 3, wins: 0, podiums: 0 },
+  { position: 13, driverCode: 'BEA', driverName: 'オリバー・ベアマン', team: 'Haas F1 Team', teamColor: '#B6BABD', points: 23, wins: 0, podiums: 0 },
+  { position: 14, driverCode: 'HUL', driverName: 'ニコ・ヒュルケンベルグ', team: 'Audi', teamColor: '#e0001a', points: 13, wins: 0, podiums: 0 },
+  { position: 15, driverCode: 'BOR', driverName: 'ガブリエル・ボルトレート', team: 'Audi', teamColor: '#e0001a', points: 10, wins: 0, podiums: 0 },
+  { position: 16, driverCode: 'OCO', driverName: 'エステバン・オコン', team: 'Haas F1 Team', teamColor: '#B6BABD', points: 7, wins: 0, podiums: 0 },
+  { position: 17, driverCode: 'ALO', driverName: 'フェルナンド・アロンソ', team: 'Aston Martin', teamColor: '#229971', points: 7, wins: 0, podiums: 0 },
+  { position: 18, driverCode: 'SAI', driverName: 'カルロス・サインツ', team: 'Williams', teamColor: '#00A0DE', points: 7, wins: 0, podiums: 0 },
+  { position: 19, driverCode: 'ALB', driverName: 'アレクサンダー・アルボン', team: 'Williams', teamColor: '#00A0DE', points: 5, wins: 0, podiums: 0 },
   { position: 20, driverCode: 'TSU', driverName: '角田裕毅', team: 'RB F1 Team', teamColor: '#6692FF', points: 1, wins: 0, podiums: 0 },
   { position: 21, driverCode: 'STR', driverName: 'ランス・ストロール', team: 'Aston Martin', teamColor: '#229971', points: 0, wins: 0, podiums: 0 },
   { position: 22, driverCode: 'BOT', driverName: 'バルテリ・ボッタス', team: 'Cadillac F1 Team', teamColor: '#D4AF37', points: 0, wins: 0, podiums: 0 },
@@ -1310,16 +1314,16 @@ export const DRIVER_STANDINGS_2026: DriverStanding[] = [
 ];
 
 export const CONSTRUCTOR_STANDINGS_2026: ConstructorStanding[] = [
-  { position: 1, teamName: 'Mercedes', teamColor: '#27F4D2', powerUnit: 'Mercedes', teamPrincipal: 'Toto Wolff', points: 503, wins: 10 },
-  { position: 2, teamName: 'Ferrari', teamColor: '#E80020', powerUnit: 'Ferrari', teamPrincipal: 'Frédéric Vasseur', points: 358, wins: 2 },
-  { position: 3, teamName: 'McLaren', teamColor: '#FF8000', powerUnit: 'Mercedes', teamPrincipal: 'Andrea Stella', points: 306, wins: 2 },
-  { position: 4, teamName: 'Red Bull', teamColor: '#3671C6', powerUnit: 'Red Bull Ford', teamPrincipal: 'Christian Horner', points: 230, wins: 0 },
-  { position: 5, teamName: 'RB F1 Team', teamColor: '#6692FF', powerUnit: 'Red Bull Ford', teamPrincipal: 'Laurent Mekies', points: 77, wins: 0 },
+  { position: 1, teamName: 'Mercedes', teamColor: '#27F4D2', powerUnit: 'Mercedes', teamPrincipal: 'Toto Wolff', points: 578, wins: 11 },
+  { position: 2, teamName: 'Ferrari', teamColor: '#E80020', powerUnit: 'Ferrari', teamPrincipal: 'Frédéric Vasseur', points: 444, wins: 2 },
+  { position: 3, teamName: 'McLaren', teamColor: '#FF8000', powerUnit: 'Mercedes', teamPrincipal: 'Andrea Stella', points: 339, wins: 2 },
+  { position: 4, teamName: 'Red Bull', teamColor: '#3671C6', powerUnit: 'Red Bull Ford', teamPrincipal: 'Christian Horner', points: 332, wins: 2 },
+  { position: 5, teamName: 'RB F1 Team', teamColor: '#6692FF', powerUnit: 'Red Bull Ford', teamPrincipal: 'Laurent Mekies', points: 100, wins: 0 },
   { position: 6, teamName: 'Alpine F1 Team', teamColor: '#0093cc', powerUnit: 'Mercedes', teamPrincipal: 'Oliver Oakes', points: 68, wins: 0 },
-  { position: 7, teamName: 'Haas F1 Team', teamColor: '#B6BABD', powerUnit: 'Ferrari', teamPrincipal: 'Ayao Komatsu', points: 21, wins: 0 },
-  { position: 8, teamName: 'Audi', teamColor: '#e0001a', powerUnit: 'Audi Works', teamPrincipal: 'Jonathan Wheatley', points: 17, wins: 0 },
-  { position: 9, teamName: 'Williams', teamColor: '#00A0DE', powerUnit: 'Mercedes', teamPrincipal: 'James Vowles', points: 11, wins: 0 },
-  { position: 10, teamName: 'Aston Martin', teamColor: '#229971', powerUnit: 'Honda Works', teamPrincipal: 'Mike Krack', points: 3, wins: 0 },
+  { position: 7, teamName: 'Haas F1 Team', teamColor: '#B6BABD', powerUnit: 'Ferrari', teamPrincipal: 'Ayao Komatsu', points: 30, wins: 0 },
+  { position: 8, teamName: 'Audi', teamColor: '#e0001a', powerUnit: 'Audi Works', teamPrincipal: 'Jonathan Wheatley', points: 23, wins: 0 },
+  { position: 9, teamName: 'Williams', teamColor: '#00A0DE', powerUnit: 'Mercedes', teamPrincipal: 'James Vowles', points: 12, wins: 0 },
+  { position: 10, teamName: 'Aston Martin', teamColor: '#229971', powerUnit: 'Honda Works', teamPrincipal: 'Mike Krack', points: 7, wins: 0 },
   { position: 11, teamName: 'Cadillac F1 Team', teamColor: '#D4AF37', powerUnit: 'Ferrari', teamPrincipal: 'Mario Andretti', points: 0, wins: 0 },
 ];
 
