@@ -7,13 +7,15 @@
  * ideal for dual monitors, secondary screens, or side-by-side race streaming.
  */
 
-import React, { useState, useMemo, Suspense } from 'react';
+import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import DetailedTelemetryChart from '@/components/telemetry/DetailedTelemetryChart';
 import { KNOWLEDGE_CIRCUITS, KNOWLEDGE_DRIVERS } from '@/data/f1KnowledgeData';
 import { GLOSSARY_TERMS, type GlossaryTerm, type GlossaryCategory } from '@/data/f1GlossaryData';
 import { REGULATION_ARTICLES, type RegulationCategory } from '@/data/f1RegulationsData';
 import GlossaryVisualDiagram from '@/components/glossary/GlossaryVisualDiagram';
+import { subscribePitwallSync } from '@/lib/pitwallBroadcastSync';
+import { Radio, Lock, Unlock } from 'lucide-react';
 
 /** Extract matching glossary terms from text (AI guidance / notes) */
 function extractRelevantTerms(text: string): GlossaryTerm[] {
@@ -32,11 +34,32 @@ function extractRelevantTerms(text: string): GlossaryTerm[] {
 function PopoutTelemetryContent() {
   const searchParams = useSearchParams();
 
-  const circuitId = searchParams.get('circuit') || 'bahrain-international';
-  const driver1Code = searchParams.get('d1') || 'VER';
-  const driver2Code = searchParams.get('d2') || 'NOR';
-  const lapNumber = searchParams.get('lap') ? parseInt(searchParams.get('lap')!) : undefined;
+  // WHY: Guardrail 2 — Initialize state from URL query params first so the pop-out window
+  // renders immediately without any blank state, then listen to BroadcastChannel updates.
+  const [circuitId, setCircuitId] = useState<string>(() => searchParams.get('circuit') || 'marina-bay');
+  const [driver1Code, setDriver1Code] = useState<string>(() => searchParams.get('d1') || 'VER');
+  const [driver2Code, setDriver2Code] = useState<string>(() => searchParams.get('d2') || 'LEC');
+  const [lapNumber, setLapNumber] = useState<number | undefined>(() =>
+    searchParams.get('lap') ? parseInt(searchParams.get('lap')!, 10) : undefined
+  );
+  const [syncEnabled, setSyncEnabled] = useState<boolean>(true);
+  const [lastSyncedAt, setLastSyncedAt] = useState<number | null>(null);
   const insightNotes = searchParams.get('notes') || '';
+
+  useEffect(() => {
+    if (!syncEnabled) return;
+    const unsubscribe = subscribePitwallSync({
+      role: 'popout',
+      onReceiveState: (state) => {
+        if (state.circuitId) setCircuitId(state.circuitId);
+        if (state.driver1Code) setDriver1Code(state.driver1Code);
+        if (state.driver2Code) setDriver2Code(state.driver2Code);
+        if (state.lapNumber !== undefined) setLapNumber(state.lapNumber);
+        setLastSyncedAt(state.updatedAt || Date.now());
+      },
+    });
+    return unsubscribe;
+  }, [syncEnabled]);
 
   const circuit = KNOWLEDGE_CIRCUITS.find((c) => c.id === circuitId);
   const d1 = KNOWLEDGE_DRIVERS.find((d) => d.code === driver1Code);
@@ -99,7 +122,7 @@ function PopoutTelemetryContent() {
       {/* ── Pop-out Window Header ── */}
       <header className="flex-shrink-0 bg-slate-950/98 border-b border-white/10 px-4 py-3 flex items-center justify-between gap-3 shadow-xl">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-red-600 via-red-500 to-red-700 flex items-center justify-center font-racing font-black text-xs text-white shadow-md shadow-red-950/40 border border-red-400/30 flex-shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-red-600 flex items-center justify-center font-racing font-black text-xs text-white shadow-md shadow-red-950/40 border border-red-400/30 flex-shrink-0">
             P1
           </div>
           <div className="min-w-0">
@@ -107,11 +130,11 @@ function PopoutTelemetryContent() {
               <span className="text-xs font-racing font-bold text-red-400 tracking-widest uppercase">
                 F1 PITWALL INSPECTOR
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-purple-950/80 border border-purple-500/30 text-[11px] font-mono text-purple-300 flex items-center gap-1">
-                <span>独立ポップアウト画面</span>
+              <span className="px-2 py-0.5 rounded-full bg-slate-900 border border-white/15 text-[11px] font-mono text-slate-300 flex items-center gap-1">
+                <span>マルチモニター独立窓</span>
               </span>
               {lapNumber && (
-                <span className="px-2 py-0.5 rounded-full bg-red-950/80 border border-red-500/30 text-[11px] font-mono text-red-300 font-bold">
+                <span className="px-2 py-0.5 rounded-full bg-red-950/80 border border-red-500/30 text-[11px] font-mono text-red-300 font-bold tabular-nums">
                   Lap {lapNumber}
                 </span>
               )}
@@ -124,6 +147,20 @@ function PopoutTelemetryContent() {
 
         {/* Action Controls */}
         <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            type="button"
+            onClick={() => setSyncEnabled((prev) => !prev)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-mono font-bold transition-all cursor-pointer ${
+              syncEnabled
+                ? 'bg-emerald-950/70 text-emerald-300 border-emerald-500/40 hover:bg-emerald-900/70'
+                : 'bg-slate-900 text-slate-400 border-white/10 hover:text-white'
+            }`}
+            title="メインウィンドウでのGP・ドライバー選択変更とリアルタイム連動するか切り替えます"
+          >
+            {syncEnabled ? <Unlock className="w-3.5 h-3.5 text-emerald-400" /> : <Lock className="w-3.5 h-3.5 text-slate-400" />}
+            <span>{syncEnabled ? '2画面SYNC: ON' : '2画面SYNC: 固定'}</span>
+          </button>
+
           <button
             type="button"
             onClick={() => setIsKnowledgeOpen((prev) => !prev)}
@@ -164,21 +201,24 @@ function PopoutTelemetryContent() {
         {/* Left: Telemetry Chart & AI Guidance */}
         <main className="flex-1 min-w-0 overflow-y-auto p-4 sm:p-5 space-y-4">
           {/* Top Status Bar */}
-          <div className="px-4 py-2.5 rounded-2xl bg-purple-950/30 border border-purple-500/20 text-xs text-slate-300 flex items-center justify-between gap-3 shadow-inner">
+          <div className="px-4 py-2.5 rounded-2xl bg-slate-900/90 border border-white/10 text-xs text-slate-300 flex items-center justify-between gap-3 shadow-inner">
             <div className="flex items-center gap-2">
+              <Radio className={`w-4 h-4 shrink-0 ${syncEnabled ? 'text-emerald-400 animate-pulse' : 'text-slate-500'}`} />
               <span>
-                <strong>独立マルチモニター検証中：</strong>
-                メイン画面とは完全に独立したテレメトリー環境です。サブモニターやレース中継画面の隣に自由に配置してご活用ください。
+                <strong>マルチモニター 2画面連動モード：</strong>
+                {syncEnabled
+                  ? 'メイン画面で選択したサーキット・ドライバーが自動的にこのウィンドウへリアルタイム同期されます。'
+                  : '現在このウィンドウの表示を固定（ロック）しています。'}
               </span>
             </div>
-            <span className="hidden md:inline-block font-mono text-[11px] text-purple-400 px-2 py-0.5 rounded bg-purple-950/60 border border-purple-500/30">
-              STANDALONE MODE
+            <span className="hidden md:inline-block font-mono text-[11px] text-emerald-400 px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/30 whitespace-nowrap tabular-nums">
+              {lastSyncedAt ? `SYNCED ${new Date(lastSyncedAt).toLocaleTimeString('ja-JP')}` : 'READY'}
             </span>
           </div>
 
           {/* AI Guidance with Clickable Term Chips */}
           {insightNotes && (
-            <div className="rounded-2xl bg-gradient-to-r from-slate-900/80 via-slate-900/90 to-slate-900/80 border border-slate-400/40 p-4 shadow-md space-y-2.5 animate-fade-in">
+            <div className="rounded-2xl bg-slate-900/90 border border-white/15 p-4 shadow-md space-y-2.5 animate-fade-in">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="font-racing font-bold text-xs sm:text-sm text-slate-200 tracking-wide uppercase">
@@ -222,6 +262,7 @@ function PopoutTelemetryContent() {
           {/* Interactive Detailed Telemetry Chart */}
           <div className="bg-slate-900/60 rounded-2xl border border-white/10 p-2 sm:p-4 shadow-xl">
             <DetailedTelemetryChart
+              key={`${circuitId}-${driver1Code}-${driver2Code}`}
               initialCircuitId={circuitId}
               initialDriver1Code={driver1Code}
               initialDriver2Code={driver2Code}

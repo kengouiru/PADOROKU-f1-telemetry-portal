@@ -14,7 +14,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import type { RaceWeekendSchedule } from '@/data/f1SeasonData';
 import { getCircuitTimezoneInfo, formatDualSessionTime } from '@/lib/circuitTimezones';
-import { getSessionClassification, type SessionResultData, type SessionDriverResult } from '@/lib/sessionResultsService';
+import {
+  getSessionClassification,
+  fetchOfficialSessionResults,
+  type SessionResultData,
+  type SessionDriverResult,
+} from '@/lib/sessionResultsService';
+import { openPitwallPopoutWindow } from '@/lib/pitwallBroadcastSync';
+import { ExternalLink, X, CheckCircle2, Radio } from 'lucide-react';
 
 interface SessionResultsModalProps {
   isOpen: boolean;
@@ -25,6 +32,7 @@ interface SessionResultsModalProps {
   seasonYear: string;
   onNavigateToTelemetry?: (gpName: string) => void;
   onNavigateToDriver?: (driverCode: string) => void;
+  inlineMode?: boolean;
 }
 
 export default function SessionResultsModal({
@@ -36,9 +44,11 @@ export default function SessionResultsModal({
   seasonYear,
   onNavigateToTelemetry,
   onNavigateToDriver,
+  inlineMode = false,
 }: SessionResultsModalProps) {
   // Current active session within modal
   const [activeSession, setActiveSession] = useState<string>(initialSessionName);
+  const [asyncSessionData, setAsyncSessionData] = useState<SessionResultData | null>(null);
 
   // Circuit timezone info
   const tzInfo = useMemo(() => {
@@ -52,8 +62,9 @@ export default function SessionResultsModal({
     }
   }, [initialSessionName]);
 
-  // Handle ESC key to close
+  // Handle ESC key to close (only in modal mode)
   useEffect(() => {
+    if (inlineMode) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
@@ -65,12 +76,32 @@ export default function SessionResultsModal({
       window.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, inlineMode]);
 
-  // Fetch verified classification data for this session
-  const sessionData: SessionResultData = useMemo(() => {
+  // Synchronous baseline classification
+  const syncSessionData: SessionResultData = useMemo(() => {
     return getSessionClassification(seasonYear, race.round, activeSession, 101.5, circuitId);
   }, [seasonYear, race.round, activeSession, circuitId]);
+
+  // WHY: Guardrail 1 & 3 — Asynchronously preload historical JSON chunks (2018-2025)
+  // or resolve OpenF1 PROVISIONAL live classification if Jolpica is not yet updated.
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    setAsyncSessionData(null);
+    fetchOfficialSessionResults(seasonYear, race.round, activeSession, circuitId)
+      .then((res) => {
+        if (!cancelled) {
+          setAsyncSessionData(res);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, seasonYear, race.round, activeSession, circuitId]);
+
+  const sessionData = asyncSessionData || syncSessionData;
 
   // Schedule string for active session
   const activeScheduleObj = race.scheduleJst.find((s) => s.session === activeSession);
@@ -86,23 +117,34 @@ export default function SessionResultsModal({
 
   if (!isOpen) return null;
 
+  const d1Code = sessionData.results[0]?.driverCode || 'VER';
+  const d2Code = sessionData.results[1]?.driverCode || 'LEC';
+
   return (
     <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn"
-      onClick={onClose}
+      role={inlineMode ? 'region' : 'dialog'}
+      aria-modal={!inlineMode}
+      className={
+        inlineMode
+          ? 'w-full animate-fadeIn'
+          : 'fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-fadeIn'
+      }
+      onClick={inlineMode ? undefined : onClose}
     >
       <div
-        className="relative flex flex-col w-full max-w-4xl max-h-[92vh] bg-slate-950 border border-white/15 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
+        className={
+          inlineMode
+            ? 'relative flex flex-col w-full bg-slate-950 border border-white/15 rounded-2xl shadow-xl overflow-hidden'
+            : 'relative flex flex-col w-full max-w-4xl max-h-[92vh] bg-slate-950 border border-white/15 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden'
+        }
+        onClick={inlineMode ? undefined : (e) => e.stopPropagation()}
       >
         {/* Subtle decorative glow */}
         <div className="absolute top-0 right-0 w-80 h-80 bg-red-600/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
 
-        {/* ─── MODAL HEADER ─── */}
+        {/* ─── HEADER ─── */}
         <div className="relative z-10 px-4 sm:px-6 py-3.5 sm:py-4 border-b border-white/10 bg-slate-900/90 flex flex-col gap-2.5">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-2.5 min-w-0">
               <span className="text-2xl sm:text-3xl shrink-0">{race.flag}</span>
               <div className="min-w-0">
@@ -113,22 +155,48 @@ export default function SessionResultsModal({
                   <h2 className="text-base sm:text-xl font-black text-white truncate">
                     {race.gpName}
                   </h2>
-                  <span className="text-xs text-slate-400 font-mono hidden md:inline truncate">
-                    {race.circuitName}
-                  </span>
+                  {!isUpcoming && (
+                    sessionData.verificationStatus === 'PROVISIONAL' ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-amber-950/80 text-amber-300 border border-amber-500/40">
+                        <Radio className="w-3 h-3 text-amber-400 animate-pulse" />
+                        PROVISIONAL (OpenF1速報)
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-500/40">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        OFFICIAL (公式確定)
+                      </span>
+                    )
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Close Button */}
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-1.5 sm:p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/10 transition-all cursor-pointer"
-              title="閉じる (Esc)"
-            >
-              <span className="text-lg leading-none">✕</span>
-            </button>
+            {/* Action & Close Buttons */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() =>
+                  openPitwallPopoutWindow(
+                    `/popout/telemetry?circuit=${encodeURIComponent(circuitId)}&d1=${encodeURIComponent(d1Code)}&d2=${encodeURIComponent(d2Code)}`
+                  )
+                }
+                className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-white/15 text-xs font-racing font-bold transition-all cursor-pointer flex items-center gap-1.5"
+                title="上位2台のテレメトリー比較を別ウィンドウ（マルチモニター用）で開きます"
+              >
+                <span>2画面テレメトリー窓</span>
+                <ExternalLink className="w-3.5 h-3.5 text-red-400" />
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="p-1.5 sm:p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/10 transition-all cursor-pointer flex items-center gap-1 text-xs font-mono"
+                title="閉じる"
+              >
+                <X className="w-4 h-4" />
+                {inlineMode && <span>折りたたむ</span>}
+              </button>
+            </div>
           </div>
 
           {/* ─── HORIZONTAL SESSION SWITCHER TABS ─── */}

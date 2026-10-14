@@ -924,7 +924,7 @@ export default function RaceSimulatorHub({
       setTacticalScore(null);
       setDiagnosticResult(null);
     }
-  }, [challengeLap, activeScenario, challengeSnapshots, playerTacticalCommands, radioResponses, tacticalScore, aiDifficulty]);
+  }, [isRaceFinished, challengeLap, activeScenario, challengeSnapshots, playerTacticalCommands, radioResponses, tacticalScore, aiDifficulty]);
 
   // Handle player commands
   const handleToggleBoxNextLap = () => {

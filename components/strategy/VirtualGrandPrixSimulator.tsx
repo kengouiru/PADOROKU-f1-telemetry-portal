@@ -383,7 +383,7 @@ export default function VirtualGrandPrixSimulator({
     }
 
     return snapshots;
-  }, [circuit, maxLaps, drivers, scEnabled, scLap, scDuration, rainEnabled, rainLap, rainIntensity, trackTemp]);
+  }, [circuit, maxLaps, activeDrivers, scEnabled, scLap, scDuration, rainEnabled, rainLap, rainIntensity, trackTemp]);
 
   // Current active snapshot based on currentLap
   const currentSnapshot = useMemo(() => {

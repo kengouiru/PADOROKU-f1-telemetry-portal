@@ -208,10 +208,10 @@ export default function KnowledgeHistoryHub({
 }: KnowledgeHistoryHubProps) {
   const [internalSubTab, setInternalSubTab] = useState<SubTab>(initialSubTab);
   const activeSubTab = controlledSubTab ?? internalSubTab;
-  const setActiveSubTab = (tab: SubTab) => {
+  const setActiveSubTab = React.useCallback((tab: SubTab) => {
     if (onSubTabChange) onSubTabChange(tab);
     setInternalSubTab(tab);
-  };
+  }, [onSubTabChange]);
   const { prefs, isFavoriteTeam, toggleTeam } = useUserPreferences();
   const [teamsFilterStarred, setTeamsFilterStarred] = useState(false);
   const [puFilter, setPuFilter] = useState<'ALL' | 'Ferrari' | 'Mercedes' | 'RedBullFord' | 'Honda' | 'Audi'>('ALL');
@@ -233,7 +233,7 @@ export default function KnowledgeHistoryHub({
         setActiveSubTab('teams');
       }
     }
-  }, [targetTeamId]);
+  }, [targetTeamId, setActiveSubTab]);
 
   // Filtered Teams with PU Supplier Filter & Starred Filter
   const filteredTeams = useMemo(() => {

@@ -96,7 +96,7 @@ export default function F1QuizModal({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, stopRadioAudio]);
 
   // Stop radio on unmount
   useEffect(() => {
@@ -104,7 +104,7 @@ export default function F1QuizModal({
       stopRadioAudio();
       setIsPlayingRadio(false);
     };
-  }, []);
+  }, [stopRadioAudio]);
 
   // Compute matching questions count for current filters
   const matchingPool = useMemo(() => {
@@ -153,7 +153,7 @@ export default function F1QuizModal({
   useEffect(() => {
     stopRadioAudio();
     setIsPlayingRadio(false);
-  }, [currentIndex, phase]);
+  }, [currentIndex, phase, stopRadioAudio]);
 
   // 10s Countdown timer for Sprint mode
   useEffect(() => {
@@ -181,7 +181,7 @@ export default function F1QuizModal({
     }, 100);
 
     return () => clearInterval(timer);
-  }, [phase, currentIndex, isAnswered, gameMode]);
+  }, [phase, currentIndex, isAnswered, gameMode, stopRadioAudio]);
 
   const handleOptionClick = (index: number) => {
     if (isAnswered || !currentQ) return;

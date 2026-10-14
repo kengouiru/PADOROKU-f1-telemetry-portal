@@ -82,12 +82,20 @@ export default function DriverComparisonTool({
   const color2 = driver2.teamColor || '#38bdf8';
 
   // Radar Data calculation
-  const skills1: DriverSkills = DRIVER_SKILL_RATINGS[driver1.code] || {
-    qualifying: 85, racePace: 85, tyreManagement: 85, wetWeather: 85, overtaking: 85, consistency: 85,
-  };
-  const skills2: DriverSkills = DRIVER_SKILL_RATINGS[driver2.code] || {
-    qualifying: 85, racePace: 85, tyreManagement: 85, wetWeather: 85, overtaking: 85, consistency: 85,
-  };
+  const skills1: DriverSkills = useMemo(
+    () =>
+      DRIVER_SKILL_RATINGS[driver1.code] || {
+        qualifying: 85, racePace: 85, tyreManagement: 85, wetWeather: 85, overtaking: 85, consistency: 85,
+      },
+    [driver1.code]
+  );
+  const skills2: DriverSkills = useMemo(
+    () =>
+      DRIVER_SKILL_RATINGS[driver2.code] || {
+        qualifying: 85, racePace: 85, tyreManagement: 85, wetWeather: 85, overtaking: 85, consistency: 85,
+      },
+    [driver2.code]
+  );
 
   const radarData = useMemo(() => {
     return [

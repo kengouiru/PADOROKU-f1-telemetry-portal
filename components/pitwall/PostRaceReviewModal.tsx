@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { X, PlayCircle, Loader2, RadioReceiver, Volume2, ShieldAlert } from 'lucide-react';
 import { fetchSessions, fetchTeamRadio, fetchDrivers, fetchRaceControl } from '@/lib/openf1Api';
@@ -10,11 +12,13 @@ export function PostRaceReviewModal({
   seasonYear = '2026',
   gpName,
   onClose,
+  inlineMode = false,
 }: {
   round: number;
   seasonYear?: SeasonYear;
   gpName?: string;
   onClose: () => void;
+  inlineMode?: boolean;
 }) {
   const [session, setSession] = useState<Session | null>(null);
   const [radios, setRadios] = useState<TeamRadio[]>([]);
@@ -119,12 +123,20 @@ export function PostRaceReviewModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-black/80 backdrop-blur-sm"
-      onClick={onClose}
+      className={
+        inlineMode
+          ? 'w-full animate-fadeIn'
+          : 'fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-black/80 backdrop-blur-sm'
+      }
+      onClick={inlineMode ? undefined : onClose}
     >
       <div
-        className="relative w-full max-w-4xl max-h-[90vh] flex flex-col bg-slate-950 border border-white/15 rounded-2xl shadow-2xl overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
+        className={
+          inlineMode
+            ? 'relative w-full flex flex-col bg-slate-950 border border-white/15 rounded-2xl shadow-xl overflow-hidden max-h-[760px]'
+            : 'relative w-full max-w-4xl max-h-[90vh] flex flex-col bg-slate-950 border border-white/15 rounded-2xl shadow-2xl overflow-hidden'
+        }
+        onClick={inlineMode ? undefined : (e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-slate-900/70">
@@ -144,9 +156,10 @@ export function PostRaceReviewModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-2 -mr-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+            className="px-2.5 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer flex items-center gap-1 text-xs font-mono border border-white/10"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
+            {inlineMode && <span>折りたたむ</span>}
           </button>
         </div>
 

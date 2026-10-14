@@ -378,6 +378,8 @@ export const PaddockLiveAtmosphere: React.FC<PaddockLiveAtmosphereProps> = ({
         audioContextRef.current = null;
       }
     };
+    // WHY: Ambient audio must only initialize once on component mount and clean up on unmount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Slim Bar HUD Mode (Plan B: Ambient Glass Cockpit Header)

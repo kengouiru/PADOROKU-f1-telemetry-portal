@@ -13,9 +13,18 @@
  *  - Grid Showcase (2026 New PU Regs & Audi/Honda Works vs 2025 Grid)
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { PostRaceReviewModal } from '../pitwall/PostRaceReviewModal';
 import { fetchRaceSummary, constructorColour, type RaceSummary } from '@/lib/jolpicaRaceSummary';
+import { fetchLiveOpenF1RaceSummary } from '@/lib/openf1LiveResult';
+import { preloadHistoricalSeasonResults } from '@/data/f1HistoricalResultsData';
+import {
+  broadcastPitwallState,
+  subscribePitwallSync,
+  openPitwallPopoutWindow,
+} from '@/lib/pitwallBroadcastSync';
+import RaceWeekendBriefingCard from './season/RaceWeekendBriefingCard';
 import {
   type SeasonYear,
   getActiveSeasonYear,
@@ -43,6 +52,8 @@ import { Map, Camera, ExternalLink, X, Maximize2, Compass, ChevronRight, PlayCir
 import SessionResultsModal from './SessionResultsModal';
 import AdSlot from '@/components/ads/AdSlot';
 import { FlagIcon } from '../ui/FlagIcon';
+
+export type InlineWorkspacePanel = 'none' | 'results' | 'review' | 'track_guide';
 
 interface SeasonHubProps {
   onNavigateToTelemetry?: (gpName?: string) => void;
@@ -1066,6 +1077,7 @@ export default function SeasonHub({
 }: SeasonHubProps) {
   // Live JST Clock (Telemetry System Reference)
   const jstClock = useCurrentJstClock();
+  const router = useRouter();
 
   // Season State: Defaults to current active season (2026), synced with prop if provided
   const [selectedSeasonInternal, setSelectedSeasonInternal] = useState<SeasonYear>(() => selectedSeasonProp || getActiveSeasonYear());
@@ -1076,6 +1088,17 @@ export default function SeasonHub({
       setSelectedSeasonInternal(selectedSeasonProp);
     }
   }, [selectedSeasonProp, selectedSeasonInternal]);
+
+  // Preload historical JSON chunk (2018-2025) on demand so initial bundle stays lean (Guardrail 1)
+  const [historicalChunkRev, setHistoricalChunkRev] = useState(0);
+  useEffect(() => {
+    if (selectedSeason === '2026') return;
+    let active = true;
+    preloadHistoricalSeasonResults(selectedSeason).then(() => {
+      if (active) setHistoricalChunkRev((r) => r + 1);
+    });
+    return () => { active = false; };
+  }, [selectedSeason]);
 
   const [activeTab, setActiveTab] = useState<MainTab>('calendar');
   const [calendarFilter, setCalendarFilter] = useState<'all' | 'sprint'>('all');
@@ -1088,10 +1111,13 @@ export default function SeasonHub({
 
   const [heroSubView, setHeroSubView] = useState<'schedule' | 'weather'>('schedule');
   const [sessionModalOpen, setSessionModalOpen] = useState<boolean>(false);
-  const [selectedSessionForModal, setSelectedSessionForModal] = useState<string>('FP1');
+  const [selectedSessionForModal, setSelectedSessionForModal] = useState<string>('決勝');
   const [modalRaceOverride, setModalRaceOverride] = useState<RaceWeekendSchedule | null>(null);
   const [reviewModalRound, setReviewModalRound] = useState<number | null>(null);
   const [is3dModalOpen, setIs3dModalOpen] = useState<boolean>(false);
+
+  // Inline Master-Detail Workspace state (replaces excessive fixed inset-0 modal overlays)
+  const [inlinePanel, setInlinePanel] = useState<InlineWorkspacePanel>('none');
 
   // Active season calendar & grid — starts with local data, upgradeable via API
   const localCalendar = useMemo(() => getSeasonCalendar(selectedSeason), [selectedSeason]);
@@ -1197,6 +1223,60 @@ export default function SeasonHub({
     return getCircuitIdForRace(selectedRace);
   }, [selectedRace]);
 
+  // WHY: Guardrail 2 — Switch inline workspace tab using router.replace(..., { scroll: false })
+  // so browser back/forward history is never polluted by tab switches.
+  const switchInlinePanel = useCallback(
+    (panel: InlineWorkspacePanel, scrollToPanel = true) => {
+      setInlinePanel(panel);
+      try {
+        const url =
+          panel === 'none'
+            ? '/'
+            : `/?panel=${panel}&round=${(modalRaceOverride || selectedRace).round}`;
+        router.replace(url, { scroll: false });
+      } catch {
+        // Ignore router replace errors in isolated test environments
+      }
+      if (panel !== 'none' && scrollToPanel && typeof document !== 'undefined') {
+        setTimeout(() => {
+          document.getElementById('season-inline-workspace')?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+          });
+        }, 60);
+      }
+    },
+    [router, modalRaceOverride, selectedRace]
+  );
+
+  // WHY: Guardrail 2 — BroadcastChannel('padoroku_pitwall_sync') parent handshake & live sync
+  useEffect(() => {
+    const top1 = activeDriverStandings[0]?.driverCode || 'VER';
+    const top2 = activeDriverStandings[1]?.driverCode || 'NOR';
+    broadcastPitwallState({
+      circuitId: selectedCircuitId,
+      driver1: top1,
+      driver2: top2,
+      round: selectedRace.round,
+      seasonYear: selectedSeason,
+      sessionName: selectedSessionForModal,
+    });
+  }, [selectedCircuitId, selectedRace.round, selectedSeason, selectedSessionForModal, activeDriverStandings]);
+
+  useEffect(() => {
+    return subscribePitwallSync({
+      role: 'parent',
+      getCurrentState: () => ({
+        circuitId: selectedCircuitId,
+        driver1: activeDriverStandings[0]?.driverCode || 'VER',
+        driver2: activeDriverStandings[1]?.driverCode || 'NOR',
+        round: selectedRace.round,
+        seasonYear: selectedSeason,
+        sessionName: selectedSessionForModal,
+      }),
+    });
+  }, [selectedCircuitId, selectedRace.round, selectedSeason, selectedSessionForModal, activeDriverStandings]);
+
   const currentTzInfo = useMemo(() => {
     return getCircuitTimezoneInfo(selectedCircuitId, selectedRace?.country, selectedRace?.city);
   }, [selectedCircuitId, selectedRace]);
@@ -1215,21 +1295,22 @@ export default function SeasonHub({
     return getCircuitAtmospherePhotos(selectedCircuitId, selectedRace?.gpName || '');
   }, [selectedCircuitId, selectedRace]);
 
-  // Authentic 2026 Race & Quali Classifications
+  // Authentic Race & Quali Classifications (supports 2026 static + 2018-2025 preloaded chunks)
   const raceClassification2026 = useMemo(() => {
-    if (selectedSeason !== '2026') return null;
-    const res = getSessionClassification('2026', selectedRace.round, '決勝', 101.5, selectedCircuitId);
+    void historicalChunkRev;
+    const res = getSessionClassification(selectedSeason, selectedRace.round, '決勝', 101.5, selectedCircuitId);
     return res.status === 'completed' && res.results.length > 0 ? res : null;
-  }, [selectedSeason, selectedRace.round, selectedCircuitId]);
+  }, [selectedSeason, selectedRace.round, selectedCircuitId, historicalChunkRev]);
 
   const qualiClassification2026 = useMemo(() => {
-    if (selectedSeason !== '2026') return null;
-    const res = getSessionClassification('2026', selectedRace.round, '予選', 101.5, selectedCircuitId);
+    void historicalChunkRev;
+    const res = getSessionClassification(selectedSeason, selectedRace.round, '予選', 101.5, selectedCircuitId);
     return res.status === 'completed' && res.results.length > 0 ? res : null;
-  }, [selectedSeason, selectedRace.round, selectedCircuitId]);
+  }, [selectedSeason, selectedRace.round, selectedCircuitId, historicalChunkRev]);
 
-  // Finished races not yet in static data → fetch official result from Jolpica.
-  const [fetchedSummary, setFetchedSummary] = useState<RaceSummary | null>(null);
+  // Finished races not yet in static data → fetch official result from Jolpica,
+  // with Graceful Degradation fallback to OpenF1 Live Timing (Guardrail 3).
+  const [fetchedSummary, setFetchedSummary] = useState<(RaceSummary & { verificationStatus?: 'PROVISIONAL' | 'OFFICIAL' }) | null>(null);
   const [summaryStatus, setSummaryStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [summaryRetry, setSummaryRetry] = useState(0);
   const raceFinished = useMemo(() => {
@@ -1244,15 +1325,24 @@ export default function SeasonHub({
     }
     const ac = new AbortController();
     setSummaryStatus('loading');
-    fetchRaceSummary('2026', selectedRace.round, ac.signal).then((s) => {
+    fetchRaceSummary('2026', selectedRace.round, ac.signal).then(async (s) => {
       if (ac.signal.aborted) return;
-      setFetchedSummary(s);
-      setSummaryStatus(s ? 'idle' : 'error');
+      if (s) {
+        setFetchedSummary({ ...s, verificationStatus: 'OFFICIAL' });
+        setSummaryStatus('idle');
+        return;
+      }
+      // WHY: Guardrail 3 (OpenF1 × Jolpica Graceful Degradation) — レース直後で Jolpica API が未反映の時間帯は
+      // OpenF1 API 速報へフォールバックし PROVISIONAL（速報値）として表示する
+      const liveSummary = await fetchLiveOpenF1RaceSummary('2026', selectedRace.round);
+      if (ac.signal.aborted) return;
+      setFetchedSummary(liveSummary);
+      setSummaryStatus(liveSummary ? 'idle' : 'error');
     });
     return () => ac.abort();
   }, [selectedSeason, selectedRace.round, selectedRace.isCancelled, raceClassification2026, raceFinished, summaryRetry]);
 
-  /** Unified result view: static 2026 classification → fetched → null. */
+  /** Unified result view: static classification → Jolpica OFFICIAL → OpenF1 PROVISIONAL → null. */
   const raceResultView = useMemo(() => {
     if (raceClassification2026) {
       return {
@@ -1264,6 +1354,7 @@ export default function SeasonHub({
         fastest: raceClassification2026.fastestLap
           ? `${raceClassification2026.fastestLap.driverCode} ${raceClassification2026.fastestLap.time}` : null,
         source: raceClassification2026.dataSource,
+        verificationStatus: 'OFFICIAL' as const,
       };
     }
     if (fetchedSummary) {
@@ -1274,6 +1365,7 @@ export default function SeasonHub({
         pole: fetchedSummary.pole ? `${fetchedSummary.pole.code} ${fetchedSummary.pole.time}` : null,
         fastest: fetchedSummary.fastestLap ? `${fetchedSummary.fastestLap.code} ${fetchedSummary.fastestLap.time}` : null,
         source: fetchedSummary.source,
+        verificationStatus: fetchedSummary.verificationStatus || ('OFFICIAL' as const),
       };
     }
     return null;
@@ -1306,6 +1398,11 @@ export default function SeasonHub({
     return activeCalendar.find((r) => r.round === prevRound) ?? null;
   }, [activeCalendar, selectedRound]);
 
+  const activeWorkspaceRace = modalRaceOverride || selectedRace;
+  const activeWorkspaceCircuitId = modalRaceOverride
+    ? getCircuitIdForRace(modalRaceOverride)
+    : selectedCircuitId;
+
   return (
     <div className="space-y-3 sm:space-y-4 pb-8 animate-fade-in max-w-7xl mx-auto">
       {/* ─────────────────────────────────────────────────────────────
@@ -1319,11 +1416,16 @@ export default function SeasonHub({
           onOpenResults={() => {
             setModalRaceOverride(previousRace);
             setSelectedSessionForModal('決勝');
-            setSessionModalOpen(true);
+            switchInlinePanel('results');
           }}
-          onOpenReview={() => setReviewModalRound(previousRace.round)}
+          onOpenReview={() => {
+            setModalRaceOverride(previousRace);
+            setReviewModalRound(previousRace.round);
+            switchInlinePanel('review');
+          }}
           onSelectRace={() => {
             userHasSelectedRoundRef.current = true;
+            setModalRaceOverride(null);
             setSelectedRound(previousRace.round);
           }}
         />
@@ -1356,37 +1458,57 @@ export default function SeasonHub({
           <div className="relative z-10 flex items-center justify-between gap-2 flex-wrap">
             <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
               {isRaceLive && (
-                <span className="px-2.5 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-racing font-bold tracking-wider uppercase bg-red-600/90 text-white shadow-lg flex items-center gap-1.5 backdrop-blur-md">
+                <span className="px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-racing font-bold tracking-wider uppercase bg-red-600/90 text-white shadow-lg flex items-center gap-1.5 backdrop-blur-md">
                   <span className="w-2 h-2 rounded-full bg-white animate-pulse inline-block" />
                   <span>LIVE RACING IN PROGRESS</span>
                 </span>
               )}
-              <span className="px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-mono font-bold tracking-wider uppercase bg-slate-950/80 text-red-400 border border-red-500/50 backdrop-blur-md shadow-lg flex items-center gap-1.5">
+              <span className="px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-mono font-bold tracking-wider uppercase bg-slate-950/80 text-red-400 border border-red-500/50 backdrop-blur-md shadow-lg flex items-center gap-1.5 tabular-nums whitespace-nowrap">
                 <span>🏁</span>
                 <span>{selectedSeason}年 第{selectedRace.round}戦 / 全{activeCalendar.length}戦</span>
               </span>
               {selectedRace.isSprint && (
-                <span className="px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-racing font-bold bg-slate-950/80 text-cyan-300 border border-cyan-400/50 backdrop-blur-md shadow-lg flex items-center gap-1.5">
+                <span className="px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-racing font-bold bg-slate-950/80 text-cyan-300 border border-cyan-400/50 backdrop-blur-md shadow-lg flex items-center gap-1.5 whitespace-nowrap">
                   <span className="text-cyan-400 animate-pulse">⚡</span>
                   <span className="tracking-wider">SPRINT</span>
                 </span>
               )}
-              <span className="px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-mono text-slate-200 bg-slate-950/80 border border-white/20 backdrop-blur-md shadow-lg flex items-center gap-1.5">
+              <span className="px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-mono text-slate-200 bg-slate-950/80 border border-white/20 backdrop-blur-md shadow-lg flex items-center gap-1.5 tabular-nums whitespace-nowrap">
                 <span>📅</span>
                 <span>{selectedRace.dates}</span>
               </span>
             </div>
 
             {/* Quick Action Badges */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <button
                 type="button"
-                onClick={() => setIs3dModalOpen(true)}
-                className="px-3 py-1 rounded-full bg-slate-950/80 hover:bg-sky-950/80 text-sky-300 hover:text-white border border-sky-400/40 backdrop-blur-md text-xs font-bold font-mono flex items-center gap-1.5 shadow-lg transition-all cursor-pointer"
-                title="コース図・3D標高モデルを起動"
+                onClick={() => {
+                  setModalRaceOverride(null);
+                  switchInlinePanel(inlinePanel === 'track_guide' ? 'none' : 'track_guide');
+                }}
+                className="px-3 py-1 rounded-full bg-slate-950/80 hover:bg-sky-950/80 text-sky-300 hover:text-white border border-sky-400/40 backdrop-blur-md text-xs font-bold font-mono flex items-center gap-1.5 shadow-lg transition-all cursor-pointer whitespace-nowrap"
+                title="ページ内でコース図・3D標高モデルを展開"
               >
                 <Map className="w-3.5 h-3.5 text-sky-400" />
-                <span>3Dコース ↗</span>
+                <span>3Dコース解析 {inlinePanel === 'track_guide' ? '▾' : '▸'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  openPitwallPopoutWindow({
+                    circuitId: selectedCircuitId,
+                    driver1: activeDriverStandings[0]?.driverCode || 'VER',
+                    driver2: activeDriverStandings[1]?.driverCode || 'NOR',
+                    round: selectedRace.round,
+                    seasonYear: selectedSeason,
+                  })
+                }
+                className="px-3 py-1 rounded-full bg-slate-950/80 hover:bg-red-950/80 text-slate-200 hover:text-white border border-white/20 hover:border-red-500/40 backdrop-blur-md text-xs font-bold font-mono flex items-center gap-1.5 shadow-lg transition-all cursor-pointer whitespace-nowrap"
+                title="2画面観戦用の独立テレメトリーウィンドウを開く（BroadcastChannel自動同期）"
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-red-400" />
+                <span>2画面Pop-out ↗</span>
               </button>
               {selectedAtmospherePhotos && selectedAtmospherePhotos.length > 0 && (
                 <button
@@ -1396,7 +1518,7 @@ export default function SeasonHub({
                     caption: selectedAtmospherePhotos[0].caption,
                     tag: `${toJapaneseGpName(selectedRace.gpName)} - ${selectedAtmospherePhotos[0].tag}`
                   })}
-                  className="px-3 py-1 rounded-full bg-slate-950/80 hover:bg-amber-950/80 text-amber-300 hover:text-white border border-amber-400/40 backdrop-blur-md text-xs font-bold font-mono flex items-center gap-1.5 shadow-lg transition-all cursor-pointer"
+                  className="px-3 py-1 rounded-full bg-slate-950/80 hover:bg-amber-950/80 text-amber-300 hover:text-white border border-amber-400/40 backdrop-blur-md text-xs font-bold font-mono flex items-center gap-1.5 shadow-lg transition-all cursor-pointer whitespace-nowrap"
                   title="サーキット現地フォトギャラリーを開く"
                 >
                   <Camera className="w-3.5 h-3.5 text-amber-400" />
@@ -1424,17 +1546,17 @@ export default function SeasonHub({
               </div>
 
               {/* Quick Circuit Specs */}
-              <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-slate-200">
-                <span className="px-2.5 py-0.5 rounded-lg bg-slate-950/70 backdrop-blur-md border border-white/15 drop-shadow-md">
+              <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-slate-200 tabular-nums">
+                <span className="px-2.5 py-0.5 rounded-lg bg-slate-950/70 backdrop-blur-md border border-white/15 drop-shadow-md whitespace-nowrap">
                   📍 {selectedRace.city}、{selectedRace.country}
                 </span>
-                <span className="px-2.5 py-0.5 rounded-lg bg-slate-950/70 backdrop-blur-md border border-white/15 drop-shadow-md">
+                <span className="px-2.5 py-0.5 rounded-lg bg-slate-950/70 backdrop-blur-md border border-white/15 drop-shadow-md whitespace-nowrap">
                   🛣️ {selectedRace.lengthKm.toFixed(3)} km
                 </span>
-                <span className="px-2.5 py-0.5 rounded-lg bg-slate-950/70 backdrop-blur-md border border-white/15 drop-shadow-md">
+                <span className="px-2.5 py-0.5 rounded-lg bg-slate-950/70 backdrop-blur-md border border-white/15 drop-shadow-md whitespace-nowrap">
                   🔄 {selectedRace.laps} 周
                 </span>
-                <span className="px-2.5 py-0.5 rounded-lg bg-slate-950/70 backdrop-blur-md border border-white/15 drop-shadow-md">
+                <span className="px-2.5 py-0.5 rounded-lg bg-slate-950/70 backdrop-blur-md border border-white/15 drop-shadow-md whitespace-nowrap">
                   🛞 {selectedRace.pirelliCompounds}
                 </span>
               </div>
@@ -1496,19 +1618,19 @@ export default function SeasonHub({
                 </div>
 
                 {heroSubView === 'schedule' ? (
-                  <div className="flex items-center gap-2 text-[11px] font-mono">
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-900 border border-white/10 text-slate-300">
+                  <div className="flex items-center gap-2 text-[11px] font-mono tabular-nums">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-900 border border-white/10 text-slate-300 whitespace-nowrap">
                       <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
                       <span>JST (生中継観戦用)</span>
                     </span>
                     <span className="text-slate-500">/</span>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-950/60 border border-sky-500/20 text-sky-300">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-950/60 border border-sky-500/20 text-sky-300 whitespace-nowrap">
                       <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
                       <span>現地時間 ({currentTzInfo.tzAbbr})</span>
                     </span>
                   </div>
                 ) : selectedWeather ? (
-                  <span className="text-[11px] text-slate-300 font-mono bg-slate-900 px-2 py-0.5 rounded-md border border-white/10">
+                  <span className="text-[11px] text-slate-300 font-mono bg-slate-900 px-2 py-0.5 rounded-md border border-white/10 tabular-nums whitespace-nowrap">
                     降水確率: <strong className={selectedWeather.rainProb > 30 ? 'text-sky-400' : 'text-slate-200'}>{selectedWeather.rainProb}%</strong>
                   </span>
                 ) : null}
@@ -1518,18 +1640,27 @@ export default function SeasonHub({
               {raceResultView && (
                 <div className="p-3 rounded-xl bg-emerald-950/25 border border-emerald-500/30 space-y-2.5 animate-fadeIn">
                   <div className="flex items-center justify-between flex-wrap gap-2">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <Trophy className="w-4 h-4 text-emerald-400" />
                       <span className="text-xs font-bold text-white">
-                        {selectedSeason}年 第{selectedRace.round}戦 公式決勝リザルト (TOP 3)
+                        {selectedSeason}年 第{selectedRace.round}戦 決勝リザルト (TOP 3)
                       </span>
+                      {raceResultView.verificationStatus === 'PROVISIONAL' ? (
+                        <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 whitespace-nowrap">
+                          PROVISIONAL (OpenF1速報)
+                        </span>
+                      ) : (
+                        <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 whitespace-nowrap">
+                          OFFICIAL (FIA確定)
+                        </span>
+                      )}
                       {raceResultView.pole && (
-                        <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-900/90 border border-white/10 text-slate-300">
+                        <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-900/90 border border-white/10 text-slate-300 tabular-nums whitespace-nowrap">
                           PP: <strong className="text-white">{raceResultView.pole}</strong>
                         </span>
                       )}
                       {raceResultView.fastest && (
-                        <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-900/90 border border-white/10 text-slate-300">
+                        <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-900/90 border border-white/10 text-slate-300 tabular-nums whitespace-nowrap">
                           FL: <strong className="text-white">{raceResultView.fastest}</strong>
                         </span>
                       )}
@@ -1540,19 +1671,23 @@ export default function SeasonHub({
                         onClick={() => {
                           setModalRaceOverride(null);
                           setSelectedSessionForModal('決勝');
-                          setSessionModalOpen(true);
+                          switchInlinePanel('results');
                         }}
-                        className="px-2.5 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold transition-colors cursor-pointer"
+                        className="px-2.5 py-1 rounded-lg bg-red-600 hover:bg-red-500 text-white text-[11px] font-bold transition-colors cursor-pointer whitespace-nowrap"
                       >
-                        全順位・リザルト詳細 ↗
+                        全順位・リザルト詳細 ▾
                       </button>
                       <button
                         type="button"
-                        onClick={() => setReviewModalRound(selectedRace.round)}
-                        className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                        onClick={() => {
+                          setModalRaceOverride(null);
+                          setReviewModalRound(selectedRace.round);
+                          switchInlinePanel('review');
+                        }}
+                        className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer whitespace-nowrap"
                       >
                         <PlayCircle className="w-3.5 h-3.5" />
-                        <span>無線・RC記録</span>
+                        <span>無線・RC記録 ▾</span>
                       </button>
                     </div>
                   </div>
@@ -1562,15 +1697,15 @@ export default function SeasonHub({
                         key={p.code}
                         className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-slate-900/90 border border-white/10"
                       >
-                        <span className="w-5 h-5 rounded font-racing font-black text-xs flex items-center justify-center bg-white/10 text-amber-300 shrink-0">
+                        <span className="w-5 h-5 rounded font-racing font-black text-xs flex items-center justify-center bg-white/10 text-amber-300 shrink-0 tabular-nums">
                           {idx + 1}
                         </span>
                         <span className="w-1 h-6 rounded-full shrink-0" style={{ backgroundColor: p.color }} />
                         <div className="min-w-0 flex-1">
                           <div className="text-xs font-bold text-white truncate">{p.name}</div>
-                          <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                          <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 tabular-nums">
                             <span className="truncate">{p.team}</span>
-                            <span className="text-emerald-300 shrink-0">{p.note}</span>
+                            <span className="text-emerald-300 shrink-0 whitespace-nowrap">{p.note}</span>
                           </div>
                         </div>
                       </div>
@@ -1591,14 +1726,14 @@ export default function SeasonHub({
                         onClick={() => {
                           setModalRaceOverride(null);
                           setSelectedSessionForModal(s.session);
-                          setSessionModalOpen(true);
+                          switchInlinePanel('results');
                         }}
                         className={`text-left flex flex-col justify-between p-2.5 sm:p-3 rounded-xl border transition-all cursor-pointer group hover:scale-[1.02] active:scale-[0.98] ${
                           dual.isFinalRace
                             ? 'col-span-2 sm:col-span-1 bg-red-950/40 hover:bg-red-950/60 border-red-500/60 hover:border-red-400 shadow-xl ring-1 ring-red-500/40'
                             : 'bg-slate-900/90 hover:bg-slate-850 border-white/10 hover:border-sky-400/50 shadow-md'
                         }`}
-                        title={`クリックして${s.session}の結果詳細を表示`}
+                        title={`クリックして${s.session}の結果詳細をインライン展開`}
                       >
                         {/* Session Card Header */}
                         <div className="flex items-center justify-between gap-1.5 pb-1.5 border-b border-white/[0.08] w-full">
@@ -1611,28 +1746,28 @@ export default function SeasonHub({
                               {dual.isFinalRace ? '🏁 決勝' : s.session}
                             </span>
                             {dual.isFinalRace ? (
-                              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-red-600 text-white font-bold tracking-wider shrink-0 shadow-sm">
+                              <span className="text-[11px] font-mono px-1.5 py-0.2 rounded bg-red-600 text-white font-bold tracking-wider shrink-0 shadow-sm whitespace-nowrap">
                                 FINAL
                               </span>
                             ) : s.session.includes('スプリント') ? (
-                              <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-gradient-to-r from-violet-900/60 to-cyan-900/60 text-cyan-300 border border-cyan-500/30 font-bold shrink-0">
+                              <span className="text-[11px] font-mono px-1.5 py-0.2 rounded bg-gradient-to-r from-violet-900/60 to-cyan-900/60 text-cyan-300 border border-cyan-500/30 font-bold shrink-0 whitespace-nowrap">
                                 SPRINT
                               </span>
                             ) : null}
                           </div>
-                          <span className="text-[9px] text-slate-400 group-hover:text-sky-300 font-mono transition-colors shrink-0">
-                            詳細↗
+                          <span className="text-[11px] text-slate-400 group-hover:text-sky-300 font-mono transition-colors shrink-0 whitespace-nowrap">
+                            結果▾
                           </span>
                         </div>
 
                         {/* Session Card Body */}
                         <div className="pt-1.5 space-y-1">
                           <div>
-                            <div className="flex items-center gap-1 text-[10px] text-slate-400 font-mono">
+                            <div className="flex items-center gap-1 text-[11px] text-slate-400 font-mono whitespace-nowrap">
                               <span className="w-1.5 h-1.5 rounded-full bg-red-500/70" />
                               <span>日本時間</span>
                             </div>
-                            <div className="text-sm font-racing font-bold text-white tracking-wide">
+                            <div className="text-sm font-racing font-bold text-white tracking-wide tabular-nums whitespace-nowrap">
                               <span className="text-xs text-slate-300 font-sans mr-1">{dual.jstDay}</span>
                               <span className={dual.isFinalRace ? 'text-red-300 font-black' : 'text-white'}>
                                 {dual.jstTime}
@@ -1641,14 +1776,14 @@ export default function SeasonHub({
                           </div>
 
                           <div className="pt-1 border-t border-white/[0.06]">
-                            <div className="flex items-center gap-1 text-[9px] text-slate-400 font-mono">
+                            <div className="flex items-center gap-1 text-[11px] text-slate-400 font-mono whitespace-nowrap">
                               <span className="w-1.5 h-1.5 rounded-full bg-sky-400/70" />
                               <span>現地時間</span>
                             </div>
-                            <div className="text-xs font-racing text-slate-300">
-                              <span className="text-[10px] text-slate-400 font-sans mr-1">{dual.localDay}</span>
+                            <div className="text-xs font-racing text-slate-300 tabular-nums whitespace-nowrap">
+                              <span className="text-[11px] text-slate-400 font-sans mr-1">{dual.localDay}</span>
                               <span className="text-slate-200">{dual.localTime}</span>
-                              <span className="text-[9px] text-sky-400/80 font-mono ml-1 font-bold">
+                              <span className="text-[11px] text-sky-400/80 font-mono ml-1 font-bold">
                                 {dual.tzAbbr}
                               </span>
                             </div>
@@ -1665,22 +1800,22 @@ export default function SeasonHub({
                 <div className="p-3 sm:p-4 rounded-xl bg-slate-900/90 border border-white/10 space-y-3 animate-fadeIn">
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 text-center">
                     <div className="p-2 sm:p-2.5 rounded-lg bg-slate-950/60 border border-white/5">
-                      <div className="text-[10px] text-slate-400 font-mono">気温 (Air)</div>
-                      <div className="text-base sm:text-lg font-racing font-black text-amber-300">{selectedWeather.airTempC} ℃</div>
+                      <div className="text-[11px] text-slate-400 font-mono whitespace-nowrap">気温 (Air)</div>
+                      <div className="text-base sm:text-lg font-racing font-black text-amber-300 tabular-nums whitespace-nowrap">{selectedWeather.airTempC} ℃</div>
                     </div>
                     <div className="p-2 sm:p-2.5 rounded-lg bg-slate-950/60 border border-white/5">
-                      <div className="text-[10px] text-slate-400 font-mono">路面温度 (Track)</div>
-                      <div className="text-base sm:text-lg font-racing font-black text-rose-300">{selectedWeather.trackTempC} ℃</div>
+                      <div className="text-[11px] text-slate-400 font-mono whitespace-nowrap">路面温度 (Track)</div>
+                      <div className="text-base sm:text-lg font-racing font-black text-rose-300 tabular-nums whitespace-nowrap">{selectedWeather.trackTempC} ℃</div>
                     </div>
                     <div className="p-2 sm:p-2.5 rounded-lg bg-slate-950/60 border border-white/5">
-                      <div className="text-[10px] text-slate-400 font-mono">降水確率 (Rain)</div>
-                      <div className={`text-base sm:text-lg font-racing font-black ${selectedWeather.rainProb > 40 ? 'text-sky-300' : 'text-slate-200'}`}>
+                      <div className="text-[11px] text-slate-400 font-mono whitespace-nowrap">降水確率 (Rain)</div>
+                      <div className={`text-base sm:text-lg font-racing font-black tabular-nums whitespace-nowrap ${selectedWeather.rainProb > 40 ? 'text-sky-300' : 'text-slate-200'}`}>
                         {selectedWeather.rainProb} %
                       </div>
                     </div>
                     <div className="p-2 sm:p-2.5 rounded-lg bg-slate-950/60 border border-white/5">
-                      <div className="text-[10px] text-slate-400 font-mono">湿度 (Humidity)</div>
-                      <div className="text-xs sm:text-sm font-racing font-bold text-slate-200 mt-1">
+                      <div className="text-[11px] text-slate-400 font-mono whitespace-nowrap">湿度 (Humidity)</div>
+                      <div className="text-xs sm:text-sm font-racing font-bold text-slate-200 mt-1 tabular-nums whitespace-nowrap">
                         {selectedWeather.humidity}%
                       </div>
                     </div>
@@ -1690,7 +1825,7 @@ export default function SeasonHub({
                       <span>⛅</span>
                       <span>気象ステータス: {selectedWeather.conditionText}</span>
                     </span>
-                    <span className="text-[11px] font-mono text-slate-400">
+                    <span className="text-[11px] font-mono text-slate-400 tabular-nums whitespace-nowrap">
                       風速: {selectedWeather.windSpeedKmh} km/h ({selectedWeather.windDirection})
                     </span>
                   </div>
@@ -1704,19 +1839,182 @@ export default function SeasonHub({
                 circuitId={selectedCircuitId}
                 race={selectedRace}
                 onOpenAnalysis={() => {
-                  setActiveTab('track_analysis');
-                  setTimeout(() => {
-                    document.getElementById('track-analysis-section')?.scrollIntoView({ behavior: 'smooth' });
-                  }, 100);
+                  setModalRaceOverride(null);
+                  switchInlinePanel('track_guide');
                 }}
                 onOpenEncyclopedia={onNavigateToCircuit ? () => onNavigateToCircuit(selectedCircuitId) : undefined}
-                onOpen3dModal={() => setIs3dModalOpen(true)}
+                onOpen3dModal={() => {
+                  setModalRaceOverride(null);
+                  switchInlinePanel('track_guide');
+                }}
               />
             </div>
           </div>
         </div>
 
       </div>
+
+      {/* ─────────────────────────────────────────────────────────────
+          1.2 RACE WEEKEND INTELLIGENCE BRIEF & 2-SCREEN LAUNCHER (Phase 4)
+          ───────────────────────────────────────────────────────────── */}
+      <RaceWeekendBriefingCard
+        race={selectedRace}
+        circuitId={selectedCircuitId}
+        seasonYear={selectedSeason}
+        onOpenInlineTrackGuide={() => {
+          setModalRaceOverride(null);
+          switchInlinePanel(inlinePanel === 'track_guide' ? 'none' : 'track_guide');
+        }}
+        onNavigateToTelemetry={
+          onNavigateToTelemetry ? () => onNavigateToTelemetry(selectedRace.gpName) : undefined
+        }
+        isPro={isPro}
+        onOpenUpgradeModal={onOpenUpgradeModal}
+      />
+
+      {/* ─────────────────────────────────────────────────────────────
+          1.5 INLINE MASTER-DETAIL WORKSPACE (Phase 2 — Replaces Modal Overload)
+          ───────────────────────────────────────────────────────────── */}
+      <section
+        id="season-inline-workspace"
+        aria-label="インライン分析ワークスペース"
+        className="rounded-2xl border border-white/15 bg-slate-950/95 shadow-xl overflow-hidden"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 bg-slate-900/90 border-b border-white/10">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-wider mr-1 whitespace-nowrap">
+              INLINE WORKSPACE:
+            </span>
+            <button
+              type="button"
+              onClick={() => switchInlinePanel(inlinePanel === 'results' ? 'none' : 'results', false)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                inlinePanel === 'results'
+                  ? 'bg-red-600 text-white shadow-sm'
+                  : 'bg-slate-950/80 text-slate-300 hover:text-white border border-white/10'
+              }`}
+            >
+              <Trophy className="w-3.5 h-3.5" />
+              <span>公式リザルト・全順位 ({activeWorkspaceRace.round}戦)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!reviewModalRound) setReviewModalRound(activeWorkspaceRace.round);
+                switchInlinePanel(inlinePanel === 'review' ? 'none' : 'review', false);
+              }}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                inlinePanel === 'review'
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'bg-slate-950/80 text-slate-300 hover:text-white border border-white/10'
+              }`}
+            >
+              <PlayCircle className="w-3.5 h-3.5" />
+              <span>レース振り返り・無線RC</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => switchInlinePanel(inlinePanel === 'track_guide' ? 'none' : 'track_guide', false)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                inlinePanel === 'track_guide'
+                  ? 'bg-sky-600 text-white shadow-sm'
+                  : 'bg-slate-950/80 text-slate-300 hover:text-white border border-white/10'
+              }`}
+            >
+              <Compass className="w-3.5 h-3.5" />
+              <span>3D標高・コース戦術ガイド</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() =>
+                openPitwallPopoutWindow({
+                  circuitId: activeWorkspaceCircuitId,
+                  driver1: activeDriverStandings[0]?.driverCode || 'VER',
+                  driver2: activeDriverStandings[1]?.driverCode || 'NOR',
+                  round: activeWorkspaceRace.round,
+                  seasonYear: selectedSeason,
+                })
+              }
+              className="px-2.5 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 text-slate-200 border border-white/15 text-[11px] font-mono font-bold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
+              title="別ウィンドウ（Pop-out）でテレメトリー比較を起動し、この画面と2画面同期します"
+            >
+              <ExternalLink className="w-3 h-3 text-red-400" />
+              <span>別ウィンドウ (Pop-out) ↗</span>
+            </button>
+            {inlinePanel !== 'none' && (
+              <button
+                type="button"
+                onClick={() => switchInlinePanel('none', false)}
+                className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-slate-300 hover:text-white text-[11px] font-mono transition-colors cursor-pointer whitespace-nowrap"
+              >
+                ✕ 折りたたむ
+              </button>
+            )}
+          </div>
+        </div>
+
+        {inlinePanel === 'results' && (
+          <div className="p-3 sm:p-4 animate-fadeIn">
+            <SessionResultsModal
+              isOpen={true}
+              inlineMode={true}
+              onClose={() => switchInlinePanel('none', false)}
+              race={activeWorkspaceRace}
+              circuitId={activeWorkspaceCircuitId}
+              initialSessionName={selectedSessionForModal}
+              seasonYear={selectedSeason}
+              onNavigateToTelemetry={onNavigateToTelemetry}
+              onNavigateToDriver={onNavigateToDriver}
+            />
+          </div>
+        )}
+
+        {inlinePanel === 'review' && (
+          <div className="p-3 sm:p-4 animate-fadeIn">
+            <PostRaceReviewModal
+              round={reviewModalRound || activeWorkspaceRace.round}
+              seasonYear={selectedSeason}
+              gpName={activeWorkspaceRace.gpName}
+              inlineMode={true}
+              onClose={() => switchInlinePanel('none', false)}
+            />
+          </div>
+        )}
+
+        {inlinePanel === 'track_guide' && (
+          <div className="p-3 sm:p-5 space-y-3 animate-fadeIn">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+              <div className="flex items-center gap-2.5">
+                <span className="text-2xl">{activeWorkspaceRace.flag}</span>
+                <div>
+                  <h3 className="text-sm sm:text-base font-bold text-white">
+                    {toJapaneseGpName(activeWorkspaceRace.gpName)} — 3D標高＆戦術ガイド
+                  </h3>
+                  <p className="text-[11px] font-mono text-slate-400">
+                    マウスドラッグで360度3D回転・標高ウォール・2026年OVR（オーバーライド）区間を表示
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIs3dModalOpen(true)}
+                className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-white/15 text-[11px] font-mono flex items-center gap-1 cursor-pointer whitespace-nowrap"
+              >
+                <Maximize2 className="w-3 h-3" />
+                <span>全画面拡大</span>
+              </button>
+            </div>
+            <F1BroadcastTrackGuide
+              circuitId={activeWorkspaceCircuitId}
+              gpName={activeWorkspaceRace.gpName}
+              round={activeWorkspaceRace.round}
+            />
+          </div>
+        )}
+      </section>
 
       {/* ── Official Broadcast Partner (FOD) Slot ── */}
       {selectedSeason === '2026' && (

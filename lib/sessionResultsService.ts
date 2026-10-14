@@ -18,7 +18,8 @@
 
 import { getHistoricalArchive } from '@/data/f1HistoricalArchivesData';
 import { getGrandPrixReportByRound } from '@/data/f1GrandPrixReportsData';
-import { getHistoricalRaceResults } from '@/data/f1HistoricalResultsData';
+import { getHistoricalRaceResults, preloadHistoricalSeasonResults } from '@/data/f1HistoricalResultsData';
+import { fetchLiveOpenF1RaceSummary } from './openf1LiveResult';
 
 export interface SessionDriverResult {
   position: number;
@@ -52,6 +53,7 @@ export interface SessionResultData {
   sessionName: string;      // "FP1", "FP2", "FP3", "予選", "決勝", "スプリント予選", "スプリント決勝"
   sessionType: 'practice' | 'qualifying' | 'sprint_qualifying' | 'sprint' | 'race';
   status: 'completed' | 'upcoming';
+  verificationStatus?: 'OFFICIAL' | 'PROVISIONAL' | 'UPCOMING';
   scheduledJst: string;
   scheduledLocal: string;
   dataSource?: string;      // e.g. "FIA Formula 1 Official Timing / OpenF1 API"
@@ -1091,7 +1093,11 @@ export function getSessionClassification(
 }
 
 /**
- * Asynchronously fetches official session results.
+ * WHY: Guardrail 3 — Hybrid Session Classification Resolver with Graceful Degradation.
+ * 1. Preloads per-year JSON chunk if historical season (2018-2025).
+ * 2. Returns OFFICIAL classification if present in verified archive / Jolpica.
+ * 3. Immediately after a 2026 session finishes (before Jolpica/FIA static confirmation),
+ *    falls back to OpenF1 live timing as PROVISIONAL without throwing an error.
  */
 export async function fetchOfficialSessionResults(
   season: string,
@@ -1099,5 +1105,41 @@ export async function fetchOfficialSessionResults(
   sessionName: string,
   circuitId: string = ''
 ): Promise<SessionResultData> {
-  return getSessionClassification(season, round, sessionName, 101.5, circuitId);
+  const yearNum = parseInt(season, 10);
+  if (!isNaN(yearNum) && yearNum >= 2018 && yearNum <= 2025) {
+    await preloadHistoricalSeasonResults(yearNum);
+  }
+
+  const base = getSessionClassification(season, round, sessionName, 101.5, circuitId);
+  if (base.status === 'completed' && base.results.length > 0) {
+    return {
+      ...base,
+      verificationStatus: 'OFFICIAL',
+    };
+  }
+
+  // Try OpenF1 Live Timing fallback for newly completed 2026+ sessions
+  const liveSummary = await fetchLiveOpenF1RaceSummary(season, round);
+  if (liveSummary && liveSummary.fullResults && liveSummary.fullResults.length > 0) {
+    return {
+      ...base,
+      gpName: liveSummary.raceName || base.gpName,
+      status: 'completed',
+      verificationStatus: 'PROVISIONAL',
+      dataSource: liveSummary.source,
+      polePosition: liveSummary.pole
+        ? {
+            driverCode: liveSummary.pole.code,
+            driverName: liveSummary.podium[0]?.name || liveSummary.pole.code,
+            time: liveSummary.pole.time || '-',
+          }
+        : base.polePosition,
+      results: liveSummary.fullResults,
+    };
+  }
+
+  return {
+    ...base,
+    verificationStatus: 'UPCOMING',
+  };
 }

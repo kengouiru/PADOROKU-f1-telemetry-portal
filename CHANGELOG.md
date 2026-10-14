@@ -2,6 +2,32 @@
 
 本プロジェクト「PADOROKU - F1 Telemetry Intelligence Portal」の全アップデート履歴を記録します。
 
+## [v3.2.0] - 2026-10-14
+### Added
+- **2画面リアルタイム同期エンジン (`lib/pitwallBroadcastSync.ts`, `app/popout/telemetry/page.tsx`)**:
+  - `BroadcastChannel('padoroku_pitwall_sync')` と初期URLクエリ連携＋`REQUEST_STATE` ➔ `SYNC_STATE` 初期ハンドシェイクを実装。Pop-out ウィンドウを開いた瞬間に空白にならず、メイン画面（SEASON / TELEMETRY）で選択したサーキット・比較ドライバーが即座に同期されるマルチモニター観戦体験を構築。
+- **インライン・マスターディテール・ワークスペース (`components/hubs/SeasonHub.tsx`, `components/hubs/SessionResultsModal.tsx`, `components/pitwall/PostRaceReviewModal.tsx`)**:
+  - 背景を暗転させる透過モーダル（`fixed inset-0`）の乱用を廃止し、SEASONハブ内に直接展開されるインライン分析ワークスペース（`公式リザルト・全順位` / `レース振り返り・無線RC` / `3D標高・コース戦術ガイド`）を新設。
+  - インラインタブ切替時はブラウザの戻る/進む履歴を汚染しないよう `router.replace(..., { scroll: false })` でURLクエリを同期。
+- **観戦・戦略3分ブリーフィングボード (`components/hubs/season/RaceWeekendBriefingCard.tsx`, `lib/physicsConstants.ts`)**:
+  - `lib/physicsConstants.ts` の物理定数（`FUEL_EFFECT_S_PER_KG`, `MGU_K_MAX_POWER_KW`, `DEFAULT_GREEN_PIT_LOSS_S`, `SC_PIT_LOSS_FACTOR`, `BASE_UNDERCUT_GAIN_S`）とサーキット幾何を連動させ、①通常時/SC時ピットロスタイム、②アンダーカット1周効果、③燃料10kgペナルティ＆2026年MGU-K 350kW Manual Override特性、④勝負コーナー＆2画面Pop-out起動を1カードに凝縮。
+- **OpenF1 × Jolpica ハイブリッド速報・確定リザルトエンジン (`lib/sessionResultsService.ts`, `lib/openf1LiveResult.ts`, `components/hubs/SeasonHub.tsx`)**:
+  - 決勝・予選終了直後で Jolpica API が未反映の時間帯でもエラーにせず、OpenF1 API から全20台の順位・ギャップ・周回数を取得して `PROVISIONAL (OpenF1速報)` バッジ付きで即座に表示し、Jolpica / FIA 公式分類確認後に `OFFICIAL (FIA確定)` へ自動昇格する Graceful Degradation を実装。
+
+### Changed
+- **巨大歴史リザルトデータの年別JSONチャンク分割と動的プリロード (`data/f1HistoricalResultsData.ts`, `data/chunks/historical/results-2018.json`〜`results-2025.json`)**:
+  - 92,468行（約2.42MB）あった単一TypeScriptファイル `data/f1HistoricalResultsData.ts` を125行の軽量ローダー＋年別JSONチャンク（`2018`〜`2025`）へ分割し、動的 `import()` によるオンデマンド読み込みへ移行。`tsc` 型チェック速度と初回バンドルサイズを劇的に改善。
+- **タイポグラフィ引き上げとモバイル折り返し防止 (`components/hubs/SeasonHub.tsx`, `components/hubs/race-simulator/panels/TimingTowerPanel.tsx`, `app/page.tsx`)**:
+  - `text-[9px]` / `text-[10px]` を最小 `11px`（`text-[11px]` / `text-xs`）へ引き上げるとともに、タイミングタワーやテレメトリー数値・時刻表示に `tabular-nums whitespace-nowrap` を徹底適用してモバイル幅での数値折り返し崩れを防止。
+
+### Removed
+- **未使用デッドコードの完全撤去**:
+  - どこからも参照されていなかった `lib/f1GrandPrixCatalog.ts`, `lib/dataSourceRegistry.ts`, `data/f1SprintHistoryData.ts`, `components/ads/PitwallProUpgradeModal.tsx` を削除。
+
+### Fixed
+- **全コンポーネントの ESLint `react-hooks/exhaustive-deps` 警告ゼロ化**:
+  - `KnowledgeHistoryHub.tsx`, `TimingTowerPanel.tsx`, `RaceSimulatorHub.tsx`, `LiveTrackGpsRadar.tsx`, `F1QuizModal.tsx`, `VirtualGrandPrixSimulator.tsx`, `PaddockLiveAtmosphere.tsx`, `DriverComparisonTool.tsx` の全 Hook 依存配列警告を解消。
+
 ## [v3.1.0] - 2026-10-14
 ### Added
 - **前回大会確認セクション（Previous Race Summary）の完全復旧と機能拡張 (`components/hubs/SeasonHub.tsx`)**:

@@ -2,6 +2,22 @@
 
 本ドキュメントは、プロジェクト「F1 Telemetry Intelligence Portal (`f1-telemetry-next`)」におけるアーキテクチャ設計、UI/UXレイアウト、データ仕様、および運用方針に関する意思決定の背景・理由・却下代替案を記録する永続ログである。
 
+## [2026-10-14] マスターメンテナンス＆進化計画（v3.2.0：巨大データJSONチャンク分割・インラインワークスペース化・BroadcastChannel 2画面同期・OpenF1×Jolpica Graceful Degradation）
+- **決定事項 (Decision)**:
+  1. **巨大データ（`data/f1HistoricalResultsData.ts` 92,468行）の年別JSONチャンク分割と動的 `import()`**: 2018〜2025年の全セッションリザルトを `data/chunks/historical/results-YYYY.json` に分離し、`preloadHistoricalSeasonResults(year)` でオンデマンド取得する方式へ変更。
+  2. **透過モーダル乱用の廃止とインライン・マスターディテール・ワークスペース＋2画面Pop-out同期 (`SeasonHub.tsx`, `lib/pitwallBroadcastSync.ts`)**:
+     - SEASONハブでのリザルト・無線振り返り・3Dコースガイド表示を、`fixed inset-0` の全画面透過モーダルからページ内インライン展開ワークスペース（`inlineMode={true}`）へ移行。
+     - インラインタブ切替時はブラウザ履歴を汚染しないよう `router.replace(..., { scroll: false })` を使用。
+     - 別ウィンドウ（`/popout/telemetry`）は初期URLクエリ＋`BroadcastChannel('padoroku_pitwall_sync')` の `REQUEST_STATE` ➔ `SYNC_STATE` ハンドシェイクにより、開いた瞬間から親ウィンドウの選択サーキット・ドライバーと完全同期。
+  3. **OpenF1 × Jolpica タイムラグ対策（Graceful Degradation）**: レース終了直後で Jolpica API が未反映の時間帯は、OpenF1 API からリザルトを取得して `PROVISIONAL（OpenF1速報）` バッジ付きで表示し、Jolpica 反映後に `OFFICIAL（FIA確定）` へ昇格。
+  4. **タイポグラフィ引き上げ時のレイアウト保護**: `text-[9px]` / `text-[10px]` を `11px` 以上へ引き上げる際、モバイル幅でのタイミングタワーや数値が折り返さないよう `tabular-nums whitespace-nowrap` を組み合わせる。
+- **背景・理由 (Rationale)**:
+  1. 92,468行の単一TSファイルが `tsc` のメモリ・CPU負荷と初回バンドル肥大化の主因となっていたため。
+  2. 画面の上に半透明モーダルが何重にも重なるUIは視認性と操作性を損ねるため、1画面完結のインライン展開と、2画面（マルチモニター）観戦用のPop-outウィンドウに役割を明確に分離した。
+  3. レース終了直後の最もアクセスが集中する時間帯に「Jolpica未反映＝エラー」とせず、OpenF1速報値を透明性をもって即座に提示するため。
+- **却下した代替案 (Rejected Alternatives)**:
+  - 「インラインタブ切替に `router.push` を使う案」: ブラウザの「戻る」ボタンを何回も押さないと前のページに戻れなくなる履歴汚染を招くため却下し、`router.replace(..., { scroll: false })` を採用。
+
 ## [2026-10-14] クライアントハイドレーション復旧・単一メインコンテナ化・前回大会リザルト常時表示とVercelブランチ同期
 - **決定事項 (Decision)**:
   1. **単一 `<main>` コンテナへの統合 (`app/page.tsx`)**: デスクトップ（`lg+`）とモバイル（`<lg`）で別々に `{mainHubContent}` を描画していた構造を廃止し、単一のレスポンシブ `<main>` 内で1回のみマウントする設計に変更。

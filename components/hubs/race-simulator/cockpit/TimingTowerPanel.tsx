@@ -31,7 +31,7 @@ export const TimingTowerPanel: React.FC<TimingTowerPanelProps> = ({
   activeScenario,
   lapProgressPct,
 }) => {
-  const allCars = currentSnapshot?.cars || [];
+  const allCars = React.useMemo(() => currentSnapshot?.cars || [], [currentSnapshot?.cars]);
 
   const sortedCars = React.useMemo(() => {
     return [...allCars].sort((a, b) => {
@@ -44,7 +44,6 @@ export const TimingTowerPanel: React.FC<TimingTowerPanelProps> = ({
   const renderCarCard = (car: typeof allCars[0], idx: number) => {
     const isTarget = car.code === activeScenario.playerConfig.code;
     const isTeammate = car.code === activeScenario.teammateConfig.code;
-    const tyreProp = TYRE_PROPERTIES[car.tyreCompound];
     const isOvrWindow = car.position > 1 && car.gapToAhead <= 1.0;
     const isRetired = !!car.isRetired;
 
@@ -61,7 +60,7 @@ export const TimingTowerPanel: React.FC<TimingTowerPanelProps> = ({
     return (
       <div
         key={`${car.code}-${car.position}-${idx}`}
-        className={`px-1.5 py-1 rounded-lg flex items-center justify-between text-xs transition-all ${
+        className={`px-1.5 py-1 rounded-lg flex items-center justify-between text-xs transition-all whitespace-nowrap ${
           isRetired
             ? 'opacity-40 bg-slate-950/40 text-slate-500 border border-transparent'
             : isTarget
@@ -73,7 +72,7 @@ export const TimingTowerPanel: React.FC<TimingTowerPanelProps> = ({
       >
         {/* Left: Position, Team Stripe, Driver Code (Large), Target/Teammate Tag */}
         <div className="flex items-center gap-1.5 min-w-0">
-          <span className="w-[18px] text-right font-racing font-bold text-[10px] text-slate-400 tracking-tight shrink-0">
+          <span className="w-[18px] text-right font-racing font-bold text-[11px] text-slate-400 tracking-tight tabular-nums whitespace-nowrap shrink-0">
             {isRetired ? '-' : car.position}
           </span>
           <div
@@ -82,7 +81,7 @@ export const TimingTowerPanel: React.FC<TimingTowerPanelProps> = ({
           />
           <div className="flex items-center gap-1 flex-nowrap shrink-0">
             <span
-              className={`font-mono font-black text-[12px] tracking-tight ${
+              className={`font-mono font-black text-xs tracking-tight whitespace-nowrap ${
                 isRetired ? 'text-slate-500 line-through' : 'text-white'
               }`}
             >
@@ -92,11 +91,11 @@ export const TimingTowerPanel: React.FC<TimingTowerPanelProps> = ({
         </div>
 
         {/* Right: OVR, Tyre Compound, Gap / PIT / OUT */}
-        <div className="flex items-center gap-1 font-mono shrink-0">
+        <div className="flex items-center gap-1 font-mono shrink-0 whitespace-nowrap tabular-nums">
           {/* 2026 Manual Override Mode (OVR) Indicator */}
           {!isRetired && isOvrWindow && !car.isPitting && (
             <span
-              className="text-[7px] font-mono font-bold text-cyan-400/80 shrink-0 leading-none"
+              className="text-[11px] font-mono font-bold text-cyan-400/80 shrink-0 leading-none whitespace-nowrap"
               title="Manual Override Mode (2026年規定: 1秒以内追従時350kW電力ブースト)"
             >
               OVR
@@ -105,9 +104,9 @@ export const TimingTowerPanel: React.FC<TimingTowerPanelProps> = ({
 
           {/* Official Pirelli Tyre Badge & Age */}
           {!isRetired && (
-            <div className="flex items-center gap-0.5 shrink-0 font-mono">
+            <div className="flex items-center gap-0.5 shrink-0 font-mono whitespace-nowrap">
               <span
-                className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[7.5px] font-black leading-none shadow-sm ${
+                className={`w-4 h-4 rounded-full flex items-center justify-center text-[11px] font-black leading-none shadow-sm ${
                   car.tyreCompound === 'SOFT'
                     ? 'bg-[#FF1801] text-white'
                     : car.tyreCompound === 'MEDIUM'
@@ -122,36 +121,36 @@ export const TimingTowerPanel: React.FC<TimingTowerPanelProps> = ({
               >
                 {car.tyreCompound[0]}
               </span>
-              <span className="text-[8px] text-slate-400 font-bold tabular-nums">
+              <span className="text-[11px] text-slate-400 font-bold tabular-nums whitespace-nowrap">
                 {car.tyreAge}
               </span>
             </div>
           )}
 
           {/* Gap / Interval / PIT / OUT Column */}
-          <div className="text-right min-w-[36px]">
+          <div className="text-right min-w-[40px] whitespace-nowrap tabular-nums">
             {isRetired ? (
-              <span className="px-1.5 py-0.2 rounded bg-rose-950/80 border border-rose-500/40 text-rose-300 text-[7.5px] font-mono font-extrabold tracking-wider inline-block">
+              <span className="px-1.5 py-0.5 rounded bg-rose-950/80 border border-rose-500/40 text-rose-300 text-[11px] font-mono font-extrabold tracking-wider inline-block whitespace-nowrap">
                 OUT
               </span>
             ) : isCarInPit ? (
-              <span className="px-1 py-0.2 rounded bg-amber-500 text-slate-950 text-[7.5px] font-mono font-extrabold tracking-wider animate-pulse inline-block">
+              <span className="px-1 py-0.5 rounded bg-amber-500 text-slate-950 text-[11px] font-mono font-extrabold tracking-wider animate-pulse inline-block whitespace-nowrap">
                 PIT
               </span>
             ) : isCarOut ? (
-              <span className="px-1 py-0.2 rounded bg-emerald-500 text-slate-950 text-[7.5px] font-mono font-extrabold tracking-wider inline-block">
+              <span className="px-1 py-0.5 rounded bg-emerald-500 text-slate-950 text-[11px] font-mono font-extrabold tracking-wider inline-block whitespace-nowrap">
                 OUT
               </span>
             ) : isCarInLap ? (
-              <span className="px-1 py-0.2 rounded bg-amber-600/90 text-amber-100 text-[7.5px] font-mono font-extrabold tracking-wider inline-block">
+              <span className="px-1 py-0.5 rounded bg-amber-600/90 text-amber-100 text-[11px] font-mono font-extrabold tracking-wider inline-block whitespace-nowrap">
                 IN-LAP
               </span>
             ) : timingTowerMode === 'gap' ? (
-              <span className="font-bold text-white text-[10.5px] sm:text-[11px] tabular-nums font-mono tracking-tight leading-none">
+              <span className="font-bold text-white text-[11px] tabular-nums whitespace-nowrap font-mono tracking-tight leading-none">
                 {car.position === 1 ? 'LEAD' : `+${car.gapToLeader.toFixed(1)}`}
               </span>
             ) : (
-              <span className="font-bold text-white text-[10.5px] sm:text-[11px] tabular-nums font-mono tracking-tight leading-none">
+              <span className="font-bold text-white text-[11px] tabular-nums whitespace-nowrap font-mono tracking-tight leading-none">
                 {car.position === 1 ? 'LEAD' : `Δ${car.gapToAhead.toFixed(1)}`}
               </span>
             )}

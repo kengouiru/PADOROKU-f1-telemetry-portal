@@ -67,8 +67,9 @@ import type { TelemetryTarget } from '@/data/f1KnowledgeData';
 import { GLOSSARY_TERMS } from '@/data/f1GlossaryData';
 import type { NavAction } from '@/components/AIStrategist';
 import AITelemetryInspectorModal from '@/components/telemetry/AITelemetryInspectorModal';
-import { Flag, Activity, Newspaper, BookOpen, Gamepad2, Clock, Search, Trophy } from 'lucide-react';
+import { Flag, Activity, Newspaper, BookOpen, Gamepad2, Clock, Search, Trophy, ExternalLink } from 'lucide-react';
 import { useCurrentJstClock } from '@/lib/systemClock';
+import { broadcastPitwallState, openPitwallPopoutWindow } from '@/lib/pitwallBroadcastSync';
 
 import AuthButton from '@/components/auth/AuthButton';
 import AuthModal from '@/components/auth/AuthModal';
@@ -248,6 +249,16 @@ export default function DashboardPage() {
       }
     } catch (_) {}
   }, []);
+
+  // WHY: Guardrail 2 — Keep any open Pop-out Telemetry window synchronized when TELEMETRY params change
+  useEffect(() => {
+    broadcastPitwallState({
+      circuitId: detailedTelemetryParams.circuitId,
+      driver1: detailedTelemetryParams.driver1,
+      driver2: detailedTelemetryParams.driver2,
+      seasonYear: state.selectedYear,
+    });
+  }, [detailedTelemetryParams, state.selectedYear]);
 
   const handleRequireAuth = useCallback((title?: string, description?: string) => {
     setAuthModalConfig({
@@ -868,7 +879,7 @@ export default function DashboardPage() {
                 <span className="text-base">🤖</span>
                 <h4 className="font-racing font-bold text-xs sm:text-sm text-white flex items-center gap-2">
                   <span>{activeAiGuidance.title}</span>
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                  <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 whitespace-nowrap">
                     AIアドバイス保持中
                   </span>
                 </h4>
@@ -888,30 +899,19 @@ export default function DashboardPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    if (typeof window === 'undefined') return;
-                    const params = new URLSearchParams();
-                    if (detailedTelemetryParams.circuitId) params.set('circuit', detailedTelemetryParams.circuitId);
-                    if (detailedTelemetryParams.driver1) params.set('d1', detailedTelemetryParams.driver1);
-                    if (detailedTelemetryParams.driver2) params.set('d2', detailedTelemetryParams.driver2);
-                    if (activeAiGuidance.content) params.set('notes', activeAiGuidance.content);
-
-                    const url = `/popout/telemetry?${params.toString()}`;
-                    const width = 1280;
-                    const height = 850;
-                    const left = Math.max(0, Math.round((window.screen.width - width) / 2));
-                    const top = Math.max(0, Math.round((window.screen.height - height) / 2));
-
-                    window.open(
-                      url,
-                      'F1TelemetryInspectorPopout',
-                      `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,resizable=yes,scrollbars=yes`
-                    );
-                  }}
-                  className="text-[11px] font-racing font-bold px-2.5 py-1 rounded-lg bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 hover:border-purple-300 text-purple-200 hover:text-white transition-colors cursor-pointer shadow-sm flex items-center gap-1"
-                  title="テレメトリーを別ウィンドウで分離して開く（マルチモニター・デュアルディスプレイ対応）"
+                  onClick={() =>
+                    openPitwallPopoutWindow({
+                      circuitId: detailedTelemetryParams.circuitId,
+                      driver1: detailedTelemetryParams.driver1,
+                      driver2: detailedTelemetryParams.driver2,
+                      notes: activeAiGuidance.content,
+                      seasonYear: state.selectedYear,
+                    })
+                  }
+                  className="text-[11px] font-racing font-bold px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-white/20 text-slate-200 hover:text-white transition-colors cursor-pointer shadow-sm flex items-center gap-1 whitespace-nowrap"
+                  title="テレメトリーを別ウィンドウで分離して開く（BroadcastChannelマルチモニター同期対応）"
                 >
-                  <span>↗</span>
+                  <ExternalLink className="w-3 h-3 text-red-400" />
                   <span className="hidden sm:inline">別ウィンドウ</span>
                 </button>
                 <button
@@ -941,7 +941,7 @@ export default function DashboardPage() {
             {/* Clickable Relevant Term Chips */}
             {relevantTerms.length > 0 && (
               <div className="flex flex-wrap items-center gap-1.5 pt-1.5 border-t border-white/10 mt-1">
-                <span className="text-[10px] font-racing font-bold text-sky-400 flex items-center gap-1 flex-shrink-0">
+                <span className="text-[11px] font-racing font-bold text-sky-400 flex items-center gap-1 flex-shrink-0">
                   <span>💡</span>
                   <span>解説内の重要用語:</span>
                 </span>
@@ -953,7 +953,7 @@ export default function DashboardPage() {
                       setQuickGlossaryQuery(term.term.split(' ')[0]);
                       setQuickGlossaryOpen(true);
                     }}
-                    className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold bg-slate-800/90 hover:bg-emerald-950/90 text-slate-300 hover:text-emerald-300 border border-white/10 hover:border-emerald-500/40 transition-all flex items-center gap-1 cursor-pointer shadow-sm active:scale-95"
+                    className="px-2 py-0.5 rounded-lg text-[11px] font-mono font-bold bg-slate-800/90 hover:bg-emerald-950/90 text-slate-300 hover:text-emerald-300 border border-white/10 hover:border-emerald-500/40 transition-all flex items-center gap-1 cursor-pointer shadow-sm active:scale-95 whitespace-nowrap"
                   >
                     <span>🧠</span>
                     <span>{term.term.split(' ')[0]}</span>
@@ -969,10 +969,10 @@ export default function DashboardPage() {
       {telemetrySubTab === 'pace' && (
         <div className="space-y-3 sm:space-y-4 animate-fade-in">
           <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-base">📈</span>
               <h2 className="f1-card-title text-white">PACE & POSITION ANALYSIS</h2>
-              <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+              <span className="text-[11px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
                 ラップタイム推移・累積ギャップ・周回順位変動
               </span>
             </div>
@@ -1025,13 +1025,29 @@ export default function DashboardPage() {
       {telemetrySubTab === 'car_data' && (
         <div className="space-y-3 sm:space-y-4 animate-fade-in">
           <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-base">⚡</span>
               <h2 className="f1-card-title text-white">COCKPIT CAR TELEMETRY</h2>
-              <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+              <span className="text-[11px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
                 車速・ペダル・ギア3連精密比較 ＆ コースマップ・デルタマトリクス
               </span>
             </div>
+            <button
+              type="button"
+              onClick={() =>
+                openPitwallPopoutWindow({
+                  circuitId: detailedTelemetryParams.circuitId,
+                  driver1: detailedTelemetryParams.driver1,
+                  driver2: detailedTelemetryParams.driver2,
+                  seasonYear: state.selectedYear,
+                })
+              }
+              className="px-3 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-white/15 text-[11px] font-mono font-bold flex items-center gap-1.5 transition-colors cursor-pointer whitespace-nowrap"
+              title="2画面観戦用の独立テレメトリーウィンドウを開く（BroadcastChannel自動同期）"
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-red-400" />
+              <span>2画面Pop-out ↗</span>
+            </button>
           </div>
 
           <section id="detailed-telemetry-section">
@@ -1068,10 +1084,10 @@ export default function DashboardPage() {
       {telemetrySubTab === 'strategy' && (
         <div className="space-y-3 sm:space-y-4 animate-fade-in">
           <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-base">🛞</span>
               <h2 className="f1-card-title text-white">TYRE STINTS & PIT STRATEGY</h2>
-              <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+              <span className="text-[11px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
                 全車タイヤ履歴 ＆ 戦略シミュレーション
               </span>
             </div>
@@ -1116,10 +1132,10 @@ export default function DashboardPage() {
       {telemetrySubTab === 'radio' && (
         <div className="space-y-3 sm:space-y-4 animate-fade-in">
           <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-base">📻</span>
               <h2 className="f1-card-title text-white">TEAM RADIO & RACE CONTROL</h2>
-              <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+              <span className="text-[11px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
                 無線音声・リアルタイムAI戦術翻訳 ＆ FIA審理速報
               </span>
             </div>
@@ -1146,10 +1162,10 @@ export default function DashboardPage() {
       {telemetrySubTab === 'laptable' && (
         <div className="space-y-3 sm:space-y-4 animate-fade-in">
           <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-white/10">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-base">📋</span>
               <h2 className="f1-card-title text-white">LAP-BY-LAP DATA SHEET</h2>
-              <span className="text-[10px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
+              <span className="text-[11px] font-mono text-slate-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">
                 全周回ラップタイム・セクター別スプリット・ピット詳細データ
               </span>
             </div>

@@ -436,7 +436,7 @@ export default function LiveTrackGpsRadar({
       });
 
     return [...activeList, ...retiredList];
-  }, [cars, leaderPct, baseLapTime, getExactTrackPoint, pitLaneGeometry, playerCarCode, teammateCarCode, currentLap, isSC, isScEnding]);
+  }, [cars, leaderPct, baseLapTime, getExactTrackPoint, pitLaneGeometry, playerCarCode, teammateCarCode, currentLap, isSC]);
 
   // Find player car position and progress
   const playerCarData = useMemo(() => {
